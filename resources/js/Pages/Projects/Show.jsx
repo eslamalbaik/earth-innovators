@@ -229,7 +229,7 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
                                     <p className="text-sm text-gray-600 mb-1">المعلم</p>
                                     <p className="font-medium text-gray-900 flex items-center gap-2">
                                         <FaGraduationCap className="text-blue-600" />
-                                        {project.teacher.name || 'غير محدد'}
+                                        {project.teacher.name_ar || project.teacher.user?.name || 'غير محدد'}
                                     </p>
                                 </div>
                             )}

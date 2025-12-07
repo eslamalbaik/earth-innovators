@@ -112,7 +112,7 @@ export default function ProjectsIndex({ auth, projects, userRole }) {
                                             {project.teacher ? (
                                                 <>
                                                     <FaGraduationCap className="text-gray-400" />
-                                                    <span>{project.teacher.name || 'معلم'}</span>
+                                                    <span>{project.teacher.name_ar || project.teacher.user?.name || 'معلم'}</span>
                                                 </>
                                             ) : (
                                                 <>

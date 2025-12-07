@@ -30,6 +30,7 @@ class SchoolPublicationController extends Controller
             10
         );
 
+        // Accessor in Model handles image path normalization automatically
         $stats = $this->publicationService->getSchoolPublicationStats($user->id);
 
         return Inertia::render('School/Publications/Index', [
@@ -50,6 +51,7 @@ class SchoolPublicationController extends Controller
 
         $publications = $this->publicationService->getSchoolPendingPublications($user->id, 10);
 
+        // Accessor in Model handles image path normalization automatically
         return Inertia::render('School/Publications/Pending', [
             'publications' => $publications,
         ]);
@@ -76,6 +78,10 @@ class SchoolPublicationController extends Controller
         $data['status'] = 'approved';
         $data['approved_by'] = $user->id;
         $data['approved_at'] = now();
+        // تعيين اسم الناشر تلقائياً باسم المدرسة
+        $data['publisher_name'] = $user->name;
+        // تعيين تاريخ النشر تلقائياً
+        $data['publish_date'] = now()->toDateString();
 
         // Handle file uploads
         if ($request->hasFile('cover_image')) {
@@ -86,16 +92,59 @@ class SchoolPublicationController extends Controller
             $data['file'] = $request->file('file');
         }
 
-        $publication = $this->publicationService->createPublication($data);
+        try {
+            $publication = $this->publicationService->createPublication($data);
 
-        // إرسال إشعار لجميع الطلاب والمعلمين في المدرسة عند نشر المقال مباشرة
-        if ($publication->status === 'approved') {
-            \App\Jobs\SendNewPublicationNotification::dispatch($publication);
+            // إرسال إشعار لجميع الطلاب والمعلمين في المدرسة عند نشر المقال مباشرة
+            if ($publication->status === 'approved') {
+                // إرسال مباشر بدون queue لضمان وصول الإشعارات فوراً
+                try {
+                    $publication->refresh();
+                    $publication->load(['author', 'school']);
+                    
+                    if ($publication->school_id) {
+                        $users = \App\Models\User::where('school_id', $publication->school_id)
+                            ->whereIn('role', ['student', 'teacher'])
+                            ->get();
+                        
+                        foreach ($users as $user) {
+                            try {
+                                $user->notify(new \App\Notifications\NewPublicationNotification($publication));
+                            } catch (\Exception $e) {
+                                \Log::error('Failed to send publication notification to user', [
+                                    'user_id' => $user->id,
+                                    'publication_id' => $publication->id,
+                                    'error' => $e->getMessage(),
+                                ]);
+                            }
+                        }
+                        
+                        \Log::info('Publication notifications sent', [
+                            'publication_id' => $publication->id,
+                            'users_count' => $users->count(),
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Failed to send publication notifications', [
+                        'publication_id' => $publication->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                    // لا نوقف العملية إذا فشل إرسال الإشعارات
+                }
+            }
+
+            return redirect()
+                ->route('school.publications.index')
+                ->with('success', 'تم نشر المقال بنجاح!');
+        } catch (\Exception $e) {
+            \Log::error('Error creating publication: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return back()
+                ->withErrors(['error' => 'حدث خطأ أثناء إنشاء المقال: ' . $e->getMessage()])
+                ->withInput();
         }
-
-        return redirect()
-            ->route('school.publications.index')
-            ->with('success', 'تم نشر المقال بنجاح!');
     }
 
     /**
@@ -161,6 +210,7 @@ class SchoolPublicationController extends Controller
 
         $publication->load(['author', 'school']);
 
+        // Accessor in Model handles image path normalization automatically
         return Inertia::render('School/Publications/Show', [
             'publication' => $publication,
         ]);
@@ -178,6 +228,7 @@ class SchoolPublicationController extends Controller
             abort(403);
         }
 
+        // Accessor in Model handles image path normalization automatically
         return Inertia::render('School/Publications/Edit', [
             'publication' => $publication,
         ]);
@@ -196,7 +247,7 @@ class SchoolPublicationController extends Controller
         }
 
         $validated = $request->validate([
-            'type' => 'required|in:magazine,booklet,report',
+            'type' => 'required|in:magazine,booklet,report,article',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'content' => 'nullable|string',
@@ -223,11 +274,25 @@ class SchoolPublicationController extends Controller
             $validated['file'] = $request->file('file')->store('publications/files', 'public');
         }
 
-        $publication->update($validated);
+        try {
+            $publication->update($validated);
 
-        return redirect()
-            ->route('school.publications.index')
-            ->with('success', 'تم تحديث المقال بنجاح!');
+            // Clear cache
+            $this->publicationService->clearPublicationCache($publication->school_id, $publication->author_id);
+
+            return redirect()
+                ->route('school.publications.index')
+                ->with('success', 'تم تحديث المقال بنجاح!');
+        } catch (\Exception $e) {
+            \Log::error('Error updating publication: ' . $e->getMessage(), [
+                'publication_id' => $publication->id,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return back()
+                ->withErrors(['error' => 'حدث خطأ أثناء تحديث المقال: ' . $e->getMessage()])
+                ->withInput();
+        }
     }
 
     /**
@@ -242,18 +307,21 @@ class SchoolPublicationController extends Controller
             abort(403);
         }
 
-        // حذف الصور والملفات
-        if ($publication->cover_image) {
-            Storage::disk('public')->delete($publication->cover_image);
-        }
-        if ($publication->file) {
-            Storage::disk('public')->delete($publication->file);
-        }
+        try {
+            // Use service to delete (handles file deletion and cache clearing)
+            $this->publicationService->deletePublication($publication);
 
-        $publication->delete();
+            return redirect()
+                ->route('school.publications.index')
+                ->with('success', 'تم حذف المقال بنجاح!');
+        } catch (\Exception $e) {
+            \Log::error('Error deleting publication: ' . $e->getMessage(), [
+                'publication_id' => $publication->id,
+                'trace' => $e->getTraceAsString(),
+            ]);
 
-        return redirect()
-            ->route('school.publications.index')
-            ->with('success', 'تم حذف المقال بنجاح!');
+            return back()
+                ->withErrors(['error' => 'حدث خطأ أثناء حذف المقال: ' . $e->getMessage()]);
+        }
     }
 }

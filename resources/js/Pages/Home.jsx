@@ -5,15 +5,15 @@ import HeroSection from '../Components/Sections/HeroSection';
 import WhyChooseSection from '../Components/Sections/WhyChooseSection';
 import CTABannerSection from '../Components/Sections/CTABannerSection';
 import PlatformFeaturesSection from '../Components/Sections/PlatformFeaturesSection';
-import SubjectsSection from '../Components/Sections/SubjectsSection';
-import TeachersSection from '../Components/Sections/TeachersSection';
+import ProjectsSection from '../Components/Sections/ProjectsSection';
+import UAESchoolsSection from '../Components/Sections/UAESchoolsSection';
 import TeacherRecruitmentSection from '../Components/Sections/TeacherRecruitmentSection';
 import TestimonialsSection from '../Components/Sections/TestimonialsSection';
 import FAQSection from '../Components/Sections/FAQSection';
 import CTASection from '../Components/Sections/CTASection';
 import PublicationsSection from '../Components/Sections/PublicationsSection';
 
-export default function Home({ auth, cities = [], subjects = [], featuredTeachers = [], testimonials = [], stats = [], featuredPublications = [] }) {
+export default function Home({ auth, cities = [], subjects = [], featuredTeachers = [], testimonials = [], stats = [], featuredPublications = [], featuredProjects = [], uaeSchools = [] }) {
     const [openFAQ, setOpenFAQ] = useState(null);
 
     const toggleFAQ = (index) => {
@@ -58,18 +58,11 @@ export default function Home({ auth, cities = [], subjects = [], featuredTeacher
         router.visit('/projects');
     };
 
-    const handleSubjectClick = (subject) => {
-        const subjectName = subject.name_ar || subject.name || subject.name_en;
-        router.get('/projects', { category: subjectName });
-    };
-
-    const handleTeacherClick = (teacher) => {
-        if (teacher && teacher.id) {
-            router.visit(`/projects/${teacher.id}`);
-        }
-    };
-
     const handleViewAllTeachers = () => {
+        router.visit('/projects');
+    };
+
+    const handleViewAllProjects = () => {
         router.visit('/projects');
     };
 
@@ -95,15 +88,13 @@ export default function Home({ auth, cities = [], subjects = [], featuredTeacher
 
             <PlatformFeaturesSection />
 
-            <SubjectsSection
-                subjects={subjects}
-                onSubjectClick={handleSubjectClick}
+            <ProjectsSection
+                projects={featuredProjects}
+                onViewAllProjects={handleViewAllProjects}
             />
 
-            <TeachersSection
-                teachers={featuredTeachers}
-                onTeacherClick={handleTeacherClick}
-                onViewAllTeachers={handleViewAllTeachers}
+            <UAESchoolsSection
+                schools={uaeSchools}
             />
 
             <TeacherRecruitmentSection onJoinClick={handleJoinTeacher} />

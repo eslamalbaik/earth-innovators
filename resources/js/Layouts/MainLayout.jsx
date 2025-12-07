@@ -32,7 +32,7 @@ export default function MainLayout({ children, auth }) {
                                 <img
                                     src="/images/logo-modified.png"
                                     alt="إرث المبتكرين - Innovators Legacy"
-                                    className="h-12 w-auto object-contain"
+                                    className="h-8 w-auto object-contain"
                                 />
                               <p className="text-white text-2xl font-bold">إرث المبتكرين</p>
                             </Link>

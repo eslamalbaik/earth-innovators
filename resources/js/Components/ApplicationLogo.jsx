@@ -1,4 +1,4 @@
-export default function ApplicationLogo(props) {
+export default function ApplicationLogo() {
     return (
         <img
             src="/images/logo-modified.png"

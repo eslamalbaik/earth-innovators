@@ -7,8 +7,10 @@ use App\Models\UserBadge;
 use App\Repositories\BadgeRepository;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\URL;
 
 class BadgeService extends BaseService
@@ -163,8 +165,8 @@ class BadgeService extends BaseService
             ->where('badge_id', $badgeId)
             ->exists();
 
-        $awardedById = $awardedBy ?? auth()->id();
-        
+        $awardedById = $awardedBy ?? (Auth::check() ? Auth::id() : null);
+
         $userBadge = UserBadge::updateOrCreate(
             [
                 'user_id' => $userId,
@@ -184,7 +186,7 @@ class BadgeService extends BaseService
             $student = \App\Models\User::find($userId);
             $badge = Badge::find($badgeId);
             $awardedByUser = \App\Models\User::find($awardedById);
-            
+
             if ($student && $badge && $awardedByUser) {
                 \App\Jobs\SendBadgeAwardedNotification::dispatch($student, $badge, $awardedByUser);
             }
@@ -200,7 +202,7 @@ class BadgeService extends BaseService
         return $userBadge;
     }
 
-    public function getUserBadges(int $userId): Collection
+    public function getUserBadges(int $userId): SupportCollection
     {
         $cacheKey = "user_badges_{$userId}";
         $cacheTag = "student_badges_{$userId}";
@@ -216,7 +218,7 @@ class BadgeService extends BaseService
                         $userBadge->badge->icon = $this->formatBadgeImageUrl($userBadge->badge->icon);
                         $userBadge->badge->image = $this->formatBadgeImageUrl($userBadge->badge->image);
                     }
-                    
+
                     return [
                         'id' => $userBadge->id,
                         'badge_id' => $userBadge->badge_id,

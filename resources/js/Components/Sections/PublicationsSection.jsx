@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import SectionTitle from '../SectionTitle';
 import { FaBook, FaFileAlt, FaHeart, FaArrowLeft } from 'react-icons/fa';
+import { getPublicationImageUrl } from '../../utils/imageUtils';
 
 export default function PublicationsSection({
     title = "الإصدارات",
@@ -71,11 +72,7 @@ export default function PublicationsSection({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {publications.slice(0, 2).map((publication) => {
                         const TypeIcon = getTypeIcon(publication.type);
-                        const coverImage = publication.cover_image 
-                            ? (publication.cover_image.startsWith('http') 
-                                ? publication.cover_image 
-                                : `/storage/${publication.cover_image}`)
-                            : '/images/default-publication.jpg';
+                        const coverImage = getPublicationImageUrl(publication.cover_image);
 
                         return (
                             <div key={publication.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition">

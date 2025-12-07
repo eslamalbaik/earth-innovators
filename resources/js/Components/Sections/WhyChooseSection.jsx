@@ -17,7 +17,7 @@ export default function WhyChooseSection({
                             <img
                                 src={imageSrc}
                                 alt={imageAlt}
-                                className="w-full max-w-md h-auto"
+                                className="w-full max-w-xl h-auto"
                             />
                         </div>
                     </div>

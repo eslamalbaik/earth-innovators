@@ -6,15 +6,19 @@ import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
+import { useToast } from '@/Contexts/ToastContext';
 
 export default function EditSchoolProject({ auth, project }) {
-    const { data, setData, post, processing, errors } = useForm({
+    const { showSuccess } = useToast();
+    const { data, setData, put, processing, errors, transform } = useForm({
         title: project?.title || '',
         description: project?.description || '',
         category: project?.category || 'other',
         files: [],
         images: [],
         report: project?.report || '',
+        existing_files: [],
+        existing_images: [],
     });
 
     const [fileList, setFileList] = useState([]);
@@ -24,6 +28,7 @@ export default function EditSchoolProject({ auth, project }) {
     const [dragActive, setDragActive] = useState(false);
     const fileInputRef = useRef(null);
     const imageInputRef = useRef(null);
+    const submitDataRef = useRef(null);
 
     useEffect(() => {
         // تحميل الصور والملفات الموجودة
@@ -40,33 +45,38 @@ export default function EditSchoolProject({ auth, project }) {
         const validFiles = fileArray.filter(file => {
             const maxSize = 10 * 1024 * 1024;
             const validTypes = [
-                'application/pdf', 'application/msword', 
+                'application/pdf', 'application/msword',
                 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                 'video/mp4', 'video/avi', 'video/mov',
                 'application/zip', 'application/x-rar-compressed'
             ];
-            
+
             if (file.size > maxSize) {
                 alert(`الملف ${file.name} أكبر من 10 ميجابايت`);
                 return false;
             }
-            
+
             if (!validTypes.includes(file.type)) {
                 alert(`نوع الملف ${file.name} غير مدعوم`);
                 return false;
             }
-            
+
             return true;
         });
 
-        setFileList(prev => [...prev, ...validFiles.map(file => ({
-            file,
-            id: Date.now() + Math.random(),
-            name: file.name,
-            size: file.size,
-        }))]);
+        if (validFiles.length === 0) return;
 
-        setData('files', [...data.files, ...validFiles]);
+        setFileList(prev => {
+            const newItems = validFiles.map(file => ({
+                file,
+                id: Date.now() + Math.random(),
+                name: file.name,
+                size: file.size,
+            }));
+            return [...prev, ...newItems];
+        });
+
+        setData('files', prev => [...prev, ...validFiles]);
     };
 
     const handleImages = (files) => {
@@ -74,67 +84,194 @@ export default function EditSchoolProject({ auth, project }) {
         const validFiles = fileArray.filter(file => {
             const maxSize = 5 * 1024 * 1024;
             const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-            
+
             if (file.size > maxSize) {
                 alert(`الصورة ${file.name} أكبر من 5 ميجابايت`);
                 return false;
             }
-            
+
             if (!validTypes.includes(file.type)) {
                 alert(`نوع الصورة ${file.name} غير مدعوم`);
                 return false;
             }
-            
+
             return true;
         });
 
-        setImageList(prev => [...prev, ...validFiles.map(file => ({
-            file,
-            id: Date.now() + Math.random(),
-            name: file.name,
-            size: file.size,
-            preview: URL.createObjectURL(file),
-        }))]);
+        if (validFiles.length === 0) return;
 
-        setData('images', [...data.images, ...validFiles]);
+        setImageList(prev => {
+            const newItems = validFiles.map(file => ({
+                file,
+                id: Date.now() + Math.random(),
+                name: file.name,
+                size: file.size,
+                preview: URL.createObjectURL(file),
+            }));
+            return [...prev, ...newItems];
+        });
+
+        setData('images', prev => [...prev, ...validFiles]);
     };
 
-    const removeFile = (id) => {
+    const removeFile = (e, id) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
         setFileList(prev => {
             const newList = prev.filter(item => item.id !== id);
-            setData('files', newList.map(item => item.file));
+            const filesToKeep = newList.map(item => item.file);
+            setData('files', filesToKeep);
             return newList;
         });
     };
 
-    const removeImage = (id) => {
+    const removeImage = (e, id) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
         setImageList(prev => {
             const item = prev.find(i => i.id === id);
             if (item && item.preview) {
                 URL.revokeObjectURL(item.preview);
             }
             const newList = prev.filter(item => item.id !== id);
-            setData('images', newList.map(item => item.file));
+            const imagesToKeep = newList.map(item => item.file);
+            setData('images', imagesToKeep);
             return newList;
         });
     };
 
     const removeExistingFile = (index) => {
-        setExistingFiles(prev => prev.filter((_, i) => i !== index));
+        setExistingFiles(prev => {
+            const newFiles = prev.filter((_, i) => i !== index);
+            // تحديث form data أيضاً
+            setData('existing_files', newFiles);
+            return newFiles;
+        });
     };
 
     const removeExistingImage = (index) => {
-        setExistingImages(prev => prev.filter((_, i) => i !== index));
+        setExistingImages(prev => {
+            const newImages = prev.filter((_, i) => i !== index);
+            // تحديث form data أيضاً
+            setData('existing_images', newImages);
+            return newImages;
+        });
+    };
+
+    const handleRemoveExistingFile = (e, index) => {
+        e.preventDefault();
+        e.stopPropagation();
+        removeExistingFile(index);
+    };
+
+    const handleRemoveExistingImage = (e, index) => {
+        e.preventDefault();
+        e.stopPropagation();
+        removeExistingImage(index);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(`/school/projects/${project.id}`, {
-            _method: 'PUT',
+
+        // التحقق من أن البيانات الأساسية موجودة
+        if (!data.title || !data.description || !data.category) {
+            console.error('Missing required fields:', { title: data.title, description: data.description, category: data.category });
+            alert('يرجى ملء جميع الحقول المطلوبة');
+            return;
+        }
+
+        // إنشاء FormData مباشرة لضمان إرسال جميع البيانات بشكل صحيح
+        const formData = new FormData();
+        
+        // إضافة الحقول الأساسية
+        formData.append('title', data.title || '');
+        formData.append('description', data.description || '');
+        formData.append('category', data.category || 'other');
+        if (data.report) {
+            formData.append('report', data.report);
+        }
+
+        // إضافة existing_files - Laravel يتوقع array
+        if (existingFiles && existingFiles.length > 0) {
+            existingFiles.forEach((file, index) => {
+                formData.append(`existing_files[${index}]`, file);
+            });
+        }
+
+        // إضافة existing_images - Laravel يتوقع array
+        if (existingImages && existingImages.length > 0) {
+            existingImages.forEach((image, index) => {
+                formData.append(`existing_images[${index}]`, image);
+            });
+        }
+
+        // إضافة الملفات الجديدة
+        if (data.files && data.files.length > 0) {
+            data.files.forEach((file) => {
+                if (file instanceof File) {
+                    formData.append('files[]', file);
+                }
+            });
+        }
+
+        // إضافة الصور الجديدة
+        if (data.images && data.images.length > 0) {
+            data.images.forEach((image) => {
+                if (image instanceof File) {
+                    formData.append('images[]', image);
+                }
+            });
+        }
+
+        // تسجيل البيانات المرسلة للتشخيص
+        console.log('Sending form data:', {
+            title: data.title,
+            description: data.description,
+            category: data.category,
+            existing_files_count: existingFiles?.length || 0,
+            existing_images_count: existingImages?.length || 0,
+            files_count: data.files?.length || 0,
+            images_count: data.images?.length || 0,
+        });
+
+        // إضافة _method للـ method spoofing (Laravel يتطلب هذا)
+        formData.append('_method', 'PUT');
+
+        // إرسال البيانات باستخدام router.post مع _method: PUT
+        router.post(`/school/projects/${project.id}`, formData, {
             forceFormData: true,
-            preserveScroll: true,
+            preserveScroll: false,
             onSuccess: () => {
+                showSuccess('تم تحديث المشروع بنجاح');
                 router.visit('/school/projects');
+            },
+            onError: (errors) => {
+                console.error('Validation errors:', errors);
+                console.log('Form data sent:', {
+                    title: data.title,
+                    description: data.description,
+                    category: data.category,
+                    existing_files: existingFiles,
+                    existing_images: existingImages,
+                    files_count: data.files?.length || 0,
+                    images_count: data.images?.length || 0,
+                });
+                let errorMessage = 'حدث خطأ أثناء حفظ التعديلات';
+                if (errors.message) {
+                    errorMessage = errors.message;
+                } else if (typeof errors === 'object' && Object.keys(errors).length > 0) {
+                    const firstError = Object.values(errors)[0];
+                    if (Array.isArray(firstError)) {
+                        errorMessage = firstError[0];
+                    } else if (typeof firstError === 'string') {
+                        errorMessage = firstError;
+                    }
+                }
+                alert('خطأ: ' + errorMessage);
             },
         });
     };
@@ -224,7 +361,7 @@ export default function EditSchoolProject({ auth, project }) {
                                             />
                                             <button
                                                 type="button"
-                                                onClick={() => removeExistingImage(index)}
+                                                onClick={(e) => handleRemoveExistingImage(e, index)}
                                                 className="absolute top-2 left-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
                                             >
                                                 <FaTrash className="text-xs" />
@@ -286,7 +423,7 @@ export default function EditSchoolProject({ auth, project }) {
                                             />
                                             <button
                                                 type="button"
-                                                onClick={() => removeImage(item.id)}
+                                                onClick={(e) => removeImage(e, item.id)}
                                                 className="absolute top-2 left-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
                                             >
                                                 <FaTrash className="text-xs" />
@@ -312,7 +449,7 @@ export default function EditSchoolProject({ auth, project }) {
                                             </div>
                                             <button
                                                 type="button"
-                                                onClick={() => removeExistingFile(index)}
+                                                onClick={(e) => handleRemoveExistingFile(e, index)}
                                                 className="text-red-500 hover:text-red-700"
                                             >
                                                 <FaTrash />
@@ -375,7 +512,7 @@ export default function EditSchoolProject({ auth, project }) {
                                             </div>
                                             <button
                                                 type="button"
-                                                onClick={() => removeFile(item.id)}
+                                                onClick={(e) => removeFile(e, item.id)}
                                                 className="text-red-500 hover:text-red-700"
                                             >
                                                 <FaTrash />

@@ -1,13 +1,17 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { FaBook, FaPlus, FaSearch, FaEye, FaEdit, FaTrash, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import TextInput from '@/Components/TextInput';
 import SelectInput from '@/Components/SelectInput';
 import PrimaryButton from '@/Components/PrimaryButton';
 import { toHijriDate } from '@/utils/dateUtils';
+import { useToast } from '@/Contexts/ToastContext';
+import { useEffect } from 'react';
 
 export default function SchoolProjects({ projects, auth }) {
-    const { data, setData, get, delete: deleteProject } = useForm({
+    const { flash } = usePage().props;
+    const { showSuccess } = useToast();
+    const { data, setData, get } = useForm({
         search: '',
         status: '',
         category: '',
@@ -45,13 +49,37 @@ export default function SchoolProjects({ projects, auth }) {
         });
     };
 
-    const handleDelete = (projectId) => {
+    const handleDelete = (projectId, e) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
         if (confirm('هل أنت متأكد من حذف هذا المشروع؟')) {
-            deleteProject(`/school/projects/${projectId}`, {
-                preserveScroll: true,
+            // استخدام router.post مع _method: DELETE للتوافق مع Laravel
+            router.post(`/school/projects/${projectId}`, {
+                _method: 'DELETE',
+            }, {
+                preserveScroll: false,
+                onSuccess: () => {
+                    showSuccess('تم حذف المشروع بنجاح');
+                    // إعادة تحميل قائمة المشاريع بعد الحذف
+                    router.reload({ only: ['projects'] });
+                },
+                onError: (errors) => {
+                    console.error('Delete error:', errors);
+                    alert('حدث خطأ أثناء حذف المشروع');
+                },
             });
         }
     };
+
+    // عرض رسالة النجاح
+    useEffect(() => {
+        if (flash?.success) {
+            showSuccess(flash.success);
+        }
+    }, [flash?.success, showSuccess]);
 
     return (
         <DashboardLayout header="مشاريع المدرسة">
@@ -157,7 +185,7 @@ export default function SchoolProjects({ projects, auth }) {
                                                 <FaEye />
                                                 عرض
                                             </Link>
-                                            {project.user_id === auth.user.id && (
+                                            {(project.user_id === auth.user.id || project.school_id === auth.user.id || project.teacher_id) && (
                                                 <>
                                                     <Link
                                                         href={`/school/projects/${project.id}/edit`}
@@ -167,7 +195,7 @@ export default function SchoolProjects({ projects, auth }) {
                                                         تعديل
                                                     </Link>
                                                     <button
-                                                        onClick={() => handleDelete(project.id)}
+                                                        onClick={(e) => handleDelete(project.id, e)}
                                                         className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center gap-2 shadow-md"
                                                     >
                                                         <FaTrash />

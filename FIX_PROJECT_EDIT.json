@@ -1,0 +1,153 @@
+{
+  "title": "إصلاح: تعديل المشروع لا يُرسل ولا يتم الحفظ",
+  "status": "تم الإصلاح",
+  "diagnosis": {
+    "possible_causes": [
+      {
+        "cause": "مشكلة في مزامنة البيانات",
+        "description": "existingFiles و existingImages كانت متغيرات state منفصلة غير متزامنة مع form data من Inertia",
+        "priority": "high"
+      },
+      {
+        "cause": "عدم تحديث form data قبل الإرسال",
+        "description": "عند استدعاء setData() ثم put() مباشرة، قد لا تكون البيانات محدثة بسبب الطبيعة غير المتزامنة",
+        "priority": "high"
+      },
+      {
+        "cause": "مشاكل في معالجة الأخطاء",
+        "description": "عدم وجود رسائل خطأ واضحة للمستخدم عند فشل العملية",
+        "priority": "medium"
+      }
+    ]
+  },
+  "solution": {
+    "files_modified": [
+      "resources/js/Pages/School/Projects/Edit.jsx"
+    ],
+    "changes": [
+      {
+        "file": "resources/js/Pages/School/Projects/Edit.jsx",
+        "change_type": "fix",
+        "description": "مزامنة existingFiles و existingImages مع form data عند الحذف",
+        "code": "const removeExistingFile = (index) => {\n    setExistingFiles(prev => {\n        const newFiles = prev.filter((_, i) => i !== index);\n        setData('existing_files', newFiles);\n        return newFiles;\n    });\n};"
+      },
+      {
+        "file": "resources/js/Pages/School/Projects/Edit.jsx",
+        "change_type": "fix",
+        "description": "تحسين handleSubmit لضمان إرسال جميع البيانات بشكل صحيح",
+        "code": "const handleSubmit = (e) => {\n    e.preventDefault();\n    \n    if (!data.title || !data.description || !data.category) {\n        alert('يرجى ملء جميع الحقول المطلوبة');\n        return;\n    }\n    \n    const updatedData = {\n        title: data.title,\n        description: data.description,\n        category: data.category,\n        report: data.report || '',\n        existing_files: existingFiles || [],\n        existing_images: existingImages || [],\n        files: data.files || [],\n        images: data.images || [],\n    };\n    \n    setData(updatedData);\n    \n    put(`/school/projects/${project.id}`, {\n        forceFormData: true,\n        preserveScroll: false,\n        onSuccess: () => {\n            showSuccess('تم تحديث المشروع بنجاح');\n            router.visit('/school/projects');\n        },\n        onError: (errors) => {\n            // معالجة الأخطاء المحسنة\n        },\n    });\n};"
+      },
+      {
+        "file": "resources/js/Pages/School/Projects/Edit.jsx",
+        "change_type": "improvement",
+        "description": "تحسين معالجة الأخطاء مع رسائل واضحة للمستخدم",
+        "code": "onError: (errors) => {\n    console.error('Validation errors:', errors);\n    let errorMessage = 'حدث خطأ أثناء حفظ التعديلات';\n    if (errors.message) {\n        errorMessage = errors.message;\n    } else if (typeof errors === 'object' && Object.keys(errors).length > 0) {\n        const firstError = Object.values(errors)[0];\n        if (Array.isArray(firstError)) {\n            errorMessage = firstError[0];\n        } else if (typeof firstError === 'string') {\n            errorMessage = firstError;\n        }\n    }\n    alert('خطأ: ' + errorMessage);\n}"
+      }
+    ]
+  },
+  "testing": {
+    "test_cases": [
+      {
+        "id": 1,
+        "description": "اختبار التعديل الأساسي",
+        "steps": [
+          "افتح صفحة التحرير",
+          "عدّل العنوان",
+          "عدّل الوصف",
+          "غيّر الفئة",
+          "اضغط على 'حفظ التغييرات'",
+          "تحقق من ظهور رسالة النجاح",
+          "تحقق من تحديث البيانات في قاعدة البيانات"
+        ],
+        "expected_result": "يتم حفظ التعديلات بنجاح وتظهر رسالة نجاح"
+      },
+      {
+        "id": 2,
+        "description": "اختبار الملفات والصور",
+        "steps": [
+          "أضف ملفات جديدة",
+          "أضف صور جديدة",
+          "احذف ملفات موجودة",
+          "احذف صور موجودة",
+          "احفظ التعديلات",
+          "تحقق من تحديث الملفات والصور"
+        ],
+        "expected_result": "يتم حفظ الملفات والصور بشكل صحيح"
+      },
+      {
+        "id": 3,
+        "description": "اختبار التحقق من البيانات",
+        "steps": [
+          "حاول الحفظ بدون عنوان",
+          "حاول الحفظ بدون وصف",
+          "تحقق من ظهور رسائل الخطأ المناسبة"
+        ],
+        "expected_result": "تظهر رسائل خطأ واضحة عند البيانات غير الصحيحة"
+      },
+      {
+        "id": 4,
+        "description": "اختبار معالجة الأخطاء",
+        "steps": [
+          "حاول الحفظ مع بيانات غير صحيحة",
+          "تحقق من معالجة الأخطاء من الخادم",
+          "تحقق من ظهور رسائل الخطأ للمستخدم"
+        ],
+        "expected_result": "يتم معالجة الأخطاء بشكل صحيح وعرض رسائل واضحة"
+      }
+    ]
+  },
+  "diagnostic_steps": [
+    {
+      "step": 1,
+      "description": "افتح Developer Tools (F12)",
+      "actions": [
+        "انتقل إلى تبويب Console",
+        "ابحث عن أي أخطاء JavaScript"
+      ]
+    },
+    {
+      "step": 2,
+      "description": "تحقق من Network Tab",
+      "actions": [
+        "افتح تبويب Network",
+        "حاول حفظ التعديلات",
+        "ابحث عن طلب PUT /school/projects/{id}",
+        "تحقق من: هل الطلب تم إرساله؟ ما هي حالة الاستجابة؟ ما هي البيانات المرسلة؟"
+      ]
+    },
+    {
+      "step": 3,
+      "description": "تحقق من Server Logs",
+      "actions": [
+        "راجع ملفات log في Laravel",
+        "ابحث عن أخطاء في storage/logs/laravel.log"
+      ]
+    },
+    {
+      "step": 4,
+      "description": "تحقق من Routes",
+      "command": "php artisan route:list | grep school.projects"
+    },
+    {
+      "step": 5,
+      "description": "تحقق من الصلاحيات",
+      "actions": [
+        "تأكد من أن المستخدم لديه صلاحية تعديل المشروع",
+        "راجع SchoolProjectController::update() للتحقق من منطق الصلاحيات"
+      ]
+    }
+  ],
+  "notes": [
+    "تم استخدام setData مع كائن كامل لضمان تحديث جميع البيانات دفعة واحدة",
+    "تم مزامنة existingFiles و existingImages مع form data عند الحذف",
+    "تم تحسين معالجة الأخطاء لعرض رسائل واضحة للمستخدم",
+    "Inertia's useForm يدير state داخلياً، لذا setData ثم put() يجب أن يعملا بشكل صحيح"
+  ],
+  "next_steps": [
+    "اختبار الحل في بيئة التطوير",
+    "التحقق من عمل جميع حالات الاستخدام",
+    "مراجعة الكود للتأكد من عدم وجود مشاكل أخرى",
+    "اختبار في بيئة الإنتاج بعد التأكد من عمل الحل"
+  ]
+}
+

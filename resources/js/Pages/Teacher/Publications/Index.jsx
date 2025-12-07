@@ -13,6 +13,7 @@ export default function TeacherPublications({ publications, auth }) {
         magazine: 'مجلة',
         booklet: 'كتيب',
         report: 'تقرير',
+        article: 'مقال',
     };
 
     return (

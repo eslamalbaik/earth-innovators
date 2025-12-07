@@ -26,7 +26,13 @@ class ProjectService extends BaseService
 
         return $this->cacheTags($cacheTag, $cacheKey, function () use ($search, $category, $schoolId, $perPage) {
             $query = Project::where('status', 'approved')
-                ->with(['teacher:id,name_ar', 'user:id,name', 'school:id,name', 'approver:id,name'])
+                ->with([
+                    'teacher:id,name_ar,user_id',
+                    'teacher.user:id,name',
+                    'user:id,name',
+                    'school:id,name',
+                    'approver:id,name'
+                ])
                 ->select('id', 'title', 'description', 'category', 'status', 'teacher_id', 'user_id', 'school_id', 'approved_by', 'views', 'likes', 'rating', 'created_at');
 
             if ($search) {
@@ -55,7 +61,8 @@ class ProjectService extends BaseService
 
         $project = $this->cacheTags($cacheTag, $cacheKey, function () use ($projectId) {
             return Project::with([
-                'teacher:id,name_ar',
+                'teacher:id,name_ar,user_id',
+                'teacher.user:id,name',
                 'user:id,name',
                 'school:id,name',
                 'approver:id,name',
@@ -139,7 +146,11 @@ class ProjectService extends BaseService
                          ->where('school_id', $schoolId);
                   });
             })
-            ->with(['user:id,name', 'teacher:id,name_ar'])
+            ->with([
+                'user:id,name',
+                'teacher:id,name_ar,user_id',
+                'teacher.user:id,name'
+            ])
             ->select('id', 'title', 'description', 'category', 'status', 'user_id', 'teacher_id', 'created_at');
 
             if ($search) {
@@ -257,10 +268,26 @@ class ProjectService extends BaseService
             $this->forgetCacheTags(["school_projects_{$schoolId}"]);
             // مسح مباشر للكاش بدون tags
             if (!$supportsTags) {
-                // مسح جميع مفاتيح الكاش المحتملة للمدرسة
-                for ($page = 1; $page <= 20; $page++) {
-                    \Cache::forget("school_projects_{$schoolId}_" . md5('') . "_{$page}");
-                    \Cache::forget("school_pending_projects_{$schoolId}_" . md5('') . "_{$page}");
+                // مسح جميع التوليفات المحتملة من search, status, category
+                $searchOptions = [null, ''];
+                $statusOptions = [null, '', 'pending', 'approved', 'rejected'];
+                $categoryOptions = [null, '', 'science', 'technology', 'engineering', 'mathematics', 'arts', 'other'];
+                
+                foreach ($searchOptions as $search) {
+                    foreach ($statusOptions as $status) {
+                        foreach ($categoryOptions as $category) {
+                            $cacheKey = "school_projects_{$schoolId}_" . md5(json_encode([$search, $status, $category, 15]));
+                            \Cache::forget($cacheKey);
+                        }
+                    }
+                }
+                
+                // مسح pending projects
+                foreach ($searchOptions as $search) {
+                    foreach ($categoryOptions as $category) {
+                        $cacheKey = "school_pending_projects_{$schoolId}_" . md5(json_encode([$search, $category, 15]));
+                        \Cache::forget($cacheKey);
+                    }
                 }
             }
         }

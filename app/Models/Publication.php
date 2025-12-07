@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class Publication extends Model
 {
@@ -80,5 +81,103 @@ class Publication extends Model
     public function incrementViews(): void
     {
         $this->increment('views');
+    }
+
+    /**
+     * Accessor لتطبيع مسار صورة الغلاف
+     * يعمل تلقائياً عند قراءة الخاصية
+     * Returns absolute URL for proper image display
+     */
+    public function getCoverImageAttribute($value): ?string
+    {
+        // الحصول على القيمة الأصلية من قاعدة البيانات مباشرة من attributes
+        // هذا مهم جداً لأن $value قد يكون null حتى لو كانت القيمة موجودة في DB
+        $originalValue = null;
+
+        // أولاً: جرب قراءة من attributes مباشرة
+        if (isset($this->attributes['cover_image']) && $this->attributes['cover_image'] !== null) {
+            $originalValue = $this->attributes['cover_image'];
+        }
+        // ثانياً: إذا لم تكن موجودة في attributes، استخدم $value
+        elseif ($value !== null) {
+            $originalValue = $value;
+        }
+
+        // إذا لم توجد قيمة، أرجع null
+        if (!$originalValue || trim($originalValue) === '') {
+            return null;
+        }
+
+        // تنظيف القيمة
+        $originalValue = trim($originalValue);
+
+        // If it's a full URL, return as is
+        if (str_starts_with($originalValue, 'http://') || str_starts_with($originalValue, 'https://')) {
+            return $originalValue;
+        }
+
+        // Normalize the path
+        $normalizedPath = $originalValue;
+
+        // Remove leading slashes
+        $normalizedPath = ltrim($normalizedPath, '/');
+
+        // Remove 'storage/' prefix if present (we'll add it back in the URL)
+        $normalizedPath = str_replace('storage/', '', $normalizedPath);
+
+        // المسار المحفوظ في DB يكون مثل: publications/covers/filename.jpg
+        // نحتاج إلى تحويله إلى: /storage/publications/covers/filename.jpg
+
+        // Return absolute URL - always use url() helper
+        // This ensures proper domain handling (works in dev and production)
+        return url('/storage/' . $normalizedPath);
+    }
+
+    /**
+     * Accessor لتطبيع مسار الملف
+     * يعمل تلقائياً عند قراءة الخاصية
+     * Returns absolute URL for proper file access
+     */
+    public function getFileAttribute($value): ?string
+    {
+        // الحصول على القيمة الأصلية من قاعدة البيانات مباشرة من attributes
+        $originalValue = null;
+
+        // أولاً: جرب قراءة من attributes مباشرة
+        if (isset($this->attributes['file']) && $this->attributes['file'] !== null) {
+            $originalValue = $this->attributes['file'];
+        }
+        // ثانياً: إذا لم تكن موجودة في attributes، استخدم $value
+        elseif ($value !== null) {
+            $originalValue = $value;
+        }
+
+        // إذا لم توجد قيمة، أرجع null
+        if (!$originalValue || trim($originalValue) === '') {
+            return null;
+        }
+
+        // تنظيف القيمة
+        $originalValue = trim($originalValue);
+
+        // If it's a full URL, return as is
+        if (str_starts_with($originalValue, 'http://') || str_starts_with($originalValue, 'https://')) {
+            return $originalValue;
+        }
+
+        // Normalize the path
+        $normalizedPath = $originalValue;
+
+        // Remove leading slashes
+        $normalizedPath = ltrim($normalizedPath, '/');
+
+        // Remove 'storage/' prefix if present
+        $normalizedPath = str_replace('storage/', '', $normalizedPath);
+
+        // المسار المحفوظ في DB يكون مثل: publications/files/filename.pdf
+        // نحتاج إلى تحويله إلى: /storage/publications/files/filename.pdf
+
+        // Return absolute URL
+        return url('/storage/' . $normalizedPath);
     }
 }

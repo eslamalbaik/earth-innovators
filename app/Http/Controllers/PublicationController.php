@@ -26,11 +26,9 @@ class PublicationController extends Controller
             12
         )->withQueryString();
 
-        // Normalize image and file paths
+        // Accessor in Model handles image path normalization automatically
         $publications->getCollection()->transform(function ($publication) {
             $publication->is_liked = Auth::check() ? $publication->isLikedBy(Auth::id()) : false;
-            $publication->cover_image = $this->publicationService->normalizeImagePath($publication->cover_image);
-            $publication->file = $this->publicationService->normalizeFilePath($publication->file);
             return $publication;
         });
 
@@ -54,9 +52,7 @@ class PublicationController extends Controller
             abort(404);
         }
 
-        // Normalize paths
-        $publication->cover_image = $this->publicationService->normalizeImagePath($publication->cover_image);
-        $publication->file = $this->publicationService->normalizeFilePath($publication->file);
+        // Accessor in Model handles image path normalization automatically
 
         return Inertia::render('Publications/Show', [
             'publication' => $publication,

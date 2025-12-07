@@ -6,6 +6,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './lib/react-query';
+import { ToastProvider } from './Contexts/ToastContext';
 
 const appName = import.meta.env.VITE_APP_NAME || 'إرث المبتكرين - Innovators Legacy';
 
@@ -21,7 +22,9 @@ createInertiaApp({
 
         root.render(
             <QueryClientProvider client={queryClient}>
-                <App {...props} />
+                <ToastProvider>
+                    <App {...props} />
+                </ToastProvider>
             </QueryClientProvider>
         );
     },

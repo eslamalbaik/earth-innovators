@@ -14,10 +14,10 @@ class StorePublicationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => 'required|in:magazine,booklet,report',
+            'type' => 'required|in:magazine,booklet,report,article',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'content' => 'required|string',
+            'content' => 'nullable|string',
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'file' => 'nullable|file|mimes:pdf|max:10240',
             'issue_number' => 'nullable|integer|min:1',

@@ -11,9 +11,11 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import SidebarItem from '@/Components/SidebarItem';
 import SidebarSubMenu from '@/Components/SidebarSubMenu';
 import { getUserImageUrl, getInitials, getColorFromName } from '@/utils/imageUtils';
+import { useToast } from '@/Contexts/ToastContext';
 
 export default function DashboardLayout({ children, header }) {
     const { auth } = usePage().props;
+    const { showInfo } = useToast();
     const [sidebarOpen, setSidebarOpen] = useState(() => {
         if (typeof window !== 'undefined') {
             return window.innerWidth >= 1100;
@@ -26,6 +28,7 @@ export default function DashboardLayout({ children, header }) {
     const [unreadCount, setUnreadCount] = useState(0);
     const dropdownRef = useRef(null);
     const notificationsRef = useRef(null);
+    const previousDashboardDataRef = useRef(null);
 
     const getUserImage = () => {
         if (auth?.user?.image) {
@@ -44,64 +47,158 @@ export default function DashboardLayout({ children, header }) {
         if (auth?.user) {
             fetchNotifications();
             
-            // إعداد Real-time notifications باستخدام Echo
+            // إعداد Real-time notifications باستخدام Echo (Redis + Laravel Echo Server)
             let notificationChannel = null;
             let pollingInterval = null;
+            let reconnectAttempts = 0;
+            const maxReconnectAttempts = 5;
             
-            if (window.Echo) {
-                try {
-                    const userId = auth.user.id;
-                    const channelName = `App.Models.User.${userId}`;
-                    
-                    // الاستماع للإشعارات الجديدة
-                    notificationChannel = window.Echo.private(channelName);
-                    
-                    notificationChannel.listen('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', (e) => {
-                        console.log('New notification received via Echo:', e);
+            const setupEchoListener = () => {
+                if (window.Echo) {
+                    try {
+                        const userId = auth.user.id;
+                        const channelName = `App.Models.User.${userId}`;
                         
-                        // إضافة الإشعار الجديد إلى القائمة
-                        if (e.notification || e.data) {
-                            const notificationData = e.notification || e.data || {};
-                            const notification = {
-                                id: notificationData.id || e.id,
-                                type: notificationData.type || e.type,
-                                data: notificationData.data || notificationData || {},
-                                read_at: notificationData.read_at || null,
-                                created_at: notificationData.created_at || e.created_at || new Date().toISOString(),
-                                created_at_human: notificationData.created_at_human || new Date(notificationData.created_at || e.created_at || new Date()).toLocaleString('ar-SA'),
-                            };
-                            
-                            setNotifications(prev => {
-                                // تجنب الإشعارات المكررة
-                                const exists = prev.find(n => n.id === notification.id);
-                                if (exists) return prev;
-                                return [notification, ...prev];
-                            });
-                            setUnreadCount(prev => prev + 1);
-                            
-                            // إعادة جلب الإشعارات للتأكد من التزامن
-                            setTimeout(() => fetchNotifications(), 1000);
+                        // Only log in development mode
+                        if (import.meta.env.DEV) {
+                            console.log('🔌 Setting up Echo listener for user:', userId);
                         }
-                    });
-                    
-                    console.log('Echo notification listener initialized for user:', userId);
-                } catch (error) {
-                    console.error('Error setting up Echo listener:', error);
-                    // Fallback to polling
-                    pollingInterval = setInterval(fetchNotifications, 30000);
+                        
+                        // الاستماع للإشعارات الجديدة
+                        notificationChannel = window.Echo.private(channelName);
+                        
+                        // Laravel يرسل الإشعارات عبر event: Illuminate\Notifications\Events\BroadcastNotificationCreated
+                        notificationChannel.listen('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', (e) => {
+                            console.log('📬 New notification received via Echo:', e);
+                            
+                            try {
+                                // Laravel يرسل البيانات في هيكل محدد
+                                const notification = {
+                                    id: e.id || `notif_${Date.now()}_${Math.random()}`,
+                                    type: e.type || 'notification',
+                                    data: e.data || {},
+                                    read_at: e.read_at || null,
+                                    created_at: e.created_at || new Date().toISOString(),
+                                    created_at_human: e.created_at 
+                                        ? new Date(e.created_at).toLocaleString('ar-SA', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit'
+                                        })
+                                        : new Date().toLocaleString('ar-SA', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit'
+                                        }),
+                                };
+                                
+                                console.log('✅ Processed notification:', notification);
+                                
+                                setNotifications(prev => {
+                                    // تجنب الإشعارات المكررة
+                                    const exists = prev.find(n => n.id === notification.id);
+                                    if (exists) {
+                                        console.log('⚠️ Notification already exists, skipping:', notification.id);
+                                        return prev;
+                                    }
+                                    console.log('➕ Adding new notification to list');
+                                    return [notification, ...prev];
+                                });
+                                
+                                setUnreadCount(prev => {
+                                    const newCount = prev + 1;
+                                    console.log('📊 Unread count updated:', newCount);
+                                    return newCount;
+                                });
+                                
+                                // إعادة جلب الإشعارات للتأكد من التزامن مع قاعدة البيانات
+                                setTimeout(() => {
+                                    console.log('🔄 Refreshing notifications from server...');
+                                    fetchNotifications();
+                                }, 500);
+                            } catch (error) {
+                                console.error('❌ Error processing notification:', error);
+                                // إعادة جلب الإشعارات في حالة الخطأ
+                                fetchNotifications();
+                            }
+                        });
+                        
+                        // معالجة الأخطاء في الاتصال
+                        notificationChannel.error((error) => {
+                            console.error('❌ Echo channel error:', error);
+                            reconnectAttempts++;
+                            
+                            if (reconnectAttempts < maxReconnectAttempts) {
+                                console.log(`🔄 Attempting to reconnect (${reconnectAttempts}/${maxReconnectAttempts})...`);
+                                setTimeout(setupEchoListener, 2000 * reconnectAttempts);
+                            } else {
+                                console.warn('⚠️ Max reconnection attempts reached, falling back to polling');
+                                // Fallback to polling on error
+                                if (pollingInterval) {
+                                    clearInterval(pollingInterval);
+                                }
+                                pollingInterval = setInterval(fetchNotifications, 10000); // Poll every 10 seconds
+                            }
+                        });
+                        
+                        // Connection status listeners
+                        if (window.Echo.connector && window.Echo.connector.socket) {
+                            window.Echo.connector.socket.on('connect', () => {
+                                console.log('✅ Echo connected successfully');
+                                reconnectAttempts = 0; // Reset on successful connection
+                            });
+                            
+                            window.Echo.connector.socket.on('disconnect', () => {
+                                console.warn('⚠️ Echo disconnected');
+                                reconnectAttempts++;
+                                if (reconnectAttempts < maxReconnectAttempts) {
+                                    setTimeout(setupEchoListener, 2000 * reconnectAttempts);
+                                }
+                            });
+                        }
+                        
+                        // Only log in development mode
+                        if (import.meta.env.DEV) {
+                            console.log('✅ Echo notification listener initialized for user:', userId, 'on channel:', channelName);
+                        }
+                        reconnectAttempts = 0; // Reset on successful setup
+                    } catch (error) {
+                        console.error('❌ Error setting up Echo listener:', error);
+                        reconnectAttempts++;
+                        if (reconnectAttempts < maxReconnectAttempts) {
+                            setTimeout(setupEchoListener, 2000 * reconnectAttempts);
+                        } else {
+                            // Fallback to polling
+                            pollingInterval = setInterval(fetchNotifications, 10000);
+                        }
+                    }
+                } else {
+                    // Fallback: تحديث الإشعارات كل 10 ثوانٍ إذا لم يكن Echo متاحاً
+                    console.warn('⚠️ Echo not available, using polling for notifications');
+                    pollingInterval = setInterval(fetchNotifications, 10000);
                 }
-            } else {
-                // Fallback: تحديث الإشعارات كل 30 ثانية إذا لم يكن Echo متاحاً
-                pollingInterval = setInterval(fetchNotifications, 30000);
-            }
+            };
+            
+            // Initial setup
+            setupEchoListener();
             
             // تنظيف عند إلغاء التحميل
             return () => {
                 if (notificationChannel && window.Echo) {
                     try {
-                        window.Echo.leave(`App.Models.User.${auth.user.id}`);
+                        const channelName = `App.Models.User.${auth.user.id}`;
+                        notificationChannel.stopListening('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated');
+                        window.Echo.leave(channelName);
+                        // Only log in development mode
+                        if (import.meta.env.DEV) {
+                            console.log('👋 Left Echo channel:', channelName);
+                        }
                     } catch (error) {
-                        console.error('Error leaving Echo channel:', error);
+                        console.error('❌ Error leaving Echo channel:', error);
                     }
                 }
                 if (pollingInterval) {
@@ -165,6 +262,81 @@ export default function DashboardLayout({ children, header }) {
 
     // Get current URL from Inertia page props
     const { url } = usePage();
+    const pageProps = usePage().props;
+
+    // Detect dashboard changes and show toast notifications
+    useEffect(() => {
+        const currentUrl = url || window.location.pathname;
+        
+        // Only track changes on dashboard pages
+        const isDashboardPage = currentUrl.includes('/dashboard') || 
+                               currentUrl.includes('/teacher/dashboard') ||
+                               currentUrl.includes('/student/dashboard') ||
+                               currentUrl.includes('/school/dashboard');
+        
+        if (!isDashboardPage) {
+            previousDashboardDataRef.current = null;
+            return;
+        }
+
+        // Get current dashboard data
+        const currentData = {
+            url: currentUrl,
+            stats: pageProps.stats || {},
+            teacher: pageProps.teacher || null,
+            auth: pageProps.auth || {},
+            timestamp: Date.now(),
+        };
+
+        // Compare with previous data
+        const previousData = previousDashboardDataRef.current;
+        
+        // Determine dashboard type
+        let dashboardType = 'لوحة التحكم';
+        if (currentUrl.includes('/teacher')) {
+            dashboardType = 'لوحة تحكم المعلم';
+        } else if (currentUrl.includes('/student')) {
+            dashboardType = 'لوحة تحكم الطالب';
+        } else if (currentUrl.includes('/school')) {
+            dashboardType = 'لوحة تحكم المدرسة';
+        }
+
+        // If this is the first time on this dashboard, don't show toast
+        if (!previousData) {
+            previousDashboardDataRef.current = currentData;
+            return;
+        }
+
+        // If URL changed (navigated to different dashboard), show toast
+        if (previousData.url !== currentData.url) {
+            showInfo('تم تحميل البيانات', {
+                title: `${dashboardType}`,
+                message: 'تم تحميل معلومات لوحة التحكم بنجاح',
+                autoDismiss: 5000,
+            });
+            previousDashboardDataRef.current = currentData;
+            return;
+        }
+
+        // Same URL - check for data changes
+        if (previousData.url === currentData.url) {
+            // Check for changes in stats (deep comparison of key values)
+            const statsChanged = JSON.stringify(previousData.stats) !== JSON.stringify(currentData.stats);
+            const teacherChanged = JSON.stringify(previousData.teacher) !== JSON.stringify(currentData.teacher);
+            
+            // Only show toast if there's a meaningful change (not just timestamp)
+            if (statsChanged || teacherChanged) {
+                showInfo('تم تحديث البيانات', {
+                    title: `تحديث ${dashboardType}`,
+                    message: 'تم تحديث معلومات لوحة التحكم بنجاح',
+                    autoDismiss: 5000,
+                });
+            }
+        }
+
+        // Update previous data
+        previousDashboardDataRef.current = currentData;
+    }, [url, pageProps, showInfo]);
 
     /**
      * Check if a route is active
@@ -220,7 +392,17 @@ export default function DashboardLayout({ children, header }) {
                     { name: 'إنشاء مشروع', href: '/teacher/projects/create', icon: FaProjectDiagram },
                 ]
             },
-            { name: 'التحديات', href: '/teacher/challenges', icon: FaCalendar },
+            {
+                name: 'التحديات',
+                href: '/teacher/challenges',
+                icon: FaCalendar,
+                subItems: [
+                    { name: 'تسليمات التحديات', href: '/teacher/challenge-submissions', icon: FaFile },
+                    { name: 'مراجعة التحديات', href: '/teacher/challenge-submissions?status=submitted', icon: FaBookOpen },
+                    { name: 'تحدياتي', href: '/teacher/challenges', icon: FaCalendar },
+                    { name: 'إنشاء تحدّي', href: '/teacher/challenges/create', icon: FaCalendar },
+                ]
+            },
             { name: 'مقالاتي', href: '/teacher/publications', icon: FaBook },
             { name: 'إنشاء مقال', href: '/teacher/publications/create', icon: FaBook },
             { name: 'الطلاب المتابعون', href: '/teacher/students', icon: FaGraduationCap },
@@ -246,6 +428,17 @@ export default function DashboardLayout({ children, header }) {
             { name: 'مراجعة مقالات المجلة', href: '/school/publications/pending', icon: FaBookOpen },
             { name: 'مقالات المدرسة', href: '/school/publications', icon: FaBook },
             { name: 'إنشاء مقال', href: '/school/publications/create', icon: FaBook },
+            {
+                name: 'التحديات',
+                href: '/school/challenges',
+                icon: FaCalendar,
+                subItems: [
+                    { name: 'تسليمات التحديات', href: '/school/challenge-submissions', icon: FaFile },
+                    { name: 'مراجعة التحديات', href: '/school/challenge-submissions?status=submitted', icon: FaBookOpen },
+                    { name: 'تحديات المدرسة', href: '/school/challenges', icon: FaCalendar },
+                    { name: 'إنشاء تحدّي', href: '/school/challenges/create', icon: FaCalendar },
+                ]
+            },
             { name: 'الطلاب', href: '/school/students', icon: FaGraduationCap },
             { name: 'الترتيب والشارات', href: '/school/ranking', icon: FaTrophy },
             { name: 'الإحصائيات', href: '/school/statistics', icon: FaChartLine },
@@ -432,9 +625,82 @@ export default function DashboardLayout({ children, header }) {
                                                                     if (!notification.read_at) {
                                                                         markAsRead(notification.id);
                                                                     }
-                                                                    if (notification.data?.action_url) {
-                                                                        router.visit(notification.data.action_url);
+                                                                    // التنقل إلى رابط الإشعار إذا كان موجوداً
+                                                                    let actionUrl = notification.data?.action_url || 
+                                                                                   notification.data?.actions?.[0]?.url ||
+                                                                                   null;
+                                                                    
+                                                                    // إذا لم يكن هناك action_url، قم ببناء URL بناءً على البيانات المتاحة
+                                                                    if (!actionUrl) {
+                                                                        const userRole = auth?.user?.role || 'student';
+                                                                        
+                                                                        if (notification.data?.challenge_id) {
+                                                                            // بناء URL التحدي بناءً على role المستخدم
+                                                                            if (userRole === 'student') {
+                                                                                actionUrl = `/student/challenges/${notification.data.challenge_id}`;
+                                                                            } else if (userRole === 'teacher') {
+                                                                                actionUrl = `/teacher/challenge-submissions?challenge_id=${notification.data.challenge_id}`;
+                                                                            } else if (userRole === 'school') {
+                                                                                actionUrl = `/school/challenges/${notification.data.challenge_id}`;
+                                                                            } else {
+                                                                                actionUrl = `/student/challenges/${notification.data.challenge_id}`;
+                                                                            }
+                                                                        } else if (notification.data?.project_id) {
+                                                                            // بناء URL المشروع بناءً على role المستخدم
+                                                                            if (userRole === 'student') {
+                                                                                actionUrl = `/student/projects/${notification.data.project_id}`;
+                                                                            } else if (userRole === 'teacher') {
+                                                                                actionUrl = `/teacher/projects/${notification.data.project_id}`;
+                                                                            } else if (userRole === 'school') {
+                                                                                actionUrl = `/school/projects/${notification.data.project_id}`;
+                                                                            } else {
+                                                                                actionUrl = `/student/projects/${notification.data.project_id}`;
+                                                                            }
+                                                                        } else if (notification.data?.publication_id) {
+                                                                            actionUrl = `/publications/${notification.data.publication_id}`;
+                                                                        } else if (notification.data?.submission_id) {
+                                                                            // بناء URL التسليم بناءً على role المستخدم
+                                                                            if (userRole === 'student') {
+                                                                                // للطلاب، اذهب إلى صفحة التحدي
+                                                                                if (notification.data?.challenge_id) {
+                                                                                    actionUrl = `/student/challenges/${notification.data.challenge_id}`;
+                                                                                }
+                                                                            } else if (userRole === 'teacher') {
+                                                                                actionUrl = `/teacher/challenge-submissions/${notification.data.submission_id}`;
+                                                                            } else if (userRole === 'school') {
+                                                                                actionUrl = `/school/challenge-submissions/${notification.data.submission_id}`;
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    
+                                                                    // تنظيف URL من أي متغيرات غير مستبدلة
+                                                                    if (actionUrl && typeof actionUrl === 'string') {
+                                                                        // إزالة أي {variable} غير مستبدلة
+                                                                        actionUrl = actionUrl.replace(/\{[^}]+\}/g, '');
+                                                                        
+                                                                        // إذا كان هناك challenge_id في البيانات والـ URL يحتوي على placeholder، استبدله
+                                                                        if (notification.data?.challenge_id && actionUrl.includes('/challenges/') && actionUrl.includes('{')) {
+                                                                            actionUrl = actionUrl.replace(/\{[^}]+\}/, notification.data.challenge_id);
+                                                                        }
+                                                                        
+                                                                        // إذا كان هناك project_id في البيانات والـ URL يحتوي على placeholder، استبدله
+                                                                        if (notification.data?.project_id && actionUrl.includes('/projects/') && actionUrl.includes('{')) {
+                                                                            actionUrl = actionUrl.replace(/\{[^}]+\}/, notification.data.project_id);
+                                                                        }
+                                                                        
+                                                                        // إذا كان هناك submission_id في البيانات والـ URL يحتوي على placeholder، استبدله
+                                                                        if (notification.data?.submission_id && actionUrl.includes('/submissions/') && actionUrl.includes('{')) {
+                                                                            actionUrl = actionUrl.replace(/\{[^}]+\}/, notification.data.submission_id);
+                                                                        }
+                                                                        
+                                                                        console.log('🔗 Navigating to:', actionUrl, 'from notification:', notification);
+                                                                    }
+                                                                    
+                                                                    if (actionUrl && actionUrl.trim() !== '' && !actionUrl.includes('{')) {
+                                                                        router.visit(actionUrl);
                                                                         setNotificationsOpen(false);
+                                                                    } else {
+                                                                        console.warn('⚠️ No valid action URL found for notification:', notification, 'actionUrl:', actionUrl);
                                                                     }
                                                                 }}
                                                             >
@@ -444,11 +710,31 @@ export default function DashboardLayout({ children, header }) {
                                                                     )}
                                                                     <div className="flex-1 min-w-0">
                                                                         <p className="text-sm text-gray-900 font-medium mb-1">
-                                                                            {notification.data?.message_ar || notification.data?.message || 'إشعار جديد'}
+                                                                            {notification.data?.title || 
+                                                                             notification.data?.message_ar || 
+                                                                             notification.data?.message || 
+                                                                             notification.data?.body ||
+                                                                             'إشعار جديد'}
                                                                         </p>
+                                                                        {(notification.data?.message || notification.data?.body) && 
+                                                                         notification.data?.title && (
+                                                                            <p className="text-xs text-gray-600 mb-1">
+                                                                                {notification.data?.message || notification.data?.body}
+                                                                            </p>
+                                                                        )}
                                                                         {notification.data?.project_title && (
                                                                             <p className="text-xs text-gray-600 mb-1">
                                                                                 المشروع: {notification.data.project_title}
+                                                                            </p>
+                                                                        )}
+                                                                        {notification.data?.challenge_title && (
+                                                                            <p className="text-xs text-gray-600 mb-1">
+                                                                                التحدي: {notification.data.challenge_title}
+                                                                            </p>
+                                                                        )}
+                                                                        {notification.data?.publication_title && (
+                                                                            <p className="text-xs text-gray-600 mb-1">
+                                                                                المقال: {notification.data.publication_title}
                                                                             </p>
                                                                         )}
                                                                         {notification.data?.rating && (
@@ -471,7 +757,14 @@ export default function DashboardLayout({ children, header }) {
                                                                             </div>
                                                                         )}
                                                                         <p className="text-xs text-gray-500">
-                                                                            {notification.created_at_human || notification.created_at}
+                                                                            {notification.created_at_human || 
+                                                                             (notification.created_at ? new Date(notification.created_at).toLocaleString('ar-SA', {
+                                                                                 year: 'numeric',
+                                                                                 month: 'short',
+                                                                                 day: 'numeric',
+                                                                                 hour: '2-digit',
+                                                                                 minute: '2-digit'
+                                                                             }) : '')}
                                                                         </p>
                                                                     </div>
                                                                 </div>

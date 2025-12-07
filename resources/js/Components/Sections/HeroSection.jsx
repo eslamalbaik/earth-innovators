@@ -1,56 +1,18 @@
-import { FaSearch, FaProjectDiagram, FaUsers, FaTrophy, FaClock, FaMedal } from 'react-icons/fa';
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { FaProjectDiagram, FaUsers, FaTrophy } from 'react-icons/fa';
 import { router } from '@inertiajs/react';
 
 export default function HeroSection({
     title = "نحن معا نحو التقدم والتطور",
     subtitle = "مشاريع إبداعية في كل المجالات",
-    searchPlaceholder = "البحث عن المشاريع أو التحديات",
     cities = [],
     subjects = []
 }) {
-    const [searchTerm, setSearchTerm] = useState('');
-    const [suggestions, setSuggestions] = useState([]);
-    const [showSuggestions, setShowSuggestions] = useState(false);
-
-    useEffect(() => {
-        if (searchTerm.length >= 2) {
-            const timeoutId = setTimeout(() => {
-                fetchSuggestions();
-            }, 300);
-            return () => clearTimeout(timeoutId);
-        } else {
-            setSuggestions([]);
-            setShowSuggestions(false);
-        }
-    }, [searchTerm]);
-
-    const fetchSuggestions = async () => {
-        try {
-            const response = await axios.get('/search/suggestions', {
-                params: { q: searchTerm }
-            });
-            setSuggestions(response.data.suggestions);
-            setShowSuggestions(true);
-        } catch (error) {
-            // Handle error silently
-        }
-    };
-
-    const handleSearch = () => {
-        router.visit('/projects', {
-            data: { search: searchTerm }
-        });
-    };
-
-    const handleSuggestionClick = (suggestion) => {
-        setSearchTerm(suggestion.text);
-        setShowSuggestions(false);
+    const handleStartJourney = () => {
+        router.visit('/register');
     };
 
     return (
-        <section className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-legacy-green/10 via-white to-legacy-blue/10">
+        <section className="relative min-h-screen px-24 flex items-center overflow-hidden bg-gradient-to-br from-legacy-green/10 via-white to-legacy-blue/10">
             {/* Background decorative elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 {/* Dotted lines and arrows */}
@@ -85,46 +47,9 @@ export default function HeroSection({
             </div>
 
             <div className="container mx-auto px-4 lg:px-12 py-24 relative z-10">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                    {/* Left side - Illustration and text */}
-                    <div className="relative">
-                            {/* Student illustration circle */}
-                            <div className="relative">
-                                {/* Concentric circles */}
-                                <div className="absolute top-0 right-0 w-80 h-80">
-                                    <div className="absolute inset-0 border-4 border-legacy-green/30 rounded-full opacity-30"></div>
-                                    <div className="absolute inset-4 border-4 border-legacy-blue/30 rounded-full opacity-40"></div>
-                                    <div className="absolute inset-8 border-4 border-legacy-green/20 rounded-full opacity-50"></div>
-                                </div>
-
-                                {/* Student image placeholder - in a circular frame */}
-                                <div className="relative w-64 h-64 mx-auto mt-8">
-                                    <div className="absolute inset-0 border-4 border-legacy-green rounded-full bg-white shadow-2xl flex items-center justify-center overflow-hidden">
-                                        {/* Placeholder for student image - using a gradient background */}
-                                        <div className="w-full h-full bg-gradient-to-br from-legacy-green/20 to-legacy-blue/20 flex items-center justify-center">
-                                            <div className="text-center">
-                                                <div className="w-32 h-32 bg-gradient-to-br from-legacy-green to-legacy-blue rounded-full mx-auto mb-3 flex items-center justify-center">
-                                                    <FaUsers className="text-white text-4xl" />
-                                                </div>
-                                                <div className="text-xs text-gray-600 font-semibold">طالب مبتكر</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Smartphone icon in bottom left */}
-                                <div className="absolute bottom-0 left-0 w-24 h-24 transform rotate-12 opacity-60">
-                                    <div className="w-full h-full bg-gradient-to-br from-legacy-blue to-legacy-green rounded-2xl shadow-lg flex items-center justify-center">
-                                        <div className="w-12 h-20 bg-white rounded-lg shadow-inner flex items-center justify-center">
-                                            <div className="w-2 h-2 bg-legacy-green rounded-full"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                    </div>
-
-                    {/* Right side - Text and search */}
-                    <div className="space-y-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                    {/* Left side - Text and CTA Button */}
+                    <div className="space-y-8 order-1 lg:order-1">
                         {/* Top small text */}
                         <div className="text-legacy-green text-lg font-medium">
                             كل ما عليك هو التعلم
@@ -140,39 +65,25 @@ export default function HeroSection({
                             {subtitle}
                         </p>
 
-                        {/* Search bar */}
-                        <div className="flex gap-4 mt-8">
-                            <div className="flex-1 relative">
-                                <input
-                                    type="text"
-                                    placeholder={searchPlaceholder}
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    onFocus={() => setShowSuggestions(suggestions.length > 0)}
-                                    className="w-full bg-white text-gray-900 px-6 py-4 rounded-xl border-2 border-legacy-green/30 focus:ring-2 focus:ring-legacy-green focus:border-legacy-green text-lg shadow-md"
-                                />
-                                {showSuggestions && suggestions.length > 0 && (
-                                    <div className="absolute top-full left-0 right-0 bg-white border-2 border-legacy-green/30 rounded-xl shadow-lg z-50 mt-2 max-h-60 overflow-y-auto">
-                                        {suggestions.map((suggestion, index) => (
-                                            <div
-                                                key={index}
-                                                onClick={() => handleSuggestionClick(suggestion)}
-                                                className="px-6 py-3 hover:bg-legacy-green/10 cursor-pointer border-b border-gray-100 last:border-b-0"
-                                            >
-                                                <div className="font-medium text-gray-900">{suggestion.text}</div>
-                                                <div className="text-sm text-gray-500">{suggestion.subtext}</div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
+                        {/* CTA Button */}
+                        <div className="mt-8">
                             <button
-                                onClick={handleSearch}
-                                className="bg-gradient-to-r from-legacy-green to-legacy-blue hover:from-primary-600 hover:to-blue-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition duration-300 shadow-lg hover:shadow-xl flex items-center gap-2"
+                                onClick={handleStartJourney}
+                                className="bg-gradient-to-r from-legacy-green to-legacy-blue hover:from-primary-600 hover:to-blue-700 text-white px-12 py-4 rounded-xl font-semibold text-lg transition duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
                             >
-                                <span>البحث</span>
-                                <FaSearch />
+                                ابدأ رحلتك معنا
                             </button>
+                        </div>
+                    </div>
+
+                    {/* Right side - Hero Image */}
+                    <div className="relative order-2 lg:order-2">
+                        <div className="relative w-full h-full flex items-center justify-center">
+                            <img
+                                src="/images/hero.png"
+                                alt="Hero"
+                                className="w-full h-auto max-w-xl object-contain"
+                            />
                         </div>
                     </div>
                 </div>

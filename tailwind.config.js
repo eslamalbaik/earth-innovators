@@ -35,6 +35,25 @@ export default {
                     white: '#ffffff',
                 },
             },
+            animation: {
+                'slide-up': 'slideUp 0.3s ease-out',
+                'slideInLeft': 'slideInLeft 0.4s ease-out',
+                'fadeOut': 'fadeOut 0.3s ease-in',
+            },
+            keyframes: {
+                slideUp: {
+                    '0%': { transform: 'translateY(-100%)', opacity: '0' },
+                    '100%': { transform: 'translateY(0)', opacity: '1' },
+                },
+                slideInLeft: {
+                    '0%': { transform: 'translateX(-100%)', opacity: '0' },
+                    '100%': { transform: 'translateX(0)', opacity: '1' },
+                },
+                fadeOut: {
+                    '0%': { opacity: '1' },
+                    '100%': { opacity: '0' },
+                },
+            },
         },
     },
 

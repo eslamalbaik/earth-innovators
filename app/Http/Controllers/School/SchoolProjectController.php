@@ -9,6 +9,8 @@ use App\Services\ProjectService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 class SchoolProjectController extends Controller
@@ -20,24 +22,24 @@ class SchoolProjectController extends Controller
     public function pending(Request $request)
     {
         $school = Auth::user();
-        
+
         $projects = $this->projectService->getSchoolPendingProjects(
             $school->id,
             $request->get('search'),
             $request->get('category'),
             15
         )->withQueryString();
-        
+
         return Inertia::render('School/Projects/Pending', [
             'projects' => $projects,
         ]);
     }
-    
+
     // عرض جميع مشاريع المدرسة
     public function index(Request $request)
     {
         $school = Auth::user();
-        
+
         $projects = $this->projectService->getSchoolProjects(
             $school->id,
             $request->get('search'),
@@ -45,18 +47,18 @@ class SchoolProjectController extends Controller
             $request->get('category'),
             15
         )->withQueryString();
-        
+
         return Inertia::render('School/Projects/Index', [
             'projects' => $projects,
         ]);
     }
-    
+
     // إنشاء مشروع جديد من قبل المدرسة
     public function create()
     {
         return Inertia::render('School/Projects/Create');
     }
-    
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -69,9 +71,9 @@ class SchoolProjectController extends Controller
             'images.*' => 'image|max:5120',
             'report' => 'nullable|string',
         ]);
-        
+
         $school = Auth::user();
-        
+
         $project = Project::create([
             'user_id' => $school->id,
             'school_id' => $school->id,
@@ -83,7 +85,7 @@ class SchoolProjectController extends Controller
             'approved_at' => now(),
             'report' => $validated['report'] ?? null,
         ]);
-        
+
         // رفع الملفات
         if ($request->hasFile('files')) {
             $files = [];
@@ -92,7 +94,7 @@ class SchoolProjectController extends Controller
             }
             $project->files = $files;
         }
-        
+
         // رفع الصور
         if ($request->hasFile('images')) {
             $images = [];
@@ -101,38 +103,41 @@ class SchoolProjectController extends Controller
             }
             $project->images = $images;
         }
-        
+
         $project->save();
-        
+
+        // مسح الكاش لضمان ظهور المشروع في القوائم
+        $this->projectService->clearProjectCache($project->id, $project->user_id, $project->teacher_id, $school->id);
+
         // إرسال إشعار لجميع الطلاب في المدرسة
         \App\Jobs\SendNewProjectNotification::dispatch($project);
-        
+
         return redirect()->route('school.projects.index')
             ->with('success', 'تم إنشاء المشروع بنجاح');
     }
-    
+
     // قبول مشروع
     public function approve(Project $project)
     {
         $school = Auth::user();
-        
+
         // إعادة تحميل المشروع للتأكد من الحصول على أحدث البيانات
         $project->refresh();
         $project->load(['user', 'teacher', 'school']);
-        
+
         // الحصول على قائمة طلاب المدرسة (مطابق لمنطق getSchoolPendingProjects)
         $students = User::where('school_id', $school->id)->where('role', 'student')->pluck('id')->toArray();
-        
+
         // التحقق من الصلاحية: إما مشروع طالب أو مشروع معلم مرسل لهذه المدرسة
         // يجب أن يكون منطق التحقق مطابقاً تماماً لمنطق getSchoolPendingProjects
         $isStudentProject = in_array($project->user_id, $students);
-        
+
         // للمشاريع من المعلمين: التحقق من أن teacher_id موجود و school_id مطابق
         // هذا مطابق تماماً لشرط getSchoolPendingProjects: whereNotNull('teacher_id') && where('school_id', $schoolId)
         $isTeacherProject = $project->teacher_id !== null && $project->school_id === $school->id;
-        
+
         // Logging للتشخيص
-        \Log::info('Project approval attempt', [
+        Log::info('Project approval attempt', [
             'project_id' => $project->id,
             'project_status' => $project->status,
             'project_school_id' => $project->school_id,
@@ -143,16 +148,16 @@ class SchoolProjectController extends Controller
             'isTeacherProject' => $isTeacherProject,
             'students' => $students,
         ]);
-        
+
         if ((!$isStudentProject && !$isTeacherProject) || $project->status !== 'pending') {
-            \Log::warning('Project approval denied', [
+            Log::warning('Project approval denied', [
                 'project_id' => $project->id,
                 'reason' => !$isStudentProject && !$isTeacherProject ? 'not_authorized' : 'not_pending',
                 'status' => $project->status,
             ]);
             abort(403, 'غير مصرح لك بقبول هذا المشروع');
         }
-        
+
         // تحديث المشروع
         $updated = $project->update([
             'status' => 'approved',
@@ -162,7 +167,7 @@ class SchoolProjectController extends Controller
         ]);
 
         if (!$updated) {
-            \Log::error('Failed to update project status', [
+            Log::error('Failed to update project status', [
                 'project_id' => $project->id,
                 'school_id' => $school->id,
             ]);
@@ -175,7 +180,7 @@ class SchoolProjectController extends Controller
 
         // التحقق من أن المشروع تم قبوله بشكل صحيح
         if ($project->status !== 'approved') {
-            \Log::error('Project status not updated correctly', [
+            Log::error('Project status not updated correctly', [
                 'project_id' => $project->id,
                 'status' => $project->status,
                 'expected' => 'approved',
@@ -183,7 +188,7 @@ class SchoolProjectController extends Controller
             return redirect()->back()->with('error', 'حدث خطأ أثناء قبول المشروع');
         }
 
-        \Log::info('Project approved successfully', [
+        Log::info('Project approved successfully', [
             'project_id' => $project->id,
             'status' => $project->status,
             'school_id' => $project->school_id,
@@ -192,31 +197,31 @@ class SchoolProjectController extends Controller
 
         // مسح الكاش لضمان ظهور المشروع في القوائم
         $this->projectService->clearProjectCache($project->id, $project->user_id, $project->teacher_id, $school->id);
-        
+
         // مسح كاش المشاريع المعتمدة
         $cacheDriver = config('cache.default');
         if (in_array($cacheDriver, ['redis', 'memcached'])) {
-            \Cache::tags(['approved_projects'])->flush();
+            Cache::tags(['approved_projects'])->flush();
         } else {
             // مسح جميع مفاتيح الكاش المتعلقة بالمشاريع المعتمدة
             for ($page = 1; $page <= 20; $page++) {
-                \Cache::forget("approved_projects_" . md5(json_encode([null, null, $school->id, 12])));
-                \Cache::forget("approved_projects_" . md5(json_encode([null, null, null, 12])));
+                Cache::forget("approved_projects_" . md5(json_encode([null, null, $school->id, 12])));
+                Cache::forget("approved_projects_" . md5(json_encode([null, null, null, 12])));
             }
         }
 
         // إرسال حدث قبول المشروع
         \App\Events\ProjectApproved::dispatch($project);
-        
+
         // إرسال إشعار لجميع الطلاب والمعلمين في المدرسة عند قبول المشروع
         \App\Jobs\SendNewProjectNotification::dispatch($project);
-        
+
         // منح نقاط للطالب أو المعلم
         $user = $project->user;
         if ($user && $user->role === 'student') {
             $pointsToAdd = 10; // نقاط عند قبول المشروع
             $user->increment('points', $pointsToAdd);
-            
+
             // تسجيل النقاط في التاريخ
             \App\Models\Point::create([
                 'user_id' => $user->id,
@@ -227,7 +232,7 @@ class SchoolProjectController extends Controller
                 'description' => 'تم قبول المشروع: ' . $project->title,
                 'description_ar' => 'تم قبول المشروع: ' . $project->title,
             ]);
-            
+
             $project->update(['points_earned' => $pointsToAdd]);
         } elseif ($project->teacher_id) {
             // منح نقاط للمعلم أيضاً
@@ -235,7 +240,7 @@ class SchoolProjectController extends Controller
             if ($teacher) {
                 $pointsToAdd = 15; // نقاط أكثر للمعلم
                 $teacher->increment('points', $pointsToAdd);
-                
+
                 \App\Models\Point::create([
                     'user_id' => $teacher->id,
                     'points' => $pointsToAdd,
@@ -247,24 +252,24 @@ class SchoolProjectController extends Controller
                 ]);
             }
         }
-        
+
         return redirect()->back()->with('success', 'تم قبول المشروع بنجاح');
     }
-    
+
     // رفض مشروع
     public function reject(Request $request, Project $project)
     {
         $school = Auth::user();
         $students = User::where('school_id', $school->id)->where('role', 'student')->pluck('id');
-        
+
         // التحقق من الصلاحية: إما مشروع طالب أو مشروع معلم مرسل لهذه المدرسة
         $isStudentProject = in_array($project->user_id, $students->toArray());
         $isTeacherProject = $project->teacher_id !== null && $project->school_id === $school->id;
-        
+
         if ((!$isStudentProject && !$isTeacherProject) || $project->status !== 'pending') {
             abort(403, 'غير مصرح لك برفض هذا المشروع');
         }
-        
+
         $project->update([
             'status' => 'rejected',
             'approved_by' => $school->id,
@@ -273,51 +278,63 @@ class SchoolProjectController extends Controller
 
         // إرسال حدث رفض المشروع
         \App\Events\ProjectRejected::dispatch($project);
-        
+
         return redirect()->back()->with('success', 'تم رفض المشروع');
     }
-    
+
     // عرض تفاصيل المشروع
     public function show(Project $project)
     {
         $school = Auth::user();
         $students = User::where('school_id', $school->id)->where('role', 'student')->pluck('id');
-        
+
         // التحقق من الصلاحية
         if (!in_array($project->user_id, $students->toArray()) && $project->school_id !== $school->id) {
             abort(403, 'غير مصرح لك بعرض هذا المشروع');
         }
-        
+
         $project->load('user', 'challenges', 'school', 'approver');
-        
+
         return Inertia::render('School/Projects/Show', [
             'project' => $project,
         ]);
     }
-    
+
     // تعديل مشروع
     public function edit(Project $project)
     {
         $school = Auth::user();
-        
-        if ($project->school_id !== $school->id || $project->user_id !== $school->id) {
+        $students = User::where('school_id', $school->id)->where('role', 'student')->pluck('id')->toArray();
+
+        // التحقق من الصلاحية: إما مشروع المدرسة مباشرة أو مشروع طالب في المدرسة أو مشروع معلم في المدرسة
+        $isSchoolProject = $project->school_id === $school->id && $project->user_id === $school->id;
+        $isStudentProject = in_array($project->user_id, $students) && $project->school_id === $school->id;
+        $isTeacherProject = $project->teacher_id !== null && $project->school_id === $school->id;
+
+        if (!$isSchoolProject && !$isStudentProject && !$isTeacherProject) {
             abort(403, 'غير مصرح لك بتعديل هذا المشروع');
         }
-        
+
         return Inertia::render('School/Projects/Edit', [
             'project' => $project,
         ]);
     }
-    
+
     // تحديث مشروع
     public function update(Request $request, Project $project)
     {
         $school = Auth::user();
-        
-        if ($project->school_id !== $school->id || $project->user_id !== $school->id) {
+        $students = User::where('school_id', $school->id)->where('role', 'student')->pluck('id')->toArray();
+
+        // التحقق من الصلاحية: إما مشروع المدرسة مباشرة أو مشروع طالب في المدرسة أو مشروع معلم في المدرسة
+        $isSchoolProject = $project->school_id === $school->id && $project->user_id === $school->id;
+        $isStudentProject = in_array($project->user_id, $students) && $project->school_id === $school->id;
+        $isTeacherProject = $project->teacher_id !== null && $project->school_id === $school->id;
+
+        if (!$isSchoolProject && !$isStudentProject && !$isTeacherProject) {
             abort(403, 'غير مصرح لك بتعديل هذا المشروع');
         }
-        
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -327,63 +344,139 @@ class SchoolProjectController extends Controller
             'images' => 'nullable|array',
             'images.*' => 'image|max:5120',
             'report' => 'nullable|string',
+            'existing_files' => 'nullable|array',
+            'existing_files.*' => 'string',
+            'existing_images' => 'nullable|array',
+            'existing_images.*' => 'string',
         ]);
-        
+
         $project->update([
             'title' => $validated['title'],
             'description' => $validated['description'],
             'category' => $validated['category'],
             'report' => $validated['report'] ?? null,
         ]);
-        
-        // تحديث الملفات
+
+        // تحديث الملفات - دمج الملفات المتبقية مع الجديدة
+        $allFiles = [];
+
+        // إضافة الملفات المتبقية
+        if ($request->has('existing_files') && is_array($request->existing_files)) {
+            $allFiles = array_merge($allFiles, $request->existing_files);
+        }
+
+        // إضافة الملفات الجديدة
         if ($request->hasFile('files')) {
-            $files = [];
             foreach ($request->file('files') as $file) {
-                $files[] = $file->store('projects/files', 'public');
+                $allFiles[] = $file->store('projects/files', 'public');
             }
-            $project->files = $files;
         }
-        
-        // تحديث الصور
+
+        // حذف الملفات القديمة التي لم تعد موجودة
+        if ($project->files) {
+            foreach ($project->files as $oldFile) {
+                if (!in_array($oldFile, $allFiles)) {
+                    Storage::disk('public')->delete($oldFile);
+                }
+            }
+        }
+
+        $project->files = $allFiles;
+
+        // تحديث الصور - دمج الصور المتبقية مع الجديدة
+        $allImages = [];
+
+        // إضافة الصور المتبقية
+        if ($request->has('existing_images') && is_array($request->existing_images)) {
+            $allImages = array_merge($allImages, $request->existing_images);
+        }
+
+        // إضافة الصور الجديدة
         if ($request->hasFile('images')) {
-            $images = [];
             foreach ($request->file('images') as $image) {
-                $images[] = $image->store('projects/images', 'public');
+                $allImages[] = $image->store('projects/images', 'public');
             }
-            $project->images = $images;
         }
-        
+
+        // حذف الصور القديمة التي لم تعد موجودة
+        if ($project->images) {
+            foreach ($project->images as $oldImage) {
+                if (!in_array($oldImage, $allImages)) {
+                    Storage::disk('public')->delete($oldImage);
+                }
+            }
+        }
+
+        $project->images = $allImages;
+
         $project->save();
+
+        // مسح الكاش بشكل شامل
+        $this->projectService->clearProjectCache($project->id, $project->user_id, $project->teacher_id, $school->id);
         
+        // مسح كاش إضافي للتأكد من ظهور التحديثات
+        // مسح جميع مفاتيح الكاش المتعلقة بالمدرسة
+        $cacheDriver = config('cache.default');
+        if (in_array($cacheDriver, ['redis', 'memcached'])) {
+            Cache::tags(['school_projects_' . $school->id, 'approved_projects'])->flush();
+        } else {
+            // مسح جميع التوليفات المحتملة
+            $searchOptions = [null, ''];
+            $statusOptions = [null, '', 'pending', 'approved', 'rejected'];
+            $categoryOptions = [null, '', 'science', 'technology', 'engineering', 'mathematics', 'arts', 'other'];
+            
+            foreach ($searchOptions as $search) {
+                foreach ($statusOptions as $status) {
+                    foreach ($categoryOptions as $category) {
+                        $cacheKey = "school_projects_{$school->id}_" . md5(json_encode([$search, $status, $category, 15]));
+                        Cache::forget($cacheKey);
+                    }
+                }
+            }
+            
+            // مسح pending projects
+            foreach ($searchOptions as $search) {
+                foreach ($categoryOptions as $category) {
+                    $cacheKey = "school_pending_projects_{$school->id}_" . md5(json_encode([$search, $category, 15]));
+                    Cache::forget($cacheKey);
+                }
+            }
+        }
+
         return redirect()->route('school.projects.index')
             ->with('success', 'تم تحديث المشروع بنجاح');
     }
-    
+
     // حذف مشروع
     public function destroy(Project $project)
     {
         $school = Auth::user();
-        
-        if ($project->school_id !== $school->id || $project->user_id !== $school->id) {
+        $students = User::where('school_id', $school->id)->where('role', 'student')->pluck('id')->toArray();
+
+        // التحقق من الصلاحية: إما مشروع المدرسة مباشرة أو مشروع طالب في المدرسة أو مشروع معلم في المدرسة
+        $isSchoolProject = $project->school_id === $school->id && $project->user_id === $school->id;
+        $isStudentProject = in_array($project->user_id, $students) && $project->school_id === $school->id;
+        $isTeacherProject = $project->teacher_id !== null && $project->school_id === $school->id;
+
+        if (!$isSchoolProject && !$isStudentProject && !$isTeacherProject) {
             abort(403, 'غير مصرح لك بحذف هذا المشروع');
         }
-        
+
         // حذف الملفات
         if ($project->files) {
             foreach ($project->files as $file) {
                 Storage::disk('public')->delete($file);
             }
         }
-        
+
         if ($project->images) {
             foreach ($project->images as $image) {
                 Storage::disk('public')->delete($image);
             }
         }
-        
+
         $project->delete();
-        
+
         return redirect()->route('school.projects.index')
             ->with('success', 'تم حذف المشروع بنجاح');
     }

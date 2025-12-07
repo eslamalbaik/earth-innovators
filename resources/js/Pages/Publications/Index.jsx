@@ -3,6 +3,7 @@ import MainLayout from '../../Layouts/MainLayout';
 import { FaBook, FaFileAlt, FaCalendar, FaBuilding, FaHeart, FaArrowLeft, FaSearch, FaDownload, FaNewspaper } from 'react-icons/fa';
 import { useState } from 'react';
 import axios from 'axios';
+import { getPublicationImageUrl } from '../../utils/imageUtils';
 
 export default function PublicationsIndex({ auth, publications, filters }) {
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
@@ -51,6 +52,7 @@ export default function PublicationsIndex({ auth, publications, filters }) {
             magazine: 'مجلة',
             booklet: 'كتيب',
             report: 'تقرير',
+            article: 'مقال',
         };
         return labels[type] || type;
     };
@@ -58,6 +60,7 @@ export default function PublicationsIndex({ auth, publications, filters }) {
     const getTypeIcon = (type) => {
         if (type === 'magazine') return FaNewspaper;
         if (type === 'booklet') return FaBook;
+        if (type === 'article') return FaFileAlt;
         return FaFileAlt;
     };
 
@@ -72,42 +75,20 @@ export default function PublicationsIndex({ auth, publications, filters }) {
     const magazines = publications.data?.filter(p => p.type === 'magazine') || [];
     const booklets = publications.data?.filter(p => p.type === 'booklet') || [];
     const reports = publications.data?.filter(p => p.type === 'report') || [];
+    const articles = publications.data?.filter(p => p.type === 'article') || [];
 
     const renderPublicationCard = (publication) => {
         const TypeIcon = getTypeIcon(publication.type);
         const isLiked = publication.is_liked || likedPublications.has(publication.id);
-        
-        // معالجة مسار الصورة
-        const getCoverImage = () => {
-            if (!publication.cover_image) {
-                return '/images/default-publication.jpg';
-            }
-            
-            // إذا كان URL كامل
-            if (publication.cover_image.startsWith('http://') || publication.cover_image.startsWith('https://')) {
-                return publication.cover_image;
-            }
-            
-            // إذا كان يبدأ بـ /storage/ أو /images/
-            if (publication.cover_image.startsWith('/storage/') || publication.cover_image.startsWith('/images/')) {
-                return publication.cover_image;
-            }
-            
-            // إذا كان يبدأ بـ storage/ بدون /
-            if (publication.cover_image.startsWith('storage/')) {
-                return '/' + publication.cover_image;
-            }
-            
-            // افتراض أنه مسار نسبي في storage
-            return `/storage/${publication.cover_image}`;
-        };
-        
-        const coverImage = getCoverImage();
+
+        // Use utility function for consistent image URL handling
+        const coverImage = getPublicationImageUrl(publication.cover_image);
 
         // تحديد لون البادج حسب النوع
         const getBadgeColor = (type) => {
             if (type === 'magazine') return 'bg-blue-50 border-blue-200 text-blue-800';
             if (type === 'booklet') return 'bg-amber-50 border-amber-200 text-amber-800';
+            if (type === 'article') return 'bg-green-50 border-green-200 text-green-800';
             return 'bg-gray-50 border-gray-200 text-gray-800';
         };
 
@@ -120,8 +101,10 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                         alt={publication.title}
                         className="w-full h-64 object-cover"
                         onError={(e) => {
+                            console.error('Failed to load publication image:', coverImage);
                             e.target.src = '/images/default-publication.jpg';
                         }}
+                        loading="lazy"
                     />
                     {/* New tag */}
                     <div className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
@@ -320,8 +303,21 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                                 </div>
                             )}
 
+                            {/* Articles Section */}
+                            {articles.length > 0 && (
+                                <div className="mb-12">
+                                    <div className="flex items-center gap-3 mb-6">
+                                        <FaFileAlt className="text-2xl text-gray-700" />
+                                        <h2 className="text-2xl font-bold text-gray-900">مقالات</h2>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {articles.map(renderPublicationCard)}
+                                    </div>
+                                </div>
+                            )}
+
                             {/* If no specific type matches, show all */}
-                            {magazines.length === 0 && booklets.length === 0 && reports.length === 0 && (
+                            {magazines.length === 0 && booklets.length === 0 && reports.length === 0 && articles.length === 0 && (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {publications.data.map(renderPublicationCard)}
                                 </div>

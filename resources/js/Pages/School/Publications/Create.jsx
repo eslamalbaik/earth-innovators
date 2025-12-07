@@ -6,6 +6,7 @@ import TextInput from '../../../Components/TextInput';
 import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
 import PrimaryButton from '../../../Components/PrimaryButton';
+import TiptapEditor from '../../../Components/TiptapEditor';
 
 export default function SchoolPublicationCreate({ auth }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -16,8 +17,6 @@ export default function SchoolPublicationCreate({ auth }) {
         cover_image: null,
         file: null,
         issue_number: '',
-        publish_date: '',
-        publisher_name: '',
     });
 
     const [coverPreview, setCoverPreview] = useState(null);
@@ -74,6 +73,7 @@ export default function SchoolPublicationCreate({ auth }) {
                                 <option value="magazine">مجلة</option>
                                 <option value="booklet">كتيب</option>
                                 <option value="report">تقرير</option>
+                                <option value="article">مقال</option>
                             </select>
                             <InputError message={errors.type} className="mt-2" />
                         </div>
@@ -107,15 +107,14 @@ export default function SchoolPublicationCreate({ auth }) {
 
                         {/* Content */}
                         <div>
-                            <InputLabel htmlFor="content" value="المحتوى (HTML)" />
-                            <textarea
-                                id="content"
-                                value={data.content}
-                                onChange={(e) => setData('content', e.target.value)}
-                                rows={10}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-legacy-green focus:ring-legacy-green font-mono text-sm"
-                                placeholder="يمكنك استخدام HTML هنا"
-                            />
+                            <InputLabel htmlFor="content" value="المحتوى" />
+                            <div className="mt-1">
+                                <TiptapEditor
+                                    content={data.content}
+                                    onChange={(html) => setData('content', html)}
+                                    placeholder="أدخل محتوى المقال..."
+                                />
+                            </div>
                             <InputError message={errors.content} className="mt-2" />
                         </div>
 
@@ -173,33 +172,6 @@ export default function SchoolPublicationCreate({ auth }) {
                                 className="mt-1 block w-full"
                             />
                             <InputError message={errors.issue_number} className="mt-2" />
-                        </div>
-
-                        {/* Publish Date */}
-                        <div>
-                            <InputLabel htmlFor="publish_date" value="تاريخ النشر" />
-                            <TextInput
-                                id="publish_date"
-                                type="date"
-                                value={data.publish_date}
-                                onChange={(e) => setData('publish_date', e.target.value)}
-                                className="mt-1 block w-full"
-                            />
-                            <InputError message={errors.publish_date} className="mt-2" />
-                        </div>
-
-                        {/* Publisher Name */}
-                        <div>
-                            <InputLabel htmlFor="publisher_name" value="اسم الناشر (مثل: مجلس المدارس المبتكرة)" />
-                            <TextInput
-                                id="publisher_name"
-                                type="text"
-                                value={data.publisher_name}
-                                onChange={(e) => setData('publisher_name', e.target.value)}
-                                className="mt-1 block w-full"
-                                placeholder="مثال: مجلس المدارس المبتكرة"
-                            />
-                            <InputError message={errors.publisher_name} className="mt-2" />
                         </div>
 
                         {/* Submit Button */}

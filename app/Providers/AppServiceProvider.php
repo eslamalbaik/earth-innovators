@@ -11,10 +11,26 @@ use App\Events\TeacherProjectCreated;
 use App\Events\ProjectApproved;
 use App\Events\ProjectRejected;
 use App\Events\StudentSubmissionUpdated;
+use App\Events\SubmissionCreated;
+use App\Events\SubmissionUpdated;
+use App\Events\EvaluationCreated;
+use App\Events\EvaluationUpdated;
+use App\Events\EvaluationDeleted;
+use App\Events\CommentAdded;
+use App\Events\StatusChanged;
+use App\Events\ChallengeSubmissionReviewed;
+use App\Events\ChallengeCreated;
 use App\Listeners\SendTeacherProjectCreatedNotification;
 use App\Listeners\SendProjectApprovedNotification;
 use App\Listeners\SendProjectRejectedNotification;
 use App\Listeners\SendStudentSubmissionUpdatedNotification;
+use App\Listeners\HandleSubmissionCreated;
+use App\Listeners\HandleEvaluationCreated;
+use App\Listeners\HandleEvaluationUpdated;
+use App\Listeners\HandleCommentAdded;
+use App\Listeners\HandleStatusChanged;
+use App\Listeners\SendSubmissionReviewNotification;
+use App\Listeners\SendChallengeCreatedNotification;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
@@ -199,6 +215,16 @@ class AppServiceProvider extends ServiceProvider
             \App\Services\ChatService::class,
             \App\Services\ChatService::class
         );
+
+        $this->app->bind(
+            \App\Services\EvaluationService::class,
+            \App\Services\EvaluationService::class
+        );
+
+        $this->app->bind(
+            \App\Services\ChallengeNotificationRouterService::class,
+            \App\Services\ChallengeNotificationRouterService::class
+        );
     }
 
     public function boot(): void
@@ -227,6 +253,47 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(
             StudentSubmissionUpdated::class,
             SendStudentSubmissionUpdatedNotification::class
+        );
+
+        // Challenge submission and evaluation events
+        Event::listen(
+            SubmissionCreated::class,
+            HandleSubmissionCreated::class
+        );
+
+        Event::listen(
+            SubmissionUpdated::class,
+            HandleSubmissionCreated::class // Reuse same handler for updates
+        );
+
+        Event::listen(
+            EvaluationCreated::class,
+            HandleEvaluationCreated::class
+        );
+
+        Event::listen(
+            EvaluationUpdated::class,
+            HandleEvaluationUpdated::class
+        );
+
+        Event::listen(
+            CommentAdded::class,
+            HandleCommentAdded::class
+        );
+
+        Event::listen(
+            StatusChanged::class,
+            HandleStatusChanged::class
+        );
+
+        Event::listen(
+            ChallengeSubmissionReviewed::class,
+            SendSubmissionReviewNotification::class
+        );
+
+        Event::listen(
+            ChallengeCreated::class,
+            SendChallengeCreatedNotification::class
         );
     }
 }

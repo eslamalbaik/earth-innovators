@@ -189,6 +189,7 @@ export default function CreatePublication({ auth, school }) {
                                 <option value="magazine">مجلة</option>
                                 <option value="booklet">كتيب</option>
                                 <option value="report">تقرير</option>
+                                <option value="article">مقال</option>
                             </select>
                             <InputError message={errors.type} className="mt-2" />
                         </div>

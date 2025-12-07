@@ -60,3 +60,69 @@ export const getColorFromName = (name) => {
     return colors[index];
 };
 
+/**
+ * Get publication cover image URL
+ * Handles both absolute URLs (from Laravel accessor) and relative paths
+ * @param {string|null|undefined} imagePath - The image path from the API
+ * @param {string} fallback - Fallback image path (default: '/images/default-publication.jpg')
+ * @returns {string} The complete image URL
+ */
+export const getPublicationImageUrl = (imagePath, fallback = '/images/default-publication.jpg') => {
+    if (!imagePath) {
+        return fallback;
+    }
+
+    // If it's already a full URL (absolute), return as is
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+        return imagePath;
+    }
+
+    // If it's a data URL (base64), return as is
+    if (imagePath.startsWith('data:')) {
+        return imagePath;
+    }
+
+    // If it starts with /storage/ or /images/, it's already a proper path
+    if (imagePath.startsWith('/storage/') || imagePath.startsWith('/images/')) {
+        return imagePath;
+    }
+
+    // If it starts with storage/ without leading slash, add it
+    if (imagePath.startsWith('storage/')) {
+        return '/' + imagePath;
+    }
+
+    // Assume it's a relative path in storage - prepend /storage/
+    return `/storage/${imagePath}`;
+};
+
+/**
+ * Get publication file URL
+ * Similar to getPublicationImageUrl but for PDF files
+ * @param {string|null|undefined} filePath - The file path from the API
+ * @returns {string|null} The complete file URL or null
+ */
+export const getPublicationFileUrl = (filePath) => {
+    if (!filePath) {
+        return null;
+    }
+
+    // If it's already a full URL, return as is
+    if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
+        return filePath;
+    }
+
+    // If it starts with /storage/, it's already a proper path
+    if (filePath.startsWith('/storage/')) {
+        return filePath;
+    }
+
+    // If it starts with storage/ without leading slash, add it
+    if (filePath.startsWith('storage/')) {
+        return '/' + filePath;
+    }
+
+    // Assume it's a relative path in storage
+    return `/storage/${filePath}`;
+};
+

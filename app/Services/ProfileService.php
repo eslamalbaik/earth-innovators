@@ -56,7 +56,6 @@ class ProfileService extends BaseService
         // Add badges for students
         if ($user->isStudent()) {
             $badges = $user->badges()
-                ->with('pivot')
                 ->select('badges.id', 'badges.name', 'badges.name_ar', 'badges.description', 'badges.description_ar', 'badges.icon', 'badges.image')
                 ->get()
                 ->map(function ($badge) {

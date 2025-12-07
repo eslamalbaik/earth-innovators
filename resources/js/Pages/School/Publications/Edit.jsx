@@ -6,6 +6,7 @@ import TextInput from '../../../Components/TextInput';
 import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
 import PrimaryButton from '../../../Components/PrimaryButton';
+import { getPublicationImageUrl } from '../../../utils/imageUtils';
 
 export default function SchoolPublicationEdit({ auth, publication }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -18,16 +19,41 @@ export default function SchoolPublicationEdit({ auth, publication }) {
         issue_number: publication?.issue_number || '',
         publish_date: publication?.publish_date || '',
         publisher_name: publication?.publisher_name || '',
+        _method: 'PUT',
     });
 
-    const [coverPreview, setCoverPreview] = useState(
-        publication?.cover_image 
-            ? (publication.cover_image.startsWith('http') 
-                ? publication.cover_image 
-                : `/storage/${publication.cover_image}`)
-            : null
-    );
+    const getImageUrl = (imagePath) => {
+        if (!imagePath) return null;
+        // Use utility function for consistency, but allow null for preview state
+        return getPublicationImageUrl(imagePath, null);
+    };
+
+    const [coverPreview, setCoverPreview] = useState(() => {
+        return getImageUrl(publication?.cover_image);
+    });
     const [fileName, setFileName] = useState(publication?.file ? 'ملف موجود' : '');
+
+    // Update preview when publication changes (but not if user selected a new file)
+    useEffect(() => {
+        if (publication?.cover_image) {
+            const imageUrl = getImageUrl(publication.cover_image);
+            // Only update if current preview is not a blob URL (user-selected file)
+            setCoverPreview(prev => {
+                if (prev && prev.startsWith('blob:')) {
+                    return prev; // Keep user-selected file preview
+                }
+                return imageUrl;
+            });
+        } else {
+            // If no image in publication and no user-selected file, clear preview
+            setCoverPreview(prev => {
+                if (prev && prev.startsWith('blob:')) {
+                    return prev; // Keep user-selected file preview
+                }
+                return null;
+            });
+        }
+    }, [publication?.cover_image]);
 
     const handleCoverImageChange = (e) => {
         const file = e.target.files[0];
@@ -48,12 +74,20 @@ export default function SchoolPublicationEdit({ auth, publication }) {
     const submit = (e) => {
         e.preventDefault();
         post(`/school/publications/${publication.id}`, {
-            _method: 'PUT',
             forceFormData: true,
-            onSuccess: () => {
+            preserveScroll: true,
+            onSuccess: (page) => {
+                // Clean up blob URL if exists
                 if (coverPreview && coverPreview.startsWith('blob:')) {
                     URL.revokeObjectURL(coverPreview);
                 }
+                // Update preview with the new image path if available
+                if (page?.props?.publication?.cover_image) {
+                    setCoverPreview(getImageUrl(page.props.publication.cover_image));
+                }
+            },
+            onError: (errors) => {
+                console.error('Update errors:', errors);
             },
         });
     };
@@ -144,13 +178,26 @@ export default function SchoolPublicationEdit({ auth, publication }) {
                                     onChange={handleCoverImageChange}
                                     className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-legacy-green/10 file:text-legacy-green hover:file:bg-legacy-green/20"
                                 />
-                                {coverPreview && (
-                                    <img
-                                        src={coverPreview}
-                                        alt="Preview"
-                                        className="mt-4 w-48 h-48 object-cover rounded-lg border border-gray-300"
-                                    />
-                                )}
+                                {coverPreview ? (
+                                    <div className="mt-4">
+                                        <img
+                                            src={coverPreview}
+                                            alt="Preview"
+                                            className="w-48 h-48 object-cover rounded-lg border border-gray-300"
+                                            onError={(e) => {
+                                                console.error('Failed to load image:', coverPreview);
+                                                e.target.style.display = 'none';
+                                                // Show error message
+                                                const errorDiv = document.createElement('div');
+                                                errorDiv.className = 'mt-2 text-sm text-red-600';
+                                                errorDiv.textContent = 'فشل تحميل الصورة';
+                                                e.target.parentElement.appendChild(errorDiv);
+                                            }}
+                                        />
+                                    </div>
+                                ) : publication?.cover_image ? (
+                                    <p className="mt-2 text-sm text-gray-500">جاري تحميل الصورة...</p>
+                                ) : null}
                             </div>
                             <InputError message={errors.cover_image} className="mt-2" />
                         </div>

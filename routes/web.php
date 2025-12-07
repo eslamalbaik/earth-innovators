@@ -16,6 +16,11 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+// Serve storage files directly (MUST be first to catch storage requests before other routes)
+Route::get('/storage/{path}', [\App\Http\Controllers\StorageController::class, 'serve'])
+    ->where('path', '.*')
+    ->name('storage.serve');
+
 Route::get('/', function () {
     $cities = \Illuminate\Support\Facades\Cache::remember('home_cities', 3600, function () {
         return \App\Models\Teacher::where('is_active', true)
@@ -99,6 +104,16 @@ Route::get('/', function () {
     });
 
     $testimonials = \Illuminate\Support\Facades\Cache::remember('home_testimonials', 3600, function () {
+        // Map reviewer names to titles and initials
+        $reviewerInfo = [
+            'سارة أحمد' => ['title' => 'منصة رائعة للإبداع والتعلم', 'initials' => 'سأ'],
+            'فاطمة محمد' => ['title' => 'تجربة ممتازة للمدارس', 'initials' => 'فم'],
+            'أم خالد' => ['title' => 'أفضل منصة تعليمية', 'initials' => 'أخ'],
+            'أحمد علي' => ['title' => 'منصة محترفة ومبتكرة', 'initials' => 'أع'],
+            'أبو ناصر' => ['title' => 'تجربة إيجابية جداً', 'initials' => 'أن'],
+            'محمد خالد' => ['title' => 'منصة متميزة للطلاب', 'initials' => 'مخ'],
+        ];
+
         return \App\Models\Review::where('is_published', true)
             ->whereNotNull('comment')
             ->where('comment', '!=', '')
@@ -106,45 +121,18 @@ Route::get('/', function () {
             ->orderBy('created_at', 'desc')
             ->limit(6)
             ->get()
-            ->map(function ($review) {
+            ->map(function ($review) use ($reviewerInfo) {
+                $reviewerName = $review->reviewer_name ?? ($review->student ? $review->student->name : 'مجهول');
+                $info = $reviewerInfo[$reviewerName] ?? ['title' => '', 'initials' => ''];
+
                 return [
                     'id' => $review->id,
+                    'title' => $info['title'],
                     'text' => $review->comment,
                     'rating' => round($review->rating, 1),
-                    'name' => $review->reviewer_name ?? ($review->student ? $review->student->name : 'مجهول'),
+                    'name' => $reviewerName,
                     'location' => $review->reviewer_location ?? ($review->student && $review->student->city ? $review->student->city : ''),
-                ];
-            })
-            ->toArray();
-    });
-
-    $featuredPublications = \Illuminate\Support\Facades\Cache::remember('home_publications', 3600, function () {
-        return \App\Models\Publication::where('status', 'approved')
-            ->with(['school', 'author'])
-            ->orderBy('created_at', 'desc')
-            ->limit(2)
-            ->get()
-            ->map(function ($publication) {
-                return [
-                    'id' => $publication->id,
-                    'title' => $publication->title,
-                    'description' => $publication->description,
-                    'type' => $publication->type,
-                    'cover_image' => $publication->cover_image 
-                        ? (str_starts_with($publication->cover_image, '/images/') 
-                            ? $publication->cover_image 
-                            : asset('storage/' . $publication->cover_image))
-                        : null,
-                    'file' => $publication->file,
-                    'content' => $publication->content,
-                    'issue_number' => $publication->issue_number,
-                    'publish_date' => $publication->publish_date,
-                    'publisher_name' => $publication->publisher_name,
-                    'likes_count' => $publication->likes_count,
-                    'school' => $publication->school ? [
-                        'id' => $publication->school->id,
-                        'name' => $publication->school->name,
-                    ] : null,
+                    'initials' => $info['initials'],
                 ];
             })
             ->toArray();
@@ -201,12 +189,8 @@ Route::get('/', function () {
                     'title' => $publication->title,
                     'description' => $publication->description,
                     'type' => $publication->type,
-                    'cover_image' => $publication->cover_image 
-                        ? (str_starts_with($publication->cover_image, '/images/') 
-                            ? $publication->cover_image 
-                            : asset('storage/' . $publication->cover_image))
-                        : null,
-                    'file' => $publication->file,
+                    'cover_image' => app(\App\Services\PublicationService::class)->normalizeImagePath($publication->cover_image),
+                    'file' => app(\App\Services\PublicationService::class)->normalizeFilePath($publication->file),
                     'content' => $publication->content,
                     'issue_number' => $publication->issue_number,
                     'publish_date' => $publication->publish_date,
@@ -221,6 +205,86 @@ Route::get('/', function () {
             ->toArray();
     });
 
+    $featuredProjects = \Illuminate\Support\Facades\Cache::remember('home_featured_projects', 3600, function () {
+        return \App\Models\Project::where('status', 'approved')
+            ->with([
+                'teacher:id,name_ar,user_id',
+                'teacher.user:id,name',
+                'user:id,name',
+                'school:id,name'
+            ])
+            ->orderBy('rating', 'desc')
+            ->orderBy('likes', 'desc')
+            ->orderBy('views', 'desc')
+            ->limit(4)
+            ->get()
+            ->map(function ($project) {
+                return [
+                    'id' => $project->id,
+                    'title' => $project->title,
+                    'description' => $project->description,
+                    'category' => $project->category,
+                    'views' => $project->views,
+                    'likes' => $project->likes,
+                    'rating' => $project->rating,
+                    'teacher' => $project->teacher ? [
+                        'id' => $project->teacher->id,
+                        'name_ar' => $project->teacher->name_ar,
+                        'user' => $project->teacher->user ? [
+                            'id' => $project->teacher->user->id,
+                            'name' => $project->teacher->user->name,
+                        ] : null,
+                    ] : null,
+                    'user' => $project->user ? [
+                        'id' => $project->user->id,
+                        'name' => $project->user->name,
+                    ] : null,
+                    'school' => $project->school ? [
+                        'id' => $project->school->id,
+                        'name' => $project->school->name,
+                    ] : null,
+                ];
+            })
+            ->toArray();
+    });
+
+    $uaeSchools = \Illuminate\Support\Facades\Cache::remember('home_uae_schools', 3600, function () {
+        // البحث عن مدارس الإمارات بناءً على أسماء المدن
+        $uaeCities = ['دبي', 'أبوظبي', 'الشارقة', 'عجمان', 'رأس الخيمة', 'الفجيرة', 'أم القيوين',
+                      'Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman', 'Ras Al Khaimah', 'Fujairah', 'Umm Al Quwain'];
+
+        return \App\Models\User::where('role', 'school')
+            ->where(function ($query) use ($uaeCities) {
+                foreach ($uaeCities as $city) {
+                    $query->orWhere('name', 'like', '%' . $city . '%');
+                }
+            })
+            ->withCount(['students' => function ($query) {
+                $query->where('role', 'student');
+            }])
+            ->limit(8)
+            ->get()
+            ->map(function ($school) {
+                $students = \App\Models\User::where('school_id', $school->id)
+                    ->where('role', 'student')
+                    ->pluck('id');
+
+                $totalPoints = \App\Models\User::whereIn('id', $students)->sum('points') ?? 0;
+                $projectsCount = \App\Models\Project::whereIn('user_id', $students)
+                    ->where('status', 'approved')
+                    ->count();
+
+                return [
+                    'id' => $school->id,
+                    'name' => $school->name,
+                    'total_students' => $school->students_count ?? 0,
+                    'projects_count' => $projectsCount,
+                    'total_points' => $totalPoints,
+                ];
+            })
+            ->toArray();
+    });
+
     return Inertia::render('Home', [
         'cities' => $cities,
         'subjects' => $subjects,
@@ -228,6 +292,8 @@ Route::get('/', function () {
         'testimonials' => $testimonials,
         'stats' => $stats,
         'featuredPublications' => $featuredPublications,
+        'featuredProjects' => $featuredProjects,
+        'uaeSchools' => $uaeSchools,
     ]);
 })->name('home');
 
@@ -240,6 +306,10 @@ Route::get('/subjects', [SubjectController::class, 'index'])->name('subjects');
 // المشاريع المعتمدة (عام - متاح لجميع المستخدمين)
 Route::get('/projects', [App\Http\Controllers\ProjectController::class, 'index'])->name('projects.index');
 Route::get('/projects/{project}', [App\Http\Controllers\ProjectController::class, 'show'])->name('projects.show');
+
+// التحديات النشطة (عام - متاح لجميع المستخدمين)
+Route::get('/challenges', [App\Http\Controllers\ChallengeController::class, 'index'])->name('challenges.index');
+Route::get('/challenges/{challenge}', [App\Http\Controllers\ChallengeController::class, 'show'])->name('challenges.show');
 
 Route::get('/badges', [App\Http\Controllers\BadgeController::class, 'index'])->name('badges');
 Route::get('/badges/{id}', [App\Http\Controllers\BadgeController::class, 'show'])->name('badges.show');
@@ -346,9 +416,20 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/student/projects', [\App\Http\Controllers\Student\StudentProjectController::class, 'index'])->name('student.projects.index');
     Route::get('/student/projects/{project}', [\App\Http\Controllers\Student\StudentProjectController::class, 'show'])->name('student.projects.show');
 
+    // Student Challenges
+    Route::get('/student/challenges', [\App\Http\Controllers\Student\StudentChallengeController::class, 'index'])->name('student.challenges.index');
+    Route::get('/student/challenges/{challenge}', [\App\Http\Controllers\Student\StudentChallengeController::class, 'show'])->name('student.challenges.show');
+    Route::post('/student/challenges/{challenge}/submit', [\App\Http\Controllers\Student\StudentChallengeController::class, 'submit'])->name('student.challenges.submit');
+    Route::get('/student/challenges/{challenge}/submissions/{submission}', [\App\Http\Controllers\Student\StudentChallengeController::class, 'showSubmission'])->name('student.challenges.submissions.show');
+    Route::put('/student/challenges/{challenge}/submissions/{submission}', [\App\Http\Controllers\Student\StudentChallengeController::class, 'updateSubmission'])->name('student.challenges.submissions.update');
+
     // تسليمات المشاريع
     Route::post('/projects/{project}/submissions', [\App\Http\Controllers\ProjectSubmissionController::class, 'store'])->name('project.submissions.store');
     Route::put('/project-submissions/{submission}', [\App\Http\Controllers\ProjectSubmissionController::class, 'update'])->name('project.submissions.update');
+
+    // تسليمات التحديات
+    Route::post('/challenges/{challenge}/submissions', [\App\Http\Controllers\ChallengeSubmissionController::class, 'store'])->name('challenge.submissions.store');
+    Route::put('/challenges/{challenge}/submissions/{submission}', [\App\Http\Controllers\ChallengeSubmissionController::class, 'update'])->name('challenge.submissions.update');
 
     // تعليقات المشاريع
     Route::post('/projects/{project}/comments', [\App\Http\Controllers\ProjectCommentController::class, 'store'])->name('project.comments.store');
@@ -390,6 +471,14 @@ Route::middleware(['auth', 'school'])->prefix('school')->name('school.')->group(
     Route::post('/publications/{publication}/approve', [\App\Http\Controllers\School\SchoolPublicationController::class, 'approve'])->name('publications.approve');
     Route::post('/publications/{publication}/reject', [\App\Http\Controllers\School\SchoolPublicationController::class, 'reject'])->name('publications.reject');
     Route::resource('publications', \App\Http\Controllers\School\SchoolPublicationController::class);
+
+    // إدارة التحديات
+    Route::resource('challenges', \App\Http\Controllers\School\SchoolChallengeController::class);
+
+    // إدارة تقديمات التحديات
+    Route::get('/challenge-submissions', [\App\Http\Controllers\School\SchoolChallengeSubmissionController::class, 'index'])->name('challenge-submissions.index');
+    Route::get('/challenge-submissions/{submission}', [\App\Http\Controllers\School\SchoolChallengeSubmissionController::class, 'show'])->name('challenge-submissions.show');
+    Route::post('/challenge-submissions/{submission}/evaluate', [\App\Http\Controllers\School\SchoolChallengeSubmissionController::class, 'evaluate'])->name('challenge-submissions.evaluate');
 
     // إدارة الشارات من المعلمين
     Route::get('/badges/pending', [\App\Http\Controllers\School\SchoolBadgeController::class, 'pending'])->name('badges.pending');
@@ -438,6 +527,20 @@ Route::middleware(['auth', 'teacher'])->group(function () {
     Route::get('/teacher/publications/{publication}/edit', [\App\Http\Controllers\Teacher\TeacherPublicationController::class, 'edit'])->name('teacher.publications.edit');
     Route::put('/teacher/publications/{publication}', [\App\Http\Controllers\Teacher\TeacherPublicationController::class, 'update'])->name('teacher.publications.update');
     Route::delete('/teacher/publications/{publication}', [\App\Http\Controllers\Teacher\TeacherPublicationController::class, 'destroy'])->name('teacher.publications.destroy');
+
+    // إدارة التحديات
+    Route::get('/teacher/challenges', [\App\Http\Controllers\Teacher\TeacherChallengeController::class, 'index'])->name('teacher.challenges.index');
+    Route::get('/teacher/challenges/create', [\App\Http\Controllers\Teacher\TeacherChallengeController::class, 'create'])->name('teacher.challenges.create');
+    Route::post('/teacher/challenges', [\App\Http\Controllers\Teacher\TeacherChallengeController::class, 'store'])->name('teacher.challenges.store');
+    Route::get('/teacher/challenges/{challenge}', [\App\Http\Controllers\Teacher\TeacherChallengeController::class, 'show'])->name('teacher.challenges.show');
+    Route::get('/teacher/challenges/{challenge}/edit', [\App\Http\Controllers\Teacher\TeacherChallengeController::class, 'edit'])->name('teacher.challenges.edit');
+    Route::put('/teacher/challenges/{challenge}', [\App\Http\Controllers\Teacher\TeacherChallengeController::class, 'update'])->name('teacher.challenges.update');
+    Route::delete('/teacher/challenges/{challenge}', [\App\Http\Controllers\Teacher\TeacherChallengeController::class, 'destroy'])->name('teacher.challenges.destroy');
+
+    // إدارة تقديمات التحديات
+    Route::get('/teacher/challenge-submissions', [\App\Http\Controllers\Teacher\TeacherChallengeSubmissionController::class, 'index'])->name('teacher.challenge-submissions.index');
+    Route::get('/teacher/challenge-submissions/{submission}', [\App\Http\Controllers\Teacher\TeacherChallengeSubmissionController::class, 'show'])->name('teacher.challenge-submissions.show');
+    Route::post('/teacher/challenge-submissions/{submission}/evaluate', [\App\Http\Controllers\Teacher\TeacherChallengeSubmissionController::class, 'evaluate'])->name('teacher.challenge-submissions.evaluate');
 
     // إدارة الشارات من المعلمين
     Route::prefix('teacher')->group(function () {

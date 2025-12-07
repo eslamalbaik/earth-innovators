@@ -2,6 +2,7 @@ import DashboardLayout from '../../../Layouts/DashboardLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { FaBook, FaPlus, FaCalendar, FaEye, FaEdit, FaTrash } from 'react-icons/fa';
 import { useState } from 'react';
+import { getPublicationImageUrl } from '../../../utils/imageUtils';
 
 export default function SchoolPublicationsIndex({ auth, publications, stats, filters }) {
     const [processing, setProcessing] = useState(null);
@@ -38,6 +39,7 @@ export default function SchoolPublicationsIndex({ auth, publications, stats, fil
             magazine: 'مجلة',
             booklet: 'كتيب',
             report: 'تقرير',
+            article: 'مقال',
         };
         return labels[type] || type;
     };
@@ -137,27 +139,7 @@ export default function SchoolPublicationsIndex({ auth, publications, stats, fil
                         {publications.data && publications.data.length > 0 ? (
                             <div className="divide-y divide-gray-200">
                                 {publications.data.map((publication) => {
-                                    const getCoverImage = () => {
-                                        if (!publication.cover_image) {
-                                            return '/images/default-publication.jpg';
-                                        }
-                                        
-                                        if (publication.cover_image.startsWith('http://') || publication.cover_image.startsWith('https://')) {
-                                            return publication.cover_image;
-                                        }
-                                        
-                                        if (publication.cover_image.startsWith('/storage/') || publication.cover_image.startsWith('/images/')) {
-                                            return publication.cover_image;
-                                        }
-                                        
-                                        if (publication.cover_image.startsWith('storage/')) {
-                                            return '/' + publication.cover_image;
-                                        }
-                                        
-                                        return `/storage/${publication.cover_image}`;
-                                    };
-                                    
-                                    const coverImage = getCoverImage();
+                                    const coverImage = getPublicationImageUrl(publication.cover_image);
 
                                     return (
                                         <div key={publication.id} className="p-6 hover:bg-gray-50 transition">

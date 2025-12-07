@@ -209,8 +209,39 @@ class PublicationService extends BaseService
             'approved_at' => now(),
         ]);
 
-        // إرسال إشعار لجميع الطلاب والمعلمين في المدرسة
-        \App\Jobs\SendNewPublicationNotification::dispatch($publication->fresh());
+        // إرسال إشعار لجميع الطلاب والمعلمين في المدرسة مباشرة
+        try {
+            $publication = $publication->fresh(['author', 'school']);
+            
+            if ($publication->school_id) {
+                $users = \App\Models\User::where('school_id', $publication->school_id)
+                    ->whereIn('role', ['student', 'teacher'])
+                    ->get();
+                
+                foreach ($users as $user) {
+                    try {
+                        $user->notify(new \App\Notifications\NewPublicationNotification($publication));
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to send publication notification to user', [
+                            'user_id' => $user->id,
+                            'publication_id' => $publication->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
+                }
+                
+                \Log::info('Publication notifications sent after approval', [
+                    'publication_id' => $publication->id,
+                    'users_count' => $users->count(),
+                ]);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Failed to send publication notifications after approval', [
+                'publication_id' => $publication->id,
+                'error' => $e->getMessage(),
+            ]);
+            // لا نوقف العملية إذا فشل إرسال الإشعارات
+        }
 
         // Clear cache
         $this->clearPublicationCache($publication->school_id, $publication->author_id);
@@ -253,16 +284,37 @@ class PublicationService extends BaseService
         return $deleted;
     }
 
-    private function clearPublicationCache(?int $schoolId = null, ?int $authorId = null): void
+    public function clearPublicationCache(?int $schoolId = null, ?int $authorId = null): void
     {
+        $cacheDriver = config('cache.default');
+        $supportsTags = in_array($cacheDriver, ['redis', 'memcached']);
+        
         $this->forgetCacheTags(['approved_publications']);
 
         if ($schoolId) {
             $this->forgetCacheTags(["school_publications_{$schoolId}"]);
+            // مسح مباشر للكاش بدون tags
+            if (!$supportsTags) {
+                for ($page = 1; $page <= 20; $page++) {
+                    \Cache::forget("school_publications_{$schoolId}_" . md5('') . "_{$page}");
+                    \Cache::forget("school_pending_publications_{$schoolId}_{$page}");
+                }
+            }
         }
 
         if ($authorId) {
             $this->forgetCacheTags(["teacher_publications_{$authorId}"]);
+            // مسح مباشر للكاش بدون tags
+            if (!$supportsTags) {
+                for ($page = 1; $page <= 20; $page++) {
+                    \Cache::forget("teacher_publications_{$authorId}_{$page}");
+                }
+            }
+        }
+        
+        // مسح كاش المقالات المعتمدة العامة
+        if (!$supportsTags) {
+            \Cache::forget('approved_publications_' . md5(json_encode([null, null, 12])));
         }
     }
 }

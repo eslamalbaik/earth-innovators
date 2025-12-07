@@ -36,6 +36,7 @@ export default function SchoolPublicationsPending({ auth, publications }) {
             magazine: 'مجلة',
             booklet: 'كتيب',
             report: 'تقرير',
+            article: 'مقال',
         };
         return labels[type] || type;
     };

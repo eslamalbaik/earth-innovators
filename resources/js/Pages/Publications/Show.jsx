@@ -3,6 +3,7 @@ import MainLayout from '../../Layouts/MainLayout';
 import { FaArrowLeft, FaHeart, FaFileAlt, FaCalendar, FaBuilding, FaEye } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { getPublicationImageUrl, getPublicationFileUrl } from '../../utils/imageUtils';
 
 export default function PublicationShow({ auth, publication, isLiked: initialIsLiked }) {
     const [isLiked, setIsLiked] = useState(initialIsLiked || false);
@@ -32,31 +33,7 @@ export default function PublicationShow({ auth, publication, isLiked: initialIsL
         return `${d.getFullYear()} ${months[d.getMonth()]}`;
     };
 
-    const getCoverImage = () => {
-        if (!publication?.cover_image) {
-            return '/images/default-publication.jpg';
-        }
-        
-        // إذا كان URL كامل
-        if (publication.cover_image.startsWith('http://') || publication.cover_image.startsWith('https://')) {
-            return publication.cover_image;
-        }
-        
-        // إذا كان يبدأ بـ /storage/ أو /images/
-        if (publication.cover_image.startsWith('/storage/') || publication.cover_image.startsWith('/images/')) {
-            return publication.cover_image;
-        }
-        
-        // إذا كان يبدأ بـ storage/ بدون /
-        if (publication.cover_image.startsWith('storage/')) {
-            return '/' + publication.cover_image;
-        }
-        
-        // افتراض أنه مسار نسبي في storage
-        return `/storage/${publication.cover_image}`;
-    };
-
-    const coverImage = getCoverImage();
+    const coverImage = getPublicationImageUrl(publication?.cover_image);
 
     if (!publication) {
         return (
@@ -96,8 +73,10 @@ export default function PublicationShow({ auth, publication, isLiked: initialIsL
                                 alt={publication.title}
                                 className="w-full h-auto rounded-xl shadow-lg"
                                 onError={(e) => {
+                                    console.error('Failed to load publication image:', coverImage);
                                     e.target.src = '/images/default-publication.jpg';
                                 }}
+                                loading="lazy"
                             />
                         </div>
                     )}
@@ -136,7 +115,7 @@ export default function PublicationShow({ auth, publication, isLiked: initialIsL
                         <div className="flex items-center gap-4 pt-6 border-t border-gray-200">
                             {publication.file && (
                                 <a
-                                    href={`/storage/${publication.file}`}
+                                    href={getPublicationFileUrl(publication.file) || '#'}
                                     download
                                     className="flex items-center gap-2 px-6 py-3 bg-legacy-blue text-white rounded-lg hover:bg-blue-700 transition"
                                 >
