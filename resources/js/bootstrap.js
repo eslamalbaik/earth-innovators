@@ -36,37 +36,37 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
                 if (window.Echo.connector && window.Echo.connector.socket) {
                     window.Echo.connector.socket.on('connect', () => {
                         console.log('✅ Laravel Echo connected (Socket.IO):', echoServerUrl);
+                        window.Echo._connectionErrorLogged = false; // Reset on successful connection
                     });
 
                     window.Echo.connector.socket.on('disconnect', () => {
-                        console.warn('⚠️ Laravel Echo disconnected - notifications will use polling');
+                        // Only log if we had a successful connection before
+                        if (!window.Echo._connectionErrorLogged) {
+                            console.warn('⚠️ Laravel Echo disconnected - notifications will use polling');
+                        }
                     });
 
-                    window.Echo.connector.socket.on('error', (error) => {
-                        // Only log if it's not a connection refused error (server not running)
-                        if (!error.message?.includes('ERR_CONNECTION_REFUSED') && 
-                            !error.message?.includes('ECONNREFUSED')) {
-                            console.error('❌ Laravel Echo error:', error);
-                        } else {
-                            console.warn('⚠️ Laravel Echo Server not running - notifications will use polling');
-                        }
+                    // Suppress all error events to avoid console spam
+                    window.Echo.connector.socket.on('error', () => {
+                        // Silently ignore - polling will be used as fallback
                     });
 
                     // Handle connection errors silently
                     window.Echo.connector.socket.on('connect_error', (error) => {
-                        // Silently handle connection errors - polling will be used as fallback
+                        // Silently handle all connection errors - polling will be used as fallback
                         // Only log once to avoid spam
                         if (!window.Echo._connectionErrorLogged) {
-                            if (error.message?.includes('ERR_CONNECTION_REFUSED') || 
-                                error.message?.includes('ECONNREFUSED')) {
-                                console.warn('⚠️ Laravel Echo Server not running - notifications will use polling');
-                                window.Echo._connectionErrorLogged = true;
-                            } else {
-                                console.warn('⚠️ Laravel Echo connection error:', error.message);
-                                window.Echo._connectionErrorLogged = true;
-                            }
+                            // Suppress all connection errors completely
+                            window.Echo._connectionErrorLogged = true;
                         }
                     });
+                    
+                    // Suppress polling transport errors
+                    if (window.Echo.connector.socket.io) {
+                        window.Echo.connector.socket.io.on('error', () => {
+                            // Silently ignore polling errors
+                        });
+                    }
                 }
 
                 console.log('🚀 Laravel Echo initialized with Socket.IO');

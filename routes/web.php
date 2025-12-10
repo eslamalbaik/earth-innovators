@@ -337,6 +337,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         $user = auth()->user();
 
+        // إعادة توجيه الأدمن مباشرة إلى لوحة التحكم الخاصة بهم
+        if ($user->isAdmin()) {
+            return redirect()->route('admin.dashboard');
+        }
+
         // التحقق من وجود teacher record قبل إعادة التوجيه
         if ($user->isTeacher()) {
             // إذا لم يكن هناك teacher record، قم بإنشائه
@@ -371,7 +376,7 @@ Route::middleware(['auth'])->group(function () {
             return redirect()->route('school.dashboard');
         }
 
-        if ($user->isStudent() || !$user->isAdmin()) {
+        if ($user->isStudent()) {
             return app(StudentDashboardController::class)->index(request());
         }
 
@@ -380,6 +385,10 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
+    // Certificate API routes
+    Route::post('/api/certificates/generate', [\App\Http\Controllers\CertificateController::class, 'generate'])->name('api.certificates.generate');
+    Route::get('/certificates/{id}/download', [\App\Http\Controllers\CertificateController::class, 'download'])->name('certificates.download');
+
     Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
     Route::post('/availabilities/book', [AvailabilityController::class, 'book'])->name('availabilities.book');
     Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
@@ -463,9 +472,6 @@ Route::middleware(['auth', 'school'])->prefix('school')->name('school.')->group(
     // الترتيب والشارات
     Route::get('/ranking', [\App\Http\Controllers\School\SchoolRankingController::class, 'index'])->name('ranking');
 
-    // الإحصائيات
-    Route::get('/statistics', [\App\Http\Controllers\School\SchoolStatisticsController::class, 'index'])->name('statistics');
-
     // إدارة الإصدارات
     Route::get('/publications/pending', [\App\Http\Controllers\School\SchoolPublicationController::class, 'pending'])->name('publications.pending');
     Route::post('/publications/{publication}/approve', [\App\Http\Controllers\School\SchoolPublicationController::class, 'approve'])->name('publications.approve');
@@ -491,6 +497,9 @@ Route::middleware(['auth', 'school'])->prefix('school')->name('school.')->group(
     Route::get('/submissions', [\App\Http\Controllers\School\SchoolSubmissionController::class, 'index'])->name('submissions.index');
     Route::get('/submissions/{submission}', [\App\Http\Controllers\School\SchoolSubmissionController::class, 'show'])->name('submissions.show');
     Route::post('/submissions/{submission}/evaluate', [\App\Http\Controllers\School\SchoolSubmissionController::class, 'evaluate'])->name('submissions.evaluate');
+
+    // إدارة الشهادات
+    Route::get('/certificates', [\App\Http\Controllers\School\SchoolCertificateController::class, 'index'])->name('certificates.index');
 });
 
 Route::middleware(['auth', 'teacher'])->group(function () {
@@ -565,6 +574,9 @@ Route::middleware(['auth', 'teacher'])->group(function () {
     Route::get('/teacher/submissions', [\App\Http\Controllers\Teacher\TeacherSubmissionController::class, 'index'])->name('teacher.submissions.index');
     Route::get('/teacher/submissions/{submission}', [\App\Http\Controllers\Teacher\TeacherSubmissionController::class, 'show'])->name('teacher.submissions.show');
     Route::post('/teacher/submissions/{submission}/evaluate', [\App\Http\Controllers\Teacher\TeacherSubmissionController::class, 'evaluate'])->name('teacher.submissions.evaluate');
+
+    // إدارة الشهادات
+    Route::get('/teacher/certificates', [\App\Http\Controllers\Teacher\TeacherCertificateController::class, 'index'])->name('teacher.certificates.index');
 });
 
 Route::prefix('api/webhooks/payment')->group(function () {
@@ -572,7 +584,7 @@ Route::prefix('api/webhooks/payment')->group(function () {
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/statistics', [\App\Http\Controllers\Admin\StatisticsController::class, 'index'])->name('statistics');
+    Route::get('/dashboard', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/subjects', [SubjectController::class, 'adminIndex'])->name('subjects.index');
     Route::post('/subjects', [SubjectController::class, 'store'])->name('subjects.store');
@@ -613,7 +625,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/import/teachers', [\App\Http\Controllers\Admin\ImportController::class, 'importTeachers'])->name('import.teachers');
     Route::post('/import/bookings', [\App\Http\Controllers\Admin\ImportController::class, 'importBookings'])->name('import.bookings');
 
-    Route::get('/users', [\App\Http\Controllers\Admin\UserManagementController::class, 'index'])->name('users.index');
+    // إدارة المستخدمين - CRUD كامل
+    Route::resource('users', \App\Http\Controllers\Admin\UserManagementController::class);
     Route::put('/users/{user}/role', [\App\Http\Controllers\Admin\UserManagementController::class, 'updateRole'])->name('users.update-role');
 
     Route::get('/teachers/{teacher}/report', [\App\Http\Controllers\Admin\TeacherReportController::class, 'show'])->name('teachers.report');
@@ -622,12 +635,30 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('badges', \App\Http\Controllers\Admin\BadgeController::class);
     Route::post('/badges/{badge}/award', [\App\Http\Controllers\Admin\BadgeController::class, 'award'])->name('badges.award');
 
-    // Packages Management
+    // Packages Management (Legacy - يمكن إزالتها لاحقاً)
     Route::resource('packages', \App\Http\Controllers\Admin\PackageController::class);
     Route::get('/packages/{package}/subscribers', [\App\Http\Controllers\Admin\PackageController::class, 'subscribers'])->name('packages.subscribers');
 
+    // إدارة الاشتراكات والمدفوعات
+    Route::get('/subscriptions', [\App\Http\Controllers\Admin\AdminSubscriptionController::class, 'index'])->name('subscriptions.index');
+    Route::get('/subscriptions/subscription/{subscription}', [\App\Http\Controllers\Admin\AdminSubscriptionController::class, 'showSubscription'])->name('subscriptions.show-subscription');
+
     // إدارة الإصدارات
     Route::resource('publications', \App\Http\Controllers\Admin\AdminPublicationController::class)->only(['index', 'destroy']);
+
+    // إدارة التحديات - CRUD كامل
+    Route::resource('challenges', \App\Http\Controllers\Admin\AdminChallengeController::class);
+
+    // إدارة المشاريع - CRUD كامل
+    Route::get('/projects', [\App\Http\Controllers\Admin\AdminProjectController::class, 'index'])->name('projects.index');
+    Route::get('/projects/create', [\App\Http\Controllers\Admin\AdminProjectController::class, 'create'])->name('projects.create');
+    Route::post('/projects', [\App\Http\Controllers\Admin\AdminProjectController::class, 'store'])->name('projects.store');
+    Route::get('/projects/{project}/edit', [\App\Http\Controllers\Admin\AdminProjectController::class, 'edit'])->name('projects.edit');
+    Route::put('/projects/{project}', [\App\Http\Controllers\Admin\AdminProjectController::class, 'update'])->name('projects.update');
+    Route::get('/projects/{project}', [\App\Http\Controllers\Admin\AdminProjectController::class, 'show'])->name('projects.show');
+    Route::post('/projects/{project}/approve', [\App\Http\Controllers\Admin\AdminProjectController::class, 'approve'])->name('projects.approve');
+    Route::post('/projects/{project}/reject', [\App\Http\Controllers\Admin\AdminProjectController::class, 'reject'])->name('projects.reject');
+    Route::delete('/projects/{project}', [\App\Http\Controllers\Admin\AdminProjectController::class, 'destroy'])->name('projects.destroy');
 });
 
 Route::middleware('auth')->group(function () {
@@ -663,9 +694,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::post('/payments/{id}/cancel', [\App\Http\Controllers\Admin\PaymentController::class, 'cancel'])->name('admin.payments.cancel');
     Route::post('/payments/{id}/refund', [\App\Http\Controllers\Admin\PaymentController::class, 'refund'])->name('admin.payments.refund');
 
-    // إدارة تسليمات المشاريع
-    Route::get('/submissions', [\App\Http\Controllers\Admin\AdminSubmissionController::class, 'index'])->name('submissions.index');
-    Route::get('/submissions/{submission}', [\App\Http\Controllers\Admin\AdminSubmissionController::class, 'show'])->name('submissions.show');
 });
 
 // الإصدارات - عام (للطلاب والمستخدمين غير المسجلين)

@@ -117,7 +117,8 @@ export default function Index({ auth, students, availableBadges }) {
         return (
             student.name.toLowerCase().includes(search) ||
             student.email.toLowerCase().includes(search) ||
-            (student.phone && student.phone.includes(search))
+            (student.phone && student.phone.includes(search)) ||
+            (student.membership_number && student.membership_number.toLowerCase().includes(search))
         );
     });
 
@@ -150,7 +151,7 @@ export default function Index({ auth, students, availableBadges }) {
                         <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                         <input
                             type="text"
-                            placeholder="ابحث عن طالب..."
+                            placeholder="ابحث عن طالب (الاسم، البريد، الهاتف، رقم العضوية)..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-legacy-green focus:border-transparent"
@@ -164,6 +165,9 @@ export default function Index({ auth, students, availableBadges }) {
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gradient-to-r from-legacy-green/10 to-legacy-blue/10">
                                 <tr>
+                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                        رقم العضوية
+                                    </th>
                                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
                                         الاسم
                                     </th>
@@ -190,13 +194,18 @@ export default function Index({ auth, students, availableBadges }) {
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {filteredStudents.length === 0 ? (
                                     <tr>
-                                        <td colSpan="7" className="px-6 py-12 text-center text-gray-500">
+                                        <td colSpan="8" className="px-6 py-12 text-center text-gray-500">
                                             {searchTerm ? 'لا توجد نتائج للبحث' : 'لا يوجد طلاب مسجلين'}
                                         </td>
                                     </tr>
                                 ) : (
                                     filteredStudents.map((student) => (
                                         <tr key={student.id} className="hover:bg-gray-50">
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm font-semibold text-legacy-green">
+                                                    {student.membership_number || '-'}
+                                                </div>
+                                            </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="text-sm font-medium text-gray-900">{student.name}</div>
                                             </td>

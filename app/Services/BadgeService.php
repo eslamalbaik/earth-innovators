@@ -19,10 +19,42 @@ class BadgeService extends BaseService
         private BadgeRepository $badgeRepository
     ) {}
 
+    private function isEmojiOrText(?string $value): bool
+    {
+        if (!$value) {
+            return false;
+        }
+
+        // Remove /storage/ prefix if it was incorrectly added to emoji
+        $cleanValue = preg_replace('#^/storage/#', '', $value);
+
+        // Check if it's an emoji (contains Unicode emoji characters)
+        if (preg_match('/[\x{1F300}-\x{1F9FF}]|[\x{2600}-\x{26FF}]|[\x{2700}-\x{27BF}]/u', $cleanValue)) {
+            return true;
+        }
+
+        // Check if it doesn't look like a file path (no extension, no slashes)
+        if (!preg_match('/\.(jpg|jpeg|png|gif|svg|webp|ico)$/i', $cleanValue) &&
+            !str_contains($cleanValue, '/') &&
+            !str_contains($cleanValue, '\\')) {
+            // If it's short text (less than 50 chars) and doesn't look like a path, treat as text
+            if (strlen($cleanValue) < 50) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private function formatBadgeImageUrl(?string $path): ?string
     {
         if (!$path) {
             return null;
+        }
+
+        // Don't format if it's an emoji or text
+        if ($this->isEmojiOrText($path)) {
+            return $path;
         }
 
         // If it's already a full URL, return as is
@@ -44,12 +76,12 @@ class BadgeService extends BaseService
         return '/storage/' . $path;
     }
 
-    public function getAllBadges(?string $search = null, int $perPage = 20): LengthAwarePaginator
+    public function getAllBadges(?string $search = null, int $perPage = 20, ?string $status = null, ?string $type = null): LengthAwarePaginator
     {
-        $cacheKey = "all_badges_" . md5($search ?? '') . "_{$perPage}";
+        $cacheKey = "all_badges_" . md5($search ?? '') . "_" . md5($status ?? '') . "_" . md5($type ?? '') . "_{$perPage}";
         $cacheTag = 'badges';
 
-        return $this->cacheTags($cacheTag, $cacheKey, function () use ($search, $perPage) {
+        return $this->cacheTags($cacheTag, $cacheKey, function () use ($search, $perPage, $status, $type) {
             $query = Badge::query();
 
             if ($search) {
@@ -61,14 +93,36 @@ class BadgeService extends BaseService
                 });
             }
 
+            if ($status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($status === 'inactive') {
+                $query->where('is_active', false);
+            }
+
+            if ($type) {
+                $query->where('type', $type);
+            }
+
             $badges = $query->orderBy('created_at', 'desc')
                 ->select('id', 'name', 'name_ar', 'description', 'description_ar', 'icon', 'image', 'type', 'points_required', 'is_active', 'status', 'created_at')
                 ->paginate($perPage);
 
             // Format image and icon URLs
             $badges->getCollection()->transform(function ($badge) {
-                $badge->icon = $this->formatBadgeImageUrl($badge->icon);
-                $badge->image = $this->formatBadgeImageUrl($badge->image);
+                // Handle icon: if it's emoji/text, remove any incorrect /storage/ prefix
+                if ($badge->icon) {
+                    if ($this->isEmojiOrText($badge->icon)) {
+                        // Remove /storage/ prefix if it was incorrectly added
+                        $badge->icon = preg_replace('#^/storage/#', '', $badge->icon);
+                    } else {
+                        // It's a file path, format it properly
+                        $badge->icon = $this->formatBadgeImageUrl($badge->icon);
+                    }
+                }
+                // Only format image if it exists and is a file path
+                if ($badge->image) {
+                    $badge->image = $this->formatBadgeImageUrl($badge->image);
+                }
                 return $badge;
             });
 

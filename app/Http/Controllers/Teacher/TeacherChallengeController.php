@@ -103,6 +103,20 @@ class TeacherChallengeController extends Controller
         try {
             $challenge = $this->challengeService->createChallenge($data);
 
+            // Force clear cache immediately after creation to ensure it appears in school challenges
+            // This ensures the challenge appears in /school/challenges route
+            if ($challenge->school_id) {
+                $this->challengeService->clearChallengeCache($challenge->school_id, $challenge->created_by);
+            }
+            
+            Log::info('Teacher challenge created successfully', [
+                'challenge_id' => $challenge->id,
+                'school_id' => $challenge->school_id,
+                'teacher_id' => $challenge->created_by,
+                'title' => $challenge->title,
+                'status' => $challenge->status,
+            ]);
+
             return redirect()
                 ->route('teacher.challenges.index')
                 ->with('success', 'تم إنشاء التحدي بنجاح!');

@@ -21,7 +21,9 @@ class BadgeController extends Controller
     {
         $badges = $this->badgeService->getAllBadges(
             $request->get('search'),
-            20
+            20,
+            $request->get('status'),
+            $request->get('type')
         );
 
         $stats = $this->badgeService->getBadgeStats();
@@ -29,6 +31,11 @@ class BadgeController extends Controller
         return Inertia::render('Admin/Badges/Index', [
             'badges' => $badges,
             'stats' => $stats,
+            'filters' => [
+                'search' => $request->get('search'),
+                'status' => $request->get('status'),
+                'type' => $request->get('type'),
+            ],
         ]);
     }
 
@@ -71,7 +78,7 @@ class BadgeController extends Controller
     public function award(AwardBadgeRequest $request, Badge $badge)
     {
         $validated = $request->validated();
-        
+
         $this->badgeService->awardBadge(
             $validated['user_id'],
             $badge->id,

@@ -29,6 +29,7 @@ class StoreChallengeRequest extends FormRequest
             'challenge_type' => 'required|in:60_seconds,mental_math,conversions,team_fastest,build_problem,custom',
             'category' => 'required|in:science,technology,engineering,mathematics,arts,other',
             'age_group' => 'required|in:6-9,10-13,14-17,18+',
+            'school_id' => 'nullable|exists:users,id',
             'start_date' => 'required|date|after_or_equal:today',
             'deadline' => 'required|date|after:start_date',
             'status' => 'nullable|in:draft,active,completed,cancelled',

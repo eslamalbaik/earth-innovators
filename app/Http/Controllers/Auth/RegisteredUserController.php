@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Teacher;
+use App\Services\MembershipService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,6 +18,10 @@ use Inertia\Response;
 
 class RegisteredUserController extends Controller
 {
+    public function __construct(
+        private MembershipService $membershipService
+    ) {}
+
     public function create(): Response
     {
         $schools = User::where('role', 'school')
@@ -97,6 +102,11 @@ class RegisteredUserController extends Controller
 
         try {
             DB::beginTransaction();
+
+            // Generate membership number for students and teachers
+            if (in_array($validated['role'], ['student', 'teacher'])) {
+                $userData['membership_number'] = $this->membershipService->generateMembershipNumber($validated['role']);
+            }
 
             $user = User::create($userData);
 

@@ -11,6 +11,7 @@ use App\Models\UserBadge;
 use App\Repositories\UserRepository;
 use App\Repositories\ProjectRepository;
 use App\Repositories\BadgeRepository;
+use App\Services\MembershipService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -21,7 +22,8 @@ class StudentService extends BaseService
     public function __construct(
         private UserRepository $userRepository,
         private ProjectRepository $projectRepository,
-        private BadgeRepository $badgeRepository
+        private BadgeRepository $badgeRepository,
+        private MembershipService $membershipService
     ) {}
 
     public function getAllStudents(?string $search = null, ?string $status = null, ?string $dateFrom = null, ?string $dateTo = null, int $perPage = 15): LengthAwarePaginator
@@ -88,6 +90,24 @@ class StudentService extends BaseService
             // Get project counts in a single query
             $projectCounts = $this->projectRepository->getProjectCountsByUserIds($userIds);
             
+            // Ensure all students have membership numbers before transforming
+            $studentIds = $students->getCollection()->pluck('id')->toArray();
+            if (!empty($studentIds)) {
+                $studentsWithoutMembership = \App\Models\User::whereIn('id', $studentIds)
+                    ->whereNull('membership_number')
+                    ->where('role', 'student')
+                    ->get();
+                
+                foreach ($studentsWithoutMembership as $student) {
+                    $this->membershipService->ensureMembershipNumber($student);
+                }
+                
+                // Reload students to get updated membership numbers
+                $students->getCollection()->each(function ($student) {
+                    $student->refresh();
+                });
+            }
+            
             // Transform the paginated results
             $students->getCollection()->transform(function ($student) use ($projectCounts) {
                 $counts = $projectCounts[$student->id] ?? (object)['total' => 0, 'approved' => 0, 'pending' => 0];
@@ -102,6 +122,7 @@ class StudentService extends BaseService
                     'name' => $student->name,
                     'email' => $student->email,
                     'phone' => $student->phone,
+                    'membership_number' => $student->membership_number,
                     'points' => $student->points ?? 0,
                     'projects_count' => $counts->total ?? 0,
                     'approved_projects' => $counts->approved ?? 0,
@@ -158,6 +179,7 @@ class StudentService extends BaseService
             'role' => 'student',
             'school_id' => $dto->schoolId,
             'points' => $dto->points,
+            'membership_number' => $this->membershipService->generateMembershipNumber('student'),
         ]);
 
         // Clear cache using tags

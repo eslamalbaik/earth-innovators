@@ -6,11 +6,16 @@ use App\Models\Booking;
 use App\Models\Teacher;
 use App\Models\TeacherAvailability;
 use App\Models\User;
+use App\Services\MembershipService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class ImportService extends BaseService
 {
+    public function __construct(
+        private MembershipService $membershipService
+    ) {}
+
     public function parseCsvFile(string $path, array $requiredHeaders): array
     {
         $rows = [];
@@ -64,6 +69,7 @@ class ImportService extends BaseService
                     'email' => $data['email'],
                     'password' => Hash::make($data['password'] ?? 'password123'),
                     'role' => 'student',
+                    'membership_number' => $this->membershipService->generateMembershipNumber('student'),
                 ]);
                 $inserted++;
             } catch (\Exception $e) {
@@ -104,6 +110,7 @@ class ImportService extends BaseService
                         'password' => Hash::make($data['password'] ?? 'password123'),
                         'role' => 'teacher',
                         'email_verified_at' => now(),
+                        'membership_number' => $this->membershipService->generateMembershipNumber('teacher'),
                     ]);
 
                     Teacher::create([

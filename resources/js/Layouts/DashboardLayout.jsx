@@ -369,9 +369,16 @@ export default function DashboardLayout({ children, header }) {
     const navigation = {
         admin: [
             { name: 'لوحة التحكم', href: '/admin/dashboard', icon: FaTachometerAlt },
-            { name: 'الإحصائيات', href: '/admin/statistics', icon: FaChartLine },
             { name: 'المشاريع', href: '/admin/projects', icon: FaBook },
-            { name: 'تسليمات المشاريع', href: '/admin/submissions', icon: FaFile },
+            {
+                name: 'مقالات',
+                href: '/admin/publications',
+                icon: FaBook,
+                subItems: [
+                    { name: 'مراجعة مقالات المجلة', href: '/admin/publications?status=pending', icon: FaBookOpen },
+                    { name: 'مقالات المدرسة', href: '/admin/publications', icon: FaBook },
+                ]
+            },
             { name: 'التحديات', href: '/admin/challenges', icon: FaCalendar },
             { name: 'المستخدمون', href: '/admin/users', icon: FaUsers },
             { name: 'الشارات', href: '/admin/badges', icon: FaCommentDots },
@@ -393,6 +400,16 @@ export default function DashboardLayout({ children, header }) {
                 ]
             },
             {
+                name: 'مقالات',
+                href: '/teacher/publications',
+                icon: FaBook,
+                subItems: [
+                    { name: 'مراجعة مقالات المجلة', href: '/school/publications/pending', icon: FaBookOpen },
+                    { name: 'مقالات المدرسة', href: '/teacher/publications', icon: FaBook },
+                    { name: 'إنشاء مقال', href: '/teacher/publications/create', icon: FaBook },
+                ]
+            },
+            {
                 name: 'التحديات',
                 href: '/teacher/challenges',
                 icon: FaCalendar,
@@ -403,11 +420,10 @@ export default function DashboardLayout({ children, header }) {
                     { name: 'إنشاء تحدّي', href: '/teacher/challenges/create', icon: FaCalendar },
                 ]
             },
-            { name: 'مقالاتي', href: '/teacher/publications', icon: FaBook },
-            { name: 'إنشاء مقال', href: '/teacher/publications/create', icon: FaBook },
             { name: 'الطلاب المتابعون', href: '/teacher/students', icon: FaGraduationCap },
             { name: 'شاراتي', href: '/teacher/badges', icon: FaMedal },
             { name: 'إرسال شارة', href: '/teacher/badges/create', icon: FaCommentDots },
+            { name: 'الشهادات', href: '/teacher/certificates', icon: FaFile },
             { name: 'الملف الشخصي', href: '/teacher/profile', icon: FaUser },
         ],
         school: [
@@ -441,7 +457,7 @@ export default function DashboardLayout({ children, header }) {
             },
             { name: 'الطلاب', href: '/school/students', icon: FaGraduationCap },
             { name: 'الترتيب والشارات', href: '/school/ranking', icon: FaTrophy },
-            { name: 'الإحصائيات', href: '/school/statistics', icon: FaChartLine },
+            { name: 'الشهادات', href: '/school/certificates', icon: FaFile },
             { name: 'الملف الشخصي', href: '/profile', icon: FaUser },
         ],
         student: [

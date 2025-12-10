@@ -1,0 +1,82 @@
+{
+    "student_name": {
+        "x": 150,
+        "y": 320,
+        "font_size": 18,
+        "align": "center",
+        "font_family": "DejaVuSans"
+    },
+    "student_id": {
+        "x": 150,
+        "y": 360,
+        "font_size": 14,
+        "align": "center",
+        "font_family": "DejaVuSans"
+    },
+    "membership_number": {
+        "x": 150,
+        "y": 380,
+        "font_size": 14,
+        "align": "center",
+        "font_family": "DejaVuSans"
+    },
+    "course_name": {
+        "x": 150,
+        "y": 400,
+        "font_size": 16,
+        "align": "center",
+        "font_family": "DejaVuSans"
+    },
+    "subject": {
+        "x": 150,
+        "y": 420,
+        "font_size": 16,
+        "align": "center",
+        "font_family": "DejaVuSans"
+    },
+    "grade": {
+        "x": 150,
+        "y": 440,
+        "font_size": 14,
+        "align": "center",
+        "font_family": "DejaVuSans"
+    },
+    "date": {
+        "x": 420,
+        "y": 520,
+        "font_size": 12,
+        "align": "right",
+        "font_family": "DejaVuSans"
+    },
+    "issue_date": {
+        "x": 420,
+        "y": 520,
+        "font_size": 12,
+        "align": "right",
+        "font_family": "DejaVuSans"
+    },
+    "signature": {
+        "x": 520,
+        "y": 520,
+        "width": 120,
+        "height": 40,
+        "font_size": 12,
+        "align": "center",
+        "font_family": "DejaVuSans"
+    },
+    "issued_by": {
+        "x": 520,
+        "y": 560,
+        "font_size": 12,
+        "align": "center",
+        "font_family": "DejaVuSans"
+    },
+    "certificate_number": {
+        "x": 50,
+        "y": 50,
+        "font_size": 10,
+        "align": "left",
+        "font_family": "DejaVuSans"
+    }
+}
+

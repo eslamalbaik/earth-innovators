@@ -59,12 +59,18 @@ class AppServiceProvider extends ServiceProvider
 
         // Register Services
         $this->app->bind(
+            \App\Services\MembershipService::class,
+            \App\Services\MembershipService::class
+        );
+
+        $this->app->bind(
             \App\Services\StudentService::class,
             function ($app) {
                 return new \App\Services\StudentService(
                     $app->make(\App\Repositories\UserRepository::class),
                     $app->make(\App\Repositories\ProjectRepository::class),
-                    $app->make(\App\Repositories\BadgeRepository::class)
+                    $app->make(\App\Repositories\BadgeRepository::class),
+                    $app->make(\App\Services\MembershipService::class)
                 );
             }
         );

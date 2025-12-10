@@ -1,19 +1,20 @@
 import { Head } from '@inertiajs/react';
 import { useState } from 'react';
-import { FaBars, FaUser, FaCog, FaSignOutAlt, FaHome, FaUsers, FaBook, FaCalendar, FaChartBar, FaFileAlt } from 'react-icons/fa';
+import { FaBars, FaUser, FaCog, FaSignOutAlt, FaHome, FaUsers, FaBook, FaCalendar, FaChartBar, FaFileAlt, FaTrophy, FaCreditCard } from 'react-icons/fa';
 
 export default function AdminLayout({ children, title = 'لوحة الإدارة' }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const navigation = [
         { name: 'لوحة التحكم', href: '/admin/dashboard', icon: FaHome },
-        { name: 'الإحصائيات', href: '/admin/statistics', icon: FaChartBar },
         { name: 'المعلمين', href: '/admin/teachers', icon: FaUsers },
         { name: 'طلبات الانضمام', href: '/admin/teacher-applications', icon: FaFileAlt },
         { name: 'الطلاب', href: '/admin/students', icon: FaUsers },
         { name: 'الحجوزات', href: '/admin/bookings', icon: FaCalendar },
         { name: 'التقييمات', href: '/admin/reviews', icon: FaBook },
         { name: 'المواد', href: '/admin/subjects', icon: FaBook },
+        { name: 'التحديات', href: '/admin/challenges', icon: FaTrophy },
+        { name: 'الاشتراكات', href: '/admin/subscriptions', icon: FaCreditCard },
     ];
 
     return (

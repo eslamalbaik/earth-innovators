@@ -27,6 +27,7 @@ class User extends Authenticatable
         'image',
         'points',
         'school_id',
+        'membership_number',
     ];
 
     protected $hidden = [
