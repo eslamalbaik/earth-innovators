@@ -2,13 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Tajawal Font Family */
+/* Dubai Font Family - Import from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Dubai:wght@300;400;500;600;700&display=swap');
+
+/* Dubai Font Family */
 body {
-    font-family: 'Tajawal', sans-serif;
+    font-family: 'Dubai', 'Tajawal', sans-serif;
 }
 
 * {
-    font-family: 'Tajawal', sans-serif;
+    font-family: 'Dubai', 'Tajawal', sans-serif;
 }
 
 /* Custom Animations */
@@ -92,7 +95,7 @@ body {
 
 /* Gradient text */
 .gradient-text {
-    background: linear-gradient(135deg, #22c55e 0%, #3b82f6 100%);
+    background: linear-gradient(135deg, #F88630 0%, #5A4FCF 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -132,7 +135,7 @@ body {
     left: 0;
     width: 0;
     height: 2px;
-    background-color: #22c55e;
+    background-color: #F88630;
     transition: width 0.3s ease;
 }
 

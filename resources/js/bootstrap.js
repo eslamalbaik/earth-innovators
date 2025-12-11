@@ -42,7 +42,7 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
                     window.Echo.connector.socket.on('disconnect', () => {
                         // Only log if we had a successful connection before
                         if (!window.Echo._connectionErrorLogged) {
-                            console.warn('⚠️ Laravel Echo disconnected - notifications will use polling');
+                        console.warn('⚠️ Laravel Echo disconnected - notifications will use polling');
                         }
                     });
 
@@ -57,15 +57,15 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
                         // Only log once to avoid spam
                         if (!window.Echo._connectionErrorLogged) {
                             // Suppress all connection errors completely
-                            window.Echo._connectionErrorLogged = true;
-                        }
+                                window.Echo._connectionErrorLogged = true;
+                            }
                     });
                     
                     // Suppress polling transport errors
                     if (window.Echo.connector.socket.io) {
                         window.Echo.connector.socket.io.on('error', () => {
                             // Silently ignore polling errors
-                        });
+                    });
                     }
                 }
 

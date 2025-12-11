@@ -13,21 +13,38 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Tajawal', 'Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Dubai', 'Tajawal', 'Figtree', ...defaultTheme.fontFamily.sans],
+                dubai: ['Dubai', 'sans-serif'],
                 tajawal: ['Tajawal', 'sans-serif'],
             },
             colors: {
                 primary: {
-                    50: '#f0fdf4',
-                    100: '#dcfce7',
-                    200: '#bbf7d0',
-                    300: '#86efac',
-                    400: '#4ade80',
-                    500: '#22c55e', // Main green from logo
-                    600: '#16a34a',
-                    700: '#15803d',
-                    800: '#166534',
-                    900: '#14532d',
+                    50: '#fff4ed',
+                    100: '#ffe4d4',
+                    200: '#ffc5a8',
+                    300: '#ff9d71',
+                    400: '#ff6d38',
+                    500: '#F88630', // Main orange color
+                    600: '#e66a1f',
+                    700: '#bf5019',
+                    800: '#984019',
+                    900: '#7a3716',
+                },
+                secondary: {
+                    50: '#f5f3ff',
+                    100: '#ede9fe',
+                    200: '#ddd6fe',
+                    300: '#c4b5fd',
+                    400: '#a78bfa',
+                    500: '#5A4FCF', // Secondary color - Purple
+                    600: '#4c3fb8',
+                    700: '#3d3296',
+                    800: '#32287a',
+                    900: '#2a2163',
+                },
+                brand: {
+                    orange: '#F88630',
+                    purple: '#5A4FCF',
                 },
                 legacy: {
                     green: '#22c55e',

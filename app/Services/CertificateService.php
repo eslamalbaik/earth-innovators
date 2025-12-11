@@ -198,8 +198,39 @@ class CertificateService
     protected function generateCertificateNumber(User $student): string
     {
         $year = date('Y');
-        $number = str_pad($student->id, 4, '0', STR_PAD_LEFT);
-        return "CERT-{$year}-{$number}";
+        $baseNumber = str_pad($student->id, 4, '0', STR_PAD_LEFT);
+        
+        // Count existing certificates for this student in the current year
+        $existingCount = Certificate::where('user_id', $student->id)
+            ->whereYear('created_at', $year)
+            ->count();
+        
+        // If no existing certificates, use base format
+        if ($existingCount === 0) {
+            $certificateNumber = "CERT-{$year}-{$baseNumber}";
+        } else {
+            // Append sequence number for uniqueness
+            $sequence = str_pad($existingCount + 1, 3, '0', STR_PAD_LEFT);
+            $certificateNumber = "CERT-{$year}-{$baseNumber}-{$sequence}";
+        }
+        
+        // Double-check uniqueness (in case of race condition)
+        $counter = 1;
+        $originalNumber = $certificateNumber;
+        while (Certificate::where('certificate_number', $certificateNumber)->exists()) {
+            $sequence = str_pad($existingCount + 1 + $counter, 3, '0', STR_PAD_LEFT);
+            $certificateNumber = "CERT-{$year}-{$baseNumber}-{$sequence}";
+            $counter++;
+            
+            // Safety check to prevent infinite loop
+            if ($counter > 999) {
+                // Fallback: use timestamp for uniqueness
+                $certificateNumber = "CERT-{$year}-{$baseNumber}-" . time();
+                break;
+            }
+        }
+        
+        return $certificateNumber;
     }
 
     /**
