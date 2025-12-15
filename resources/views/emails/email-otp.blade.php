@@ -64,7 +64,7 @@
     </div>
 
     <div class="warning-box">
-        <p><strong>⚠️ تنبيه:</strong> هذا الرمز صالح لمدة <strong>10 دقائق</strong> فقط</p>
+        <p><strong>⚠️ تنبيه:</strong> هذا الرمز صالح لمدة <strong>{{ $expiryMinutes ?? 10 }} دقائق</strong> فقط</p>
     </div>
 
     <div class="info-card">

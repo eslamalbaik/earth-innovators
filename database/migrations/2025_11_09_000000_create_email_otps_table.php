@@ -14,13 +14,17 @@ return new class extends Migration
         Schema::create('email_otps', function (Blueprint $table) {
             $table->id();
             $table->string('token')->unique();
-            $table->string('email');
+            $table->string('email')->index();
             $table->string('code'); // hashed code
-            $table->string('purpose');
+            $table->string('purpose'); // 'signup', 'login', etc.
             $table->json('payload')->nullable();
             $table->unsignedTinyInteger('attempts')->default(0);
+            $table->string('ip_address', 45)->nullable();
             $table->timestamp('expires_at');
+            $table->timestamp('used_at')->nullable();
             $table->timestamps();
+            
+            $table->index(['email', 'purpose', 'created_at']);
         });
     }
 

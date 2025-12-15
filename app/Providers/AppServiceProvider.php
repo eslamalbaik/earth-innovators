@@ -20,6 +20,10 @@ use App\Events\CommentAdded;
 use App\Events\StatusChanged;
 use App\Events\ChallengeSubmissionReviewed;
 use App\Events\ChallengeCreated;
+use App\Events\CertificateIssued;
+use App\Events\ProjectEvaluated;
+use App\Events\BadgeGranted;
+use App\Events\ArticleApproved;
 use App\Listeners\SendTeacherProjectCreatedNotification;
 use App\Listeners\SendProjectApprovedNotification;
 use App\Listeners\SendProjectRejectedNotification;
@@ -31,6 +35,10 @@ use App\Listeners\HandleCommentAdded;
 use App\Listeners\HandleStatusChanged;
 use App\Listeners\SendSubmissionReviewNotification;
 use App\Listeners\SendChallengeCreatedNotification;
+use App\Listeners\SendCertificateIssuedNotification;
+use App\Listeners\SendProjectEvaluatedNotification;
+use App\Listeners\SendBadgeGrantedNotification;
+use App\Listeners\SendArticleApprovedNotification;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
@@ -231,6 +239,21 @@ class AppServiceProvider extends ServiceProvider
             \App\Services\ChallengeNotificationRouterService::class,
             \App\Services\ChallengeNotificationRouterService::class
         );
+
+        $this->app->bind(
+            \App\Services\EmailService::class,
+            \App\Services\EmailService::class
+        );
+
+        $this->app->bind(
+            \App\Services\OtpService::class,
+            \App\Services\OtpService::class
+        );
+
+        $this->app->bind(
+            \App\Services\PasswordResetService::class,
+            \App\Services\PasswordResetService::class
+        );
     }
 
     public function boot(): void
@@ -300,6 +323,27 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(
             ChallengeCreated::class,
             SendChallengeCreatedNotification::class
+        );
+
+        // Email notification events
+        Event::listen(
+            CertificateIssued::class,
+            SendCertificateIssuedNotification::class
+        );
+
+        Event::listen(
+            ProjectEvaluated::class,
+            SendProjectEvaluatedNotification::class
+        );
+
+        Event::listen(
+            BadgeGranted::class,
+            SendBadgeGrantedNotification::class
+        );
+
+        Event::listen(
+            ArticleApproved::class,
+            SendArticleApprovedNotification::class
         );
     }
 }

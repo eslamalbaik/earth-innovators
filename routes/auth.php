@@ -32,6 +32,18 @@ Route::middleware('guest')->group(function () {
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
 
+    // OTP Authentication Routes
+    Route::prefix('otp')->name('otp.')->group(function () {
+        Route::post('signup/request', [\App\Http\Controllers\Auth\OtpAuthController::class, 'requestSignupOtp'])
+            ->name('signup.request');
+        Route::post('signup/verify', [\App\Http\Controllers\Auth\OtpAuthController::class, 'verifySignupOtp'])
+            ->name('signup.verify');
+        Route::post('login/request', [\App\Http\Controllers\Auth\OtpAuthController::class, 'requestLoginOtp'])
+            ->name('login.request');
+        Route::post('login/verify', [\App\Http\Controllers\Auth\OtpAuthController::class, 'verifyLoginOtp'])
+            ->name('login.verify');
+    });
+
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
 
