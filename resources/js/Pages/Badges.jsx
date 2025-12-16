@@ -1,103 +1,42 @@
-import { Head, Link } from '@inertiajs/react';
-import React, { useState } from 'react';
+import { Head } from '@inertiajs/react';
+import React from 'react';
 import MainLayout from '../Layouts/MainLayout';
-import { FaMedal, FaTrophy, FaAward, FaStar, FaCheckCircle, FaCrown, FaUsers, FaProjectDiagram } from 'react-icons/fa';
+import { FaMedal, FaTrophy, FaCrown, FaUsers, FaProjectDiagram, FaStar, FaAward } from 'react-icons/fa';
+import AchievementBadge from '../Components/Badges/AchievementBadge';
+import CommunityBadge from '../Components/Badges/CommunityBadge';
 
-// Badge Image Component with fallback
-function BadgeImage({ badge, isEarned, size = 'w-24 h-24' }) {
-    const [imageError, setImageError] = useState(false);
-    const imageUrl = badge.image || badge.icon;
-    
-    const IconMap = {
-        rank_first: FaTrophy,
-        rank_second: FaMedal,
-        rank_third: FaAward,
-        excellent_innovator: FaStar,
-        active_participant: FaCheckCircle,
-        custom: FaMedal
-    };
-    const BadgeIcon = IconMap[badge.type] || FaMedal;
-    
-    // Get badge colors based on type
-    const getBadgeColors = (type, isEarned) => {
-        if (isEarned) {
-            // Colors when badge is earned
-            const earnedColors = {
-                rank_first: 'bg-gradient-to-br from-yellow-400 to-yellow-600',
-                rank_second: 'bg-gradient-to-br from-gray-300 to-gray-500',
-                rank_third: 'bg-gradient-to-br from-orange-400 to-orange-600',
-                excellent_innovator: 'bg-gradient-to-br from-purple-400 to-purple-600',
-                active_participant: 'bg-gradient-to-br from-blue-400 to-blue-600',
-                custom: 'bg-gradient-to-br from-legacy-green to-legacy-blue'
-            };
-            return earnedColors[type] || 'bg-gradient-to-br from-legacy-green to-legacy-blue';
-        } else {
-            // Colors when badge is not earned
-            const unearnedColors = {
-                rank_first: 'bg-gradient-to-br from-yellow-100 to-yellow-200',
-                rank_second: 'bg-gradient-to-br from-gray-100 to-gray-200',
-                rank_third: 'bg-gradient-to-br from-orange-100 to-orange-200',
-                excellent_innovator: 'bg-gradient-to-br from-purple-100 to-purple-200',
-                active_participant: 'bg-gradient-to-br from-blue-100 to-blue-200',
-                custom: 'bg-gradient-to-br from-gray-200 to-gray-300'
-            };
-            return unearnedColors[type] || 'bg-gradient-to-br from-gray-200 to-gray-300';
-        }
-    };
-
-    const getIconColor = (type, isEarned) => {
-        if (isEarned) {
-            return 'text-white';
-        } else {
-            const iconColors = {
-                rank_first: 'text-yellow-600',
-                rank_second: 'text-gray-600',
-                rank_third: 'text-orange-600',
-                excellent_innovator: 'text-purple-600',
-                active_participant: 'text-blue-600',
-                custom: 'text-gray-600'
-            };
-            return iconColors[type] || 'text-gray-600';
-        }
-    };
-    
-    // Check if URL is valid
-    const isValidUrl = imageUrl && 
-                       imageUrl.trim() !== '' && 
-                       imageUrl !== 'null' && 
-                       imageUrl !== 'undefined' &&
-                       !imageError;
-
-    if (isValidUrl) {
-        return (
-            <img
-                src={imageUrl}
-                alt={badge.name_ar || badge.name}
-                className={`${size} object-contain`}
-                onError={() => setImageError(true)}
-            />
-        );
-    }
-
-    const bgColor = getBadgeColors(badge.type, isEarned);
-    const iconColor = getIconColor(badge.type, isEarned);
-    const iconSize = size === 'w-24 h-24' ? 'text-5xl' : 'text-3xl';
-
-    return (
-        <div className={`${size} rounded-full flex items-center justify-center ${bgColor}`}>
-            <BadgeIcon className={`${iconSize} ${iconColor}`} />
-        </div>
-    );
-}
-
-export default function Badges({ auth, badges = [], userBadges = [], schoolsRanking = [], currentSchoolRank = null }) {
+export default function Badges({
+    auth,
+    achievementBadges = [],
+    communityBadges = [],
+    userBadges = [],
+    userCommunityBadgeProgress = [],
+    schoolsRanking = [],
+    currentSchoolRank = null
+}) {
     const earnedBadgeIds = userBadges.map(ub => ub.badge_id);
+
+    // Create a map of badge_id to progress for quick lookup
+    const progressMap = {};
+    userCommunityBadgeProgress.forEach(progress => {
+        progressMap[progress.badge_id] = progress;
+    });
 
     const getRankIcon = (rank) => {
         if (rank === 1) return <FaCrown className="text-yellow-500 text-3xl" />;
         if (rank === 2) return <FaMedal className="text-gray-400 text-3xl" />;
         if (rank === 3) return <FaMedal className="text-orange-400 text-3xl" />;
         return <span className="text-2xl font-bold text-gray-600">#{rank}</span>;
+    };
+
+    // Get source for achievement badges (from userBadges pivot data)
+    const getBadgeSource = (badgeId) => {
+        const userBadge = userBadges.find(ub => ub.badge_id === badgeId);
+        if (!userBadge) return null;
+
+        // Try to determine source from badge or userBadge data
+        // This would need to be enhanced based on your actual data structure
+        return userBadge.badge?.created_by ? 'teacher' : null;
     };
 
     return (
@@ -226,89 +165,82 @@ export default function Badges({ auth, badges = [], userBadges = [], schoolsRank
                     </div>
                 </div>
 
-                {/* الشارات */}
-                <div className="mb-8">
-                    <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                        <FaMedal className="text-legacy-green" />
-                        الشارات المتاحة
-                    </h2>
-                </div>
-
+                {/* User's Badges Summary */}
                 {auth?.user && (
                     <div className="mb-8 bg-gradient-to-r from-legacy-green/10 to-legacy-blue/10 rounded-xl p-6 border-2 border-legacy-green/20">
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between flex-wrap gap-4">
                             <div>
                                 <h2 className="text-2xl font-bold text-gray-900 mb-2">شاراتي</h2>
-                                <p className="text-gray-600">لديك {userBadges.length} شارة من أصل {badges.length}</p>
-                            </div>
-                            <div className="flex gap-2">
-                                {userBadges.slice(0, 5).map((userBadge) => {
-                                    // Use badge from userBadge if available, otherwise find from badges array
-                                    const badge = userBadge.badge || badges.find(b => b.id === userBadge.badge_id);
-                                    if (!badge) return null;
-                                    
-                                    return (
-                                        <div key={userBadge.id} className="text-center p-3 bg-white rounded-lg shadow-md">
-                                            <div className="flex justify-center mb-2">
-                                                <BadgeImage badge={badge} isEarned={true} size="w-16 h-16" />
-                                            </div>
-                                            <p className="text-xs font-semibold text-gray-900">{badge.name_ar || badge.name}</p>
-                                        </div>
-                                    );
-                                })}
+                                <p className="text-gray-600">
+                                    {userBadges.length} شارة إنجاز • {userCommunityBadgeProgress.length} شارة مجتمعية
+                                </p>
                             </div>
                         </div>
                     </div>
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {badges.map((badge) => {
-                        const isEarned = earnedBadgeIds.includes(badge.id);
+                {/* Achievement Badges Section */}
+                {achievementBadges.length > 0 && (
+                    <div className="mb-12">
+                        <div className="mb-6">
+                            <h2 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+                                <FaAward className="text-legacy-green" />
+                                شارات الإنجاز
+                            </h2>
+                            <p className="text-gray-600">
+                                شارات يتم منحها يدوياً من قبل المعلمين أو المدارس عند إكمال إنجاز معين
+                            </p>
+                        </div>
 
-                        return (
-                            <div
-                                key={badge.id}
-                                className={`bg-white rounded-xl shadow-lg overflow-hidden border-2 transition-all ${
-                                    isEarned
-                                        ? 'border-legacy-green shadow-legacy-green/20'
-                                        : 'border-gray-200 hover:border-legacy-green/50'
-                                }`}
-                            >
-                                <div className={`p-6 ${isEarned ? 'bg-gradient-to-br from-legacy-green/10 to-legacy-blue/10' : 'bg-gray-50'}`}>
-                                    <div className="flex items-center justify-center mb-4">
-                                        <BadgeImage badge={badge} isEarned={isEarned} />
-                                    </div>
-                                    {isEarned && (
-                                        <div className="text-center mb-2">
-                                            <span className="inline-block bg-gradient-to-r from-legacy-green to-legacy-blue text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
-                                                ✓ مكتسبة
-                                            </span>
-                                        </div>
-                                    )}
-                                    <h3 className="text-xl font-bold text-gray-900 text-center mb-2">
-                                        {badge.name_ar || badge.name}
-                                    </h3>
-                                    <p className="text-gray-600 text-center text-sm mb-4">
-                                        {badge.description_ar || badge.description}
-                                    </p>
-                                    <div className="flex items-center justify-center gap-4 text-sm">
-                                        <div className="text-gray-500">
-                                            <FaStar className="inline ml-1 text-yellow-500" />
-                                            {badge.points_required} نقطة
-                                        </div>
-                                        {badge.type && (
-                                            <div className="text-gray-500 capitalize">
-                                                {badge.type.replace('_', ' ')}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {achievementBadges.map((badge) => {
+                                const isEarned = earnedBadgeIds.includes(badge.id);
+                                const source = getBadgeSource(badge.id);
 
-                {badges.length === 0 && (
+                                return (
+                                    <AchievementBadge
+                                        key={badge.id}
+                                        badge={badge}
+                                        isEarned={isEarned}
+                                        source={source}
+                                    />
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
+                {/* Community Badges Section */}
+                {communityBadges.length > 0 && (
+                    <div className="mb-12">
+                        <div className="mb-6">
+                            <h2 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+                                <FaMedal className="text-legacy-green" />
+                                الشارات المجتمعية
+                            </h2>
+                            <p className="text-gray-600">
+                                شارات تعتمد على النقاط المتراكمة من النشاط المجتمعي (0-100 نقطة)
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {communityBadges.map((badge) => {
+                                const progress = progressMap[badge.id] || null;
+
+                                return (
+                                    <CommunityBadge
+                                        key={badge.id}
+                                        badge={badge}
+                                        progress={progress}
+                                    />
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
+                {/* Empty State */}
+                {achievementBadges.length === 0 && communityBadges.length === 0 && (
                     <div className="text-center py-12">
                         <FaMedal className="mx-auto text-6xl text-gray-300 mb-4" />
                         <p className="text-gray-500 text-lg">لا توجد شارات متاحة حالياً</p>
@@ -318,4 +250,3 @@ export default function Badges({ auth, badges = [], userBadges = [], schoolsRank
         </MainLayout>
     );
 }
-

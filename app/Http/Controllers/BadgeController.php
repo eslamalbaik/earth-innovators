@@ -17,11 +17,18 @@ class BadgeController extends Controller
 
     public function index(Request $request)
     {
-        $badges = $this->badgeService->getActiveBadges();
+        $allBadges = $this->badgeService->getActiveBadges();
+
+        // Separate badges by category
+        $achievementBadges = $allBadges->filter(fn($badge) => $badge->badge_category === 'achievement')->values();
+        $communityBadges = $allBadges->filter(fn($badge) => $badge->badge_category === 'community')->values();
 
         $userBadges = [];
+        $userCommunityBadgeProgress = [];
         if ($request->user()) {
-            $userBadges = $this->badgeService->getUserBadges($request->user()->id);
+            $userId = $request->user()->id;
+            $userBadges = $this->badgeService->getUserBadges($userId);
+            $userCommunityBadgeProgress = $this->badgeService->getUserCommunityBadgeProgress($userId);
         }
 
         // Get school rankings (available for all users)
@@ -32,8 +39,10 @@ class BadgeController extends Controller
         $rankings = $this->rankingService->getSchoolRankings($currentSchoolId);
 
         return Inertia::render('Badges', [
-            'badges' => $badges,
+            'achievementBadges' => $achievementBadges,
+            'communityBadges' => $communityBadges,
             'userBadges' => $userBadges,
+            'userCommunityBadgeProgress' => $userCommunityBadgeProgress,
             'schoolsRanking' => $rankings['schoolsRanking'],
             'currentSchoolRank' => $rankings['currentSchoolRank'],
         ]);

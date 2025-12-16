@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Models\Badge;
+use App\Models\User;
 use App\Models\UserBadge;
+use App\Models\UserCommunityBadge;
 use App\Repositories\BadgeRepository;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
@@ -104,7 +106,7 @@ class BadgeService extends BaseService
             }
 
             $badges = $query->orderBy('created_at', 'desc')
-                ->select('id', 'name', 'name_ar', 'description', 'description_ar', 'icon', 'image', 'type', 'points_required', 'is_active', 'status', 'created_at')
+                ->select('id', 'name', 'name_ar', 'description', 'description_ar', 'icon', 'image', 'type', 'badge_category', 'level', 'points_required', 'is_active', 'status', 'created_at')
                 ->paginate($perPage);
 
             // Format image and icon URLs
@@ -137,7 +139,7 @@ class BadgeService extends BaseService
 
         return $this->cacheTags($cacheTag, $cacheKey, function () {
             $badges = Badge::where('is_active', true)
-                ->select('id', 'name', 'name_ar', 'description', 'description_ar', 'icon', 'image', 'type', 'points_required')
+                ->select('id', 'name', 'name_ar', 'description', 'description_ar', 'icon', 'image', 'type', 'badge_category', 'level', 'points_required')
                 ->orderBy('points_required')
                 ->get();
 
@@ -148,6 +150,26 @@ class BadgeService extends BaseService
                 return $badge;
             });
         }, 3600); // Cache for 1 hour
+    }
+
+    /**
+     * Get active achievement badges only
+     */
+    public function getActiveAchievementBadges(): Collection
+    {
+        return $this->getActiveBadges()->filter(function ($badge) {
+            return $badge->badge_category === 'achievement';
+        })->values();
+    }
+
+    /**
+     * Get active community badges only
+     */
+    public function getActiveCommunityBadges(): Collection
+    {
+        return $this->getActiveBadges()->filter(function ($badge) {
+            return $badge->badge_category === 'community';
+        })->values();
     }
 
     public function getBadgeStats(): array
@@ -263,7 +285,7 @@ class BadgeService extends BaseService
 
         return $this->cacheTags($cacheTag, $cacheKey, function () use ($userId) {
             return UserBadge::where('user_id', $userId)
-                ->with('badge:id,name,name_ar,icon,image')
+                ->with('badge:id,name,name_ar,icon,image,badge_category')
                 ->select('id', 'badge_id', 'earned_at')
                 ->get()
                 ->map(function ($userBadge) {
@@ -283,10 +305,79 @@ class BadgeService extends BaseService
                             'name_ar' => $userBadge->badge->name_ar,
                             'icon' => $userBadge->badge->icon,
                             'image' => $userBadge->badge->image,
+                            'badge_category' => $userBadge->badge->badge_category,
                         ] : null,
                     ];
                 });
         }, 300); // Cache for 5 minutes
+    }
+
+    /**
+     * Get user's community badge progress
+     */
+    public function getUserCommunityBadgeProgress(int $userId): SupportCollection
+    {
+        $cacheKey = "user_community_badge_progress_{$userId}";
+        $cacheTag = "student_badges_{$userId}";
+
+        return $this->cacheTags($cacheTag, $cacheKey, function () use ($userId) {
+            return UserCommunityBadge::where('user_id', $userId)
+                ->with('badge:id,name,name_ar,icon,image,badge_category')
+                ->select('id', 'badge_id', 'score', 'last_updated_at')
+                ->get()
+                ->map(function ($progress) {
+                    // Format badge icon and image URLs
+                    if ($progress->badge) {
+                        $progress->badge->icon = $this->formatBadgeImageUrl($progress->badge->icon);
+                        $progress->badge->image = $this->formatBadgeImageUrl($progress->badge->image);
+                    }
+
+                    return [
+                        'id' => $progress->id,
+                        'badge_id' => $progress->badge_id,
+                        'score' => $progress->score,
+                        'percentage' => $progress->percentage,
+                        'current_range' => $progress->current_range,
+                        'last_updated_at' => $progress->last_updated_at?->format('Y-m-d H:i:s'),
+                        'badge' => $progress->badge ? [
+                            'id' => $progress->badge->id,
+                            'name' => $progress->badge->name,
+                            'name_ar' => $progress->badge->name_ar,
+                            'icon' => $progress->badge->icon,
+                            'image' => $progress->badge->image,
+                            'badge_category' => $progress->badge->badge_category,
+                        ] : null,
+                    ];
+                });
+        }, 300); // Cache for 5 minutes
+    }
+
+    /**
+     * Update or create community badge progress for a user
+     */
+    public function updateCommunityBadgeProgress(int $userId, int $badgeId, int $score): UserCommunityBadge
+    {
+        // Ensure score is between 0 and 100
+        $score = max(0, min(100, $score));
+
+        $progress = UserCommunityBadge::updateOrCreate(
+            [
+                'user_id' => $userId,
+                'badge_id' => $badgeId,
+            ],
+            [
+                'score' => $score,
+                'last_updated_at' => now(),
+            ]
+        );
+
+        // Clear cache
+        $this->forgetCacheTags([
+            "student_badges_{$userId}",
+            "user_community_badge_progress_{$userId}",
+        ]);
+
+        return $progress;
     }
 
     public function userHasBadge(int $userId, int $badgeId): bool
@@ -294,6 +385,37 @@ class BadgeService extends BaseService
         return UserBadge::where('user_id', $userId)
             ->where('badge_id', $badgeId)
             ->exists();
+    }
+
+    /**
+     * Check and award community badges based on user's points
+     */
+    public function checkAndAwardCommunityBadges(User $user): void
+    {
+        $userPoints = $user->points;
+
+        // Get all active community badges ordered by points required
+        $communityBadges = Badge::where('badge_category', 'community')
+            ->where('is_active', true)
+            ->where('status', 'approved')
+            ->where('points_required', '<=', $userPoints)
+            ->orderBy('points_required', 'desc')
+            ->get();
+
+        foreach ($communityBadges as $badge) {
+            // Check if user already has this badge
+            if (!$this->userHasBadge($user->id, $badge->id)) {
+                // Award the badge automatically
+                $this->awardBadge(
+                    $user->id,
+                    $badge->id,
+                    null, // project_id
+                    null, // challenge_id
+                    "Automatically earned for reaching {$badge->points_required} points",
+                    null  // awarded_by (system)
+                );
+            }
+        }
     }
 }
 

@@ -21,6 +21,8 @@ class StoreBadgeRequest extends FormRequest
             'icon' => 'nullable|string',
             'image' => 'nullable|image|max:2048',
             'type' => 'required|in:rank_first,rank_second,rank_third,excellent_innovator,active_participant,custom',
+            'badge_category' => 'nullable|in:achievement,community',
+            'level' => 'nullable|in:bronze,silver,gold',
             'points_required' => 'required|integer|min:0',
             'is_active' => 'boolean',
         ];

@@ -16,6 +16,10 @@ class BadgeResource extends JsonResource
             'description_ar' => $this->description_ar,
             'icon' => $this->icon,
             'image' => $this->image ? asset('storage/' . $this->image) : null,
+            'badge_category' => $this->badge_category ?? 'achievement',
+            'level' => $this->level,
+            'level_label' => $this->level_label,
+            'level_label_ar' => $this->level_label_ar,
             'points_required' => $this->points_required ?? 0,
             'pivot' => $this->when($this->pivot, [
                 'reason' => $this->pivot->reason ?? null,

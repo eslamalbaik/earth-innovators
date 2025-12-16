@@ -110,6 +110,42 @@ class User extends Authenticatable
         return $this->hasMany(Challenge::class, 'created_by');
     }
 
+    /**
+     * Get challenge participations for this user
+     */
+    public function challengeParticipations(): HasMany
+    {
+        return $this->hasMany(ChallengeParticipation::class);
+    }
+
+    /**
+     * Get challenges this user is participating in
+     */
+    public function participatingChallenges(): BelongsToMany
+    {
+        return $this->belongsToMany(Challenge::class, 'challenge_participants')
+            ->withPivot('status', 'points_earned', 'rank', 'joined_at', 'completed_at')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get active challenge participations
+     */
+    public function activeChallengeParticipations(): HasMany
+    {
+        return $this->hasMany(ChallengeParticipation::class)
+            ->whereIn('status', ['joined', 'in_progress']);
+    }
+
+    /**
+     * Get completed challenge participations
+     */
+    public function completedChallengeParticipations(): HasMany
+    {
+        return $this->hasMany(ChallengeParticipation::class)
+            ->where('status', 'completed');
+    }
+
     public function badges(): BelongsToMany
     {
         return $this->belongsToMany(Badge::class, 'user_badges')
@@ -120,6 +156,11 @@ class User extends Authenticatable
     public function userBadges(): HasMany
     {
         return $this->hasMany(UserBadge::class);
+    }
+
+    public function communityBadgeProgress(): HasMany
+    {
+        return $this->hasMany(UserCommunityBadge::class);
     }
 
     public function pointsHistory(): HasMany
