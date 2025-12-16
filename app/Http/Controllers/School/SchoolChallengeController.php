@@ -70,7 +70,7 @@ class SchoolChallengeController extends Controller
         $data['created_by'] = $user->id;
         $data['school_id'] = $user->id;
         $data['status'] = $data['status'] ?? 'draft';
-        
+
         // Convert date strings to datetime
         if (isset($data['start_date']) && !str_contains($data['start_date'], ' ')) {
             $data['start_date'] = $data['start_date'] . ' 00:00:00';
@@ -78,7 +78,7 @@ class SchoolChallengeController extends Controller
         if (isset($data['deadline']) && !str_contains($data['deadline'], ' ')) {
             $data['deadline'] = $data['deadline'] . ' 23:59:59';
         }
-        
+
         // Convert max_participants to null if empty
         if (isset($data['max_participants']) && $data['max_participants'] === '') {
             $data['max_participants'] = null;
@@ -89,7 +89,7 @@ class SchoolChallengeController extends Controller
 
             // Force clear cache immediately after creation (double-clear to ensure)
             $this->challengeService->clearChallengeCache($user->id, $user->id);
-            
+
             Log::info('Challenge created successfully', [
                 'challenge_id' => $challenge->id,
                 'school_id' => $user->id,
@@ -124,7 +124,7 @@ class SchoolChallengeController extends Controller
         }
 
         $challenge->load(['creator', 'school']);
-        
+
         // Load submission counts
         $challenge->loadCount([
             'submissions',
@@ -138,6 +138,11 @@ class SchoolChallengeController extends Controller
                 $query->where('status', 'approved');
             },
         ]);
+
+        // Ensure image_url is available
+        if (!isset($challenge->image_url) && $challenge->image) {
+            $challenge->image_url = $challenge->getImageUrlAttribute();
+        }
 
         return Inertia::render('School/Challenges/Show', [
             'challenge' => $challenge,
@@ -182,7 +187,7 @@ class SchoolChallengeController extends Controller
         }
 
         $validated = $request->validated();
-        
+
         // Convert date strings to datetime
         if (isset($validated['start_date']) && !str_contains($validated['start_date'], ' ')) {
             $validated['start_date'] = $validated['start_date'] . ' 00:00:00';

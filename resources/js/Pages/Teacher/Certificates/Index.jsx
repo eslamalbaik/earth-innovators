@@ -28,8 +28,6 @@ export default function Index({ auth, students, description }) {
         student_id: '',
         membership_number: '',
         course_name: 'شهادة إتمام',
-        subject: '',
-        grade: '',
         date: new Date().toISOString().split('T')[0],
         signature: '',
         issued_by: auth.user?.name || '',
@@ -42,8 +40,6 @@ export default function Index({ auth, students, description }) {
             student_id: student.id.toString(),
             membership_number: student.membership_number || '',
             course_name: 'شهادة إتمام',
-            subject: '',
-            grade: '',
             date: new Date().toISOString().split('T')[0],
             signature: '',
             issued_by: auth.user?.name || '',
@@ -68,8 +64,6 @@ export default function Index({ auth, students, description }) {
                     student_id: formData.student_id,
                     membership_number: formData.membership_number,
                     course_name: formData.course_name,
-                    subject: formData.subject,
-                    grade: formData.grade,
                     signature: formData.signature,
                     issued_by: formData.issued_by,
                 },
@@ -291,28 +285,6 @@ export default function Index({ auth, students, description }) {
                         </div>
 
                         <div>
-                            <InputLabel htmlFor="subject" value="المادة (اختياري)" />
-                            <TextInput
-                                id="subject"
-                                type="text"
-                                value={formData.subject}
-                                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                                className="mt-1 block w-full"
-                            />
-                        </div>
-
-                        <div>
-                            <InputLabel htmlFor="grade" value="الدرجة (اختياري)" />
-                            <TextInput
-                                id="grade"
-                                type="text"
-                                value={formData.grade}
-                                onChange={(e) => setFormData({ ...formData, grade: e.target.value })}
-                                className="mt-1 block w-full"
-                            />
-                        </div>
-
-                        <div>
                             <InputLabel htmlFor="date_format" value="تنسيق التاريخ" />
                             <select
                                 id="date_format"
@@ -371,8 +343,6 @@ export default function Index({ auth, students, description }) {
                             <div><strong>اسم الطالب:</strong> {previewData.student_name}</div>
                             <div><strong>رقم العضوية:</strong> {previewData.membership_number}</div>
                             <div><strong>اسم الدورة:</strong> {previewData.course_name}</div>
-                            {previewData.subject && <div><strong>المادة:</strong> {previewData.subject}</div>}
-                            {previewData.grade && <div><strong>الدرجة:</strong> {previewData.grade}</div>}
                             <div><strong>التاريخ:</strong> {formatDatePreview(previewData.date, previewData.date_format)}</div>
                             <div><strong>صادر عن:</strong> {previewData.issued_by}</div>
                         </div>

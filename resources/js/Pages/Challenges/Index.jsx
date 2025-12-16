@@ -3,6 +3,7 @@ import MainLayout from '../../Layouts/MainLayout';
 import { useState } from 'react';
 import { FaSearch, FaTrophy, FaEye, FaUser, FaCalendar, FaGraduationCap, FaUsers, FaClock } from 'react-icons/fa';
 import { toHijriDate } from '@/utils/dateUtils';
+import ChallengeCard from '../../Components/Challenges/ChallengeCard';
 
 export default function ChallengesIndex({ auth, challenges, userRole }) {
     const [search, setSearch] = useState('');
@@ -132,70 +133,11 @@ export default function ChallengesIndex({ auth, challenges, userRole }) {
                 {challenges.data && challenges.data.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {challenges.data.map((challenge) => (
-                            <Link
+                            <ChallengeCard
                                 key={challenge.id}
-                                href={`/challenges/${challenge.id}`}
-                                className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition duration-300 overflow-hidden group"
-                            >
-                                <div className="p-6">
-                                    <div className="flex items-start justify-between mb-4">
-                                        <div className="flex items-center gap-2">
-                                            <FaTrophy className="text-yellow-600 text-xl" />
-                                            <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
-                                                نشط
-                                            </span>
-                                        </div>
-                                        <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded">
-                                            {getChallengeTypeLabel(challenge.challenge_type)}
-                                        </span>
-                                    </div>
-
-                                    <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition">
-                                        {challenge.title}
-                                    </h3>
-
-                                    {challenge.objective && (
-                                        <p className="text-gray-600 text-sm mb-2">
-                                            <span className="font-semibold">الهدف:</span> {challenge.objective}
-                                        </p>
-                                    )}
-
-                                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                                        {challenge.description}
-                                    </p>
-
-                                    <div className="flex items-center justify-between text-sm text-gray-500 pt-4 border-t border-gray-200">
-                                        <div className="flex items-center gap-2">
-                                            <FaGraduationCap className="text-gray-400" />
-                                            <span>{challenge.creator?.name || challenge.school?.name || 'مستخدم'}</span>
-                                        </div>
-                                        {challenge.max_participants && (
-                                            <div className="flex items-center gap-2">
-                                                <FaUsers className="text-gray-400" />
-                                                <span>{challenge.current_participants || 0} / {challenge.max_participants}</span>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {challenge.school && (
-                                        <div className="mt-2 text-xs text-gray-500">
-                                            مدرسة: {challenge.school.name}
-                                        </div>
-                                    )}
-
-                                    <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
-                                        <div className="flex items-center gap-1">
-                                            <FaCalendar />
-                                            <span>ينتهي: {formatDate(challenge.deadline)}</span>
-                                        </div>
-                                        {challenge.points_reward > 0 && (
-                                            <div className="text-green-600 font-semibold">
-                                                {challenge.points_reward} نقطة
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </Link>
+                                challenge={challenge}
+                                user={auth?.user}
+                            />
                         ))}
                     </div>
                 ) : (

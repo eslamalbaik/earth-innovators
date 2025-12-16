@@ -311,6 +311,31 @@ Route::get('/projects/{project}', [App\Http\Controllers\ProjectController::class
 Route::get('/challenges', [App\Http\Controllers\ChallengeController::class, 'index'])->name('challenges.index');
 Route::get('/challenges/{challenge}', [App\Http\Controllers\ChallengeController::class, 'show'])->name('challenges.show');
 
+// API Routes for Challenges
+Route::prefix('api')->group(function () {
+    // Public challenge endpoints
+    Route::get('/challenges', [App\Http\Controllers\Api\ChallengeApiController::class, 'index'])->name('api.challenges.index');
+    Route::get('/challenges/{challenge}', [App\Http\Controllers\Api\ChallengeApiController::class, 'show'])->name('api.challenges.show');
+
+    // Leaderboard endpoints (public)
+    Route::get('/leaderboard/global', [App\Http\Controllers\Api\LeaderboardApiController::class, 'global'])->name('api.leaderboard.global');
+    Route::get('/leaderboard/challenge/{challenge}', [App\Http\Controllers\Api\LeaderboardApiController::class, 'challenge'])->name('api.leaderboard.challenge');
+    Route::get('/leaderboard/school/{school}', [App\Http\Controllers\Api\LeaderboardApiController::class, 'school'])->name('api.leaderboard.school');
+    Route::get('/leaderboard/top-schools', [App\Http\Controllers\Api\LeaderboardApiController::class, 'topSchools'])->name('api.leaderboard.top-schools');
+
+    // Authenticated endpoints
+    Route::middleware(['auth'])->group(function () {
+        // Challenge participation
+        Route::post('/challenges/{challenge}/join', [App\Http\Controllers\Api\ChallengeParticipationApiController::class, 'join'])->name('api.challenges.join');
+        Route::get('/challenges/{challenge}/participation', [App\Http\Controllers\Api\ChallengeParticipationApiController::class, 'show'])->name('api.challenges.participation');
+        Route::get('/challenges/participations/active', [App\Http\Controllers\Api\ChallengeParticipationApiController::class, 'active'])->name('api.challenges.participations.active');
+        Route::get('/challenges/participations/completed', [App\Http\Controllers\Api\ChallengeParticipationApiController::class, 'completed'])->name('api.challenges.participations.completed');
+
+        // User leaderboard rank
+        Route::get('/leaderboard/user-rank', [App\Http\Controllers\Api\LeaderboardApiController::class, 'userRank'])->name('api.leaderboard.user-rank');
+    });
+});
+
 Route::get('/badges', [App\Http\Controllers\BadgeController::class, 'index'])->name('badges');
 Route::get('/badges/{id}', [App\Http\Controllers\BadgeController::class, 'show'])->name('badges.show');
 
@@ -428,6 +453,7 @@ Route::middleware(['auth'])->group(function () {
     // Student Challenges
     Route::get('/student/challenges', [\App\Http\Controllers\Student\StudentChallengeController::class, 'index'])->name('student.challenges.index');
     Route::get('/student/challenges/{challenge}', [\App\Http\Controllers\Student\StudentChallengeController::class, 'show'])->name('student.challenges.show');
+    Route::post('/student/challenges/{challenge}/join', [\App\Http\Controllers\Student\StudentChallengeController::class, 'join'])->name('student.challenges.join');
     Route::post('/student/challenges/{challenge}/submit', [\App\Http\Controllers\Student\StudentChallengeController::class, 'submit'])->name('student.challenges.submit');
     Route::get('/student/challenges/{challenge}/submissions/{submission}', [\App\Http\Controllers\Student\StudentChallengeController::class, 'showSubmission'])->name('student.challenges.submissions.show');
     Route::put('/student/challenges/{challenge}/submissions/{submission}', [\App\Http\Controllers\Student\StudentChallengeController::class, 'updateSubmission'])->name('student.challenges.submissions.update');

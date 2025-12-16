@@ -25,6 +25,7 @@ class StoreChallengeRequest extends FormRequest
             'title' => 'required|string|max:255',
             'objective' => 'required|string|max:1000',
             'description' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'instructions' => 'required|string',
             'challenge_type' => 'required|in:60_seconds,mental_math,conversions,team_fastest,build_problem,custom',
             'category' => 'required|in:science,technology,engineering,mathematics,arts,other',

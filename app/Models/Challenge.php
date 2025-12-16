@@ -15,6 +15,7 @@ class Challenge extends Model
         'title',
         'objective',
         'description',
+        'image',
         'instructions',
         'challenge_type',
         'category',
@@ -33,6 +34,33 @@ class Challenge extends Model
         'deadline' => 'datetime',
         'badges_reward' => 'array',
     ];
+
+    protected $appends = [
+        'image_url',
+    ];
+
+    /**
+     * Get the image URL attribute
+     */
+    public function getImageUrlAttribute(): ?string
+    {
+        if (!$this->image) {
+            return null;
+        }
+
+        // If it's already a full URL, return as is
+        if (str_starts_with($this->image, 'http://') || str_starts_with($this->image, 'https://')) {
+            return $this->image;
+        }
+
+        // If it starts with /storage/, return as is
+        if (str_starts_with($this->image, '/storage/')) {
+            return $this->image;
+        }
+
+        // Otherwise, prepend /storage/
+        return '/storage/' . $this->image;
+    }
 
     public function creator(): BelongsTo
     {
@@ -78,6 +106,72 @@ class Challenge extends Model
     }
 
     /**
+     * Get all participants in this challenge
+     */
+    public function participants(): HasMany
+    {
+        return $this->hasMany(ChallengeParticipation::class);
+    }
+
+    /**
+     * Get active participants
+     */
+    public function activeParticipants(): HasMany
+    {
+        return $this->hasMany(ChallengeParticipation::class)
+            ->whereIn('status', ['joined', 'in_progress']);
+    }
+
+    /**
+     * Get completed participants
+     */
+    public function completedParticipants(): HasMany
+    {
+        return $this->hasMany(ChallengeParticipation::class)
+            ->where('status', 'completed');
+    }
+
+    /**
+     * Get participants as users (many-to-many through participation)
+     */
+    public function participantUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'challenge_participants')
+            ->withPivot('status', 'points_earned', 'rank', 'joined_at', 'completed_at')
+            ->withTimestamps();
+    }
+
+    /**
+     * Check if a user is participating in this challenge
+     */
+    public function hasParticipant(int $userId): bool
+    {
+        return $this->participants()->where('user_id', $userId)->exists();
+    }
+
+    /**
+     * Get remaining time in days
+     */
+    public function getRemainingDaysAttribute(): ?int
+    {
+        if ($this->deadline < now()) {
+            return 0;
+        }
+        return now()->diffInDays($this->deadline, false);
+    }
+
+    /**
+     * Get progress percentage (0-100)
+     */
+    public function getProgressPercentageAttribute(): float
+    {
+        if (!$this->max_participants) {
+            return 0;
+        }
+        return min(100, ($this->current_participants / $this->max_participants) * 100);
+    }
+
+    /**
      * Get challenge type label in Arabic
      */
     public function getChallengeTypeLabelAttribute(): string
@@ -99,8 +193,8 @@ class Challenge extends Model
     public function isActive(): bool
     {
         $now = now();
-        return $this->status === 'active' 
-            && $this->start_date <= $now 
+        return $this->status === 'active'
+            && $this->start_date <= $now
             && $this->deadline >= $now;
     }
 

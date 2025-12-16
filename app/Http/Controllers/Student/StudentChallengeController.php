@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Challenge;
 use App\Models\ChallengeSubmission;
 use App\Services\ChallengeSubmissionService;
+use App\Services\ChallengeParticipationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -16,7 +17,8 @@ use Inertia\Response;
 class StudentChallengeController extends Controller
 {
     public function __construct(
-        private ChallengeSubmissionService $submissionService
+        private ChallengeSubmissionService $submissionService,
+        private ChallengeParticipationService $participationService
     ) {}
 
     /**
@@ -63,14 +65,96 @@ class StudentChallengeController extends Controller
     }
 
     /**
+     * الانضمام إلى تحدّي
+     */
+    public function join(Challenge $challenge)
+    {
+        $student = Auth::user();
+
+        // Challenges can be global (no school_id) or school-specific
+        // If challenge has school_id, verify it matches student's school
+        if ($challenge->school_id && $challenge->school_id !== $student->school_id) {
+            return back()->withErrors([
+                'error' => 'غير مصرح لك بالانضمام إلى هذا التحدي',
+            ]);
+        }
+
+        if (!$challenge->isActive()) {
+            return back()->withErrors([
+                'error' => 'هذا التحدي غير نشط حالياً',
+            ]);
+        }
+
+        try {
+            // #region agent log
+            $logPath = base_path('.cursor/debug.log');
+            $logData = json_encode([
+                'sessionId' => 'debug-session',
+                'runId' => 'run1',
+                'hypothesisId' => 'E',
+                'location' => 'StudentChallengeController.php:88',
+                'message' => 'Before calling joinChallenge service',
+                'data' => ['studentId' => $student->id, 'challengeId' => $challenge->id],
+                'timestamp' => now()->timestamp * 1000
+            ]) . "\n";
+            file_put_contents($logPath, $logData, FILE_APPEND);
+            // #endregion
+
+            $this->participationService->joinChallenge($student->id, $challenge->id);
+
+            // #region agent log
+            $logData2 = json_encode([
+                'sessionId' => 'debug-session',
+                'runId' => 'run2',
+                'hypothesisId' => 'F',
+                'location' => 'StudentChallengeController.php:105',
+                'message' => 'After joinChallenge, before redirect',
+                'data' => ['route' => 'student.challenges.show', 'challengeId' => $challenge->id, 'routeUrl' => route('student.challenges.show', $challenge)],
+                'timestamp' => now()->timestamp * 1000
+            ]) . "\n";
+            file_put_contents($logPath, $logData2, FILE_APPEND);
+            // #endregion
+
+            // Redirect to challenge page
+            $redirectResponse = redirect()
+                ->route('student.challenges.show', $challenge)
+                ->with('success', 'تم الانضمام إلى التحدي بنجاح! يمكنك الآن تقديم حل.');
+
+            // #region agent log
+            $logData3 = json_encode([
+                'sessionId' => 'debug-session',
+                'runId' => 'run2',
+                'hypothesisId' => 'H',
+                'location' => 'StudentChallengeController.php:118',
+                'message' => 'Redirect response created',
+                'data' => ['targetUrl' => $redirectResponse->getTargetUrl(), 'statusCode' => $redirectResponse->getStatusCode()],
+                'timestamp' => now()->timestamp * 1000
+            ]) . "\n";
+            file_put_contents($logPath, $logData3, FILE_APPEND);
+            // #endregion
+
+            return $redirectResponse;
+        } catch (\Exception $e) {
+            Log::error('Error joining challenge: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return back()->withErrors([
+                'error' => 'حدث خطأ أثناء الانضمام: ' . $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
      * عرض تفاصيل تحدّي مع إمكانية التسليم
      */
     public function show(Challenge $challenge): Response
     {
         $student = Auth::user();
 
-        // Verify challenge is available for student
-        if ($challenge->school_id !== $student->school_id) {
+        // Challenges can be global (no school_id) or school-specific
+        // If challenge has school_id, verify it matches student's school
+        if ($challenge->school_id && $challenge->school_id !== $student->school_id) {
             abort(403, 'غير مصرح لك بعرض هذا التحدي');
         }
 
@@ -88,8 +172,9 @@ class StudentChallengeController extends Controller
     {
         $student = Auth::user();
 
-        // Verify challenge is available and active
-        if ($challenge->school_id !== $student->school_id) {
+        // Challenges can be global (no school_id) or school-specific
+        // If challenge has school_id, verify it matches student's school
+        if ($challenge->school_id && $challenge->school_id !== $student->school_id) {
             abort(403, 'غير مصرح لك بتقديم حل لهذا التحدي');
         }
 

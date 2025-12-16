@@ -1,16 +1,21 @@
 import DashboardLayout from '../../../Layouts/DashboardLayout';
 import { Head, useForm, Link } from '@inertiajs/react';
-import { FaTrophy, FaSpinner, FaArrowLeft } from 'react-icons/fa';
+import { FaTrophy, FaSpinner, FaArrowLeft, FaImage, FaTrash } from 'react-icons/fa';
 import TextInput from '../../../Components/TextInput';
 import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
 import PrimaryButton from '../../../Components/PrimaryButton';
+import { useState, useRef } from 'react';
 
 export default function TeacherChallengeCreate({ auth, school }) {
+    const [imagePreview, setImagePreview] = useState(null);
+    const imageInputRef = useRef(null);
+
     const { data, setData, post, processing, errors } = useForm({
         title: '',
         objective: '',
         description: '',
+        image: null,
         instructions: '',
         challenge_type: '60_seconds',
         category: 'mathematics',
@@ -22,21 +27,50 @@ export default function TeacherChallengeCreate({ auth, school }) {
         max_participants: '',
     });
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const maxSize = 5 * 1024 * 1024; // 5 MB
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+
+            if (file.size > maxSize) {
+                alert('الصورة أكبر من 5 ميجابايت');
+                return;
+            }
+
+            if (!validTypes.includes(file.type)) {
+                alert('نوع الصورة غير مدعوم. يرجى اختيار صورة بصيغة JPEG, PNG, GIF, أو WebP');
+                return;
+            }
+
+            setData('image', file);
+            setImagePreview(URL.createObjectURL(file));
+        }
+    };
+
+    const removeImage = () => {
+        setData('image', null);
+        setImagePreview(null);
+        if (imageInputRef.current) {
+            imageInputRef.current.value = '';
+        }
+    };
+
     const submit = (e) => {
         e.preventDefault();
-        
+
         // Prepare data - convert empty strings to null for optional fields
         const submitData = {
             ...data,
             max_participants: data.max_participants === '' ? null : (data.max_participants ? parseInt(data.max_participants) : null),
             points_reward: parseInt(data.points_reward) || 0,
         };
-        
+
         // Update form data
         Object.keys(submitData).forEach(key => {
             setData(key, submitData[key]);
         });
-        
+
         post('/teacher/challenges', {
             onSuccess: () => {
                 // Form will redirect on success
@@ -157,6 +191,47 @@ export default function TeacherChallengeCreate({ auth, school }) {
                                 required
                             />
                             <InputError message={errors.description} className="mt-2" />
+                        </div>
+
+                        {/* Image */}
+                        <div>
+                            <InputLabel htmlFor="image" value="صورة التحدي (اختياري)" />
+                            <div className="mt-1">
+                                {imagePreview ? (
+                                    <div className="relative">
+                                        <img
+                                            src={imagePreview}
+                                            alt="Preview"
+                                            className="w-full h-64 object-cover rounded-lg border border-gray-300"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={removeImage}
+                                            className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition"
+                                        >
+                                            <FaTrash />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div
+                                        onClick={() => imageInputRef.current?.click()}
+                                        className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-legacy-green transition"
+                                    >
+                                        <FaImage className="mx-auto text-gray-400 text-4xl mb-2" />
+                                        <p className="text-gray-600">انقر لرفع صورة</p>
+                                        <p className="text-sm text-gray-400 mt-1">JPEG, PNG, GIF, WebP (حد أقصى 5 ميجابايت)</p>
+                                    </div>
+                                )}
+                                <input
+                                    ref={imageInputRef}
+                                    type="file"
+                                    id="image"
+                                    accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                                    onChange={handleImageChange}
+                                    className="hidden"
+                                />
+                            </div>
+                            <InputError message={errors.image} className="mt-2" />
                         </div>
 
                         {/* Instructions */}

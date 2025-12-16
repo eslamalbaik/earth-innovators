@@ -230,7 +230,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                         {/* Actions */}
                                         <div className="flex items-center gap-2">
                                             <Link
-                                                href={`/school/challenges/${challenge.id}`}
+                                                href={`/challenges/${challenge.id}`}
                                                 className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition text-sm"
                                             >
                                                 <FaEye />

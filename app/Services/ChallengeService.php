@@ -7,6 +7,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ChallengeService extends BaseService
 {
@@ -25,7 +26,18 @@ class ChallengeService extends BaseService
             $query->where('status', $status);
         }
 
-        return $query->paginate($perPage);
+        $challenges = $query->paginate($perPage);
+
+        // Ensure image_url is appended to each challenge
+        $challenges->getCollection()->transform(function ($challenge) {
+            // Force append image_url if not already present
+            if (!isset($challenge->image_url) && $challenge->image) {
+                $challenge->image_url = $challenge->getImageUrlAttribute();
+            }
+            return $challenge;
+        });
+
+        return $challenges;
     }
 
     /**
@@ -35,12 +47,22 @@ class ChallengeService extends BaseService
     {
         $cacheKey = "teacher_challenges_{$teacherId}_{$perPage}";
         $cacheTag = "teacher_challenges_{$teacherId}";
-        
+
         return $this->cacheTags($cacheTag, $cacheKey, function () use ($teacherId, $perPage) {
-            return Challenge::where('created_by', $teacherId)
+            $challenges = Challenge::where('created_by', $teacherId)
                 ->with(['creator', 'school'])
                 ->orderBy('created_at', 'desc')
                 ->paginate($perPage);
+
+            // Ensure image_url is appended to each challenge
+            $challenges->getCollection()->transform(function ($challenge) {
+                if (!isset($challenge->image_url) && $challenge->image) {
+                    $challenge->image_url = $challenge->getImageUrlAttribute();
+                }
+                return $challenge;
+            });
+
+            return $challenges;
         }, 3600);
     }
 
@@ -51,7 +73,7 @@ class ChallengeService extends BaseService
     {
         $cacheKey = "active_school_challenges_{$schoolId}_{$perPage}";
         $cacheTag = "school_challenges_{$schoolId}";
-        
+
         return $this->cacheTags($cacheTag, $cacheKey, function () use ($schoolId, $perPage) {
             return Challenge::where('school_id', $schoolId)
                 ->where('status', 'active')
@@ -75,7 +97,7 @@ class ChallengeService extends BaseService
     ): LengthAwarePaginator {
         $cacheKey = "active_challenges_" . md5(json_encode([$search, $category, $challengeType, $schoolId, $perPage]));
         $cacheTag = 'active_challenges';
-        
+
         return $this->cacheTags($cacheTag, $cacheKey, function () use ($search, $category, $challengeType, $schoolId, $perPage) {
             $query = Challenge::where('status', 'active')
                 ->where('start_date', '<=', now())
@@ -103,7 +125,17 @@ class ChallengeService extends BaseService
                 $query->where('challenge_type', $challengeType);
             }
 
-            return $query->paginate($perPage);
+            $challenges = $query->paginate($perPage);
+
+            // Ensure image_url is appended to each challenge
+            $challenges->getCollection()->transform(function ($challenge) {
+                if (!isset($challenge->image_url) && $challenge->image) {
+                    $challenge->image_url = $challenge->getImageUrlAttribute();
+                }
+                return $challenge;
+            });
+
+            return $challenges;
         }, 300); // Cache for 5 minutes
     }
 
@@ -114,18 +146,23 @@ class ChallengeService extends BaseService
     {
         DB::beginTransaction();
         try {
+            // Handle image upload
+            if (isset($data['image']) && is_file($data['image'])) {
+                $data['image'] = $data['image']->store('challenges/images', 'public');
+            }
+
             $challenge = Challenge::create($data);
-            
+
             $this->clearChallengeCache($challenge->school_id, $challenge->created_by);
-            
+
             DB::commit();
-            
+
             // Load relationships for event
             $challenge->load(['creator', 'school']);
-            
+
             // Trigger event for notification
             event(new \App\Events\ChallengeCreated($challenge));
-            
+
             return $challenge;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -140,10 +177,30 @@ class ChallengeService extends BaseService
     {
         DB::beginTransaction();
         try {
+            // Handle image upload
+            if (isset($data['image'])) {
+                if (is_file($data['image'])) {
+                    // Delete old image if exists
+                    if ($challenge->image) {
+                        Storage::disk('public')->delete($challenge->image);
+                    }
+                    // Store new image
+                    $data['image'] = $data['image']->store('challenges/images', 'public');
+                } elseif ($data['image'] === null) {
+                    // Delete image if explicitly set to null
+                    if ($challenge->image) {
+                        Storage::disk('public')->delete($challenge->image);
+                    }
+                } else {
+                    // Keep existing image if not provided
+                    unset($data['image']);
+                }
+            }
+
             $challenge->update($data);
-            
+
             $this->clearChallengeCache($challenge->school_id, $challenge->created_by);
-            
+
             DB::commit();
             return $challenge->fresh();
         } catch (\Exception $e) {
@@ -161,11 +218,16 @@ class ChallengeService extends BaseService
         try {
             $schoolId = $challenge->school_id;
             $createdBy = $challenge->created_by;
-            
+
+            // Delete image if exists
+            if ($challenge->image) {
+                Storage::disk('public')->delete($challenge->image);
+            }
+
             $challenge->delete();
-            
+
             $this->clearChallengeCache($schoolId, $createdBy);
-            
+
             DB::commit();
             return true;
         } catch (\Exception $e) {
@@ -181,18 +243,18 @@ class ChallengeService extends BaseService
     {
         $cacheDriver = config('cache.default');
         $supportsTags = in_array($cacheDriver, ['redis', 'memcached']);
-        
+
         if ($schoolId) {
             // Clear using tags if supported
             $this->forgetCacheTags(["school_challenges_{$schoolId}"]);
-            
+
             // Always clear stats cache
             Cache::forget("school_challenge_stats_{$schoolId}");
-            
+
             // Clear all possible cache keys for this school (for non-tagging drivers or as backup)
             $possibleStatuses = [null, 'draft', 'active', 'completed', 'cancelled'];
             $possiblePerPages = [10, 15, 20, 25, 30];
-            
+
             foreach ($possibleStatuses as $status) {
                 foreach ($possiblePerPages as $perPage) {
                     $cacheKey = "school_challenges_{$schoolId}_" . md5(json_encode([$status, $perPage]));
@@ -201,7 +263,7 @@ class ChallengeService extends BaseService
                     }
                 }
             }
-            
+
             // Clear active school challenges cache
             foreach ($possiblePerPages as $perPage) {
                 for ($page = 1; $page <= 20; $page++) {
@@ -209,7 +271,7 @@ class ChallengeService extends BaseService
                     Cache::forget("active_school_challenges_{$schoolId}_{$page}");
                 }
             }
-            
+
             Log::info('Challenge cache cleared for school', [
                 'school_id' => $schoolId,
                 'supports_tags' => $supportsTags,
@@ -219,7 +281,7 @@ class ChallengeService extends BaseService
         if ($createdBy) {
             // Clear using tags if supported
             $this->forgetCacheTags(["teacher_challenges_{$createdBy}"]);
-            
+
             // Clear all possible cache keys for this teacher (for non-tagging drivers or as backup)
             $possiblePerPages = [10, 15, 20, 25, 30];
             foreach ($possiblePerPages as $perPage) {
@@ -228,13 +290,13 @@ class ChallengeService extends BaseService
                     Cache::forget("teacher_challenges_{$createdBy}_{$page}");
                 }
             }
-            
+
             Log::info('Challenge cache cleared for teacher', [
                 'created_by' => $createdBy,
                 'supports_tags' => $supportsTags,
             ]);
         }
-        
+
         // Also clear active challenges cache (public)
         $this->forgetCacheTags(['active_challenges']);
     }

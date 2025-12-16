@@ -25,6 +25,7 @@ class UpdateChallengeRequest extends FormRequest
             'title' => 'sometimes|required|string|max:255',
             'objective' => 'sometimes|required|string|max:1000',
             'description' => 'sometimes|required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'instructions' => 'sometimes|required|string',
             'challenge_type' => 'sometimes|required|in:60_seconds,mental_math,conversions,team_fastest,build_problem,custom',
             'category' => 'sometimes|required|in:science,technology,engineering,mathematics,arts,other',

@@ -40,7 +40,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 40px;
+            padding: 10px;
+        }
+        .header .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
         .header h1 {
             font-size: 28px;
@@ -82,7 +87,9 @@
 <body>
     <div class="email-container">
         <div class="header">
-            <div class="logo">📚</div>
+            <div class="logo">
+                <img src="{{ url('images/logo-modified.png') }}" alt="{{ config('app.name', 'إرث المبتكرين') }}" />
+            </div>
             <h1>@yield('header_title', config('app.name', 'إرث المبتكرين'))</h1>
             <p>@yield('header_subtitle', 'منصة تعليمية لإبداع الطلاب والموهوبين')</p>
         </div>
@@ -96,7 +103,7 @@
             <p>منصة تعليمية لبناء مجتمع من المبتكرين والموهوبين في المدارس</p>
             <p>© {{ date('Y') }} جميع الحقوق محفوظة</p>
             <p style="margin-top: 15px;">
-                <a href="{{ config('app.url') }}">زيارة الموقع</a> | 
+                <a href="{{ config('app.url') }}">زيارة الموقع</a> |
                 <a href="{{ config('app.url') }}/contact">تواصل معنا</a>
             </p>
         </div>

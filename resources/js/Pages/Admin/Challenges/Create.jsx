@@ -1,12 +1,17 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { FaArrowRight, FaSave, FaTimes } from 'react-icons/fa';
+import { FaArrowRight, FaSave, FaTimes, FaImage, FaTrash } from 'react-icons/fa';
+import { useState, useRef } from 'react';
 
 export default function AdminChallengesCreate({ schools }) {
+    const [imagePreview, setImagePreview] = useState(null);
+    const imageInputRef = useRef(null);
+
     const { data, setData, post, processing, errors } = useForm({
         title: '',
         objective: '',
         description: '',
+        image: null,
         instructions: '',
         challenge_type: '',
         category: '',
@@ -18,6 +23,35 @@ export default function AdminChallengesCreate({ schools }) {
         points_reward: 0,
         max_participants: null,
     });
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const maxSize = 5 * 1024 * 1024; // 5 MB
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+
+            if (file.size > maxSize) {
+                alert('الصورة أكبر من 5 ميجابايت');
+                return;
+            }
+
+            if (!validTypes.includes(file.type)) {
+                alert('نوع الصورة غير مدعوم. يرجى اختيار صورة بصيغة JPEG, PNG, GIF, أو WebP');
+                return;
+            }
+
+            setData('image', file);
+            setImagePreview(URL.createObjectURL(file));
+        }
+    };
+
+    const removeImage = () => {
+        setData('image', null);
+        setImagePreview(null);
+        if (imageInputRef.current) {
+            imageInputRef.current.value = '';
+        }
+    };
 
     const submit = (e) => {
         e.preventDefault();
@@ -97,6 +131,51 @@ export default function AdminChallengesCreate({ schools }) {
                             />
                             {errors.description && (
                                 <p className="mt-1 text-sm text-red-600">{errors.description}</p>
+                            )}
+                        </div>
+
+                        {/* صورة التحدي */}
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                صورة التحدي (اختياري)
+                            </label>
+                            <div>
+                                {imagePreview ? (
+                                    <div className="relative">
+                                        <img
+                                            src={imagePreview}
+                                            alt="Preview"
+                                            className="w-full h-64 object-cover rounded-lg border border-gray-300"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={removeImage}
+                                            className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition"
+                                        >
+                                            <FaTrash />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div
+                                        onClick={() => imageInputRef.current?.click()}
+                                        className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-500 transition"
+                                    >
+                                        <FaImage className="mx-auto text-gray-400 text-4xl mb-2" />
+                                        <p className="text-gray-600">انقر لرفع صورة</p>
+                                        <p className="text-sm text-gray-400 mt-1">JPEG, PNG, GIF, WebP (حد أقصى 5 ميجابايت)</p>
+                                    </div>
+                                )}
+                                <input
+                                    ref={imageInputRef}
+                                    type="file"
+                                    id="image"
+                                    accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                                    onChange={handleImageChange}
+                                    className="hidden"
+                                />
+                            </div>
+                            {errors.image && (
+                                <p className="mt-1 text-sm text-red-600">{errors.image}</p>
                             )}
                         </div>
 

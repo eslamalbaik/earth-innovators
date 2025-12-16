@@ -20,7 +20,7 @@ class ChallengeController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        
+
         $schoolId = null;
         if ($user && $user->isStudent() && $user->school_id) {
             $schoolId = $user->school_id;
@@ -46,12 +46,12 @@ class ChallengeController extends Controller
     public function show(int $id)
     {
         $user = Auth::user();
-        
+
         // للطلاب: توجيههم إلى صفحة الطلاب
         if ($user && $user->isStudent()) {
             return redirect()->route('student.challenges.show', $id);
         }
-        
+
         // للمعلمين: توجيههم إلى صفحة المعلمين
         if ($user && $user->isTeacher()) {
             $challenge = Challenge::findOrFail($id);
@@ -59,18 +59,15 @@ class ChallengeController extends Controller
                 return redirect()->route('teacher.challenges.show', $id);
             }
         }
-        
-        // للمدارس: توجيههم إلى صفحة المدارس
-        if ($user && $user->isSchool()) {
-            $challenge = Challenge::findOrFail($id);
-            if ($challenge->school_id === $user->id) {
-                return redirect()->route('school.challenges.show', $id);
-            }
-        }
-        
-        // للزوار والمستخدمين الآخرين: عرض التحدي العام
+
+        // للزوار والمستخدمين الآخرين: عرض التحدي العام (بما في ذلك المدارس)
         $challenge = Challenge::with(['creator', 'school'])
             ->findOrFail($id);
+
+        // Ensure image_url is available
+        if (!isset($challenge->image_url) && $challenge->image) {
+            $challenge->image_url = $challenge->getImageUrlAttribute();
+        }
 
         // Get existing submission if user is student
         $existingSubmission = null;

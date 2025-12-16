@@ -66,8 +66,6 @@ class CertificateService
             'student_id' => $overrides['student_id'] ?? (string)$student->id,
             'membership_number' => $overrides['membership_number'] ?? $student->membership_number ?? 'N/A',
             'course_name' => $overrides['course_name'] ?? 'دورة تدريبية',
-            'subject' => $overrides['subject'] ?? '',
-            'grade' => $overrides['grade'] ?? '',
             'date' => $this->formatDate($issueDate, $dateFormat),
             'issue_date' => $this->formatDate($issueDate, $dateFormat),
             'signature' => $overrides['signature'] ?? '',

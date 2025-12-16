@@ -31,15 +31,24 @@ class LoginRequest extends FormRequest
 
         $remember = $this->boolean('remember');
         $baseCredentials = $this->only('email', 'password');
-        $role = $this->filled('role') ? $this->string('role')->value() : null;
 
-        $authenticated = false;
+        // Check if user exists and get their actual role from database
+        // Role should always match the email, not the request
+        $user = \App\Models\User::where('email', $baseCredentials['email'])->first();
 
-        if ($role) {
-            $authenticated = Auth::attempt(array_merge($baseCredentials, ['role' => $role]), $remember);
-        } else {
-            $authenticated = Auth::attempt($baseCredentials, $remember);
+        if (!$user) {
+            RateLimiter::hit($this->throttleKey());
+            throw ValidationException::withMessages([
+                'email' => trans('auth.failed'),
+            ]);
         }
+
+        // Use the user's actual role from database, not from request
+        // This ensures role is always correct and matches the email
+        $userRole = $user->role;
+
+        // Authenticate using the user's actual role from database
+        $authenticated = Auth::attempt(array_merge($baseCredentials, ['role' => $userRole]), $remember);
 
         if (! $authenticated) {
             RateLimiter::hit($this->throttleKey());
