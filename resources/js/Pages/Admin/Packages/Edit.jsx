@@ -1,15 +1,19 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FaArrowRight, FaSave, FaTimes } from 'react-icons/fa';
+import { useState, useEffect } from 'react';
 
 export default function AdminPackagesEdit({ package: pkg }) {
+    const [features, setFeatures] = useState(pkg.features && pkg.features.length > 0 ? pkg.features : ['']);
+    const [featuresAr, setFeaturesAr] = useState(pkg.features_ar && pkg.features_ar.length > 0 ? pkg.features_ar : ['']);
+
     const { data, setData, put, processing, errors } = useForm({
         name: pkg.name || '',
         name_ar: pkg.name_ar || '',
         description: pkg.description || '',
         description_ar: pkg.description_ar || '',
         price: pkg.price || 0,
-        currency: pkg.currency || 'SAR',
+        currency: pkg.currency || 'AED',
         duration_type: pkg.duration_type || 'monthly',
         duration_months: pkg.duration_months || 1,
         points_bonus: pkg.points_bonus || 0,
@@ -22,6 +26,40 @@ export default function AdminPackagesEdit({ package: pkg }) {
         is_active: pkg.is_active !== undefined ? pkg.is_active : true,
         is_popular: pkg.is_popular || false,
     });
+
+    const addFeature = (isArabic = false) => {
+        if (isArabic) {
+            setFeaturesAr([...featuresAr, '']);
+        } else {
+            setFeatures([...features, '']);
+        }
+    };
+
+    const updateFeature = (index, value, isArabic = false) => {
+        if (isArabic) {
+            const newFeatures = [...featuresAr];
+            newFeatures[index] = value;
+            setFeaturesAr(newFeatures);
+            setData('features_ar', newFeatures.filter(f => f.trim() !== ''));
+        } else {
+            const newFeatures = [...features];
+            newFeatures[index] = value;
+            setFeatures(newFeatures);
+            setData('features', newFeatures.filter(f => f.trim() !== ''));
+        }
+    };
+
+    const removeFeature = (index, isArabic = false) => {
+        if (isArabic) {
+            const newFeatures = featuresAr.filter((_, i) => i !== index);
+            setFeaturesAr(newFeatures);
+            setData('features_ar', newFeatures.filter(f => f.trim() !== ''));
+        } else {
+            const newFeatures = features.filter((_, i) => i !== index);
+            setFeatures(newFeatures);
+            setData('features', newFeatures.filter(f => f.trim() !== ''));
+        }
+    };
 
     const submit = (e) => {
         e.preventDefault();
@@ -278,6 +316,71 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                 <label className="mr-2 text-sm font-medium text-gray-700">
                                     شائع
                                 </label>
+                            </div>
+                        </div>
+
+                        {/* Features Section */}
+                        <div className="md:col-span-2">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">الميزات (إنجليزي)</h3>
+                            <div className="space-y-3">
+                                {features.map((feature, index) => (
+                                    <div key={index} className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={feature}
+                                            onChange={(e) => updateFeature(index, e.target.value, false)}
+                                            placeholder={`ميزة ${index + 1}`}
+                                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => removeFeature(index, false)}
+                                            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg"
+                                        >
+                                            <FaTimes />
+                                        </button>
+                                    </div>
+                                ))}
+                                <button
+                                    type="button"
+                                    onClick={() => addFeature(false)}
+                                    className="w-full px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-500 hover:text-blue-600 transition"
+                                >
+                                    + إضافة ميزة
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Features AR Section */}
+                        <div className="md:col-span-2">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">الميزات (عربي)</h3>
+                            <div className="space-y-3">
+                                {featuresAr.map((feature, index) => (
+                                    <div key={index} className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={feature}
+                                            onChange={(e) => updateFeature(index, e.target.value, true)}
+                                            placeholder={`ميزة ${index + 1}`}
+                                            dir="rtl"
+                                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-right"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => removeFeature(index, true)}
+                                            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg"
+                                        >
+                                            <FaTimes />
+                                        </button>
+                                    </div>
+                                ))}
+                                <button
+                                    type="button"
+                                    onClick={() => addFeature(true)}
+                                    className="w-full px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-500 hover:text-blue-600 transition"
+                                >
+                                    + إضافة ميزة
+                                </button>
                             </div>
                         </div>
                     </div>

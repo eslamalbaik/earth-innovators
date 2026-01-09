@@ -140,7 +140,7 @@ class TamaraService
                     'order_id' => $orderId,
                     'total_amount' => [
                         'amount' => '0',
-                        'currency' => 'SAR',
+                        'currency' => 'AED',
                     ],
                 ];
             } else {
@@ -225,7 +225,7 @@ class TamaraService
                 $refundData = [
                     'total_amount' => [
                         'amount' => '0',
-                        'currency' => 'SAR',
+                        'currency' => 'AED',
                     ],
                     'comment' => 'Refund request',
                 ];
@@ -292,7 +292,7 @@ class TamaraService
         }
     }
 
-    public function getPaymentTypes(string $countryCode = 'SA', string $phone = '', string $currency = 'SAR', float $orderValue = 0): ?array
+    public function getPaymentTypes(string $countryCode = 'AE', string $phone = '', string $currency = 'AED', float $orderValue = 0): ?array
     {
         try {
             $params = [

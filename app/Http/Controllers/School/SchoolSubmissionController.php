@@ -57,13 +57,25 @@ class SchoolSubmissionController extends Controller
     {
         $school = Auth::user();
 
-        // التحقق من أن المشروع للمدرسة
-        if ($submission->project->school_id !== $school->id) {
+        // التحقق من أن المشروع للمدرسة أو مشروع من الإدارة مرتبط بهذه المدرسة
+        $isSchoolProject = $submission->project->school_id === $school->id;
+        $isAdminProjectForSchool = $submission->project->user && 
+                                   $submission->project->user->role === 'admin' && 
+                                   $submission->project->school_id === $school->id;
+        
+        if (!$isSchoolProject && !$isAdminProjectForSchool) {
             abort(403, 'غير مصرح لك بعرض هذا التسليم');
         }
 
-        // المشاريع المعتمدة للمدرسة
-        $schoolProjects = Project::where('school_id', $school->id)
+        // المشاريع المعتمدة للمدرسة (بما في ذلك مشاريع الإدارة المرتبطة بهذه المدرسة)
+        $schoolProjects = Project::where(function($query) use ($school) {
+                $query->where('school_id', $school->id)
+                      ->orWhere(function($q) use ($school) {
+                          $q->whereHas('user', function($userQuery) {
+                              $userQuery->where('role', 'admin');
+                          })->where('school_id', $school->id);
+                      });
+            })
             ->where('status', 'approved')
             ->pluck('id');
 

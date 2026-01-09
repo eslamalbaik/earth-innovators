@@ -52,8 +52,18 @@ export default function StudentPayments({ payments, stats, filters }) {
         setMethodFilter(newMethod);
     };
 
+    const { confirm } = useConfirmDialog();
+
     const handleCancel = async (paymentId) => {
-        if (!confirm('هل أنت متأكد من إلغاء هذا الدفع؟')) {
+        const confirmed = await confirm({
+            title: 'تأكيد الإلغاء',
+            message: 'هل أنت متأكد من إلغاء هذا الدفع؟',
+            confirmText: 'إلغاء',
+            cancelText: 'تراجع',
+            variant: 'warning',
+        });
+
+        if (!confirmed) {
             return;
         }
 
@@ -110,7 +120,15 @@ export default function StudentPayments({ payments, stats, filters }) {
 
         const comment = prompt('أدخل تعليق (اختياري):') || '';
 
-        if (!confirm('هل أنت متأكد من refund هذا الدفع؟')) {
+        const confirmed = await confirm({
+            title: 'تأكيد الاسترجاع',
+            message: 'هل أنت متأكد من refund هذا الدفع؟',
+            confirmText: 'استرجاع',
+            cancelText: 'إلغاء',
+            variant: 'warning',
+        });
+
+        if (!confirmed) {
             return;
         }
 
@@ -138,7 +156,15 @@ export default function StudentPayments({ payments, stats, filters }) {
     };
 
     const handleCapture = async (paymentId) => {
-        if (!confirm('هل أنت متأكد من capture هذا الدفع؟')) {
+        const confirmed = await confirm({
+            title: 'تأكيد Capture',
+            message: 'هل أنت متأكد من capture هذا الدفع؟',
+            confirmText: 'Capture',
+            cancelText: 'إلغاء',
+            variant: 'info',
+        });
+
+        if (!confirmed) {
             return;
         }
 
@@ -210,7 +236,7 @@ export default function StudentPayments({ payments, stats, filters }) {
                             <p className="text-3xl font-bold text-purple-600">{stats.totalPaid.toFixed(2)}</p>
                         </div>
                         <div className="p-3 bg-purple-100 rounded-full">
-                            <img src="/images/sar-currency(black).svg" alt="currency" className="w-8 h-8" />
+                            <img src="/images/aed-currency(black).svg" alt="currency" className="w-8 h-8" />
                         </div>
                     </div>
                 </div>

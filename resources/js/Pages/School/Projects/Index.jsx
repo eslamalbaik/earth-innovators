@@ -5,12 +5,10 @@ import TextInput from '@/Components/TextInput';
 import SelectInput from '@/Components/SelectInput';
 import PrimaryButton from '@/Components/PrimaryButton';
 import { toHijriDate } from '@/utils/dateUtils';
-import { useToast } from '@/Contexts/ToastContext';
-import { useEffect } from 'react';
+import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 
 export default function SchoolProjects({ projects, auth }) {
-    const { flash } = usePage().props;
-    const { showSuccess } = useToast();
+    const { confirm } = useConfirmDialog();
     const { data, setData, get } = useForm({
         search: '',
         status: '',
@@ -49,20 +47,28 @@ export default function SchoolProjects({ projects, auth }) {
         });
     };
 
-    const handleDelete = (projectId, e) => {
+    const handleDelete = async (projectId, e) => {
         if (e) {
             e.preventDefault();
             e.stopPropagation();
         }
         
-        if (confirm('هل أنت متأكد من حذف هذا المشروع؟')) {
+        const confirmed = await confirm({
+            title: 'تأكيد الحذف',
+            message: 'هل أنت متأكد من حذف هذا المشروع؟ هذا الإجراء لا يمكن التراجع عنه.',
+            confirmText: 'حذف',
+            cancelText: 'إلغاء',
+            variant: 'danger',
+        });
+
+        if (confirmed) {
             // استخدام router.post مع _method: DELETE للتوافق مع Laravel
             router.post(`/school/projects/${projectId}`, {
                 _method: 'DELETE',
             }, {
                 preserveScroll: false,
                 onSuccess: () => {
-                    showSuccess('تم حذف المشروع بنجاح');
+                    // رسالة النجاح تأتي تلقائياً من الخادم عبر flash messages
                     // إعادة تحميل قائمة المشاريع بعد الحذف
                     router.reload({ only: ['projects'] });
                 },
@@ -74,12 +80,7 @@ export default function SchoolProjects({ projects, auth }) {
         }
     };
 
-    // عرض رسالة النجاح
-    useEffect(() => {
-        if (flash?.success) {
-            showSuccess(flash.success);
-        }
-    }, [flash?.success, showSuccess]);
+    // رسائل النجاح تعرض تلقائياً عبر useFlashNotifications في DashboardLayout
 
     return (
         <DashboardLayout header="مشاريع المدرسة">

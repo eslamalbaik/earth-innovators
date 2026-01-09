@@ -203,7 +203,7 @@ export default function Bookings({ bookings, auth }) {
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center">
                                                     <p className="text-xl mt-1">{stats.total_price}</p>
-                                                    <img src="/images/sar-currency(black).svg" alt="currency" className="w-6 h-6" />
+                                                    <img src="/images/aed-currency(black).svg" alt="currency" className="w-6 h-6" />
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
@@ -301,7 +301,7 @@ export default function Bookings({ bookings, auth }) {
                                             <label className="block text-sm font-medium text-gray-700">السعر الإجمالي</label>
                                             <div className="flex items-center">
                                                 <p className="font-bold">{selectedBooking.total_price}</p>
-                                                <img src="/images/sar-currency(black).svg" alt="currency" className="w-5 h-5" />
+                                                <img src="/images/aed-currency(black).svg" alt="currency" className="w-5 h-5" />
                                             </div>
                                         </div>
                                     </div>

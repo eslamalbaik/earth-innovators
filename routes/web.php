@@ -107,7 +107,7 @@ Route::get('/', function () {
         // Map reviewer names to titles and initials
         $reviewerInfo = [
             'سارة أحمد' => ['title' => 'منصة رائعة للإبداع والتعلم', 'initials' => 'سأ'],
-            'فاطمة محمد' => ['title' => 'تجربة ممتازة للمدارس', 'initials' => 'فم'],
+            'فاطمة محمد' => ['title' => 'تجربة ممتازة للمؤسسات تعليمية', 'initials' => 'فم'],
             'أم خالد' => ['title' => 'أفضل منصة تعليمية', 'initials' => 'أخ'],
             'أحمد علي' => ['title' => 'منصة محترفة ومبتكرة', 'initials' => 'أع'],
             'أبو ناصر' => ['title' => 'تجربة إيجابية جداً', 'initials' => 'أن'],
@@ -249,7 +249,7 @@ Route::get('/', function () {
     });
 
     $uaeSchools = \Illuminate\Support\Facades\Cache::remember('home_uae_schools', 3600, function () {
-        // البحث عن مدارس الإمارات بناءً على أسماء المدن
+        // البحث عن مؤسسات تعليمية الإمارات بناءً على أسماء المدن
         $uaeCities = ['دبي', 'أبوظبي', 'الشارقة', 'عجمان', 'رأس الخيمة', 'الفجيرة', 'أم القيوين',
                       'Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman', 'Ras Al Khaimah', 'Fujairah', 'Umm Al Quwain'];
 
@@ -285,6 +285,36 @@ Route::get('/', function () {
             ->toArray();
     });
 
+    $packages = \Illuminate\Support\Facades\Cache::remember('home_packages', 3600, function () {
+        return \App\Models\Package::where('is_active', true)
+            ->orderBy('price')
+            ->orderBy('created_at')
+            ->get()
+            ->map(function ($package) {
+                return [
+                    'id' => $package->id,
+                    'name' => $package->name,
+                    'name_ar' => $package->name_ar,
+                    'description' => $package->description,
+                    'description_ar' => $package->description_ar,
+                    'price' => $package->price,
+                    'currency' => $package->currency,
+                    'duration_type' => $package->duration_type,
+                    'duration_months' => $package->duration_months,
+                    'points_bonus' => $package->points_bonus,
+                    'projects_limit' => $package->projects_limit,
+                    'challenges_limit' => $package->challenges_limit,
+                    'certificate_access' => $package->certificate_access,
+                    'badge_access' => $package->badge_access,
+                    'features' => $package->features,
+                    'features_ar' => $package->features_ar,
+                    'is_active' => $package->is_active,
+                    'is_popular' => $package->is_popular,
+                ];
+            })
+            ->toArray();
+    });
+
     return Inertia::render('Home', [
         'cities' => $cities,
         'subjects' => $subjects,
@@ -294,6 +324,7 @@ Route::get('/', function () {
         'featuredPublications' => $featuredPublications,
         'featuredProjects' => $featuredProjects,
         'uaeSchools' => $uaeSchools,
+        'packages' => $packages,
     ]);
 })->name('home');
 
@@ -323,6 +354,9 @@ Route::prefix('api')->group(function () {
     Route::get('/leaderboard/school/{school}', [App\Http\Controllers\Api\LeaderboardApiController::class, 'school'])->name('api.leaderboard.school');
     Route::get('/leaderboard/top-schools', [App\Http\Controllers\Api\LeaderboardApiController::class, 'topSchools'])->name('api.leaderboard.top-schools');
 
+    // Customize Package Request (public)
+    Route::post('/customize-package-request', [App\Http\Controllers\Api\CustomizePackageRequestController::class, 'store'])->name('api.customize-package-request.store');
+
     // Authenticated endpoints
     Route::middleware(['auth'])->group(function () {
         // Challenge participation
@@ -339,8 +373,25 @@ Route::prefix('api')->group(function () {
 Route::get('/badges', [App\Http\Controllers\BadgeController::class, 'index'])->name('badges');
 Route::get('/badges/{id}', [App\Http\Controllers\BadgeController::class, 'show'])->name('badges.show');
 
-Route::get('/packages', [App\Http\Controllers\PackageController::class, 'index'])->name('packages');
-Route::get('/packages/{id}', [App\Http\Controllers\PackageController::class, 'show'])->name('packages.show');
+// Package subscription routes (public)
+Route::get('/packages', [\App\Http\Controllers\PackageSubscriptionController::class, 'index'])->name('packages.index');
+Route::get('/my-subscriptions', [\App\Http\Controllers\PackageSubscriptionController::class, 'mySubscriptions'])
+    ->middleware('auth')
+    ->name('packages.my-subscriptions');
+Route::post('/packages/{package}/subscribe', [\App\Http\Controllers\PackageSubscriptionController::class, 'subscribe'])
+    ->middleware('auth')
+    ->name('packages.subscribe');
+Route::post('/packages/subscriptions/{userPackage}/cancel', [\App\Http\Controllers\PackageSubscriptionController::class, 'cancelSubscription'])
+    ->middleware('auth')
+    ->name('packages.subscription.cancel');
+Route::get('/packages/payment/{payment}/success', [\App\Http\Controllers\PackageSubscriptionController::class, 'paymentSuccess'])
+    ->name('packages.payment.success');
+Route::get('/packages/payment/{payment}/cancel', [\App\Http\Controllers\PackageSubscriptionController::class, 'paymentCancel'])
+    ->name('packages.payment.cancel');
+
+// Ziina webhook
+Route::post('/webhook/ziina', [\App\Http\Controllers\Api\ZiinaWebhookController::class, 'handle'])
+    ->name('webhook.ziina');
 
 Route::get('/search', [App\Http\Controllers\SearchController::class, 'search'])->name('search');
 Route::get('/search/suggestions', [App\Http\Controllers\SearchController::class, 'suggestions'])->name('search.suggestions');
@@ -611,6 +662,7 @@ Route::prefix('api/webhooks/payment')->group(function () {
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/chart-data', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'getChartDataApi'])->name('dashboard.chart-data');
 
     Route::get('/subjects', [SubjectController::class, 'adminIndex'])->name('subjects.index');
     Route::post('/subjects', [SubjectController::class, 'store'])->name('subjects.store');
@@ -654,6 +706,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // إدارة المستخدمين - CRUD كامل
     Route::resource('users', \App\Http\Controllers\Admin\UserManagementController::class);
     Route::put('/users/{user}/role', [\App\Http\Controllers\Admin\UserManagementController::class, 'updateRole'])->name('users.update-role');
+    Route::post('/users/bulk-delete', [\App\Http\Controllers\Admin\UserManagementController::class, 'bulkDelete'])->name('users.bulk-delete');
+    Route::get('/users/export/excel', [\App\Http\Controllers\Admin\UserManagementController::class, 'export'])->name('users.export');
+
+    // إدارة الصلاحيات - CRUD كامل للمستخدمين الإداريين
+    Route::resource('permissions', \App\Http\Controllers\Admin\AdminPermissionsController::class)->except(['show']);
 
     Route::get('/teachers/{teacher}/report', [\App\Http\Controllers\Admin\TeacherReportController::class, 'show'])->name('teachers.report');
 
@@ -661,16 +718,22 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('badges', \App\Http\Controllers\Admin\BadgeController::class);
     Route::post('/badges/{badge}/award', [\App\Http\Controllers\Admin\BadgeController::class, 'award'])->name('badges.award');
 
-    // Packages Management (Legacy - يمكن إزالتها لاحقاً)
+    // Packages Management
     Route::resource('packages', \App\Http\Controllers\Admin\PackageController::class);
+    Route::post('/packages/{package}/toggle-status', [\App\Http\Controllers\Admin\PackageController::class, 'toggleStatus'])->name('packages.toggle-status');
     Route::get('/packages/{package}/subscribers', [\App\Http\Controllers\Admin\PackageController::class, 'subscribers'])->name('packages.subscribers');
+    Route::post('/packages/subscribers/{userPackage}/update-status', [\App\Http\Controllers\Admin\PackageController::class, 'updateSubscriberStatus'])->name('packages.subscribers.update-status');
+    Route::post('/packages/subscribers/{userPackage}/cancel', [\App\Http\Controllers\Admin\PackageController::class, 'cancelSubscription'])->name('packages.subscribers.cancel');
+    Route::post('/packages/subscribers/{userPackage}/renew', [\App\Http\Controllers\Admin\PackageController::class, 'renewSubscription'])->name('packages.subscribers.renew');
 
     // إدارة الاشتراكات والمدفوعات
     Route::get('/subscriptions', [\App\Http\Controllers\Admin\AdminSubscriptionController::class, 'index'])->name('subscriptions.index');
     Route::get('/subscriptions/subscription/{subscription}', [\App\Http\Controllers\Admin\AdminSubscriptionController::class, 'showSubscription'])->name('subscriptions.show-subscription');
 
     // إدارة الإصدارات
-    Route::resource('publications', \App\Http\Controllers\Admin\AdminPublicationController::class)->only(['index', 'destroy']);
+    Route::resource('publications', \App\Http\Controllers\Admin\AdminPublicationController::class)->only(['index', 'create', 'store', 'show', 'destroy']);
+    Route::post('/publications/{publication}/approve', [\App\Http\Controllers\Admin\AdminPublicationController::class, 'approve'])->name('publications.approve');
+    Route::post('/publications/{publication}/reject', [\App\Http\Controllers\Admin\AdminPublicationController::class, 'reject'])->name('publications.reject');
 
     // إدارة التحديات - CRUD كامل
     Route::resource('challenges', \App\Http\Controllers\Admin\AdminChallengeController::class);
@@ -685,12 +748,27 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/projects/{project}/approve', [\App\Http\Controllers\Admin\AdminProjectController::class, 'approve'])->name('projects.approve');
     Route::post('/projects/{project}/reject', [\App\Http\Controllers\Admin\AdminProjectController::class, 'reject'])->name('projects.reject');
     Route::delete('/projects/{project}', [\App\Http\Controllers\Admin\AdminProjectController::class, 'destroy'])->name('projects.destroy');
+    
+    // إدارة تسليمات المشاريع
+    Route::get('/submissions/{submission}', [\App\Http\Controllers\Admin\AdminSubmissionController::class, 'show'])->name('submissions.show');
+    Route::post('/submissions/{submission}/evaluate', [\App\Http\Controllers\Admin\AdminSubmissionController::class, 'evaluate'])->name('submissions.evaluate');
+
+    // إدارة معايير القبول
+    Route::get('/acceptance-criteria', [\App\Http\Controllers\Admin\AcceptanceCriteriaController::class, 'index'])->name('acceptance-criteria.index');
+    Route::post('/acceptance-criteria', [\App\Http\Controllers\Admin\AcceptanceCriteriaController::class, 'store'])->name('acceptance-criteria.store');
+    Route::put('/acceptance-criteria/{acceptanceCriterion}', [\App\Http\Controllers\Admin\AcceptanceCriteriaController::class, 'update'])->name('acceptance-criteria.update');
+    Route::delete('/acceptance-criteria/{acceptanceCriterion}', [\App\Http\Controllers\Admin\AcceptanceCriteriaController::class, 'destroy'])->name('acceptance-criteria.destroy');
+    Route::post('/acceptance-criteria/update-order', [\App\Http\Controllers\Admin\AcceptanceCriteriaController::class, 'updateOrder'])->name('acceptance-criteria.update-order');
 });
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Notification Preferences
+    Route::get('/notification-preferences', [\App\Http\Controllers\NotificationPreferencesController::class, 'index'])->name('notification-preferences.index');
+    Route::put('/notification-preferences', [\App\Http\Controllers\NotificationPreferencesController::class, 'update'])->name('notification-preferences.update');
 });
 
 Route::middleware('auth')->prefix('teacher')->group(function () {

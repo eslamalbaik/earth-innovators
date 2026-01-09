@@ -2,8 +2,10 @@ import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { FaSearch, FaFilter, FaEye, FaEdit, FaTrash, FaPlus, FaTrophy, FaSave, FaTimes, FaAward, FaUser } from 'react-icons/fa';
+import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 
 export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
+    const { confirm } = useConfirmDialog();
     const [search, setSearch] = useState(filters?.search || '');
     const [status, setStatus] = useState(filters?.status || '');
     const [type, setType] = useState(filters?.type || '');
@@ -28,8 +30,16 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
         });
     };
 
-    const handleDelete = (badgeId) => {
-        if (confirm('هل أنت متأكد من حذف هذه الشارة؟')) {
+    const handleDelete = async (badgeId, badgeName) => {
+        const confirmed = await confirm({
+            title: 'تأكيد الحذف',
+            message: `هل أنت متأكد من حذف الشارة "${badgeName}"؟ هذا الإجراء لا يمكن التراجع عنه.`,
+            confirmText: 'حذف',
+            cancelText: 'إلغاء',
+            variant: 'danger',
+        });
+
+        if (confirmed) {
             router.delete(route('admin.badges.destroy', badgeId), {
                 preserveScroll: true,
                 onSuccess: () => {
@@ -307,7 +317,7 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                                                     <FaEdit />
                                                 </Link>
                                                 <button
-                                                    onClick={() => handleDelete(badge.id)}
+                                                    onClick={() => handleDelete(badge.id, badge.name_ar || badge.name)}
                                                     className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50"
                                                     title="حذف"
                                                 >

@@ -48,8 +48,16 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
         });
     };
 
-    const handleDelete = (bookingId) => {
-        if (confirm('هل أنت متأكد من حذف هذا الحجز؟')) {
+    const handleDelete = async (bookingId) => {
+        const confirmed = await confirm({
+            title: 'تأكيد الحذف',
+            message: 'هل أنت متأكد من حذف هذا الحجز؟ هذا الإجراء لا يمكن التراجع عنه.',
+            confirmText: 'حذف',
+            cancelText: 'إلغاء',
+            variant: 'danger',
+        });
+
+        if (confirmed) {
             router.delete(`/admin/bookings/${bookingId}`, {
                 preserveScroll: true,
                 onSuccess: () => {
@@ -418,7 +426,7 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                 <div className="flex items-center">
                                                     <p className="text-md mt-1">{(booking.total_price || booking.price) ? `${booking.total_price || booking.price}` : 'غير محدد'}</p>
-                                                    <img src="/images/sar-currency(black).svg" alt="currency" className="w-4 h-4" />
+                                                    <img src="/images/aed-currency(black).svg" alt="currency" className="w-4 h-4" />
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">

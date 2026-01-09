@@ -2,13 +2,24 @@ import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { FaProjectDiagram, FaPlus, FaEye, FaClock, FaCheckCircle, FaTimesCircle, FaEdit, FaTrash } from 'react-icons/fa';
 import { toHijriDate } from '@/utils/dateUtils';
+import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 
 export default function TeacherProjects({ projects, auth }) {
-    const handleDelete = (projectId, e) => {
+    const { confirm } = useConfirmDialog();
+
+    const handleDelete = async (projectId, projectTitle, e) => {
         e.preventDefault();
         e.stopPropagation();
         
-        if (confirm('هل أنت متأكد من حذف هذا المشروع؟')) {
+        const confirmed = await confirm({
+            title: 'تأكيد الحذف',
+            message: `هل أنت متأكد من حذف المشروع "${projectTitle}"؟ هذا الإجراء لا يمكن التراجع عنه.`,
+            confirmText: 'حذف',
+            cancelText: 'إلغاء',
+            variant: 'danger',
+        });
+
+        if (confirmed) {
             router.delete(`/teacher/projects/${projectId}`, {
                 preserveScroll: true,
                 onSuccess: () => {
@@ -123,7 +134,7 @@ export default function TeacherProjects({ projects, auth }) {
                                                         </Link>
                                                         <button
                                                             type="button"
-                                                            onClick={(e) => handleDelete(project.id, e)}
+                                                            onClick={(e) => handleDelete(project.id, project.title, e)}
                                                             className="bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg font-medium transition flex items-center gap-2"
                                                         >
                                                             <FaTrash />

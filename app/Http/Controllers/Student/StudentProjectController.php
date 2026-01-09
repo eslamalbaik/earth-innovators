@@ -50,7 +50,13 @@ class StudentProjectController extends Controller
         $student = Auth::user();
 
         // Verify project is available for student
-        if ($project->status !== 'approved' || $project->school_id !== $student->school_id) {
+        // المشروع يجب أن يكون معتمداً وإما:
+        // 1. متاح لجميع المؤسسات تعليمية (school_id = null)
+        // 2. أو متاح لمدرسة الطالب (school_id = student->school_id)
+        $isAvailableForAllSchools = $project->school_id === null;
+        $isAvailableForStudentSchool = $project->school_id === $student->school_id;
+        
+        if ($project->status !== 'approved' || (!$isAvailableForAllSchools && !$isAvailableForStudentSchool)) {
             abort(403, 'غير مصرح لك بعرض هذا المشروع');
         }
 

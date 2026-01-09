@@ -31,16 +31,16 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* ترحيب */}
-                <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-lg shadow-lg p-8 mb-8">
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-8">
                     <div className="flex items-center justify-between">
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900 mb-2">
                                 مرحباً بك، {teacher?.name || 'المعلم'}
                             </h1>
-                            <p className="text-gray-800 text-lg">نظام ارث - إدارة مشاريعك ومقالاتك وإنجازاتك</p>
+                            <p className="text-gray-600 text-lg">نظام ارث - إدارة مشاريعك ومقالاتك وإنجازاتك</p>
                         </div>
-                        <div className="bg-white bg-opacity-20 rounded-full p-4">
-                            <FaGraduationCap className="text-6xl text-white" />
+                        <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+                            <FaGraduationCap className="text-6xl text-gray-400" />
                         </div>
                     </div>
                 </div>
@@ -67,58 +67,66 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
                 {/* بطاقات الإحصائيات الرئيسية */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     {/* إجمالي النقاط */}
-                    <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-lg p-6 text-white">
-                        <div className="flex items-center justify-between">
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+                        <div className="flex items-center justify-between mb-4">
                             <div>
-                                <p className="text-purple-100 text-sm font-medium mb-1">إجمالي النقاط</p>
-                                <p className="text-4xl font-bold">{points.total || 0}</p>
-                                <p className="text-purple-100 text-xs mt-1">{points.count || 0} عملية</p>
+                                <p className="text-gray-500 text-sm font-medium mb-2">إجمالي النقاط</p>
+                                <p className="text-3xl font-bold text-gray-900">{points.total || 0}</p>
                             </div>
-                            <div className="bg-white bg-opacity-20 rounded-full p-4">
-                                <FaStar className="text-4xl" />
+                            <div className="p-3 bg-purple-50 rounded-2xl">
+                                <FaStar className="text-2xl text-purple-600" />
                             </div>
+                        </div>
+                        <div className="pt-3 border-t border-gray-100">
+                            <p className="text-sm text-gray-600">{points.count || 0} عملية</p>
                         </div>
                     </div>
 
                     {/* المشاريع */}
-                    <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
-                        <div className="flex items-center justify-between">
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+                        <div className="flex items-center justify-between mb-4">
                             <div>
-                                <p className="text-blue-100 text-sm font-medium mb-1">المشاريع</p>
-                                <p className="text-4xl font-bold">{projects.total || 0}</p>
-                                <p className="text-blue-100 text-xs mt-1">{projects.approved || 0} معتمد</p>
+                                <p className="text-gray-500 text-sm font-medium mb-2">المشاريع</p>
+                                <p className="text-3xl font-bold text-gray-900">{projects.total || 0}</p>
                             </div>
-                            <div className="bg-white bg-opacity-20 rounded-full p-4">
-                                <FaProjectDiagram className="text-4xl" />
+                            <div className="p-3 bg-blue-50 rounded-2xl">
+                                <FaProjectDiagram className="text-2xl text-blue-600" />
                             </div>
+                        </div>
+                        <div className="pt-3 border-t border-gray-100">
+                            <p className="text-sm text-gray-600">{projects.approved || 0} معتمد</p>
                         </div>
                     </div>
 
                     {/* المقالات */}
-                    <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-lg p-6 text-white">
-                        <div className="flex items-center justify-between">
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+                        <div className="flex items-center justify-between mb-4">
                             <div>
-                                <p className="text-green-100 text-sm font-medium mb-1">المقالات</p>
-                                <p className="text-4xl font-bold">{publications.total || 0}</p>
-                                <p className="text-green-100 text-xs mt-1">{publications.approved || 0} منشور</p>
+                                <p className="text-gray-500 text-sm font-medium mb-2">المقالات</p>
+                                <p className="text-3xl font-bold text-gray-900">{publications.total || 0}</p>
                             </div>
-                            <div className="bg-white bg-opacity-20 rounded-full p-4">
-                                <FaBook className="text-4xl" />
+                            <div className="p-3 bg-green-50 rounded-2xl">
+                                <FaBook className="text-2xl text-green-600" />
                             </div>
+                        </div>
+                        <div className="pt-3 border-t border-gray-100">
+                            <p className="text-sm text-gray-600">{publications.approved || 0} منشور</p>
                         </div>
                     </div>
 
                     {/* الشارات */}
-                    <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-lg p-6 text-white">
-                        <div className="flex items-center justify-between">
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+                        <div className="flex items-center justify-between mb-4">
                             <div>
-                                <p className="text-orange-100 text-sm font-medium mb-1">الشارات</p>
-                                <p className="text-4xl font-bold">{badges.total || 0}</p>
-                                <p className="text-orange-100 text-xs mt-1">إنجازاتك</p>
+                                <p className="text-gray-500 text-sm font-medium mb-2">الشارات</p>
+                                <p className="text-3xl font-bold text-gray-900">{badges.total || 0}</p>
                             </div>
-                            <div className="bg-white bg-opacity-20 rounded-full p-4">
-                                <FaAward className="text-4xl" />
+                            <div className="p-3 bg-orange-50 rounded-2xl">
+                                <FaAward className="text-2xl text-orange-600" />
                             </div>
+                        </div>
+                        <div className="pt-3 border-t border-gray-100">
+                            <p className="text-sm text-gray-600">إنجازاتك</p>
                         </div>
                     </div>
                 </div>
@@ -126,9 +134,9 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
                 {/* إحصائيات تفصيلية */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     {/* إحصائيات المشاريع */}
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="bg-blue-100 p-3 rounded-full">
+                            <div className="bg-blue-50 p-3 rounded-xl border border-blue-100">
                                 <FaProjectDiagram className="text-blue-600 text-2xl" />
                             </div>
                             <h3 className="text-lg font-bold text-gray-900">إحصائيات المشاريع</h3>
@@ -168,9 +176,9 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
                     </div>
 
                     {/* إحصائيات المقالات */}
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="bg-green-100 p-3 rounded-full">
+                            <div className="bg-green-50 p-3 rounded-xl border border-green-100">
                                 <FaBook className="text-green-600 text-2xl" />
                             </div>
                             <h3 className="text-lg font-bold text-gray-900">إحصائيات المقالات</h3>
@@ -206,9 +214,9 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
                     </div>
 
                     {/* إحصائيات التحديات */}
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="bg-orange-100 p-3 rounded-full">
+                            <div className="bg-orange-50 p-3 rounded-xl border border-orange-100">
                                 <FaTrophy className="text-orange-600 text-2xl" />
                             </div>
                             <h3 className="text-lg font-bold text-gray-900">إحصائيات التحديات</h3>
@@ -237,9 +245,9 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
 
                     {/* إحصائيات التسليمات */}
                     {stats.submissions && (
-                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="bg-indigo-100 p-3 rounded-full">
+                                <div className="bg-indigo-50 p-3 rounded-xl border border-indigo-100">
                                     <FaProjectDiagram className="text-indigo-600 text-2xl" />
                                 </div>
                                 <h3 className="text-lg font-bold text-gray-900">تسليمات المشاريع</h3>
@@ -272,10 +280,10 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <Link
                         href="/teacher/projects/create"
-                        className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition duration-300 group"
+                        className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition group"
                     >
                         <div className="flex items-center gap-4">
-                            <div className="bg-blue-100 p-3 rounded-full group-hover:bg-blue-200 transition duration-300">
+                            <div className="bg-blue-50 p-3 rounded-xl border border-blue-100 group-hover:bg-blue-100 transition">
                                 <FaPlus className="text-blue-600 text-2xl" />
                             </div>
                             <div>
@@ -287,10 +295,10 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
 
                     <Link
                         href="/teacher/publications/create"
-                        className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition duration-300 group"
+                        className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition group"
                     >
                         <div className="flex items-center gap-4">
-                            <div className="bg-green-100 p-3 rounded-full group-hover:bg-green-200 transition duration-300">
+                            <div className="bg-green-50 p-3 rounded-xl border border-green-100 group-hover:bg-green-100 transition">
                                 <FaPlus className="text-green-600 text-2xl" />
                             </div>
                             <div>
@@ -302,10 +310,10 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
 
                     <Link
                         href="/teacher/challenges/create"
-                        className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition duration-300 group"
+                        className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition group"
                     >
                         <div className="flex items-center gap-4">
-                            <div className="bg-orange-100 p-3 rounded-full group-hover:bg-orange-200 transition duration-300">
+                            <div className="bg-orange-50 p-3 rounded-xl border border-orange-100 group-hover:bg-orange-100 transition">
                                 <FaPlus className="text-orange-600 text-2xl" />
                             </div>
                             <div>
@@ -319,8 +327,8 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
                 {/* المشاريع والمقالات الأخيرة */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* المشاريع الأخيرة */}
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
                             <h3 className="font-bold text-gray-900 flex items-center gap-2">
                                 <FaProjectDiagram className="text-blue-600" />
                                 المشاريع الأخيرة
@@ -339,9 +347,9 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
                                     </Link>
                                 </div>
                             ) : (
-                                <div className="space-y-4">
+                                <div className="space-y-3">
                                     {recentProjects.map((project) => (
-                                        <div key={project.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                        <div key={project.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
                                             <div className="flex-1">
                                                 <p className="font-medium text-gray-900">{project.title}</p>
                                                 <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
@@ -383,8 +391,8 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
                     </div>
 
                     {/* المقالات الأخيرة */}
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
                             <h3 className="font-bold text-gray-900 flex items-center gap-2">
                                 <FaBook className="text-green-600" />
                                 المقالات الأخيرة
@@ -403,9 +411,9 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
                                     </Link>
                                 </div>
                             ) : (
-                                <div className="space-y-4">
+                                <div className="space-y-3">
                                     {recentPublications.map((publication) => (
-                                        <div key={publication.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                        <div key={publication.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
                                             <div className="flex-1">
                                                 <p className="font-medium text-gray-900">{publication.title}</p>
                                                 <p className="text-sm text-gray-600 mt-1">
@@ -450,8 +458,8 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
 
                 {/* الشارات الأخيرة */}
                 {badges.recent && badges.recent.length > 0 && (
-                    <div className="mt-8 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <div className="mt-8 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
                             <h3 className="font-bold text-gray-900 flex items-center gap-2">
                                 <FaAward className="text-orange-600" />
                                 الشارات المكتسبة
@@ -460,7 +468,7 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
                         <div className="p-6">
                             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                                 {badges.recent.map((badge, index) => (
-                                    <div key={index} className="text-center p-4 bg-gray-50 rounded-lg">
+                                    <div key={index} className="text-center p-4 bg-gray-50 rounded-xl border border-gray-100">
                                         {badge.icon && (
                                             <div className="text-4xl mb-2">{badge.icon}</div>
                                         )}

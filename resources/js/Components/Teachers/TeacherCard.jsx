@@ -147,7 +147,7 @@ export default function TeacherCard({ teacher }) {
                     <div className="grid grid-cols-3 items-center gap-3 mt-auto">
                         <div className="text-sm font-bold text-gray-900 flex items-center ">
                             <span>{teacher.price}</span>
-                            <img src="/images/sar-currency(black).svg" alt="currency" className="w-5 h-5" />
+                            <img src="/images/aed-currency(black).svg" alt="currency" className="w-5 h-5" />
                             <span> / ساعة</span>
                         </div>
                         <div className="col-span-2 grid grid-cols-2 w-full gap-3">

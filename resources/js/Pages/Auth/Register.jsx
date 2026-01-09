@@ -53,6 +53,7 @@ export default function Register({ schools = [] }) {
         { key: 'student', label: 'طالب', description: 'إنشاء حساب كطالب' },
         { key: 'teacher', label: 'معلم', description: 'إنشاء حساب كمعلم' },
         { key: 'school', label: 'مدرسة', description: 'إنشاء حساب كمدرسة' },
+        { key: 'educational_institution', label: 'مؤسسة تعليمية', description: 'إنشاء حساب كمؤسسة تعليمية' },
     ];
 
     // الحصول على الأخطاء من Inertia (من usePage) أو من state المحلي أو من useForm
@@ -204,7 +205,7 @@ export default function Register({ schools = [] }) {
                                             </SelectInput>
                                         ) : (
                                             <div className="block w-full pr-10 pl-3 py-2 border border-red-300 rounded-md shadow-sm bg-red-50 text-red-700 text-sm">
-                                                <p className="font-semibold">تحذير: لا توجد مدارس مسجلة في النظام</p>
+                                                <p className="font-semibold">تحذير: لا توجد مؤسسات تعليمية مسجلة في النظام</p>
                                                 <p className="text-xs mt-1">يرجى التواصل مع الإدارة لإنشاء حساب مدرسة أولاً</p>
                                             </div>
                                         )}

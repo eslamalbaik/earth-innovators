@@ -3,8 +3,10 @@ import { Head, Link, router } from '@inertiajs/react';
 import { FaBook, FaPlus, FaCalendar, FaEye, FaEdit, FaTrash } from 'react-icons/fa';
 import { useState } from 'react';
 import { getPublicationImageUrl } from '../../../utils/imageUtils';
+import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 
 export default function SchoolPublicationsIndex({ auth, publications, stats, filters }) {
+    const { confirm } = useConfirmDialog();
     const [processing, setProcessing] = useState(null);
     const [selectedStatus, setSelectedStatus] = useState(filters?.status || '');
 
@@ -17,8 +19,16 @@ export default function SchoolPublicationsIndex({ auth, publications, stats, fil
         });
     };
 
-    const handleDelete = (publicationId) => {
-        if (confirm('هل أنت متأكد من حذف هذا المقال؟')) {
+    const handleDelete = async (publicationId, publicationTitle) => {
+        const confirmed = await confirm({
+            title: 'تأكيد الحذف',
+            message: `هل أنت متأكد من حذف المقال "${publicationTitle}"؟ هذا الإجراء لا يمكن التراجع عنه.`,
+            confirmText: 'حذف',
+            cancelText: 'إلغاء',
+            variant: 'danger',
+        });
+
+        if (confirmed) {
             setProcessing(publicationId);
             router.delete(`/school/publications/${publicationId}`, {
                 preserveScroll: true,
@@ -205,7 +215,7 @@ export default function SchoolPublicationsIndex({ auth, publications, stats, fil
                                                         )}
                                                         {publication.author_id === auth.user.id && (
                                                             <button
-                                                                onClick={() => handleDelete(publication.id)}
+                                                                onClick={() => handleDelete(publication.id, publication.title)}
                                                                 disabled={processing === publication.id}
                                                                 className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-100 text-red-600 rounded hover:bg-red-200 transition text-sm disabled:opacity-50"
                                                             >

@@ -30,6 +30,7 @@ class CertificateController extends Controller
             'overrides' => 'sometimes|array',
             'template_path' => 'sometimes|string',
             'date_format' => 'sometimes|string|in:Y-m-d,d-m-Y,long,short',
+            'certificate_type' => 'sometimes|string|in:student,school,achievement,membership',
         ]);
 
         if ($validator->fails()) {
@@ -55,13 +56,15 @@ class CertificateController extends Controller
             $overrides = $request->input('overrides', []);
             $templatePath = $request->input('template_path');
             $dateFormat = $request->input('date_format', 'Y-m-d');
+            $certificateType = $request->input('certificate_type', 'student');
 
             $filePath = $this->certificateService->generateCertificate(
                 $student,
                 $user,
                 $overrides,
                 $templatePath,
-                $dateFormat
+                $dateFormat,
+                $certificateType
             );
 
             // Save certificate record
@@ -70,8 +73,9 @@ class CertificateController extends Controller
                 $user,
                 $filePath,
                 array_merge($overrides, [
-                    'course_name' => $overrides['course_name'] ?? 'شهادة إتمام',
-                ])
+                    'course_name' => $overrides['course_name'] ?? ($certificateType === 'membership' ? 'شهادة عضوية' : 'شهادة إتمام'),
+                ]),
+                $certificateType
             );
 
             // Return download URL

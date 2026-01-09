@@ -94,7 +94,7 @@ export default function TeachersSection({
                                         <div className="text-end text-lg font-bold text-gray-900">
                                             <div className="text-sm font-bold text-gray-900 flex items-center ">
                                                 <p className="text-md font-bold text-gray-900 mt-1">{teacher.price}</p>
-                                                <img src="/images/sar-currency(black).svg" alt="currency" className="w-5 h-5" />
+                                                <img src="/images/aed-currency(black).svg" alt="currency" className="w-5 h-5" />
                                                 <p className="text-md font-bold text-gray-900">/ ساعة</p>
                                             </div>
                                         </div>

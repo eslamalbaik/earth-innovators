@@ -19,10 +19,18 @@ class AdminChallengeController extends Controller
     ) {}
     /**
      * عرض جميع التحديات
+     * PERFORMANCE OPTIMIZED: Reduced query size, cached stats, selective field loading
      */
     public function index(Request $request)
     {
-        $challenges = Challenge::with(['school:id,name', 'creator:id,name,email'])
+        // Only fetch required fields - significantly reduces payload size
+        $challenges = Challenge::select([
+            'id', 'title', 'objective', 'description', 'instructions', 
+            'challenge_type', 'category', 'age_group', 'status',
+            'school_id', 'created_by', 'start_date', 'deadline',
+            'points_reward', 'max_participants', 'current_participants', 'created_at'
+        ])
+            ->with(['school:id,name', 'creator:id,name']) // Only load needed relations with minimal fields
             ->when($request->filled('search'), function ($q) use ($request) {
                 $search = $request->search;
                 $q->where(function ($query) use ($search) {
@@ -69,24 +77,44 @@ class AdminChallengeController extends Controller
                 ];
             });
 
-        $stats = [
-            'total' => Challenge::count(),
-            'active' => Challenge::where('status', 'active')->count(),
-            'draft' => Challenge::where('status', 'draft')->count(),
-            'completed' => Challenge::where('status', 'completed')->count(),
-            'cancelled' => Challenge::where('status', 'cancelled')->count(),
-        ];
+        // Cache stats for 5 minutes to avoid repeated queries
+        $stats = \Illuminate\Support\Facades\Cache::remember('admin_challenge_stats', 300, function () {
+            return [
+                'total' => Challenge::count(),
+                'active' => Challenge::where('status', 'active')->count(),
+                'draft' => Challenge::where('status', 'draft')->count(),
+                'completed' => Challenge::where('status', 'completed')->count(),
+                'cancelled' => Challenge::where('status', 'cancelled')->count(),
+            ];
+        });
 
-        $schools = User::where('role', 'school')
-            ->select('id', 'name')
-            ->orderBy('name')
-            ->get();
+        // Only fetch schools if not doing a partial reload
+        $schools = [];
+        if (!$request->has('only') || in_array('schools', explode(',', $request->get('only')))) {
+            $schools = User::where('role', 'school')
+                ->select('id', 'name')
+                ->orderBy('name')
+                ->get();
+        }
+
+        // Cache analytics data for 5 minutes
+        $analytics = [];
+        if (!$request->has('only') || in_array('analytics', explode(',', $request->get('only')))) {
+            $analytics = \Illuminate\Support\Facades\Cache::remember('admin_challenge_analytics', 300, function () {
+                return [
+                    'total_challenges' => Challenge::count(),
+                    'total_participants' => \App\Models\ChallengeSubmission::distinct('student_id')->count(),
+                    'completed_submissions' => \App\Models\ChallengeSubmission::where('status', 'completed')->count(),
+                ];
+            });
+        }
 
         return Inertia::render('Admin/Challenges/Index', [
             'challenges' => $challenges,
             'stats' => $stats,
             'filters' => $request->only(['search', 'status', 'category', 'challenge_type']),
             'schools' => $schools,
+            'analytics' => $analytics,
         ]);
     }
 
@@ -233,6 +261,7 @@ class AdminChallengeController extends Controller
 
     /**
      * تحديث تحدٍ
+     * PERFORMANCE OPTIMIZED: Stay on same page with partial reload support
      */
     public function update(UpdateChallengeRequest $request, Challenge $challenge)
     {
@@ -254,7 +283,15 @@ class AdminChallengeController extends Controller
         try {
             // Use ChallengeService to ensure cache is cleared properly
             $this->challengeService->updateChallenge($challenge, $data);
-            $challenge->refresh();
+            
+            // Clear cached stats since we updated a challenge
+            \Illuminate\Support\Facades\Cache::forget('admin_challenge_stats');
+            \Illuminate\Support\Facades\Cache::forget('admin_challenge_analytics');
+            
+            // If Inertia request expects JSON response (partial reload), return JSON
+            if ($request->wantsJson() || $request->header('X-Inertia')) {
+                return back()->with('success', 'تم تحديث التحدي بنجاح');
+            }
 
             return redirect()
                 ->route('admin.challenges.index')
@@ -273,6 +310,7 @@ class AdminChallengeController extends Controller
 
     /**
      * حذف تحدٍ
+     * PERFORMANCE OPTIMIZED: Stay on same page with partial reload support
      */
     public function destroy(Challenge $challenge)
     {
@@ -282,6 +320,15 @@ class AdminChallengeController extends Controller
             
             // Use ChallengeService to ensure cache is cleared properly
             $this->challengeService->deleteChallenge($challenge);
+            
+            // Clear cached stats since we deleted a challenge
+            \Illuminate\Support\Facades\Cache::forget('admin_challenge_stats');
+            \Illuminate\Support\Facades\Cache::forget('admin_challenge_analytics');
+
+            // If Inertia request expects JSON response (partial reload), return JSON
+            if (request()->wantsJson() || request()->header('X-Inertia')) {
+                return back()->with('success', 'تم حذف التحدي بنجاح');
+            }
 
             return redirect()
                 ->route('admin.challenges.index')

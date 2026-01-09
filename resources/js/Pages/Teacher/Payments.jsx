@@ -99,7 +99,7 @@ export default function TeacherPayments({ payments, stats, filters }) {
                             <p className="text-sm text-gray-600 mb-1">إجمالي الأرباح</p>
                             <div className="flex items-center">
                                 <p className="text-2xl font-bold text-purple-600 mt-1">{stats.totalEarnings.toFixed(2)}</p>
-                                <img src="/images/sar-currency(black).svg" alt="currency" className="w-7 h-7" />
+                                <img src="/images/aed-currency(black).svg" alt="currency" className="w-7 h-7" />
                             </div>
                         </div>
                         <div className="p-3 bg-purple-100 rounded-full">
@@ -114,7 +114,7 @@ export default function TeacherPayments({ payments, stats, filters }) {
                             <p className="text-sm text-gray-600 mb-1">معلق</p>
                             <div className="flex items-center">
                                 <p className="text-2xl font-bold text-orange-600 mt-1">{stats.pendingEarnings.toFixed(2)}</p>
-                                <img src="/images/sar-currency(black).svg" alt="currency" className="w-7 h-7" />
+                                <img src="/images/aed-currency(black).svg" alt="currency" className="w-7 h-7" />
                             </div>
                         </div>
                         <div className="p-3 bg-orange-100 rounded-full">

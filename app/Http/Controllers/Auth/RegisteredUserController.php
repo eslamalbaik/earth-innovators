@@ -24,7 +24,7 @@ class RegisteredUserController extends Controller
 
     public function create(): Response
     {
-        $schools = User::where('role', 'school')
+        $schools = User::whereIn('role', ['school', 'educational_institution'])
             ->orderBy('name')
             ->get(['id', 'name'])
             ->map(function ($school) {
@@ -46,7 +46,7 @@ class RegisteredUserController extends Controller
             'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'phone' => ['nullable', 'string', 'max:20', 'unique:' . User::class . ',phone'],
-            'role' => 'required|string|in:student,teacher,school',
+            'role' => 'required|string|in:student,teacher,school,educational_institution',
         ];
 
         // إضافة شرط school_id للطلاب والمعلمين
@@ -77,7 +77,7 @@ class RegisteredUserController extends Controller
         // التحقق من أن المدرسة موجودة ومفعلة (إذا كانت مدرسة)
         if (in_array($validated['role'], ['student', 'teacher']) && isset($validated['school_id'])) {
             $school = User::where('id', $validated['school_id'])
-                ->where('role', 'school')
+                ->whereIn('role', ['school', 'educational_institution'])
                 ->first();
 
             if (!$school) {

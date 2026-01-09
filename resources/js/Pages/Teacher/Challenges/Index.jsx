@@ -1,13 +1,23 @@
 import DashboardLayout from '../../../Layouts/DashboardLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import { FaTrophy, FaPlus, FaCalendar, FaEye, FaEdit, FaTrash, FaUsers } from 'react-icons/fa';
+import { FaTrophy, FaPlus, FaCalendar, FaEye, FaEdit, FaTrash, FaUsers, FaSearch } from 'react-icons/fa';
 import { useState } from 'react';
+import InnovationChallengeCard from '@/Components/Challenges/InnovationChallengeCard';
 
 export default function TeacherChallengesIndex({ auth, challenges }) {
+    const { confirm } = useConfirmDialog();
     const [processing, setProcessing] = useState(null);
 
-    const handleDelete = (challengeId) => {
-        if (confirm('هل أنت متأكد من حذف هذا التحدي؟')) {
+    const handleDelete = async (challengeId) => {
+        const confirmed = await confirm({
+            title: 'تأكيد الحذف',
+            message: 'هل أنت متأكد من حذف هذا التحدي؟ هذا الإجراء لا يمكن التراجع عنه.',
+            confirmText: 'حذف',
+            cancelText: 'إلغاء',
+            variant: 'danger',
+        });
+
+        if (confirmed) {
             setProcessing(challengeId);
             router.delete(`/teacher/challenges/${challengeId}`, {
                 preserveScroll: true,
@@ -65,103 +75,90 @@ export default function TeacherChallengesIndex({ auth, challenges }) {
     return (
         <DashboardLayout
             auth={auth}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">تحدياتي</h2>}
+            header="التحديات الابتكارية"
         >
-            <Head title="تحدياتي - لوحة المعلم" />
+            <Head title="التحديات الابتكارية - لوحة المعلم" />
 
-            <div className="py-6">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    {/* Actions */}
-                    <div className="bg-white rounded-lg shadow mb-6 p-4">
-                        <Link
-                            href="/teacher/challenges/create"
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-legacy-green to-legacy-blue text-white rounded-lg hover:opacity-90 transition"
-                        >
-                            <FaPlus />
-                            إنشاء تحدّي جديد
-                        </Link>
+            <div className="min-h-screen bg-gray-50 pb-32" dir="rtl">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    {/* Header with Actions - تصميم جديد */}
+                    <div className="mb-8">
+                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+                            <div>
+                                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                                    التحديات الابتكارية
+                                </h1>
+                                <p className="text-gray-600">
+                                    إطلاق وإدارة مسابقات الابتكار بين الطلاب
+                                </p>
+                            </div>
+                            <Link
+                                href="/teacher/challenges/create"
+                                className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold shadow-md hover:shadow-lg"
+                            >
+                                <FaPlus />
+                                إطلاق تحدي جديد
+                            </Link>
+                        </div>
+
+                        {/* Navigation Tabs - شريط التصفية */}
+                        <div className="flex flex-wrap items-center gap-4 mb-6">
+                            <button
+                                onClick={() => router.get('/teacher/challenges', { status: '' }, { preserveState: true })}
+                                className="px-4 py-2 rounded-lg font-medium transition-colors bg-blue-600 text-white"
+                            >
+                                الكل
+                            </button>
+                            <button
+                                onClick={() => router.get('/teacher/challenges', { status: 'completed' }, { preserveState: true })}
+                                className="px-4 py-2 rounded-lg font-medium transition-colors bg-white text-gray-700 hover:bg-gray-100"
+                            >
+                                مكتمل
+                            </button>
+                            <button
+                                onClick={() => router.get('/teacher/challenges', { status: 'upcoming' }, { preserveState: true })}
+                                className="px-4 py-2 rounded-lg font-medium transition-colors bg-white text-gray-700 hover:bg-gray-100"
+                            >
+                                قادم
+                            </button>
+                            <button
+                                onClick={() => router.get('/teacher/challenges', { status: 'active' }, { preserveState: true })}
+                                className="px-4 py-2 rounded-lg font-medium transition-colors bg-white text-gray-700 hover:bg-gray-100"
+                            >
+                                نشط
+                            </button>
+                        </div>
+
+                        {/* Search Bar */}
+                        <form onSubmit={(e) => { e.preventDefault(); }} className="mb-6">
+                            <div className="relative max-w-md">
+                                <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                <input
+                                    type="text"
+                                    placeholder="ابحث عن تحدي..."
+                                    className="w-full pr-10 pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                />
+                            </div>
+                        </form>
                     </div>
 
-                    {/* Challenges List */}
+                    {/* Challenges Grid - بطاقات التحديات */}
                     <div className="bg-white rounded-lg shadow">
                         {challenges.data && challenges.data.length > 0 ? (
-                            <div className="divide-y divide-gray-200">
-                                {challenges.data.map((challenge) => (
-                                    <div key={challenge.id} className="p-6 hover:bg-gray-50 transition">
-                                        <div className="flex items-start justify-between mb-4">
-                                            <div className="flex-1">
-                                                <h3 className="text-lg font-bold text-gray-900 mb-2">
-                                                    {challenge.title}
-                                                </h3>
-                                                <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600 mb-3">
-                                                    <span className="px-2 py-1 bg-legacy-green/10 text-legacy-green rounded">
-                                                        {getChallengeTypeLabel(challenge.challenge_type)}
-                                                    </span>
-                                                    <span className="px-2 py-1 bg-legacy-blue/10 text-legacy-blue rounded">
-                                                        {getCategoryLabel(challenge.category)}
-                                                    </span>
-                                                    <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded">
-                                                        {challenge.age_group}
-                                                    </span>
-                                                    {challenge.start_date && (
-                                                        <div className="flex items-center gap-1">
-                                                            <FaCalendar className="text-xs" />
-                                                            {formatDate(challenge.start_date)}
-                                                        </div>
-                                                    )}
-                                                    {challenge.max_participants && (
-                                                        <div className="flex items-center gap-1">
-                                                            <FaUsers className="text-xs" />
-                                                            {challenge.current_participants || 0} / {challenge.max_participants}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                {challenge.objective && (
-                                                    <p className="text-gray-700 mb-2">
-                                                        <span className="font-semibold">الهدف:</span> {challenge.objective}
-                                                    </p>
-                                                )}
-                                                {challenge.description && (
-                                                    <p className="text-gray-600 mb-2 line-clamp-2">
-                                                        {challenge.description}
-                                                    </p>
-                                                )}
-                                                {challenge.points_reward > 0 && (
-                                                    <p className="text-legacy-green font-semibold">
-                                                        نقاط المكافأة: {challenge.points_reward}
-                                                    </p>
-                                                )}
-                                            </div>
-                                            {getStatusBadge(challenge.status)}
-                                        </div>
-
-                                        {/* Actions */}
-                                        <div className="flex items-center gap-2">
-                                            <Link
-                                                href={`/teacher/challenges/${challenge.id}`}
-                                                className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition text-sm"
-                                            >
-                                                <FaEye />
-                                                عرض
-                                            </Link>
-                                            <Link
-                                                href={`/teacher/challenges/${challenge.id}/edit`}
-                                                className="inline-flex items-center gap-2 px-3 py-1.5 bg-legacy-blue/10 text-legacy-blue rounded hover:bg-legacy-blue/20 transition text-sm"
-                                            >
-                                                <FaEdit />
-                                                تعديل
-                                            </Link>
-                                            <button
-                                                onClick={() => handleDelete(challenge.id)}
-                                                disabled={processing === challenge.id}
-                                                className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-100 text-red-600 rounded hover:bg-red-200 transition text-sm disabled:opacity-50"
-                                            >
-                                                <FaTrash />
-                                                حذف
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
+                            <div className="p-6">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    {challenges.data.map((challenge) => (
+                                        <InnovationChallengeCard
+                                            key={challenge.id}
+                                            challenge={challenge}
+                                            onEdit={(challenge) => router.visit(`/teacher/challenges/${challenge.id}/edit`)}
+                                            onManageParticipants={(challenge) => {
+                                                router.visit(`/teacher/challenges/${challenge.id}?tab=participants`);
+                                            }}
+                                            routePrefix="teacher.challenges"
+                                        />
+                                    ))}
+                                </div>
                             </div>
                         ) : (
                             <div className="text-center py-12">
@@ -196,6 +193,37 @@ export default function TeacherChallengesIndex({ auth, challenges }) {
                                 </div>
                             </div>
                         )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Bottom Banner - Banner سفلي */}
+            <div className="mt-8 bg-purple-900 text-white p-6 rounded-xl shadow-2xl" dir="rtl">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                    {/* Right Side - أيقونة كأس */}
+                    <div className="hidden md:flex items-center justify-center">
+                        <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center">
+                            <FaTrophy className="text-4xl text-white" />
+                        </div>
+                    </div>
+
+                    {/* Center - النص */}
+                    <div className="flex-1 text-center md:text-right">
+                        <h3 className="text-2xl font-bold mb-2">قم بتحفيز طلابك اليوم!</h3>
+                        <p className="text-purple-100 text-sm md:text-base">
+                            أفادت الدراسات أن المسابقات الودية تزيد من معدل إنتاجية الابتكار بنسبة 40%. اختر موضوعًا شيقًا وابدأ التحدي الآن.
+                        </p>
+                    </div>
+
+                    {/* Left Side - زر إنشاء تحدي */}
+                    <div className="flex-shrink-0">
+                        <Link
+                            href="/teacher/challenges/create"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-purple-900 rounded-lg hover:bg-purple-50 transition-colors font-bold shadow-lg hover:shadow-xl"
+                        >
+                            <FaPlus />
+                            إنشاء تحدي مخصص
+                        </Link>
                     </div>
                 </div>
             </div>

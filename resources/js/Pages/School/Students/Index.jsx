@@ -10,6 +10,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
+import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 
 export default function Index({ auth, students, availableBadges }) {
     const [showCreateModal, setShowCreateModal] = useState(false);
@@ -18,6 +19,7 @@ export default function Index({ auth, students, availableBadges }) {
     const [showBadgesListModal, setShowBadgesListModal] = useState(false);
     const [selectedStudent, setSelectedStudent] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const { confirm } = useConfirmDialog();
 
     const createForm = useForm({
         name: '',
@@ -72,8 +74,16 @@ export default function Index({ auth, students, availableBadges }) {
         });
     };
 
-    const handleDelete = (studentId) => {
-        if (confirm('هل أنت متأكد من حذف هذا الطالب؟')) {
+    const handleDelete = async (studentId, studentName) => {
+        const confirmed = await confirm({
+            title: 'تأكيد الحذف',
+            message: `هل أنت متأكد من حذف الطالب "${studentName}"؟ هذا الإجراء لا يمكن التراجع عنه.`,
+            confirmText: 'حذف',
+            cancelText: 'إلغاء',
+            variant: 'danger',
+        });
+
+        if (confirmed) {
             router.delete(`/school/students/${studentId}`, {
                 preserveScroll: true,
             });
@@ -103,8 +113,16 @@ export default function Index({ auth, students, availableBadges }) {
         setShowBadgesListModal(true);
     };
 
-    const handleRemoveBadge = (badgeId) => {
-        if (confirm('هل أنت متأكد من إزالة هذه الشارة؟')) {
+    const handleRemoveBadge = async (badgeId, badgeName) => {
+        const confirmed = await confirm({
+            title: 'تأكيد الإزالة',
+            message: `هل أنت متأكد من إزالة الشارة "${badgeName}"؟`,
+            confirmText: 'إزالة',
+            cancelText: 'إلغاء',
+            variant: 'warning',
+        });
+
+        if (confirmed) {
             router.delete(`/school/students/${selectedStudent.id}/badges/${badgeId}`, {
                 preserveScroll: true,
             });
@@ -253,7 +271,7 @@ export default function Index({ auth, students, availableBadges }) {
                                                         <FaEdit />
                                                     </button>
                                                     <button
-                                                        onClick={() => handleDelete(student.id)}
+                                                        onClick={() => handleDelete(student.id, student.name)}
                                                         className="text-red-600 hover:text-red-900 p-2 rounded hover:bg-red-50"
                                                         title="حذف"
                                                     >
@@ -585,7 +603,7 @@ export default function Index({ auth, students, availableBadges }) {
                                         </div>
                                     </div>
                                     <button
-                                        onClick={() => handleRemoveBadge(badge.id)}
+                                        onClick={() => handleRemoveBadge(badge.id, badge.name_ar || badge.name)}
                                         className="text-red-600 hover:text-red-800 p-2 rounded hover:bg-red-50"
                                         title="إزالة الشارة"
                                     >

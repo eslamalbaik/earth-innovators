@@ -26,7 +26,7 @@ return new class extends Migration
             $table->timestamp('approved_at')->nullable(); // وقت الموافقة
             $table->integer('issue_number')->nullable(); // رقم العدد (للمجلات)
             $table->date('publish_date')->nullable(); // تاريخ النشر
-            $table->string('publisher_name')->nullable(); // اسم الناشر (مثل "مجلس المدارس المبتكرة")
+            $table->string('publisher_name')->nullable(); // اسم الناشر (مثل "مجلس المؤسسات تعليمية المبتكرة")
             $table->integer('views')->default(0); // عدد المشاهدات
             $table->integer('likes_count')->default(0); // عدد الإعجابات
             $table->timestamps();

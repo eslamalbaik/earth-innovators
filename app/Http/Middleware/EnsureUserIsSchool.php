@@ -10,8 +10,13 @@ class EnsureUserIsSchool
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->check() || !auth()->user()->isSchool()) {
-            abort(403, 'Unauthorized action.');
+        if (!auth()->check()) {
+            abort(403, 'يجب تسجيل الدخول للوصول إلى هذه الصفحة.');
+        }
+
+        $user = auth()->user();
+        if (!$user->isSchool()) {
+            abort(403, 'غير مصرح لك بالوصول إلى هذه الصفحة. يجب أن تكون مسجلًا كمدرسة. (الدور الحالي: ' . ($user->role ?? 'غير محدد') . ')');
         }
 
         return $next($request);

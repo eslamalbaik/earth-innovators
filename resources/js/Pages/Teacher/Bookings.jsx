@@ -157,7 +157,7 @@ export default function TeacherBookings({ bookings }) {
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center">
                                                 <p className="text-lg mt-1">{booking.total_price}</p>
-                                                <img src="/images/sar-currency(black).svg" alt="currency" className="w-5 h-5" />
+                                                <img src="/images/aed-currency(black).svg" alt="currency" className="w-5 h-5" />
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">

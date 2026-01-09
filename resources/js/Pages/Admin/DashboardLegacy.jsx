@@ -135,7 +135,7 @@ export default function AdminDashboardLegacy({ auth, stats = {} }) {
                 <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-orange-500">
                     <div className="flex items-center justify-between mb-4">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">المدارس</p>
+                            <p className="text-sm text-gray-600 mb-1">المؤسسات تعليمية</p>
                             <p className="text-2xl font-bold text-gray-900">{displayStats.totalSchools}</p>
                         </div>
                         <div className="p-3 bg-orange-100 rounded-xl">
@@ -143,7 +143,7 @@ export default function AdminDashboardLegacy({ auth, stats = {} }) {
                         </div>
                     </div>
                     <Link href="/admin/schools" className="text-sm text-gray-500 hover:text-legacy-green">
-                        إدارة المدارس →
+                        إدارة المؤسسات تعليمية →
                     </Link>
                 </div>
             </div>
@@ -232,7 +232,7 @@ export default function AdminDashboardLegacy({ auth, stats = {} }) {
                             <h3 className="font-bold text-gray-900">إدارة المستخدمين</h3>
                         </div>
                     </div>
-                    <p className="text-sm text-gray-600">إدارة حسابات الطلاب والمعلمين والمدارس</p>
+                    <p className="text-sm text-gray-600">إدارة حسابات الطلاب والمعلمين والمؤسسات تعليمية</p>
                 </Link>
 
                 <Link href="/admin/projects" className="bg-gradient-to-br from-legacy-blue/10 to-legacy-blue/5 rounded-xl p-6 border-2 border-legacy-blue/20 hover:shadow-lg transition">

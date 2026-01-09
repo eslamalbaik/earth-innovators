@@ -5,27 +5,54 @@ import { FaSearch, FaFilter, FaEye, FaEdit, FaTrash, FaPlus, FaBox, FaUsers, FaD
 
 export default function AdminPackagesIndex({ packages, stats }) {
     const [search, setSearch] = useState('');
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [packageToDelete, setPackageToDelete] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const handleSearch = () => {
         // يمكن إضافة فلترة لاحقاً
     };
 
-    const formatCurrency = (amount, currency = 'SAR') => {
-        return new Intl.NumberFormat('ar-SA', {
+    const formatCurrency = (amount, currency = 'AED') => {
+        return new Intl.NumberFormat('ar-AE', {
             style: 'currency',
             currency: currency,
         }).format(amount);
     };
 
-    const handleDelete = (packageId) => {
-        if (confirm('هل أنت متأكد من حذف هذه الباقة؟')) {
-            router.delete(route('admin.packages.destroy', packageId), {
-                preserveScroll: true,
+    const handleDelete = (pkg) => {
+        setPackageToDelete(pkg);
+        setShowDeleteModal(true);
+    };
+
+    const confirmDelete = () => {
+        if (packageToDelete && !isDeleting) {
+            setIsDeleting(true);
+            router.post(`/admin/packages/${packageToDelete.id}`, {
+                _method: 'DELETE',
+            }, {
+                preserveScroll: false,
                 onSuccess: () => {
-                    // سيتم إعادة تحميل الصفحة تلقائياً
+                    setShowDeleteModal(false);
+                    setPackageToDelete(null);
+                    setIsDeleting(false);
+                    router.reload({ only: ['packages', 'stats'] });
                 },
+                onError: (errors) => {
+                    console.error('Delete error:', errors);
+                    alert('حدث خطأ أثناء حذف الباقة: ' + (errors.message || 'خطأ غير معروف'));
+                    setIsDeleting(false);
+                },
+                onFinish: () => {
+                    setIsDeleting(false);
+                }
             });
         }
+    };
+
+    const cancelDelete = () => {
+        setShowDeleteModal(false);
+        setPackageToDelete(null);
     };
 
     return (
@@ -182,8 +209,8 @@ export default function AdminPackagesIndex({ packages, stats }) {
                                             <FaEdit />
                                         </Link>
                                         <button
-                                            onClick={() => handleDelete(pkg.id)}
-                                            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg"
+                                            onClick={() => handleDelete(pkg)}
+                                            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
                                             title="حذف"
                                         >
                                             <FaTrash />
@@ -198,6 +225,41 @@ export default function AdminPackagesIndex({ packages, stats }) {
                     </div>
                 )}
             </div>
+
+            {/* Delete Confirmation Modal */}
+            {showDeleteModal && packageToDelete && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={cancelDelete}>
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4" onClick={(e) => e.stopPropagation()}>
+                        <div className="p-6">
+                            <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full">
+                                <FaTrash className="text-3xl text-red-600" />
+                            </div>
+                            <h2 className="text-xl font-bold text-gray-900 text-center mb-2">تأكيد الحذف</h2>
+                            <p className="text-gray-600 text-center mb-6">
+                                هل أنت متأكد من حذف الباقة <strong>{packageToDelete.name_ar || packageToDelete.name}</strong>؟
+                                <br />
+                                <span className="text-sm text-red-600">هذا الإجراء لا يمكن التراجع عنه.</span>
+                            </p>
+                            <div className="flex items-center gap-4">
+                                <button
+                                    onClick={confirmDelete}
+                                    disabled={isDeleting}
+                                    className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {isDeleting ? 'جاري الحذف...' : 'حذف'}
+                                </button>
+                                <button
+                                    onClick={cancelDelete}
+                                    disabled={isDeleting}
+                                    className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    إلغاء
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </DashboardLayout>
     );
 }

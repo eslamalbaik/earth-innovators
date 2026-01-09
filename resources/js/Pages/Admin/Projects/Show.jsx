@@ -1,29 +1,58 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import { FaArrowRight, FaCheckCircle, FaTimesCircle, FaTrash, FaUser, FaSchool, FaChalkboardTeacher, FaEye, FaHeart, FaStar } from 'react-icons/fa';
+import { FaArrowRight, FaCheckCircle, FaTimesCircle, FaTrash, FaUser, FaSchool, FaChalkboardTeacher, FaEye, FaHeart, FaStar, FaFileAlt, FaCalendar, FaStar as FaStarIcon } from 'react-icons/fa';
+import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 
 export default function AdminProjectShow({ project }) {
-    const handleApprove = () => {
-        if (confirm('هل أنت متأكد من الموافقة على هذا المشروع؟')) {
+    const { confirm } = useConfirmDialog();
+
+    const handleApprove = async () => {
+        const confirmed = await confirm({
+            title: 'تأكيد الموافقة',
+            message: `هل أنت متأكد من الموافقة على المشروع "${project.title}"؟`,
+            confirmText: 'موافقة',
+            cancelText: 'إلغاء',
+            variant: 'info',
+        });
+
+        if (confirmed) {
             router.post(route('admin.projects.approve', project.id), {}, {
                 preserveScroll: true,
             });
         }
     };
 
-    const handleReject = () => {
-        const reason = prompt('يرجى إدخال سبب الرفض (اختياري):');
-        if (reason !== null) {
-            router.post(route('admin.projects.reject', project.id), {
-                reason: reason || '',
-            }, {
-                preserveScroll: true,
-            });
+    const handleReject = async () => {
+        const confirmed = await confirm({
+            title: 'تأكيد الرفض',
+            message: `هل أنت متأكد من رفض المشروع "${project.title}"؟ يمكنك إدخال سبب الرفض في الخطوة التالية.`,
+            confirmText: 'رفض',
+            cancelText: 'إلغاء',
+            variant: 'warning',
+        });
+
+        if (confirmed) {
+            const reason = prompt('يرجى إدخال سبب الرفض (اختياري):');
+            if (reason !== null) {
+                router.post(route('admin.projects.reject', project.id), {
+                    reason: reason || '',
+                }, {
+                    preserveScroll: true,
+                });
+            }
         }
     };
 
-    const handleDelete = () => {
-        if (confirm('هل أنت متأكد من حذف هذا المشروع؟ هذا الإجراء لا يمكن التراجع عنه.')) {
+    const handleDelete = async () => {
+        const confirmed = await confirm({
+            title: 'تأكيد الحذف',
+            message: `هل أنت متأكد من حذف المشروع "${project.title}"؟ هذا الإجراء لا يمكن التراجع عنه.`,
+            confirmText: 'حذف',
+            cancelText: 'إلغاء',
+            variant: 'danger',
+        });
+
+        if (confirmed) {
             router.delete(route('admin.projects.destroy', project.id));
         }
     };
@@ -137,6 +166,62 @@ export default function AdminProjectShow({ project }) {
                             )}
                         </div>
                     ) : null}
+
+                    {/* Submissions Section */}
+                    {project.submissions && project.submissions.length > 0 && (
+                        <div className="bg-white rounded-xl shadow-lg p-6">
+                            <h2 className="text-xl font-bold text-gray-900 mb-4">التسليمات ({project.submissions.length})</h2>
+                            <div className="space-y-4">
+                                {project.submissions.map((submission) => (
+                                    <div key={submission.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition">
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-3 mb-2">
+                                                    <FaUser className="text-blue-500" />
+                                                    <div>
+                                                        <p className="font-semibold text-gray-900">{submission.student.name}</p>
+                                                        <p className="text-sm text-gray-600">{submission.student.email}</p>
+                                                    </div>
+                                                </div>
+                                                {submission.comment && (
+                                                    <p className="text-sm text-gray-700 mb-2 mt-2">{submission.comment}</p>
+                                                )}
+                                                <div className="flex items-center gap-4 mt-3 text-sm text-gray-600">
+                                                    <div className="flex items-center gap-1">
+                                                        <FaCalendar />
+                                                        <span>{submission.submitted_at || 'غير محدد'}</span>
+                                                    </div>
+                                                    {submission.rating && (
+                                                        <div className="flex items-center gap-1">
+                                                            <FaStarIcon className="text-yellow-500" />
+                                                            <span>{submission.rating}/5</span>
+                                                        </div>
+                                                    )}
+                                                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                                        submission.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                                        submission.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                                        submission.status === 'reviewed' ? 'bg-blue-100 text-blue-800' :
+                                                        'bg-gray-100 text-gray-800'
+                                                    }`}>
+                                                        {submission.status === 'approved' ? 'معتمد' :
+                                                         submission.status === 'rejected' ? 'مرفوض' :
+                                                         submission.status === 'reviewed' ? 'تم المراجعة' : 'مقدم'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <Link
+                                                href={route('admin.submissions.show', submission.id)}
+                                                className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+                                            >
+                                                <FaEye />
+                                                {submission.status === 'submitted' ? 'تقييم' : 'عرض'}
+                                            </Link>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Sidebar */}
@@ -165,31 +250,39 @@ export default function AdminProjectShow({ project }) {
                         </div>
                     </div>
 
-                    {/* Student Info */}
+                    {/* Student/Publisher Info */}
                     <div className="bg-white rounded-xl shadow-lg p-6">
                         <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                             <FaUser className="text-blue-500" />
-                            معلومات الطالب
+                            {project.user?.role === 'admin' ? 'الناشر' : 'معلومات الطالب'}
                         </h2>
                         <div className="space-y-2">
-                            <p className="font-semibold text-gray-900">{project.student.name}</p>
-                            <p className="text-sm text-gray-600">{project.student.email}</p>
+                            <p className="font-semibold text-gray-900">{project.student?.name || project.user?.name}</p>
+                            <p className="text-sm text-gray-600">{project.student?.email || project.user?.email}</p>
                         </div>
                     </div>
 
                     {/* School Info */}
-                    {project.school && (
+                    {project.school ? (
                         <div className="bg-white rounded-xl shadow-lg p-6">
                             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                                 <FaSchool className="text-green-500" />
-                                المدرسة
+                                تابع لمدرسة
                             </h2>
                             <p className="font-semibold text-gray-900">{project.school.name}</p>
                         </div>
-                    )}
+                    ) : project.user?.role === 'admin' ? (
+                        <div className="bg-white rounded-xl shadow-lg p-6">
+                            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                <FaSchool className="text-purple-500" />
+                                المصدر
+                            </h2>
+                            <p className="font-semibold text-gray-900">من إدارة مجتمع إرث المبتكرين</p>
+                        </div>
+                    ) : null}
 
-                    {/* Teacher Info */}
-                    {project.teacher && (
+                    {/* Teacher Info - لا يعرض إذا كان المشروع من الإدارة */}
+                    {project.teacher && project.user?.role !== 'admin' && (
                         <div className="bg-white rounded-xl shadow-lg p-6">
                             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                                 <FaChalkboardTeacher className="text-purple-500" />

@@ -12,6 +12,8 @@ export default function UsersEdit({ user, schools, auth }) {
         role: user.role || 'student',
         school_id: user.school_id || '',
         points: user.points || 0,
+        account_type: user.account_type || 'regular',
+        membership_type: user.membership_type || '',
     });
 
     const submit = (e) => {
@@ -94,6 +96,27 @@ export default function UsersEdit({ user, schools, auth }) {
                             )}
                         </div>
 
+                        {/* نوع الحساب */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                نوع الحساب <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                                value={data.account_type}
+                                onChange={(e) => setData('account_type', e.target.value)}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                    errors.account_type ? 'border-red-500' : 'border-gray-300'
+                                }`}
+                                required
+                            >
+                                <option value="regular">حساب عادي</option>
+                                <option value="project">حساب مشروع</option>
+                            </select>
+                            {errors.account_type && (
+                                <p className="mt-1 text-sm text-red-600">{errors.account_type}</p>
+                            )}
+                        </div>
+
                         {/* الدور */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -110,12 +133,42 @@ export default function UsersEdit({ user, schools, auth }) {
                                 <option value="student">طالب</option>
                                 <option value="teacher">معلم</option>
                                 <option value="school">مدرسة</option>
+                                <option value="educational_institution">مؤسسة تعليمية</option>
                                 <option value="admin">أدمن</option>
+                                {data.account_type === 'project' && (
+                                    <>
+                                        <option value="system_supervisor">مشرف النظام</option>
+                                        <option value="school_support_coordinator">منسق دعم المؤسسات تعليمية</option>
+                                    </>
+                                )}
                             </select>
                             {errors.role && (
                                 <p className="mt-1 text-sm text-red-600">{errors.role}</p>
                             )}
                         </div>
+
+                        {/* نوع العضوية */}
+                        {data.account_type === 'regular' && (
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    نوع العضوية
+                                </label>
+                                <select
+                                    value={data.membership_type}
+                                    onChange={(e) => setData('membership_type', e.target.value)}
+                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                        errors.membership_type ? 'border-red-500' : 'border-gray-300'
+                                    }`}
+                                >
+                                    <option value="">بدون عضوية</option>
+                                    <option value="basic">عضوية أساسية</option>
+                                    <option value="subscription">اشتراك عضوية</option>
+                                </select>
+                                {errors.membership_type && (
+                                    <p className="mt-1 text-sm text-red-600">{errors.membership_type}</p>
+                                )}
+                            </div>
+                        )}
 
                         {/* المدرسة */}
                         {data.role === 'student' && (

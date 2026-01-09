@@ -30,15 +30,15 @@ export default function SidebarSubMenu({ item, isActive, currentUrl, onSubItemCl
             {/* Main Menu Item */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                     isActive || hasActiveSubItem
-                        ? 'bg-gradient-to-r from-legacy-green to-legacy-blue text-white shadow-lg'
-                        : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/20'
+                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                 }`}
             >
                 <div className="flex items-center gap-3 flex-1">
                     <Icon className={`text-lg ${isActive || hasActiveSubItem ? 'text-white' : 'text-gray-500'}`} />
-                    <span className="font-medium">{item.name}</span>
+                    <span className={`font-medium ${isActive || hasActiveSubItem ? 'font-semibold' : ''}`}>{item.name}</span>
                 </div>
                 {isOpen ? (
                     <FaChevronUp className={`text-sm ${isActive || hasActiveSubItem ? 'text-white' : 'text-gray-500'}`} />
@@ -49,7 +49,7 @@ export default function SidebarSubMenu({ item, isActive, currentUrl, onSubItemCl
 
             {/* Submenu Items */}
             {isOpen && item.subItems && (
-                <div className="mt-1 mr-4 space-y-1">
+                <div className="mt-2 mr-4 space-y-1">
                     {item.subItems.map((subItem) => {
                         const isSubActive = (() => {
                             if (currentUrl === subItem.href) return true;
@@ -67,9 +67,9 @@ export default function SidebarSubMenu({ item, isActive, currentUrl, onSubItemCl
                                 key={subItem.name}
                                 href={subItem.href}
                                 onClick={onSubItemClick}
-                                className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${
+                                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 ${
                                     isSubActive
-                                        ? 'bg-legacy-blue/20 text-legacy-blue font-semibold border-r-4 border-legacy-blue'
+                                        ? 'bg-blue-50 text-blue-600 font-semibold border-r-2 border-blue-500'
                                         : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                                 }`}
                             >

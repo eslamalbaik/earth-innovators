@@ -1,6 +1,7 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router, useForm } from '@inertiajs/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useOptimisticCRUD } from '@/Hooks/useOptimisticCRUD';
 import { 
     FaSearch, 
     FaFilter, 
@@ -14,7 +15,10 @@ import {
     FaGraduationCap,
     FaSchool,
     FaSave,
-    FaTimes
+    FaTimes,
+    FaFileExcel,
+    FaCheckSquare,
+    FaSquare
 } from 'react-icons/fa';
 
 export default function UsersIndex({ users, stats, filters, auth, schools: initialSchools }) {
@@ -22,9 +26,32 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
     const [roleFilter, setRoleFilter] = useState(filters?.role || 'all');
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
+    const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
     const [userToEdit, setUserToEdit] = useState(null);
+    const [selectedUsers, setSelectedUsers] = useState([]);
+    const [selectAll, setSelectAll] = useState(false);
     const [schools, setSchools] = useState(initialSchools || []);
+
+    const { data: editData, setData: setEditData, put: updateUser, processing: editProcessing, errors: editErrors, reset: resetEditForm } = useForm({
+        name: '',
+        email: '',
+        phone: '',
+        password: '',
+        password_confirmation: '',
+        role: 'student',
+        school_id: '',
+        points: 0,
+        account_type: 'regular',
+        membership_type: '',
+    });
+
+    // PERFORMANCE: Use optimistic CRUD hook for instant UI feedback
+    const { items: optimizedUsers, handleDelete: optimisticDelete, isDeleting } = useOptimisticCRUD(
+        users?.data || [],
+        'users',
+        ['stats'] // Also reload stats on delete
+    );
 
     // Fetch schools if not provided
     useEffect(() => {
@@ -41,42 +68,109 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
         }
     }, []);
 
-    const { data: editData, setData: setEditData, put: updateUser, processing: editProcessing, errors: editErrors, reset: resetEditForm } = useForm({
-        name: '',
-        email: '',
-        phone: '',
-        password: '',
-        password_confirmation: '',
-        role: 'student',
-        school_id: '',
-        points: 0,
-    });
+    // Update selectAll when selectedUsers changes
+    useEffect(() => {
+        if (optimizedUsers && optimizedUsers.length > 0) {
+            const allUserIds = optimizedUsers.map(user => user.id);
+            setSelectAll(allUserIds.length > 0 && allUserIds.every(id => selectedUsers.includes(id)));
+        }
+    }, [selectedUsers, optimizedUsers]);
 
-    const handleSearch = () => {
+    /**
+     * PERFORMANCE OPTIMIZED: Filter with partial reload
+     */
+    const handleSearch = useCallback(() => {
         router.get(route('admin.users.index'), {
             search: search || undefined,
             role: roleFilter !== 'all' ? roleFilter : undefined,
         }, {
             preserveState: true,
+            preserveScroll: true,
             replace: true,
+            only: ['users', 'filters'], // PARTIAL RELOAD: Only refresh users and filters
+        });
+    }, [search, roleFilter]);
+
+    const handleDelete = useCallback((user) => {
+        setUserToDelete(user);
+        setShowDeleteModal(true);
+    }, []);
+
+    /**
+     * PERFORMANCE OPTIMIZED: Optimistic delete with partial reload
+     */
+    const confirmDelete = useCallback(() => {
+        if (userToDelete) {
+            optimisticDelete(
+                userToDelete.id,
+                route('admin.users.destroy', userToDelete.id),
+                {
+                    confirmMessage: false, // Already confirmed via modal
+                    onSuccess: () => {
+                        setShowDeleteModal(false);
+                        setUserToDelete(null);
+                        setSelectedUsers([]);
+                    },
+                }
+            );
+        }
+    }, [userToDelete, optimisticDelete]);
+
+    const handleSelectUser = (userId) => {
+        setSelectedUsers(prev => {
+            if (prev.includes(userId)) {
+                return prev.filter(id => id !== userId);
+            } else {
+                return [...prev, userId];
+            }
         });
     };
 
-    const handleDelete = (user) => {
-        setUserToDelete(user);
-        setShowDeleteModal(true);
+    const handleSelectAll = useCallback(() => {
+        if (selectAll) {
+            setSelectedUsers([]);
+            setSelectAll(false);
+        } else {
+            const allUserIds = optimizedUsers.map(user => user.id);
+            setSelectedUsers(allUserIds);
+            setSelectAll(true);
+        }
+    }, [selectAll, optimizedUsers]);
+
+    const handleBulkDelete = () => {
+        if (selectedUsers.length === 0) {
+            alert('يرجى تحديد مستخدم واحد على الأقل للحذف');
+            return;
+        }
+        setShowBulkDeleteModal(true);
     };
 
-    const confirmDelete = () => {
-        if (userToDelete) {
-            router.delete(route('admin.users.destroy', userToDelete.id), {
+    /**
+     * PERFORMANCE OPTIMIZED: Bulk delete with partial reload
+     */
+    const confirmBulkDelete = useCallback(() => {
+        if (selectedUsers.length > 0) {
+            router.post(route('admin.users.bulk-delete'), {
+                user_ids: selectedUsers
+            }, {
+                preserveState: true,
                 preserveScroll: true,
+                only: ['users', 'stats'], // PARTIAL RELOAD
                 onSuccess: () => {
-                    setShowDeleteModal(false);
-                    setUserToDelete(null);
+                    setShowBulkDeleteModal(false);
+                    setSelectedUsers([]);
+                    setSelectAll(false);
                 },
             });
         }
+    }, [selectedUsers]);
+
+    const handleExportExcel = () => {
+        const params = new URLSearchParams();
+        if (search) params.append('search', search);
+        if (roleFilter !== 'all') params.append('role', roleFilter);
+        
+        window.location.href = route('admin.users.export') + (params.toString() ? '?' + params.toString() : '');
     };
 
     const handleEdit = (user) => {
@@ -90,6 +184,8 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
             role: user.role || 'student',
             school_id: user.school_id || '',
             points: user.points || 0,
+            account_type: user.account_type || 'regular',
+            membership_type: user.membership_type || '',
         });
         setShowEditModal(true);
     };
@@ -112,20 +208,30 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
         resetEditForm();
     };
 
-    const getRoleBadge = (role) => {
+    const getRoleBadge = (role, accountType) => {
         const roleMap = {
             'admin': { bg: 'bg-red-100', text: 'text-red-800', label: 'أدمن', icon: FaUser },
             'teacher': { bg: 'bg-purple-100', text: 'text-purple-800', label: 'معلم', icon: FaChalkboardTeacher },
             'student': { bg: 'bg-green-100', text: 'text-green-800', label: 'طالب', icon: FaGraduationCap },
             'school': { bg: 'bg-blue-100', text: 'text-blue-800', label: 'مدرسة', icon: FaSchool },
+            'educational_institution': { bg: 'bg-cyan-100', text: 'text-cyan-800', label: 'مؤسسة تعليمية', icon: FaSchool },
+            'system_supervisor': { bg: 'bg-orange-100', text: 'text-orange-800', label: 'مشرف النظام', icon: FaUser },
+            'school_support_coordinator': { bg: 'bg-indigo-100', text: 'text-indigo-800', label: 'منسق دعم المؤسسات تعليمية', icon: FaUser },
         };
         const roleConfig = roleMap[role] || { bg: 'bg-gray-100', text: 'text-gray-800', label: role, icon: FaUser };
         const Icon = roleConfig.icon;
         return (
-            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${roleConfig.bg} ${roleConfig.text} flex items-center gap-1 w-fit`}>
-                <Icon className="text-xs" />
-                {roleConfig.label}
-            </span>
+            <div className="flex items-center gap-2">
+                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${roleConfig.bg} ${roleConfig.text} flex items-center gap-1 w-fit`}>
+                    <Icon className="text-xs" />
+                    {roleConfig.label}
+                </span>
+                {accountType === 'project' && (
+                    <span className="px-2 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
+                        حساب مشروع
+                    </span>
+                )}
+            </div>
         );
     };
 
@@ -147,7 +253,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                 <div className="bg-white rounded-xl shadow-lg p-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">المدارس</p>
+                            <p className="text-sm text-gray-600 mb-1">المؤسسات تعليمية</p>
                             <p className="text-3xl font-bold text-blue-600">{stats?.schools || 0}</p>
                         </div>
                         <FaSchool className="text-3xl text-blue-400" />
@@ -208,8 +314,11 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                 <option value="all">جميع الأدوار</option>
                                 <option value="admin">أدمن</option>
                                 <option value="school">مدرسة</option>
+                                <option value="educational_institution">مؤسسة تعليمية</option>
                                 <option value="teacher">معلم</option>
                                 <option value="student">طالب</option>
+                                <option value="system_supervisor">مشرف النظام</option>
+                                <option value="school_support_coordinator">منسق دعم المؤسسات تعليمية</option>
                             </select>
                         </div>
                         <button
@@ -220,13 +329,31 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                             بحث
                         </button>
                     </div>
-                    <Link
-                        href={route('admin.users.create')}
-                        className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
-                    >
-                        <FaPlus />
-                        إضافة مستخدم جديد
-                    </Link>
+                    <div className="flex gap-3">
+                        {selectedUsers.length > 0 && (
+                            <button
+                                onClick={handleBulkDelete}
+                                className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
+                            >
+                                <FaTrash />
+                                حذف المحدد ({selectedUsers.length})
+                            </button>
+                        )}
+                        <button
+                            onClick={handleExportExcel}
+                            className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
+                        >
+                            <FaFileExcel />
+                            تصدير Excel
+                        </button>
+                        <Link
+                            href={route('admin.users.create')}
+                            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
+                        >
+                            <FaPlus />
+                            إضافة مستخدم جديد
+                        </Link>
+                    </div>
                 </div>
             </div>
 
@@ -236,6 +363,15 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                     <table className="w-full">
                         <thead className="bg-gray-50">
                             <tr>
+                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700 w-12">
+                                    <button
+                                        onClick={handleSelectAll}
+                                        className="text-gray-600 hover:text-gray-900"
+                                        title={selectAll ? 'إلغاء تحديد الكل' : 'تحديد الكل'}
+                                    >
+                                        {selectAll ? <FaCheckSquare className="text-lg" /> : <FaSquare className="text-lg" />}
+                                    </button>
+                                </th>
                                 <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">ID</th>
                                 <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">الاسم</th>
                                 <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">البريد الإلكتروني</th>
@@ -247,9 +383,22 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                            {users.data && users.data.length > 0 ? (
-                                users.data.map((user) => (
-                                    <tr key={user.id} className="hover:bg-gray-50">
+                            {optimizedUsers && optimizedUsers.length > 0 ? (
+                                optimizedUsers.map((user) => {
+                                    const deleting = isDeleting(user.id);
+                                    return (
+                                    <tr 
+                                        key={user.id} 
+                                        className={`hover:bg-gray-50 ${selectedUsers.includes(user.id) ? 'bg-blue-50' : ''} ${deleting ? 'opacity-50 pointer-events-none' : ''}`}
+                                    >
+                                        <td className="py-4 px-6">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedUsers.includes(user.id)}
+                                                onChange={() => handleSelectUser(user.id)}
+                                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                            />
+                                        </td>
                                         <td className="py-4 px-6 text-sm font-medium text-gray-900">#{user.id}</td>
                                         <td className="py-4 px-6">
                                             <div className="flex items-center gap-3">
@@ -260,7 +409,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                             </div>
                                         </td>
                                         <td className="py-4 px-6 text-sm text-gray-700">{user.email}</td>
-                                        <td className="py-4 px-6">{getRoleBadge(user.role)}</td>
+                                        <td className="py-4 px-6">{getRoleBadge(user.role, user.account_type)}</td>
                                         <td className="py-4 px-6 text-sm text-gray-700">{user.school_name}</td>
                                         <td className="py-4 px-6">
                                             <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
@@ -286,18 +435,24 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(user)}
-                                                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
-                                                    title="حذف"
+                                                    disabled={deleting}
+                                                    className={`p-2 text-red-600 hover:bg-red-50 rounded-lg transition ${deleting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                    title={deleting ? 'جاري الحذف...' : 'حذف'}
                                                 >
-                                                    <FaTrash />
+                                                    {deleting ? (
+                                                        <span className="animate-spin text-xs">⏳</span>
+                                                    ) : (
+                                                        <FaTrash />
+                                                    )}
                                                 </button>
                                             </div>
                                         </td>
                                     </tr>
-                                ))
+                                    );
+                                })
                             ) : (
                                 <tr>
-                                    <td colSpan="8" className="py-12 text-center text-gray-500">
+                                    <td colSpan="9" className="py-12 text-center text-gray-500">
                                         لا توجد مستخدمين
                                     </td>
                                 </tr>
@@ -404,6 +559,27 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                     )}
                                 </div>
 
+                                {/* نوع الحساب */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        نوع الحساب <span className="text-red-500">*</span>
+                                    </label>
+                                    <select
+                                        value={editData.account_type}
+                                        onChange={(e) => setEditData('account_type', e.target.value)}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                            editErrors.account_type ? 'border-red-500' : 'border-gray-300'
+                                        }`}
+                                        required
+                                    >
+                                        <option value="regular">حساب عادي</option>
+                                        <option value="project">حساب مشروع</option>
+                                    </select>
+                                    {editErrors.account_type && (
+                                        <p className="mt-1 text-sm text-red-600">{editErrors.account_type}</p>
+                                    )}
+                                </div>
+
                                 {/* الدور */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -420,12 +596,42 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                         <option value="student">طالب</option>
                                         <option value="teacher">معلم</option>
                                         <option value="school">مدرسة</option>
+                                        <option value="educational_institution">مؤسسة تعليمية</option>
                                         <option value="admin">أدمن</option>
+                                        {editData.account_type === 'project' && (
+                                            <>
+                                                <option value="system_supervisor">مشرف النظام</option>
+                                                <option value="school_support_coordinator">منسق دعم المؤسسات تعليمية</option>
+                                            </>
+                                        )}
                                     </select>
                                     {editErrors.role && (
                                         <p className="mt-1 text-sm text-red-600">{editErrors.role}</p>
                                     )}
                                 </div>
+
+                                {/* نوع العضوية */}
+                                {editData.account_type === 'regular' && (
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            نوع العضوية
+                                        </label>
+                                        <select
+                                            value={editData.membership_type}
+                                            onChange={(e) => setEditData('membership_type', e.target.value)}
+                                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                                editErrors.membership_type ? 'border-red-500' : 'border-gray-300'
+                                            }`}
+                                        >
+                                            <option value="">بدون عضوية</option>
+                                            <option value="basic">عضوية أساسية</option>
+                                            <option value="subscription">اشتراك عضوية</option>
+                                        </select>
+                                        {editErrors.membership_type && (
+                                            <p className="mt-1 text-sm text-red-600">{editErrors.membership_type}</p>
+                                        )}
+                                    </div>
+                                )}
 
                                 {/* المدرسة */}
                                 {editData.role === 'student' && (
@@ -562,6 +768,36 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                 className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition"
                             >
                                 حذف
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Bulk Delete Modal */}
+            {showBulkDeleteModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl shadow-xl p-6 max-w-md w-full mx-4">
+                        <h3 className="text-xl font-bold text-gray-900 mb-4">تأكيد الحذف المتعدد</h3>
+                        <p className="text-gray-700 mb-6">
+                            هل أنت متأكد من حذف <strong>{selectedUsers.length}</strong> مستخدم؟
+                            <br />
+                            <span className="text-sm text-red-600">هذا الإجراء لا يمكن التراجع عنه.</span>
+                        </p>
+                        <div className="flex gap-4">
+                            <button
+                                onClick={() => {
+                                    setShowBulkDeleteModal(false);
+                                }}
+                                className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg transition"
+                            >
+                                إلغاء
+                            </button>
+                            <button
+                                onClick={confirmBulkDelete}
+                                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition"
+                            >
+                                حذف المحدد
                             </button>
                         </div>
                     </div>

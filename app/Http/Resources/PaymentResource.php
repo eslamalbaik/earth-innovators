@@ -12,7 +12,7 @@ class PaymentResource extends JsonResource
             'id' => $this->id,
             'booking_id' => $this->booking_id,
             'amount' => (float) $this->amount,
-            'currency' => $this->currency ?? 'SAR',
+            'currency' => $this->currency ?? 'AED',
             'status' => $this->status,
             'payment_method' => $this->payment_method,
             'payment_gateway' => $this->payment_gateway,

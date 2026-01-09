@@ -72,7 +72,7 @@ class RankingService extends BaseService
         $cacheTag = "school_badges_{$schoolId}";
 
         return $this->cacheTags($cacheTag, $cacheKey, function () use ($schoolId) {
-            // الشارات المتاحة للمدارس
+            // الشارات المتاحة للمؤسسات تعليمية
             $badges = Badge::where('is_active', true)
                 ->where(function ($query) {
                     $query->where('type', 'custom')

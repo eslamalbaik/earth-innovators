@@ -146,7 +146,7 @@ export default function StudentDashboard({ auth, stats = {} }) {
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* معلومات المستخدم */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4 flex-1">
                             {/* صورة الملف الشخصي */}
@@ -155,16 +155,16 @@ export default function StudentDashboard({ auth, stats = {} }) {
                                     <img
                                         src={getUserImage()}
                                         alt={user.name}
-                                        className="w-20 h-20 rounded-full object-cover border-2 border-legacy-green"
+                                        className="w-20 h-20 rounded-2xl object-cover border border-gray-200"
                                     />
                                 ) : (
-                                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-legacy-green to-legacy-blue flex items-center justify-center text-white text-2xl font-bold">
+                                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-2xl font-bold">
                                         {user.name?.charAt(0) || 'ط'}
                                     </div>
                                 )}
                                 <button
                                     onClick={() => setShowImageModal(true)}
-                                    className="absolute bottom-0 right-0 bg-green-500 text-white rounded-full p-2 hover:bg-green-600 transition shadow-lg"
+                                    className="absolute bottom-0 right-0 bg-blue-500 text-white rounded-xl p-2 hover:bg-blue-600 transition shadow-lg"
                                 >
                                     <FaEdit className="text-xs" />
                                 </button>
@@ -179,10 +179,10 @@ export default function StudentDashboard({ auth, stats = {} }) {
 
                                 {/* العلامات */}
                                 <div className="flex gap-2">
-                                    <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
+                                    <span className="px-3 py-1 bg-blue-50 text-blue-700 text-sm font-medium rounded-xl border border-blue-100">
                                         مبتكر
                                     </span>
-                                    <span className="px-3 py-1 bg-purple-100 text-purple-700 text-sm font-medium rounded-full">
+                                    <span className="px-3 py-1 bg-purple-50 text-purple-700 text-sm font-medium rounded-xl border border-purple-100">
                                         مشارك نشط
                                     </span>
                                 </div>
@@ -191,10 +191,10 @@ export default function StudentDashboard({ auth, stats = {} }) {
 
                         {/* أيقونات التنقل */}
                         <div className="flex gap-3">
-                            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center cursor-pointer hover:bg-blue-200 transition">
+                            <div className="w-12 h-12 bg-blue-50 rounded-xl border border-blue-100 flex items-center justify-center cursor-pointer hover:bg-blue-100 transition">
                                 <FaStar className="text-blue-600" />
                             </div>
-                            <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center cursor-pointer hover:bg-yellow-200 transition">
+                            <div className="w-12 h-12 bg-yellow-50 rounded-xl border border-yellow-100 flex items-center justify-center cursor-pointer hover:bg-yellow-100 transition">
                                 <FaTrophy className="text-yellow-600" />
                             </div>
                         </div>
@@ -202,41 +202,38 @@ export default function StudentDashboard({ auth, stats = {} }) {
                 </div>
 
                 {/* إحصائياتي */}
-                <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">إحصائياتي</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div className="text-center">
-                            <p className="text-2xl font-bold text-gray-900">{stats.totalPoints || 0}</p>
-                            <p className="text-sm text-gray-600 mt-1">النقاط</p>
-                        </div>
-                        <div className="text-center">
-                            <p className="text-2xl font-bold text-gray-900">{stats.totalProjects || 0}</p>
-                            <p className="text-sm text-gray-600 mt-1">المشاريع</p>
-                        </div>
-                        <div className="text-center">
-                            <p className="text-2xl font-bold text-gray-900">{stats.totalBadges || 0}</p>
-                            <p className="text-sm text-gray-600 mt-1">الشارات</p>
-                        </div>
-                        <div className="text-center">
-                            <p className="text-2xl font-bold text-gray-900">{stats.winningProjects || 0}</p>
-                            <p className="text-sm text-gray-600 mt-1">الفائزة</p>
-                        </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center hover:shadow-md transition">
+                        <p className="text-3xl font-bold text-gray-900 mb-2">{stats.totalPoints || 0}</p>
+                        <p className="text-sm text-gray-600 font-medium">النقاط</p>
+                    </div>
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center hover:shadow-md transition">
+                        <p className="text-3xl font-bold text-gray-900 mb-2">{stats.totalProjects || 0}</p>
+                        <p className="text-sm text-gray-600 font-medium">المشاريع</p>
+                    </div>
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center hover:shadow-md transition">
+                        <p className="text-3xl font-bold text-gray-900 mb-2">{stats.totalBadges || 0}</p>
+                        <p className="text-sm text-gray-600 font-medium">الشارات</p>
+                    </div>
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center hover:shadow-md transition">
+                        <p className="text-3xl font-bold text-gray-900 mb-2">{stats.winningProjects || 0}</p>
+                        <p className="text-sm text-gray-600 font-medium">الفائزة</p>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     {/* شاراتي */}
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-lg font-bold text-gray-900">شاراتي</h3>
-                            <Link href="/student/badges" className="text-green-600 hover:text-green-700 text-sm font-medium">
+                            <Link href="/student/badges" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
                                 عرض الكل
                             </Link>
                         </div>
                         {stats.recentBadges && stats.recentBadges.length > 0 ? (
                             <div className="grid grid-cols-3 gap-4">
                                 {stats.recentBadges.map((badge, index) => (
-                                    <div key={badge.id || index} className="text-center p-4 rounded-lg border-2 border-gray-200 hover:border-green-300 transition">
+                                    <div key={badge.id || index} className="text-center p-4 rounded-xl border border-gray-100 bg-gray-50 hover:shadow-sm transition">
                                         {badge.icon ? (
                                             <div className="text-4xl mb-2">{badge.icon}</div>
                                         ) : badge.image ? (
@@ -265,10 +262,10 @@ export default function StudentDashboard({ auth, stats = {} }) {
                     </div>
 
                     {/* مشاريعي */}
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-lg font-bold text-gray-900">مشاريعي</h3>
-                            <Link href="/student/projects" className="text-green-600 hover:text-green-700 text-sm font-medium">
+                            <Link href="/student/projects" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
                                 عرض الكل
                             </Link>
                         </div>
@@ -278,7 +275,7 @@ export default function StudentDashboard({ auth, stats = {} }) {
                                     const statusBadge = getStatusBadge(project.status);
                                     const StatusIcon = statusBadge.icon;
                                     return (
-                                        <div key={project.id} className="p-4 bg-white rounded-lg border border-gray-200 hover:shadow-md transition">
+                                        <div key={project.id} className="p-4 bg-gray-50 rounded-xl border border-gray-100 hover:shadow-sm transition">
                                             <div className="flex items-center justify-between mb-3">
                                                 <h4 className="font-semibold text-gray-900 text-base">{project.title}</h4>
                                                 <span className={`px-3 py-1 inline-flex items-center gap-1 text-xs font-medium rounded-full ${statusBadge.color}`}>
@@ -311,11 +308,11 @@ export default function StudentDashboard({ auth, stats = {} }) {
 
                 {/* الإشعارات */}
                 {stats.notifications && stats.notifications.length > 0 && (
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-lg font-bold text-gray-900">الإشعارات</h3>
                             {stats.unreadCount > 0 && (
-                                <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded-full">
+                                <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded-xl">
                                     {stats.unreadCount}
                                 </span>
                             )}
@@ -325,7 +322,7 @@ export default function StudentDashboard({ auth, stats = {} }) {
                                 <Link
                                     key={notification.id}
                                     href={notification.project_title ? `/student/projects` : '#'}
-                                    className="block p-4 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition"
+                                    className="block p-4 bg-blue-50 border border-blue-100 rounded-xl hover:bg-blue-100 transition"
                                 >
                                     <div className="flex items-start gap-3">
                                         <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
@@ -358,12 +355,12 @@ export default function StudentDashboard({ auth, stats = {} }) {
                 )}
 
                 {/* نشاطاتي */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                     <h3 className="text-lg font-bold text-gray-900 mb-4">نشاطاتي</h3>
                     {stats.activities && stats.activities.length > 0 ? (
-                        <div className="space-y-4">
+                        <div className="space-y-3">
                             {stats.activities.map((activity, index) => (
-                                <div key={index} className="flex items-start gap-4">
+                                <div key={index} className="flex items-start gap-4 p-3 bg-gray-50 rounded-xl border border-gray-100">
                                     <div className={`w-3 h-3 rounded-full mt-2 ${getActivityColor(activity.color)}`}></div>
                                     <div className="flex-1">
                                         <p className="text-gray-900 font-medium">
@@ -385,8 +382,8 @@ export default function StudentDashboard({ auth, stats = {} }) {
 
             {/* Modal تعديل الصورة الشخصية */}
             {showImageModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-6 max-w-md w-full mx-4">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-lg font-bold text-gray-900">تعديل الصورة الشخصية</h3>
                             <button

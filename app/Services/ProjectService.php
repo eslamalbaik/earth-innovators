@@ -47,7 +47,14 @@ class ProjectService extends BaseService
             }
 
             if ($schoolId) {
-                $query->where('school_id', $schoolId);
+                // إظهار المشاريع المتاحة لمدرسة محددة أو المتاحة لجميع المؤسسات تعليمية
+                $query->where(function ($q) use ($schoolId) {
+                    $q->where('school_id', $schoolId)
+                      ->orWhereNull('school_id');
+                });
+            } else {
+                // إذا لم يتم تحديد مدرسة، عرض جميع المشاريع المعتمدة (بما في ذلك المتاحة لجميع المؤسسات تعليمية)
+                // لا حاجة لفلترة إضافية - جميع المشاريع المعتمدة ستظهر
             }
 
             return $query->latest()->paginate($perPage);
@@ -63,7 +70,7 @@ class ProjectService extends BaseService
             return Project::with([
                 'teacher:id,name_ar,user_id',
                 'teacher.user:id,name',
-                'user:id,name',
+                'user:id,name,role',
                 'school:id,name',
                 'approver:id,name',
                 'comments' => function ($query) {
@@ -144,6 +151,10 @@ class ProjectService extends BaseService
                   ->orWhere(function ($tq) use ($schoolId) {
                       $tq->whereNotNull('teacher_id')
                          ->where('school_id', $schoolId);
+                  })
+                  ->orWhere(function ($aq) {
+                      // المشاريع المتاحة لجميع المؤسسات تعليمية (school_id = null)
+                      $aq->whereNull('school_id');
                   });
             })
             ->with([

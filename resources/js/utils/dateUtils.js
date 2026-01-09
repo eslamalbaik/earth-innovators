@@ -161,6 +161,39 @@ function getHijriYearLength(year) {
 }
 
 /**
+ * Format Gregorian date in Arabic format
+ * @param {Date|string} date - The date to format
+ * @param {boolean} includeTime - Whether to include time in the output
+ * @returns {string} - Formatted Gregorian date string in Arabic
+ */
+export function toGregorianDate(date, includeTime = false) {
+    if (!date) return 'غير محدد';
+    
+    const gregorianDate = new Date(date);
+    if (isNaN(gregorianDate.getTime())) return 'تاريخ غير صحيح';
+
+    const gregorianMonths = [
+        'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+        'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+    ];
+
+    const day = gregorianDate.getDate();
+    const month = gregorianMonths[gregorianDate.getMonth()];
+    const year = gregorianDate.getFullYear();
+
+    let result = `${day} ${month} ${year}`;
+    
+    if (includeTime) {
+        const hours = gregorianDate.getHours();
+        const minutes = gregorianDate.getMinutes();
+        const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+        result += ` - ${timeString}`;
+    }
+
+    return result;
+}
+
+/**
  * Format date for display (Hijri with optional Gregorian)
  * @param {Date|string} date - The date to format
  * @param {Object} options - Formatting options

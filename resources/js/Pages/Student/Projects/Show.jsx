@@ -1,7 +1,8 @@
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import DashboardLayout from '../../../Layouts/DashboardLayout';
 import { useState, useRef } from 'react';
-import { toHijriDate } from '@/utils/dateUtils';
+import { toHijriDate, toGregorianDate } from '@/utils/dateUtils';
+import { useToast } from '@/Contexts/ToastContext';
 import {
     FaArrowLeft,
     FaUpload,
@@ -17,7 +18,9 @@ import {
     FaCalendar,
     FaEye,
     FaStar,
-    FaAward
+    FaAward,
+    FaSchool,
+    FaCheckCircle
 } from 'react-icons/fa';
 import TextInput from '../../../Components/TextInput';
 import InputLabel from '../../../Components/InputLabel';
@@ -30,6 +33,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
     const [dragActive, setDragActive] = useState(false);
     const [replyingTo, setReplyingTo] = useState(null);
     const fileInputRef = useRef(null);
+    const { showSuccess } = useToast();
 
     const submissionForm = useForm({
         files: [],
@@ -121,7 +125,21 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
             onSuccess: () => {
                 submissionForm.reset();
                 setFileList([]);
-                router.reload();
+                // Show success notification on the left
+                showSuccess('تم تسليم المشروع بنجاح!', {
+                    title: 'نجاح التسليم',
+                    autoDismiss: 5000,
+                });
+                // Switch to details tab
+                setActiveTab('details');
+                // Reload to get updated submission data
+                router.reload({
+                    preserveScroll: true,
+                    onFinish: () => {
+                        // Scroll to top to see the submission status
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                });
             },
         });
     };
@@ -223,12 +241,33 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
 
                         {/* Project Info */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-6 border-t border-gray-200">
-                            <div>
-                                <p className="text-sm text-gray-600 mb-1">المعلم</p>
-                                <p className="font-medium text-gray-900">
-                                    {project.teacher?.name || project.user?.name || 'غير محدد'}
-                                </p>
-                            </div>
+                            {/* عرض المعلم فقط إذا لم يكن المشروع من الإدارة */}
+                            {project.teacher && project.user?.role !== 'admin' && (
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">المعلم</p>
+                                    <p className="font-medium text-gray-900">
+                                        {project.teacher.name || project.user?.name || 'غير محدد'}
+                                    </p>
+                                </div>
+                            )}
+                            {/* عرض المدرسة أو الإدارة */}
+                            {project.school ? (
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">تابع لمدرسة</p>
+                                    <p className="font-medium text-gray-900 flex items-center gap-2">
+                                        <FaSchool className="text-green-600" />
+                                        {project.school.name}
+                                    </p>
+                                </div>
+                            ) : project.user?.role === 'admin' ? (
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">المصدر</p>
+                                    <p className="font-medium text-gray-900 flex items-center gap-2">
+                                        <FaSchool className="text-purple-600" />
+                                        من إدارة مجتمع إرث المبتكرين
+                                    </p>
+                                </div>
+                            ) : null}
                             {project.approved_at && (
                                 <div>
                                     <p className="text-sm text-gray-600 mb-1">تاريخ الموافقة</p>
@@ -242,21 +281,41 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                         {/* Existing Submission */}
                         {existingSubmission && (
                             <div className="mt-6 space-y-4">
-                                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                                    <h3 className="font-bold text-blue-900 mb-3">تسليمك الحالي</h3>
+                                <div className="p-4 bg-green-50 border-2 border-green-300 rounded-lg">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <h3 className="font-bold text-green-900 flex items-center gap-2">
+                                            <FaCheckCircle className="text-green-600" />
+                                            تم تسليم المشروع بنجاح
+                                        </h3>
+                                        {/* إخفاء زر التعديل إذا تم تقييم المشروع */}
+                                        {!existingSubmission.reviewed_at && existingSubmission.status === 'submitted' && (
+                                            <button
+                                                onClick={() => setActiveTab('submit')}
+                                                className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium"
+                                            >
+                                                <FaEdit />
+                                                تعديل التسليم
+                                            </button>
+                                        )}
+                                    </div>
                                     <div className="space-y-2">
-                                        <p className="text-sm text-blue-800">
-                                            الحالة: <span className="font-medium">
+                                        <p className="text-sm text-green-800">
+                                            الحالة: <span className="font-bold text-green-900">
                                                 {existingSubmission.status === 'submitted' ? 'مُسلم' :
                                                  existingSubmission.status === 'reviewed' ? 'تم المراجعة' :
                                                  existingSubmission.status === 'approved' ? 'مقبول' :
                                                  existingSubmission.status === 'rejected' ? 'مرفوض' : existingSubmission.status}
                                             </span>
                                         </p>
+                                        {(existingSubmission.submitted_at || existingSubmission.created_at) && (
+                                            <p className="text-xs text-green-700">
+                                                تاريخ التسليم: {toGregorianDate(existingSubmission.submitted_at || existingSubmission.created_at)}
+                                            </p>
+                                        )}
                                         {existingSubmission.comment && (
                                             <div className="mt-2">
-                                                <p className="text-sm font-medium text-blue-900 mb-1">تعليقك:</p>
-                                                <p className="text-sm text-blue-700">{existingSubmission.comment}</p>
+                                                <p className="text-sm font-medium text-green-900 mb-1">تعليقك:</p>
+                                                <p className="text-sm text-green-800 bg-white p-2 rounded border border-green-200">{existingSubmission.comment}</p>
                                             </div>
                                         )}
                                     </div>
@@ -327,7 +386,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
 
                                         {existingSubmission.reviewed_at && (
                                             <p className="text-xs text-green-700 mt-4">
-                                                تم التقييم في: {toHijriDate(existingSubmission.reviewed_at)}
+                                                تم التقييم في: {toGregorianDate(existingSubmission.reviewed_at)}
                                             </p>
                                         )}
                                     </div>

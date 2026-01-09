@@ -23,6 +23,7 @@ class StorePublicationRequest extends FormRequest
             'issue_number' => 'nullable|integer|min:1',
             'publish_date' => 'nullable|date',
             'publisher_name' => 'nullable|string|max:255',
+            'school_id' => 'nullable|exists:users,id',
         ];
     }
 

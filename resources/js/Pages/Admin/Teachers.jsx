@@ -351,7 +351,7 @@ export default function Teachers({ teachers, auth, cities = [], filters = {} }) 
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="text-sm font-bold text-gray-900 flex items-center ">
                                             <p className="text-sm font-medium text-gray-900">{teacher.price_per_hour}</p>
-                                            <img src="/images/sar-currency(black).svg" alt="currency" className="w-4 h-4" />
+                                            <img src="/images/aed-currency(black).svg" alt="currency" className="w-4 h-4" />
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">

@@ -34,7 +34,7 @@ class TeacherBadgeController extends Controller
      */
     public function create()
     {
-        // الحصول على جميع المدارس (يمكن تحسينها لاحقاً للتحقق من ارتباط المعلم بالمدرسة)
+        // الحصول على جميع المؤسسات تعليمية (يمكن تحسينها لاحقاً للتحقق من ارتباط المعلم بالمدرسة)
         $schools = User::where('role', 'school')
             ->get(['id', 'name']);
 

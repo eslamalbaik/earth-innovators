@@ -32,7 +32,8 @@ class CertificateService
         User $issuer,
         array $overrides = [],
         ?string $templatePath = null,
-        ?string $dateFormat = 'Y-m-d'
+        ?string $dateFormat = 'Y-m-d',
+        string $certificateType = 'student'
     ): string {
         // Use default template if not provided
         $templatePath = $templatePath ?? public_path('Certificate.pdf');
@@ -42,7 +43,7 @@ class CertificateService
         }
 
         // Get student data
-        $data = $this->prepareCertificateData($student, $issuer, $overrides, $dateFormat);
+        $data = $this->prepareCertificateData($student, $issuer, $overrides, $dateFormat, $certificateType);
 
         // Generate PDF
         $pdfPath = $this->fillPdfTemplate($templatePath, $data);
@@ -57,9 +58,11 @@ class CertificateService
         User $student,
         User $issuer,
         array $overrides,
-        string $dateFormat
+        string $dateFormat,
+        string $certificateType = 'student'
     ): array {
         $issueDate = Carbon::now();
+        $now = Carbon::now();
         
         $data = [
             'student_name' => $overrides['student_name'] ?? $student->name,
@@ -72,6 +75,31 @@ class CertificateService
             'issued_by' => $overrides['issued_by'] ?? $issuer->name,
             'certificate_number' => $overrides['certificate_number'] ?? $this->generateCertificateNumber($student),
         ];
+
+        // Add membership certificate specific fields
+        if ($certificateType === 'membership') {
+            // Join date: use created_at of user as default
+            $joinDate = isset($overrides['join_date']) 
+                ? Carbon::parse($overrides['join_date']) 
+                : ($student->created_at ? Carbon::parse($student->created_at) : $now);
+            
+            // Issue time: current time
+            $issueTime = isset($overrides['issue_time']) 
+                ? Carbon::parse($overrides['issue_time']) 
+                : $now;
+            
+            // Today's date: current date
+            $todayDate = isset($overrides['today_date']) 
+                ? Carbon::parse($overrides['today_date']) 
+                : $now;
+
+            $data['join_date'] = $this->formatDate($joinDate, $dateFormat);
+            $data['issue_time'] = $issueTime->format('H:i:s'); // Time format: HH:MM:SS
+            $data['today_date'] = $this->formatDate($todayDate, $dateFormat);
+            
+            // Override course_name for membership certificate
+            $data['course_name'] = $overrides['course_name'] ?? 'شهادة عضوية';
+        }
 
         return $data;
     }
@@ -238,14 +266,19 @@ class CertificateService
         User $student,
         User $issuer,
         string $filePath,
-        array $data = []
+        array $data = [],
+        string $certificateType = 'student'
     ): Certificate {
+        // Determine title based on certificate type
+        $defaultTitle = $certificateType === 'membership' ? 'شهادة عضوية' : 'شهادة إتمام';
+        $title = $data['course_name'] ?? $defaultTitle;
+        
         $certificate = Certificate::create([
             'user_id' => $student->id,
             'school_id' => $student->school_id,
-            'type' => 'student',
-            'title' => $data['course_name'] ?? 'شهادة إتمام',
-            'title_ar' => $data['course_name'] ?? 'شهادة إتمام',
+            'type' => $certificateType,
+            'title' => $title,
+            'title_ar' => $title,
             'description' => $data['description'] ?? null,
             'description_ar' => $data['description_ar'] ?? null,
             'certificate_number' => $data['certificate_number'] ?? $this->generateCertificateNumber($student),

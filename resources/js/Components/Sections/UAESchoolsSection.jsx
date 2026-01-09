@@ -2,8 +2,8 @@ import SectionTitle from '../SectionTitle';
 import { FaSchool, FaUsers, FaTrophy } from 'react-icons/fa';
 
 export default function UAESchoolsSection({
-    title = "مدارس مشاركة من الإمارات",
-    subtitle = "نفتخر بشراكتنا مع مدارس متميزة من دولة الإمارات العربية المتحدة",
+    title = "مؤسسات تعليمية مشاركة من الإمارات",
+    subtitle = "نفتخر بشراكتنا مع مؤسسات تعليمية متميزة من دولة الإمارات العربية المتحدة",
     schools = []
 }) {
     return (
@@ -25,7 +25,7 @@ export default function UAESchoolsSection({
                 {schools.length === 0 ? (
                     <div className="text-center py-12">
                         <FaSchool className="mx-auto text-6xl text-gray-300 mb-4" />
-                        <p className="text-gray-600">لا توجد مدارس متاحة حالياً</p>
+                        <p className="text-gray-600">لا توجد مؤسسات تعليمية متاحة حالياً</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

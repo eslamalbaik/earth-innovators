@@ -3,7 +3,7 @@ import { FaCheck } from 'react-icons/fa';
 
 export default function WhyChooseSection({
     title = "لماذا منصة إرث المبتكرين؟",
-    subtitle = "منصة تعليمية شاملة تهدف إلى بناء مجتمع من المبتكرين والموهوبين في المدارس. نوفر بيئة محفزة للإبداع والابتكار.",
+    subtitle = "منصة تعليمية شاملة تهدف إلى بناء مجتمع من المبتكرين والموهوبين في المؤسسات تعليمية. نوفر بيئة محفزة للإبداع والابتكار.",
     benefits = [],
     imageSrc = "/images/erth-img.jpg",
     imageAlt = "معلم متخصص"

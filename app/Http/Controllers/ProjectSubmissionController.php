@@ -22,7 +22,11 @@ class ProjectSubmissionController extends Controller
         $student = Auth::user();
 
         // Verify project is available for student
-        if ($project->school_id !== $student->school_id) {
+        // المشروع يجب أن يكون متاحاً للطالب: إما متاح لجميع المؤسسات تعليمية أو متاح لمدرسة الطالب
+        $isAvailableForAllSchools = $project->school_id === null;
+        $isAvailableForStudentSchool = $project->school_id === $student->school_id;
+        
+        if (!$isAvailableForAllSchools && !$isAvailableForStudentSchool) {
             return back()->withErrors(['error' => 'غير مصرح لك بتسليم هذا المشروع']);
         }
 

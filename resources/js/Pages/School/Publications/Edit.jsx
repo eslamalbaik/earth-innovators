@@ -258,7 +258,7 @@ export default function SchoolPublicationEdit({ auth, publication }) {
                                 value={data.publisher_name}
                                 onChange={(e) => setData('publisher_name', e.target.value)}
                                 className="mt-1 block w-full"
-                                placeholder="مثال: مجلس المدارس المبتكرة"
+                                placeholder="مثال: مجلس المؤسسات تعليمية المبتكرة"
                             />
                             <InputError message={errors.publisher_name} className="mt-2" />
                         </div>

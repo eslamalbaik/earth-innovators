@@ -1,6 +1,7 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router, useForm } from '@inertiajs/react';
-import { useState, useEffect } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 import { 
     FaSearch, 
     FaFilter, 
@@ -13,6 +14,7 @@ import {
 } from 'react-icons/fa';
 
 export default function AdminProjectsIndex({ projects, stats, filters, users, schools, teachers }) {
+    const { confirm } = useConfirmDialog();
     const [search, setSearch] = useState(filters?.search || '');
     const [status, setStatus] = useState(filters?.status || '');
     const [category, setCategory] = useState(filters?.category || '');
@@ -20,14 +22,17 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [projectToEdit, setProjectToEdit] = useState(null);
     const [isLoadingProject, setIsLoadingProject] = useState(false);
+    
+    // PERFORMANCE: Optimistic UI state for instant feedback
+    const [optimisticProjects, setOptimisticProjects] = useState(null);
+    const [deletingIds, setDeletingIds] = useState(new Set());
 
     const { data: editData, setData: setEditData, put: updateProject, processing: editProcessing, errors: editErrors, reset: resetEditForm } = useForm({
         title: '',
         description: '',
         category: '',
-        user_id: '',
         school_id: '',
-        teacher_id: '',
+        for_all_schools: false,
         status: 'pending',
         files: [],
         images: [],
@@ -36,39 +41,66 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
     const { data: createData, setData: setCreateData, post: createProject, processing: createProcessing, errors: createErrors, reset: resetCreateForm } = useForm({
         title: '',
         description: '',
-        category: '',
-        user_id: '',
+        category: 'other',
         school_id: '',
-        teacher_id: '',
+        for_all_schools: false,
         status: 'pending',
         files: [],
         images: [],
     });
 
-    const handleFilter = () => {
+    /**
+     * PERFORMANCE OPTIMIZED: Filter with partial reload
+     * Only refreshes projects and filters, preserving other component state
+     */
+    const handleFilter = useCallback(() => {
         router.get(route('admin.projects.index'), {
             search: search || undefined,
             status: status || undefined,
             category: category || undefined,
         }, {
             preserveState: true,
+            preserveScroll: true,
             replace: true,
+            only: ['projects', 'filters'], // PARTIAL RELOAD: Only refresh projects and filters
         });
-    };
+    }, [search, status, category]);
 
-    const handleEdit = async (project) => {
+    /**
+     * PERFORMANCE OPTIMIZED: Memoized edit handler
+     * Uses project data directly when available instead of fetching
+     */
+    const handleEdit = useCallback(async (project) => {
         setIsLoadingProject(true);
         setProjectToEdit(project);
         try {
+            // PERFORMANCE: Try to use existing data first, only fetch if needed
+            if (project.title && project.description) {
+                // Use existing project data
+                setEditData({
+                    title: project.title || '',
+                    description: project.description || '',
+                    category: project.category || '',
+                    school_id: project.school_id || '',
+                    for_all_schools: !project.school_id,
+                    status: project.status || 'pending',
+                    files: project.files || [],
+                    images: project.images || [],
+                });
+                setShowEditModal(true);
+                setIsLoadingProject(false);
+                return;
+            }
+            
+            // Only fetch if data is missing
             const response = await fetch(route('admin.projects.edit', project.id));
             const data = await response.json();
             setEditData({
                 title: data.project.title || '',
                 description: data.project.description || '',
                 category: data.project.category || '',
-                user_id: data.project.user_id || '',
                 school_id: data.project.school_id || '',
-                teacher_id: data.project.teacher_id || '',
+                for_all_schools: !data.project.school_id,
                 status: data.project.status || 'pending',
                 files: data.project.files || [],
                 images: data.project.images || [],
@@ -80,51 +112,109 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
         } finally {
             setIsLoadingProject(false);
         }
-    };
+    }, [setEditData]);
 
-    const handleEditSubmit = (e) => {
+    /**
+     * PERFORMANCE OPTIMIZED: Edit submit with partial reload
+     * Only refreshes projects and stats, preserving scroll and other state
+     */
+    const handleEditSubmit = useCallback((e) => {
         e.preventDefault();
+        if (!projectToEdit) return;
+        
         updateProject(route('admin.projects.update', projectToEdit.id), {
+            preserveState: true,
             preserveScroll: true,
+            only: ['projects', 'stats'], // PARTIAL RELOAD: Only refresh projects and stats
             onSuccess: () => {
                 setShowEditModal(false);
                 setProjectToEdit(null);
                 resetEditForm();
             },
         });
-    };
+    }, [projectToEdit, updateProject, resetEditForm]);
 
-    const handleCreateSubmit = (e) => {
+    /**
+     * PERFORMANCE OPTIMIZED: Create submit with partial reload
+     */
+    const handleCreateSubmit = useCallback((e) => {
         e.preventDefault();
         createProject(route('admin.projects.store'), {
+            preserveState: true,
             preserveScroll: true,
+            only: ['projects', 'stats'], // PARTIAL RELOAD
             onSuccess: () => {
                 setShowCreateModal(false);
                 resetCreateForm();
             },
         });
-    };
+    }, [createProject, resetCreateForm]);
 
-    const closeEditModal = () => {
+    /**
+     * PERFORMANCE: Memoized modal close handlers
+     */
+    const closeEditModal = useCallback(() => {
         setShowEditModal(false);
         setProjectToEdit(null);
         resetEditForm();
-    };
+    }, [resetEditForm]);
 
-    const closeCreateModal = () => {
+    const closeCreateModal = useCallback(() => {
         setShowCreateModal(false);
         resetCreateForm();
-    };
+    }, [resetCreateForm]);
 
-    const handleDelete = (project) => {
-        if (confirm(`هل أنت متأكد من حذف المشروع "${project.title}"؟\nهذا الإجراء لا يمكن التراجع عنه.`)) {
-            router.delete(route('admin.projects.destroy', project.id), {
-                preserveScroll: true,
-            });
+    /**
+     * PERFORMANCE OPTIMIZED: Optimistic delete with instant UI feedback
+     * Removes item from UI immediately, then syncs with server
+     */
+    const handleDelete = useCallback(async (project) => {
+        const confirmed = await confirm({
+            title: 'تأكيد الحذف',
+            message: `هل أنت متأكد من حذف المشروع "${project.title}"؟ هذا الإجراء لا يمكن التراجع عنه.`,
+            confirmText: 'حذف',
+            cancelText: 'إلغاء',
+            variant: 'danger',
+        });
+
+        if (!confirmed) {
+            return;
         }
-    };
 
-    const getStatusBadge = (status) => {
+        // INSTANT UI UPDATE: Remove from local state immediately
+        const projectsData = projects?.data || [];
+        setOptimisticProjects(projectsData.filter(p => p.id !== project.id));
+        setDeletingIds(prev => new Set([...prev, project.id]));
+
+        // Server sync: Use partial reload to only refresh projects and stats
+        router.delete(route('admin.projects.destroy', project.id), {
+            preserveState: true,
+            preserveScroll: true,
+            only: ['projects', 'stats'], // PARTIAL RELOAD: Only refresh these props
+            onSuccess: () => {
+                setDeletingIds(prev => {
+                    const next = new Set(prev);
+                    next.delete(project.id);
+                    return next;
+                });
+                setOptimisticProjects(null);
+            },
+            onError: () => {
+                // Revert optimistic update on error
+                setOptimisticProjects(null);
+                setDeletingIds(prev => {
+                    const next = new Set(prev);
+                    next.delete(project.id);
+                    return next;
+                });
+            },
+        });
+    }, [projects, confirm]);
+
+    /**
+     * PERFORMANCE: Memoize status badge helper to prevent recreation on each render
+     */
+    const getStatusBadge = useCallback((status) => {
         const statusMap = {
             'approved': { bg: 'bg-green-100', text: 'text-green-800', label: 'معتمد' },
             'pending': { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'قيد المراجعة' },
@@ -136,7 +226,18 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                 {statusConfig.label}
             </span>
         );
-    };
+    }, []);
+
+    /**
+     * PERFORMANCE: Use optimistic state if available, otherwise use server data
+     * This provides instant UI feedback while server processes the request
+     */
+    const projectsData = useMemo(() => {
+        if (optimisticProjects !== null) {
+            return optimisticProjects;
+        }
+        return projects?.data || [];
+    }, [optimisticProjects, projects]);
 
     return (
         <DashboardLayout header="إدارة المشاريع">
@@ -230,17 +331,22 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                         <thead className="bg-gray-50">
                             <tr>
                                 <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">المشروع</th>
-                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">الطالب</th>
-                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">المدرسة</th>
+                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">الناشر</th>
+                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">المؤسسة التعليمية</th>
                                 <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">الحالة</th>
                                 <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">تاريخ الإنشاء</th>
                                 <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">الإجراءات</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                            {projects.data && projects.data.length > 0 ? (
-                                projects.data.map((project) => (
-                                    <tr key={project.id} className="hover:bg-gray-50">
+                            {projectsData && projectsData.length > 0 ? (
+                                projectsData.map((project) => {
+                                    const isDeleting = deletingIds.has(project.id);
+                                    return (
+                                    <tr 
+                                        key={project.id} 
+                                        className={`hover:bg-gray-50 transition-colors ${isDeleting ? 'opacity-50 pointer-events-none' : ''}`}
+                                    >
                                         <td className="py-4 px-6">
                                             <div>
                                                 <Link
@@ -282,15 +388,21 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(project)}
-                                                    className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50 transition"
-                                                    title="حذف"
+                                                    disabled={isDeleting}
+                                                    className={`text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50 transition ${isDeleting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                    title={isDeleting ? 'جاري الحذف...' : 'حذف'}
                                                 >
-                                                    <FaTrash />
+                                                    {isDeleting ? (
+                                                        <span className="animate-spin text-xs">⏳</span>
+                                                    ) : (
+                                                        <FaTrash />
+                                                    )}
                                                 </button>
                                             </div>
                                         </td>
                                     </tr>
-                                ))
+                                    );
+                                })
                             ) : (
                                 <tr>
                                     <td colSpan="6" className="py-12 text-center text-gray-500">
@@ -331,7 +443,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
             {/* Edit Modal */}
             {showEditModal && projectToEdit && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-                    <div className="bg-white rounded-xl shadow-xl p-6 max-w-3xl w-full my-8 max-h-[90vh] overflow-y-auto">
+                    <div className="bg-white rounded-xl shadow-lg p-6 max-w-3xl w-full my-8 max-h-[90vh] overflow-y-auto">
                         <div className="flex items-center justify-between mb-6">
                             <h3 className="text-2xl font-bold text-gray-900">تعديل مشروع</h3>
                             <button
@@ -341,6 +453,8 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                 <FaTimes className="text-xl" />
                             </button>
                         </div>
+
+                        <h2 className="text-2xl font-bold text-gray-900 mb-6">معلومات المشروع</h2>
 
                         <form onSubmit={handleEditSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -387,14 +501,21 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         الفئة
                                     </label>
-                                    <input
-                                        type="text"
+                                    <select
                                         value={editData.category}
                                         onChange={(e) => setEditData('category', e.target.value)}
                                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                                             editErrors.category ? 'border-red-500' : 'border-gray-300'
                                         }`}
-                                    />
+                                    >
+                                        <option value="">اختر فئة</option>
+                                        <option value="science">علوم</option>
+                                        <option value="technology">تقنية</option>
+                                        <option value="engineering">هندسة</option>
+                                        <option value="mathematics">رياضيات</option>
+                                        <option value="arts">فنون</option>
+                                        <option value="other">أخرى</option>
+                                    </select>
                                     {editErrors.category && (
                                         <p className="mt-1 text-sm text-red-600">{editErrors.category}</p>
                                     )}
@@ -422,78 +543,61 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                     )}
                                 </div>
 
-                                {/* الطالب */}
-                                <div>
+                                {/* المؤسسة التعليمية */}
+                                <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        الطالب <span className="text-red-500">*</span>
+                                        المؤسسة التعليمية
                                     </label>
-                                    <select
-                                        value={editData.user_id}
-                                        onChange={(e) => setEditData('user_id', e.target.value)}
-                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            editErrors.user_id ? 'border-red-500' : 'border-gray-300'
-                                        }`}
-                                        required
-                                    >
-                                        <option value="">اختر طالب</option>
-                                        {users && users.map((user) => (
-                                            <option key={user.id} value={user.id}>
-                                                {user.name} ({user.email})
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {editErrors.user_id && (
-                                        <p className="mt-1 text-sm text-red-600">{editErrors.user_id}</p>
-                                    )}
-                                </div>
-
-                                {/* المدرسة */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        المدرسة
-                                    </label>
-                                    <select
-                                        value={editData.school_id}
-                                        onChange={(e) => setEditData('school_id', e.target.value)}
-                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            editErrors.school_id ? 'border-red-500' : 'border-gray-300'
-                                        }`}
-                                    >
-                                        <option value="">اختر مدرسة</option>
-                                        {schools && schools.map((school) => (
-                                            <option key={school.id} value={school.id}>
-                                                {school.name}
-                                            </option>
-                                        ))}
-                                    </select>
+                                    <div className="space-y-3">
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                checked={editData.for_all_schools}
+                                                onChange={(e) => {
+                                                    setEditData('for_all_schools', e.target.checked);
+                                                    if (e.target.checked) {
+                                                        setEditData('school_id', '');
+                                                    }
+                                                }}
+                                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                            />
+                                            <span className="text-sm text-gray-700">متاح لجميع المؤسسات التعليمية</span>
+                                        </label>
+                                        {!editData.for_all_schools && (
+                                            <select
+                                                value={editData.school_id}
+                                                onChange={(e) => setEditData('school_id', e.target.value)}
+                                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                                    editErrors.school_id ? 'border-red-500' : 'border-gray-300'
+                                                }`}
+                                            >
+                                                <option value="">اختر مؤسسة تعليمية</option>
+                                                {schools && schools.map((school) => (
+                                                    <option key={school.id} value={school.id}>
+                                                        {school.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        )}
+                                        {editData.for_all_schools && (
+                                            <p className="text-sm text-blue-600 bg-blue-50 p-3 rounded-lg">
+                                                سيصبح هذا المشروع متاحاً لجميع طلاب جميع المؤسسات التعليمية
+                                            </p>
+                                        )}
+                                        {!editData.for_all_schools && editData.school_id && (
+                                            <p className="text-sm text-green-600 bg-green-50 p-3 rounded-lg">
+                                                سيصبح هذا المشروع متاحاً لجميع طلاب المؤسسة التعليمية المختارة
+                                            </p>
+                                        )}
+                                    </div>
                                     {editErrors.school_id && (
                                         <p className="mt-1 text-sm text-red-600">{editErrors.school_id}</p>
                                     )}
-                                </div>
-
-                                {/* المعلم */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        المعلم
-                                    </label>
-                                    <select
-                                        value={editData.teacher_id}
-                                        onChange={(e) => setEditData('teacher_id', e.target.value)}
-                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            editErrors.teacher_id ? 'border-red-500' : 'border-gray-300'
-                                        }`}
-                                    >
-                                        <option value="">اختر معلم</option>
-                                        {teachers && teachers.map((teacher) => (
-                                            <option key={teacher.id} value={teacher.id}>
-                                                {teacher.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {editErrors.teacher_id && (
-                                        <p className="mt-1 text-sm text-red-600">{editErrors.teacher_id}</p>
+                                    {editErrors.for_all_schools && (
+                                        <p className="mt-1 text-sm text-red-600">{editErrors.for_all_schools}</p>
                                     )}
                                 </div>
+
                             </div>
 
                             {/* Actions */}
@@ -523,7 +627,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
             {/* Create Modal */}
             {showCreateModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-                    <div className="bg-white rounded-xl shadow-xl p-6 max-w-3xl w-full my-8 max-h-[90vh] overflow-y-auto">
+                    <div className="bg-white rounded-xl shadow-lg p-6 max-w-3xl w-full my-8 max-h-[90vh] overflow-y-auto">
                         <div className="flex items-center justify-between mb-6">
                             <h3 className="text-2xl font-bold text-gray-900">إضافة مشروع جديد</h3>
                             <button
@@ -533,6 +637,8 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                 <FaTimes className="text-xl" />
                             </button>
                         </div>
+
+                        <h2 className="text-2xl font-bold text-gray-900 mb-6">معلومات المشروع</h2>
 
                         <form onSubmit={handleCreateSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -579,14 +685,21 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         الفئة
                                     </label>
-                                    <input
-                                        type="text"
+                                    <select
                                         value={createData.category}
                                         onChange={(e) => setCreateData('category', e.target.value)}
                                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                                             createErrors.category ? 'border-red-500' : 'border-gray-300'
                                         }`}
-                                    />
+                                    >
+                                        <option value="">اختر فئة</option>
+                                        <option value="science">علوم</option>
+                                        <option value="technology">تقنية</option>
+                                        <option value="engineering">هندسة</option>
+                                        <option value="mathematics">رياضيات</option>
+                                        <option value="arts">فنون</option>
+                                        <option value="other">أخرى</option>
+                                    </select>
                                     {createErrors.category && (
                                         <p className="mt-1 text-sm text-red-600">{createErrors.category}</p>
                                     )}
@@ -614,78 +727,61 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                     )}
                                 </div>
 
-                                {/* الطالب */}
-                                <div>
+                                {/* المؤسسة التعليمية */}
+                                <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        الطالب <span className="text-red-500">*</span>
+                                        المؤسسة التعليمية
                                     </label>
-                                    <select
-                                        value={createData.user_id}
-                                        onChange={(e) => setCreateData('user_id', e.target.value)}
-                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            createErrors.user_id ? 'border-red-500' : 'border-gray-300'
-                                        }`}
-                                        required
-                                    >
-                                        <option value="">اختر طالب</option>
-                                        {users && users.map((user) => (
-                                            <option key={user.id} value={user.id}>
-                                                {user.name} ({user.email})
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {createErrors.user_id && (
-                                        <p className="mt-1 text-sm text-red-600">{createErrors.user_id}</p>
-                                    )}
-                                </div>
-
-                                {/* المدرسة */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        المدرسة
-                                    </label>
-                                    <select
-                                        value={createData.school_id}
-                                        onChange={(e) => setCreateData('school_id', e.target.value)}
-                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            createErrors.school_id ? 'border-red-500' : 'border-gray-300'
-                                        }`}
-                                    >
-                                        <option value="">اختر مدرسة</option>
-                                        {schools && schools.map((school) => (
-                                            <option key={school.id} value={school.id}>
-                                                {school.name}
-                                            </option>
-                                        ))}
-                                    </select>
+                                    <div className="space-y-3">
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                checked={createData.for_all_schools}
+                                                onChange={(e) => {
+                                                    setCreateData('for_all_schools', e.target.checked);
+                                                    if (e.target.checked) {
+                                                        setCreateData('school_id', '');
+                                                    }
+                                                }}
+                                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                            />
+                                            <span className="text-sm text-gray-700">متاح لجميع المؤسسات التعليمية</span>
+                                        </label>
+                                        {!createData.for_all_schools && (
+                                            <select
+                                                value={createData.school_id}
+                                                onChange={(e) => setCreateData('school_id', e.target.value)}
+                                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                                    createErrors.school_id ? 'border-red-500' : 'border-gray-300'
+                                                }`}
+                                            >
+                                                <option value="">اختر مؤسسة تعليمية</option>
+                                                {schools && schools.map((school) => (
+                                                    <option key={school.id} value={school.id}>
+                                                        {school.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        )}
+                                        {createData.for_all_schools && (
+                                            <p className="text-sm text-blue-600 bg-blue-50 p-3 rounded-lg">
+                                                سيصبح هذا المشروع متاحاً لجميع طلاب جميع المؤسسات التعليمية
+                                            </p>
+                                        )}
+                                        {!createData.for_all_schools && createData.school_id && (
+                                            <p className="text-sm text-green-600 bg-green-50 p-3 rounded-lg">
+                                                سيصبح هذا المشروع متاحاً لجميع طلاب المؤسسة التعليمية المختارة
+                                            </p>
+                                        )}
+                                    </div>
                                     {createErrors.school_id && (
                                         <p className="mt-1 text-sm text-red-600">{createErrors.school_id}</p>
                                     )}
-                                </div>
-
-                                {/* المعلم */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        المعلم
-                                    </label>
-                                    <select
-                                        value={createData.teacher_id}
-                                        onChange={(e) => setCreateData('teacher_id', e.target.value)}
-                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            createErrors.teacher_id ? 'border-red-500' : 'border-gray-300'
-                                        }`}
-                                    >
-                                        <option value="">اختر معلم</option>
-                                        {teachers && teachers.map((teacher) => (
-                                            <option key={teacher.id} value={teacher.id}>
-                                                {teacher.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {createErrors.teacher_id && (
-                                        <p className="mt-1 text-sm text-red-600">{createErrors.teacher_id}</p>
+                                    {createErrors.for_all_schools && (
+                                        <p className="mt-1 text-sm text-red-600">{createErrors.for_all_schools}</p>
                                     )}
                                 </div>
+
                             </div>
 
                             {/* Actions */}

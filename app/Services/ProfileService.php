@@ -5,7 +5,12 @@ namespace App\Services;
 use App\Models\User;
 use App\Models\Teacher;
 use App\Models\Subject;
+use App\Models\Project;
+use App\Models\Publication;
+use App\Models\ActivityLog;
+use App\Models\NotificationPreference;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 class ProfileService extends BaseService
@@ -21,6 +26,27 @@ class ProfileService extends BaseService
             $data['user_image'] = str_starts_with($user->image, 'http')
                 ? $user->image
                 : Storage::url($user->image);
+        }
+
+        // Add admin-specific fields
+        if ($user->isAdmin()) {
+            $data['institution'] = $user->institution ?? '';
+            $data['bio'] = $user->bio ?? '';
+            
+            // Get notification preferences
+            $notificationPreferences = NotificationPreference::where('user_id', $user->id)
+                ->get()
+                ->keyBy('notification_type')
+                ->map(function ($pref) {
+                    return $pref->enabled;
+                })
+                ->toArray();
+
+            $data['notification_preferences'] = [
+                'email_notifications' => $notificationPreferences['email_notifications'] ?? true,
+                'popup_notifications' => $notificationPreferences['popup_notifications'] ?? true,
+                'platform_updates' => $notificationPreferences['platform_updates'] ?? false,
+            ];
         }
 
         if ($user->isTeacher() && $user->teacher) {
@@ -72,6 +98,11 @@ class ProfileService extends BaseService
                     ];
                 });
             $data['badges'] = $badges;
+        }
+
+        // Add admin statistics
+        if ($user->isAdmin()) {
+            $data['admin_stats'] = $this->getAdminStats($user);
         }
 
         return $data;
@@ -276,6 +307,36 @@ class ProfileService extends BaseService
             'حائل',
             'نجران',
             'الجبيل'
+        ];
+    }
+
+    private function getAdminStats(User $user): array
+    {
+        // حساب ساعات النشاط (من ActivityLog)
+        $activityHours = 0;
+        if (DB::getSchemaBuilder()->hasTable('activity_logs')) {
+            $activities = ActivityLog::where('user_id', $user->id)
+                ->where('created_at', '>=', now()->subMonths(3))
+                ->get();
+            
+            // تقدير ساعات النشاط بناءً على عدد الأنشطة (نفترض أن كل نشاط = 0.5 ساعة)
+            $activityHours = round($activities->count() * 0.5);
+        }
+
+        // عدد المقالات المنشورة التي وافق عليها الأدمن
+        $publishedArticles = Publication::where('approved_by', $user->id)
+            ->where('status', 'approved')
+            ->count();
+
+        // عدد المشاريع التي تمت مراجعتها (التي وافق عليها الأدمن)
+        $reviewedProjects = Project::where('approved_by', $user->id)
+            ->where('status', 'approved')
+            ->count();
+
+        return [
+            'activity_hours' => $activityHours,
+            'published_articles' => $publishedArticles,
+            'reviewed_projects' => $reviewedProjects,
         ];
     }
 }

@@ -26,6 +26,11 @@ class SchoolChallengeController extends Controller
     {
         $user = Auth::user();
 
+        // التحقق من أن المستخدم لديه صلاحية المدرسة
+        if (!$user || !$user->isSchool()) {
+            abort(403, 'غير مصرح لك بالوصول إلى هذه الصفحة. يجب أن تكون مسجلًا كمدرسة.');
+        }
+
         $challenges = $this->challengeService->getSchoolChallenges(
             $user->id,
             $request->get('status'),
@@ -34,12 +39,35 @@ class SchoolChallengeController extends Controller
 
         $stats = $this->challengeService->getSchoolChallengeStats($user->id);
 
+        // Check if viewing submissions for a specific challenge
+        $challengeId = $request->get('challenge_id');
+        $selectedChallenge = null;
+        $submissions = null;
+
+        if ($challengeId) {
+            $selectedChallenge = \App\Models\Challenge::where('id', $challengeId)
+                ->where('school_id', $user->id)
+                ->first();
+
+            if ($selectedChallenge) {
+                $submissionService = app(\App\Services\ChallengeSubmissionService::class);
+                $submissions = $submissionService->getChallengeSubmissions(
+                    $challengeId,
+                    $request->get('submission_status'),
+                    15
+                )->withQueryString();
+            }
+        }
+
         return Inertia::render('School/Challenges/Index', [
             'challenges' => $challenges,
             'stats' => $stats,
             'filters' => [
                 'status' => $request->status,
+                'submission_status' => $request->get('submission_status'),
             ],
+            'selectedChallenge' => $selectedChallenge,
+            'submissions' => $submissions,
             'auth' => [
                 'user' => $user,
             ],

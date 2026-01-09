@@ -16,7 +16,9 @@ import {
     FaCalendar,
     FaEye,
     FaGraduationCap,
-    FaSchool
+    FaSchool,
+    FaPlus,
+    FaEdit
 } from 'react-icons/fa';
 import TextInput from '../../Components/TextInput';
 import InputLabel from '../../Components/InputLabel';
@@ -224,7 +226,8 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
 
                         {/* Project Info */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-6 border-t border-gray-200">
-                            {project.teacher && (
+                            {/* عرض المعلم فقط إذا لم يكن المشروع من الإدارة */}
+                            {project.teacher && project.user?.role !== 'admin' && (
                                 <div>
                                     <p className="text-sm text-gray-600 mb-1">المعلم</p>
                                     <p className="font-medium text-gray-900 flex items-center gap-2">
@@ -233,15 +236,24 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
                                     </p>
                                 </div>
                             )}
-                            {project.school && (
+                            {/* عرض المدرسة أو الإدارة */}
+                            {project.school ? (
                                 <div>
-                                    <p className="text-sm text-gray-600 mb-1">المدرسة</p>
+                                    <p className="text-sm text-gray-600 mb-1">تابع لمدرسة</p>
                                     <p className="font-medium text-gray-900 flex items-center gap-2">
                                         <FaSchool className="text-green-600" />
                                         {project.school.name}
                                     </p>
                                 </div>
-                            )}
+                            ) : project.user?.role === 'admin' ? (
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">المصدر</p>
+                                    <p className="font-medium text-gray-900 flex items-center gap-2">
+                                        <FaSchool className="text-purple-600" />
+                                        من إدارة مجتمع إرث المبتكرين
+                                    </p>
+                                </div>
+                            ) : null}
                             {project.approved_at && (
                                 <div>
                                     <p className="text-sm text-gray-600 mb-1">تاريخ الموافقة</p>
@@ -250,6 +262,28 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
                                         {toHijriDate(project.approved_at)}
                                     </p>
                                 </div>
+                            )}
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="mt-6 pt-6 border-t border-gray-200">
+                            {userRole === 'student' && canSubmit && (
+                                <button
+                                    onClick={() => setActiveTab('submit')}
+                                    className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium shadow-md"
+                                >
+                                    <FaPlus />
+                                    {existingSubmission ? 'تعديل التسليم' : 'إضافة تسليم'}
+                                </button>
+                            )}
+                            {userRole === 'teacher' && auth?.user && (
+                                <Link
+                                    href="/teacher/submissions"
+                                    className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium shadow-md"
+                                >
+                                    <FaEdit />
+                                    عرض التسليمات
+                                </Link>
                             )}
                         </div>
 

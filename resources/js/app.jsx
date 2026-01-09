@@ -7,6 +7,7 @@ import { createRoot } from 'react-dom/client';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './lib/react-query';
 import { ToastProvider } from './Contexts/ToastContext';
+import { ConfirmProvider } from './Contexts/ConfirmContext';
 
 const appName = import.meta.env.VITE_APP_NAME || 'إرث المبتكرين - Innovators Legacy';
 
@@ -23,7 +24,9 @@ createInertiaApp({
         root.render(
             <QueryClientProvider client={queryClient}>
                 <ToastProvider>
-                    <App {...props} />
+                    <ConfirmProvider>
+                        <App {...props} />
+                    </ConfirmProvider>
                 </ToastProvider>
             </QueryClientProvider>
         );

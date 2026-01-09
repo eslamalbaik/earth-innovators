@@ -20,6 +20,7 @@ class ProjectController extends Controller
     {
         $user = Auth::user();
         
+        // عرض جميع المشاريع المعتمدة (المتاحة لجميع المؤسسات تعليمية + المتاحة لمدرسة الطالب إذا كان طالب)
         $schoolId = null;
         if ($user && $user->isStudent() && $user->school_id) {
             $schoolId = $user->school_id;
@@ -51,9 +52,12 @@ class ProjectController extends Controller
             abort(404, 'المشروع غير موجود أو غير معتمد');
         }
 
-        // للطلاب: التحقق من أن المشروع متاح لمدرستهم
+        // للطلاب: التحقق من أن المشروع متاح لمدرستهم أو متاح لجميع المؤسسات تعليمية
         if ($user && $user->isStudent() && $user->school_id) {
-            if ($project->school_id !== $user->school_id) {
+            $isAvailableForAllSchools = $project->school_id === null;
+            $isAvailableForStudentSchool = $project->school_id === $user->school_id;
+            
+            if (!$isAvailableForAllSchools && !$isAvailableForStudentSchool) {
                 abort(403, 'غير مصرح لك بعرض هذا المشروع');
             }
         }
@@ -80,7 +84,7 @@ class ProjectController extends Controller
             'project' => $project,
             'existingSubmission' => $existingSubmission,
             'userRole' => $user ? $user->role : null,
-            'canSubmit' => $user && $user->isStudent() && $project->school_id === $user->school_id,
+            'canSubmit' => $user && $user->isStudent() && ($project->school_id === null || $project->school_id === $user->school_id),
         ]);
     }
 }

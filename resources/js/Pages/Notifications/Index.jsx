@@ -31,6 +31,8 @@ export default function Index({ auth, notifications, unread_count }) {
         switch (type) {
             case 'badge_awarded':
                 return <FaMedal className="text-2xl text-orange-500" />;
+            case 'project_evaluated':
+                return <FaCheckCircle className="text-2xl text-green-500" />;
             default:
                 return <FaBell className="text-2xl text-blue-500" />;
         }
@@ -40,6 +42,8 @@ export default function Index({ auth, notifications, unread_count }) {
         switch (type) {
             case 'badge_awarded':
                 return 'bg-orange-50 border-orange-200';
+            case 'project_evaluated':
+                return 'bg-green-50 border-green-200';
             default:
                 return 'bg-blue-50 border-blue-200';
         }

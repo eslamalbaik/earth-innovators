@@ -154,21 +154,39 @@ class DashboardService extends BaseService
                 ->where('user_id', $userId)
                 ->count();
 
-            // Get recent projects
-            $recentProjects = Project::where('user_id', $userId)
+            // Get recent projects - المشاريع التي أنشأها الطالب أو سلمها
+            $userProjectIds = Project::where('user_id', $userId)
+                ->pluck('id')
+                ->toArray();
+            
+            $submittedProjectIds = ProjectSubmission::where('student_id', $userId)
+                ->pluck('project_id')
+                ->toArray();
+            
+            // دمج قوائم المشاريع
+            $allProjectIds = array_unique(array_merge($userProjectIds, $submittedProjectIds));
+            
+            $recentProjects = Project::whereIn('id', $allProjectIds)
                 ->select('id', 'title', 'status', 'rating', 'likes', 'views', 'created_at')
                 ->latest()
                 ->limit(5)
                 ->get()
-                ->map(function ($project) {
+                ->map(function ($project) use ($userId) {
+                    // التحقق من أن هذا المشروع منشأ من قبل الطالب أم مسلم
+                    $isOwned = $project->user_id === $userId;
+                    $submission = ProjectSubmission::where('project_id', $project->id)
+                        ->where('student_id', $userId)
+                        ->first();
+                    
                     return [
                         'id' => $project->id,
                         'title' => $project->title,
-                        'status' => $project->status,
-                        'rating' => $project->rating,
+                        'status' => $submission ? $submission->status : $project->status,
+                        'rating' => $submission ? ($submission->rating ?? $project->rating) : $project->rating,
                         'likes' => $project->likes ?? 0,
                         'views' => $project->views ?? 0,
-                        'created_at' => $project->created_at->format('Y-m-d'),
+                        'created_at' => $submission ? $submission->submitted_at->format('Y-m-d') : $project->created_at->format('Y-m-d'),
+                        'is_submission' => !$isOwned && $submission !== null,
                     ];
                 });
 

@@ -143,7 +143,7 @@ export default function TeacherProfileHeader({ teacher, onBookClick }) {
                         <div className="flex justify-start items-center gap-4">
                             <div className="text-sm font-bold text-gray-900 flex items-center ">
                                 <span>{teacher?.price || '0'}</span>
-                                <img src="/images/sar-currency(black).svg" alt="currency" className="w-5 h-5" />
+                                <img src="/images/aed-currency(black).svg" alt="currency" className="w-5 h-5" />
                                 <span> / ساعة</span>
                             </div>
 

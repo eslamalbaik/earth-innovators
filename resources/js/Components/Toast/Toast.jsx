@@ -66,23 +66,24 @@ const Toast = ({ toast, onRemove }) => {
     return (
         <div
             className={`
-                relative flex items-start gap-3 p-4 rounded-lg shadow-lg border-l-4 min-w-[320px] max-w-md
+                relative flex items-start gap-2.5 p-3 rounded-lg shadow-md border-l-4 min-w-[280px] max-w-sm
                 ${getBgColor()}
                 ${isExiting ? 'animate-fadeOut' : 'animate-slideInLeft'}
-                transition-all duration-300
+                transition-all duration-200
+                backdrop-blur-sm
             `}
             role="alert"
         >
-            <div className={`flex-shrink-0 text-xl ${getTextColor()}`}>
+            <div className={`flex-shrink-0 text-lg ${getTextColor()}`}>
                 {getIcon()}
             </div>
             <div className="flex-1 min-w-0">
                 {toast.title && (
-                    <h4 className={`font-semibold mb-1 ${getTextColor()}`}>
+                    <h4 className={`font-medium mb-0.5 text-xs ${getTextColor()}`}>
                         {toast.title}
                     </h4>
                 )}
-                <p className={`text-sm ${getTextColor()} opacity-90`}>
+                <p className={`text-xs ${getTextColor()} opacity-95 leading-relaxed`}>
                     {toast.message}
                 </p>
             </div>

@@ -43,17 +43,25 @@ class UserManagementController extends Controller
                     'school_id' => $user->school_id,
                     'school_name' => $user->school->name ?? '—',
                     'points' => $user->points ?? 0,
+                    'account_type' => $user->account_type ?? 'regular',
+                    'membership_type' => $user->membership_type,
                     'created_at' => $user->created_at->format('Y-m-d H:i'),
                 ];
             });
             
-        $stats = [
-            'total' => User::count(),
-            'admins' => User::where('role', 'admin')->count(),
-            'teachers' => User::where('role', 'teacher')->count(),
-            'students' => User::where('role', 'student')->count(),
-            'schools' => User::where('role', 'school')->count(),
-        ];
+        // PERFORMANCE: Cache stats for 5 minutes
+        $stats = \Illuminate\Support\Facades\Cache::remember('admin_users_stats', 300, function () {
+            return [
+                'total' => User::count(),
+                'admins' => User::where('role', 'admin')->count(),
+                'teachers' => User::where('role', 'teacher')->count(),
+                'students' => User::where('role', 'student')->count(),
+                'schools' => User::where('role', 'school')->count(),
+                'system_supervisors' => User::where('role', 'system_supervisor')->count(),
+                'school_support_coordinators' => User::where('role', 'school_support_coordinator')->count(),
+                'project_accounts' => User::where('account_type', 'project')->count(),
+            ];
+        });
 
         // Get schools for edit modal
         $schools = User::where('role', 'school')
@@ -94,9 +102,11 @@ class UserManagementController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'phone' => 'nullable|string|max:20',
             'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|in:admin,teacher,student,school',
+            'role' => 'required|in:admin,teacher,student,school,system_supervisor,school_support_coordinator',
             'school_id' => 'nullable|exists:users,id',
             'points' => 'nullable|integer|min:0',
+            'account_type' => 'nullable|in:regular,project',
+            'membership_type' => 'nullable|in:basic,subscription',
         ]);
 
         $user = User::create([
@@ -107,6 +117,8 @@ class UserManagementController extends Controller
             'role' => $validated['role'],
             'school_id' => $validated['school_id'] ?? null,
             'points' => $validated['points'] ?? 0,
+            'account_type' => $validated['account_type'] ?? 'regular',
+            'membership_type' => $validated['membership_type'] ?? null,
             'email_verified_at' => now(),
         ]);
 
@@ -139,6 +151,8 @@ class UserManagementController extends Controller
                 'school_id' => $user->school_id,
                 'points' => $user->points ?? 0,
                 'image' => $user->image,
+                'account_type' => $user->account_type ?? 'regular',
+                'membership_type' => $user->membership_type,
                 'created_at' => $user->created_at->format('Y-m-d H:i'),
                 'email_verified_at' => $user->email_verified_at?->format('Y-m-d H:i'),
             ],
@@ -268,6 +282,8 @@ class UserManagementController extends Controller
                 'school_id' => $user->school_id,
                 'points' => $user->points ?? 0,
                 'image' => $user->image,
+                'account_type' => $user->account_type ?? 'regular',
+                'membership_type' => $user->membership_type,
             ],
             'schools' => $schools,
         ]);
@@ -275,6 +291,7 @@ class UserManagementController extends Controller
 
     /**
      * تحديث مستخدم
+     * PERFORMANCE OPTIMIZED: Support partial reloads
      */
     public function update(Request $request, User $user)
     {
@@ -283,9 +300,11 @@ class UserManagementController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'phone' => 'nullable|string|max:20',
             'password' => 'nullable|string|min:8|confirmed',
-            'role' => 'required|in:admin,teacher,student,school',
+            'role' => 'required|in:admin,teacher,student,school,system_supervisor,school_support_coordinator',
             'school_id' => 'nullable|exists:users,id',
             'points' => 'nullable|integer|min:0',
+            'account_type' => 'nullable|in:regular,project',
+            'membership_type' => 'nullable|in:basic,subscription',
         ]);
 
         $updateData = [
@@ -295,6 +314,8 @@ class UserManagementController extends Controller
             'role' => $validated['role'],
             'school_id' => $validated['school_id'] ?? null,
             'points' => $validated['points'] ?? 0,
+            'account_type' => $validated['account_type'] ?? $user->account_type ?? 'regular',
+            'membership_type' => $validated['membership_type'] ?? $user->membership_type,
         ];
 
         if (!empty($validated['password'])) {
@@ -302,6 +323,14 @@ class UserManagementController extends Controller
         }
 
         $user->update($updateData);
+        
+        // Clear cached stats since user was updated
+        \Illuminate\Support\Facades\Cache::forget('admin_users_stats');
+
+        // If Inertia request (partial reload), return JSON response
+        if ($request->wantsJson() || $request->header('X-Inertia')) {
+            return back()->with('success', 'تم تحديث المستخدم بنجاح');
+        }
 
         return redirect()
             ->route('admin.users.index')
@@ -310,6 +339,7 @@ class UserManagementController extends Controller
 
     /**
      * حذف مستخدم
+     * PERFORMANCE OPTIMIZED: Support partial reloads
      */
     public function destroy(User $user)
     {
@@ -319,6 +349,11 @@ class UserManagementController extends Controller
         }
 
         $user->delete();
+
+        // If Inertia request (partial reload), return JSON response
+        if (request()->wantsJson() || request()->header('X-Inertia')) {
+            return back()->with('success', 'تم حذف المستخدم بنجاح');
+        }
 
         return redirect()
             ->route('admin.users.index')
@@ -331,11 +366,109 @@ class UserManagementController extends Controller
     public function updateRole(Request $request, User $user)
     {
         $request->validate([
-            'role' => 'required|in:admin,teacher,student,school'
+            'role' => 'required|in:admin,teacher,student,school,system_supervisor,school_support_coordinator'
         ]);
         
         $user->update(['role' => $request->role]);
         
         return back()->with('success', 'تم تحديث صلاحية المستخدم');
+    }
+
+    /**
+     * حذف متعدد للمستخدمين
+     */
+    public function bulkDelete(Request $request)
+    {
+        $validated = $request->validate([
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'required|integer|exists:users,id',
+        ]);
+
+        $currentUserId = auth()->id();
+        $userIds = array_filter($validated['user_ids'], function ($id) use ($currentUserId) {
+            return $id != $currentUserId; // منع حذف المستخدم الحالي
+        });
+
+        if (empty($userIds)) {
+            return back()->with('error', 'لا يمكنك حذف حسابك الخاص');
+        }
+
+        $deletedCount = User::whereIn('id', $userIds)->delete();
+
+        return redirect()
+            ->route('admin.users.index')
+            ->with('success', "تم حذف {$deletedCount} مستخدم بنجاح");
+    }
+
+    /**
+     * تصدير بيانات المستخدمين إلى Excel
+     */
+    public function export(Request $request)
+    {
+        $users = User::select('id', 'name', 'email', 'phone', 'role', 'school_id', 'points', 'account_type', 'membership_type', 'created_at')
+            ->with('school:id,name')
+            ->when($request->filled('search'), function ($q) use ($request) {
+                $s = $request->search;
+                $q->where(function ($query) use ($s) {
+                    $query->where('id', 'like', "%{$s}%")
+                        ->orWhere('name', 'like', "%{$s}%")
+                        ->orWhere('email', 'like', "%{$s}%")
+                        ->orWhere('phone', 'like', "%{$s}%");
+                });
+            })
+            ->when($request->filled('role') && $request->role !== 'all', function ($q) use ($request) {
+                $q->where('role', $request->role);
+            })
+            ->orderBy('id', 'desc')
+            ->get()
+            ->map(function ($user) {
+                $roleMap = [
+                    'admin' => 'أدمن',
+                    'teacher' => 'معلم',
+                    'student' => 'طالب',
+                    'school' => 'مدرسة',
+                    'system_supervisor' => 'مشرف النظام',
+                    'school_support_coordinator' => 'منسق دعم المؤسسات تعليمية',
+                ];
+                
+                return [
+                    'ID' => $user->id,
+                    'الاسم' => $user->name,
+                    'البريد الإلكتروني' => $user->email,
+                    'الهاتف' => $user->phone ?? '—',
+                    'الدور' => $roleMap[$user->role] ?? $user->role,
+                    'المدرسة' => $user->school->name ?? '—',
+                    'النقاط' => $user->points ?? 0,
+                    'تاريخ التسجيل' => $user->created_at->format('Y-m-d H:i'),
+                ];
+            });
+
+        // Create CSV content
+        $filename = 'users_export_' . date('Y-m-d_His') . '.csv';
+        
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        // Add BOM for UTF-8 to ensure Excel displays Arabic correctly
+        $output = "\xEF\xBB\xBF";
+        
+        // Add headers
+        if ($users->isNotEmpty()) {
+            $output .= implode(',', array_keys($users->first())) . "\n";
+        }
+
+        // Add data rows
+        foreach ($users as $user) {
+            $row = array_map(function ($value) {
+                // Escape commas and quotes in CSV
+                $value = str_replace('"', '""', $value);
+                return '"' . $value . '"';
+            }, array_values($user));
+            $output .= implode(',', $row) . "\n";
+        }
+
+        return response($output, 200, $headers);
     }
 }

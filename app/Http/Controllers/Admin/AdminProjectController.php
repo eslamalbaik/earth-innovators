@@ -51,8 +51,8 @@ class AdminProjectController extends Controller
                     'category' => $project->category,
                     'views' => $project->views ?? 0,
                     'likes' => $project->likes ?? 0,
-                    'created_at' => $project->created_at->format('Y-m-d H:i'),
-                    'approved_at' => $project->approved_at?->format('Y-m-d H:i'),
+                    'created_at' => $project->created_at->format('Y-m-d'),
+                    'approved_at' => $project->approved_at?->format('Y-m-d'),
                 ];
             });
 
@@ -134,28 +134,47 @@ class AdminProjectController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'category' => 'nullable|string|max:255',
-            'user_id' => 'required|exists:users,id',
+            'category' => 'nullable|in:science,technology,engineering,mathematics,arts,other',
             'school_id' => 'nullable|exists:users,id',
-            'teacher_id' => 'nullable|exists:teachers,id',
+            'for_all_schools' => 'nullable|boolean',
             'status' => 'required|in:pending,approved,rejected',
             'files' => 'nullable|array',
             'images' => 'nullable|array',
+        ], [
+            'title.required' => 'عنوان المشروع مطلوب',
+            'description.required' => 'وصف المشروع مطلوب',
+            'category.in' => 'الفئة يجب أن تكون واحدة من: science, technology, engineering, mathematics, arts, other',
+            'school_id.exists' => 'المدرسة المحددة غير موجودة',
         ]);
 
+        // إذا كان المشروع لجميع المؤسسات تعليمية، نتأكد من أن school_id فارغ
+        $schoolId = null;
+        if ($validated['for_all_schools'] ?? false) {
+            $schoolId = null;
+        } else {
+            $schoolId = $validated['school_id'] ?? null;
+        }
+
+        // المشروع لا يحتاج user_id لأنه متاح لجميع الطلاب في المدرسة/المؤسسات تعليمية المحددة
+        // سنستخدم user_id كـ null أو يمكن استخدام admin id كـ user_id
         $project = Project::create([
             'title' => $validated['title'],
             'description' => $validated['description'],
-            'category' => $validated['category'] ?? null,
-            'user_id' => $validated['user_id'],
-            'school_id' => $validated['school_id'] ?? null,
-            'teacher_id' => $validated['teacher_id'] ?? null,
+            'category' => $validated['category'] ?? 'other',
+            'user_id' => auth()->id(), // استخدام admin id كـ user_id لأن المشروع منشأ من قبل الأدمن
+            'school_id' => $schoolId,
+            'teacher_id' => null, // المشاريع من الإدارة لا تحتوي على معلم
             'status' => $validated['status'],
             'files' => $validated['files'] ?? [],
             'images' => $validated['images'] ?? [],
             'approved_by' => $validated['status'] === 'approved' ? auth()->id() : null,
             'approved_at' => $validated['status'] === 'approved' ? now() : null,
         ]);
+
+        // إرسال إشعارات عند إنشاء المشروع إذا كان معتمداً
+        if ($validated['status'] === 'approved') {
+            \App\Jobs\SendNewProjectNotification::dispatch($project);
+        }
 
         return redirect()
             ->route('admin.projects.index')
@@ -242,34 +261,51 @@ class AdminProjectController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'category' => 'nullable|string|max:255',
-            'user_id' => 'required|exists:users,id',
+            'category' => 'nullable|in:science,technology,engineering,mathematics,arts,other',
             'school_id' => 'nullable|exists:users,id',
-            'teacher_id' => 'nullable|exists:teachers,id',
+            'for_all_schools' => 'nullable|boolean',
             'status' => 'required|in:pending,approved,rejected',
             'files' => 'nullable|array',
             'images' => 'nullable|array',
+        ], [
+            'title.required' => 'عنوان المشروع مطلوب',
+            'description.required' => 'وصف المشروع مطلوب',
+            'category.in' => 'الفئة يجب أن تكون واحدة من: science, technology, engineering, mathematics, arts, other',
+            'school_id.exists' => 'المدرسة المحددة غير موجودة',
         ]);
+
+        // إذا كان المشروع لجميع المؤسسات تعليمية، نتأكد من أن school_id فارغ
+        $schoolId = null;
+        if ($validated['for_all_schools'] ?? false) {
+            $schoolId = null;
+        } else {
+            $schoolId = $validated['school_id'] ?? null;
+        }
 
         $updateData = [
             'title' => $validated['title'],
             'description' => $validated['description'],
             'category' => $validated['category'] ?? null,
-            'user_id' => $validated['user_id'],
-            'school_id' => $validated['school_id'] ?? null,
-            'teacher_id' => $validated['teacher_id'] ?? null,
+            'school_id' => $schoolId,
+            'teacher_id' => null, // المشاريع من الإدارة لا تحتوي على معلم
             'status' => $validated['status'],
             'files' => $validated['files'] ?? [],
             'images' => $validated['images'] ?? [],
         ];
 
         // Update approval info if status changed to approved
-        if ($validated['status'] === 'approved' && $project->status !== 'approved') {
+        $wasApproved = $project->status === 'approved';
+        if ($validated['status'] === 'approved' && !$wasApproved) {
             $updateData['approved_by'] = auth()->id();
             $updateData['approved_at'] = now();
         }
 
         $project->update($updateData);
+
+        // إرسال إشعارات عند الموافقة على المشروع لأول مرة
+        if ($validated['status'] === 'approved' && !$wasApproved) {
+            \App\Jobs\SendNewProjectNotification::dispatch($project);
+        }
 
         return redirect()
             ->route('admin.projects.index')
@@ -281,7 +317,7 @@ class AdminProjectController extends Controller
      */
     public function show(Project $project)
     {
-        $project->load(['user', 'school', 'teacher', 'approver']);
+        $project->load(['user', 'school', 'teacher', 'approver', 'submissions.student', 'submissions.reviewer']);
 
         // Format files and images URLs
         $files = [];
@@ -305,6 +341,40 @@ class AdminProjectController extends Controller
             }, $project->images);
         }
 
+        // Format submissions
+        $submissions = $project->submissions->map(function ($submission) {
+            $submissionFiles = [];
+            if ($submission->files && is_array($submission->files)) {
+                $submissionFiles = array_map(function ($file) {
+                    if (str_starts_with($file, 'http')) {
+                        return $file;
+                    }
+                    return asset('storage/' . ltrim($file, '/'));
+                }, $submission->files);
+            }
+            
+            return [
+                'id' => $submission->id,
+                'student' => [
+                    'id' => $submission->student->id ?? null,
+                    'name' => $submission->student->name ?? 'غير معروف',
+                    'email' => $submission->student->email ?? '—',
+                ],
+                'comment' => $submission->comment,
+                'files' => $submissionFiles,
+                'status' => $submission->status,
+                'rating' => $submission->rating,
+                'feedback' => $submission->feedback,
+                'reviewer' => $submission->reviewer ? [
+                    'id' => $submission->reviewer->id,
+                    'name' => $submission->reviewer->name,
+                ] : null,
+                'submitted_at' => $submission->submitted_at ? $submission->submitted_at->format('Y-m-d H:i') : null,
+                'reviewed_at' => $submission->reviewed_at ? $submission->reviewed_at->format('Y-m-d H:i') : null,
+                'badges' => $submission->badges ?? [],
+            ];
+        });
+
         return Inertia::render('Admin/Projects/Show', [
             'project' => [
                 'id' => $project->id,
@@ -322,7 +392,13 @@ class AdminProjectController extends Controller
                     'id' => $project->user->id ?? null,
                     'name' => $project->user->name ?? 'غير معروف',
                     'email' => $project->user->email ?? '—',
+                    'role' => $project->user->role ?? null,
                 ],
+                'user' => $project->user ? [
+                    'id' => $project->user->id ?? null,
+                    'name' => $project->user->name ?? 'غير معروف',
+                    'role' => $project->user->role ?? null,
+                ] : null,
                 'school' => $project->school ? [
                     'id' => $project->school->id ?? null,
                     'name' => $project->school->name ?? 'غير محدد',
@@ -335,8 +411,9 @@ class AdminProjectController extends Controller
                     'id' => $project->approver->id ?? null,
                     'name' => $project->approver->name ?? '—',
                 ] : null,
-                'created_at' => $project->created_at->format('Y-m-d H:i'),
-                'approved_at' => $project->approved_at?->format('Y-m-d H:i'),
+                'created_at' => $project->created_at->format('Y-m-d'),
+                'approved_at' => $project->approved_at?->format('Y-m-d'),
+                'submissions' => $submissions,
             ],
         ]);
     }
@@ -346,11 +423,18 @@ class AdminProjectController extends Controller
      */
     public function approve(Request $request, Project $project)
     {
+        $wasApproved = $project->status === 'approved';
+        
         $project->update([
             'status' => 'approved',
             'approved_by' => auth()->id(),
             'approved_at' => now(),
         ]);
+
+        // إرسال إشعارات عند الموافقة على المشروع لأول مرة
+        if (!$wasApproved) {
+            \App\Jobs\SendNewProjectNotification::dispatch($project);
+        }
 
         return back()->with('success', 'تم الموافقة على المشروع بنجاح');
     }

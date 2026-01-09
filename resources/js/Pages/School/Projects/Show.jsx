@@ -2,8 +2,10 @@ import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { FaArrowLeft, FaEdit, FaTrash, FaFile, FaImage, FaDownload, FaUser, FaCalendar, FaTag } from 'react-icons/fa';
 import { toHijriDate } from '@/utils/dateUtils';
+import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 
 export default function ShowSchoolProject({ project, auth }) {
+    const { confirm } = useConfirmDialog();
     const categoryColors = {
         science: 'bg-blue-100 text-blue-700',
         technology: 'bg-purple-100 text-purple-700',
@@ -28,8 +30,16 @@ export default function ShowSchoolProject({ project, auth }) {
         rejected: { label: 'مرفوض', color: 'bg-red-100 text-red-700' },
     };
 
-    const handleDelete = () => {
-        if (confirm('هل أنت متأكد من حذف هذا المشروع؟')) {
+    const handleDelete = async () => {
+        const confirmed = await confirm({
+            title: 'تأكيد الحذف',
+            message: `هل أنت متأكد من حذف المشروع "${project.title}"؟ هذا الإجراء لا يمكن التراجع عنه.`,
+            confirmText: 'حذف',
+            cancelText: 'إلغاء',
+            variant: 'danger',
+        });
+
+        if (confirmed) {
             // استخدام router.post مع _method: DELETE للتوافق مع Laravel
             router.post(`/school/projects/${project.id}`, {
                 _method: 'DELETE',

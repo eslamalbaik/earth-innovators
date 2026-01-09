@@ -6,6 +6,8 @@ use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\EnsureUserIsTeacher;
+use App\Http\Middleware\EnsureUserIsSystemSupervisor;
+use App\Http\Middleware\EnsureUserIsSchoolSupportCoordinator;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -28,6 +30,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => EnsureUserIsAdmin::class,
             'teacher' => EnsureUserIsTeacher::class,
             'school' => \App\Http\Middleware\EnsureUserIsSchool::class,
+            'system_supervisor' => EnsureUserIsSystemSupervisor::class,
+            'school_support_coordinator' => EnsureUserIsSchoolSupportCoordinator::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

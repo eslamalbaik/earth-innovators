@@ -48,6 +48,7 @@ class SchoolCertificateController extends Controller
                     'email' => $student->email,
                     'membership_number' => $student->membership_number,
                     'certificates_count' => $student->certificates_count,
+                    'created_at' => $student->created_at ? $student->created_at->toISOString() : null,
                 ];
             });
 

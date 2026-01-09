@@ -5,8 +5,10 @@ import TextInput from '@/Components/TextInput';
 import SelectInput from '@/Components/SelectInput';
 import PrimaryButton from '@/Components/PrimaryButton';
 import { toHijriDate } from '@/utils/dateUtils';
+import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 
 export default function PendingProjects({ projects, auth }) {
+    const { confirm } = useConfirmDialog();
     const { data, setData, get } = useForm({
         search: '',
         category: '',
@@ -38,16 +40,32 @@ export default function PendingProjects({ projects, auth }) {
         });
     };
 
-    const handleApprove = (projectId) => {
-        if (confirm('هل أنت متأكد من قبول هذا المشروع؟')) {
+    const handleApprove = async (projectId, projectTitle) => {
+        const confirmed = await confirm({
+            title: 'تأكيد القبول',
+            message: `هل أنت متأكد من قبول المشروع "${projectTitle}"؟`,
+            confirmText: 'قبول',
+            cancelText: 'إلغاء',
+            variant: 'info',
+        });
+
+        if (confirmed) {
             router.post(`/school/projects/${projectId}/approve`, {}, {
                 preserveScroll: true,
             });
         }
     };
 
-    const handleReject = (projectId) => {
-        if (confirm('هل أنت متأكد من رفض هذا المشروع؟')) {
+    const handleReject = async (projectId, projectTitle) => {
+        const confirmed = await confirm({
+            title: 'تأكيد الرفض',
+            message: `هل أنت متأكد من رفض المشروع "${projectTitle}"؟`,
+            confirmText: 'رفض',
+            cancelText: 'إلغاء',
+            variant: 'warning',
+        });
+
+        if (confirmed) {
             router.post(`/school/projects/${projectId}/reject`, {}, {
                 preserveScroll: true,
             });
@@ -141,14 +159,14 @@ export default function PendingProjects({ projects, auth }) {
                                                 عرض
                                             </Link>
                                             <button
-                                                onClick={() => handleApprove(project.id)}
+                                                onClick={() => handleApprove(project.id, project.title)}
                                                 className="bg-legacy-green hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center gap-2 shadow-md"
                                             >
                                                 <FaCheckCircle />
                                                 قبول
                                             </button>
                                             <button
-                                                onClick={() => handleReject(project.id)}
+                                                onClick={() => handleReject(project.id, project.title)}
                                                 className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center gap-2 shadow-md"
                                             >
                                                 <FaTimesCircle />

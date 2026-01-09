@@ -168,7 +168,15 @@ class SubmissionService extends BaseService
         $cacheTag = "school_submissions_{$schoolId}";
 
         return $this->cacheTags($cacheTag, $cacheKey, function () use ($schoolId, $status, $studentId, $search, $perPage) {
-            $schoolProjects = Project::where('school_id', $schoolId)
+            // المشاريع المعتمدة للمدرسة (بما في ذلك مشاريع الإدارة المرتبطة بهذه المدرسة)
+            $schoolProjects = Project::where(function($query) use ($schoolId) {
+                    $query->where('school_id', $schoolId)
+                          ->orWhere(function($q) use ($schoolId) {
+                              $q->whereHas('user', function($userQuery) {
+                                  $userQuery->where('role', 'admin');
+                              })->where('school_id', $schoolId);
+                          });
+                })
                 ->where('status', 'approved')
                 ->pluck('id');
 
@@ -242,15 +250,18 @@ class SubmissionService extends BaseService
         }, 300); // Cache for 5 minutes
     }
 
-    public function evaluateSubmission(ProjectSubmission $submission, array $data, int $reviewerId, ?int $schoolId = null, ?int $teacherId = null): ProjectSubmission
+    public function evaluateSubmission(ProjectSubmission $submission, array $data, int $reviewerId, ?int $schoolId = null, ?int $teacherId = null, ?bool $isAdmin = false): ProjectSubmission
     {
-        // Verify ownership
-        if ($schoolId && $submission->project->school_id !== $schoolId) {
-            throw new \Exception('غير مصرح لك بتقييم هذا التسليم');
-        }
+        // Admin can evaluate any submission
+        if (!$isAdmin) {
+            // Verify ownership for non-admin users
+            if ($schoolId && $submission->project->school_id !== $schoolId) {
+                throw new \Exception('غير مصرح لك بتقييم هذا التسليم');
+            }
 
-        if ($teacherId && $submission->project->teacher_id !== $teacherId) {
-            throw new \Exception('غير مصرح لك بتقييم هذا التسليم');
+            if ($teacherId && $submission->project->teacher_id !== $teacherId) {
+                throw new \Exception('غير مصرح لك بتقييم هذا التسليم');
+            }
         }
 
         $submission->update([

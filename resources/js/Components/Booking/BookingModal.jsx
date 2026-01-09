@@ -551,7 +551,7 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
                                 {bookingSubmitting ? 'جاري التوجيه إلى بوابة الدفع...' :
                                     <div className="text-sm font-bold text-gray-900 flex items-center gap-1">
                                         <span>أكمل الدفع بـ {totalPrice}</span>
-                                        <img src="/images/sar-currency(black).svg" alt="currency" className="w-5 h-5" />
+                                        <img src="/images/aed-currency(black).svg" alt="currency" className="w-5 h-5" />
                                     </div>
                                 }
                             </button>
@@ -916,13 +916,13 @@ function SummaryView({ teacher, selectedSubject, selectedSessions, totalPrice, r
                         <div className="flex justify-between items-center mb-2">
                             <div className="text-sm font-bold text-gray-900 flex items-center ">
                                 <p className="text-3xl font-bold text-gray-900 mt-2">{selectedSessions.length} حصص × {teacher.price}</p>
-                                <img src="/images/sar-currency(black).svg" alt="currency" className="w-5 h-5" />
+                                <img src="/images/aed-currency(black).svg" alt="currency" className="w-5 h-5" />
                             </div>
                         </div>
                         <div className="flex justify-between items-center">
                             <div className="text-sm font-bold text-gray-900 flex items-center ">
                                 <span>الإجمالي = {totalPrice} </span>
-                                <img src="/images/sar-currency(black).svg" alt="currency" className="w-5 h-5" />
+                                <img src="/images/aed-currency(black).svg" alt="currency" className="w-5 h-5" />
                             </div>
                         </div>
                     </div>

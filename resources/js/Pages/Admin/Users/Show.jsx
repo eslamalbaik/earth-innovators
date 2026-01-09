@@ -19,10 +19,21 @@ import {
     FaHeart,
     FaFlag
 } from 'react-icons/fa';
+import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 
 export default function UsersShow({ user, contributions, auth }) {
-    const handleDelete = () => {
-        if (confirm(`هل أنت متأكد من حذف المستخدم ${user.name}؟\nهذا الإجراء لا يمكن التراجع عنه.`)) {
+    const { confirm } = useConfirmDialog();
+
+    const handleDelete = async () => {
+        const confirmed = await confirm({
+            title: 'تأكيد الحذف',
+            message: `هل أنت متأكد من حذف المستخدم "${user.name}"؟ هذا الإجراء لا يمكن التراجع عنه.`,
+            confirmText: 'حذف',
+            cancelText: 'إلغاء',
+            variant: 'danger',
+        });
+
+        if (confirmed) {
             router.delete(route('admin.users.destroy', user.id));
         }
     };

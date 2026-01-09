@@ -166,7 +166,7 @@ class BookingService extends BaseService
                 $createData['payment_status'] = 'pending';
             }
             if (Schema::hasColumn('bookings', 'currency')) {
-                $createData['currency'] = config('app.currency', 'SAR');
+                $createData['currency'] = config('app.currency', 'AED');
             }
             if (Schema::hasColumn('bookings', 'payment_method') && isset($data['payment_method'])) {
                 $createData['payment_method'] = $data['payment_method'];

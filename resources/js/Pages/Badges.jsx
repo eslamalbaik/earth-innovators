@@ -56,12 +56,12 @@ export default function Badges({
             </div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                {/* ترتيب المدارس */}
+                {/* ترتيب المؤسسات تعليمية */}
                 <div className="mb-12 bg-white rounded-xl shadow-lg overflow-hidden">
                     <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-legacy-green/10 to-legacy-blue/10">
                         <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
                             <FaTrophy className="text-legacy-green" />
-                            ترتيب المدارس
+                            ترتيب المؤسسات تعليمية
                         </h2>
                     </div>
                     <div className="p-6">
@@ -159,7 +159,7 @@ export default function Badges({
                         ) : (
                             <div className="text-center py-12">
                                 <FaTrophy className="text-6xl text-gray-300 mx-auto mb-4" />
-                                <p className="text-gray-600">لا توجد مدارس في الترتيب حالياً</p>
+                                <p className="text-gray-600">لا توجد مؤسسات تعليمية في الترتيب حالياً</p>
                             </div>
                         )}
                     </div>
@@ -188,7 +188,7 @@ export default function Badges({
                                 شارات الإنجاز
                             </h2>
                             <p className="text-gray-600">
-                                شارات يتم منحها يدوياً من قبل المعلمين أو المدارس عند إكمال إنجاز معين
+                                شارات يتم منحها يدوياً من قبل المعلمين أو المؤسسات تعليمية عند إكمال إنجاز معين
                             </p>
                         </div>
 

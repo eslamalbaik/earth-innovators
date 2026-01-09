@@ -5,7 +5,7 @@ import { getPublicationImageUrl } from '../../utils/imageUtils';
 
 export default function PublicationsSection({
     title = "الإصدارات",
-    subtitle = "اكتشف محتوى مبتكر من الطلاب والمعلمين: مجلات، كتيبات وتقارير تعرض إبداع مدارسنا.",
+    subtitle = "اكتشف محتوى مبتكر من الطلاب والمعلمين: مجلات، كتيبات وتقارير تعرض إبداع مؤسسات تعليميةنا.",
     publications = [],
     viewAllLink = "/publications"
 }) {
@@ -63,7 +63,7 @@ export default function PublicationsSection({
                 {/* Green Info Banner */}
                 <div className="bg-legacy-green/10 rounded-xl p-6 mb-8 border border-legacy-green/20">
                     <p className="text-legacy-green text-center md:text-right leading-relaxed">
-                        اكتشف محتوى مبتكر من الطلاب والمعلمين: مجلات، كتيبات وتقارير تعرض إبداع مدارسنا.
+                        اكتشف محتوى مبتكر من الطلاب والمعلمين: مجلات، كتيبات وتقارير تعرض إبداع مؤسسات تعليميةنا.
                         <span className="block mt-2">اقرأ، تعلم، واستلهم من تجارب المبدعين حولك</span>
                     </p>
                 </div>

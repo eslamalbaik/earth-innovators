@@ -6,6 +6,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import { useState } from 'react';
 
 export default function PendingBadges({ badges, auth }) {
+    const { confirm } = useConfirmDialog();
     const { data, setData, get } = useForm({
         search: '',
     });
@@ -21,20 +22,37 @@ export default function PendingBadges({ badges, auth }) {
         });
     };
 
-    const handleApprove = (badgeId) => {
-        if (confirm('هل أنت متأكد من قبول هذه الشارة؟')) {
+    const handleApprove = async (badgeId, badgeName) => {
+        const confirmed = await confirm({
+            title: 'تأكيد القبول',
+            message: `هل أنت متأكد من قبول الشارة "${badgeName}"؟`,
+            confirmText: 'قبول',
+            cancelText: 'إلغاء',
+            variant: 'info',
+        });
+
+        if (confirmed) {
             router.post(`/school/badges/${badgeId}/approve`, {}, {
                 preserveScroll: true,
             });
         }
     };
 
-    const handleReject = (badgeId) => {
+    const handleReject = async (badgeId, badgeName) => {
         if (rejectReason.trim() === '') {
             alert('يرجى إدخال سبب الرفض');
             return;
         }
-        if (confirm('هل أنت متأكد من رفض هذه الشارة؟')) {
+        
+        const confirmed = await confirm({
+            title: 'تأكيد الرفض',
+            message: `هل أنت متأكد من رفض الشارة "${badgeName}"؟`,
+            confirmText: 'رفض',
+            cancelText: 'إلغاء',
+            variant: 'warning',
+        });
+
+        if (confirmed) {
             router.post(`/school/badges/${badgeId}/reject`, {
                 rejection_reason: rejectReason,
             }, {
@@ -121,7 +139,7 @@ export default function PendingBadges({ badges, auth }) {
                                                 عرض
                                             </Link>
                                             <button
-                                                onClick={() => handleApprove(badge.id)}
+                                                onClick={() => handleApprove(badge.id, badge.name_ar || badge.name)}
                                                 className="bg-legacy-green hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center gap-2 shadow-md"
                                             >
                                                 <FaCheckCircle />
@@ -138,7 +156,7 @@ export default function PendingBadges({ badges, auth }) {
                                                     />
                                                     <div className="flex gap-2">
                                                         <button
-                                                            onClick={() => handleReject(badge.id)}
+                                                            onClick={() => handleReject(badge.id, badge.name_ar || badge.name)}
                                                             className="flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm font-medium transition"
                                                         >
                                                             تأكيد الرفض

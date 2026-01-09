@@ -28,6 +28,11 @@ class User extends Authenticatable
         'points',
         'school_id',
         'membership_number',
+        'membership_type',
+        'account_type',
+        'notification_preferences',
+        'institution',
+        'bio',
     ];
 
     protected $hidden = [
@@ -40,6 +45,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'notification_preferences' => 'array',
         ];
     }
 
@@ -187,7 +193,54 @@ class User extends Authenticatable
 
     public function isSchool(): bool
     {
-        return $this->role === 'school';
+        return $this->role === 'school' || $this->role === 'educational_institution';
+    }
+
+    public function isSystemSupervisor(): bool
+    {
+        return $this->role === 'system_supervisor';
+    }
+
+    public function isSchoolSupportCoordinator(): bool
+    {
+        return $this->role === 'school_support_coordinator';
+    }
+
+    public function isProjectAccount(): bool
+    {
+        return $this->account_type === 'project';
+    }
+
+    public function hasBasicMembership(): bool
+    {
+        return $this->membership_type === 'basic';
+    }
+
+    public function hasSubscriptionMembership(): bool
+    {
+        return $this->membership_type === 'subscription';
+    }
+
+    /**
+     * التحقق من صلاحيات الوصول حسب نوع العضوية
+     */
+    public function canAccessPlatform(): bool
+    {
+        // مشرف النظام و منسق دعم المؤسسات تعليمية يمكنهم الوصول دائماً
+        if ($this->isSystemSupervisor() || $this->isSchoolSupportCoordinator() || $this->isAdmin()) {
+            return true;
+        }
+
+        // المستخدمون الآخرون يحتاجون عضوية للوصول
+        return $this->membership_type !== null;
+    }
+
+    /**
+     * التحقق من صلاحيات إدارة المؤسسات تعليمية (لمنسق دعم المؤسسات تعليمية)
+     */
+    public function canManageSchools(): bool
+    {
+        return $this->isSchoolSupportCoordinator() || $this->isSystemSupervisor() || $this->isAdmin();
     }
 
     public function school(): BelongsTo

@@ -23,6 +23,7 @@ export default function Index({ auth, students, description }) {
     const [searchTerm, setSearchTerm] = useState('');
     const [dateFormat, setDateFormat] = useState('Y-m-d');
 
+    const [certificateType, setCertificateType] = useState('student');
     const [formData, setFormData] = useState({
         student_name: '',
         student_id: '',
@@ -31,10 +32,12 @@ export default function Index({ auth, students, description }) {
         date: new Date().toISOString().split('T')[0],
         signature: '',
         issued_by: auth.user?.name || '',
+        join_date: '',
     });
 
     const handleSelectStudent = (student) => {
         setSelectedStudent(student);
+        setCertificateType('student');
         setFormData({
             student_name: student.name,
             student_id: student.id.toString(),
@@ -43,12 +46,17 @@ export default function Index({ auth, students, description }) {
             date: new Date().toISOString().split('T')[0],
             signature: '',
             issued_by: auth.user?.name || '',
+            join_date: student.created_at ? new Date(student.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
         });
         setShowGenerateModal(true);
     };
 
     const handlePreview = () => {
-        setPreviewData({ ...formData, date_format: dateFormat });
+        const preview = { ...formData, date_format: dateFormat, certificate_type: certificateType };
+        if (certificateType === 'membership') {
+            preview.join_date = formData.join_date || selectedStudent?.created_at ? new Date(selectedStudent.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+        }
+        setPreviewData(preview);
         setShowPreviewModal(true);
     };
 
@@ -57,17 +65,26 @@ export default function Index({ auth, students, description }) {
 
         setGenerating(true);
         try {
+            const overrides = {
+                student_name: formData.student_name,
+                student_id: formData.student_id,
+                membership_number: formData.membership_number,
+                course_name: formData.course_name,
+                signature: formData.signature,
+                issued_by: formData.issued_by,
+            };
+
+            // Add membership-specific fields
+            if (certificateType === 'membership') {
+                overrides.join_date = formData.join_date;
+                overrides.course_name = 'شهادة عضوية';
+            }
+
             const response = await axios.post('/api/certificates/generate', {
                 student_id: selectedStudent.id,
-                overrides: {
-                    student_name: formData.student_name,
-                    student_id: formData.student_id,
-                    membership_number: formData.membership_number,
-                    course_name: formData.course_name,
-                    signature: formData.signature,
-                    issued_by: formData.issued_by,
-                },
+                overrides: overrides,
                 date_format: dateFormat,
+                certificate_type: certificateType,
             });
 
             if (response.data.success) {
@@ -251,38 +268,80 @@ export default function Index({ auth, students, description }) {
                     </div>
 
                     <div className="space-y-4">
+                        {/* Certificate Type */}
                         <div>
-                            <InputLabel htmlFor="student_name" value="اسم الطالب" />
+                            <InputLabel htmlFor="certificate_type" value="نوع الشهادة *" />
+                            <select
+                                id="certificate_type"
+                                value={certificateType}
+                                onChange={(e) => {
+                                    setCertificateType(e.target.value);
+                                    if (e.target.value === 'membership') {
+                                        setFormData({ ...formData, course_name: 'شهادة عضوية' });
+                                    } else {
+                                        setFormData({ ...formData, course_name: 'شهادة إتمام' });
+                                    }
+                                }}
+                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            >
+                                <option value="student">شهادة إتمام</option>
+                                <option value="membership">شهادة عضوية</option>
+                                <option value="achievement">شهادة إنجاز</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <InputLabel htmlFor="student_name" value="الاسم الكامل *" />
                             <TextInput
                                 id="student_name"
                                 type="text"
                                 value={formData.student_name}
                                 onChange={(e) => setFormData({ ...formData, student_name: e.target.value })}
                                 className="mt-1 block w-full"
+                                required
                             />
                         </div>
 
                         <div>
-                            <InputLabel htmlFor="membership_number" value="رقم العضوية" />
+                            <InputLabel htmlFor="membership_number" value="رقم العضوية *" />
                             <TextInput
                                 id="membership_number"
                                 type="text"
                                 value={formData.membership_number}
                                 onChange={(e) => setFormData({ ...formData, membership_number: e.target.value })}
                                 className="mt-1 block w-full"
+                                required
                             />
                         </div>
 
-                        <div>
-                            <InputLabel htmlFor="course_name" value="اسم الدورة/المادة" />
-                            <TextInput
-                                id="course_name"
-                                type="text"
-                                value={formData.course_name}
-                                onChange={(e) => setFormData({ ...formData, course_name: e.target.value })}
-                                className="mt-1 block w-full"
-                            />
-                        </div>
+                        {/* Show join date only for membership certificates */}
+                        {certificateType === 'membership' && (
+                            <div>
+                                <InputLabel htmlFor="join_date" value="تاريخ بدء الانضمام *" />
+                                <TextInput
+                                    id="join_date"
+                                    type="date"
+                                    value={formData.join_date}
+                                    onChange={(e) => setFormData({ ...formData, join_date: e.target.value })}
+                                    className="mt-1 block w-full"
+                                    required
+                                />
+                            </div>
+                        )}
+
+                        {/* Show course name only for non-membership certificates */}
+                        {certificateType !== 'membership' && (
+                            <div>
+                                <InputLabel htmlFor="course_name" value="اسم الدورة/المادة" />
+                                <TextInput
+                                    id="course_name"
+                                    type="text"
+                                    value={formData.course_name}
+                                    onChange={(e) => setFormData({ ...formData, course_name: e.target.value })}
+                                    className="mt-1 block w-full"
+                                />
+                            </div>
+                        )}
 
                         <div>
                             <InputLabel htmlFor="date_format" value="تنسيق التاريخ" />
@@ -340,10 +399,24 @@ export default function Index({ auth, students, description }) {
 
                     {previewData && (
                         <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
-                            <div><strong>اسم الطالب:</strong> {previewData.student_name}</div>
+                            <div><strong>نوع الشهادة:</strong> {certificateType === 'membership' ? 'شهادة عضوية' : certificateType === 'achievement' ? 'شهادة إنجاز' : 'شهادة إتمام'}</div>
+                            <div><strong>الاسم الكامل:</strong> {previewData.student_name}</div>
                             <div><strong>رقم العضوية:</strong> {previewData.membership_number}</div>
-                            <div><strong>اسم الدورة:</strong> {previewData.course_name}</div>
-                            <div><strong>التاريخ:</strong> {formatDatePreview(previewData.date, previewData.date_format)}</div>
+                            {certificateType === 'membership' && previewData.join_date && (
+                                <div><strong>تاريخ بدء الانضمام:</strong> {formatDatePreview(previewData.join_date, previewData.date_format)}</div>
+                            )}
+                            {certificateType === 'membership' && (
+                                <>
+                                    <div><strong>وقت الإصدار:</strong> {new Date().toLocaleTimeString('ar-SA')}</div>
+                                    <div><strong>تاريخ اليوم:</strong> {formatDatePreview(new Date().toISOString().split('T')[0], previewData.date_format)}</div>
+                                </>
+                            )}
+                            {certificateType !== 'membership' && (
+                                <>
+                                    <div><strong>اسم الدورة:</strong> {previewData.course_name}</div>
+                                    <div><strong>التاريخ:</strong> {formatDatePreview(previewData.date, previewData.date_format)}</div>
+                                </>
+                            )}
                             <div><strong>صادر عن:</strong> {previewData.issued_by}</div>
                         </div>
                     )}

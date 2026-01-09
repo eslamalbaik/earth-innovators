@@ -23,7 +23,7 @@ export default function MainLayout({ children, auth }) {
     }, []);
 
     return (
-        <div className="min-h-screen bg-white" dir="rtl">
+        <div className="min-h-screen bg-white flex flex-col" dir="rtl">
             <header className="bg-gradient-to-r from-legacy-green to-legacy-blue sticky top-0 z-50 shadow-md">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16">
@@ -106,6 +106,7 @@ export default function MainLayout({ children, auth }) {
                                                 {auth.user.role === 'teacher' && 'معلم'}
                                                 {auth.user.role === 'student' && 'طالب'}
                                                 {auth.user.role === 'school' && 'مدرسة'}
+                                                {auth.user.role === 'educational_institution' && 'مؤسسة تعليمية'}
                                             </div>
                                         </div>
                                     </button>
@@ -213,11 +214,11 @@ export default function MainLayout({ children, auth }) {
                 </div>
             </header>
 
-            <main>
+            <main className="flex-1">
                 {children}
             </main>
 
-            <footer className="bg-gradient-to-r from-legacy-green to-legacy-blue py-6 mt-auto" >
+            <footer className="bg-gradient-to-r from-legacy-green to-legacy-blue py-6 mt-auto">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                         <div className="text-white font-semibold">

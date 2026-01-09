@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             SubjectsSeeder::class,
             ReviewsSeeder::class,
             SchoolDemoSeeder::class,
+            PackagesSeeder::class,
         ]);
     }
 }

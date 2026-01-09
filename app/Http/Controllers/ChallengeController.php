@@ -60,7 +60,7 @@ class ChallengeController extends Controller
             }
         }
 
-        // للزوار والمستخدمين الآخرين: عرض التحدي العام (بما في ذلك المدارس)
+        // للزوار والمستخدمين الآخرين: عرض التحدي العام (بما في ذلك المؤسسات تعليمية)
         $challenge = Challenge::with(['creator', 'school'])
             ->findOrFail($id);
 

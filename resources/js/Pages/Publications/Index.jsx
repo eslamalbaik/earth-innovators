@@ -254,7 +254,7 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                 <div className="bg-gradient-to-r from-legacy-green/20 to-legacy-green/10 border-b border-legacy-green/20">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                         <p className="text-legacy-green text-center md:text-right text-lg leading-relaxed">
-                            اكتشف محتوى مبتكر من الطلاب والمعلمين: مجلات، كتيبات وتقارير تعرض إبداع مدارسنا.
+                            اكتشف محتوى مبتكر من الطلاب والمعلمين: مجلات، كتيبات وتقارير تعرض إبداع مؤسسات تعليميةنا.
                             <span className="block mt-2 font-semibold">"اقرأ، تعلم، واستلهم من تجارب المبدعين حولك!"</span>
                         </p>
                     </div>

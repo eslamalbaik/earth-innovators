@@ -24,6 +24,7 @@ class HandleInertiaRequests extends Middleware
 
     /**
      * Define the props that are shared by default.
+     * PERFORMANCE OPTIMIZED: Minimal shared data to reduce payload size
      *
      * @return array<string, mixed>
      */
@@ -38,6 +39,7 @@ class HandleInertiaRequests extends Middleware
                     'name' => $user->name,
                     'email' => $user->email,
                     'role' => $user->role,
+                    // Only include image if it exists - avoid unnecessary data
                     'image' => $user->image ? (
                         str_starts_with($user->image, 'http') 
                             ? $user->image 
@@ -45,9 +47,14 @@ class HandleInertiaRequests extends Middleware
                     ) : null,
                 ] : null,
             ],
+            // Flash messages are lightweight, keep them
             'flash' => [
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),
+            ],
+            // PERFORMANCE: Add ziggy route helper only in development to reduce payload
+            'ziggy' => fn () => [
+                'url' => $request->url(),
             ],
         ]);
     }

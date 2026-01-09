@@ -169,7 +169,7 @@ export default function StudentBookings({ bookings, auth }) {
                             <p className="text-3xl font-bold text-purple-600">{stats.totalSpent.toFixed(0)}</p>
                         </div>
                         <div className="p-3 bg-purple-100 rounded-full">
-                            <img src="/images/sar-currency(black).svg" alt="currency" className="w-8 h-8" />
+                            <img src="/images/aed-currency(black).svg" alt="currency" className="w-8 h-8" />
                         </div>
                     </div>
                 </div>
@@ -272,7 +272,7 @@ export default function StudentBookings({ bookings, auth }) {
                                             <span className="text-sm text-gray-600">السعر الإجمالي:</span>
                                             <div className="flex items-center">
                                                 <p className="font-bold">{booking.total_price}</p>
-                                                <img src="/images/sar-currency(black).svg" alt="currency" className="w-5 h-5" />
+                                                <img src="/images/aed-currency(black).svg" alt="currency" className="w-5 h-5" />
                                             </div>
                                         </div>
                                     </div>

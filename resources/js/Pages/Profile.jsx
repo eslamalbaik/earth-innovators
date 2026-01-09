@@ -1,6 +1,7 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, useForm, router } from '@inertiajs/react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import axios from 'axios';
 import {
     FaUser,
     FaEnvelope,
@@ -17,23 +18,43 @@ import {
     FaPhone,
     FaMedal,
     FaAward,
+    FaBell,
+    FaSignOutAlt,
+    FaChartLine,
+    FaFileAlt,
+    FaBuilding,
+    FaEye,
+    FaEyeSlash,
 } from 'react-icons/fa';
 import Modal from '@/Components/Modal';
 import DangerButton from '@/Components/DangerButton';
 
-export default function Profile({ auth, mustVerifyEmail, status, teacher, subjects, cities, badges = [] }) {
+export default function Profile({ auth, mustVerifyEmail, status, teacher, subjects, cities, badges = [], admin_stats = null, notification_preferences = null }) {
     const user = auth.user;
     const [activeTab, setActiveTab] = useState('basic');
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [imagePreview, setImagePreview] = useState(null);
     const [teacherImagePreview, setTeacherImagePreview] = useState(null);
+    const [coverImagePreview, setCoverImagePreview] = useState(null);
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showPasswordConfirmation, setShowPasswordConfirmation] = useState(false);
+    const [notificationPrefs, setNotificationPrefs] = useState({
+        email_notifications: notification_preferences?.email_notifications ?? true,
+        popup_notifications: notification_preferences?.popup_notifications ?? true,
+        platform_updates: notification_preferences?.platform_updates ?? false,
+    });
+    const [savingPreferences, setSavingPreferences] = useState(false);
     const imageInputRef = useRef(null);
     const teacherImageInputRef = useRef(null);
+    const coverImageInputRef = useRef(null);
 
     const basicForm = useForm({
         name: user.name || '',
         email: user.email || '',
         image: null,
+        institution: user.institution || '',
+        bio: user.bio || '',
     });
 
     const teacherForm = useForm({
@@ -169,24 +190,92 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
         });
     };
 
+    // Calculate password strength
+    const calculatePasswordStrength = (password) => {
+        if (!password) return { strength: 0, label: '', color: 'gray' };
+
+        let strength = 0;
+        let checks = {
+            length: password.length >= 8,
+            lowercase: /[a-z]/.test(password),
+            uppercase: /[A-Z]/.test(password),
+            numbers: /[0-9]/.test(password),
+            special: /[^A-Za-z0-9]/.test(password),
+        };
+
+        if (checks.length) strength += 1;
+        if (checks.lowercase) strength += 1;
+        if (checks.uppercase) strength += 1;
+        if (checks.numbers) strength += 1;
+        if (checks.special) strength += 1;
+
+        if (password.length >= 12) strength += 1;
+
+        if (strength <= 2) {
+            return { strength, label: 'ضعيفة', color: 'red', percentage: 33 };
+        } else if (strength <= 4) {
+            return { strength, label: 'متوسطة', color: 'yellow', percentage: 66 };
+        } else {
+            return { strength, label: 'قوية', color: 'green', percentage: 100 };
+        }
+    };
+
+    const passwordStrength = calculatePasswordStrength(passwordForm.data.password);
+    const isPasswordStrong = passwordStrength.strength >= 5;
+
     const handlePasswordSubmit = (e) => {
         e.preventDefault();
-        passwordForm.post(route('password.update'), {
+        
+        // Validate password strength
+        if (!isPasswordStrong) {
+            alert('كلمة المرور يجب أن تكون قوية. يرجى استخدام مزيج من الأحرف الكبيرة والصغيرة والأرقام والرموز الخاصة.');
+            return;
+        }
+
+        passwordForm.put(route('password.update'), {
             preserveScroll: true,
             onSuccess: () => {
                 passwordForm.reset();
+                setShowCurrentPassword(false);
+                setShowPassword(false);
+                setShowPasswordConfirmation(false);
             },
         });
     };
 
     const handleDeleteAccount = (e) => {
         e.preventDefault();
-        deleteForm.delete(route('profile.destroy'), {
+        deleteForm.delete('/profile', {
             preserveScroll: true,
             onSuccess: () => {
                 setShowDeleteModal(false);
             },
         });
+    };
+
+    const handleNotificationPreferenceUpdate = async (preferenceType, value) => {
+        setSavingPreferences(true);
+        try {
+            const response = await axios.put('/notification-preferences', {
+                [preferenceType]: value,
+            });
+            
+            // Update local state
+            setNotificationPrefs(prev => ({
+                ...prev,
+                [preferenceType]: value
+            }));
+        } catch (error) {
+            console.error('Error updating notification preferences:', error);
+            // Revert the change on error
+            setNotificationPrefs(prev => ({
+                ...prev,
+                [preferenceType]: !value
+            }));
+            alert('حدث خطأ أثناء تحديث تفضيلات الإشعارات. يرجى المحاولة مرة أخرى.');
+        } finally {
+            setSavingPreferences(false);
+        }
     };
 
     const handleSubjectChange = (subjectName) => {
@@ -268,6 +357,512 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
         return user.name;
     };
 
+    // Admin-specific profile design
+    if (user.role === 'admin') {
+        return (
+            <DashboardLayout header="الملف الشخصي">
+                <Head title="الملف الشخصي - الأدمن" />
+
+                <div className="max-w-7xl mx-auto">
+                    {/* Cover Section */}
+                    <div className="relative mb-6 rounded-xl overflow-hidden">
+                        <div className="h-48 bg-gradient-to-r from-green-600 to-green-800 relative">
+                            {coverImagePreview ? (
+                                <img src={coverImagePreview} alt="Cover" className="w-full h-full object-cover" />
+                            ) : (
+                                <div className="w-full h-full bg-gradient-to-r from-green-600 to-green-800"></div>
+                            )}
+                            <button
+                                onClick={() => coverImageInputRef.current?.click()}
+                                className="absolute bottom-4 left-4 bg-white/90 hover:bg-white text-gray-700 px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition"
+                            >
+                                <FaEdit className="text-sm" />
+                                تعديل الغلاف
+                            </button>
+                            <input
+                                ref={coverImageInputRef}
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => {
+                                    const file = e.target.files[0];
+                                    if (file) {
+                                        setCoverImagePreview(URL.createObjectURL(file));
+                                    }
+                                }}
+                                className="hidden"
+                            />
+                        </div>
+                        
+                        {/* Profile Header */}
+                        <div className="bg-gray-50 px-6 py-6">
+                            <div className="flex items-start gap-6">
+                                <div className="relative -mt-16">
+                                    <div className="w-32 h-32 rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-4xl font-bold border-4 border-white shadow-lg">
+                                        {getDisplayImage() ? (
+                                            <>
+                                                <img
+                                                    src={getDisplayImage()}
+                                                    alt={getDisplayName()}
+                                                    className="w-full h-full object-cover"
+                                                    onError={(e) => {
+                                                        e.target.style.display = 'none';
+                                                        const fallback = e.target.nextElementSibling;
+                                                        if (fallback) fallback.style.display = 'flex';
+                                                    }}
+                                                />
+                                                <div className="hidden w-full h-full items-center justify-center">
+                                                    {getDisplayName()?.charAt(0)?.toUpperCase() || 'A'}
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center">
+                                                {getDisplayName()?.charAt(0)?.toUpperCase() || 'A'}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <button
+                                        onClick={() => imageInputRef.current?.click()}
+                                        className="absolute bottom-0 right-0 bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded-full shadow-lg transition"
+                                    >
+                                        <FaCamera className="text-sm" />
+                                    </button>
+                                    <input
+                                        ref={imageInputRef}
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleImageChange}
+                                        className="hidden"
+                                    />
+                                </div>
+
+                                <div className="flex-1 flex items-start justify-between mt-4">
+                                    <div>
+                                        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                                            {getDisplayName()}
+                                        </h1>
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium flex items-center gap-1">
+                                                <FaCheckCircle className="text-xs" />
+                                                مدير النظام (Super Admin)
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-gray-600">
+                                            <FaEnvelope className="text-sm" />
+                                            <span>{user.email}</span>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <a
+                                            href="/logout"
+                                            method="post"
+                                            className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition"
+                                        >
+                                            <FaSignOutAlt />
+                                            تسجيل الخروج
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                        {/* Sidebar Navigation */}
+                        <div className="lg:col-span-1">
+                            <div className="bg-white rounded-xl shadow-lg p-4">
+                                <nav className="space-y-2">
+                                    <button
+                                        onClick={() => setActiveTab('basic')}
+                                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition ${
+                                            activeTab === 'basic'
+                                                ? 'bg-green-100 text-green-700'
+                                                : 'text-gray-700 hover:bg-gray-100'
+                                        }`}
+                                    >
+                                        <FaUser className="text-lg" />
+                                        المعلومات الأساسية
+                                    </button>
+                                    <button
+                                        onClick={() => setActiveTab('password')}
+                                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition ${
+                                            activeTab === 'password'
+                                                ? 'bg-green-100 text-green-700'
+                                                : 'text-gray-700 hover:bg-gray-100'
+                                        }`}
+                                    >
+                                        <FaLock className="text-lg" />
+                                        الأمان وكلمة المرور
+                                    </button>
+                                    <button
+                                        onClick={() => setActiveTab('notifications')}
+                                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition ${
+                                            activeTab === 'notifications'
+                                                ? 'bg-green-100 text-green-700'
+                                                : 'text-gray-700 hover:bg-gray-100'
+                                        }`}
+                                    >
+                                        <FaBell className="text-lg" />
+                                        إشعارات النظام
+                                    </button>
+                                </nav>
+                            </div>
+                        </div>
+
+                        {/* Main Content */}
+                        <div className="lg:col-span-3">
+                            <div className="bg-white rounded-xl shadow-lg p-6">
+                                {activeTab === 'basic' && (
+                                    <form onSubmit={handleBasicSubmit}>
+                                        <h2 className="text-2xl font-bold text-gray-900 mb-6">الملف الشخصي</h2>
+
+                                        <div className="space-y-6">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    الاسم الكامل
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={basicForm.data.name}
+                                                    onChange={(e) => basicForm.setData('name', e.target.value)}
+                                                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-400 focus:border-transparent"
+                                                    required
+                                                />
+                                                {basicForm.errors.name && (
+                                                    <p className="text-red-500 text-sm mt-1">{basicForm.errors.name}</p>
+                                                )}
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    المدرسة / المؤسسة
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={basicForm.data.institution}
+                                                    onChange={(e) => basicForm.setData('institution', e.target.value)}
+                                                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-400 focus:border-transparent"
+                                                    placeholder="إدارة إرث المبتكرين"
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    نبذة تعريفية
+                                                </label>
+                                                <textarea
+                                                    value={basicForm.data.bio}
+                                                    onChange={(e) => basicForm.setData('bio', e.target.value)}
+                                                    rows="4"
+                                                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-400 focus:border-transparent"
+                                                    placeholder="أعمل على تطوير بيئة ابتكارية محفزة للطلاب ودعم المشاريع التقنية والريادية في المدرسة."
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    البريد الإلكتروني
+                                                </label>
+                                                <input
+                                                    type="email"
+                                                    value={basicForm.data.email}
+                                                    onChange={(e) => basicForm.setData('email', e.target.value)}
+                                                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-400 focus:border-transparent"
+                                                    required
+                                                />
+                                                {basicForm.errors.email && (
+                                                    <p className="text-red-500 text-sm mt-1">{basicForm.errors.email}</p>
+                                                )}
+                                            </div>
+
+                                            <div className="flex justify-end pt-4 border-t border-gray-200">
+                                                <button
+                                                    type="submit"
+                                                    disabled={basicForm.processing}
+                                                    className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition disabled:opacity-50"
+                                                >
+                                                    <FaSave />
+                                                    {basicForm.processing ? 'جاري الحفظ...' : 'حفظ التغييرات'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                )}
+
+                                {activeTab === 'password' && (
+                                    <form onSubmit={handlePasswordSubmit}>
+                                        <h2 className="text-2xl font-bold text-gray-900 mb-6">الأمان وكلمة المرور</h2>
+
+                                        <div className="space-y-6">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    كلمة المرور الحالية *
+                                                </label>
+                                                <div className="relative">
+                                                    <input
+                                                        type={showCurrentPassword ? "text" : "password"}
+                                                        value={passwordForm.data.current_password}
+                                                        onChange={(e) => passwordForm.setData('current_password', e.target.value)}
+                                                        className="w-full border border-gray-300 rounded-lg px-4 py-2 pr-12 focus:ring-2 focus:ring-green-400"
+                                                        required
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                                                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                                                    >
+                                                        {showCurrentPassword ? <FaEyeSlash className="text-lg" /> : <FaEye className="text-lg" />}
+                                                    </button>
+                                                </div>
+                                                {passwordForm.errors.current_password && (
+                                                    <p className="text-red-500 text-sm mt-1">{passwordForm.errors.current_password}</p>
+                                                )}
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    كلمة المرور الجديدة *
+                                                </label>
+                                                <div className="relative">
+                                                    <input
+                                                        type={showPassword ? "text" : "password"}
+                                                        value={passwordForm.data.password}
+                                                        onChange={(e) => passwordForm.setData('password', e.target.value)}
+                                                        className={`w-full border rounded-lg px-4 py-2 pr-12 focus:ring-2 ${
+                                                            passwordForm.data.password
+                                                                ? passwordStrength.color === 'red'
+                                                                    ? 'border-red-300 focus:ring-red-400'
+                                                                    : passwordStrength.color === 'yellow'
+                                                                    ? 'border-yellow-300 focus:ring-yellow-400'
+                                                                    : 'border-green-300 focus:ring-green-400'
+                                                                : 'border-gray-300 focus:ring-green-400'
+                                                        }`}
+                                                        required
+                                                        minLength="8"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowPassword(!showPassword)}
+                                                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                                                    >
+                                                        {showPassword ? <FaEyeSlash className="text-lg" /> : <FaEye className="text-lg" />}
+                                                    </button>
+                                                </div>
+                                                
+                                                {/* Password Strength Indicator */}
+                                                {passwordForm.data.password && (
+                                                    <div className="mt-3">
+                                                        <div className="flex items-center justify-between mb-2">
+                                                            <span className="text-xs font-medium text-gray-600">قوة كلمة المرور:</span>
+                                                            <span className={`text-xs font-bold ${
+                                                                passwordStrength.color === 'red' ? 'text-red-600' :
+                                                                passwordStrength.color === 'yellow' ? 'text-yellow-600' :
+                                                                'text-green-600'
+                                                            }`}>
+                                                                {passwordStrength.label}
+                                                            </span>
+                                                        </div>
+                                                        <div className="w-full bg-gray-200 rounded-full h-2">
+                                                            <div
+                                                                className={`h-2 rounded-full transition-all duration-300 ${
+                                                                    passwordStrength.color === 'red' ? 'bg-red-500' :
+                                                                    passwordStrength.color === 'yellow' ? 'bg-yellow-500' :
+                                                                    'bg-green-500'
+                                                                }`}
+                                                                style={{ width: `${passwordStrength.percentage}%` }}
+                                                            ></div>
+                                                        </div>
+                                                        <div className="mt-2 text-xs text-gray-600">
+                                                            <p className="mb-1">يجب أن تحتوي كلمة المرور على:</p>
+                                                            <ul className="list-disc list-inside space-y-1">
+                                                                <li className={passwordForm.data.password.length >= 8 ? 'text-green-600' : 'text-gray-500'}>
+                                                                    على الأقل 8 أحرف
+                                                                </li>
+                                                                <li className={/[a-z]/.test(passwordForm.data.password) ? 'text-green-600' : 'text-gray-500'}>
+                                                                    حرف صغير (a-z)
+                                                                </li>
+                                                                <li className={/[A-Z]/.test(passwordForm.data.password) ? 'text-green-600' : 'text-gray-500'}>
+                                                                    حرف كبير (A-Z)
+                                                                </li>
+                                                                <li className={/[0-9]/.test(passwordForm.data.password) ? 'text-green-600' : 'text-gray-500'}>
+                                                                    رقم (0-9)
+                                                                </li>
+                                                                <li className={/[^A-Za-z0-9]/.test(passwordForm.data.password) ? 'text-green-600' : 'text-gray-500'}>
+                                                                    رمز خاص (!@#$%^&*)
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                
+                                                {passwordForm.errors.password && (
+                                                    <p className="text-red-500 text-sm mt-1">{passwordForm.errors.password}</p>
+                                                )}
+                                                
+                                                {passwordForm.data.password && !isPasswordStrong && (
+                                                    <p className="text-red-500 text-sm mt-2">
+                                                        ⚠️ كلمة المرور يجب أن تكون قوية لتتمكن من حفظها
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    تأكيد كلمة المرور *
+                                                </label>
+                                                <div className="relative">
+                                                    <input
+                                                        type={showPasswordConfirmation ? "text" : "password"}
+                                                        value={passwordForm.data.password_confirmation}
+                                                        onChange={(e) => passwordForm.setData('password_confirmation', e.target.value)}
+                                                        className={`w-full border rounded-lg px-4 py-2 pr-12 focus:ring-2 ${
+                                                            passwordForm.data.password_confirmation
+                                                                ? passwordForm.data.password === passwordForm.data.password_confirmation
+                                                                    ? 'border-green-300 focus:ring-green-400'
+                                                                    : 'border-red-300 focus:ring-red-400'
+                                                                : 'border-gray-300 focus:ring-green-400'
+                                                        }`}
+                                                        required
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowPasswordConfirmation(!showPasswordConfirmation)}
+                                                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                                                    >
+                                                        {showPasswordConfirmation ? <FaEyeSlash className="text-lg" /> : <FaEye className="text-lg" />}
+                                                    </button>
+                                                </div>
+                                                {passwordForm.data.password_confirmation && passwordForm.data.password !== passwordForm.data.password_confirmation && (
+                                                    <p className="text-red-500 text-sm mt-1">كلمة المرور غير متطابقة</p>
+                                                )}
+                                                {passwordForm.errors.password_confirmation && (
+                                                    <p className="text-red-500 text-sm mt-1">{passwordForm.errors.password_confirmation}</p>
+                                                )}
+                                            </div>
+
+                                            <div className="flex justify-end pt-4 border-t border-gray-200">
+                                                <button
+                                                    type="submit"
+                                                    disabled={passwordForm.processing || !isPasswordStrong || passwordForm.data.password !== passwordForm.data.password_confirmation}
+                                                    className={`px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition ${
+                                                        isPasswordStrong && passwordForm.data.password === passwordForm.data.password_confirmation
+                                                            ? 'bg-green-500 hover:bg-green-600 text-white'
+                                                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                                    }`}
+                                                >
+                                                    <FaSave />
+                                                    {passwordForm.processing ? 'جاري الحفظ...' : 'تحديث كلمة المرور'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                )}
+
+                                {activeTab === 'notifications' && (
+                                    <div>
+                                        <h2 className="text-2xl font-bold text-gray-900 mb-6">إشعارات النظام</h2>
+                                        
+                                        <div className="space-y-6">
+                                            {/* Email Notifications */}
+                                            <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                                                <div className="flex items-start justify-between">
+                                                    <div className="flex-1">
+                                                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                                                            إشعارات البريد الإلكتروني
+                                                        </h3>
+                                                        <p className="text-sm text-gray-600">
+                                                            تلقي ملخص يومي للمشاريع الجديدة والمقالات المنتظرة للمراجعة.
+                                                        </p>
+                                                    </div>
+                                                    <label className="relative inline-flex items-center cursor-pointer mr-4">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={notificationPrefs.email_notifications}
+                                                            onChange={(e) => {
+                                                                const newValue = e.target.checked;
+                                                                setNotificationPrefs(prev => ({
+                                                                    ...prev,
+                                                                    email_notifications: newValue
+                                                                }));
+                                                                handleNotificationPreferenceUpdate('email_notifications', newValue);
+                                                            }}
+                                                            className="sr-only peer"
+                                                        />
+                                                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            {/* Popup Notifications */}
+                                            <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                                                <div className="flex items-start justify-between">
+                                                    <div className="flex-1">
+                                                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                                                            إشعارات النظام المنبثقة
+                                                        </h3>
+                                                        <p className="text-sm text-gray-600">
+                                                            تنبيهات فورية عند قيام طالب بتقديم مشروع جديد.
+                                                        </p>
+                                                    </div>
+                                                    <label className="relative inline-flex items-center cursor-pointer mr-4">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={notificationPrefs.popup_notifications}
+                                                            onChange={(e) => {
+                                                                const newValue = e.target.checked;
+                                                                setNotificationPrefs(prev => ({
+                                                                    ...prev,
+                                                                    popup_notifications: newValue
+                                                                }));
+                                                                handleNotificationPreferenceUpdate('popup_notifications', newValue);
+                                                            }}
+                                                            className="sr-only peer"
+                                                        />
+                                                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            {/* Platform Updates */}
+                                            <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                                                <div className="flex items-start justify-between">
+                                                    <div className="flex-1">
+                                                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                                                            تحديثات المنصة
+                                                        </h3>
+                                                        <p className="text-sm text-gray-600">
+                                                            معرفة الميزات الجديدة والتحسينات المضافة لنظام إرث المبتكرين.
+                                                        </p>
+                                                    </div>
+                                                    <label className="relative inline-flex items-center cursor-pointer mr-4">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={notificationPrefs.platform_updates}
+                                                            onChange={(e) => {
+                                                                const newValue = e.target.checked;
+                                                                setNotificationPrefs(prev => ({
+                                                                    ...prev,
+                                                                    platform_updates: newValue
+                                                                }));
+                                                                handleNotificationPreferenceUpdate('platform_updates', newValue);
+                                                            }}
+                                                            className="sr-only peer"
+                                                        />
+                                                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </DashboardLayout>
+        );
+    }
+
+    // Original profile design for other roles
     return (
         <DashboardLayout header="الملف الشخصي">
             <Head title="الملف الشخصي" />
@@ -708,13 +1303,22 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         كلمة المرور الحالية *
                                     </label>
-                                    <input
-                                        type="password"
-                                        value={passwordForm.data.current_password}
-                                        onChange={(e) => passwordForm.setData('current_password', e.target.value)}
-                                        className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400"
-                                        required
-                                    />
+                                    <div className="relative">
+                                        <input
+                                            type={showCurrentPassword ? "text" : "password"}
+                                            value={passwordForm.data.current_password}
+                                            onChange={(e) => passwordForm.setData('current_password', e.target.value)}
+                                            className="w-full border border-gray-300 rounded-lg px-4 py-2 pr-12 focus:ring-2 focus:ring-yellow-400"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                                            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                                        >
+                                            {showCurrentPassword ? <FaEyeSlash className="text-lg" /> : <FaEye className="text-lg" />}
+                                        </button>
+                                    </div>
                                     {passwordForm.errors.current_password && (
                                         <p className="text-red-500 text-sm mt-1">{passwordForm.errors.current_password}</p>
                                     )}
@@ -724,16 +1328,86 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         كلمة المرور الجديدة *
                                     </label>
-                                    <input
-                                        type="password"
-                                        value={passwordForm.data.password}
-                                        onChange={(e) => passwordForm.setData('password', e.target.value)}
-                                        className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400"
-                                        required
-                                        minLength="8"
-                                    />
+                                    <div className="relative">
+                                        <input
+                                            type={showPassword ? "text" : "password"}
+                                            value={passwordForm.data.password}
+                                            onChange={(e) => passwordForm.setData('password', e.target.value)}
+                                            className={`w-full border rounded-lg px-4 py-2 pr-12 focus:ring-2 ${
+                                                passwordForm.data.password
+                                                    ? passwordStrength.color === 'red'
+                                                        ? 'border-red-300 focus:ring-red-400'
+                                                        : passwordStrength.color === 'yellow'
+                                                        ? 'border-yellow-300 focus:ring-yellow-400'
+                                                        : 'border-green-300 focus:ring-green-400'
+                                                    : 'border-gray-300 focus:ring-yellow-400'
+                                            }`}
+                                            required
+                                            minLength="8"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                                        >
+                                            {showPassword ? <FaEyeSlash className="text-lg" /> : <FaEye className="text-lg" />}
+                                        </button>
+                                    </div>
+                                    
+                                    {/* Password Strength Indicator */}
+                                    {passwordForm.data.password && (
+                                        <div className="mt-3">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <span className="text-xs font-medium text-gray-600">قوة كلمة المرور:</span>
+                                                <span className={`text-xs font-bold ${
+                                                    passwordStrength.color === 'red' ? 'text-red-600' :
+                                                    passwordStrength.color === 'yellow' ? 'text-yellow-600' :
+                                                    'text-green-600'
+                                                }`}>
+                                                    {passwordStrength.label}
+                                                </span>
+                                            </div>
+                                            <div className="w-full bg-gray-200 rounded-full h-2">
+                                                <div
+                                                    className={`h-2 rounded-full transition-all duration-300 ${
+                                                        passwordStrength.color === 'red' ? 'bg-red-500' :
+                                                        passwordStrength.color === 'yellow' ? 'bg-yellow-500' :
+                                                        'bg-green-500'
+                                                    }`}
+                                                    style={{ width: `${passwordStrength.percentage}%` }}
+                                                ></div>
+                                            </div>
+                                            <div className="mt-2 text-xs text-gray-600">
+                                                <p className="mb-1">يجب أن تحتوي كلمة المرور على:</p>
+                                                <ul className="list-disc list-inside space-y-1">
+                                                    <li className={passwordForm.data.password.length >= 8 ? 'text-green-600' : 'text-gray-500'}>
+                                                        على الأقل 8 أحرف
+                                                    </li>
+                                                    <li className={/[a-z]/.test(passwordForm.data.password) ? 'text-green-600' : 'text-gray-500'}>
+                                                        حرف صغير (a-z)
+                                                    </li>
+                                                    <li className={/[A-Z]/.test(passwordForm.data.password) ? 'text-green-600' : 'text-gray-500'}>
+                                                        حرف كبير (A-Z)
+                                                    </li>
+                                                    <li className={/[0-9]/.test(passwordForm.data.password) ? 'text-green-600' : 'text-gray-500'}>
+                                                        رقم (0-9)
+                                                    </li>
+                                                    <li className={/[^A-Za-z0-9]/.test(passwordForm.data.password) ? 'text-green-600' : 'text-gray-500'}>
+                                                        رمز خاص (!@#$%^&*)
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    )}
+                                    
                                     {passwordForm.errors.password && (
                                         <p className="text-red-500 text-sm mt-1">{passwordForm.errors.password}</p>
+                                    )}
+                                    
+                                    {passwordForm.data.password && !isPasswordStrong && (
+                                        <p className="text-red-500 text-sm mt-2">
+                                            ⚠️ كلمة المرور يجب أن تكون قوية لتتمكن من حفظها
+                                        </p>
                                     )}
                                 </div>
 
@@ -741,13 +1415,31 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         تأكيد كلمة المرور *
                                     </label>
-                                    <input
-                                        type="password"
-                                        value={passwordForm.data.password_confirmation}
-                                        onChange={(e) => passwordForm.setData('password_confirmation', e.target.value)}
-                                        className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400"
-                                        required
-                                    />
+                                    <div className="relative">
+                                        <input
+                                            type={showPasswordConfirmation ? "text" : "password"}
+                                            value={passwordForm.data.password_confirmation}
+                                            onChange={(e) => passwordForm.setData('password_confirmation', e.target.value)}
+                                            className={`w-full border rounded-lg px-4 py-2 pr-12 focus:ring-2 ${
+                                                passwordForm.data.password_confirmation
+                                                    ? passwordForm.data.password === passwordForm.data.password_confirmation
+                                                        ? 'border-green-300 focus:ring-green-400'
+                                                        : 'border-red-300 focus:ring-red-400'
+                                                    : 'border-gray-300 focus:ring-yellow-400'
+                                            }`}
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPasswordConfirmation(!showPasswordConfirmation)}
+                                            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                                        >
+                                            {showPasswordConfirmation ? <FaEyeSlash className="text-lg" /> : <FaEye className="text-lg" />}
+                                        </button>
+                                    </div>
+                                    {passwordForm.data.password_confirmation && passwordForm.data.password !== passwordForm.data.password_confirmation && (
+                                        <p className="text-red-500 text-sm mt-1">كلمة المرور غير متطابقة</p>
+                                    )}
                                     {passwordForm.errors.password_confirmation && (
                                         <p className="text-red-500 text-sm mt-1">{passwordForm.errors.password_confirmation}</p>
                                     )}
@@ -756,8 +1448,12 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                                 <div className="flex justify-end">
                                     <button
                                         type="submit"
-                                        disabled={passwordForm.processing}
-                                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition disabled:opacity-50"
+                                        disabled={passwordForm.processing || !isPasswordStrong || passwordForm.data.password !== passwordForm.data.password_confirmation}
+                                        className={`px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition ${
+                                            isPasswordStrong && passwordForm.data.password === passwordForm.data.password_confirmation
+                                                ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
+                                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                        }`}
                                     >
                                         <FaSave />
                                         {passwordForm.processing ? 'جاري الحفظ...' : 'تحديث كلمة المرور'}

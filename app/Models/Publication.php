@@ -116,6 +116,12 @@ class Publication extends Model
             return $originalValue;
         }
 
+        // If it's a path starting with /images/, return as is (for public/images directory)
+        if (str_starts_with($originalValue, '/images/') || str_starts_with($originalValue, 'images/')) {
+            $imagePath = ltrim($originalValue, '/');
+            return url('/' . $imagePath);
+        }
+
         // Normalize the path
         $normalizedPath = $originalValue;
 

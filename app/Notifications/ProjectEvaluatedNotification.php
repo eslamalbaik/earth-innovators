@@ -40,6 +40,13 @@ class ProjectEvaluatedNotification extends Notification implements ShouldBroadca
 
     public function toArray(object $notifiable): array
     {
+        $statusText = match($this->submission->status) {
+            'approved' => 'تم قبول',
+            'rejected' => 'تم رفض',
+            'reviewed' => 'تم مراجعة',
+            default => 'تم تقييم'
+        };
+
         return [
             'type' => 'project_evaluated',
             'submission_id' => $this->submission->id,
@@ -47,8 +54,9 @@ class ProjectEvaluatedNotification extends Notification implements ShouldBroadca
             'project_title' => $this->submission->project->title,
             'rating' => $this->submission->rating,
             'status' => $this->submission->status,
-            'message' => 'تم تقييم مشروعك: ' . $this->submission->project->title,
-            'message_ar' => 'تم تقييم مشروعك: ' . $this->submission->project->title,
+            'title' => 'تم تقييم مشروعك',
+            'message' => $statusText . ' مشروعك "' . $this->submission->project->title . '" من قبل الإدارة',
+            'message_ar' => $statusText . ' مشروعك "' . $this->submission->project->title . '" من قبل الإدارة',
             'action_url' => '/student/projects/' . $this->submission->project_id,
         ];
     }

@@ -51,7 +51,7 @@ class TeacherProjectController extends Controller
             // الحصول على مدرسة المعلم (من user model)
             $school = $user->school;
             
-            // الحصول على قائمة المدارس المتاحة (اختياري - يمكن للمعلم اختيار مدرسة)
+            // الحصول على قائمة المؤسسات تعليمية المتاحة (اختياري - يمكن للمعلم اختيار مدرسة)
             $schools = User::where('role', 'school')
                 ->select('id', 'name')
                 ->get();
@@ -237,7 +237,7 @@ class TeacherProjectController extends Controller
 
         $project->load(['school']);
 
-        // الحصول على قائمة المدارس المتاحة
+        // الحصول على قائمة المؤسسات تعليمية المتاحة
         $schools = User::where('role', 'school')
             ->select('id', 'name')
             ->get();

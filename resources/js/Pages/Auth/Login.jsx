@@ -94,6 +94,7 @@ export default function Login({ status, canResetPassword }) {
                                         { key: 'student', label: 'طالب', description: 'للوصول إلى لوحة الطالب' },
                                         { key: 'teacher', label: 'معلم', description: 'للوصول إلى لوحة المعلم' },
                                         { key: 'school', label: 'مدرسة', description: 'للوصول إلى لوحة المدرسة' },
+                                        { key: 'educational_institution', label: 'مؤسسة تعليمية', description: 'للوصول إلى لوحة المؤسسة التعليمية' },
                                     ].map((roleOption) => {
                                         const isActive = data.role === roleOption.key;
                                         return (
@@ -107,7 +108,7 @@ export default function Login({ status, canResetPassword }) {
                                                     }`}
                                             >
                                                 <span className="text-base font-semibold">
-                                                    {roleOption.key === 'student' ? 'الدخول كطالب' : roleOption.key === 'teacher' ? 'الدخول كمعلم' : 'الدخول كمدرسة'}
+                                                    {roleOption.key === 'student' ? 'الدخول كطالب' : roleOption.key === 'teacher' ? 'الدخول كمعلم' : roleOption.key === 'school' ? 'الدخول كمدرسة' : 'الدخول كمؤسسة تعليمية'}
                                                 </span>
                                                 <span className="mt-1 text-xs text-gray-500">
                                                     {roleOption.description}

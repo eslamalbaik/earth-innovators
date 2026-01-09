@@ -19,7 +19,7 @@ export const ToastProvider = ({ children }) => {
             type: 'info',
             title: null,
             message: '',
-            autoDismiss: 5000,
+            autoDismiss: 3000, // Default shorter duration (3 seconds instead of 5)
             ...toast,
         };
 

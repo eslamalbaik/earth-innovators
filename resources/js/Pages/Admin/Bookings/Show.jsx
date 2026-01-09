@@ -1,9 +1,11 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
+import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 import { Head, useForm, router } from '@inertiajs/react';
 import { FaArrowRight, FaEdit, FaSave, FaEnvelope, FaUser, FaCalendar, FaClock, FaDollarSign, FaCheck, FaTimes, FaSpinner, FaPhone, FaMapMarkerAlt, FaGraduationCap } from 'react-icons/fa';
 import { useState } from 'react';
 
 export default function BookingShow({ booking, auth }) {
+    const { confirm } = useConfirmDialog();
     const [isEditing, setIsEditing] = useState(false);
     const [showEmailModal, setShowEmailModal] = useState(false);
 
@@ -37,8 +39,16 @@ export default function BookingShow({ booking, auth }) {
         });
     };
 
-    const handleDelete = () => {
-        if (confirm('هل أنت متأكد من حذف هذا الحجز؟ هذا الإجراء لا يمكن التراجع عنه.')) {
+    const handleDelete = async () => {
+        const confirmed = await confirm({
+            title: 'تأكيد الحذف',
+            message: 'هل أنت متأكد من حذف هذا الحجز؟ هذا الإجراء لا يمكن التراجع عنه.',
+            confirmText: 'حذف',
+            cancelText: 'إلغاء',
+            variant: 'danger',
+        });
+
+        if (confirmed) {
             router.delete(`/admin/bookings/${booking.id}`, {
                 onSuccess: () => {
                     router.visit('/admin/bookings');

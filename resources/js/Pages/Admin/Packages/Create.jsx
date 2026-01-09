@@ -13,7 +13,7 @@ export default function AdminPackagesCreate() {
         description: '',
         description_ar: '',
         price: 0,
-        currency: 'SAR',
+        currency: 'AED',
         duration_type: 'monthly',
         duration_months: 1,
         points_bonus: 0,
@@ -350,6 +350,71 @@ export default function AdminPackagesCreate() {
                                 <label className="mr-2 text-sm font-medium text-gray-700">
                                     شائع
                                 </label>
+                            </div>
+                        </div>
+
+                        {/* Features Section */}
+                        <div className="md:col-span-2">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">الميزات (إنجليزي)</h3>
+                            <div className="space-y-3">
+                                {features.map((feature, index) => (
+                                    <div key={index} className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={feature}
+                                            onChange={(e) => updateFeature(index, e.target.value, false)}
+                                            placeholder={`ميزة ${index + 1}`}
+                                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => removeFeature(index, false)}
+                                            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg"
+                                        >
+                                            <FaTimes />
+                                        </button>
+                                    </div>
+                                ))}
+                                <button
+                                    type="button"
+                                    onClick={() => addFeature(false)}
+                                    className="w-full px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-500 hover:text-blue-600 transition"
+                                >
+                                    + إضافة ميزة
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Features AR Section */}
+                        <div className="md:col-span-2">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">الميزات (عربي)</h3>
+                            <div className="space-y-3">
+                                {featuresAr.map((feature, index) => (
+                                    <div key={index} className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={feature}
+                                            onChange={(e) => updateFeature(index, e.target.value, true)}
+                                            placeholder={`ميزة ${index + 1}`}
+                                            dir="rtl"
+                                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-right"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => removeFeature(index, true)}
+                                            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg"
+                                        >
+                                            <FaTimes />
+                                        </button>
+                                    </div>
+                                ))}
+                                <button
+                                    type="button"
+                                    onClick={() => addFeature(true)}
+                                    className="w-full px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-500 hover:text-blue-600 transition"
+                                >
+                                    + إضافة ميزة
+                                </button>
                             </div>
                         </div>
                     </div>

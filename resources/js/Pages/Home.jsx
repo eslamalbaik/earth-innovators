@@ -12,8 +12,9 @@ import TestimonialsSection from '../Components/Sections/TestimonialsSection';
 import FAQSection from '../Components/Sections/FAQSection';
 import CTASection from '../Components/Sections/CTASection';
 import PublicationsSection from '../Components/Sections/PublicationsSection';
+import PackagesSection from '../Components/Sections/PackagesSection';
 
-export default function Home({ auth, cities = [], subjects = [], featuredTeachers = [], testimonials = [], stats = [], featuredPublications = [], featuredProjects = [], uaeSchools = [] }) {
+export default function Home({ auth, cities = [], subjects = [], featuredTeachers = [], testimonials = [], stats = [], featuredPublications = [], featuredProjects = [], uaeSchools = [], packages = [] }) {
     const [openFAQ, setOpenFAQ] = useState(null);
 
     const toggleFAQ = (index) => {
@@ -31,7 +32,7 @@ export default function Home({ auth, cities = [], subjects = [], featuredTeacher
         },
         {
             title: "الترتيب والمنافسة",
-            description: "تنافس مع المدارس الأخرى وحقق ترتيب متقدم. تابع إحصائيات مدرستك ومقارنتها مع المدارس الأخرى."
+            description: "تنافس مع المؤسسات تعليمية الأخرى وحقق ترتيب متقدم. تابع إحصائيات مدرستك ومقارنتها مع المؤسسات تعليمية الأخرى."
         }
     ];
 
@@ -50,7 +51,7 @@ export default function Home({ auth, cities = [], subjects = [], featuredTeacher
         },
         {
             question: "ما هي الباقات المتاحة وكيف يمكنني الاشتراك؟",
-            answer: "نوفر باقات متنوعة للمدارس والطلاب (شهرية، ربع سنوية، سنوية). كل باقة توفر ميزات مختلفة مثل عدد المشاريع المسموح بها، عدد التحديات، إمكانية الحصول على شهادات، وغيرها. يمكنك الاشتراك من صفحة الباقات."
+            answer: "نوفر باقات متنوعة للمؤسسات تعليمية والطلاب (شهرية، ربع سنوية، سنوية). كل باقة توفر ميزات مختلفة مثل عدد المشاريع المسموح بها، عدد التحديات، إمكانية الحصول على شهادات، وغيرها. يمكنك الاشتراك من صفحة الباقات."
         }
     ];
 
@@ -108,6 +109,8 @@ export default function Home({ auth, cities = [], subjects = [], featuredTeacher
             />
 
             <PublicationsSection publications={featuredPublications} />
+
+            <PackagesSection packages={packages} />
 
             <CTASection />
         </MainLayout >

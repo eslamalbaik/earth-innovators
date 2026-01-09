@@ -28,7 +28,7 @@ class PaymentService extends BaseService
             'student_id' => $user->id,
             'teacher_id' => $booking->teacher_id,
             'amount' => $amount,
-            'currency' => $booking->currency ?? 'SAR',
+            'currency' => $booking->currency ?? 'AED',
             'status' => 'pending',
             'payment_method' => 'tamara',
             'payment_gateway' => 'Tamara',
@@ -153,38 +153,38 @@ class PaymentService extends BaseService
             'order_number' => 'BOOKING-' . $booking->id,
             'total_amount' => [
                 'amount' => (string) number_format($amount, 2, '.', ''),
-                'currency' => 'SAR',
+                'currency' => $booking->currency ?? 'AED',
             ],
             'shipping_amount' => [
                 'amount' => '0',
-                'currency' => 'SAR',
+                'currency' => $booking->currency ?? 'AED',
             ],
             'tax_amount' => [
                 'amount' => '0',
-                'currency' => 'SAR',
+                'currency' => $booking->currency ?? 'AED',
             ],
             'description' => 'حجز مع معلم - ' . ($booking->teacher->name_ar ?? 'معلم'),
-            'country_code' => 'SA',
+            'country_code' => 'AE',
             'payment_type' => 'PAY_BY_INSTALMENTS',
             'instalments' => 3,
-            'locale' => 'ar_SA',
+            'locale' => 'ar_AE',
             'platform' => 'TeacherK Platform',
             'is_mobile' => false,
             'items' => $this->buildOrderItems($booking, $amount),
             'shipping_address' => [
                 'first_name' => $user->name,
                 'last_name' => '',
-                'line1' => $booking->neighborhood ?? $booking->city ?? 'Riyadh',
-                'city' => $booking->city ?? 'Riyadh',
-                'country_code' => 'SA',
+                'line1' => $booking->neighborhood ?? $booking->city ?? 'Dubai',
+                'city' => $booking->city ?? 'Dubai',
+                'country_code' => 'AE',
                 'phone_number' => $phone,
             ],
             'billing_address' => [
                 'first_name' => $user->name,
                 'last_name' => '',
-                'line1' => $booking->neighborhood ?? $booking->city ?? 'Riyadh',
-                'city' => $booking->city ?? 'Riyadh',
-                'country_code' => 'SA',
+                'line1' => $booking->neighborhood ?? $booking->city ?? 'Dubai',
+                'city' => $booking->city ?? 'Dubai',
+                'country_code' => 'AE',
                 'phone_number' => $phone,
             ],
             'consumer' => [
@@ -436,7 +436,7 @@ class PaymentService extends BaseService
             $refundData = [
                 'total_amount' => [
                     'amount' => (string) number_format($refundAmount, 2, '.', ''),
-                    'currency' => $payment->currency ?? 'SAR',
+                    'currency' => $payment->currency ?? 'AED',
                 ],
                 'comment' => $refundComment,
             ];
@@ -569,11 +569,11 @@ class PaymentService extends BaseService
             'quantity' => $count,
             'unit_price' => [
                 'amount' => (string) number_format($unitPrice, 2, '.', ''),
-                'currency' => 'SAR',
+                'currency' => $booking->currency ?? 'AED',
             ],
             'total_amount' => [
                 'amount' => (string) number_format($amount, 2, '.', ''),
-                'currency' => 'SAR',
+                'currency' => $booking->currency ?? 'AED',
             ],
         ]];
     }
@@ -591,7 +591,7 @@ class PaymentService extends BaseService
             'order_id' => $payment->gateway_payment_id,
             'total_amount' => [
                 'amount' => (string) number_format($amount, 2, '.', ''),
-                'currency' => $payment->currency ?? 'SAR',
+                'currency' => $payment->currency ?? 'AED',
             ],
         ];
 
@@ -600,7 +600,7 @@ class PaymentService extends BaseService
         } else {
             $captureData['shipping_amount'] = [
                 'amount' => '0',
-                'currency' => $payment->currency ?? 'SAR',
+                'currency' => $payment->currency ?? 'AED',
             ];
         }
 
@@ -609,7 +609,7 @@ class PaymentService extends BaseService
         } else {
             $captureData['tax_amount'] = [
                 'amount' => '0',
-                'currency' => $payment->currency ?? 'SAR',
+                'currency' => $payment->currency ?? 'AED',
             ];
         }
 
@@ -634,7 +634,7 @@ class PaymentService extends BaseService
         $cancelData = [
             'total_amount' => [
                 'amount' => (string) number_format($amount, 2, '.', ''),
-                'currency' => $payment->currency ?? 'SAR',
+                'currency' => $payment->currency ?? 'AED',
             ],
         ];
 
@@ -647,7 +647,7 @@ class PaymentService extends BaseService
         } else {
             $cancelData['shipping_amount'] = [
                 'amount' => '0',
-                'currency' => $payment->currency ?? 'SAR',
+                'currency' => $payment->currency ?? 'AED',
             ];
         }
 
@@ -656,7 +656,7 @@ class PaymentService extends BaseService
         } else {
             $cancelData['tax_amount'] = [
                 'amount' => '0',
-                'currency' => $payment->currency ?? 'SAR',
+                'currency' => $payment->currency ?? 'AED',
             ];
         }
 

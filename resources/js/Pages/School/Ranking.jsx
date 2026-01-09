@@ -63,12 +63,12 @@ export default function SchoolRanking({ schoolsRanking = [], currentSchoolRank, 
             )}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* ترتيب المدارس */}
+                {/* ترتيب المؤسسات تعليمية */}
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                     <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-legacy-green/10 to-legacy-blue/10">
                         <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                             <FaTrophy className="text-legacy-green" />
-                            ترتيب المدارس
+                            ترتيب المؤسسات تعليمية
                         </h3>
                     </div>
                     <div className="p-6">

@@ -5,17 +5,22 @@ import {
     FaBars, FaTimes, FaHome, FaUsers, FaBookOpen,
     FaCalendar, FaChartLine, FaUser, FaCog, FaSignOutAlt,
     FaGraduationCap, FaCommentDots, FaTachometerAlt, FaBell, FaBook,
-    FaChevronDown, FaCreditCard, FaTrophy, FaProjectDiagram, FaMedal, FaFile
+    FaChevronDown, FaCreditCard, FaTrophy, FaProjectDiagram, FaMedal, FaFile,
+    FaCheckCircle
 } from 'react-icons/fa';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import SidebarItem from '@/Components/SidebarItem';
 import SidebarSubMenu from '@/Components/SidebarSubMenu';
 import { getUserImageUrl, getInitials, getColorFromName } from '@/utils/imageUtils';
 import { useToast } from '@/Contexts/ToastContext';
+import { useFlashNotifications } from '@/Hooks/useFlashNotifications';
 
 export default function DashboardLayout({ children, header }) {
     const { auth } = usePage().props;
     const { showInfo } = useToast();
+    
+    // Automatically show flash messages as non-intrusive popups
+    useFlashNotifications();
     const [sidebarOpen, setSidebarOpen] = useState(() => {
         if (typeof window !== 'undefined') {
             return window.innerWidth >= 1100;
@@ -41,6 +46,22 @@ export default function DashboardLayout({ children, header }) {
     };
 
     const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+
+    const getDashboardTitle = () => {
+        const role = auth?.user?.role;
+        switch (role) {
+            case 'student':
+                return 'لوحة تحكم الطالب';
+            case 'teacher':
+                return 'لوحة تحكم المعلم';
+            case 'school':
+                return 'لوحة تحكم المدرسة';
+            case 'admin':
+                return 'لوحة الإدارة';
+            default:
+                return 'لوحة التحكم';
+        }
+    };
 
     // جلب الإشعارات وإعداد Real-time listeners
     useEffect(() => {
@@ -384,6 +405,7 @@ export default function DashboardLayout({ children, header }) {
             { name: 'الشارات', href: '/admin/badges', icon: FaCommentDots },
             { name: 'الباقات', href: '/admin/packages', icon: FaCreditCard },
             { name: 'الشهادات', href: '/admin/certificates', icon: FaGraduationCap },
+            { name: 'معايير القبول', href: '/admin/acceptance-criteria', icon: FaCheckCircle },
             { name: 'الملف الشخصي', href: '/profile', icon: FaUser },
         ],
         teacher: [
@@ -439,24 +461,36 @@ export default function DashboardLayout({ children, header }) {
                     { name: 'إنشاء مشروع', href: '/school/projects/create', icon: FaProjectDiagram },
                 ]
             },
-            { name: 'مراجعة الشارات', href: '/school/badges/pending', icon: FaMedal },
-            { name: 'الشارات المرسلة', href: '/school/badges', icon: FaCommentDots },
-            { name: 'مراجعة مقالات المجلة', href: '/school/publications/pending', icon: FaBookOpen },
-            { name: 'مقالات المدرسة', href: '/school/publications', icon: FaBook },
-            { name: 'إنشاء مقال', href: '/school/publications/create', icon: FaBook },
+            {
+                name: 'الشارات',
+                href: '/school/badges',
+                icon: FaMedal,
+                subItems: [
+                    { name: 'مراجعة الشارات', href: '/school/badges/pending', icon: FaMedal },
+                    { name: 'الشارات المرسلة', href: '/school/badges', icon: FaCommentDots },
+                    { name: 'الترتيب والشارات', href: '/school/ranking', icon: FaTrophy },
+                ]
+            },
+            {
+                name: 'المقالات',
+                href: '/school/publications',
+                icon: FaBook,
+                subItems: [
+                    { name: 'مقالات المدرسة', href: '/school/publications', icon: FaBook },
+                    { name: 'إنشاء مقال', href: '/school/publications/create', icon: FaBook },
+                ]
+            },
             {
                 name: 'التحديات',
                 href: '/school/challenges',
                 icon: FaCalendar,
                 subItems: [
                     { name: 'تسليمات التحديات', href: '/school/challenge-submissions', icon: FaFile },
-                    { name: 'مراجعة التحديات', href: '/school/challenge-submissions?status=submitted', icon: FaBookOpen },
                     { name: 'تحديات المدرسة', href: '/school/challenges', icon: FaCalendar },
                     { name: 'إنشاء تحدّي', href: '/school/challenges/create', icon: FaCalendar },
                 ]
             },
             { name: 'الطلاب', href: '/school/students', icon: FaGraduationCap },
-            { name: 'الترتيب والشارات', href: '/school/ranking', icon: FaTrophy },
             { name: 'الشهادات', href: '/school/certificates', icon: FaFile },
             { name: 'الملف الشخصي', href: '/profile', icon: FaUser },
         ],
@@ -474,31 +508,39 @@ export default function DashboardLayout({ children, header }) {
     const currentNavigation = navigation[auth.user?.role] || navigation.student;
 
     return (
-        <div dir="rtl" className="min-h-screen bg-gray-100">
+        <div dir="rtl" className="min-h-screen bg-gray-50">
+            {/* Sidebar - Fixed on Right (Rounded, Floating) */}
             <aside
-                className={`fixed top-0 right-0 z-40 h-screen transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : 'translate-x-full'
-                    } ${sidebarOpen ? 'w-64' : 'w-0'} bg-white shadow-lg`}
+                className={`fixed top-4 right-4 bottom-4 z-40 transition-all duration-300 ${
+                    sidebarOpen ? 'translate-x-0 opacity-100' : 'translate-x-[120%] opacity-0 pointer-events-none'
+                } w-72 bg-white rounded-2xl shadow-2xl border border-gray-100`}
             >
                 {/* Logo */}
-                <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
-                    <div className="w-full flex justify-center items-center gap-3">
-                        <Link href="/">
-                            <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
-                        </Link>
-                    </div>
+                <div className="relative flex flex-col items-center justify-center h-24 px-6 border-b border-gray-100">
                     {sidebarOpen && (
                         <button
                             onClick={toggleSidebar}
-                            className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
+                            className="absolute left-4 top-4 lg:hidden p-2 rounded-xl hover:bg-gray-50 transition"
                         >
-                            <FaTimes className="text-gray-600" />
+                            <FaTimes className="text-gray-500" />
                         </button>
+                    )}
+                    <div className="w-full flex justify-center items-center gap-3">
+                        <Link href="/" className="flex items-center gap-3">
+                            <ApplicationLogo />
+                            <span className="text-lg font-bold bg-gradient-to-r from-legacy-green to-legacy-blue bg-clip-text text-transparent">إرث المبتكرين</span>
+                        </Link>
+                    </div>
+                    {auth?.user && (
+                        <div className="text-xs text-gray-500 mt-1">
+                            {getDashboardTitle()}
+                        </div>
                     )}
                 </div>
 
-                <div className="flex flex-col justify-between h-[calc(100vh-64px)]">
+                <div className="flex flex-col justify-between h-[calc(100vh-144px)]">
                     {sidebarOpen && (
-                        <nav className="px-4 py-6 space-y-1 overflow-y-auto">
+                        <nav className="px-4 py-6 space-y-2 overflow-y-auto">
                             {currentNavigation.map((item) => {
                                 const isActive = isRouteActive(item.href, url);
 
@@ -540,13 +582,13 @@ export default function DashboardLayout({ children, header }) {
 
                     <div>
                         {sidebarOpen && (
-                            <div className="px-3 py-2 border-t border-gray-200">
+                            <div className="px-4 py-4 border-t border-gray-100">
                                 <div className="flex justify-start items-center gap-3">
                                     {getUserImage() ? (
                                         <img
                                             src={getUserImage()}
                                             alt={auth.user?.name}
-                                            className="w-10 h-10 rounded-full object-cover border-2 border-legacy-green"
+                                            className="w-10 h-10 rounded-xl object-cover border border-gray-200"
                                             onError={(e) => {
                                                 e.target.style.display = 'none';
                                                 const fallback = e.target.nextElementSibling;
@@ -556,7 +598,7 @@ export default function DashboardLayout({ children, header }) {
                                         />
                                     ) : null}
                                     <div
-                                        className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${getUserImage() ? 'hidden' : ''}`}
+                                        className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold ${getUserImage() ? 'hidden' : ''}`}
                                         style={{
                                             background: `linear-gradient(135deg, ${getColorFromName(auth.user?.name || 'User')})`
                                         }}
@@ -570,6 +612,7 @@ export default function DashboardLayout({ children, header }) {
                                             {auth.user?.role === 'teacher' && 'معلم'}
                                             {auth.user?.role === 'student' && 'طالب'}
                                             {auth.user?.role === 'school' && 'مدرسة'}
+                                            {auth.user?.role === 'educational_institution' && 'مؤسسة تعليمية'}
                                         </p>
                                     </div>
                                 </div>
@@ -579,30 +622,42 @@ export default function DashboardLayout({ children, header }) {
                 </div>
             </aside>
 
-            <div className={`transition-all duration-300 ${sidebarOpen ? 'mr-64' : 'mr-0'}`}>
-                <header className="bg-white shadow-sm sticky top-0 z-30">
-                    <div className="flex items-center justify-between px-6 py-2">
+            {/* Main Content Area */}
+            <div className={`transition-all duration-300 ${sidebarOpen ? 'mr-80' : 'mr-0'}`}>
+                {/* Top Navbar - Simple */}
+                <header className="bg-white/80 backdrop-blur-sm border-b border-gray-100 sticky top-0 z-30">
+                    <div className="flex items-center justify-between px-6 py-4">
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={toggleSidebar}
-                                className="p-2 rounded-lg hover:bg-gray-100 transition"
+                                className="p-2 rounded-xl hover:bg-gray-50 transition"
                             >
                                 <FaBars className="text-gray-600" />
                             </button>
                             {header && (
-                                <div className="text-xl font-bold text-gray-900">{header}</div>
+                                <h1 className="text-xl font-bold text-gray-900">{header}</h1>
                             )}
                         </div>
 
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-3">
+                            {/* Sort Dropdown */}
+                            <div className="relative">
+                                <select className="appearance-none bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 pr-8 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <option>ترتيب حسب</option>
+                                    <option>الأحدث</option>
+                                    <option>الأقدم</option>
+                                    <option>الأكثر مشاهدة</option>
+                                </select>
+                            </div>
+
                             {/* صندوق الإشعارات */}
-                            {(auth?.user?.role === 'student' || auth?.user?.role === 'teacher' || auth?.user?.role === 'school') && (
+                            {(auth?.user?.role === 'student' || auth?.user?.role === 'teacher' || auth?.user?.role === 'school' || auth?.user?.role === 'educational_institution' || auth?.user?.role === 'admin') && (
                                 <div className="relative" ref={notificationsRef}>
                                     <button
                                         onClick={() => setNotificationsOpen(!notificationsOpen)}
-                                        className="relative p-2 rounded-lg hover:bg-gray-100 transition"
+                                        className="relative p-2.5 rounded-xl hover:bg-gray-50 transition"
                                     >
-                                        <FaBell className="text-gray-600 text-xl" />
+                                        <FaBell className="text-gray-600 text-lg" />
                                         {unreadCount > 0 && (
                                             <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                                                 {unreadCount > 9 ? '9+' : unreadCount}
@@ -611,8 +666,8 @@ export default function DashboardLayout({ children, header }) {
                                     </button>
 
                                     {notificationsOpen && (
-                                        <div className="absolute left-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-96 overflow-hidden flex flex-col">
-                                            <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+                                        <div className="absolute left-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 max-h-96 overflow-hidden flex flex-col">
+                                            <div className="px-4 py-3 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between rounded-t-2xl">
                                                 <h3 className="font-bold text-gray-900">الإشعارات</h3>
                                                 {unreadCount > 0 && (
                                                     <button
@@ -809,16 +864,17 @@ export default function DashboardLayout({ children, header }) {
                                 </div>
                             )}
 
+                            {/* User Avatar */}
                             <div className="relative" ref={dropdownRef}>
                                 <button
                                     onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                                    className="flex items-center gap-3 hover:bg-gray-50 rounded-lg p-2 transition"
+                                    className="flex items-center gap-2 hover:bg-gray-50 rounded-xl p-1.5 transition"
                                 >
                                     {getUserImage() ? (
                                         <img
                                             src={getUserImage()}
                                             alt={auth.user?.name}
-                                            className="w-8 h-8 rounded-full object-cover border-2 border-legacy-green"
+                                            className="w-9 h-9 rounded-xl object-cover border border-gray-200"
                                             onError={(e) => {
                                                 e.target.style.display = 'none';
                                                 const fallback = e.target.nextElementSibling;
@@ -828,27 +884,18 @@ export default function DashboardLayout({ children, header }) {
                                         />
                                     ) : null}
                                     <div
-                                        className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${getUserImage() ? 'hidden' : ''}`}
+                                        className={`w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold ${getUserImage() ? 'hidden' : ''}`}
                                         style={{
                                             background: `linear-gradient(135deg, ${getColorFromName(auth.user?.name || 'User')})`
                                         }}
                                     >
                                         {getInitials(auth.user?.name || 'User')}
                                     </div>
-                                    <div className="text-start hidden md:block pe-3">
-                                        <p className="text-sm font-semibold text-gray-900">{auth.user?.name}</p>
-                                        <p className="text-xs text-gray-500">
-                                            {auth.user?.role === 'admin' && 'أدمن'}
-                                            {auth.user?.role === 'teacher' && 'معلم'}
-                                            {auth.user?.role === 'student' && 'طالب'}
-                                            {auth.user?.role === 'school' && 'مدرسة'}
-                                        </p>
-                                    </div>
                                     <FaChevronDown className={`text-gray-400 text-xs transition-transform ${userDropdownOpen ? 'rotate-180' : ''}`} />
                                 </button>
 
                                 {userDropdownOpen && (
-                                    <div className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                                    <div className="absolute left-0 mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50">
                                         <div className="py-2">
                                             <Link
                                                 href={auth?.user?.role === 'teacher' ? '/teacher/profile' : '/profile'}
@@ -880,13 +927,16 @@ export default function DashboardLayout({ children, header }) {
                 </header>
 
                 <main className="p-6">
-                    {children}
+                    <div className="max-w-7xl mx-auto">
+                        {children}
+                    </div>
                 </main>
             </div>
 
+            {/* Mobile Overlay */}
             {sidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+                    className="fixed inset-0 bg-black/20 backdrop-blur-sm z-30 lg:hidden"
                     onClick={toggleSidebar}
                 ></div>
             )}

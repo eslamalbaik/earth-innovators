@@ -19,8 +19,8 @@ export default function AdminSubscriptionsShowSubscription({ subscription }) {
         );
     };
 
-    const formatCurrency = (amount, currency = 'SAR') => {
-        return new Intl.NumberFormat('ar-SA', {
+    const formatCurrency = (amount, currency = 'AED') => {
+        return new Intl.NumberFormat('ar-AE', {
             style: 'currency',
             currency: currency,
         }).format(amount);

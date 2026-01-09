@@ -85,14 +85,14 @@ export default function AdminPayments({ payments, stats, teachers, filters }) {
                     <p className="text-xs text-gray-600 mb-1">إجمالي الإيرادات</p>
                     <div className="font-bold text-indigo-600 flex items-center ">
                         <p className="text-xl mt-1">{(stats.totalRevenue || 0).toFixed(2)}</p>
-                        <img src="/images/sar-currency(black).svg" alt="currency" className="w-6 h-6" />
+                        <img src="/images/aed-currency(black).svg" alt="currency" className="w-6 h-6" />
                     </div>
                 </div>
                 <div className="bg-white rounded-xl shadow-lg p-4 border-r-4 border-orange-500">
                     <p className="text-xs text-gray-600 mb-1">معلق</p>
                     <div className="font-bold text-orange-600 flex items-center ">
                         <p className="text-xl mt-1">{(stats.pendingAmount || 0).toFixed(2)}</p>
-                        <img src="/images/sar-currency(black).svg" alt="currency" className="w-6 h-6" />
+                        <img src="/images/aed-currency(black).svg" alt="currency" className="w-6 h-6" />
                     </div>
                 </div>
             </div>
