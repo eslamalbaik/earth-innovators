@@ -57,5 +57,39 @@ class SchoolCertificateController extends Controller
             'description' => 'قائمة بجميع الطلاب مع إمكانية إنشاء شهادات جماعية أو فردية',
         ]);
     }
+
+    /**
+     * Show school certificate page
+     */
+    public function show()
+    {
+        $user = Auth::user();
+
+        if (!$user || $user->role !== 'school') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $school = \App\Models\School::where('user_id', $user->id)->first();
+        $joinDate = $user->created_at ? $user->created_at->format('Y-m-d') : now()->format('Y-m-d');
+        $issueDate = now()->format('Y-m-d');
+
+        // Get membership certificate if exists
+        $membershipCertificateService = app(\App\Services\MembershipCertificateService::class);
+        $membershipCertificate = $membershipCertificateService->getUserMembershipCertificate($user->id, $user->role);
+
+        return Inertia::render('School/Certificate/Show', [
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'school_name' => $school ? $school->name : $user->name,
+                'membership_number' => $user->membership_number ?? 'SCH-' . now()->format('Y') . '-' . str_pad($user->id, 3, '0', STR_PAD_LEFT),
+            ],
+            'stats' => [],
+            'certificate' => [
+                'issue_date' => $membershipCertificate ? $membershipCertificate->issue_date->format('Y-m-d') : $issueDate,
+                'download_url' => $membershipCertificate ? route('membership-certificates.download', $membershipCertificate->id) : null,
+            ],
+        ]);
+    }
 }
 

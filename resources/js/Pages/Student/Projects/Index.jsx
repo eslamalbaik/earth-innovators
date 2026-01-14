@@ -1,164 +1,258 @@
 import { Head, Link, router } from '@inertiajs/react';
-import DashboardLayout from '../../../Layouts/DashboardLayout';
-import { useState } from 'react';
-import { FaSearch, FaProjectDiagram, FaEye, FaUser, FaCalendar } from 'react-icons/fa';
-import { toHijriDate } from '@/utils/dateUtils';
+import { useState, useMemo } from 'react';
+import { FaFilter, FaChevronDown, FaTrash, FaEdit, FaImage } from 'react-icons/fa';
+import MobileTopBar from '@/Components/Mobile/MobileTopBar';
+import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
+import { useToast } from '@/Contexts/ToastContext';
 
 export default function StudentProjectsIndex({ auth, projects, message }) {
-    const [search, setSearch] = useState('');
-    const [category, setCategory] = useState('');
+    const { showError } = useToast();
+    const [filter, setFilter] = useState('all'); // all | pending | evaluated | winners
+    const [showFilterDropdown, setShowFilterDropdown] = useState(false);
 
-    const handleSearch = (e) => {
-        e.preventDefault();
-        router.get('/student/projects', { search, category }, {
-            preserveState: true,
-            preserveScroll: true,
-        });
+    // Map project status to filter categories
+    const getProjectStatus = (project) => {
+        // If project has submission status, use it
+        if (project.submission_status) {
+            if (project.submission_status === 'pending' || project.submission_status === 'under_review') {
+                return 'pending';
+            }
+            if (project.submission_status === 'evaluated' || project.submission_status === 'approved') {
+                return project.rating >= 4.5 ? 'winners' : 'evaluated';
+            }
+        }
+        // Otherwise use project status
+        if (project.status === 'pending' || project.status === 'under_review') {
+            return 'pending';
+        }
+        if (project.status === 'approved' || project.status === 'evaluated') {
+            return project.rating >= 4.5 ? 'winners' : 'evaluated';
+        }
+        return 'evaluated';
     };
 
-    const categories = [
-        { value: '', label: 'جميع الفئات' },
-        { value: 'science', label: 'علوم' },
-        { value: 'technology', label: 'تقنية' },
-        { value: 'engineering', label: 'هندسة' },
-        { value: 'mathematics', label: 'رياضيات' },
-        { value: 'arts', label: 'فنون' },
-        { value: 'other', label: 'أخرى' },
-    ];
+    const filteredProjects = useMemo(() => {
+        const list = projects?.data || [];
+        if (filter === 'all') return list;
+        return list.filter((p) => getProjectStatus(p) === filter);
+    }, [projects?.data, filter]);
 
-    return (
-        <DashboardLayout auth={auth}>
-            <Head title="المشاريع المعتمدة" />
+    const getStatusLabel = (project) => {
+        const status = getProjectStatus(project);
+        if (status === 'pending') return { label: 'تحت التقييم', color: 'bg-yellow-100 text-yellow-700 border-yellow-300' };
+        if (status === 'evaluated') return { label: 'تم التقييم', color: 'bg-blue-100 text-blue-700 border-blue-300' };
+        if (status === 'winners') return { label: 'فائز', color: 'bg-green-100 text-green-700 border-green-300' };
+        return { label: 'تم التقييم', color: 'bg-blue-100 text-blue-700 border-blue-300' };
+    };
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">المشاريع المعتمدة</h1>
-                    <p className="text-gray-600">استعرض المشاريع المعتمدة من مدرستك وقدم مشروعك</p>
-                </div>
+    const getCategoryLabel = (category) => {
+        const labels = {
+            science: 'علوم',
+            technology: 'تقنية',
+            engineering: 'هندسة',
+            mathematics: 'رياضيات',
+            arts: 'فنون',
+            mobile: 'تطبيقات الجوال',
+            other: 'أخرى',
+        };
+        return labels[category] || 'أخرى';
+    };
 
-                {message && (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-                        <p className="text-yellow-800">{message}</p>
-                    </div>
-                )}
+    const formatDate = (date) => {
+        if (!date) return '';
+        const d = new Date(date);
+        const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+        return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+    };
 
-                {/* البحث والفلترة */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-                    <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
-                        <div className="flex-1">
-                            <div className="relative">
-                                <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                                <input
-                                    type="text"
-                                    value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
-                                    placeholder="ابحث عن مشروع..."
-                                    className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                />
-                            </div>
-                        </div>
-                        <div className="md:w-48">
-                            <select
-                                value={category}
-                                onChange={(e) => setCategory(e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+    const handleDelete = (projectId, e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (confirm('هل أنت متأكد من حذف هذا المشروع؟')) {
+            router.delete(`/student/projects/${projectId}`, {
+            preserveScroll: true,
+                onError: () => {
+                    showError('حدث خطأ أثناء حذف المشروع');
+                },
+            });
+        }
+    };
+
+    const handleEdit = (projectId, e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        router.visit(`/student/projects/${projectId}/edit`);
+    };
+
+    const ProjectsContent = () => (
+        <div className="space-y-4">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-3">
+            <div className="text-lg font-extrabold text-gray-900">المشاريع</div>
+                <div className="flex items-center gap-2 text-gray-400 relative">
+                    <button
+                        type="button"
+                        onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+                        className="flex items-center gap-1 text-sm"
+                    >
+                        <FaFilter />
+                        <span>فلترة</span>
+                        <FaChevronDown className="text-xs" />
+                    </button>
+                    {showFilterDropdown && (
+                        <div className="absolute top-full right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-200 p-2 z-10 min-w-[150px]">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setShowFilterDropdown(false);
+                                    // يمكن إضافة فلترة إضافية هنا
+                                }}
+                                className="w-full  px-3 py-2 text-sm hover:bg-gray-50 rounded-lg"
                             >
-                                {categories.map((cat) => (
-                                    <option key={cat.value} value={cat.value}>
-                                        {cat.label}
-                                    </option>
-                                ))}
-                            </select>
+                                فلترة متقدمة
+                            </button>
                         </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Filter Buttons */}
+            <div className="flex gap-2 overflow-x-auto pb-2">
+                <button
+                    type="button"
+                    onClick={() => setFilter('all')}
+                    className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${
+                        filter === 'all' ? 'bg-[#A3C042] text-white' : 'bg-white text-gray-700'
+                    }`}
+                >
+                    الكل
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setFilter('pending')}
+                    className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${
+                        filter === 'pending' ? 'bg-[#A3C042] text-white' : 'bg-white text-gray-700'
+                    }`}
+                >
+                    تحت التقييم
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setFilter('evaluated')}
+                    className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${
+                        filter === 'evaluated' ? 'bg-[#A3C042] text-white' : 'bg-white text-gray-700'
+                    }`}
+                >
+                    تم التقييم
+                </button>
                         <button
-                            type="submit"
-                            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                    type="button"
+                    onClick={() => setFilter('winners')}
+                    className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${
+                        filter === 'winners' ? 'bg-[#A3C042] text-white' : 'bg-white text-gray-700'
+                    }`}
                         >
-                            بحث
+                    الفائزيين
                         </button>
-                    </form>
+            </div>
+
+            {/* Projects List */}
+            {message && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 text-sm text-yellow-800">
+                    {message}
                 </div>
+            )}
 
-                {/* قائمة المشاريع */}
-                {projects.data && projects.data.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {projects.data.map((project) => (
-                            <Link
+            {filteredProjects.length > 0 ? (
+                <div className="space-y-4">
+                    {filteredProjects.map((project) => {
+                        const statusInfo = getStatusLabel(project);
+                        const categoryLabel = getCategoryLabel(project.category);
+                        const projectDate = formatDate(project.submitted_at || project.created_at || project.approved_at);
+
+                        return (
+                            <div
                                 key={project.id}
-                                href={`/student/projects/${project.id}`}
-                                className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition duration-300 overflow-hidden group"
+                                className="bg-white rounded-2xl border border-gray-100 p-4 flex items-start gap-4"
                             >
-                                <div className="p-6">
-                                    <div className="flex items-start justify-between mb-4">
-                                        <div className="flex items-center gap-2">
-                                            <FaProjectDiagram className="text-blue-600 text-xl" />
-                                            <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
-                                                معتمد
-                                            </span>
-                                        </div>
-                                        <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded">
-                                            {project.category === 'science' ? 'علوم' :
-                                             project.category === 'technology' ? 'تقنية' :
-                                             project.category === 'engineering' ? 'هندسة' :
-                                             project.category === 'mathematics' ? 'رياضيات' :
-                                             project.category === 'arts' ? 'فنون' : 'أخرى'}
-                                        </span>
-                                    </div>
-
-                                    <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition">
-                                        {project.title}
-                                    </h3>
-
-                                    <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                                        {project.description}
-                                    </p>
-
-                                    <div className="flex items-center justify-between text-sm text-gray-500 pt-4 border-t border-gray-200">
-                                        <div className="flex items-center gap-2">
-                                            <FaUser className="text-gray-400" />
-                                            <span>
-                                                {project.teacher?.name || project.user?.name || 'غير محدد'}
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <FaEye className="text-gray-400" />
-                                            <span>{project.views || 0}</span>
-                                        </div>
-                                    </div>
-
-                                    {project.approved_at && (
-                                        <div className="mt-3 text-xs text-gray-500 flex items-center gap-1">
-                                            <FaCalendar />
-                                            <span>معتمد في {toHijriDate(project.approved_at)}</span>
+                                {/* Project Image */}
+                                <div className="flex-shrink-0">
+                                    {project.image || project.thumbnail ? (
+                                        <img
+                                            src={project.image || project.thumbnail || '/images/hero.png'}
+                                            alt={project.title}
+                                            className="w-20 h-20 rounded-xl object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-20 h-20 rounded-xl bg-gray-200 flex items-center justify-center">
+                                            <FaImage className="text-gray-400 text-2xl" />
                                         </div>
                                     )}
                                 </div>
-                            </Link>
-                        ))}
+
+                                {/* Project Info */}
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-start justify-between gap-2 mb-2">
+                                        <div className="flex-1">
+                                            <h3 className="text-sm font-bold text-gray-900 mb-1 line-clamp-1">
+                                                {project.title || 'تطبيق إدارة المهام'}
+                                            </h3>
+                                            <p className="text-xs text-gray-500">{projectDate || '2 أغسطس 2025'}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-2 flex-wrap mb-2">
+                                        <span className="px-2 py-1 rounded-full text-[10px] font-semibold bg-gray-100 text-gray-700 border border-gray-200">
+                                            {categoryLabel}
+                                        </span>
+                                        <span className={`px-2 py-1 rounded-full text-[10px] font-semibold border ${statusInfo.color}`}>
+                                            {statusInfo.label}
+                                        </span>
+                                    </div>
+
+                                    {/* Action Buttons */}
+                                    <div className="flex items-center gap-2 mt-2">
+                                        <button
+                                            type="button"
+                                            onClick={(e) => handleDelete(project.id, e)}
+                                            className="h-6 w-6 rounded-full bg-red-50 flex items-center justify-center hover:bg-red-100 transition"
+                                            aria-label="حذف"
+                                        >
+                                            <FaTrash className="text-red-500 text-xs" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={(e) => handleEdit(project.id, e)}
+                                            className="h-6 w-6 rounded-full bg-gray-50 flex items-center justify-center hover:bg-gray-100 transition"
+                                            aria-label="تعديل"
+                                        >
+                                            <FaEdit className="text-gray-500 text-xs" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
                     </div>
                 ) : (
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-                        <FaProjectDiagram className="mx-auto text-6xl text-gray-300 mb-4" />
-                        <p className="text-gray-500 text-lg">لا توجد مشاريع معتمدة حالياً</p>
+                <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
+                    <p className="text-gray-500 text-sm">لا توجد مشاريع</p>
                     </div>
                 )}
 
                 {/* Pagination */}
-                {projects.links && projects.links.length > 3 && (
-                    <div className="mt-6 flex justify-center">
-                        <div className="flex gap-2">
+            {projects?.links && projects.links.length > 3 && (
+                <div className="bg-white rounded-2xl border border-gray-100 p-3">
+                    <div className="flex flex-wrap gap-2 justify-center">
                             {projects.links.map((link, index) => (
-                                <button
+                            <Link
                                     key={index}
-                                    onClick={() => link.url && router.get(link.url)}
-                                    disabled={!link.url}
-                                    className={`px-4 py-2 rounded-lg ${
+                                href={link.url || '#'}
+                                className={`px-3 py-2 rounded-xl text-sm font-semibold transition ${
                                         link.active
-                                            ? 'bg-blue-600 text-white'
-                                            : link.url
-                                            ? 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-                                            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                    }`}
+                                        ? 'bg-[#A3C042] text-white'
+                                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                                } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                 />
                             ))}
@@ -166,7 +260,41 @@ export default function StudentProjectsIndex({ auth, projects, message }) {
                     </div>
                 )}
             </div>
-        </DashboardLayout>
+    );
+
+    return (
+        <div dir="rtl" className="min-h-screen bg-gray-50">
+            <Head title="مشاريعي - إرث المبتكرين" />
+
+            {/* Mobile View */}
+            <div className="block md:hidden">
+                <MobileTopBar
+                    title="إرث المبتكرين"
+                    unreadCount={auth?.unreadCount || 0}
+                    onNotifications={() => router.visit('/notifications')}
+                    onBack={() => router.visit('/')}
+                />
+                <main className="px-4 pb-24 pt-4">
+                    <ProjectsContent />
+                </main>
+                <MobileBottomNav active="projects" role={auth?.user?.role} isAuthed={!!auth?.user} user={auth?.user} />
+            </div>
+
+            {/* Desktop View */}
+            <div className="hidden md:block">
+                <MobileTopBar
+                    title="إرث المبتكرين"
+                    unreadCount={auth?.unreadCount || 0}
+                    onNotifications={() => router.visit('/notifications')}
+                    onBack={() => router.visit('/')}
+                />
+                <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-4">
+                    <div className="mx-auto w-full max-w-3xl">
+                        <ProjectsContent />
+                    </div>
+                </main>
+                <MobileBottomNav active="projects" role={auth?.user?.role} isAuthed={!!auth?.user} user={auth?.user} />
+            </div>
+        </div>
     );
 }
-

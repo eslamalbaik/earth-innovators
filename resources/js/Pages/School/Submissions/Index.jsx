@@ -97,22 +97,22 @@ export default function SchoolSubmissionsIndex({ auth, submissions, students = [
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-50">
                                     <tr>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             الطالب
                                         </th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             المشروع
                                         </th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             التاريخ
                                         </th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             التقييم
                                         </th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             الحالة
                                         </th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             الإجراءات
                                         </th>
                                     </tr>

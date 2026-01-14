@@ -107,7 +107,7 @@ export default function ProjectsSection({
                     <div className="flex justify-end items-center mt-8">
                         <button
                             onClick={onViewAllProjects}
-                            className="bg-legacy-green hover:bg-primary-600 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg font-bold text-xs md:text-sm transition duration-300 flex items-center gap-3 shadow-lg"
+                            className="bg-[#A3C042] hover:bg-primary-600 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg font-bold text-xs md:text-sm transition duration-300 flex items-center gap-3 shadow-lg"
                         >
                             عرض جميع المشاريع
                             <FaArrowLeft className="text-md" />

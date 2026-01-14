@@ -14,16 +14,55 @@ class ChallengeService extends BaseService
     /**
      * Get challenges for a school
      */
-    public function getSchoolChallenges(int $schoolId, ?string $status = null, int $perPage = 10): LengthAwarePaginator
-    {
+    public function getSchoolChallenges(
+        int $schoolId, 
+        ?string $status = null, 
+        int $perPage = 10,
+        ?string $search = null,
+        ?string $category = null,
+        ?string $challengeType = null
+    ): LengthAwarePaginator {
         // Don't cache - always get fresh data to ensure new challenges appear immediately
         // Cache was causing issues where new challenges didn't appear
         $query = Challenge::where('school_id', $schoolId)
+            ->where('status', '!=', 'cancelled')
             ->with(['creator', 'school'])
             ->orderBy('created_at', 'desc');
 
-        if ($status) {
+        // Apply status filter
+        if ($status === 'active') {
+            $query->where('status', 'active')
+                ->where('start_date', '<=', now())
+                ->where('deadline', '>=', now());
+        } elseif ($status === 'upcoming') {
+            $query->where('status', 'active')
+                ->where('start_date', '>', now());
+        } elseif ($status === 'finished') {
+            $query->where(function ($q) {
+                $q->where('status', 'completed')
+                  ->orWhere('deadline', '<', now());
+            });
+        } elseif ($status) {
             $query->where('status', $status);
+        }
+
+        // Apply search filter
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('objective', 'like', "%{$search}%");
+            });
+        }
+
+        // Apply category filter
+        if ($category) {
+            $query->where('category', $category);
+        }
+
+        // Apply challenge type filter
+        if ($challengeType) {
+            $query->where('challenge_type', $challengeType);
         }
 
         $challenges = $query->paginate($perPage);

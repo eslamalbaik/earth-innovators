@@ -21,6 +21,82 @@ Route::get('/storage/{path}', [\App\Http\Controllers\StorageController::class, '
     ->where('path', '.*')
     ->name('storage.serve');
 
+// Landing page route
+Route::get('/landing', function () {
+    $stats = \Illuminate\Support\Facades\Cache::remember('landing_stats', 3600, function () {
+        $totalStudents = \App\Models\User::where('role', 'student')->count();
+        $totalTeachers = \App\Models\Teacher::where('is_active', true)->where('is_verified', true)->count();
+        $totalSessions = \App\Models\Booking::where('status', 'completed')->count();
+        $averageRating = \App\Models\Review::where('is_published', true)->avg('rating');
+        $averageRating = $averageRating ? round($averageRating, 1) : 0;
+
+        $studentValue = $totalStudents >= 100 ? '+' . number_format($totalStudents, 0) : '+12,000';
+        $teacherValue = $totalTeachers >= 100 ? '+' . number_format($totalTeachers, 0) : '+2,500';
+        $sessionValue = $totalSessions >= 100 ? '+' . number_format($totalSessions, 0) : '+35,000';
+        $ratingValue = $averageRating >= 4 ? (string)$averageRating : '4.8';
+
+        return [
+            ['value' => $studentValue, 'label' => 'طالب'],
+            ['value' => $teacherValue, 'label' => 'معلم'],
+            ['value' => $sessionValue, 'label' => 'جلسة ناجحة'],
+            ['value' => $ratingValue, 'label' => 'التقييم المتوسط']
+        ];
+    });
+
+    $featuredProjects = \Illuminate\Support\Facades\Cache::remember('landing_featured_projects', 3600, function () {
+        return \App\Models\Project::where('status', 'approved')
+            ->with(['teacher:id,name_ar,user_id', 'teacher.user:id,name', 'user:id,name', 'school:id,name'])
+            ->orderBy('rating', 'desc')
+            ->orderBy('likes', 'desc')
+            ->orderBy('views', 'desc')
+            ->limit(4)
+            ->get()
+            ->map(function ($project) {
+                return [
+                    'id' => $project->id,
+                    'title' => $project->title,
+                    'description' => $project->description,
+                    'category' => $project->category,
+                    'views' => $project->views,
+                    'likes' => $project->likes,
+                    'rating' => $project->rating,
+                    'teacher' => $project->teacher ? ['id' => $project->teacher->id, 'name_ar' => $project->teacher->name_ar, 'user' => $project->teacher->user ? ['id' => $project->teacher->user->id, 'name' => $project->teacher->user->name] : null] : null,
+                    'user' => $project->user ? ['id' => $project->user->id, 'name' => $project->user->name] : null,
+                    'school' => $project->school ? ['id' => $project->school->id, 'name' => $project->school->name] : null,
+                ];
+            })
+            ->toArray();
+    });
+
+    // Get user's membership certificate if authenticated
+    $membershipCertificate = null;
+    if (auth()->check()) {
+        $user = auth()->user();
+        $membershipCertificateService = app(\App\Services\MembershipCertificateService::class);
+        $certificate = $membershipCertificateService->getUserMembershipCertificate($user->id, $user->role);
+        if ($certificate) {
+            $membershipCertificate = [
+                'id' => $certificate->id,
+                'certificate_number' => $certificate->certificate_number,
+                'title' => $certificate->title_ar ?? $certificate->title,
+                'description' => $certificate->description_ar ?? $certificate->description,
+                'issue_date' => $certificate->issue_date->format('Y-m-d'),
+                'issue_date_formatted' => $certificate->issue_date->format('d/m/Y'),
+                'download_url' => route('membership-certificates.download', $certificate->id),
+            ];
+        }
+    }
+
+    return Inertia::render('Landing', [
+        'stats' => $stats,
+        'featuredProjects' => $featuredProjects,
+        'featuredPublications' => [],
+        'uaeSchools' => [],
+        'testimonials' => [],
+        'membershipCertificate' => $membershipCertificate,
+    ]);
+})->name('landing');
+
 Route::get('/', function () {
     $cities = \Illuminate\Support\Facades\Cache::remember('home_cities', 3600, function () {
         return \App\Models\Teacher::where('is_active', true)
@@ -315,6 +391,283 @@ Route::get('/', function () {
             ->toArray();
     });
 
+    // Get user's membership certificate if authenticated
+    $membershipCertificate = null;
+    if (auth()->check()) {
+        $user = auth()->user();
+        $membershipCertificateService = app(\App\Services\MembershipCertificateService::class);
+        $certificate = $membershipCertificateService->getUserMembershipCertificate($user->id, $user->role);
+        if ($certificate) {
+            $membershipCertificate = [
+                'id' => $certificate->id,
+                'certificate_number' => $certificate->certificate_number,
+                'title' => $certificate->title_ar ?? $certificate->title,
+                'description' => $certificate->description_ar ?? $certificate->description,
+                'issue_date' => $certificate->issue_date->format('Y-m-d'),
+                'issue_date_formatted' => $certificate->issue_date->format('d/m/Y'),
+                'download_url' => route('membership-certificates.download', $certificate->id),
+            ];
+        }
+    }
+
+    return Inertia::render('Landing', [
+        'stats' => $stats,
+        'featuredProjects' => $featuredProjects,
+        'featuredPublications' => $featuredPublications,
+        'uaeSchools' => $uaeSchools,
+        'testimonials' => $testimonials,
+        'membershipCertificate' => $membershipCertificate,
+    ]);
+})->name('home');
+
+// Keep old home route for dashboard users
+Route::get('/home', function () {
+    $cities = \Illuminate\Support\Facades\Cache::remember('home_cities', 3600, function () {
+        return \App\Models\Teacher::where('is_active', true)
+            ->where('is_verified', true)
+            ->whereNotNull('city')
+            ->distinct()
+            ->pluck('city')
+            ->filter()
+            ->sort()
+            ->values()
+            ->toArray();
+    });
+
+    $subjects = \Illuminate\Support\Facades\Cache::remember('home_subjects', 3600, function () {
+        return \App\Models\Subject::where('is_active', true)
+            ->orderBy('sort_order')
+            ->orderBy('name_ar')
+            ->get()
+            ->map(function ($subject) {
+                $countFromPivot = $subject->teachers()
+                    ->where('is_active', true)
+                    ->where('is_verified', true)
+                    ->count();
+
+                $countFromJson = \App\Models\Teacher::where('is_active', true)
+                    ->where('is_verified', true)
+                    ->where(function ($query) use ($subject) {
+                        $query->whereRaw('JSON_SEARCH(LOWER(JSON_EXTRACT(subjects, "$")), "one", LOWER(?), NULL, "$[*]") IS NOT NULL', [$subject->name_ar])
+                            ->orWhereRaw('JSON_SEARCH(LOWER(JSON_EXTRACT(subjects, "$")), "one", LOWER(?), NULL, "$[*]") IS NOT NULL', [$subject->name_en]);
+                    })
+                    ->count();
+
+                $teacherCount = max($countFromPivot, $countFromJson);
+
+                $imageUrl = '/images/subjects/default.png';
+                if ($subject->image) {
+                    if (str_starts_with($subject->image, 'http://') || str_starts_with($subject->image, 'https://')) {
+                        $imageUrl = $subject->image;
+                    } elseif (str_starts_with($subject->image, '/storage/') || str_starts_with($subject->image, '/images/')) {
+                        $imageUrl = $subject->image;
+                    } else {
+                        $imageUrl = asset('storage/' . $subject->image);
+                    }
+                }
+
+                return [
+                    'id' => $subject->id,
+                    'name' => $subject->name_ar,
+                    'name_ar' => $subject->name_ar,
+                    'name_en' => $subject->name_en,
+                    'image' => $imageUrl,
+                    'teacher_count' => $teacherCount,
+                ];
+            })
+            ->toArray();
+    });
+
+    $featuredTeachers = \Illuminate\Support\Facades\Cache::remember('home_teachers', 3600, function () {
+        return \App\Models\Teacher::where('is_active', true)
+            ->where('is_verified', true)
+            ->orderBy('rating', 'desc')
+            ->orderBy('reviews_count', 'desc')
+            ->orderBy('students_count', 'desc')
+            ->limit(4)
+            ->get()
+            ->map(function ($teacher) {
+                $subjects = is_array($teacher->subjects) ? $teacher->subjects : json_decode($teacher->subjects, true);
+                $stages = is_array($teacher->stages) ? $teacher->stages : json_decode($teacher->stages, true);
+
+                return [
+                    'id' => $teacher->id,
+                    'name' => $teacher->name_ar,
+                    'image' => $teacher->image ? asset('storage/' . $teacher->image) : null,
+                    'rating' => round($teacher->rating ?? 0, 1),
+                    'location' => $teacher->city . (is_array($stages) && count($stages) > 0 ? ' - ' . implode(' / ', $stages) : ''),
+                    'subject' => is_array($subjects) && count($subjects) > 0 ? $subjects[0] : '',
+                    'price' => number_format($teacher->price_per_hour, 0),
+                ];
+            })
+            ->toArray();
+    });
+
+    $testimonials = \Illuminate\Support\Facades\Cache::remember('home_testimonials', 3600, function () {
+        $reviewerInfo = [
+            'سارة أحمد' => ['title' => 'منصة رائعة للإبداع والتعلم', 'initials' => 'سأ'],
+            'فاطمة محمد' => ['title' => 'تجربة ممتازة للمؤسسات تعليمية', 'initials' => 'فم'],
+            'أم خالد' => ['title' => 'أفضل منصة تعليمية', 'initials' => 'أخ'],
+            'أحمد علي' => ['title' => 'منصة محترفة ومبتكرة', 'initials' => 'أع'],
+            'أبو ناصر' => ['title' => 'تجربة إيجابية جداً', 'initials' => 'أن'],
+            'محمد خالد' => ['title' => 'منصة متميزة للطلاب', 'initials' => 'مخ'],
+        ];
+
+        return \App\Models\Review::where('is_published', true)
+            ->whereNotNull('comment')
+            ->where('comment', '!=', '')
+            ->orderBy('rating', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->limit(6)
+            ->get()
+            ->map(function ($review) use ($reviewerInfo) {
+                $reviewerName = $review->reviewer_name ?? ($review->student ? $review->student->name : 'مجهول');
+                $info = $reviewerInfo[$reviewerName] ?? ['title' => '', 'initials' => ''];
+
+                return [
+                    'id' => $review->id,
+                    'title' => $info['title'],
+                    'text' => $review->comment,
+                    'rating' => round($review->rating, 1),
+                    'name' => $reviewerName,
+                    'location' => $review->reviewer_location ?? ($review->student && $review->student->city ? $review->student->city : ''),
+                    'initials' => $info['initials'],
+                ];
+            })
+            ->toArray();
+    });
+
+    $stats = \Illuminate\Support\Facades\Cache::remember('home_stats', 3600, function () {
+        $totalStudents = \App\Models\User::where('role', 'student')->count();
+        $totalTeachers = \App\Models\Teacher::where('is_active', true)->where('is_verified', true)->count();
+        $totalSessions = \App\Models\Booking::where('status', 'completed')->count();
+        $averageRating = \App\Models\Review::where('is_published', true)->avg('rating');
+        $averageRating = $averageRating ? round($averageRating, 1) : 0;
+
+        $studentValue = $totalStudents >= 100 ? '+' . number_format($totalStudents, 0) : '+12,000';
+        $teacherValue = $totalTeachers >= 100 ? '+' . number_format($totalTeachers, 0) : '+2,500';
+        $sessionValue = $totalSessions >= 100 ? '+' . number_format($totalSessions, 0) : '+35,000';
+        $ratingValue = $averageRating >= 4 ? (string)$averageRating : '4.8';
+
+        return [
+            ['value' => $studentValue, 'label' => 'طالب'],
+            ['value' => $teacherValue, 'label' => 'معلم'],
+            ['value' => $sessionValue, 'label' => 'جلسة ناجحة'],
+            ['value' => $ratingValue, 'label' => 'التقييم المتوسط']
+        ];
+    });
+
+    $featuredPublications = \Illuminate\Support\Facades\Cache::remember('home_publications', 3600, function () {
+        return \App\Models\Publication::where('status', 'approved')
+            ->with(['school', 'author'])
+            ->orderBy('created_at', 'desc')
+            ->limit(2)
+            ->get()
+            ->map(function ($publication) {
+                return [
+                    'id' => $publication->id,
+                    'title' => $publication->title,
+                    'description' => $publication->description,
+                    'type' => $publication->type,
+                    'cover_image' => app(\App\Services\PublicationService::class)->normalizeImagePath($publication->cover_image),
+                    'file' => app(\App\Services\PublicationService::class)->normalizeFilePath($publication->file),
+                    'content' => $publication->content,
+                    'issue_number' => $publication->issue_number,
+                    'publish_date' => $publication->publish_date,
+                    'publisher_name' => $publication->publisher_name,
+                    'likes_count' => $publication->likes_count,
+                    'school' => $publication->school ? ['id' => $publication->school->id, 'name' => $publication->school->name] : null,
+                ];
+            })
+            ->toArray();
+    });
+
+    $featuredProjects = \Illuminate\Support\Facades\Cache::remember('home_featured_projects', 3600, function () {
+        return \App\Models\Project::where('status', 'approved')
+            ->with(['teacher:id,name_ar,user_id', 'teacher.user:id,name', 'user:id,name', 'school:id,name'])
+            ->orderBy('rating', 'desc')
+            ->orderBy('likes', 'desc')
+            ->orderBy('views', 'desc')
+            ->limit(4)
+            ->get()
+            ->map(function ($project) {
+                return [
+                    'id' => $project->id,
+                    'title' => $project->title,
+                    'description' => $project->description,
+                    'category' => $project->category,
+                    'views' => $project->views,
+                    'likes' => $project->likes,
+                    'rating' => $project->rating,
+                    'teacher' => $project->teacher ? ['id' => $project->teacher->id, 'name_ar' => $project->teacher->name_ar, 'user' => $project->teacher->user ? ['id' => $project->teacher->user->id, 'name' => $project->teacher->user->name] : null] : null,
+                    'user' => $project->user ? ['id' => $project->user->id, 'name' => $project->user->name] : null,
+                    'school' => $project->school ? ['id' => $project->school->id, 'name' => $project->school->name] : null,
+                ];
+            })
+            ->toArray();
+    });
+
+    $uaeSchools = \Illuminate\Support\Facades\Cache::remember('home_uae_schools', 3600, function () {
+        $uaeCities = ['دبي', 'أبوظبي', 'الشارقة', 'عجمان', 'رأس الخيمة', 'الفجيرة', 'أم القيوين',
+                      'Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman', 'Ras Al Khaimah', 'Fujairah', 'Umm Al Quwain'];
+
+        return \App\Models\User::where('role', 'school')
+            ->where(function ($query) use ($uaeCities) {
+                foreach ($uaeCities as $city) {
+                    $query->orWhere('name', 'like', '%' . $city . '%');
+                }
+            })
+            ->withCount(['students' => function ($query) {
+                $query->where('role', 'student');
+            }])
+            ->limit(8)
+            ->get()
+            ->map(function ($school) {
+                $students = \App\Models\User::where('school_id', $school->id)->where('role', 'student')->pluck('id');
+                $totalPoints = \App\Models\User::whereIn('id', $students)->sum('points') ?? 0;
+                $projectsCount = \App\Models\Project::whereIn('user_id', $students)->where('status', 'approved')->count();
+
+                return [
+                    'id' => $school->id,
+                    'name' => $school->name,
+                    'total_students' => $school->students_count ?? 0,
+                    'projects_count' => $projectsCount,
+                    'total_points' => $totalPoints,
+                ];
+            })
+            ->toArray();
+    });
+
+    $packages = \Illuminate\Support\Facades\Cache::remember('home_packages', 3600, function () {
+        return \App\Models\Package::where('is_active', true)
+            ->orderBy('price')
+            ->orderBy('created_at')
+            ->get()
+            ->map(function ($package) {
+                return [
+                    'id' => $package->id,
+                    'name' => $package->name,
+                    'name_ar' => $package->name_ar,
+                    'description' => $package->description,
+                    'description_ar' => $package->description_ar,
+                    'price' => $package->price,
+                    'currency' => $package->currency,
+                    'duration_type' => $package->duration_type,
+                    'duration_months' => $package->duration_months,
+                    'points_bonus' => $package->points_bonus,
+                    'projects_limit' => $package->projects_limit,
+                    'challenges_limit' => $package->challenges_limit,
+                    'certificate_access' => $package->certificate_access,
+                    'badge_access' => $package->badge_access,
+                    'features' => $package->features,
+                    'features_ar' => $package->features_ar,
+                    'is_active' => $package->is_active,
+                    'is_popular' => $package->is_popular,
+                ];
+            })
+            ->toArray();
+    });
+
     return Inertia::render('Home', [
         'cities' => $cities,
         'subjects' => $subjects,
@@ -326,7 +679,7 @@ Route::get('/', function () {
         'uaeSchools' => $uaeSchools,
         'packages' => $packages,
     ]);
-})->name('home');
+})->name('home.dashboard');
 
 Route::get('/teachers', [TeacherController::class, 'index'])->name('teachers.index');
 Route::get('/teachers/{id}', [TeacherController::class, 'show'])->name('teachers.show');
@@ -372,6 +725,8 @@ Route::prefix('api')->group(function () {
 
 Route::get('/badges', [App\Http\Controllers\BadgeController::class, 'index'])->name('badges');
 Route::get('/badges/{id}', [App\Http\Controllers\BadgeController::class, 'show'])->name('badges.show');
+Route::get('/achievements', [App\Http\Controllers\BadgeController::class, 'achievements'])->name('achievements');
+Route::get('/store-membership', [App\Http\Controllers\BadgeController::class, 'storeMembership'])->name('store-membership');
 
 // Package subscription routes (public)
 Route::get('/packages', [\App\Http\Controllers\PackageSubscriptionController::class, 'index'])->name('packages.index');
@@ -497,8 +852,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/student/subjects', [\App\Http\Controllers\Student\StudentSubjectController::class, 'store'])->name('student.subjects.store');
     Route::delete('/student/subjects/{id}', [\App\Http\Controllers\Student\StudentSubjectController::class, 'destroy'])->name('student.subjects.destroy');
 
+    // Student Points
+    Route::get('/student/points', [\App\Http\Controllers\Student\StudentPointsController::class, 'index'])->name('student.points');
+
     // مشاريع الطلاب
     Route::get('/student/projects', [\App\Http\Controllers\Student\StudentProjectController::class, 'index'])->name('student.projects.index');
+    Route::get('/student/projects/create', [\App\Http\Controllers\Student\StudentProjectController::class, 'create'])->name('student.projects.create');
     Route::get('/student/projects/{project}', [\App\Http\Controllers\Student\StudentProjectController::class, 'show'])->name('student.projects.show');
 
     // Student Challenges
@@ -512,6 +871,20 @@ Route::middleware(['auth'])->group(function () {
     // تسليمات المشاريع
     Route::post('/projects/{project}/submissions', [\App\Http\Controllers\ProjectSubmissionController::class, 'store'])->name('project.submissions.store');
     Route::put('/project-submissions/{submission}', [\App\Http\Controllers\ProjectSubmissionController::class, 'update'])->name('project.submissions.update');
+
+    // شهادة عضوية الطالب
+    Route::get('/student/certificate', [\App\Http\Controllers\Student\StudentCertificateController::class, 'show'])->name('student.certificate.show');
+
+    // شهادة عضوية المعلم
+    Route::get('/teacher/certificate', [\App\Http\Controllers\Teacher\TeacherCertificateController::class, 'show'])->name('teacher.certificate.show');
+
+    // شهادة عضوية المدرسة
+    Route::get('/school/certificate', [\App\Http\Controllers\School\SchoolCertificateController::class, 'show'])->name('school.certificate.show');
+
+    // شهادات العضوية
+    Route::get('/membership-certificate', [\App\Http\Controllers\MembershipCertificateController::class, 'show'])->name('membership-certificates.show');
+    Route::get('/membership-certificates/{id}/download', [\App\Http\Controllers\MembershipCertificateController::class, 'download'])->name('membership-certificates.download');
+    Route::post('/membership-certificates/check-eligibility', [\App\Http\Controllers\MembershipCertificateController::class, 'checkEligibility'])->name('membership-certificates.check-eligibility');
 
     // تسليمات التحديات
     Route::post('/challenges/{challenge}/submissions', [\App\Http\Controllers\ChallengeSubmissionController::class, 'store'])->name('challenge.submissions.store');
@@ -765,6 +1138,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Student Profile
+    Route::get('/student/profile', [\App\Http\Controllers\Student\StudentProfileController::class, 'index'])->name('student.profile');
+    Route::post('/student/profile/update-school', [\App\Http\Controllers\Student\StudentProfileController::class, 'updateSchool'])->name('student.profile.update-school');
     
     // Notification Preferences
     Route::get('/notification-preferences', [\App\Http\Controllers\NotificationPreferencesController::class, 'index'])->name('notification-preferences.index');

@@ -28,7 +28,7 @@ export default function Index({ auth, students }) {
                     <div className="flex items-center justify-between mb-6">
                         <div>
                             <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-                                <FaUsers className="text-legacy-green" />
+                                <FaUsers className="text-[#A3C042]" />
                                 الطلاب المتابعون
                             </h2>
                             <p className="text-gray-600 mt-1">إجمالي الطلاب: {students.total}</p>
@@ -43,7 +43,7 @@ export default function Index({ auth, students }) {
                             placeholder="ابحث عن طالب..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-legacy-green focus:border-transparent"
+                            className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#A3C042] focus:border-transparent"
                         />
                     </div>
                 </div>
@@ -52,27 +52,27 @@ export default function Index({ auth, students }) {
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gradient-to-r from-legacy-green/10 to-legacy-blue/10">
+                            <thead className="bg-gradient-to-r from-[#A3C042]/10 to-legacy-blue/10">
                                 <tr>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
                                         الاسم
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
                                         البريد الإلكتروني
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
                                         الهاتف
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
                                         النقاط
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
                                         المشاريع
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
                                         مشاريعك معه
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
                                         الشارات
                                     </th>
                                 </tr>
@@ -109,7 +109,7 @@ export default function Index({ auth, students }) {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm font-semibold text-legacy-green">
+                                                <div className="text-sm font-semibold text-[#A3C042]">
                                                     {student.teacher_projects_count}
                                                 </div>
                                             </td>
@@ -182,7 +182,7 @@ export default function Index({ auth, students }) {
                                                     href={link.url || '#'}
                                                     className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                                                         link.active
-                                                            ? 'z-10 bg-legacy-green border-legacy-green text-white'
+                                                            ? 'z-10 bg-[#A3C042] border-[#A3C042] text-white'
                                                             : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
                                                     } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                     dangerouslySetInnerHTML={{ __html: link.label }}

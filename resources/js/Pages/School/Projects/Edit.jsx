@@ -321,7 +321,7 @@ export default function EditSchoolProject({ auth, project }) {
                                 id="description"
                                 value={data.description}
                                 onChange={(e) => setData('description', e.target.value)}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-legacy-green focus:ring focus:ring-legacy-green focus:ring-opacity-50"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring focus:ring-[#A3C042] focus:ring-opacity-50"
                                 rows="6"
                                 required
                             />
@@ -335,7 +335,7 @@ export default function EditSchoolProject({ auth, project }) {
                                 id="category"
                                 value={data.category}
                                 onChange={(e) => setData('category', e.target.value)}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-legacy-green focus:ring focus:ring-legacy-green focus:ring-opacity-50"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring focus:ring-[#A3C042] focus:ring-opacity-50"
                                 required
                             >
                                 {categoryOptions.map(option => (
@@ -377,7 +377,7 @@ export default function EditSchoolProject({ auth, project }) {
                             <InputLabel value="إضافة صور جديدة" />
                             <div
                                 className={`mt-2 border-2 border-dashed rounded-lg p-6 text-center transition ${
-                                    dragActive ? 'border-legacy-green bg-green-50' : 'border-gray-300'
+                                    dragActive ? 'border-[#A3C042] bg-green-50' : 'border-gray-300'
                                 }`}
                                 onDragEnter={(e) => {
                                     e.preventDefault();
@@ -399,7 +399,7 @@ export default function EditSchoolProject({ auth, project }) {
                                 <button
                                     type="button"
                                     onClick={() => imageInputRef.current?.click()}
-                                    className="text-legacy-green hover:text-legacy-blue font-medium"
+                                    className="text-[#A3C042] hover:text-legacy-blue font-medium"
                                 >
                                     اختر الصور
                                 </button>
@@ -465,7 +465,7 @@ export default function EditSchoolProject({ auth, project }) {
                             <InputLabel value="إضافة ملفات جديدة" />
                             <div
                                 className={`mt-2 border-2 border-dashed rounded-lg p-6 text-center transition ${
-                                    dragActive ? 'border-legacy-green bg-green-50' : 'border-gray-300'
+                                    dragActive ? 'border-[#A3C042] bg-green-50' : 'border-gray-300'
                                 }`}
                                 onDragEnter={(e) => {
                                     e.preventDefault();
@@ -487,7 +487,7 @@ export default function EditSchoolProject({ auth, project }) {
                                 <button
                                     type="button"
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="text-legacy-green hover:text-legacy-blue font-medium"
+                                    className="text-[#A3C042] hover:text-legacy-blue font-medium"
                                 >
                                     اختر الملفات
                                 </button>
@@ -530,7 +530,7 @@ export default function EditSchoolProject({ auth, project }) {
                                 id="report"
                                 value={data.report}
                                 onChange={(e) => setData('report', e.target.value)}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-legacy-green focus:ring focus:ring-legacy-green focus:ring-opacity-50"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring focus:ring-[#A3C042] focus:ring-opacity-50"
                                 rows="4"
                             />
                             <InputError message={errors.report} className="mt-2" />

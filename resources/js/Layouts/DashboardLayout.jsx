@@ -364,26 +364,102 @@ export default function DashboardLayout({ children, header }) {
      * Handles exact matches and path prefixes for better UX
      */
     const isRouteActive = (href, currentUrl) => {
+        // Extract path and query from URLs
+        const getPath = (url) => {
+            const [path] = url.split('?');
+            return path;
+        };
+        
+        const getQuery = (url) => {
+            const [, query] = url.split('?');
+            return query || '';
+        };
+        
+        const hrefPath = getPath(href);
+        const currentPath = getPath(currentUrl);
+        const hrefQuery = getQuery(href);
+        const currentQuery = getQuery(currentUrl);
+        
+        // Exact match (including query) always returns true
         if (currentUrl === href) {
             return true;
         }
-        // For dashboard routes, only match exact
-        if (href.includes('/dashboard')) {
-            return currentUrl === href;
-        }
-        // For other routes, match if current URL starts with the href
-        // But exclude parent routes when on child routes
-        if (currentUrl.startsWith(href)) {
-            // Special handling for create routes - only match exact
-            if (href.includes('/create')) {
-                return currentUrl === href;
+        
+        // If href has query parameters, match path and query
+        if (hrefQuery) {
+            // Parse query parameters
+            const hrefParams = new URLSearchParams(hrefQuery);
+            const currentParams = new URLSearchParams(currentQuery);
+            
+            // Check if paths match
+            if (currentPath !== hrefPath) {
+                return false;
             }
-            // For pending routes, match exact or if it's the parent
-            if (href.includes('/pending')) {
-                return currentUrl === href || currentUrl === href.replace('/pending', '');
+            
+            // Check if all href query parameters match current query parameters
+            let allMatch = true;
+            for (const [key, value] of hrefParams.entries()) {
+                if (currentParams.get(key) !== value) {
+                    allMatch = false;
+                    break;
+                }
+            }
+            return allMatch;
+        }
+        
+        // If current URL has query parameters but href doesn't, only match if path matches exactly
+        if (currentQuery && !hrefQuery) {
+            return currentPath === hrefPath;
+        }
+        
+        // For dashboard routes, only match exact
+        if (hrefPath.includes('/dashboard')) {
+            return currentPath === hrefPath;
+        }
+        
+        // Special handling for create routes - only match exact
+        if (hrefPath.includes('/create')) {
+            return currentPath === hrefPath;
+        }
+        
+        // If current URL is a create route, don't match parent routes
+        if (currentPath.includes('/create')) {
+            // Don't match any parent routes when on a create route
+            return false;
+        }
+        
+        // If current URL is a pending route, only match exact or parent
+        if (currentPath.includes('/pending')) {
+            if (hrefPath.includes('/pending')) {
+                return currentPath === hrefPath;
+            }
+            // Match parent route if current is pending
+            return currentPath === hrefPath + '/pending';
+        }
+        
+        // For pending routes in href, match exact or if it's the parent
+        if (hrefPath.includes('/pending')) {
+            return currentPath === hrefPath || currentPath === hrefPath.replace('/pending', '');
+        }
+        
+        // For other routes, match if current URL starts with the href
+        // But ensure we don't match parent when on a child route with different segments
+        if (currentPath.startsWith(hrefPath)) {
+            // Check if there's a path segment after the href
+            const remainingPath = currentPath.slice(hrefPath.length);
+            // If there's a remaining path and it's not just a slash, it's a child route
+            if (remainingPath && remainingPath !== '/') {
+                // Only match if the remaining path is a valid continuation (e.g., /edit, /show)
+                // Don't match if it's a different route entirely (e.g., /create when href is /badges)
+                const nextSegment = remainingPath.split('/')[1];
+                // If next segment is 'create', don't match parent
+                if (nextSegment === 'create') {
+                    return false;
+                }
             }
             return true;
         }
+        
         return false;
     };
 
@@ -501,7 +577,7 @@ export default function DashboardLayout({ children, header }) {
             { name: 'الشارات', href: '/student/badges', icon: FaCommentDots },
             { name: 'النقاط', href: '/student/points', icon: FaChartLine },
             { name: 'الباقات', href: '/packages', icon: FaCreditCard },
-            { name: 'الملف الشخصي', href: '/profile', icon: FaUser },
+            { name: 'الملف الشخصي', href: '/student/profile', icon: FaUser },
         ]
     };
 
@@ -511,7 +587,7 @@ export default function DashboardLayout({ children, header }) {
         <div dir="rtl" className="min-h-screen bg-gray-50">
             {/* Sidebar - Fixed on Right (Rounded, Floating) */}
             <aside
-                className={`fixed top-4 right-4 bottom-4 z-40 transition-all duration-300 ${
+                className={`fixed top-2 right-4 bottom-2 z-40 transition-all duration-300 ${
                     sidebarOpen ? 'translate-x-0 opacity-100' : 'translate-x-[120%] opacity-0 pointer-events-none'
                 } w-72 bg-white rounded-2xl shadow-2xl border border-gray-100`}
             >
@@ -528,7 +604,7 @@ export default function DashboardLayout({ children, header }) {
                     <div className="w-full flex justify-center items-center gap-3">
                         <Link href="/" className="flex items-center gap-3">
                             <ApplicationLogo />
-                            <span className="text-lg font-bold bg-gradient-to-r from-legacy-green to-legacy-blue bg-clip-text text-transparent">إرث المبتكرين</span>
+                            <span className="text-lg font-bold bg-gradient-to-r from-[#A3C042] to-legacy-blue bg-clip-text text-transparent">إرث المبتكرين</span>
                         </Link>
                     </div>
                     {auth?.user && (
@@ -623,43 +699,40 @@ export default function DashboardLayout({ children, header }) {
             </aside>
 
             {/* Main Content Area */}
-            <div className={`transition-all duration-300 ${sidebarOpen ? 'mr-80' : 'mr-0'}`}>
-                {/* Top Navbar - Simple */}
-                <header className="bg-white/80 backdrop-blur-sm border-b border-gray-100 sticky top-0 z-30">
-                    <div className="flex items-center justify-between px-6 py-4">
-                        <div className="flex items-center gap-4">
-                            <button
-                                onClick={toggleSidebar}
-                                className="p-2 rounded-xl hover:bg-gray-50 transition"
-                            >
-                                <FaBars className="text-gray-600" />
-                            </button>
-                            {header && (
-                                <h1 className="text-xl font-bold text-gray-900">{header}</h1>
-                            )}
-                        </div>
-
-                        <div className="flex items-center gap-3">
-                            {/* Sort Dropdown */}
-                            <div className="relative">
-                                <select className="appearance-none bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 pr-8 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                    <option>ترتيب حسب</option>
-                                    <option>الأحدث</option>
-                                    <option>الأقدم</option>
-                                    <option>الأكثر مشاهدة</option>
-                                </select>
+            <div className={`transition-all duration-300 ${sidebarOpen ? 'ms-80' : 'ms-0'}`}>
+                {/* Top Navbar - Enhanced Design */}
+                <header className={`sticky top-2 z-30 pt-0 mb-2 "${sidebarOpen ? 'max-w-7xl mx-6' : 'max-w-7xl mx-12'}`}>
+                    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 backdrop-blur-sm">
+                        <div className="flex items-center justify-between px-4 py-2">
+                            <div className="flex items-center gap-4">
+                                <button
+                                    onClick={toggleSidebar}
+                                    className="p-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-100 transition-all duration-200 hover:shadow-sm"
+                                >
+                                    <FaBars className="text-gray-700 text-lg" />
+                                </button>
+                                {header && (
+                                    <div className="flex items-center gap-3">
+                                        <h1 className="text-xl font-bold text-gray-900">{header}</h1>
+                                    </div>
+                                )}
                             </div>
 
+                            <div className="flex items-center gap-3">
                             {/* صندوق الإشعارات */}
                             {(auth?.user?.role === 'student' || auth?.user?.role === 'teacher' || auth?.user?.role === 'school' || auth?.user?.role === 'educational_institution' || auth?.user?.role === 'admin') && (
                                 <div className="relative" ref={notificationsRef}>
                                     <button
                                         onClick={() => setNotificationsOpen(!notificationsOpen)}
-                                        className="relative p-2.5 rounded-xl hover:bg-gray-50 transition"
+                                        className={`relative p-2.5 rounded-xl transition-all duration-200 ${
+                                            notificationsOpen 
+                                                ? 'bg-[#A3C042]/10 border border-[#A3C042]/20' 
+                                                : 'bg-gray-50 hover:bg-gray-100 border border-gray-100'
+                                        }`}
                                     >
-                                        <FaBell className="text-gray-600 text-lg" />
+                                        <FaBell className={`text-lg transition ${notificationsOpen ? 'text-[#A3C042]' : 'text-gray-600'}`} />
                                         {unreadCount > 0 && (
-                                            <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center border-2 border-white">
                                                 {unreadCount > 9 ? '9+' : unreadCount}
                                             </span>
                                         )}
@@ -868,13 +941,17 @@ export default function DashboardLayout({ children, header }) {
                             <div className="relative" ref={dropdownRef}>
                                 <button
                                     onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                                    className="flex items-center gap-2 hover:bg-gray-50 rounded-xl p-1.5 transition"
+                                    className={`flex items-center gap-2.5 rounded-xl p-0.5 px-2 transition-all duration-200 border ${
+                                        userDropdownOpen
+                                            ? 'bg-[#A3C042]/10 border-[#A3C042]/20 shadow-sm'
+                                            : 'bg-gray-50 hover:bg-gray-100 border-gray-100 hover:shadow-sm'
+                                    }`}
                                 >
                                     {getUserImage() ? (
                                         <img
                                             src={getUserImage()}
                                             alt={auth.user?.name}
-                                            className="w-9 h-9 rounded-xl object-cover border border-gray-200"
+                                            className="w-8 h-8 rounded-xl object-cover border-2 border-white shadow-sm"
                                             onError={(e) => {
                                                 e.target.style.display = 'none';
                                                 const fallback = e.target.nextElementSibling;
@@ -884,45 +961,60 @@ export default function DashboardLayout({ children, header }) {
                                         />
                                     ) : null}
                                     <div
-                                        className={`w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold ${getUserImage() ? 'hidden' : ''}`}
+                                        className={`w-8 h-8 rounded-xl flex items-center justify-center text-white font-bold border-2 border-white shadow-sm ${getUserImage() ? 'hidden' : ''}`}
                                         style={{
                                             background: `linear-gradient(135deg, ${getColorFromName(auth.user?.name || 'User')})`
                                         }}
                                     >
                                         {getInitials(auth.user?.name || 'User')}
                                     </div>
-                                    <FaChevronDown className={`text-gray-400 text-xs transition-transform ${userDropdownOpen ? 'rotate-180' : ''}`} />
+                                    <div className="hidden sm:block ">
+                                        <div className="text-sm font-semibold text-gray-900">{auth.user?.name?.split(' ')[0] || 'المستخدم'}</div>
+                                        <div className="text-xs text-gray-500">
+                                            {auth.user?.role === 'admin' && 'أدمن'}
+                                            {auth.user?.role === 'teacher' && 'معلم'}
+                                            {auth.user?.role === 'student' && 'طالب'}
+                                            {auth.user?.role === 'school' && 'مدرسة'}
+                                            {auth.user?.role === 'educational_institution' && 'مؤسسة تعليمية'}
+                                        </div>
+                                    </div>
+                                    <FaChevronDown className={`text-gray-400 text-xs transition-transform duration-200 ${userDropdownOpen ? 'rotate-180' : ''}`} />
                                 </button>
 
                                 {userDropdownOpen && (
-                                    <div className="absolute left-0 mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50">
+                                    <div className="absolute left-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
                                         <div className="py-2">
                                             <Link
-                                                href={auth?.user?.role === 'teacher' ? '/teacher/profile' : '/profile'}
-                                                className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
+                                                href={
+                                                    auth?.user?.role === 'teacher' 
+                                                        ? '/teacher/profile' 
+                                                        : auth?.user?.role === 'student'
+                                                        ? '/student/profile'
+                                                        : '/profile'
+                                                }
+                                                className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition"
                                                 onClick={() => setUserDropdownOpen(false)}
                                             >
                                                 <FaUser className="text-gray-400" />
                                                 الملف الشخصي
                                             </Link>
-                                            <hr className="my-1" />
-                                            {sidebarOpen && (
-                                                <Link
-                                                    href="/logout"
-                                                    method="post"
-                                                    as="button"
-                                                    className="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition w-full text-right"
-                                                    onClick={() => setUserDropdownOpen(false)}
-                                                >
-                                                    <FaSignOutAlt className="text-red-500" />
-                                                    تسجيل الخروج
-                                                </Link>
-                                            )}
+                                            <div className="border-t border-gray-100 my-1" />
+                                            <Link
+                                                href="/logout"
+                                                method="post"
+                                                as="button"
+                                                className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition w-full "
+                                                onClick={() => setUserDropdownOpen(false)}
+                                            >
+                                                <FaSignOutAlt className="text-red-500" />
+                                                تسجيل الخروج
+                                            </Link>
                                         </div>
                                     </div>
                                 )}
                             </div>
                         </div>
+                    </div>
                     </div>
                 </header>
 

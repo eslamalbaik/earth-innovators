@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Project;
 use App\Services\ProjectService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -42,11 +43,29 @@ class ProjectController extends Controller
     /**
      * عرض تفاصيل مشروع معتمد
      */
-    public function show(int $id)
+    public function show($project)
     {
         $user = Auth::user();
         
-        $project = $this->projectService->getProjectDetails($id, $user);
+        // Handle both model binding and ID/string
+        if ($project instanceof Project) {
+            $projectId = $project->id;
+        } elseif (is_numeric($project)) {
+            $projectId = (int) $project;
+        } else {
+            // Try to find project by slug or title
+            $projectModel = Project::where('slug', $project)
+                ->orWhere('title', $project)
+                ->first();
+            
+            if (!$projectModel) {
+                abort(404, 'المشروع غير موجود');
+            }
+            
+            $projectId = $projectModel->id;
+        }
+        
+        $project = $this->projectService->getProjectDetails($projectId, $user);
 
         if (!$project || $project->status !== 'approved') {
             abort(404, 'المشروع غير موجود أو غير معتمد');

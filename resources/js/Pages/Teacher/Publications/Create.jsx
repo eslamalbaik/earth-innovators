@@ -80,7 +80,7 @@ export default function CreatePublication({ auth, school }) {
             auth={auth} 
             header={
                 <div className="flex items-center gap-3">
-                    <Link href="/teacher/publications" className="text-gray-600 hover:text-legacy-green">
+                    <Link href="/teacher/publications" className="text-gray-600 hover:text-[#A3C042]">
                         <FaArrowLeft className="text-xl" />
                     </Link>
                     <h2 className="font-semibold text-xl text-gray-800 leading-tight">إنشاء مقال جديد</h2>
@@ -115,7 +115,7 @@ export default function CreatePublication({ auth, school }) {
                                 value={data.description}
                                 onChange={(e) => setData('description', e.target.value)}
                                 rows={3}
-                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-legacy-green focus:ring-legacy-green"
+                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                                 placeholder="أدخل وصفاً مختصراً للمقال"
                             />
                             <InputError message={errors.description} className="mt-2" />
@@ -154,7 +154,7 @@ export default function CreatePublication({ auth, school }) {
                             ) : (
                                 <div
                                     onClick={() => imageInputRef.current?.click()}
-                                    className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-legacy-green transition"
+                                    className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-[#A3C042] transition"
                                 >
                                     <FaImage className="mx-auto text-4xl text-gray-400 mb-4" />
                                     <p className="text-gray-700 mb-2">
@@ -183,7 +183,7 @@ export default function CreatePublication({ auth, school }) {
                                 id="type"
                                 value={data.type}
                                 onChange={(e) => setData('type', e.target.value)}
-                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-legacy-green focus:ring-legacy-green"
+                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                                 required
                             >
                                 <option value="magazine">مجلة</option>
@@ -196,7 +196,7 @@ export default function CreatePublication({ auth, school }) {
 
                         {/* School Info */}
                         {school && (
-                            <div className="bg-legacy-green/10 border border-legacy-green/20 rounded-lg p-4">
+                            <div className="bg-[#A3C042]/10 border border-[#A3C042]/20 rounded-lg p-4">
                                 <p className="text-sm text-gray-700">
                                     <span className="font-semibold">المدرسة:</span> {school.name}
                                 </p>
@@ -218,7 +218,7 @@ export default function CreatePublication({ auth, school }) {
                             <PrimaryButton
                                 type="submit"
                                 disabled={processing || !data.title || !data.content}
-                                className="bg-legacy-green hover:bg-green-600 flex items-center gap-2"
+                                className="bg-[#A3C042] hover:bg-green-600 flex items-center gap-2"
                             >
                                 {processing ? (
                                     <>

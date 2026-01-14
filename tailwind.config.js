@@ -13,9 +13,8 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Dubai', 'Tajawal', 'Figtree', ...defaultTheme.fontFamily.sans],
-                dubai: ['Dubai', 'sans-serif'],
-                tajawal: ['Tajawal', 'sans-serif'],
+                sans: ['Cairo', ...defaultTheme.fontFamily.sans],
+                cairo: ['Cairo', 'sans-serif'],
             },
             colors: {
                 primary: {

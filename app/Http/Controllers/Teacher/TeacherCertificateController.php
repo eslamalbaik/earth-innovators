@@ -9,6 +9,7 @@ use App\Services\CertificateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Carbon\Carbon;
 
 class TeacherCertificateController extends Controller
 {
@@ -59,6 +60,47 @@ class TeacherCertificateController extends Controller
         return Inertia::render('Teacher/Certificates/Index', [
             'students' => $students,
             'description' => 'قائمة بطلابك فقط مع إمكانية إنشاء شهادات فردية وتعديل الحقول المسموح بها',
+        ]);
+    }
+
+    /**
+     * Show teacher certificate page
+     */
+    public function show()
+    {
+        $user = Auth::user();
+
+        if (!$user || $user->role !== 'teacher' || !$user->teacher) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $teacher = $user->teacher;
+        $joinDate = $user->created_at ? $user->created_at->format('Y-m-d') : now()->format('Y-m-d');
+        $issueDate = now()->format('Y-m-d');
+
+        // Calculate period (from join date to one year later)
+        $periodStart = $joinDate;
+        $periodEnd = $user->created_at 
+            ? Carbon::parse($user->created_at)->addYear()->format('Y-m-d') 
+            : now()->addYear()->format('Y-m-d');
+
+        // Get membership certificate if exists
+        $membershipCertificateService = app(\App\Services\MembershipCertificateService::class);
+        $membershipCertificate = $membershipCertificateService->getUserMembershipCertificate($user->id, $user->role);
+
+        return Inertia::render('Teacher/Certificate/Show', [
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'membership_number' => $user->membership_number ?? 'TCH-' . now()->format('Y') . '-' . str_pad($user->id, 3, '0', STR_PAD_LEFT),
+            ],
+            'stats' => [],
+            'certificate' => [
+                'issue_date' => $membershipCertificate ? $membershipCertificate->issue_date->format('Y-m-d') : $issueDate,
+                'period_start' => $periodStart,
+                'period_end' => $periodEnd,
+                'download_url' => $membershipCertificate ? route('membership-certificates.download', $membershipCertificate->id) : null,
+            ],
         ]);
     }
 }

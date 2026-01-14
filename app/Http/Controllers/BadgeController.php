@@ -33,8 +33,17 @@ class BadgeController extends Controller
 
         // Get school rankings (available for all users)
         $currentSchoolId = null;
-        if ($request->user() && $request->user()->isSchool()) {
-            $currentSchoolId = $request->user()->id;
+        $user = $request->user();
+        if ($user) {
+            if ($user->isSchool()) {
+                $currentSchoolId = $user->id;
+            } elseif ($user->isStudent() && $user->school_id) {
+                // للطلاب: إظهار ترتيب مدرستهم
+                $currentSchoolId = $user->school_id;
+            } elseif ($user->isTeacher() && $user->school_id) {
+                // للمعلمين: إظهار ترتيب مدرستهم
+                $currentSchoolId = $user->school_id;
+            }
         }
         $rankings = $this->rankingService->getSchoolRankings($currentSchoolId);
 
@@ -60,6 +69,63 @@ class BadgeController extends Controller
         return Inertia::render('Badges/Show', [
             'badge' => $badge,
             'userHasBadge' => $userHasBadge,
+        ]);
+    }
+
+    /**
+     * صفحة الإنجازات والنقاط
+     */
+    public function achievements(Request $request)
+    {
+        $user = $request->user();
+        $userBadges = [];
+        $recentAchievements = [];
+        $points = 0;
+
+        if ($user) {
+            $points = $user->points ?? 0;
+            $userBadges = $this->badgeService->getUserBadges($user->id);
+            
+            // Get recent achievements (points history)
+            $pointsService = app(\App\Services\PointsService::class);
+            $pointsHistory = $pointsService->getUserPointsHistory($user->id, 5);
+            
+            $recentAchievements = $pointsHistory->getCollection()->map(function ($point) {
+                return [
+                    'id' => $point->id,
+                    'title' => $point->description_ar ?? $point->description ?? 'إنجاز جديد',
+                    'description' => $point->description_ar ?? $point->description ?? 'حصلت على نقاط جديدة',
+                    'points' => $point->points,
+                    'created_at' => $point->created_at,
+                ];
+            })->toArray();
+        }
+
+        return Inertia::render('Achievements', [
+            'user' => $user,
+            'badges' => $userBadges,
+            'points' => $points,
+            'recentAchievements' => $recentAchievements,
+        ]);
+    }
+
+    /**
+     * صفحة بطاقة عضوية المتجر
+     */
+    public function storeMembership(Request $request)
+    {
+        $user = $request->user();
+        $currentBalance = $user ? ($user->points ?? 0) : 0;
+        
+        // Get redeemable items (you can fetch from database or use default)
+        $redeemableItems = [];
+        
+        // TODO: Fetch redeemable items from database if you have a model for it
+        
+        return Inertia::render('StoreMembership', [
+            'user' => $user,
+            'currentBalance' => $currentBalance,
+            'redeemableItems' => $redeemableItems,
         ]);
     }
 }

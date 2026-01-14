@@ -1,3 +1,5 @@
+import { FaChalkboardTeacher } from 'react-icons/fa';
+
 export default function TeacherRecruitemstSection({
     title = "هل أنت معلم أو مشرف؟",
     callToAction = "انضم إلى إرث المبتكرين!",
@@ -5,45 +7,35 @@ export default function TeacherRecruitemstSection({
     buttonText = "انضم كمعلم/مشرف",
     imageSrc = "/images/avatar2.svg",
     imageAlt = "معلم خصوصي",
-    onJoinClick
+    onJoinClick,
+    compact = false
 }) {
     return (
-        <section className="py-16 bg-gradient-to-r from-legacy-green to-legacy-blue">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                    <div className="text-center lg:text-right">
-                        <div className="bg-white rounded-3xl p-8 shadow-lg">
-                            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
-                                {title}
-                            </h2>
-
-                            <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">
-                                {callToAction}
-                            </h3>
-
-                            <p className="text-md text-gray-900 leading-relaxed mb-8">
-                                {description}
-                            </p>
-
-                            <button
-                                onClick={onJoinClick}
-                                className="bg-legacy-green hover:bg-primary-600 text-white px-8 py-4 rounded-2xl font-bold text-lg transition duration-300 transform hover:scale-105 shadow-lg"
-                            >
-                                {buttonText}
-                            </button>
-                        </div>
+        <div className="bg-gradient-to-br from-[#A3C042] to-[#93b03a] rounded-3xl p-6 md:p-8 text-white relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+            <div className="relative z-10">
+                <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                        <FaChalkboardTeacher className="text-xl" />
                     </div>
-                    <div className="flex justify-center lg:justify-end">
-                        <div className="relative">
-                            <img
-                                src={imageSrc}
-                                alt={imageAlt}
-                                className="w-full max-w-md h-auto"
-                            />
-                        </div>
-                    </div>
+                    <h2 className="text-xl md:text-2xl font-bold">{title}</h2>
                 </div>
+
+                <h3 className="text-lg md:text-xl font-bold mb-3 text-white/95">
+                    {callToAction}
+                </h3>
+
+                <p className="text-sm md:text-base text-white/90 leading-relaxed mb-6">
+                    {description}
+                </p>
+
+                <button
+                    onClick={onJoinClick}
+                    className="bg-white text-[#A3C042] px-6 py-3 rounded-xl font-bold text-sm md:text-base hover:bg-gray-100 transition shadow-lg"
+                >
+                    {buttonText}
+                </button>
             </div>
-        </section>
+        </div>
     );
 }

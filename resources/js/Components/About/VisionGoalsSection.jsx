@@ -12,9 +12,9 @@ export default function VisionGoalsSection() {
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <div className="text-right bg-white shadow-xl border border-gray-200 rounded-3xl p-6">
+            <div className=" bg-white shadow-xl border border-gray-200 rounded-3xl p-6">
                 <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 bg-gradient-to-br from-legacy-green to-legacy-blue rounded-lg flex items-center justify-center">
+                    <div className="w-12 h-12 bg-gradient-to-br from-[#A3C042] to-legacy-blue rounded-lg flex items-center justify-center">
                         <FaLightbulb className="text-white text-xl" />
                     </div>
                     <h2 className="text-2xl font-bold text-gray-900">رؤيتنا</h2>
@@ -24,9 +24,9 @@ export default function VisionGoalsSection() {
                 </p>
             </div>
 
-            <div className="text-right bg-white shadow-xl border border-gray-200 rounded-3xl p-6">
+            <div className=" bg-white shadow-xl border border-gray-200 rounded-3xl p-6">
                 <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 bg-gradient-to-br from-legacy-green to-legacy-blue rounded-lg flex items-center justify-center">
+                    <div className="w-12 h-12 bg-gradient-to-br from-[#A3C042] to-legacy-blue rounded-lg flex items-center justify-center">
                         <FaBullseye className="text-white text-xl" />
                     </div>
                     <h2 className="text-2xl font-bold text-gray-900">أهدافنا</h2>

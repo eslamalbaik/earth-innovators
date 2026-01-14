@@ -32,7 +32,7 @@ const MenuBar = ({ editor }) => {
                 onClick={() => editor.chain().focus().toggleBold().run()}
                 disabled={!editor.can().chain().focus().toggleBold().run()}
                 className={`p-2 rounded hover:bg-gray-200 transition ${
-                    editor.isActive('bold') ? 'bg-legacy-green/20 text-legacy-green' : 'text-gray-700'
+                    editor.isActive('bold') ? 'bg-[#A3C042]/20 text-[#A3C042]' : 'text-gray-700'
                 }`}
                 title="عريض"
             >
@@ -45,7 +45,7 @@ const MenuBar = ({ editor }) => {
                 onClick={() => editor.chain().focus().toggleItalic().run()}
                 disabled={!editor.can().chain().focus().toggleItalic().run()}
                 className={`p-2 rounded hover:bg-gray-200 transition ${
-                    editor.isActive('italic') ? 'bg-legacy-green/20 text-legacy-green' : 'text-gray-700'
+                    editor.isActive('italic') ? 'bg-[#A3C042]/20 text-[#A3C042]' : 'text-gray-700'
                 }`}
                 title="مائل"
             >
@@ -57,7 +57,7 @@ const MenuBar = ({ editor }) => {
                 type="button"
                 onClick={() => editor.chain().focus().toggleUnderline().run()}
                 className={`p-2 rounded hover:bg-gray-200 transition ${
-                    editor.isActive('underline') ? 'bg-legacy-green/20 text-legacy-green' : 'text-gray-700'
+                    editor.isActive('underline') ? 'bg-[#A3C042]/20 text-[#A3C042]' : 'text-gray-700'
                 }`}
                 title="تحته خط"
             >
@@ -72,7 +72,7 @@ const MenuBar = ({ editor }) => {
                 type="button"
                 onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
                 className={`p-2 rounded hover:bg-gray-200 transition ${
-                    editor.isActive('heading', { level: 1 }) ? 'bg-legacy-green/20 text-legacy-green' : 'text-gray-700'
+                    editor.isActive('heading', { level: 1 }) ? 'bg-[#A3C042]/20 text-[#A3C042]' : 'text-gray-700'
                 }`}
                 title="عنوان رئيسي"
             >
@@ -87,7 +87,7 @@ const MenuBar = ({ editor }) => {
                 type="button"
                 onClick={() => editor.chain().focus().toggleBulletList().run()}
                 className={`p-2 rounded hover:bg-gray-200 transition ${
-                    editor.isActive('bulletList') ? 'bg-legacy-green/20 text-legacy-green' : 'text-gray-700'
+                    editor.isActive('bulletList') ? 'bg-[#A3C042]/20 text-[#A3C042]' : 'text-gray-700'
                 }`}
                 title="قائمة نقطية"
             >
@@ -99,7 +99,7 @@ const MenuBar = ({ editor }) => {
                 type="button"
                 onClick={() => editor.chain().focus().toggleOrderedList().run()}
                 className={`p-2 rounded hover:bg-gray-200 transition ${
-                    editor.isActive('orderedList') ? 'bg-legacy-green/20 text-legacy-green' : 'text-gray-700'
+                    editor.isActive('orderedList') ? 'bg-[#A3C042]/20 text-[#A3C042]' : 'text-gray-700'
                 }`}
                 title="قائمة مرقمة"
             >
@@ -111,7 +111,7 @@ const MenuBar = ({ editor }) => {
                 type="button"
                 onClick={() => editor.chain().focus().toggleBlockquote().run()}
                 className={`p-2 rounded hover:bg-gray-200 transition ${
-                    editor.isActive('blockquote') ? 'bg-legacy-green/20 text-legacy-green' : 'text-gray-700'
+                    editor.isActive('blockquote') ? 'bg-[#A3C042]/20 text-[#A3C042]' : 'text-gray-700'
                 }`}
                 title="اقتباس"
             >
@@ -126,7 +126,7 @@ const MenuBar = ({ editor }) => {
                 type="button"
                 onClick={() => editor.chain().focus().setTextAlign('left').run()}
                 className={`p-2 rounded hover:bg-gray-200 transition ${
-                    editor.isActive({ textAlign: 'left' }) ? 'bg-legacy-green/20 text-legacy-green' : 'text-gray-700'
+                    editor.isActive({ textAlign: 'left' }) ? 'bg-[#A3C042]/20 text-[#A3C042]' : 'text-gray-700'
                 }`}
                 title="محاذاة لليسار"
             >
@@ -138,7 +138,7 @@ const MenuBar = ({ editor }) => {
                 type="button"
                 onClick={() => editor.chain().focus().setTextAlign('center').run()}
                 className={`p-2 rounded hover:bg-gray-200 transition ${
-                    editor.isActive({ textAlign: 'center' }) ? 'bg-legacy-green/20 text-legacy-green' : 'text-gray-700'
+                    editor.isActive({ textAlign: 'center' }) ? 'bg-[#A3C042]/20 text-[#A3C042]' : 'text-gray-700'
                 }`}
                 title="محاذاة للوسط"
             >
@@ -150,7 +150,7 @@ const MenuBar = ({ editor }) => {
                 type="button"
                 onClick={() => editor.chain().focus().setTextAlign('right').run()}
                 className={`p-2 rounded hover:bg-gray-200 transition ${
-                    editor.isActive({ textAlign: 'right' }) ? 'bg-legacy-green/20 text-legacy-green' : 'text-gray-700'
+                    editor.isActive({ textAlign: 'right' }) ? 'bg-[#A3C042]/20 text-[#A3C042]' : 'text-gray-700'
                 }`}
                 title="محاذاة لليمين"
             >
@@ -225,7 +225,7 @@ export default function TiptapEditor({ content, onChange, placeholder = 'أدخ�
             <MenuBar editor={editor} />
             <EditorContent 
                 editor={editor}
-                className="focus-within:ring-2 focus-within:ring-legacy-green focus-within:border-legacy-green"
+                className="focus-within:ring-2 focus-within:ring-[#A3C042] focus-within:border-[#A3C042]"
             />
         </div>
     );

@@ -42,7 +42,7 @@ export default function PaymentFailure({ payment }) {
                     </div>
 
                     {payment.failure_reason && (
-                        <div className="bg-red-50 border-r-4 border-red-500 p-4 mb-6 text-right rounded">
+                        <div className="bg-red-50 border-r-4 border-red-500 p-4 mb-6  rounded">
                             <p className="text-sm font-semibold text-red-900 mb-1">سبب الفشل:</p>
                             <p className="text-red-700">{payment.failure_reason}</p>
                         </div>

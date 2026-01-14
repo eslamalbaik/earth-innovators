@@ -33,7 +33,7 @@ export default function SchoolBadges({ badges, auth }) {
                 <h2 className="text-2xl font-bold text-gray-900">الشارات المرسلة للمدرسة</h2>
                 <Link
                     href="/school/badges/pending"
-                    className="bg-gradient-to-r from-legacy-green to-legacy-blue text-white px-6 py-3 rounded-lg font-semibold transition duration-300 flex items-center gap-2 shadow-md hover:shadow-xl"
+                    className="bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white px-6 py-3 rounded-lg font-semibold transition duration-300 flex items-center gap-2 shadow-md hover:shadow-xl"
                 >
                     <FaClock />
                     الشارات المعلقة
@@ -70,9 +70,9 @@ export default function SchoolBadges({ badges, auth }) {
             </div>
 
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-legacy-green/10 to-legacy-blue/10">
+                <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-[#A3C042]/10 to-legacy-blue/10">
                     <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                        <FaMedal className="text-legacy-green" />
+                        <FaMedal className="text-[#A3C042]" />
                         الشارات ({badges.total || 0})
                     </h3>
                 </div>
@@ -146,7 +146,7 @@ export default function SchoolBadges({ badges, auth }) {
                                         href={link.url || '#'}
                                         className={`px-4 py-2 rounded-lg font-medium transition ${
                                             link.active
-                                                ? 'bg-gradient-to-r from-legacy-green to-legacy-blue text-white'
+                                                ? 'bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white'
                                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                         } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}

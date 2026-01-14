@@ -15,7 +15,7 @@ export default function SchoolRanking({ schoolsRanking = [], currentSchoolRank, 
             <Head title="الترتيب والشارات - إرث المبتكرين" />
 
             {currentSchoolRank && (
-                <div className="bg-gradient-to-r from-legacy-green to-legacy-blue rounded-xl shadow-lg p-8 mb-8 text-white">
+                <div className="bg-gradient-to-r from-[#A3C042] to-legacy-blue rounded-xl shadow-lg p-8 mb-8 text-white">
                     <div className="flex items-center justify-between">
                         <div>
                             <h2 className="text-2xl font-bold mb-2">ترتيب مدرستك</h2>
@@ -65,9 +65,9 @@ export default function SchoolRanking({ schoolsRanking = [], currentSchoolRank, 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* ترتيب المؤسسات تعليمية */}
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                    <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-legacy-green/10 to-legacy-blue/10">
+                    <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-[#A3C042]/10 to-legacy-blue/10">
                         <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                            <FaTrophy className="text-legacy-green" />
+                            <FaTrophy className="text-[#A3C042]" />
                             ترتيب المؤسسات تعليمية
                         </h3>
                     </div>
@@ -78,7 +78,7 @@ export default function SchoolRanking({ schoolsRanking = [], currentSchoolRank, 
                                     key={school.id}
                                     className={`border rounded-lg p-4 transition ${
                                         school.is_current_school
-                                            ? 'border-legacy-green bg-gradient-to-r from-legacy-green/10 to-legacy-blue/10 shadow-md'
+                                            ? 'border-[#A3C042] bg-gradient-to-r from-[#A3C042]/10 to-legacy-blue/10 shadow-md'
                                             : 'border-gray-200 hover:shadow-md'
                                     }`}
                                 >
@@ -106,7 +106,7 @@ export default function SchoolRanking({ schoolsRanking = [], currentSchoolRank, 
                                             </div>
                                         </div>
                                         {school.is_current_school && (
-                                            <span className="bg-legacy-green text-white px-3 py-1 rounded-full text-xs font-semibold">
+                                            <span className="bg-[#A3C042] text-white px-3 py-1 rounded-full text-xs font-semibold">
                                                 مدرستك
                                             </span>
                                         )}
@@ -119,9 +119,9 @@ export default function SchoolRanking({ schoolsRanking = [], currentSchoolRank, 
 
                 {/* الشارات المكتسبة */}
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                    <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-legacy-green/10 to-legacy-blue/10">
+                    <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-[#A3C042]/10 to-legacy-blue/10">
                         <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                            <FaMedal className="text-legacy-green" />
+                            <FaMedal className="text-[#A3C042]" />
                             الشارات المكتسبة
                         </h3>
                     </div>
@@ -131,7 +131,7 @@ export default function SchoolRanking({ schoolsRanking = [], currentSchoolRank, 
                                 {earnedBadges.map((badgeData, index) => (
                                     <div key={badgeData.badge.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-16 h-16 bg-gradient-to-br from-legacy-green to-legacy-blue rounded-full flex items-center justify-center text-white">
+                                            <div className="w-16 h-16 bg-gradient-to-br from-[#A3C042] to-legacy-blue rounded-full flex items-center justify-center text-white">
                                                 <FaMedal className="text-2xl" />
                                             </div>
                                             <div className="flex-1">

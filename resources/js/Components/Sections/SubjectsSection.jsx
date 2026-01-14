@@ -10,7 +10,7 @@ export default function SubjectsSection({
     onSubjectClick
 }) {
     return (
-        <section className="py-16 bg-gradient-to-r from-legacy-green/5 to-legacy-blue/5">
+        <section className="py-16 bg-gradient-to-r from-[#A3C042]/5 to-legacy-blue/5">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center space-y-8">
                     <div className="text-center">
@@ -68,7 +68,7 @@ export default function SubjectsSection({
                     <div className="pt-8">
                         <Link
                             href={browseAllLink}
-                            className="inline-flex items-center gap-2 bg-legacy-green hover:bg-primary-600 text-white px-4 py-2 md:px-8 md:py-4 rounded-lg font-bold text-md md:text-lg transition duration-300 transform hover:scale-105 shadow-md"
+                            className="inline-flex items-center gap-2 bg-[#A3C042] hover:bg-primary-600 text-white px-4 py-2 md:px-8 md:py-4 rounded-lg font-bold text-md md:text-lg transition duration-300 transform hover:scale-105 shadow-md"
                         >
                             تصفح كل المواد
                             <FaArrowDown className="text-sm" />

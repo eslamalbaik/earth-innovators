@@ -107,7 +107,7 @@ export default function SchoolChallengeShow({ auth, challenge }) {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             <div className="flex items-center gap-2 text-gray-600">
                                 <span className="font-semibold">نوع التحدي:</span>
-                                <span className="px-2 py-1 bg-legacy-green/10 text-legacy-green rounded">
+                                <span className="px-2 py-1 bg-[#A3C042]/10 text-[#A3C042] rounded">
                                     {getChallengeTypeLabel(challenge?.challenge_type)}
                                 </span>
                             </div>
@@ -138,7 +138,7 @@ export default function SchoolChallengeShow({ auth, challenge }) {
                                 <div className="flex items-center gap-2 text-gray-600">
                                     <FaAward className="text-sm" />
                                     <span className="font-semibold">نقاط المكافأة:</span>
-                                    <span className="text-legacy-green font-bold">{challenge?.points_reward}</span>
+                                    <span className="text-[#A3C042] font-bold">{challenge?.points_reward}</span>
                                 </div>
                             )}
                         </div>
@@ -174,7 +174,7 @@ export default function SchoolChallengeShow({ auth, challenge }) {
                         <div className="flex flex-wrap gap-3">
                             <Link
                                 href={`/school/challenge-submissions?challenge_id=${challenge?.id}`}
-                                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-legacy-green to-legacy-blue text-white rounded-lg hover:opacity-90 transition"
+                                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white rounded-lg hover:opacity-90 transition"
                             >
                                 <FaFileAlt />
                                 عرض التسليمات

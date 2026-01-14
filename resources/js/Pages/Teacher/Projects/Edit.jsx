@@ -143,7 +143,7 @@ export default function EditProject({ auth, project, school, schools = [] }) {
             auth={auth} 
             header={
                 <div className="flex items-center gap-3">
-                    <Link href="/teacher/projects" className="text-gray-600 hover:text-legacy-green">
+                    <Link href="/teacher/projects" className="text-gray-600 hover:text-[#A3C042]">
                         <FaArrowLeft className="text-xl" />
                     </Link>
                     <h2 className="font-semibold text-xl text-gray-800 leading-tight">تعديل المشروع</h2>
@@ -178,7 +178,7 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                                 value={data.description}
                                 onChange={(e) => setData('description', e.target.value)}
                                 rows={6}
-                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-legacy-green focus:ring-legacy-green"
+                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                                 placeholder="أدخل وصفاً للمشروع"
                                 required
                             />
@@ -192,7 +192,7 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                                 id="category"
                                 value={data.category}
                                 onChange={(e) => setData('category', e.target.value)}
-                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-legacy-green focus:ring-legacy-green"
+                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                             >
                                 <option value="science">علوم</option>
                                 <option value="technology">تقنية</option>
@@ -212,7 +212,7 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                                     id="school_id"
                                     value={data.school_id || ''}
                                     onChange={(e) => setData('school_id', e.target.value || null)}
-                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-legacy-green focus:ring-legacy-green"
+                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                                 >
                                     <option value="">اختر مدرسة (اختياري)</option>
                                     {schools.map((sch) => (
@@ -272,8 +272,8 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                                 onDrop={handleDrop}
                                 className={`border-2 border-dashed rounded-lg p-8 text-center transition ${
                                     dragActive
-                                        ? 'border-legacy-green bg-legacy-green/10'
-                                        : 'border-gray-300 hover:border-legacy-green/50'
+                                        ? 'border-[#A3C042] bg-[#A3C042]/10'
+                                        : 'border-gray-300 hover:border-[#A3C042]/50'
                                 }`}
                             >
                                 <input
@@ -294,7 +294,7 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                                 <button
                                     type="button"
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="mt-4 px-6 py-2 bg-legacy-green text-white rounded-lg hover:bg-green-600 transition"
+                                    className="mt-4 px-6 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-green-600 transition"
                                 >
                                     اختر ملفات
                                 </button>
@@ -349,7 +349,7 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                             <PrimaryButton
                                 type="submit"
                                 disabled={processing || !data.title || !data.description || project?.status !== 'pending'}
-                                className="bg-legacy-green hover:bg-green-600 flex items-center gap-2"
+                                className="bg-[#A3C042] hover:bg-green-600 flex items-center gap-2"
                             >
                                 {processing ? (
                                     <>

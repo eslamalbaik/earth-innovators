@@ -305,7 +305,7 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-50">
                                     <tr>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             <input
                                                 type="checkbox"
                                                 onChange={(e) => {
@@ -318,31 +318,31 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                                                 className="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50"
                                             />
                                         </th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             رقم الطلب
                                         </th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             الطالب
                                         </th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             المعلم
                                         </th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             التاريخ
                                         </th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             الوقت
                                         </th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             السعر
                                         </th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             الحالة
                                         </th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             حالة الدفع
                                         </th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             الإجراءات
                                         </th>
                                     </tr>

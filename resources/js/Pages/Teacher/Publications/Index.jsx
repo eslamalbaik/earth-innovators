@@ -24,7 +24,7 @@ export default function TeacherPublications({ publications, auth }) {
                 <h2 className="text-2xl font-bold text-gray-900">المقالات المنشورة</h2>
                 <Link
                     href="/teacher/publications/create"
-                    className="bg-gradient-to-r from-legacy-green to-legacy-blue text-white px-6 py-3 rounded-lg font-semibold transition duration-300 flex items-center gap-2 shadow-md hover:shadow-xl"
+                    className="bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white px-6 py-3 rounded-lg font-semibold transition duration-300 flex items-center gap-2 shadow-md hover:shadow-xl"
                 >
                     <FaPlus />
                     إنشاء مقال جديد
@@ -32,9 +32,9 @@ export default function TeacherPublications({ publications, auth }) {
             </div>
 
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-legacy-green/10 to-legacy-blue/10">
+                <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-[#A3C042]/10 to-legacy-blue/10">
                     <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                        <FaBook className="text-legacy-green" />
+                        <FaBook className="text-[#A3C042]" />
                         المقالات ({publications.total || 0})
                     </h3>
                 </div>
@@ -105,7 +105,7 @@ export default function TeacherPublications({ publications, auth }) {
                             <p className="text-gray-600 text-lg mb-4">لا توجد مقالات منشورة</p>
                             <Link
                                 href="/teacher/publications/create"
-                                className="inline-block bg-gradient-to-r from-legacy-green to-legacy-blue text-white px-6 py-3 rounded-lg font-semibold transition"
+                                className="inline-block bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white px-6 py-3 rounded-lg font-semibold transition"
                             >
                                 <FaPlus className="inline ml-2" />
                                 إنشاء مقال جديد
@@ -122,7 +122,7 @@ export default function TeacherPublications({ publications, auth }) {
                                         href={link.url || '#'}
                                         className={`px-4 py-2 rounded-lg font-medium transition ${
                                             link.active
-                                                ? 'bg-gradient-to-r from-legacy-green to-legacy-blue text-white'
+                                                ? 'bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white'
                                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                         } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}

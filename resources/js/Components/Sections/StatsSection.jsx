@@ -6,7 +6,7 @@ export default function StatsSection({
     stats = []
 }) {
     return (
-        <section className="py-12 bg-gradient-to-r from-legacy-green/10 to-legacy-blue/10">
+        <section className="py-12 bg-gradient-to-r from-[#A3C042]/10 to-legacy-blue/10">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center space-y-6">
                     <div className="space-y-2">

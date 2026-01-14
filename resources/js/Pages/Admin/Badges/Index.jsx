@@ -195,13 +195,13 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                     <table className="w-full">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">الشارة</th>
-                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">الاسم</th>
-                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">النوع</th>
-                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">النقاط المطلوبة</th>
-                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">الحالة</th>
-                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">تاريخ الإنشاء</th>
-                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">الإجراءات</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الشارة</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الاسم</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">النوع</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">النقاط المطلوبة</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الحالة</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">تاريخ الإنشاء</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الإجراءات</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">

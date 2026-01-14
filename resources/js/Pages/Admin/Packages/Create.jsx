@@ -397,7 +397,7 @@ export default function AdminPackagesCreate() {
                                             onChange={(e) => updateFeature(index, e.target.value, true)}
                                             placeholder={`ميزة ${index + 1}`}
                                             dir="rtl"
-                                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-right"
+                                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent "
                                         />
                                         <button
                                             type="button"

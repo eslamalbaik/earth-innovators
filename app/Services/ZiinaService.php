@@ -7,13 +7,13 @@ use Illuminate\Support\Facades\Log;
 
 class ZiinaService
 {
-    private string $apiKey;
+    private ?string $apiKey;
     private string $baseUrl;
     private bool $testMode;
 
     public function __construct()
     {
-        $this->apiKey = config('services.ziina.api_key');
+        $this->apiKey = config('services.ziina.api_key') ?? '';
         $this->testMode = config('services.ziina.test_mode', true);
         
         // Ziina test/sandbox URL vs production URL
@@ -30,6 +30,14 @@ class ZiinaService
      */
     public function createPaymentRequest(array $data): ?array
     {
+        if (empty($this->apiKey)) {
+            Log::error('Ziina API key is not configured');
+            return [
+                'error' => true,
+                'message' => 'Ziina payment service is not configured. Please set ZIINA_API_KEY in your .env file.',
+            ];
+        }
+
         try {
             Log::info('Creating Ziina payment request', ['data' => $data]);
 
@@ -89,6 +97,11 @@ class ZiinaService
      */
     public function getPaymentRequest(string $paymentRequestId): ?array
     {
+        if (empty($this->apiKey)) {
+            Log::error('Ziina API key is not configured');
+            return null;
+        }
+
         try {
             Log::info('Getting Ziina payment request', ['id' => $paymentRequestId]);
 

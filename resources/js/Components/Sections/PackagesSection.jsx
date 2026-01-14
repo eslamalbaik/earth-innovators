@@ -26,7 +26,7 @@ export default function PackagesSection({ packages = [] }) {
     );
 
     return (
-        <section className="py-16 bg-gradient-to-r from-legacy-green/5 to-legacy-blue/5">
+        <section className="py-16 bg-gradient-to-r from-[#A3C042]/5 to-legacy-blue/5">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-12">
                     <SectionTitle
@@ -52,12 +52,12 @@ export default function PackagesSection({ packages = [] }) {
                                 key={pkg.id}
                                 className={`bg-white rounded-xl shadow-lg overflow-hidden border-2 transition-all relative ${
                                     isPopular
-                                        ? 'border-legacy-green shadow-legacy-green/20 transform scale-105'
-                                        : 'border-gray-200 hover:border-legacy-green/50'
+                                        ? 'border-[#A3C042] shadow-[#A3C042]/20 transform scale-105'
+                                        : 'border-gray-200 hover:border-[#A3C042]/50'
                                 }`}
                             >
                                 {isPopular && (
-                                    <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-legacy-green to-legacy-blue text-white text-center py-2 font-bold text-sm">
+                                    <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white text-center py-2 font-bold text-sm">
                                         ⭐ الأكثر شعبية
                                     </div>
                                 )}
@@ -69,7 +69,7 @@ export default function PackagesSection({ packages = [] }) {
                                 <div className={`p-8 ${isPopular ? 'pt-12' : ''}`}>
                                     <div className="text-center mb-6">
                                         <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${
-                                            isPopular ? 'bg-gradient-to-br from-legacy-green to-legacy-blue' : 'bg-gray-100'
+                                            isPopular ? 'bg-gradient-to-br from-[#A3C042] to-legacy-blue' : 'bg-gray-100'
                                         }`}>
                                             <Icon className={`text-3xl ${isPopular ? 'text-white' : 'text-gray-600'}`} />
                                         </div>
@@ -78,7 +78,7 @@ export default function PackagesSection({ packages = [] }) {
                                         </h3>
                                         <div className="mb-4">
                                             {isFree ? (
-                                                <span className="text-4xl font-bold text-legacy-green">مجاني</span>
+                                                <span className="text-4xl font-bold text-[#A3C042]">مجاني</span>
                                             ) : (
                                                 <>
                                                     <span className="text-4xl font-bold text-gray-900">{pkg.price}</span>
@@ -99,47 +99,47 @@ export default function PackagesSection({ packages = [] }) {
                                         <ul className="space-y-3">
                                             {pkg.projects_limit !== null ? (
                                                 <li className="flex items-center gap-2">
-                                                    <FaCheck className="text-legacy-green flex-shrink-0" />
+                                                    <FaCheck className="text-[#A3C042] flex-shrink-0" />
                                                     <span className="text-gray-700 text-sm">حتى {pkg.projects_limit} مشروع</span>
                                                 </li>
                                             ) : (
                                                 <li className="flex items-center gap-2">
-                                                    <FaCheck className="text-legacy-green flex-shrink-0" />
+                                                    <FaCheck className="text-[#A3C042] flex-shrink-0" />
                                                     <span className="text-gray-700 text-sm">مشاريع غير محدودة</span>
                                                 </li>
                                             )}
                                             {pkg.challenges_limit !== null ? (
                                                 <li className="flex items-center gap-2">
-                                                    <FaCheck className="text-legacy-green flex-shrink-0" />
+                                                    <FaCheck className="text-[#A3C042] flex-shrink-0" />
                                                     <span className="text-gray-700 text-sm">حتى {pkg.challenges_limit} تحدٍ</span>
                                                 </li>
                                             ) : (
                                                 <li className="flex items-center gap-2">
-                                                    <FaCheck className="text-legacy-green flex-shrink-0" />
+                                                    <FaCheck className="text-[#A3C042] flex-shrink-0" />
                                                     <span className="text-gray-700 text-sm">تحديات غير محدودة</span>
                                                 </li>
                                             )}
                                             {pkg.points_bonus > 0 && (
                                                 <li className="flex items-center gap-2">
-                                                    <FaCheck className="text-legacy-green flex-shrink-0" />
+                                                    <FaCheck className="text-[#A3C042] flex-shrink-0" />
                                                     <span className="text-gray-700 text-sm">{pkg.points_bonus} نقطة إضافية</span>
                                                 </li>
                                             )}
                                             {pkg.badge_access && (
                                                 <li className="flex items-center gap-2">
-                                                    <FaCheck className="text-legacy-green flex-shrink-0" />
+                                                    <FaCheck className="text-[#A3C042] flex-shrink-0" />
                                                     <span className="text-gray-700 text-sm">إمكانية الحصول على شارات</span>
                                                 </li>
                                             )}
                                             {pkg.certificate_access && (
                                                 <li className="flex items-center gap-2">
-                                                    <FaCheck className="text-legacy-green flex-shrink-0" />
+                                                    <FaCheck className="text-[#A3C042] flex-shrink-0" />
                                                     <span className="text-gray-700 text-sm">إمكانية الحصول على شهادات</span>
                                                 </li>
                                             )}
                                             {features.slice(0, 3).map((feature, index) => (
                                                 <li key={index} className="flex items-center gap-2">
-                                                    <FaCheck className="text-legacy-green flex-shrink-0" />
+                                                    <FaCheck className="text-[#A3C042] flex-shrink-0" />
                                                     <span className="text-gray-700 text-sm">{feature}</span>
                                                 </li>
                                             ))}
@@ -150,7 +150,7 @@ export default function PackagesSection({ packages = [] }) {
                                         href="/packages"
                                         className={`block w-full text-center px-6 py-3 rounded-lg font-semibold transition ${
                                             isPopular
-                                                ? 'bg-gradient-to-r from-legacy-green to-legacy-blue text-white hover:shadow-lg'
+                                                ? 'bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white hover:shadow-lg'
                                                 : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
                                         }`}
                                     >
@@ -166,7 +166,7 @@ export default function PackagesSection({ packages = [] }) {
                 <div className="text-center">
                     <button
                         onClick={() => setShowCustomizeModal(true)}
-                        className="bg-gradient-to-r from-legacy-green to-legacy-blue hover:from-primary-600 hover:to-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition duration-300 transform hover:scale-105 shadow-lg"
+                        className="bg-gradient-to-r from-[#A3C042] to-legacy-blue hover:from-primary-600 hover:to-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition duration-300 transform hover:scale-105 shadow-lg"
                     >
                         تخصيص باقة
                     </button>

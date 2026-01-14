@@ -223,40 +223,47 @@ export default function VerifyOtp() {
     return (
         <GuestLayout>
             <Head title="رمز التحقق" />
-
-            <div className="flex items-center justify-center py-8 px-4">
-                <div className="max-w-md w-full space-y-6">
-                    <div className="flex flex-col items-center">
-                        <div>
-                            <Link href="/">
-                                <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
-                            </Link>
+            <div className="flex items-center justify-center sm:px-4">
+                <div className="w-full sm:space-y-8">
+                    <div className="relative min-h-screen overflow-hidden bg-white shadow-lg sm:rounded-2xl px-4 py-10 w-[100vw] sm:w-[400px] md:w-[450px] max-w-5xl sm:mx-auto">
+                        <img src="/images/avatar.svg" alt="avatar" className="absolute -top-24 -left-24 w-48 h-48" />
+                        <img src="/images/avatar1.svg" alt="avatar" className="absolute -bottom-8 right-0 w-28 h-28" />
+                        <div className="flex flex-col items-center">
+                            <div>
+                                <img
+                                    src="/images/logo-modified.png"
+                                    alt="إرث المبتكرين - Innovators Legacy"
+                                    className="h-24 w-auto object-contain"
+                                />
+                            </div>
                         </div>
-                        <h2 className="text-2xl font-bold text-gray-900 mt-4">
-                            تأكيد رمز التحقق
-                        </h2>
-                    </div>
 
-                    <div className="bg-white shadow-lg rounded-2xl px-4 py-10 min-w-[92vw] sm:min-w-[350px]">
-                        {/* عرض بيانات المستخدم */}
-                        <div className="mb-6 space-y-3">
-                            <div className="flex items-center gap-3 text-sm text-gray-700">
-                                <FaUser className="text-gray-400" />
-                                <span className="font-medium">الاسم:</span>
-                                <span>{userData?.name || 'غير متوفر'}</span>
-                            </div>
-                            <div className="flex items-center gap-3 text-sm text-gray-700">
-                                <FaEnvelope className="text-gray-400" />
-                                <span className="font-medium">البريد الإلكتروني:</span>
-                                <span>{otpData?.email || userData?.email || 'غير متوفر'}</span>
-                            </div>
-                            {userData?.phone && (
-                                <div className="flex items-center gap-3 text-sm text-gray-700">
-                                    <FaPhone className="text-gray-400" />
-                                    <span className="font-medium">رقم الجوال:</span>
-                                    <span>{userData.phone}</span>
+                        <div className="text-center mb-6">
+                            <h2 className="text-2xl font-extrabold text-gray-900 mb-2">
+                                تأكيد رمز التحقق
+                            </h2>
+                            <p className="text-sm text-gray-600 mb-4">
+                                أدخل رمز التحقق المكون من 4 أرقام المرسل إلى بريدك الإلكتروني
+                            </p>
+                            <div className="space-y-2 text-sm text-gray-700">
+                                <div className="flex items-center justify-center gap-3">
+                                    <FaUser className="text-gray-400" />
+                                    <span className="font-medium">الاسم:</span>
+                                    <span>{userData?.name || 'غير متوفر'}</span>
                                 </div>
-                            )}
+                                <div className="flex items-center justify-center gap-3">
+                                    <FaEnvelope className="text-gray-400" />
+                                    <span className="font-medium">البريد الإلكتروني:</span>
+                                    <span>{otpData?.email || userData?.email || 'غير متوفر'}</span>
+                                </div>
+                                {userData?.phone && (
+                                    <div className="flex items-center justify-center gap-3">
+                                        <FaPhone className="text-gray-400" />
+                                        <span className="font-medium">رقم الجوال:</span>
+                                        <span>{userData.phone}</span>
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         {/* عرض جميع الأخطاء */}
@@ -311,8 +318,8 @@ export default function VerifyOtp() {
                                                 onKeyDown={(e) => handleKeyDown(originalIndex, e)}
                                                 onPaste={originalIndex === 0 ? handlePaste : undefined}
                                                 onFocus={() => setActiveIndex(originalIndex)}
-                                                className={`w-16 h-16 text-center text-2xl font-bold border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all ${activeIndex === originalIndex
-                                                    ? 'border-yellow-400 ring-2 ring-yellow-400'
+                                                className={`w-16 h-16 text-center text-2xl font-bold border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#A3C042] transition-all ${activeIndex === originalIndex
+                                                    ? 'border-[#A3C042] ring-2 ring-[#A3C042]'
                                                     : value
                                                         ? 'border-green-400'
                                                         : 'border-gray-300'
@@ -335,12 +342,12 @@ export default function VerifyOtp() {
                             <div>
                                 <PrimaryButton
                                     type="submit"
-                                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-400 hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50"
+                                    className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white !bg-[#A3C042] hover:!bg-[#F9D536] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#A3C042] disabled:opacity-50"
                                     disabled={processing || otpValues.join('').length !== 4}
                                 >
                                     {processing ? (
                                         <div className="flex items-center">
-                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white me-2"></div>
                                             جاري التحقق...
                                         </div>
                                     ) : (
@@ -354,7 +361,7 @@ export default function VerifyOtp() {
                                     لم تستلم الرمز؟{' '}
                                     <Link
                                         href={route('register')}
-                                        className="font-medium text-yellow-600 hover:text-yellow-500"
+                                        className="font-medium text-[#A3C042] hover:text-[#F9D536]"
                                     >
                                         العودة إلى التسجيل
                                     </Link>

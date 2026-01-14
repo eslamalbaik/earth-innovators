@@ -13,7 +13,7 @@ export default function SidebarItem({ item, isActive, onClick }) {
             onClick={onClick}
             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                 isActive
-                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/20'
+                    ? 'bg-[#A3C042] text-white shadow-lg shadow-[#A3C042]/20'
                     : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
             }`}
         >

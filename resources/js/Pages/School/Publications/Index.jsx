@@ -102,7 +102,7 @@ export default function SchoolPublicationsIndex({ auth, publications, stats, fil
                         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                             <Link
                                 href="/school/publications/create"
-                                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-legacy-green to-legacy-blue text-white rounded-lg hover:opacity-90 transition"
+                                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white rounded-lg hover:opacity-90 transition"
                             >
                                 <FaPlus />
                                 إنشاء مقال جديد
@@ -114,7 +114,7 @@ export default function SchoolPublicationsIndex({ auth, publications, stats, fil
                                     onClick={() => handleStatusFilter('')}
                                     className={`px-4 py-2 rounded-lg transition ${
                                         !selectedStatus
-                                            ? 'bg-gradient-to-r from-legacy-green to-legacy-blue text-white'
+                                            ? 'bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white'
                                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                     }`}
                                 >
@@ -174,7 +174,7 @@ export default function SchoolPublicationsIndex({ auth, publications, stats, fil
                                                                 )}
                                                             </h3>
                                                             <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
-                                                                <span className="px-2 py-1 bg-legacy-green/10 text-legacy-green rounded">
+                                                                <span className="px-2 py-1 bg-[#A3C042]/10 text-[#A3C042] rounded">
                                                                     {getTypeLabel(publication.type)}
                                                                 </span>
                                                                 {publication.created_at && (
@@ -236,7 +236,7 @@ export default function SchoolPublicationsIndex({ auth, publications, stats, fil
                                 <p className="text-gray-500 text-lg mb-4">لا توجد مقالات</p>
                                 <Link
                                     href="/school/publications/create"
-                                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-legacy-green to-legacy-blue text-white rounded-lg hover:opacity-90 transition"
+                                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white rounded-lg hover:opacity-90 transition"
                                 >
                                     <FaPlus />
                                     إنشاء مقال جديد
@@ -254,7 +254,7 @@ export default function SchoolPublicationsIndex({ auth, publications, stats, fil
                                             href={link.url || '#'}
                                             className={`px-4 py-2 rounded-lg ${
                                                 link.active
-                                                    ? 'bg-gradient-to-r from-legacy-green to-legacy-blue text-white'
+                                                    ? 'bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white'
                                                     : 'bg-white text-gray-700 hover:bg-gray-100'
                                             } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             dangerouslySetInnerHTML={{ __html: link.label }}

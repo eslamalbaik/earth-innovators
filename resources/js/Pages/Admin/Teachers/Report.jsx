@@ -40,12 +40,12 @@ export default function TeacherReport({ teacher, month, summary, byDay, bookings
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50"><tr>
-                                <th className="px-4 py-2 text-right text-xs text-gray-500">ID</th>
-                                <th className="px-4 py-2 text-right text-xs text-gray-500">Student</th>
-                                <th className="px-4 py-2 text-right text-xs text-gray-500">Date</th>
-                                <th className="px-4 py-2 text-right text-xs text-gray-500">Time</th>
-                                <th className="px-4 py-2 text-right text-xs text-gray-500">Price</th>
-                                <th className="px-4 py-2 text-right text-xs text-gray-500">Status</th>
+                                <th className="px-4 py-2  text-xs text-gray-500">ID</th>
+                                <th className="px-4 py-2  text-xs text-gray-500">Student</th>
+                                <th className="px-4 py-2  text-xs text-gray-500">Date</th>
+                                <th className="px-4 py-2  text-xs text-gray-500">Time</th>
+                                <th className="px-4 py-2  text-xs text-gray-500">Price</th>
+                                <th className="px-4 py-2  text-xs text-gray-500">Status</th>
                             </tr></thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {bookings.map(b => (

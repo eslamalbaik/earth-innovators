@@ -150,14 +150,14 @@ export default function Index({ auth, students, availableBadges }) {
                     <div className="flex items-center justify-between mb-6">
                         <div>
                             <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-                                <FaUsers className="text-legacy-green" />
+                                <FaUsers className="text-[#A3C042]" />
                                 إدارة الطلاب
                             </h2>
                             <p className="text-gray-600 mt-1">إجمالي الطلاب: {students.total}</p>
                         </div>
                         <button
                             onClick={() => setShowCreateModal(true)}
-                            className="bg-gradient-to-r from-legacy-green to-legacy-blue text-white px-6 py-3 rounded-lg font-medium hover:shadow-lg transition flex items-center gap-2"
+                            className="bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white px-6 py-3 rounded-lg font-medium hover:shadow-lg transition flex items-center gap-2"
                         >
                             <FaPlus />
                             إضافة طالب جديد
@@ -172,7 +172,7 @@ export default function Index({ auth, students, availableBadges }) {
                             placeholder="ابحث عن طالب (الاسم، البريد، الهاتف، رقم العضوية)..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-legacy-green focus:border-transparent"
+                            className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#A3C042] focus:border-transparent"
                         />
                     </div>
                 </div>
@@ -181,30 +181,30 @@ export default function Index({ auth, students, availableBadges }) {
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gradient-to-r from-legacy-green/10 to-legacy-blue/10">
+                            <thead className="bg-gradient-to-r from-[#A3C042]/10 to-legacy-blue/10">
                                 <tr>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
                                         رقم العضوية
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
                                         الاسم
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
                                         البريد الإلكتروني
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
                                         الهاتف
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
                                         النقاط
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
                                         المشاريع
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
                                         الشارات
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
                                         الإجراءات
                                     </th>
                                 </tr>
@@ -220,7 +220,7 @@ export default function Index({ auth, students, availableBadges }) {
                                     filteredStudents.map((student) => (
                                         <tr key={student.id} className="hover:bg-gray-50">
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm font-semibold text-legacy-green">
+                                                <div className="text-sm font-semibold text-[#A3C042]">
                                                     {student.membership_number || '-'}
                                                 </div>
                                             </td>
@@ -324,7 +324,7 @@ export default function Index({ auth, students, availableBadges }) {
                                                     href={link.url || '#'}
                                                     className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                                                         link.active
-                                                            ? 'z-10 bg-legacy-green border-legacy-green text-white'
+                                                            ? 'z-10 bg-[#A3C042] border-[#A3C042] text-white'
                                                             : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
                                                     } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                     dangerouslySetInnerHTML={{ __html: link.label }}
@@ -523,7 +523,7 @@ export default function Index({ auth, students, availableBadges }) {
                             <InputLabel htmlFor="badge_id" value="الشارة" />
                             <select
                                 id="badge_id"
-                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-legacy-green focus:ring-legacy-green"
+                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                                 value={badgeForm.data.badge_id}
                                 onChange={(e) => badgeForm.setData('badge_id', e.target.value)}
                                 required
@@ -542,7 +542,7 @@ export default function Index({ auth, students, availableBadges }) {
                             <InputLabel htmlFor="reason" value="السبب (اختياري)" />
                             <textarea
                                 id="reason"
-                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-legacy-green focus:ring-legacy-green"
+                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                                 rows="3"
                                 value={badgeForm.data.reason}
                                 onChange={(e) => badgeForm.setData('reason', e.target.value)}

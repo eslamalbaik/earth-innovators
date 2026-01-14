@@ -291,7 +291,7 @@ export default function AdminDashboard({
                     padding: 15,
                     font: {
                         size: 14,
-                        family: "'Tajawal', sans-serif",
+                        family: "'Cairo', sans-serif",
                     },
                     color: '#374151',
                 },
@@ -304,7 +304,7 @@ export default function AdminDashboard({
                 font: {
                     size: 18,
                     weight: 'bold',
-                    family: "'Tajawal', sans-serif",
+                    family: "'Cairo', sans-serif",
                 },
                 color: '#111827',
                 padding: {
@@ -329,7 +329,7 @@ export default function AdminDashboard({
                 ticks: {
                     font: {
                         size: 12,
-                        family: "'Tajawal', sans-serif",
+                        family: "'Cairo', sans-serif",
                     },
                     color: '#6B7280',
                 },
@@ -348,7 +348,7 @@ export default function AdminDashboard({
                     stepSize: 40,
                     font: {
                         size: 12,
-                        family: "'Tajawal', sans-serif",
+                        family: "'Cairo', sans-serif",
                     },
                     color: '#6B7280',
                 },
@@ -522,13 +522,13 @@ export default function AdminDashboard({
                     <table className="w-full">
                         <thead>
                             <tr className="border-b border-gray-100">
-                                <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700">المشروع</th>
-                                <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700">الطالب</th>
-                                <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700">المدرسة</th>
-                                <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700">المعلم</th>
-                                <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700">المشاهدات</th>
-                                <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700">الإعجابات</th>
-                                <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700">تاريخ النشر</th>
+                                <th className=" py-3 px-4 text-sm font-semibold text-gray-700">المشروع</th>
+                                <th className=" py-3 px-4 text-sm font-semibold text-gray-700">الطالب</th>
+                                <th className=" py-3 px-4 text-sm font-semibold text-gray-700">المدرسة</th>
+                                <th className=" py-3 px-4 text-sm font-semibold text-gray-700">المعلم</th>
+                                <th className=" py-3 px-4 text-sm font-semibold text-gray-700">المشاهدات</th>
+                                <th className=" py-3 px-4 text-sm font-semibold text-gray-700">الإعجابات</th>
+                                <th className=" py-3 px-4 text-sm font-semibold text-gray-700">تاريخ النشر</th>
                             </tr>
                         </thead>
                         <tbody>

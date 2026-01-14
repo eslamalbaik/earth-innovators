@@ -363,7 +363,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                     <table className="w-full">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700 w-12">
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700 w-12">
                                     <button
                                         onClick={handleSelectAll}
                                         className="text-gray-600 hover:text-gray-900"
@@ -372,14 +372,14 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                         {selectAll ? <FaCheckSquare className="text-lg" /> : <FaSquare className="text-lg" />}
                                     </button>
                                 </th>
-                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">ID</th>
-                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">الاسم</th>
-                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">البريد الإلكتروني</th>
-                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">الدور</th>
-                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">المدرسة</th>
-                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">النقاط</th>
-                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">تاريخ التسجيل</th>
-                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">الإجراءات</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">ID</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الاسم</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">البريد الإلكتروني</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الدور</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">المدرسة</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">النقاط</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">تاريخ التسجيل</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الإجراءات</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">

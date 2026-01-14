@@ -24,6 +24,7 @@ class ChallengeSubmissionService extends BaseService
                 ->where('start_date', '<=', now())
                 ->where('deadline', '>=', now())
                 ->with(['creator', 'school'])
+                ->withCount(['submissions as submissions_count', 'participants as participants_count'])
                 ->orderBy('created_at', 'desc')
                 ->paginate($perPage);
         }, 300);
@@ -32,15 +33,16 @@ class ChallengeSubmissionService extends BaseService
     /**
      * Get all challenges for a student's school (active, upcoming, finished)
      */
-    public function getAllChallengesForStudent(int $schoolId, ?string $status = null, int $perPage = 12): LengthAwarePaginator
+    public function getAllChallengesForStudent(int $schoolId, ?string $status = null, int $perPage = 12, ?string $search = null, ?string $category = null): LengthAwarePaginator
     {
-        $cacheKey = "all_challenges_student_{$schoolId}_" . md5(json_encode([$status, $perPage]));
+        $cacheKey = "all_challenges_student_{$schoolId}_" . md5(json_encode([$status, $perPage, $search, $category]));
         $cacheTag = "school_challenges_{$schoolId}";
         
-        return $this->cacheTags($cacheTag, $cacheKey, function () use ($schoolId, $status, $perPage) {
+        return $this->cacheTags($cacheTag, $cacheKey, function () use ($schoolId, $status, $perPage, $search, $category) {
             $query = Challenge::where('school_id', $schoolId)
                 ->where('status', '!=', 'cancelled')
                 ->with(['creator', 'school'])
+                ->withCount(['submissions as submissions_count', 'participants as participants_count'])
                 ->orderBy('created_at', 'desc');
 
             if ($status === 'active') {
@@ -55,6 +57,20 @@ class ChallengeSubmissionService extends BaseService
                     $q->where('status', 'completed')
                         ->orWhere('deadline', '<', now());
                 });
+            }
+
+            // Apply search filter
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                        ->orWhere('objective', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
+                });
+            }
+
+            // Apply category filter
+            if ($category) {
+                $query->where('category', $category);
             }
 
             return $query->paginate($perPage);

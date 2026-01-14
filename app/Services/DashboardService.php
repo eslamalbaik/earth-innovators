@@ -167,7 +167,7 @@ class DashboardService extends BaseService
             $allProjectIds = array_unique(array_merge($userProjectIds, $submittedProjectIds));
             
             $recentProjects = Project::whereIn('id', $allProjectIds)
-                ->select('id', 'title', 'status', 'rating', 'likes', 'views', 'created_at')
+                ->select('id', 'title', 'status', 'rating', 'likes', 'views', 'created_at', 'images', 'user_id')
                 ->latest()
                 ->limit(5)
                 ->get()
@@ -178,6 +178,17 @@ class DashboardService extends BaseService
                         ->where('student_id', $userId)
                         ->first();
                     
+                    // Get first image URL
+                    $imageUrl = null;
+                    if ($project->images && is_array($project->images) && count($project->images) > 0) {
+                        $firstImage = $project->images[0];
+                        if (str_starts_with($firstImage, 'http://') || str_starts_with($firstImage, 'https://')) {
+                            $imageUrl = $firstImage;
+                        } else {
+                            $imageUrl = '/storage/' . $firstImage;
+                        }
+                    }
+                    
                     return [
                         'id' => $project->id,
                         'title' => $project->title,
@@ -187,6 +198,7 @@ class DashboardService extends BaseService
                         'views' => $project->views ?? 0,
                         'created_at' => $submission ? $submission->submitted_at->format('Y-m-d') : $project->created_at->format('Y-m-d'),
                         'is_submission' => !$isOwned && $submission !== null,
+                        'image_url' => $imageUrl,
                     ];
                 });
 

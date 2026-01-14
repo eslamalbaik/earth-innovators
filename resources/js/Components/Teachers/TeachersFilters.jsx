@@ -57,7 +57,7 @@ export default function TeachersFilters({
                                 <input
                                     type="text"
                                     placeholder={searchPlaceholder}
-                                    className="w-full  text-gray-900 px-3 py-2 pe-10 rounded-lg border-0 focus:ring-2 focus:ring-yellow-400 focus:outline-none text-right"
+                                    className="w-full  text-gray-900 px-3 py-2 pe-10 rounded-lg border-0 focus:ring-2 focus:ring-yellow-400 focus:outline-none "
                                 />
                                 <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                             </div>
@@ -116,7 +116,7 @@ export default function TeachersFilters({
     return (
         <div className="space-y-4">
             <div>
-                <h2 className="text-md font-bold text-gray-900 mb-2 text-right">فلترة المعلمين</h2>
+                <h2 className="text-md font-bold text-gray-900 mb-2 ">فلترة المعلمين</h2>
                 <div className="mb-4">
                     <div className="relative border border-gray-300 rounded-lg">
                         <input
@@ -124,7 +124,7 @@ export default function TeachersFilters({
                             placeholder="ابحث باسم المعلم ..."
                             value={filters.search}
                             onChange={(e) => onFilterChange('search', e.target.value, e.target.value)}
-                            className="w-full  text-gray-900 px-3 py-2 pe-10 rounded-lg border-0 focus:ring-2 focus:ring-yellow-400 focus:outline-none text-right"
+                            className="w-full  text-gray-900 px-3 py-2 pe-10 rounded-lg border-0 focus:ring-2 focus:ring-yellow-400 focus:outline-none "
                         />
                         <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                     </div>

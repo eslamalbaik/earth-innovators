@@ -161,22 +161,22 @@ export default function PermissionsIndex({ adminUsers, stats, filters, auth }) {
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     الاسم
                                 </th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     البريد الإلكتروني
                                 </th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     الهاتف
                                 </th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     نوع الصلاحية
                                 </th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     تاريخ الإنشاء
                                 </th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     الإجراءات
                                 </th>
                             </tr>

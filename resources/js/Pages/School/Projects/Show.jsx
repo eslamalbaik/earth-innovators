@@ -76,7 +76,7 @@ export default function ShowSchoolProject({ project, auth }) {
                         <div className="flex items-center gap-2">
                             <Link
                                 href={`/school/projects/${project.id}/edit`}
-                                className="bg-legacy-green hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center gap-2 shadow-md"
+                                className="bg-[#A3C042] hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center gap-2 shadow-md"
                             >
                                 <FaEdit />
                                 تعديل
@@ -94,7 +94,7 @@ export default function ShowSchoolProject({ project, auth }) {
 
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-legacy-green/10 to-legacy-blue/10 px-6 py-4 border-b border-gray-200">
+                    <div className="bg-gradient-to-r from-[#A3C042]/10 to-legacy-blue/10 px-6 py-4 border-b border-gray-200">
                         <div className="flex items-start justify-between">
                             <div className="flex-1">
                                 <h1 className="text-3xl font-bold text-gray-900 mb-3">{project.title}</h1>
@@ -122,18 +122,18 @@ export default function ShowSchoolProject({ project, auth }) {
                         {/* Project Info */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div className="flex items-center gap-3 text-gray-700">
-                                <FaUser className="text-legacy-green" />
+                                <FaUser className="text-[#A3C042]" />
                                 <span className="font-medium">الطالب/المؤلف:</span>
                                 <span>{project.user?.name || 'المدرسة'}</span>
                             </div>
                             <div className="flex items-center gap-3 text-gray-700">
-                                <FaCalendar className="text-legacy-green" />
+                                <FaCalendar className="text-[#A3C042]" />
                                 <span className="font-medium">تاريخ الإنشاء:</span>
                                 <span>{toHijriDate(project.created_at)}</span>
                             </div>
                             {project.approved_at && (
                                 <div className="flex items-center gap-3 text-gray-700">
-                                    <FaCalendar className="text-legacy-green" />
+                                    <FaCalendar className="text-[#A3C042]" />
                                     <span className="font-medium">تاريخ الموافقة:</span>
                                     <span>{toHijriDate(project.approved_at)}</span>
                                 </div>
@@ -160,7 +160,7 @@ export default function ShowSchoolProject({ project, auth }) {
                         {project.images && project.images.length > 0 && (
                             <div className="mb-6">
                                 <h2 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
-                                    <FaImage className="text-legacy-green" />
+                                    <FaImage className="text-[#A3C042]" />
                                     صور المشروع ({project.images.length})
                                 </h2>
                                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -189,7 +189,7 @@ export default function ShowSchoolProject({ project, auth }) {
                         {project.files && project.files.length > 0 && (
                             <div>
                                 <h2 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
-                                    <FaFile className="text-legacy-green" />
+                                    <FaFile className="text-[#A3C042]" />
                                     ملفات المشروع ({project.files.length})
                                 </h2>
                                 <div className="space-y-2">
@@ -208,7 +208,7 @@ export default function ShowSchoolProject({ project, auth }) {
                                                     <FaFile className="text-gray-400 text-xl" />
                                                     <span className="text-gray-700 font-medium">{fileName}</span>
                                                 </div>
-                                                <FaDownload className="text-legacy-green opacity-0 group-hover:opacity-100 transition" />
+                                                <FaDownload className="text-[#A3C042] opacity-0 group-hover:opacity-100 transition" />
                                             </a>
                                         );
                                     })}

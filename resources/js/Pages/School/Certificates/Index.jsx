@@ -165,19 +165,19 @@ export default function Index({ auth, students, description }) {
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-50">
                                     <tr>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             الاسم
                                         </th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             رقم العضوية
                                         </th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             البريد الإلكتروني
                                         </th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             عدد الشهادات
                                         </th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             الإجراءات
                                         </th>
                                     </tr>

@@ -271,14 +271,14 @@ export default function AdminSubscriptionsIndex({
                         <table className="w-full">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">المستخدم</th>
-                                    <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">الباقة</th>
-                                    <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">تاريخ البدء</th>
-                                    <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">تاريخ الانتهاء</th>
-                                    <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">المبلغ</th>
-                                    <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">الحالة</th>
-                                    <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">رقم المعاملة</th>
-                                    <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">الإجراءات</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">المستخدم</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الباقة</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">تاريخ البدء</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">تاريخ الانتهاء</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">المبلغ</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الحالة</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">رقم المعاملة</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الإجراءات</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200">
@@ -327,14 +327,14 @@ export default function AdminSubscriptionsIndex({
                         <table className="w-full">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">الطالب</th>
-                                    <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">المعلم</th>
-                                    <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">المادة</th>
-                                    <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">المبلغ</th>
-                                    <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">الحالة</th>
-                                    <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">طريقة الدفع</th>
-                                    <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">رقم المعاملة</th>
-                                    <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">التاريخ</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الطالب</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">المعلم</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">المادة</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">المبلغ</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الحالة</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">طريقة الدفع</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">رقم المعاملة</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">التاريخ</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200">

@@ -5,7 +5,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm, router } from '@inertiajs/react';
-import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaUserGraduate, FaChalkboardTeacher, FaSchool, FaUniversity } from 'react-icons/fa';
 import { useState } from 'react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 
@@ -55,19 +55,8 @@ export default function Login({ status, canResetPassword }) {
         <GuestLayout>
             <Head title="تسجيل الدخول" />
 
-            <div className="min-h-screen flex items-center justify-center py-8 px-4">
-                <div className="max-w-md w-full space-y-6">
-                    <div className="flex flex-col items-center">
-                        <div>
-                            <Link href="/">
-                                <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
-                            </Link>
-                        </div>
-                        <h2 className="text-2xl font-bold text-gray-900">
-                            تسجيل الدخول
-                        </h2>
-                    </div>
-
+            <div className="flex items-center justify-center sm:px-4">
+                <div className="w-full sm:space-y-8">
                     {status && (
                         <div className="bg-green-50 border border-green-200 rounded-lg p-4 animate-fadeInUp">
                             <div className="flex items-center">
@@ -85,36 +74,48 @@ export default function Login({ status, canResetPassword }) {
                         </div>
                     )}
 
-                    <div className="bg-white shadow-lg rounded-2xl px-4 py-10">
-                        <form onSubmit={submit} className="space-y-6">
+<div className="relative min-h-screen overflow-hidden bg-white shadow-lg sm:rounded-2xl px-4 py-10 w-[100vw] sm:w-[400px] md:w-[450px] max-w-5xl sm:mx-auto">
+<form onSubmit={submit} className="space-y-6">
+                            <img src="/images/avatar.svg" alt="avatar" className="absolute -top-24 -left-24 w-48 h-48" />
+                            <img src="/images/avatar1.svg" alt="avatar" className="absolute -bottom-8 right-0 w-28 h-28" />
+                            <div className="flex flex-col items-center">
+                                <div>
+                                    <img
+                                        src="/images/logo-modified.png"
+                                        alt="إرث المبتكرين - Innovators Legacy"
+                                        className="h-24 w-auto object-contain"
+                                    />
+                                </div>
+                            </div>
+
                             <div>
-                                <InputLabel value="الدخول كـ" className="text-sm font-medium text-gray-700 mb-3" />
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div className='text-xs mb-1 opacity-75'>الدخول كـ</div>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5 md:gap-3">
                                     {[
-                                        { key: 'student', label: 'طالب', description: 'للوصول إلى لوحة الطالب' },
-                                        { key: 'teacher', label: 'معلم', description: 'للوصول إلى لوحة المعلم' },
-                                        { key: 'school', label: 'مدرسة', description: 'للوصول إلى لوحة المدرسة' },
-                                        { key: 'educational_institution', label: 'مؤسسة تعليمية', description: 'للوصول إلى لوحة المؤسسة التعليمية' },
+                                        { key: 'student', label: 'طالب', description: 'للوصول إلى لوحة الطالب', icon: FaUserGraduate },
+                                        { key: 'teacher', label: 'معلم', description: 'للوصول إلى لوحة المعلم', icon: FaChalkboardTeacher },
+                                        { key: 'school', label: 'مدرسة', description: 'للوصول إلى لوحة المدرسة', icon: FaSchool },
+                                        { key: 'educational_institution', label: 'مؤسسة تعليمية', description: 'للوصول إلى لوحة المؤسسة التعليمية', icon: FaUniversity },
                                     ].map((roleOption) => {
                                         const isActive = data.role === roleOption.key;
+                                        const IconComponent = roleOption.icon;
                                         return (
                                             <button
                                                 key={roleOption.key}
                                                 type="button"
                                                 onClick={() => setData('role', roleOption.key)}
-                                                className={`relative flex flex-col items-start rounded-xl border px-4 py-3 transition duration-200 ${isActive
-                                                    ? 'border-legacy-green bg-gradient-to-br from-legacy-green/10 to-legacy-blue/10 text-legacy-green shadow-sm'
-                                                    : 'border-gray-200 bg-gray-50 hover:border-legacy-green/50 hover:bg-legacy-green/5'
+                                                className={`relative flex flex-col items-center justify-center rounded-xl border px-3 py-3 transition duration-200 ${isActive
+                                                    ? 'border-[#A3C042] bg-gradient-to-br from-[#A3C042]/10 to-legacy-blue/10 text-[#A3C042] shadow-sm'
+                                                    : 'border-gray-200 bg-gray-50 hover:border-[#A3C042]/50 hover:bg-[#A3C042]/5 text-gray-700'
                                                     }`}
                                             >
-                                                <span className="text-base font-semibold">
-                                                    {roleOption.key === 'student' ? 'الدخول كطالب' : roleOption.key === 'teacher' ? 'الدخول كمعلم' : roleOption.key === 'school' ? 'الدخول كمدرسة' : 'الدخول كمؤسسة تعليمية'}
+                                                <IconComponent className={`h-4 w-4 md:h-5 md:w-5 mb-1 ${isActive ? 'text-[#A3C042]' : 'text-gray-500'}`} />
+                                                <span className="text-xs md:text-sm font-medium text-center">
+                                                    {roleOption.label}
                                                 </span>
-                                                <span className="mt-1 text-xs text-gray-500">
-                                                    {roleOption.description}
-                                                </span>
+
                                                 {isActive && (
-                                                    <span className="absolute top-3 left-3 h-2 w-2 rounded-full bg-legacy-green" aria-hidden="true"></span>
+                                                    <span className="absolute top-3 left-3 h-2 w-2 rounded-full bg-[#A3C042]" aria-hidden="true"></span>
                                                 )}
                                             </button>
                                         );
@@ -124,7 +125,6 @@ export default function Login({ status, canResetPassword }) {
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="email" value="البريد الإلكتروني" className="text-sm font-medium text-gray-700 mb-2" />
                                 <div className="relative">
                                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                         <FaEnvelope className="h-5 w-5 text-gray-400" />
@@ -134,18 +134,17 @@ export default function Login({ status, canResetPassword }) {
                                         type="email"
                                         name="email"
                                         value={data.email}
-                                        className="block w-full pr-10 pl-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-legacy-green focus:border-legacy-green sm:text-sm"
+                                        className="block w-full ps-10 pe-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
                                         autoComplete="username"
                                         isFocused={true}
                                         onChange={(e) => setData('email', e.target.value)}
-                                        placeholder="example@email.com"
+                                        placeholder="البريد الإلكتروني"
                                     />
                                 </div>
                                 <InputError message={errors.email} className="mt-2" />
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="password" value="كلمة المرور" className="text-sm font-medium text-gray-700 mb-2" />
                                 <div className="relative">
                                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                         <FaLock className="h-5 w-5 text-gray-400" />
@@ -155,10 +154,10 @@ export default function Login({ status, canResetPassword }) {
                                         type={showPassword ? "text" : "password"}
                                         name="password"
                                         value={data.password}
-                                        className="block w-full pr-10 pl-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-legacy-green focus:border-legacy-green sm:text-sm"
+                                        className="block w-full ps-10 pe-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
                                         autoComplete="current-password"
                                         onChange={(e) => setData('password', e.target.value)}
-                                        placeholder="••••••••"
+                                        placeholder="كلمة المرور"
                                     />
                                     <button
                                         type="button"
@@ -191,7 +190,7 @@ export default function Login({ status, canResetPassword }) {
                                     <div className="text-sm">
                                         <Link
                                             href={route('password.request')}
-                                            className="font-medium text-legacy-green hover:text-primary-600"
+                                            className="font-medium text-[#A3C042] hover:text-[#F9D536]"
                                         >
                                             نسيت كلمة المرور؟
                                         </Link>
@@ -199,9 +198,9 @@ export default function Login({ status, canResetPassword }) {
                                 )}
                             </div>
 
-                            <div>
+                            <div className='flex flex-col items-center justify-start gap-2'>
                                 <PrimaryButton
-                                    className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-legacy-green to-legacy-blue hover:from-primary-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-legacy-green disabled:opacity-50"
+                                    className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white !bg-[#A3C042] hover:!bg-[#F9D536] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#A3C042] disabled:opacity-50"
                                     disabled={processing}
                                 >
                                     {processing ? (
@@ -215,26 +214,15 @@ export default function Login({ status, canResetPassword }) {
                                 </PrimaryButton>
                             </div>
 
-                            <div className="text-center space-y-2">
+                            <div className="text-center space-y-2"> 
                                 <div className="text-sm text-gray-600">
                                     <p>
                                         ليس لديك حساب؟{' '}
                                         <Link
                                             href={route('register')}
-                                            className="font-medium text-legacy-green hover:text-primary-600"
-                                        >
+                                            className="font-medium text-[#A3C042] hover:text-[#F9D536]"
+                                            >
                                             إنشاء حساب جديد
-                                        </Link>
-                                    </p>
-                                </div>
-                                <div className="text-sm text-gray-500 border-t border-gray-200 pt-3">
-                                    <p>
-                                        أنت مشرف؟{' '}
-                                        <Link
-                                            href={route('admin.login')}
-                                            className="font-medium text-legacy-blue hover:text-blue-700"
-                                        >
-                                            تسجيل دخول الأدمن
                                         </Link>
                                     </p>
                                 </div>

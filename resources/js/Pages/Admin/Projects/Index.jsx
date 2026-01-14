@@ -330,12 +330,12 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                     <table className="w-full">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">المشروع</th>
-                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">الناشر</th>
-                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">المؤسسة التعليمية</th>
-                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">الحالة</th>
-                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">تاريخ الإنشاء</th>
-                                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-700">الإجراءات</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">المشروع</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الناشر</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">المؤسسة التعليمية</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الحالة</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">تاريخ الإنشاء</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الإجراءات</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">

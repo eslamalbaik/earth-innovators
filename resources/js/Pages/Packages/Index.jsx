@@ -158,7 +158,7 @@ export default function PackagesIndex({ packages, userPackage, auth }) {
                                             pkg.features_ar.slice(0, 5).map((feature, index) => (
                                                 <div
                                                     key={index}
-                                                    className="flex items-start text-right"
+                                                    className="flex items-start "
                                                 >
                                                     <svg
                                                         className="w-5 h-5 text-green-500 ml-2 flex-shrink-0 mt-0.5"

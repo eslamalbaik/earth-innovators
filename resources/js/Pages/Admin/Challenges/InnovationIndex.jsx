@@ -213,7 +213,7 @@ export default function AdminInnovationChallengesIndex({ challenges, stats, filt
                     </div>
 
                     {/* Center - النص */}
-                    <div className="flex-1 text-center md:text-right">
+                    <div className="flex-1 text-center md:">
                         <h3 className="text-2xl font-bold mb-2">قم بتحفيز طلابك اليوم!</h3>
                         <p className="text-purple-100 text-sm md:text-base">
                             أفادت الدراسات أن المسابقات الودية تزيد من معدل إنتاجية الابتكار بنسبة 40%. اختر موضوعًا شيقًا وابدأ التحدي الآن.

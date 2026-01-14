@@ -34,7 +34,7 @@ export default function AdminLayout({ children, title = 'لوحة الإدارة
                     </button>
                     <Link href="/" className="flex items-center gap-3">
                         <ApplicationLogo />
-                        <span className="text-lg font-bold bg-gradient-to-r from-legacy-green to-legacy-blue bg-clip-text text-transparent">إرث المبتكرين</span>
+                        <span className="text-lg font-bold bg-gradient-to-r from-[#A3C042] to-legacy-blue bg-clip-text text-transparent">إرث المبتكرين</span>
                     </Link>
                     <div className="text-xs text-gray-500 mt-1">
                         لوحة الإدارة

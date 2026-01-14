@@ -86,7 +86,7 @@ export default function TeachersSection({
 
                                             <p className="text-sm text-gray-600 mb-3">{teacher.location}</p>
 
-                                            <div className="bg-legacy-green/20 text-legacy-green px-3 py-1 rounded-full text-sm font-medium mb-4 inline-block border border-legacy-green/30">
+                                            <div className="bg-[#A3C042]/20 text-[#A3C042] px-3 py-1 rounded-full text-sm font-medium mb-4 inline-block border border-[#A3C042]/30">
                                                 {teacher.subject}
                                             </div>
                                         </div>
@@ -114,7 +114,7 @@ export default function TeachersSection({
                             </button>
                             <button
                                 onClick={onNextClick}
-                                className="w-8 h-8 md:w-10 md:h-10 bg-legacy-green hover:bg-primary-600 text-white rounded-lg flex items-center justify-center transition duration-300 shadow-lg"
+                                className="w-8 h-8 md:w-10 md:h-10 bg-[#A3C042] hover:bg-primary-600 text-white rounded-lg flex items-center justify-center transition duration-300 shadow-lg"
                             >
                                 <FaArrowLeft className="text-sm" />
                             </button>
@@ -122,7 +122,7 @@ export default function TeachersSection({
                         <div>
                             <button
                                 onClick={onViewAllTeachers}
-                                className="bg-legacy-green hover:bg-primary-600 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg font-bold text-xs md:text-sm transition duration-300 flex items-center gap-3 shadow-lg"
+                                className="bg-[#A3C042] hover:bg-primary-600 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg font-bold text-xs md:text-sm transition duration-300 flex items-center gap-3 shadow-lg"
                             >
                                 عرض جميع المشاريع
                                 <FaArrowLeft className="text-md" />

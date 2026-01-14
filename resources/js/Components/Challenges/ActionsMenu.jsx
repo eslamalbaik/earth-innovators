@@ -74,7 +74,7 @@ export default function ActionsMenu({
                         {onView && (
                             <button
                                 onClick={() => handleAction('view')}
-                                className="w-full text-right px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                                className="w-full  px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
                             >
                                 <FaEye className="text-blue-500 flex-shrink-0" />
                                 <span>عرض</span>
@@ -84,7 +84,7 @@ export default function ActionsMenu({
                         {showAnalytics && (
                             <button
                                 onClick={() => handleAction('analytics')}
-                                className="w-full text-right px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                                className="w-full  px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
                             >
                                 <FaChartLine className="text-indigo-500 flex-shrink-0" />
                                 <span>تحليل</span>
@@ -94,7 +94,7 @@ export default function ActionsMenu({
                         {onEdit && (
                             <button
                                 onClick={() => handleAction('edit')}
-                                className="w-full text-right px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                                className="w-full  px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
                             >
                                 <FaEdit className="text-amber-500 flex-shrink-0" />
                                 <span>تعديل</span>
@@ -104,7 +104,7 @@ export default function ActionsMenu({
                         {(canPause || canResume) && onPause && (
                             <button
                                 onClick={() => handleAction('pause')}
-                                className="w-full text-right px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                                className="w-full  px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
                             >
                                 {canPause ? (
                                     <>
@@ -126,7 +126,7 @@ export default function ActionsMenu({
                                 <button
                                     onClick={() => handleAction('delete')}
                                     disabled={isDeleting}
-                                    className={`w-full text-right px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors ${
+                                    className={`w-full  px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors ${
                                         isDeleting ? 'opacity-50 cursor-not-allowed' : ''
                                     }`}
                                 >

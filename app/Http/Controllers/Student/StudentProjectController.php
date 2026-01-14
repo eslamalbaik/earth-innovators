@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Models\ProjectSubmission;
 use App\Services\ProjectService;
+use App\Services\SubmissionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -12,7 +14,8 @@ use Inertia\Inertia;
 class StudentProjectController extends Controller
 {
     public function __construct(
-        private ProjectService $projectService
+        private ProjectService $projectService,
+        private SubmissionService $submissionService
     ) {}
 
     /**
@@ -39,6 +42,42 @@ class StudentProjectController extends Controller
 
         return Inertia::render('Student/Projects/Index', [
             'projects' => $projects,
+        ]);
+    }
+
+    /**
+     * عرض صفحة رفع مشروع جديد
+     */
+    public function create()
+    {
+        $student = Auth::user();
+
+        if (!$student->school_id) {
+            return Inertia::render('Student/Projects/Create', [
+                'projects' => [],
+                'message' => 'أنت غير مرتبط بمدرسة',
+            ]);
+        }
+
+        // Get available projects for student
+        $projects = $this->projectService->getSchoolProjects(
+            $student->school_id,
+            null,
+            'approved',
+            null,
+            100
+        );
+
+        // Get student submissions for evaluation view
+        $submissions = $this->submissionService->getStudentSubmissions(
+            $student->id,
+            null,
+            100
+        );
+
+        return Inertia::render('Student/Projects/Create', [
+            'projects' => $projects->items(),
+            'submissions' => $submissions->items(),
         ]);
     }
 

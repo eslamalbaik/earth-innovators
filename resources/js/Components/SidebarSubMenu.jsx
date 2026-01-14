@@ -10,19 +10,115 @@ export default function SidebarSubMenu({ item, isActive, currentUrl, onSubItemCl
     const [isOpen, setIsOpen] = useState(() => {
         // Auto-open if any submenu item is active
         return item.subItems?.some(subItem => {
+            // Extract path and query from URLs
+            const getPath = (url) => {
+                const [path] = url.split('?');
+                return path;
+            };
+            
+            const getQuery = (url) => {
+                const [, query] = url.split('?');
+                return query || '';
+            };
+            
+            const subItemPath = getPath(subItem.href);
+            const currentPath = getPath(currentUrl);
+            const subItemQuery = getQuery(subItem.href);
+            const currentQuery = getQuery(currentUrl);
+            
+            // Exact match (including query) always returns true
             if (currentUrl === subItem.href) return true;
-            if (subItem.href.includes('/create') && currentUrl === subItem.href) return true;
-            if (subItem.href.includes('/pending') && (currentUrl === subItem.href || currentUrl === subItem.href.replace('/pending', ''))) return true;
-            return currentUrl.startsWith(subItem.href) && !subItem.href.includes('/dashboard');
+            
+            // If subItem has query parameters, match path and query
+            if (subItemQuery) {
+                if (currentPath !== subItemPath) return false;
+                const subItemParams = new URLSearchParams(subItemQuery);
+                const currentParams = new URLSearchParams(currentQuery);
+                for (const [key, value] of subItemParams.entries()) {
+                    if (currentParams.get(key) !== value) return false;
+                }
+                return true;
+            }
+            
+            // If current URL has query parameters but subItem doesn't, only match if path matches exactly
+            if (currentQuery && !subItemQuery) {
+                return currentPath === subItemPath;
+            }
+            
+            // Special handling for create routes - only match exact
+            if (subItemPath.includes('/create')) {
+                return currentPath === subItemPath;
+            }
+            
+            // If current URL is a create route, don't match parent routes
+            if (currentPath.includes('/create')) {
+                return false;
+            }
+            
+            // For dashboard routes, only match exact
+            if (subItemPath.includes('/dashboard')) {
+                return currentPath === subItemPath;
+            }
+            
+            // For other routes, match if current URL starts with the subItem href
+            return currentPath.startsWith(subItemPath) && !subItemPath.includes('/dashboard');
         }) || false;
     });
 
     const Icon = item.icon;
     const hasActiveSubItem = item.subItems?.some(subItem => {
+        // Extract path and query from URLs
+        const getPath = (url) => {
+            const [path] = url.split('?');
+            return path;
+        };
+        
+        const getQuery = (url) => {
+            const [, query] = url.split('?');
+            return query || '';
+        };
+        
+        const subItemPath = getPath(subItem.href);
+        const currentPath = getPath(currentUrl);
+        const subItemQuery = getQuery(subItem.href);
+        const currentQuery = getQuery(currentUrl);
+        
+        // Exact match (including query) always returns true
         if (currentUrl === subItem.href) return true;
-        if (subItem.href.includes('/create') && currentUrl === subItem.href) return true;
-        if (subItem.href.includes('/pending') && (currentUrl === subItem.href || currentUrl === subItem.href.replace('/pending', ''))) return true;
-        return currentUrl.startsWith(subItem.href) && !subItem.href.includes('/dashboard');
+        
+        // If subItem has query parameters, match path and query
+        if (subItemQuery) {
+            if (currentPath !== subItemPath) return false;
+            const subItemParams = new URLSearchParams(subItemQuery);
+            const currentParams = new URLSearchParams(currentQuery);
+            for (const [key, value] of subItemParams.entries()) {
+                if (currentParams.get(key) !== value) return false;
+            }
+            return true;
+        }
+        
+        // If current URL has query parameters but subItem doesn't, only match if path matches exactly
+        if (currentQuery && !subItemQuery) {
+            return currentPath === subItemPath;
+        }
+        
+        // Special handling for create routes - only match exact
+        if (subItemPath.includes('/create')) {
+            return currentPath === subItemPath;
+        }
+        
+        // If current URL is a create route, don't match parent routes
+        if (currentPath.includes('/create')) {
+            return false;
+        }
+        
+        // For dashboard routes, only match exact
+        if (subItemPath.includes('/dashboard')) {
+            return currentPath === subItemPath;
+        }
+        
+        // For other routes, match if current URL starts with the subItem href
+        return currentPath.startsWith(subItemPath) && !subItemPath.includes('/dashboard');
     });
 
     return (
@@ -32,7 +128,7 @@ export default function SidebarSubMenu({ item, isActive, currentUrl, onSubItemCl
                 onClick={() => setIsOpen(!isOpen)}
                 className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                     isActive || hasActiveSubItem
-                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/20'
+                        ? 'bg-[#A3C042] text-white shadow-lg shadow-[#A3C042]/20'
                         : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                 }`}
             >
@@ -49,17 +145,61 @@ export default function SidebarSubMenu({ item, isActive, currentUrl, onSubItemCl
 
             {/* Submenu Items */}
             {isOpen && item.subItems && (
-                <div className="mt-2 mr-4 space-y-1">
+                <div className="mt-2 ms-3 space-y-1">
                     {item.subItems.map((subItem) => {
                         const isSubActive = (() => {
+                            // Extract path and query from URLs
+                            const getPath = (url) => {
+                                const [path] = url.split('?');
+                                return path;
+                            };
+                            
+                            const getQuery = (url) => {
+                                const [, query] = url.split('?');
+                                return query || '';
+                            };
+                            
+                            const subItemPath = getPath(subItem.href);
+                            const currentPath = getPath(currentUrl);
+                            const subItemQuery = getQuery(subItem.href);
+                            const currentQuery = getQuery(currentUrl);
+                            
+                            // Exact match (including query) always returns true
                             if (currentUrl === subItem.href) return true;
-                            if (subItem.href.includes('/create')) {
-                                return currentUrl === subItem.href;
+                            
+                            // If subItem has query parameters, match path and query
+                            if (subItemQuery) {
+                                if (currentPath !== subItemPath) return false;
+                                const subItemParams = new URLSearchParams(subItemQuery);
+                                const currentParams = new URLSearchParams(currentQuery);
+                                for (const [key, value] of subItemParams.entries()) {
+                                    if (currentParams.get(key) !== value) return false;
+                                }
+                                return true;
                             }
-                            if (subItem.href.includes('/pending')) {
-                                return currentUrl === subItem.href || currentUrl === subItem.href.replace('/pending', '');
+                            
+                            // If current URL has query parameters but subItem doesn't, only match if path matches exactly
+                            if (currentQuery && !subItemQuery) {
+                                return currentPath === subItemPath;
                             }
-                            return currentUrl.startsWith(subItem.href) && !subItem.href.includes('/dashboard');
+                            
+                            // Special handling for create routes - only match exact
+                            if (subItemPath.includes('/create')) {
+                                return currentPath === subItemPath;
+                            }
+                            
+                            // If current URL is a create route, don't match parent routes
+                            if (currentPath.includes('/create')) {
+                                return false;
+                            }
+                            
+                            // For dashboard routes, only match exact
+                            if (subItemPath.includes('/dashboard')) {
+                                return currentPath === subItemPath;
+                            }
+                            
+                            // For other routes, match if current URL starts with the subItem href
+                            return currentPath.startsWith(subItemPath) && !subItemPath.includes('/dashboard');
                         })();
 
                         return (
@@ -69,7 +209,7 @@ export default function SidebarSubMenu({ item, isActive, currentUrl, onSubItemCl
                                 onClick={onSubItemClick}
                                 className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 ${
                                     isSubActive
-                                        ? 'bg-blue-50 text-blue-600 font-semibold border-r-2 border-blue-500'
+                                        ? 'bg-[#A3C042]/10 text-[#A3C042] font-semibold'
                                         : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                                 }`}
                             >

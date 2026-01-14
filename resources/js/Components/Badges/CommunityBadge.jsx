@@ -79,7 +79,7 @@ export default function CommunityBadge({ badge, progress = null }) {
     }, []);
 
     return (
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-gray-200 hover:border-legacy-green/50 transition-all">
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-gray-200 hover:border-[#A3C042]/50 transition-all">
             <div className="p-6">
                 {/* Header with percentage and title */}
                 <div className="flex items-start justify-between mb-4">

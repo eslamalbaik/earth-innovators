@@ -1,4 +1,3 @@
-import DashboardLayout from '../../../Layouts/DashboardLayout';
 import { Head, useForm, router, Link } from '@inertiajs/react';
 import { useState, useRef } from 'react';
 import { FaArrowLeft, FaUpload, FaCloudUploadAlt, FaFile, FaSpinner, FaTrash } from 'react-icons/fa';
@@ -6,8 +5,13 @@ import TextInput from '../../../Components/TextInput';
 import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
 import PrimaryButton from '../../../Components/PrimaryButton';
+import MobileAppLayout from '@/Layouts/MobileAppLayout';
+import MobileTopBar from '@/Components/Mobile/MobileTopBar';
+import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
+import { useToast } from '@/Contexts/ToastContext';
 
 export default function CreateProject({ auth, school, schools = [] }) {
+    const { showError } = useToast();
     const { data, setData, post, processing, errors } = useForm({
         title: '',
         description: '',
@@ -32,12 +36,12 @@ export default function CreateProject({ auth, school, schools = [] }) {
             ];
             
             if (file.size > maxSize) {
-                alert(`الملف ${file.name} أكبر من 10 ميجابايت`);
+                showError(`الملف ${file.name} أكبر من 10 ميجابايت`);
                 return false;
             }
             
             if (!validTypes.includes(file.type)) {
-                alert(`نوع الملف ${file.name} غير مدعوم`);
+                showError(`نوع الملف ${file.name} غير مدعوم`);
                 return false;
             }
             
@@ -116,51 +120,39 @@ export default function CreateProject({ auth, school, schools = [] }) {
 
     // إزالة الشرط الذي يمنع الوصول للصفحة - يمكن للمعلم إنشاء مشروع حتى لو لم يكن مرتبطاً بمدرسة
 
-    return (
-        <DashboardLayout 
-            auth={auth} 
-            header={
-                <div className="flex items-center gap-3">
-                    <Link href="/teacher/projects" className="text-gray-600 hover:text-legacy-green">
-                        <FaArrowLeft className="text-xl" />
-                    </Link>
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">إرسال مشروع</h2>
-                </div>
-            }
+    const FormContent = () => (
+        <>
+            {/* Tabs */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-3">
+                <div className="grid grid-cols-2 gap-3">
+                    <button
+                        type="button"
+                        onClick={() => setActiveTab('upload')}
+                        className={`rounded-xl py-2.5 text-sm font-bold transition ${
+                            activeTab === 'upload'
+                                ? 'bg-[#A3C042] text-white'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
         >
-            <Head title="إرسال مشروع - لوحة المعلم" />
-
-            <div className="py-6">
-                <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
-                    {/* Tabs */}
-                    <div className="flex gap-4 mb-6">
+                        رفع المشروع
+                    </button>
                         <button
                             type="button"
                             onClick={() => setActiveTab('evaluation')}
-                            className={`flex-1 px-6 py-3 rounded-lg font-medium transition ${
+                        className={`rounded-xl py-2.5 text-sm font-bold transition ${
                                 activeTab === 'evaluation'
-                                    ? 'bg-legacy-green text-white'
+                                    ? 'bg-[#A3C042] text-white'
                                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                             }`}
                         >
                             صفحة التقييم
                         </button>
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab('upload')}
-                            className={`flex-1 px-6 py-3 rounded-lg font-medium transition ${
-                                activeTab === 'upload'
-                                    ? 'bg-legacy-green text-white'
-                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
-                        >
-                            رفع المشروع
-                        </button>
+                </div>
                     </div>
 
                     {/* Form */}
                     {activeTab === 'upload' && (
-                        <form onSubmit={submit} className="bg-white rounded-xl shadow-lg p-6 space-y-6">
+                        <form onSubmit={submit} className="bg-white rounded-2xl border border-gray-100 p-6 space-y-6 mt-4">
                             {/* Title */}
                             <div>
                                 <InputLabel htmlFor="title" value="عنوان المشروع" className="text-sm font-medium text-gray-700 mb-2" />
@@ -184,7 +176,7 @@ export default function CreateProject({ auth, school, schools = [] }) {
                                     value={data.description}
                                     onChange={(e) => setData('description', e.target.value)}
                                     rows={6}
-                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-legacy-green focus:ring-legacy-green"
+                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                                     placeholder="أدخل وصفاً للمشروع"
                                     required
                                 />
@@ -198,7 +190,7 @@ export default function CreateProject({ auth, school, schools = [] }) {
                                     id="category"
                                     value={data.category}
                                     onChange={(e) => setData('category', e.target.value)}
-                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-legacy-green focus:ring-legacy-green"
+                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                                 >
                                     <option value="science">علوم</option>
                                     <option value="technology">تقنية</option>
@@ -218,7 +210,7 @@ export default function CreateProject({ auth, school, schools = [] }) {
                                         id="school_id"
                                         value={data.school_id || ''}
                                         onChange={(e) => setData('school_id', e.target.value || null)}
-                                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-legacy-green focus:ring-legacy-green"
+                                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                                     >
                                         <option value="">اختر مدرسة (اختياري)</option>
                                         {schools.map((sch) => (
@@ -239,10 +231,10 @@ export default function CreateProject({ auth, school, schools = [] }) {
                                     onDragLeave={handleDrag}
                                     onDragOver={handleDrag}
                                     onDrop={handleDrop}
-                                    className={`border-2 border-dashed rounded-lg p-8 text-center transition ${
+                                    className={`border-2 border-dashed rounded-2xl p-8 text-center transition ${
                                         dragActive
-                                            ? 'border-legacy-green bg-legacy-green/10'
-                                            : 'border-gray-300 hover:border-legacy-green/50'
+                                            ? 'border-[#A3C042] bg-[#A3C042]/10'
+                                            : 'border-gray-300 hover:border-[#A3C042]/50'
                                     }`}
                                 >
                                     <input
@@ -263,7 +255,7 @@ export default function CreateProject({ auth, school, schools = [] }) {
                                     <button
                                         type="button"
                                         onClick={() => fileInputRef.current?.click()}
-                                        className="mt-4 px-6 py-2 bg-legacy-green text-white rounded-lg hover:bg-green-600 transition"
+                                        className="mt-4 px-6 py-2 bg-[#A3C042] text-white rounded-xl hover:bg-[#93b03a] transition font-bold"
                                     >
                                         اختر ملفات
                                     </button>
@@ -300,7 +292,7 @@ export default function CreateProject({ auth, school, schools = [] }) {
 
                             {/* School Info */}
                             {school && (
-                                <div className="bg-legacy-green/10 border border-legacy-green/20 rounded-lg p-4">
+                                <div className="bg-[#A3C042]/10 border border-[#A3C042]/20 rounded-lg p-4">
                                     <p className="text-sm text-gray-700">
                                         <span className="font-semibold">المدرسة المرتبطة:</span> {school.name}
                                     </p>
@@ -317,7 +309,7 @@ export default function CreateProject({ auth, school, schools = [] }) {
                                 <PrimaryButton
                                     type="submit"
                                     disabled={processing || !data.title || !data.description}
-                                    className="bg-legacy-green hover:bg-green-600 flex items-center gap-2"
+                                    className="bg-[#A3C042] hover:bg-[#93b03a] flex items-center gap-2 rounded-xl"
                                 >
                                     {processing ? (
                                         <>
@@ -337,14 +329,49 @@ export default function CreateProject({ auth, school, schools = [] }) {
 
                     {/* Evaluation Tab - Placeholder */}
                     {activeTab === 'evaluation' && (
-                        <div className="bg-white rounded-xl shadow-lg p-6">
+                <div className="bg-white rounded-2xl border border-gray-100 p-6 mt-4">
                             <p className="text-gray-500 text-center py-8">
                                 صفحة التقييم قريباً...
                             </p>
                         </div>
                     )}
-                </div>
+        </>
+    );
+
+    return (
+        <div dir="rtl" className="min-h-screen bg-gray-50">
+            <Head title="رفع المشروع - إرث المبتكرين" />
+
+            {/* Mobile View */}
+            <div className="block md:hidden">
+                <MobileAppLayout
+                    auth={auth}
+                    title="إرث المبتكرين"
+                    activeNav="profile"
+                    unreadCount={0}
+                    onNotifications={() => router.visit('/notifications')}
+                    onBack={() => router.visit('/teacher/projects')}
+                >
+                    <FormContent />
+                </MobileAppLayout>
             </div>
-        </DashboardLayout>
+
+            {/* Desktop View */}
+            <div className="hidden md:block">
+                <MobileTopBar
+                    title="إرث المبتكرين"
+                    unreadCount={auth?.unreadCount || 0}
+                    onNotifications={() => router.visit('/notifications')}
+                    onBack={() => router.visit('/teacher/projects')}
+                    reverseOrder={false}
+                />
+                <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-4">
+                    <div className="space-y-4 max-w-3xl mx-auto">
+                        <FormContent />
+                </div>
+                </main>
+                <MobileBottomNav active="profile" role={auth?.user?.role} isAuthed={!!auth?.user} user={auth?.user} />
+            </div>
+        </div>
     );
 }

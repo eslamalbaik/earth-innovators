@@ -19,7 +19,7 @@ export default function TeacherDashboardLegacy({ auth, stats = {} }) {
         <DashboardLayout auth={auth} header="لوحة تحكم المعلم">
             <Head title="لوحة تحكم المعلم - إرث المبتكرين" />
 
-            <div className="bg-gradient-to-r from-legacy-green to-legacy-blue rounded-lg shadow-lg p-8 mb-8 text-white">
+            <div className="bg-gradient-to-r from-[#A3C042] to-legacy-blue rounded-lg shadow-lg p-8 mb-8 text-white">
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-3xl font-bold mb-2">مرحباً بك، {user.name} 👨‍🏫</h1>
@@ -42,19 +42,19 @@ export default function TeacherDashboardLegacy({ auth, stats = {} }) {
                             <FaClock className="text-3xl text-yellow-600" />
                         </div>
                     </div>
-                    <Link href="/teacher/projects/pending" className="text-sm text-gray-500 hover:text-legacy-green">
+                    <Link href="/teacher/projects/pending" className="text-sm text-gray-500 hover:text-[#A3C042]">
                         مراجعة الآن →
                     </Link>
                 </div>
 
-                <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-legacy-green hover:shadow-xl transition-shadow">
+                <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-[#A3C042] hover:shadow-xl transition-shadow">
                     <div className="flex items-center justify-between mb-4">
                         <div>
                             <p className="text-sm text-gray-600 mb-1">المشاريع المقيمة</p>
                             <p className="text-3xl font-bold text-gray-900">{displayStats.evaluatedProjects}</p>
                         </div>
-                        <div className="p-4 bg-legacy-green/10 rounded-2xl">
-                            <FaCheckCircle className="text-3xl text-legacy-green" />
+                        <div className="p-4 bg-[#A3C042]/10 rounded-2xl">
+                            <FaCheckCircle className="text-3xl text-[#A3C042]" />
                         </div>
                     </div>
                     <div className="flex items-center text-sm text-gray-500">
@@ -87,7 +87,7 @@ export default function TeacherDashboardLegacy({ auth, stats = {} }) {
                             <FaUsers className="text-3xl text-purple-600" />
                         </div>
                     </div>
-                    <Link href="/teacher/students" className="text-sm text-gray-500 hover:text-legacy-green">
+                    <Link href="/teacher/students" className="text-sm text-gray-500 hover:text-[#A3C042]">
                         إدارة الطلاب →
                     </Link>
                 </div>
@@ -101,7 +101,7 @@ export default function TeacherDashboardLegacy({ auth, stats = {} }) {
                                 <FaProjectDiagram className="text-yellow-600" />
                                 مشاريع تحتاج المراجعة
                             </h3>
-                            <Link href="/teacher/projects/pending" className="text-legacy-green hover:text-legacy-blue text-sm font-medium">
+                            <Link href="/teacher/projects/pending" className="text-[#A3C042] hover:text-legacy-blue text-sm font-medium">
                                 عرض الكل →
                             </Link>
                         </div>
@@ -119,7 +119,7 @@ export default function TeacherDashboardLegacy({ auth, stats = {} }) {
                                             <p className="text-sm text-gray-600 line-clamp-2">{project.description?.substring(0, 80)}...</p>
                                             <p className="text-xs text-gray-500 mt-2">{new Date(project.created_at).toLocaleDateString('ar-SA')}</p>
                                         </div>
-                                        <Link href={`/teacher/projects/${project.id}/evaluate`} className="ml-4 bg-legacy-green text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary-600 transition">
+                                        <Link href={`/teacher/projects/${project.id}/evaluate`} className="ml-4 bg-[#A3C042] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary-600 transition">
                                             تقييم
                                         </Link>
                                     </div>
@@ -135,13 +135,13 @@ export default function TeacherDashboardLegacy({ auth, stats = {} }) {
                 </div>
 
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                    <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-legacy-blue/10 to-legacy-green/10">
+                    <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-legacy-blue/10 to-[#A3C042]/10">
                         <div className="flex items-center justify-between">
                             <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                                 <FaTrophy className="text-legacy-blue" />
                                 تحدياتي
                             </h3>
-                            <Link href="/teacher/challenges" className="text-legacy-green hover:text-legacy-blue text-sm font-medium">
+                            <Link href="/teacher/challenges" className="text-[#A3C042] hover:text-legacy-blue text-sm font-medium">
                                 عرض الكل →
                             </Link>
                         </div>
@@ -196,7 +196,7 @@ export default function TeacherDashboardLegacy({ auth, stats = {} }) {
                     <p className="text-gray-700">قم بتقييم مشاريع الطلاب ومنح التقييمات والشارات</p>
                 </Link>
 
-                <Link href="/teacher/challenges/create" className="bg-gradient-to-br from-legacy-blue/10 to-legacy-green/10 rounded-xl p-6 border-2 border-legacy-blue/20 hover:shadow-lg transition">
+                <Link href="/teacher/challenges/create" className="bg-gradient-to-br from-legacy-blue/10 to-[#A3C042]/10 rounded-xl p-6 border-2 border-legacy-blue/20 hover:shadow-lg transition">
                     <div className="flex items-center gap-4 mb-4">
                         <div className="bg-legacy-blue rounded-full p-4">
                             <FaTrophy className="text-3xl text-white" />

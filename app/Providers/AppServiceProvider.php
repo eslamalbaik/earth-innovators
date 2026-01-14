@@ -39,6 +39,7 @@ use App\Listeners\SendCertificateIssuedNotification;
 use App\Listeners\SendProjectEvaluatedNotification;
 use App\Listeners\SendBadgeGrantedNotification;
 use App\Listeners\SendArticleApprovedNotification;
+use App\Listeners\CheckMembershipCertificateEligibility;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
@@ -344,6 +345,27 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(
             ArticleApproved::class,
             SendArticleApprovedNotification::class
+        );
+
+        // Check membership certificate eligibility when points are awarded or projects are approved
+        Event::listen(
+            ProjectApproved::class,
+            CheckMembershipCertificateEligibility::class
+        );
+
+        Event::listen(
+            ProjectEvaluated::class,
+            CheckMembershipCertificateEligibility::class
+        );
+
+        Event::listen(
+            BadgeGranted::class,
+            CheckMembershipCertificateEligibility::class
+        );
+
+        Event::listen(
+            ChallengeSubmissionReviewed::class,
+            CheckMembershipCertificateEligibility::class
         );
     }
 }

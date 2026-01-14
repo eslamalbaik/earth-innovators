@@ -102,7 +102,7 @@ export default function CustomizePackageModal({ onClose }) {
                                 value={formData.school_name}
                                 onChange={handleChange}
                                 dir="rtl"
-                                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-legacy-green focus:border-transparent text-right"
+                                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#A3C042] focus:border-transparent "
                                 placeholder="أدخل اسم المدرسة أو الجهة"
                             />
                             {errors.school_name && (
@@ -121,7 +121,7 @@ export default function CustomizePackageModal({ onClose }) {
                                 value={formData.responsible_name}
                                 onChange={handleChange}
                                 dir="rtl"
-                                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-legacy-green focus:border-transparent text-right"
+                                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#A3C042] focus:border-transparent "
                                 placeholder="أدخل اسم المسؤول"
                             />
                             {errors.responsible_name && (
@@ -140,7 +140,7 @@ export default function CustomizePackageModal({ onClose }) {
                                 value={formData.mobile_number}
                                 onChange={handleChange}
                                 dir="rtl"
-                                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-legacy-green focus:border-transparent text-right"
+                                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#A3C042] focus:border-transparent "
                                 placeholder="+966 5x xxxx xxxx"
                             />
                             {errors.mobile_number && (
@@ -159,7 +159,7 @@ export default function CustomizePackageModal({ onClose }) {
                                 value={formData.expected_students}
                                 onChange={handleChange}
                                 dir="rtl"
-                                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-legacy-green focus:border-transparent text-right"
+                                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#A3C042] focus:border-transparent "
                                 placeholder="أدخل العدد المتوقع"
                                 min="1"
                             />
@@ -180,7 +180,7 @@ export default function CustomizePackageModal({ onClose }) {
                             onChange={handleChange}
                             dir="rtl"
                             rows={4}
-                            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-legacy-green focus:border-transparent text-right"
+                            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#A3C042] focus:border-transparent "
                             placeholder="أدخل أي ملاحظات أو متطلبات إضافية..."
                         />
                         {errors.additional_notes && (
@@ -200,7 +200,7 @@ export default function CustomizePackageModal({ onClose }) {
                         <PrimaryButton
                             type="submit"
                             disabled={processing}
-                            className="px-6 py-3 bg-gradient-to-r from-legacy-green to-legacy-blue text-white rounded-lg font-semibold hover:shadow-lg transition"
+                            className="px-6 py-3 bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white rounded-lg font-semibold hover:shadow-lg transition"
                         >
                             {processing ? 'جاري الإرسال...' : 'تأكيد طلب عرض السعر'}
                         </PrimaryButton>

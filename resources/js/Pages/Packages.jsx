@@ -14,7 +14,7 @@ export default function Packages({ auth, packages = [], userPackage = null }) {
         <MainLayout auth={auth}>
             <Head title="الباقات - إرث المبتكرين" />
 
-            <div className="bg-gradient-to-r from-legacy-green to-legacy-blue py-16 text-white">
+            <div className="bg-gradient-to-r from-[#A3C042] to-legacy-blue py-16 text-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center">
                         <FaBox className="mx-auto text-6xl mb-4 opacity-90" />
@@ -28,7 +28,7 @@ export default function Packages({ auth, packages = [], userPackage = null }) {
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 {auth?.user && userPackage && (
-                    <div className="mb-8 bg-gradient-to-r from-legacy-green/10 to-legacy-blue/10 rounded-xl p-6 border-2 border-legacy-green/20">
+                    <div className="mb-8 bg-gradient-to-r from-[#A3C042]/10 to-legacy-blue/10 rounded-xl p-6 border-2 border-[#A3C042]/20">
                         <div className="flex items-center justify-between">
                             <div>
                                 <h2 className="text-2xl font-bold text-gray-900 mb-2">باقتي الحالية</h2>
@@ -59,19 +59,19 @@ export default function Packages({ auth, packages = [], userPackage = null }) {
                                 key={pkg.id}
                                 className={`bg-white rounded-xl shadow-lg overflow-hidden border-2 transition-all relative ${
                                     isPopular
-                                        ? 'border-legacy-green shadow-legacy-green/20 transform scale-105'
-                                        : 'border-gray-200 hover:border-legacy-green/50'
+                                        ? 'border-[#A3C042] shadow-[#A3C042]/20 transform scale-105'
+                                        : 'border-gray-200 hover:border-[#A3C042]/50'
                                 }`}
                             >
                                 {isPopular && (
-                                    <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-legacy-green to-legacy-blue text-white text-center py-2 font-bold text-sm">
+                                    <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white text-center py-2 font-bold text-sm">
                                         ⭐ الأكثر شعبية
                                     </div>
                                 )}
                                 <div className={`p-8 ${isPopular ? 'pt-12' : ''}`}>
                                     <div className="text-center mb-6">
                                         <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${
-                                            isPopular ? 'bg-gradient-to-br from-legacy-green to-legacy-blue' : 'bg-gray-100'
+                                            isPopular ? 'bg-gradient-to-br from-[#A3C042] to-legacy-blue' : 'bg-gray-100'
                                         }`}>
                                             <Icon className={`text-3xl ${isPopular ? 'text-white' : 'text-gray-600'}`} />
                                         </div>
@@ -95,47 +95,47 @@ export default function Packages({ auth, packages = [], userPackage = null }) {
                                         <ul className="space-y-3">
                                             {pkg.projects_limit !== null ? (
                                                 <li className="flex items-center gap-2">
-                                                    <FaCheck className="text-legacy-green flex-shrink-0" />
+                                                    <FaCheck className="text-[#A3C042] flex-shrink-0" />
                                                     <span className="text-gray-700">حتى {pkg.projects_limit} مشروع</span>
                                                 </li>
                                             ) : (
                                                 <li className="flex items-center gap-2">
-                                                    <FaCheck className="text-legacy-green flex-shrink-0" />
+                                                    <FaCheck className="text-[#A3C042] flex-shrink-0" />
                                                     <span className="text-gray-700">مشاريع غير محدودة</span>
                                                 </li>
                                             )}
                                             {pkg.challenges_limit !== null ? (
                                                 <li className="flex items-center gap-2">
-                                                    <FaCheck className="text-legacy-green flex-shrink-0" />
+                                                    <FaCheck className="text-[#A3C042] flex-shrink-0" />
                                                     <span className="text-gray-700">حتى {pkg.challenges_limit} تحدٍ</span>
                                                 </li>
                                             ) : (
                                                 <li className="flex items-center gap-2">
-                                                    <FaCheck className="text-legacy-green flex-shrink-0" />
+                                                    <FaCheck className="text-[#A3C042] flex-shrink-0" />
                                                     <span className="text-gray-700">تحديات غير محدودة</span>
                                                 </li>
                                             )}
                                             {pkg.points_bonus > 0 && (
                                                 <li className="flex items-center gap-2">
-                                                    <FaCheck className="text-legacy-green flex-shrink-0" />
+                                                    <FaCheck className="text-[#A3C042] flex-shrink-0" />
                                                     <span className="text-gray-700">{pkg.points_bonus} نقطة إضافية</span>
                                                 </li>
                                             )}
                                             {pkg.badge_access && (
                                                 <li className="flex items-center gap-2">
-                                                    <FaCheck className="text-legacy-green flex-shrink-0" />
+                                                    <FaCheck className="text-[#A3C042] flex-shrink-0" />
                                                     <span className="text-gray-700">إمكانية الحصول على شارات</span>
                                                 </li>
                                             )}
                                             {pkg.certificate_access && (
                                                 <li className="flex items-center gap-2">
-                                                    <FaCheck className="text-legacy-green flex-shrink-0" />
+                                                    <FaCheck className="text-[#A3C042] flex-shrink-0" />
                                                     <span className="text-gray-700">إمكانية الحصول على شهادات</span>
                                                 </li>
                                             )}
                                             {features.map((feature, index) => (
                                                 <li key={index} className="flex items-center gap-2">
-                                                    <FaCheck className="text-legacy-green flex-shrink-0" />
+                                                    <FaCheck className="text-[#A3C042] flex-shrink-0" />
                                                     <span className="text-gray-700">{feature}</span>
                                                 </li>
                                             ))}
@@ -147,7 +147,7 @@ export default function Packages({ auth, packages = [], userPackage = null }) {
                                             href={`/packages/${pkg.id}/subscribe`}
                                             className={`block w-full text-center px-6 py-3 rounded-lg font-semibold transition ${
                                                 isPopular
-                                                    ? 'bg-gradient-to-r from-legacy-green to-legacy-blue text-white hover:shadow-lg'
+                                                    ? 'bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white hover:shadow-lg'
                                                     : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
                                             }`}
                                         >
@@ -158,7 +158,7 @@ export default function Packages({ auth, packages = [], userPackage = null }) {
                                             href="/register"
                                             className={`block w-full text-center px-6 py-3 rounded-lg font-semibold transition ${
                                                 isPopular
-                                                    ? 'bg-gradient-to-r from-legacy-green to-legacy-blue text-white hover:shadow-lg'
+                                                    ? 'bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white hover:shadow-lg'
                                                     : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
                                             }`}
                                         >

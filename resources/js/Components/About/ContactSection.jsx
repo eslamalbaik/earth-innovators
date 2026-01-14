@@ -29,7 +29,7 @@ export default function ContactSection() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {contactInfo.map((contact, index) => (
                     <div key={index} className="p-3 border border-gray-200 flex justify-start items-center gap-3 text-center bg-white shadow-md rounded-lg">
-                        <div className="w-10 h-10 bg-gradient-to-br from-legacy-green to-legacy-blue rounded-full flex items-center justify-center">
+                        <div className="w-10 h-10 bg-gradient-to-br from-[#A3C042] to-legacy-blue rounded-full flex items-center justify-center">
                             <contact.icon className="text-white text-lg" />
                         </div>
                         <p className="text-lg text-gray-800">{contact.text}</p>

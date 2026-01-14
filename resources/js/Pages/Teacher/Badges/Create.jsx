@@ -45,7 +45,7 @@ export default function CreateBadge({ schools, auth }) {
 
             <div className="bg-white rounded-xl shadow-lg p-6">
                 <div className="mb-6 flex items-center gap-3">
-                    <div className="p-3 bg-gradient-to-r from-legacy-green to-legacy-blue rounded-lg">
+                    <div className="p-3 bg-gradient-to-r from-[#A3C042] to-legacy-blue rounded-lg">
                         <FaMedal className="text-white text-2xl" />
                     </div>
                     <div>
@@ -92,7 +92,7 @@ export default function CreateBadge({ schools, auth }) {
                         <textarea
                             value={data.description_ar}
                             onChange={(e) => setData('description_ar', e.target.value)}
-                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-legacy-green focus:border-transparent"
+                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#A3C042] focus:border-transparent"
                             rows="3"
                         />
                         {errors.description_ar && <p className="text-red-500 text-sm mt-1">{errors.description_ar}</p>}
@@ -105,7 +105,7 @@ export default function CreateBadge({ schools, auth }) {
                         <textarea
                             value={data.description}
                             onChange={(e) => setData('description', e.target.value)}
-                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-legacy-green focus:border-transparent"
+                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#A3C042] focus:border-transparent"
                             rows="3"
                         />
                         {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
@@ -189,7 +189,7 @@ export default function CreateBadge({ schools, auth }) {
                                 type="file"
                                 accept="image/*"
                                 onChange={handleImageChange}
-                                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-legacy-green file:text-white hover:file:bg-primary-600"
+                                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#A3C042] file:text-white hover:file:bg-primary-600"
                             />
                             {imagePreview && (
                                 <img

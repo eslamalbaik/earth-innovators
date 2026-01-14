@@ -244,29 +244,29 @@ function ModernChallengeTable({
             <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
                     <tr>
-                        <th className="px-4 sm:px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        <th className="px-4 sm:px-6 py-4  text-xs font-semibold text-gray-700 uppercase tracking-wider">
                             التحدي
                         </th>
                         {showSchool && (
-                            <th className="px-4 sm:px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider hidden md:table-cell">
+                            <th className="px-4 sm:px-6 py-4  text-xs font-semibold text-gray-700 uppercase tracking-wider hidden md:table-cell">
                                 المدرسة
                             </th>
                         )}
-                        <th className="px-4 sm:px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        <th className="px-4 sm:px-6 py-4  text-xs font-semibold text-gray-700 uppercase tracking-wider">
                             التواريخ
                         </th>
-                        <th className="px-4 sm:px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        <th className="px-4 sm:px-6 py-4  text-xs font-semibold text-gray-700 uppercase tracking-wider">
                             المشاركون
                         </th>
-                        <th className="px-4 sm:px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        <th className="px-4 sm:px-6 py-4  text-xs font-semibold text-gray-700 uppercase tracking-wider">
                             الحالة
                         </th>
                         {showAnalytics && (
-                            <th className="px-4 sm:px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider hidden lg:table-cell">
+                            <th className="px-4 sm:px-6 py-4  text-xs font-semibold text-gray-700 uppercase tracking-wider hidden lg:table-cell">
                                 الأداء
                             </th>
                         )}
-                        <th className="px-4 sm:px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        <th className="px-4 sm:px-6 py-4  text-xs font-semibold text-gray-700 uppercase tracking-wider">
                             الإجراءات
                         </th>
                     </tr>

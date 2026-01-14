@@ -216,7 +216,7 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                                         <div className="flex items-center gap-2 mr-4">
                                             <button
                                                 onClick={() => handleApprove(project.id, project.title)}
-                                                className="bg-legacy-green hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center gap-2 shadow-md"
+                                                className="bg-[#A3C042] hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center gap-2 shadow-md"
                                             >
                                                 <FaCheckCircle />
                                                 قبول

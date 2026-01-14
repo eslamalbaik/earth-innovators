@@ -25,7 +25,7 @@ export default function AdminDashboardLegacy({ auth, stats = {} }) {
         <DashboardLayout auth={auth} header="لوحة تحكم الإدارة">
             <Head title="لوحة تحكم الإدارة - إرث المبتكرين" />
 
-            <div className="bg-gradient-to-r from-legacy-green to-legacy-blue rounded-lg shadow-lg p-8 mb-8 text-white">
+            <div className="bg-gradient-to-r from-[#A3C042] to-legacy-blue rounded-lg shadow-lg p-8 mb-8 text-white">
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-3xl font-bold mb-2">مرحباً بك، {user.name} 👨‍💼</h1>
@@ -38,14 +38,14 @@ export default function AdminDashboardLegacy({ auth, stats = {} }) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-legacy-green hover:shadow-xl transition-shadow">
+                <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-[#A3C042] hover:shadow-xl transition-shadow">
                     <div className="flex items-center justify-between mb-4">
                         <div>
                             <p className="text-sm text-gray-600 mb-1">إجمالي المستخدمين</p>
                             <p className="text-3xl font-bold text-gray-900">{displayStats.totalUsers}</p>
                         </div>
-                        <div className="p-4 bg-legacy-green/10 rounded-2xl">
-                            <FaUsers className="text-3xl text-legacy-green" />
+                        <div className="p-4 bg-[#A3C042]/10 rounded-2xl">
+                            <FaUsers className="text-3xl text-[#A3C042]" />
                         </div>
                     </div>
                     <div className="grid grid-cols-3 gap-2 text-xs text-gray-500 mt-2">
@@ -95,7 +95,7 @@ export default function AdminDashboardLegacy({ auth, stats = {} }) {
                             <FaMedal className="text-3xl text-yellow-600" />
                         </div>
                     </div>
-                    <Link href="/admin/badges" className="text-sm text-gray-500 hover:text-legacy-green">
+                    <Link href="/admin/badges" className="text-sm text-gray-500 hover:text-[#A3C042]">
                         إدارة الشارات →
                     </Link>
                 </div>
@@ -112,7 +112,7 @@ export default function AdminDashboardLegacy({ auth, stats = {} }) {
                             <FaCertificate className="text-2xl text-green-600" />
                         </div>
                     </div>
-                    <Link href="/admin/certificates" className="text-sm text-gray-500 hover:text-legacy-green">
+                    <Link href="/admin/certificates" className="text-sm text-gray-500 hover:text-[#A3C042]">
                         إدارة الشهادات →
                     </Link>
                 </div>
@@ -142,7 +142,7 @@ export default function AdminDashboardLegacy({ auth, stats = {} }) {
                             <FaSchool className="text-2xl text-orange-600" />
                         </div>
                     </div>
-                    <Link href="/admin/schools" className="text-sm text-gray-500 hover:text-legacy-green">
+                    <Link href="/admin/schools" className="text-sm text-gray-500 hover:text-[#A3C042]">
                         إدارة المؤسسات تعليمية →
                     </Link>
                 </div>
@@ -156,7 +156,7 @@ export default function AdminDashboardLegacy({ auth, stats = {} }) {
                                 <FaClock className="text-yellow-600" />
                                 مشاريع قيد المراجعة
                             </h3>
-                            <Link href="/admin/projects/pending" className="text-legacy-green hover:text-legacy-blue text-sm font-medium">
+                            <Link href="/admin/projects/pending" className="text-[#A3C042] hover:text-legacy-blue text-sm font-medium">
                                 عرض الكل →
                             </Link>
                         </div>
@@ -171,7 +171,7 @@ export default function AdminDashboardLegacy({ auth, stats = {} }) {
                                             <p className="text-sm text-gray-600">بواسطة {project.user?.name}</p>
                                             <p className="text-xs text-gray-500">{new Date(project.created_at).toLocaleDateString('ar-SA')}</p>
                                         </div>
-                                        <Link href={`/admin/projects/${project.id}`} className="ml-4 bg-legacy-green text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary-600 transition">
+                                        <Link href={`/admin/projects/${project.id}`} className="ml-4 bg-[#A3C042] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary-600 transition">
                                             مراجعة
                                         </Link>
                                     </div>
@@ -187,13 +187,13 @@ export default function AdminDashboardLegacy({ auth, stats = {} }) {
                 </div>
 
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                    <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-legacy-blue/10 to-legacy-green/10">
+                    <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-legacy-blue/10 to-[#A3C042]/10">
                         <div className="flex items-center justify-between">
                             <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                                 <FaTrophy className="text-legacy-blue" />
                                 التحديات النشطة
                             </h3>
-                            <Link href="/admin/challenges" className="text-legacy-green hover:text-legacy-blue text-sm font-medium">
+                            <Link href="/admin/challenges" className="text-[#A3C042] hover:text-legacy-blue text-sm font-medium">
                                 عرض الكل →
                             </Link>
                         </div>
@@ -223,9 +223,9 @@ export default function AdminDashboardLegacy({ auth, stats = {} }) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Link href="/admin/users" className="bg-gradient-to-br from-legacy-green/10 to-legacy-green/5 rounded-xl p-6 border-2 border-legacy-green/20 hover:shadow-lg transition">
+                <Link href="/admin/users" className="bg-gradient-to-br from-[#A3C042]/10 to-[#A3C042]/5 rounded-xl p-6 border-2 border-[#A3C042]/20 hover:shadow-lg transition">
                     <div className="flex items-center gap-4 mb-4">
-                        <div className="bg-legacy-green rounded-full p-4">
+                        <div className="bg-[#A3C042] rounded-full p-4">
                             <FaUsers className="text-2xl text-white" />
                         </div>
                         <div>

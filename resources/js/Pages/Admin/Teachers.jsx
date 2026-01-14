@@ -290,25 +290,25 @@ export default function Teachers({ teachers, auth, cities = [], filters = {} }) 
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gradient-to-r from-yellow-50 to-yellow-100">
                             <tr>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase">
+                                <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase">
                                     المعلم
                                 </th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase">
+                                <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase">
                                     المادة
                                 </th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase">
+                                <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase">
                                     المدينة
                                 </th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase">
+                                <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase">
                                     السعر
                                 </th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase">
+                                <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase">
                                     التقييم
                                 </th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase">
+                                <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase">
                                     الحالة
                                 </th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase">
+                                <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase">
                                     الإجراءات
                                 </th>
                             </tr>

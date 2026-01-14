@@ -1,11 +1,17 @@
-import DashboardLayout from '@/Layouts/DashboardLayout';
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { FaProjectDiagram, FaPlus, FaEye, FaClock, FaCheckCircle, FaTimesCircle, FaEdit, FaTrash } from 'react-icons/fa';
 import { toHijriDate } from '@/utils/dateUtils';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
+import MobileAppLayout from '@/Layouts/MobileAppLayout';
+import MobileTopBar from '@/Components/Mobile/MobileTopBar';
+import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
+import { useToast } from '@/Contexts/ToastContext';
+import { useMemo, useState } from 'react';
 
 export default function TeacherProjects({ projects, auth }) {
     const { confirm } = useConfirmDialog();
+    const { showError } = useToast();
+    const [filter, setFilter] = useState('all'); // all | pending | evaluated | winners
 
     const handleDelete = async (projectId, projectTitle, e) => {
         e.preventDefault();
@@ -27,7 +33,7 @@ export default function TeacherProjects({ projects, auth }) {
                 },
                 onError: (errors) => {
                     console.error('Error deleting project:', errors);
-                    alert('حدث خطأ أثناء حذف المشروع. يرجى المحاولة مرة أخرى.');
+                    showError('حدث خطأ أثناء حذف المشروع. يرجى المحاولة مرة أخرى.');
                 },
             });
         }
@@ -57,122 +63,170 @@ export default function TeacherProjects({ projects, auth }) {
         rejected: { label: 'مرفوض', color: 'bg-red-100 text-red-700 border-red-300', icon: FaTimesCircle },
     };
 
-    return (
-        <DashboardLayout header="مشاريعي">
-            <Head title="مشاريعي - إرث المبتكرين" />
+    const filteredProjects = useMemo(() => {
+        const list = projects?.data || [];
+        if (filter === 'all') return list;
+        if (filter === 'pending') return list.filter((p) => p.status === 'pending');
+        if (filter === 'evaluated') return list.filter((p) => p.status === 'approved' || p.status === 'rejected');
+        if (filter === 'winners') return list.filter((p) => p.status === 'approved');
+        return list;
+    }, [projects?.data, filter]);
 
-            <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">المشاريع المرسلة</h2>
-                <Link
-                    href="/teacher/projects/create"
-                    className="bg-gradient-to-r from-legacy-green to-legacy-blue text-white px-6 py-3 rounded-lg font-semibold transition duration-300 flex items-center gap-2 shadow-md hover:shadow-xl"
-                >
-                    <FaPlus />
-                    إرسال مشروع جديد
-                </Link>
+    const ProjectsContent = () => (
+        <>
+            <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2 text-gray-400">
+                    <span className="text-sm">فلترة</span>
+                </div>
+                <div className="text-lg font-extrabold text-gray-900">المشاريع</div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-legacy-green/10 to-legacy-blue/10">
-                    <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                        <FaProjectDiagram className="text-legacy-green" />
-                        المشاريع ({projects.total || 0})
-                    </h3>
-                </div>
-                <div className="p-6">
-                    {projects.data && projects.data.length > 0 ? (
-                        <div className="space-y-4">
-                            {projects.data.map((project) => {
+            <div className="flex gap-2 overflow-x-auto pb-2">
+                <button
+                    type="button"
+                    onClick={() => setFilter('all')}
+                    className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${
+                        filter === 'all' ? 'bg-[#A3C042] text-white' : 'bg-gray-100 text-gray-700'
+                    }`}
+                >
+                    الكل
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setFilter('pending')}
+                    className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${
+                        filter === 'pending' ? 'bg-[#A3C042] text-white' : 'bg-gray-100 text-gray-700'
+                    }`}
+                >
+                    تحت التقييم
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setFilter('evaluated')}
+                    className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${
+                        filter === 'evaluated' ? 'bg-[#A3C042] text-white' : 'bg-gray-100 text-gray-700'
+                    }`}
+                >
+                    تم التقييم
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setFilter('winners')}
+                    className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${
+                        filter === 'winners' ? 'bg-[#A3C042] text-white' : 'bg-gray-100 text-gray-700'
+                    }`}
+                >
+                    الفائزين
+                </button>
+            </div>
+
+            <div className="mt-3 space-y-4">
+                {filteredProjects.length > 0 ? (
+                    filteredProjects.map((project) => {
                                 const StatusIcon = statusLabels[project.status]?.icon || FaClock;
+                        const status = statusLabels[project.status] || statusLabels.pending;
+                        const categoryLabel = categoryLabels[project.category] || 'أخرى';
+
                                 return (
-                                    <div key={project.id} className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition">
-                                        <div className="flex items-start justify-between">
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-3 mb-3">
-                                                    <h4 className="text-xl font-bold text-gray-900">{project.title}</h4>
-                                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${categoryColors[project.category] || categoryColors.other}`}>
-                                                        {categoryLabels[project.category] || 'أخرى'}
+                            <button
+                                key={project.id}
+                                type="button"
+                                onClick={() => router.visit(`/teacher/projects/${project.id}`)}
+                                className="w-full  bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition"
+                            >
+                                <div className="flex items-stretch">
+                                    <div className="flex-1 p-4">
+                                        <div className="flex items-center justify-between gap-2">
+                                            <div className="flex items-center gap-2">
+                                                <span className="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700">
+                                                    تطبيقات الجوال
                                                     </span>
-                                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold border flex items-center gap-1 ${statusLabels[project.status]?.color || statusLabels.pending.color}`}>
-                                                        <StatusIcon className="text-xs" />
-                                                        {statusLabels[project.status]?.label || 'قيد المراجعة'}
+                                                <span className={`px-3 py-1 rounded-full text-xs font-bold border ${status.color}`}>
+                                                    {status.label}
                                                     </span>
                                                 </div>
-                                                <p className="text-gray-700 mb-3 line-clamp-2">{project.description}</p>
-                                                <div className="flex items-center gap-4 text-sm text-gray-600">
-                                                    {project.school && (
-                                                        <>
-                                                            <span><strong>المدرسة:</strong> {project.school.name}</span>
-                                                            <span>•</span>
-                                                        </>
-                                                    )}
-                                                    <span>تاريخ الإرسال: {toHijriDate(project.created_at)}</span>
-                                                    {project.approved_at && (
-                                                        <>
-                                                            <span>•</span>
-                                                            <span>تاريخ الموافقة: {toHijriDate(project.approved_at)}</span>
-                                                        </>
-                                                    )}
+                                            <div className="text-xs text-gray-400">{toHijriDate(project.created_at)}</div>
+                                        </div>
+
+                                        <div className="mt-2 text-base font-extrabold text-gray-900 line-clamp-1">
+                                            {project.title}
+                                        </div>
+                                        <div className="mt-1 text-sm text-gray-500 line-clamp-1">{project.description}</div>
+
+                                        <div className="mt-3 flex items-center gap-2">
+                                            <span className="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700">
+                                                {categoryLabel}
+                                            </span>
+                                            <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                                                <StatusIcon className="text-xs" />
+                                            </span>
                                                 </div>
                                             </div>
-                                            <div className="flex items-center gap-2 mr-6">
-                                                <Link
-                                                    href={`/teacher/projects/${project.id}`}
-                                                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition flex items-center gap-2"
-                                                >
-                                                    <FaEye />
-                                                    عرض
-                                                </Link>
+
+                                    <div className="relative w-28">
+                                        <img
+                                            src="/images/hero.png"
+                                            alt={project.title}
+                                            className="h-full w-full object-cover"
+                                            loading="lazy"
+                                        />
+
+                                        {/* Actions (مثل الصورة: دوائر) */}
                                                 {project.status === 'pending' && (
-                                                    <>
-                                                        <Link
-                                                            href={`/teacher/projects/${project.id}/edit`}
-                                                            className="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-lg font-medium transition flex items-center gap-2"
-                                                        >
-                                                            <FaEdit />
-                                                            تعديل
-                                                        </Link>
+                                            <div className="absolute left-2 top-1/2 -translate-y-1/2 flex flex-col gap-2">
                                                         <button
                                                             type="button"
                                                             onClick={(e) => handleDelete(project.id, project.title, e)}
-                                                            className="bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg font-medium transition flex items-center gap-2"
+                                                    className="h-9 w-9 rounded-full bg-white shadow border border-gray-100 flex items-center justify-center text-red-500"
+                                                    aria-label="حذف"
                                                         >
                                                             <FaTrash />
-                                                            حذف
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        router.visit(`/teacher/projects/${project.id}/edit`);
+                                                    }}
+                                                    className="h-9 w-9 rounded-full bg-white shadow border border-gray-100 flex items-center justify-center text-gray-600"
+                                                    aria-label="تعديل"
+                                                >
+                                                    <FaEdit />
                                                         </button>
-                                                    </>
-                                                )}
                                             </div>
-                                        </div>
+                                        )}
                                     </div>
+                                </div>
+                            </button>
                                 );
-                            })}
+                    })
+                ) : (
+                    <div className="bg-white rounded-2xl border border-gray-100 p-6 text-center text-gray-600">
+                        لا توجد مشاريع
+                    </div>
+                )}
                         </div>
-                    ) : (
-                        <div className="text-center py-12">
-                            <FaProjectDiagram className="text-6xl text-gray-300 mx-auto mb-4" />
-                            <p className="text-gray-600 text-lg mb-4">لا توجد مشاريع مرسلة</p>
+
+            <div className="mt-4">
                             <Link
                                 href="/teacher/projects/create"
-                                className="inline-block bg-gradient-to-r from-legacy-green to-legacy-blue text-white px-6 py-3 rounded-lg font-semibold transition"
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#A3C042] py-3 text-sm font-extrabold text-white hover:bg-[#93b03a] transition"
                             >
-                                <FaPlus className="inline ml-2" />
-                                إرسال مشروع جديد
+                    <FaPlus />
+                    رفع مشروع جديد
                             </Link>
                         </div>
-                    )}
 
-                    {projects.links && projects.links.length > 3 && (
-                        <div className="mt-6 flex justify-center">
-                            <div className="flex gap-2">
+            {projects?.links && projects.links.length > 3 && (
+                <div className="mt-4 bg-white rounded-2xl border border-gray-100 p-3">
+                    <div className="flex flex-wrap gap-2 justify-center">
                                 {projects.links.map((link, index) => (
                                     <Link
                                         key={index}
                                         href={link.url || '#'}
-                                        className={`px-4 py-2 rounded-lg font-medium transition ${
-                                            link.active
-                                                ? 'bg-gradient-to-r from-legacy-green to-legacy-blue text-white'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                className={`px-3 py-2 rounded-xl text-sm font-semibold transition ${
+                                    link.active ? 'bg-[#A3C042] text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
                                         } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
@@ -180,9 +234,44 @@ export default function TeacherProjects({ projects, auth }) {
                             </div>
                         </div>
                     )}
-                </div>
+        </>
+    );
+
+    return (
+        <div dir="rtl" className="min-h-screen bg-gray-50">
+            <Head title="المشاريع - إرث المبتكرين" />
+
+            {/* Mobile View */}
+            <div className="block md:hidden">
+                <MobileAppLayout
+                    auth={auth}
+                    title="إرث المبتكرين"
+                    activeNav="projects"
+                    unreadCount={0}
+                    onNotifications={() => router.visit('/notifications')}
+                    onBack={() => router.visit('/teacher/dashboard')}
+                >
+                    <ProjectsContent />
+                </MobileAppLayout>
             </div>
-        </DashboardLayout>
+
+            {/* Desktop View */}
+            <div className="hidden md:block">
+                <MobileTopBar
+                    title="إرث المبتكرين"
+                    unreadCount={auth?.unreadCount || 0}
+                    onNotifications={() => router.visit('/notifications')}
+                    onBack={() => router.visit('/teacher/dashboard')}
+                    reverseOrder={false}
+                />
+                <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-4">
+                    <div className="mx-auto w-full max-w-4xl">
+                        <ProjectsContent />
+                    </div>
+                </main>
+                <MobileBottomNav active="projects" role={auth?.user?.role} isAuthed={!!auth?.user} user={auth?.user} />
+            </div>
+        </div>
     );
 }
 

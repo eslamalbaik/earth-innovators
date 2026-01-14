@@ -1,12 +1,48 @@
 import { Head, Link, router } from '@inertiajs/react';
-import MainLayout from '../../Layouts/MainLayout';
-import { useState } from 'react';
-import { FaSearch, FaProjectDiagram, FaEye, FaUser, FaCalendar, FaGraduationCap } from 'react-icons/fa';
-import { toHijriDate } from '@/utils/dateUtils';
+import { useState, useMemo } from 'react';
+import { FaSearch, FaFilter, FaHeart, FaComment, FaTimes } from 'react-icons/fa';
+import MobileTopBar from '@/Components/Mobile/MobileTopBar';
+import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
+import DesktopFooter from '@/Components/Mobile/DesktopFooter';
 
 export default function ProjectsIndex({ auth, projects, userRole }) {
     const [search, setSearch] = useState('');
     const [category, setCategory] = useState('');
+    const [showFilterModal, setShowFilterModal] = useState(false);
+    const [filterAgeGroup, setFilterAgeGroup] = useState('');
+    const [filterSchool, setFilterSchool] = useState('');
+    const [filterSubject, setFilterSubject] = useState('');
+
+    const categories = [
+        { value: '', label: 'الكل' },
+        { value: 'science', label: 'علمي' },
+        { value: 'arts', label: 'فني' },
+        { value: 'technology', label: 'تقني' },
+        { value: 'heritage', label: 'تراثي' },
+        { value: 'environmental', label: 'بيئي' },
+    ];
+
+    const ageGroups = [
+        { value: '6-9', label: '6-9 سنوات' },
+        { value: '10-13', label: '10-13 سنة' },
+        { value: '14-17', label: '14-17 سنة' },
+        { value: '18+', label: '18+ سنة' },
+    ];
+
+    const schools = [
+        { value: 'primary', label: 'المدرسة الابتدائية' },
+        { value: 'middle', label: 'المدرسة المتوسطة' },
+        { value: 'high', label: 'المدرسة الثانوية' },
+        { value: 'university', label: 'الجامعة' },
+    ];
+
+    const subjects = [
+        { value: 'technology', label: 'التكنولوجيا' },
+        { value: 'science', label: 'العلوم' },
+        { value: 'mathematics', label: 'الرياضيات' },
+        { value: 'engineering', label: 'الهندسة' },
+        { value: 'arts', label: 'الفنون' },
+    ];
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -16,156 +52,187 @@ export default function ProjectsIndex({ auth, projects, userRole }) {
         });
     };
 
-    const categories = [
-        { value: '', label: 'جميع الفئات' },
-        { value: 'science', label: 'علوم' },
-        { value: 'technology', label: 'تقنية' },
-        { value: 'engineering', label: 'هندسة' },
-        { value: 'mathematics', label: 'رياضيات' },
-        { value: 'arts', label: 'فنون' },
-        { value: 'other', label: 'أخرى' },
-    ];
+    const handleApplyFilters = () => {
+        router.get('/projects', {
+            search,
+            category,
+            age_group: filterAgeGroup,
+            school: filterSchool,
+            subject: filterSubject,
+        }, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+        setShowFilterModal(false);
+    };
 
-    return (
-        <MainLayout auth={auth}>
-            <Head title="المشاريع المعتمدة" />
+    const handleClearFilters = () => {
+        setFilterAgeGroup('');
+        setFilterSchool('');
+        setFilterSubject('');
+        router.get('/projects', { search, category }, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    };
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">المشاريع المعتمدة</h1>
-                    <p className="text-gray-600">استعرض المشاريع المعتمدة من المؤسسات تعليمية والمعلمين</p>
-                </div>
+    const getCategoryLabel = (cat) => {
+        const found = categories.find((c) => c.value === cat);
+        return found ? found.label : 'أخرى';
+    };
 
-                {/* البحث والفلترة */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-                    <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
-                        <div className="flex-1">
+    const formatDate = (date) => {
+        if (!date) return '';
+        const d = new Date(date);
+        const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+        return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+    };
+
+    const filteredProjects = useMemo(() => {
+        return projects?.data || [];
+    }, [projects?.data]);
+
+    const ProjectsContent = ({ isDesktop = false }) => (
+        <div className="space-y-4">
+            {/* Search and Filter Bar */}
+            <div className="flex items-center gap-2">
+                <button
+                    type="button"
+                    onClick={() => setShowFilterModal(true)}
+                    className="h-10 w-10 rounded-xl bg-[#A3C042] flex items-center justify-center hover:bg-[#93b03a] transition flex-shrink-0"
+                    aria-label="فلترة"
+                >
+                    <FaFilter className="text-white text-sm" />
+                </button>
+                <form onSubmit={handleSearch} className="flex-1">
                             <div className="relative">
-                                <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                                 <input
                                     type="text"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
-                                    placeholder="ابحث عن مشروع..."
-                                    className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="ابحث عن المشاريع .."
+                            className="w-full h-10 pr-10 pl-4 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042] text-sm"
                                 />
+                        <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
                             </div>
+                </form>
                         </div>
-                        <div className="md:w-48">
-                            <select
-                                value={category}
-                                onChange={(e) => setCategory(e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            >
-                                {categories.map((cat) => (
-                                    <option key={cat.value} value={cat.value}>
+
+            {/* Category Filter Tabs */}
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                {categories.map((cat) => (
+                    <button
+                        key={cat.value}
+                        type="button"
+                        onClick={() => {
+                            setCategory(cat.value);
+                            router.get('/projects', { search, category: cat.value }, {
+                                preserveState: true,
+                                preserveScroll: true,
+                            });
+                        }}
+                        className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${
+                            category === cat.value
+                                ? 'bg-[#A3C042] text-white'
+                                : 'bg-white text-gray-700'
+                        }`}
+                    >
                                         {cat.label}
-                                    </option>
+                    </button>
                                 ))}
-                            </select>
                         </div>
-                        <button
-                            type="submit"
-                            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                        >
-                            بحث
-                        </button>
-                    </form>
+
+            {/* Projects Count */}
+            <div className="text-sm text-gray-700">
+                {filteredProjects.length} مشاريع
                 </div>
 
-                {/* قائمة المشاريع */}
-                {projects.data && projects.data.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {projects.data.map((project) => (
+            {/* Projects Grid */}
+            {filteredProjects.length > 0 ? (
+                <div className="grid grid-cols-2 gap-4">
+                    {filteredProjects.map((project) => {
+                        const isWinner = project.rating >= 4.5 || project.is_winner;
+                        const categoryLabel = getCategoryLabel(project.category);
+                        const projectImage = project.image || project.thumbnail || '/images/hero.png';
+                        const ageRange = project.age_range || '13-10 سنة';
+                        const schoolName = project.school?.name || 'المدرسة المتوسطة';
+                        const teacherName = project.teacher?.name_ar || project.user?.name || 'أحمد محمد';
+                        const likes = project.likes || 24;
+                        const comments = project.comments_count || 8;
+                        const isLiked = project.is_liked || false;
+
+                        return (
                             <Link
                                 key={project.id}
                                 href={`/projects/${project.id}`}
-                                className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition duration-300 overflow-hidden group"
+                                className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md transition"
                             >
-                                <div className="p-6">
-                                    <div className="flex items-start justify-between mb-4">
-                                        <div className="flex items-center gap-2">
-                                            <FaProjectDiagram className="text-blue-600 text-xl" />
-                                            <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
-                                                معتمد
-                                            </span>
+                                <div className="relative">
+                                    <img
+                                        src={projectImage}
+                                        alt={project.title}
+                                        className="w-full h-32 object-cover"
+                                    />
+                                    {isWinner && (
+                                        <div className="absolute top-2 left-2 px-2 py-1 rounded-full bg-orange-500 text-white text-[10px] font-bold">
+                                            مشروع فائز
                                         </div>
-                                        <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded">
-                                            {project.category === 'science' ? 'علوم' :
-                                             project.category === 'technology' ? 'تقنية' :
-                                             project.category === 'engineering' ? 'هندسة' :
-                                             project.category === 'mathematics' ? 'رياضيات' :
-                                             project.category === 'arts' ? 'فنون' : 'أخرى'}
-                                        </span>
+                                    )}
+                                    <div className="absolute top-2 right-2 px-2 py-1 rounded-full bg-gray-100 text-gray-700 text-[10px] font-semibold border border-gray-200">
+                                        {categoryLabel}
                                     </div>
-
-                                    <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition">
-                                        {project.title}
+                                </div>
+                                <div className="p-3">
+                                    <h3 className="text-sm font-bold text-gray-900 mb-2 line-clamp-2 min-h-[2.5rem]">
+                                        {project.title || 'روبوت مساعد للمنزل'}
                                     </h3>
-
-                                    <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                                        {project.description}
-                                    </p>
-
-                                    <div className="flex items-center justify-between text-sm text-gray-500 pt-4 border-t border-gray-200">
-                                        <div className="flex items-center gap-2">
-                                            {project.teacher ? (
-                                                <>
-                                                    <FaGraduationCap className="text-gray-400" />
-                                                    <span>{project.teacher.name_ar || project.teacher.user?.name || 'معلم'}</span>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <FaUser className="text-gray-400" />
-                                                    <span>{project.user?.name || 'مستخدم'}</span>
-                                                </>
-                                            )}
+                                    <div className="text-xs text-gray-600 mb-2">
+                                        {ageRange} • {schoolName} • {teacherName}
+                                    </div>
+                                    <div className="flex items-center gap-3 text-xs text-gray-500">
+                                        <div className="flex items-center gap-1">
+                                            <FaHeart className={isLiked ? 'text-red-500 fill-current' : 'text-gray-400'} />
+                                            <span>{likes}</span>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <FaEye className="text-gray-400" />
-                                            <span>{project.views || 0}</span>
+                                        <div className="flex items-center gap-1">
+                                            <FaComment className="text-gray-400" />
+                                            <span>{comments}</span>
                                         </div>
                                     </div>
-
-                                    {project.school && (
-                                        <div className="mt-2 text-xs text-gray-500">
-                                            مدرسة: {project.school.name}
-                                        </div>
-                                    )}
-
-                                    {project.approved_at && (
-                                        <div className="mt-3 text-xs text-gray-500 flex items-center gap-1">
-                                            <FaCalendar />
-                                            <span>معتمد في {toHijriDate(project.approved_at)}</span>
-                                        </div>
-                                    )}
                                 </div>
                             </Link>
-                        ))}
+                        );
+                    })}
                     </div>
                 ) : (
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-                        <FaProjectDiagram className="mx-auto text-6xl text-gray-300 mb-4" />
-                        <p className="text-gray-500 text-lg">لا توجد مشاريع معتمدة حالياً</p>
+                <div className="flex flex-col items-center justify-center py-16">
+                    <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                        <FaSearch className="text-gray-400 text-4xl" />
+                    </div>
+                    <p className="text-gray-400 text-sm mb-2">لا توجد مشاريع تطابق معايير البحث</p>
+                    <button
+                        type="button"
+                        onClick={handleClearFilters}
+                        className="text-[#A3C042] text-sm font-semibold hover:text-[#93b03a]"
+                    >
+                        عرض كل المشاريع
+                    </button>
                     </div>
                 )}
 
                 {/* Pagination */}
-                {projects.links && projects.links.length > 3 && (
-                    <div className="mt-6 flex justify-center">
-                        <div className="flex gap-2">
+            {projects?.links && projects.links.length > 3 && (
+                <div className="bg-white rounded-2xl border border-gray-100 p-3">
+                    <div className="flex flex-wrap gap-2 justify-center">
                             {projects.links.map((link, index) => (
-                                <button
+                            <Link
                                     key={index}
-                                    onClick={() => link.url && router.get(link.url)}
-                                    disabled={!link.url}
-                                    className={`px-4 py-2 rounded-lg ${
+                                href={link.url || '#'}
+                                className={`px-3 py-2 rounded-xl text-sm font-semibold transition ${
                                         link.active
-                                            ? 'bg-blue-600 text-white'
-                                            : link.url
-                                            ? 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-                                            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                    }`}
+                                        ? 'bg-[#A3C042] text-white'
+                                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                                } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                 />
                             ))}
@@ -173,7 +240,140 @@ export default function ProjectsIndex({ auth, projects, userRole }) {
                     </div>
                 )}
             </div>
-        </MainLayout>
+    );
+
+    return (
+        <div dir="rtl" className="min-h-screen bg-gray-50">
+            <Head title="استكشف المشاريع - إرث المبتكرين" />
+
+            {/* Mobile View */}
+            <div className="block md:hidden">
+                <MobileTopBar
+                    title="إرث المبتكرين"
+                    unreadCount={auth?.unreadCount || 0}
+                    onNotifications={() => router.visit('/notifications')}
+                    onBack={() => router.visit('/')}
+                />
+                <main className="px-4 pb-24 pt-4">
+                    <ProjectsContent isDesktop={false} />
+                </main>
+                <MobileBottomNav active="explore" role={auth?.user?.role} isAuthed={!!auth?.user} user={auth?.user} />
+            </div>
+
+            {/* Desktop View */}
+            <div className="hidden md:block">
+                <MobileTopBar
+                    title="إرث المبتكرين"
+                    unreadCount={auth?.unreadCount || 0}
+                    onNotifications={() => router.visit('/notifications')}
+                    onBack={() => router.visit('/')}
+                />
+                <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-4">
+                    <div className="mx-auto w-full max-w-4xl">
+                        <ProjectsContent isDesktop={true} />
+                    </div>
+                </main>
+                <MobileBottomNav active="explore" role={auth?.user?.role} isAuthed={!!auth?.user} user={auth?.user} />
+                <DesktopFooter auth={auth} />
+            </div>
+
+            {/* Filter Modal */}
+            {showFilterModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm px-4">
+                    <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl overflow-hidden">
+                        {/* Modal Header */}
+                        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                            <button
+                                type="button"
+                                onClick={() => setShowFilterModal(false)}
+                                className="text-gray-700 text-xl leading-none"
+                                aria-label="إغلاق"
+                            >
+                                <FaTimes />
+                            </button>
+                            <div className="text-sm font-extrabold text-gray-900">خيارات الفلترة</div>
+                            <div className="w-6" />
+                        </div>
+
+                        {/* Modal Content */}
+                        <div className="p-4 space-y-6 max-h-[70vh] overflow-y-auto">
+                            {/* Age Group */}
+                            <div>
+                                <div className="text-sm font-bold text-gray-900 mb-3">الفئة العمرية</div>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {ageGroups.map((age) => (
+                                        <button
+                                            key={age.value}
+                                            type="button"
+                                            onClick={() => setFilterAgeGroup(filterAgeGroup === age.value ? '' : age.value)}
+                                            className={`px-4 py-3 rounded-xl text-sm font-semibold transition ${
+                                                filterAgeGroup === age.value
+                                                    ? 'bg-[#eef8d6] text-[#6b7f2c] border-2 border-[#A3C042]'
+                                                    : 'bg-white text-gray-700 border border-gray-200'
+                                            }`}
+                                        >
+                                            {age.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* School */}
+                            <div>
+                                <div className="text-sm font-bold text-gray-900 mb-3">المدرسة</div>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {schools.map((school) => (
+                                        <button
+                                            key={school.value}
+                                            type="button"
+                                            onClick={() => setFilterSchool(filterSchool === school.value ? '' : school.value)}
+                                            className={`px-4 py-3 rounded-xl text-sm font-semibold transition ${
+                                                filterSchool === school.value
+                                                    ? 'bg-[#eef8d6] text-[#6b7f2c] border-2 border-[#A3C042]'
+                                                    : 'bg-white text-gray-700 border border-gray-200'
+                                            }`}
+                                        >
+                                            {school.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Subject */}
+                            <div>
+                                <div className="text-sm font-bold text-gray-900 mb-3">الموضوع</div>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {subjects.map((subject) => (
+                                        <button
+                                            key={subject.value}
+                                            type="button"
+                                            onClick={() => setFilterSubject(filterSubject === subject.value ? '' : subject.value)}
+                                            className={`px-4 py-3 rounded-xl text-sm font-semibold transition ${
+                                                filterSubject === subject.value
+                                                    ? 'bg-[#eef8d6] text-[#6b7f2c] border-2 border-[#A3C042]'
+                                                    : 'bg-white text-gray-700 border border-gray-200'
+                                            }`}
+                                        >
+                                            {subject.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Modal Footer */}
+                        <div className="px-4 py-3 border-t border-gray-100">
+                            <button
+                                type="button"
+                                onClick={handleApplyFilters}
+                                className="w-full rounded-xl bg-[#A3C042] py-3 text-sm font-bold text-white hover:bg-[#93b03a] transition"
+                            >
+                                تطبيق الفلاتر
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 }
-

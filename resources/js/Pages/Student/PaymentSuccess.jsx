@@ -41,7 +41,7 @@ export default function PaymentSuccess({ payment }) {
                         <p className="text-gray-600">شكراً لك على الدفع. تم استلام طلبك بنجاح.</p>
                     </div>
 
-                    <div className="bg-gray-50 rounded-lg p-6 mb-6 text-right">
+                    <div className="bg-gray-50 rounded-lg p-6 mb-6 ">
                         <h2 className="text-lg font-bold text-gray-900 mb-4">تفاصيل الدفع</h2>
                         <div className="space-y-3">
                             <div className="flex justify-between">

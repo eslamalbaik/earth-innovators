@@ -7,7 +7,7 @@ export default function TableSkeleton({ rows = 5, columns = 4 }) {
                 <thead className="bg-gray-50">
                     <tr>
                         {Array.from({ length: columns }).map((_, i) => (
-                            <th key={i} className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th key={i} className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 <div className="h-4 bg-gray-200 rounded w-24 animate-pulse"></div>
                             </th>
                         ))}

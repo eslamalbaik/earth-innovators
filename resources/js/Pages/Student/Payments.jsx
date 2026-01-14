@@ -279,15 +279,15 @@ export default function StudentPayments({ payments, stats, filters }) {
                     <table className="w-full">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">#</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">المعلم</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">المادة</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">المبلغ</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">طريقة الدفع</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الحالة</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">تاريخ الدفع</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">رقم المعاملة</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">إجراءات</th>
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">#</th>
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">المعلم</th>
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">المادة</th>
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">المبلغ</th>
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">طريقة الدفع</th>
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">الحالة</th>
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">تاريخ الدفع</th>
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">رقم المعاملة</th>
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">إجراءات</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">

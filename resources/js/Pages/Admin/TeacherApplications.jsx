@@ -143,25 +143,25 @@ export default function TeacherApplications({ applications, stats, filters }) {
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         المعلم
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         البريد الإلكتروني
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         المدينة
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         المواد
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         الحالة
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         تاريخ التقديم
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         الإجراءات
                                     </th>
                                 </tr>

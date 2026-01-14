@@ -73,22 +73,22 @@ export default function Students({ auth, students, bookings }) {
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gradient-to-r from-yellow-50 to-yellow-100">
                                 <tr>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase">
                                         الطالب
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase">
                                         البريد الإلكتروني
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase">
                                         الهاتف
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase">
                                         عدد الطلبات
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase">
                                         آخر طلب
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase">
                                         الإجراءات
                                     </th>
                                 </tr>

@@ -3,6 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { FaTrophy, FaPlus, FaCalendar, FaEye, FaEdit, FaTrash, FaUsers, FaSearch } from 'react-icons/fa';
 import { useState } from 'react';
 import InnovationChallengeCard from '@/Components/Challenges/InnovationChallengeCard';
+import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 
 export default function TeacherChallengesIndex({ auth, challenges }) {
     const { confirm } = useConfirmDialog();
@@ -166,7 +167,7 @@ export default function TeacherChallengesIndex({ auth, challenges }) {
                                 <p className="text-gray-500 text-lg mb-4">لا توجد تحديات</p>
                                 <Link
                                     href="/teacher/challenges/create"
-                                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-legacy-green to-legacy-blue text-white rounded-lg hover:opacity-90 transition"
+                                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white rounded-lg hover:opacity-90 transition"
                                 >
                                     <FaPlus />
                                     إنشاء تحدّي جديد
@@ -184,7 +185,7 @@ export default function TeacherChallengesIndex({ auth, challenges }) {
                                             href={link.url || '#'}
                                             className={`px-4 py-2 rounded-lg ${
                                                 link.active
-                                                    ? 'bg-gradient-to-r from-legacy-green to-legacy-blue text-white'
+                                                    ? 'bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white'
                                                     : 'bg-white text-gray-700 hover:bg-gray-100'
                                             } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             dangerouslySetInnerHTML={{ __html: link.label }}
@@ -208,7 +209,7 @@ export default function TeacherChallengesIndex({ auth, challenges }) {
                     </div>
 
                     {/* Center - النص */}
-                    <div className="flex-1 text-center md:text-right">
+                    <div className="flex-1 text-center md:">
                         <h3 className="text-2xl font-bold mb-2">قم بتحفيز طلابك اليوم!</h3>
                         <p className="text-purple-100 text-sm md:text-base">
                             أفادت الدراسات أن المسابقات الودية تزيد من معدل إنتاجية الابتكار بنسبة 40%. اختر موضوعًا شيقًا وابدأ التحدي الآن.

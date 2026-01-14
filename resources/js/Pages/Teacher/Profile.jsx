@@ -3,6 +3,7 @@ import { Head, useForm, router } from '@inertiajs/react';
 import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaGraduationCap, FaSave, FaEdit, FaUpload, FaTimes } from 'react-icons/fa';
 import { useState, useRef } from 'react';
 import { getInitials, getColorFromName } from '@/utils/imageUtils';
+import { useToast } from '@/Contexts/ToastContext';
 
 const getImageUrl = (image) => {
     if (!image) return null;
@@ -16,6 +17,7 @@ const getImageUrl = (image) => {
 };
 
 export default function Profile({ teacher, subjects, cities }) {
+    const { showError } = useToast();
     const [isEditing, setIsEditing] = useState(false);
     const [imagePreview, setImagePreview] = useState(null);
     const [selectedImage, setSelectedImage] = useState(null);
@@ -42,14 +44,14 @@ export default function Profile({ teacher, subjects, cities }) {
         const file = e.target.files[0];
         if (file) {
             if (file.size > 2 * 1024 * 1024) {
-                alert('حجم الصورة يجب أن يكون أقل من 2 ميجابايت');
+                showError('حجم الصورة يجب أن يكون أقل من 2 ميجابايت');
                 if (fileInputRef.current) {
                     fileInputRef.current.value = '';
                 }
                 return;
             }
             if (!file.type.startsWith('image/')) {
-                alert('الملف المحدد ليس صورة');
+                showError('الملف المحدد ليس صورة');
                 if (fileInputRef.current) {
                     fileInputRef.current.value = '';
                 }
@@ -165,7 +167,7 @@ export default function Profile({ teacher, subjects, cities }) {
                     }
                 });
 
-                alert(errorMessage);
+                showError(errorMessage, { autoDismiss: 6000 });
             },
         });
     };

@@ -36,10 +36,15 @@ class StudentChallengeController extends Controller
         }
 
         $status = $request->get('status'); // active, upcoming, finished
+        $search = $request->get('search');
+        $category = $request->get('category');
+        
         $challenges = $this->submissionService->getAllChallengesForStudent(
             $student->school_id,
             $status,
-            12
+            12,
+            $search,
+            $category
         )->withQueryString();
 
         // Load student submissions for each challenge

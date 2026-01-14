@@ -1,118 +1,187 @@
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
-import MainLayout from '../Layouts/MainLayout';
-import HeroSection from '../Components/Sections/HeroSection';
-import WhyChooseSection from '../Components/Sections/WhyChooseSection';
-import CTABannerSection from '../Components/Sections/CTABannerSection';
-import PlatformFeaturesSection from '../Components/Sections/PlatformFeaturesSection';
-import ProjectsSection from '../Components/Sections/ProjectsSection';
-import UAESchoolsSection from '../Components/Sections/UAESchoolsSection';
-import TeacherRecruitmentSection from '../Components/Sections/TeacherRecruitmentSection';
-import TestimonialsSection from '../Components/Sections/TestimonialsSection';
-import FAQSection from '../Components/Sections/FAQSection';
-import CTASection from '../Components/Sections/CTASection';
-import PublicationsSection from '../Components/Sections/PublicationsSection';
-import PackagesSection from '../Components/Sections/PackagesSection';
+import { useToast } from '@/Contexts/ToastContext';
+import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
+import MobileTopBar from '@/Components/Mobile/MobileTopBar';
+import HomeCommunityScoreCard from '@/Pages/Home/HomeCommunityScoreCard';
+import HomeCurrentChallengeSection from '@/Pages/Home/HomeCurrentChallengeSection';
+import HomeLatestProjectsSection from '@/Pages/Home/HomeLatestProjectsSection';
+import HomeSuggestChallengeCard from '@/Pages/Home/HomeSuggestChallengeCard';
+import HomeWelcomeCard from '@/Pages/Home/HomeWelcomeCard';
 
 export default function Home({ auth, cities = [], subjects = [], featuredTeachers = [], testimonials = [], stats = [], featuredPublications = [], featuredProjects = [], uaeSchools = [], packages = [] }) {
-    const [openFAQ, setOpenFAQ] = useState(null);
+    const user = auth?.user || null;
+    const isAuthed = !!user;
+    const { showSuccess, showError } = useToast();
+    const [suggestOpen, setSuggestOpen] = useState(false);
+    const [suggestText, setSuggestText] = useState('');
 
-    const toggleFAQ = (index) => {
-        setOpenFAQ(openFAQ === index ? null : index);
-    };
-
-    const benefits = [
-        {
-            title: "مشاركة المشاريع الإبداعية",
-            description: "ارفع مشاريعك الإبداعية (ملفات، صور، تقارير) وشاركها مع المجتمع التعليمي. احصل على تقييمات من المعلمين والمشرفين."
-        },
-        {
-            title: "التحديات والمسابقات",
-            description: "شارك في تحديات تعليمية متنوعة في مختلف المجالات والفئات العمرية. تنافس مع زملائك وحقق مراكز متقدمة."
-        },
-        {
-            title: "الترتيب والمنافسة",
-            description: "تنافس مع المؤسسات تعليمية الأخرى وحقق ترتيب متقدم. تابع إحصائيات مدرستك ومقارنتها مع المؤسسات تعليمية الأخرى."
-        }
-    ];
-
-    const faqData = [
-        {
-            question: "كيف يمكنني مشاركة مشروعي الإبداعي؟",
-            answer: "يمكنك رفع مشروعك من خلال لوحة التحكم. قم بتسجيل الدخول، ثم اضغط على 'إضافة مشروع جديد' واملأ البيانات المطلوبة (العنوان، الوصف، الملفات، الصور، التقرير). سيتم مراجعته من قبل المعلمين أو الإدارة قبل الموافقة عليه."
-        },
-        {
-            question: "كيف أحصل على الشارات والنقاط؟",
-            answer: "تحصل على الشارات والنقاط عند مشاركة المشاريع، المشاركة في التحديات، تحقيق مراكز متقدمة، أو عند إنجازات معينة. كل شارة لها متطلباتها الخاصة من النقاط أو الإنجازات."
-        },
-        {
-            question: "كيف يمكنني المشاركة في التحديات؟",
-            answer: "تصفح قائمة التحديات النشطة، اختر التحدي المناسب لفئتك العمرية ومجال اهتمامك، ثم قم برفع مشروعك المرتبط بالتحدي. يجب أن يتم التقديم قبل الموعد النهائي للتحدي."
-        },
-        {
-            question: "ما هي الباقات المتاحة وكيف يمكنني الاشتراك؟",
-            answer: "نوفر باقات متنوعة للمؤسسات تعليمية والطلاب (شهرية، ربع سنوية، سنوية). كل باقة توفر ميزات مختلفة مثل عدد المشاريع المسموح بها، عدد التحديات، إمكانية الحصول على شهادات، وغيرها. يمكنك الاشتراك من صفحة الباقات."
-        }
-    ];
-
-    const handleSearch = () => {
-        router.visit('/projects');
-    };
-
-    const handleViewAllTeachers = () => {
-        router.visit('/projects');
-    };
-
-    const handleViewAllProjects = () => {
-        router.visit('/projects');
-    };
-
-    const handleJoinTeacher = () => {
-        router.visit('/register');
-    };
+    const uploadTarget = (() => {
+        const role = user?.role;
+        if (!role) return '/register';
+        if (role === 'teacher') return '/teacher/projects/create';
+        if (role === 'school') return '/school/projects/create';
+        if (role === 'student') return '/student/projects/create';
+        return '/dashboard';
+    })();
 
     return (
-        <MainLayout auth={auth}>
-            <Head title="إرث المبتكرين - منصة الإبداع والتعلم" />
+        <div dir="rtl" className="min-h-screen bg-gray-50">
+            <Head title="الرئيسية - إرث المبتكرين" />
 
-            <HeroSection
-                cities={cities}
-                subjects={subjects}
-                onSearch={handleSearch}
+            {/* Mobile: phone-like frame */}
+            <div className="block md:hidden">
+                <div className="mx-auto w-full">
+                    <div className="bg-gray-50 min-h-screen">
+                        <MobileTopBar
+                            title="الرئيسية"
+                            unreadCount={isAuthed ? (auth?.unreadCount || 0) : 0}
+                            onNotifications={() => router.visit(isAuthed ? '/notifications' : '/login')}
+                            onBack={() => router.visit('/')}
+                            reverseOrder={false}
+                            auth={auth}
+                        />
+
+                        <main className="px-4 pb-24 pt-4 space-y-4">
+                            <HomeWelcomeCard
+                                userName={user?.name}
+                                onUploadProject={() => router.visit(uploadTarget)}
+                            />
+
+                            <HomeCommunityScoreCard
+                                percent={35}
+                                points={isAuthed ? (user?.points || 0) : 0}
+                            />
+
+                            <HomeLatestProjectsSection
+                                projects={featuredProjects || []}
+                                onViewAll={() => router.visit('/projects')}
+                                onOpenProject={(project) => {
+                                    if (project?.id) {
+                                        router.visit(`/projects/${project.id}`);
+                                    } else {
+                                        router.visit('/projects');
+                                    }
+                                }}
+                            />
+
+                            <HomeCurrentChallengeSection
+                                onViewAll={() => router.visit('/challenges')}
+                                onJoin={() => router.visit(isAuthed ? '/dashboard' : '/login')}
             />
 
-            <WhyChooseSection benefits={benefits} />
+                            <HomeSuggestChallengeCard
+                                onSuggest={() => setSuggestOpen(true)}
+                            />
+                        </main>
 
-            <CTABannerSection
-                onButtonClick={handleViewAllTeachers}
+                        <MobileBottomNav active="home" role={user?.role} isAuthed={isAuthed} user={user} />
+                    </div>
+                </div>
+            </div>
+
+            {/* Desktop: full-width layout like dashboard */}
+            <div className="hidden md:block">
+                <MobileTopBar
+                    title="الرئيسية"
+                    unreadCount={isAuthed ? (auth?.unreadCount || 0) : 0}
+                    onNotifications={() => router.visit(isAuthed ? '/notifications' : '/login')}
+                    onBack={() => router.visit('/')}
+                    reverseOrder={false}
+                />
+
+                <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-4">
+                    <div className="mx-auto w-full max-w-4xl">
+                        <div className="space-y-4 lg:grid lg:grid-cols-12 lg:gap-6 lg:space-y-0">
+                            <div className="space-y-4 lg:col-span-5">
+                                <HomeWelcomeCard
+                                    userName={user?.name}
+                                    onUploadProject={() => router.visit(uploadTarget)}
+                                />
+                                <HomeCommunityScoreCard
+                                    percent={35}
+                                    points={isAuthed ? (user?.points || 0) : 0}
+                                />
+                            </div>
+
+                            <div className="space-y-4 lg:col-span-7">
+                                <HomeLatestProjectsSection
+                                    projects={featuredProjects || []}
+                                    onViewAll={() => router.visit('/projects')}
+                                    onOpenProject={(project) => {
+                                        if (project?.id) {
+                                            router.visit(`/projects/${project.id}`);
+                                        } else {
+                                            router.visit('/projects');
+                                        }
+                                    }}
             />
 
-            <PlatformFeaturesSection />
+                                <HomeCurrentChallengeSection
+                                    onViewAll={() => router.visit('/challenges')}
+                                    onJoin={() => router.visit(isAuthed ? '/dashboard' : '/login')}
+                                />
 
-            <ProjectsSection
-                projects={featuredProjects}
-                onViewAllProjects={handleViewAllProjects}
+                                <HomeSuggestChallengeCard
+                                    onSuggest={() => setSuggestOpen(true)}
             />
+                            </div>
+                        </div>
+                    </div>
+                </main>
 
-            <UAESchoolsSection
-                schools={uaeSchools}
-            />
+                <MobileBottomNav active="home" role={user?.role} isAuthed={isAuthed} user={user} />
+            </div>
 
-            <TeacherRecruitmentSection onJoinClick={handleJoinTeacher} />
-
-            <TestimonialsSection testimonials={testimonials} />
-
-            <FAQSection
-                faqs={faqData}
-                openFAQ={openFAQ}
-                onToggleFAQ={setOpenFAQ}
-            />
-
-            <PublicationsSection publications={featuredPublications} />
-
-            <PackagesSection packages={packages} />
-
-            <CTASection />
-        </MainLayout >
+            {/* Modal - اقترح تحدياً جديداً (مثل الصورة) */}
+            {suggestOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm px-4">
+                    <div className="w-full max-w-md rounded-2xl bg-[#eef8d6] border border-[#d7d39a] shadow-2xl overflow-hidden">
+                        <div className="flex items-center justify-between px-4 py-3 border-b border-[#d7d39a]/60">
+                            <button
+                                type="button"
+                                onClick={() => setSuggestOpen(false)}
+                                className="text-gray-700 text-xl leading-none"
+                                aria-label="إغلاق"
+                            >
+                                ×
+                            </button>
+                            <div className="text-sm font-extrabold text-gray-900">اقترح تحدياً جديداً</div>
+                            <div className="w-6" />
+                        </div>
+                        <div className="p-4">
+                            <textarea
+                                value={suggestText}
+                                onChange={(e) => setSuggestText(e.target.value)}
+                                placeholder="أدخل تحدي جديد"
+                                rows={4}
+                                className="w-full rounded-xl border border-gray-200 bg-white p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    const text = suggestText.trim();
+                                    if (!text) {
+                                        showError('اكتب اقتراح التحدي أولاً');
+                                        return;
+                                    }
+                                    if (!isAuthed) {
+                                        router.visit('/login');
+                                        return;
+                                    }
+                                    // لا يوجد endpoint حالياً - نحفظها كتجربة UI مثل التصميم
+                                    showSuccess('تم إرسال الاقتراح');
+                                    setSuggestText('');
+                                    setSuggestOpen(false);
+                                }}
+                                className="mt-4 w-40 rounded-xl bg-[#A3C042] py-2 text-sm font-extrabold text-white hover:bg-[#93b03a] transition"
+                            >
+                                إرسال
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 }

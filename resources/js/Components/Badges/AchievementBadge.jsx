@@ -29,9 +29,9 @@ export default function AchievementBadge({ badge, isEarned = false, source = nul
                 rank_third: 'bg-gradient-to-br from-orange-400 to-orange-600',
                 excellent_innovator: 'bg-gradient-to-br from-purple-400 to-purple-600',
                 active_participant: 'bg-gradient-to-br from-blue-400 to-blue-600',
-                custom: 'bg-gradient-to-br from-legacy-green to-legacy-blue'
+                custom: 'bg-gradient-to-br from-[#A3C042] to-legacy-blue'
             };
-            return earnedColors[type] || 'bg-gradient-to-br from-legacy-green to-legacy-blue';
+            return earnedColors[type] || 'bg-gradient-to-br from-[#A3C042] to-legacy-blue';
         } else {
             const unearnedColors = {
                 rank_first: 'bg-gradient-to-br from-yellow-100 to-yellow-200',
@@ -75,11 +75,11 @@ export default function AchievementBadge({ badge, isEarned = false, source = nul
         <div
             className={`bg-white rounded-xl shadow-lg overflow-hidden border-2 transition-all ${
                 isEarned
-                    ? 'border-legacy-green shadow-legacy-green/20'
-                    : 'border-gray-200 hover:border-legacy-green/50'
+                    ? 'border-[#A3C042] shadow-[#A3C042]/20'
+                    : 'border-gray-200 hover:border-[#A3C042]/50'
             }`}
         >
-            <div className={`p-6 ${isEarned ? 'bg-gradient-to-br from-legacy-green/10 to-legacy-blue/10' : 'bg-gray-50'}`}>
+            <div className={`p-6 ${isEarned ? 'bg-gradient-to-br from-[#A3C042]/5 to-[#A3C042]/10' : 'bg-gray-50'}`}>
                 <div className="flex items-center justify-center mb-4">
                     {isValidUrl ? (
                         <img
@@ -97,7 +97,7 @@ export default function AchievementBadge({ badge, isEarned = false, source = nul
 
                 {isEarned && (
                     <div className="text-center mb-2">
-                        <span className="inline-block bg-gradient-to-r from-legacy-green to-legacy-blue text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
+                        <span className="inline-block bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
                             ✓ مكتسبة
                         </span>
                     </div>

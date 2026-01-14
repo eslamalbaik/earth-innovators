@@ -67,7 +67,7 @@ export default function AdminLogin({ status }) {
                                         type="email"
                                         name="email"
                                         value={data.email}
-                                        className="block w-full pr-10 pl-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-legacy-green focus:border-legacy-green sm:text-sm"
+                                        className="block w-full pr-10 pl-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
                                         autoComplete="username"
                                         isFocused
                                         onChange={(e) => setData('email', e.target.value)}
@@ -88,7 +88,7 @@ export default function AdminLogin({ status }) {
                                         type={showPassword ? 'text' : 'password'}
                                         name="password"
                                         value={data.password}
-                                        className="block w-full pr-10 pl-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-legacy-green focus:border-legacy-green sm:text-sm"
+                                        className="block w-full pr-10 pl-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
                                         autoComplete="current-password"
                                         onChange={(e) => setData('password', e.target.value)}
                                         placeholder="••••••••"
@@ -123,7 +123,7 @@ export default function AdminLogin({ status }) {
 
                             <div>
                                 <PrimaryButton
-                                    className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-legacy-green to-legacy-blue hover:from-primary-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-legacy-green disabled:opacity-50"
+                                    className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-[#A3C042] to-legacy-blue hover:from-primary-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#A3C042] disabled:opacity-50"
                                     disabled={processing}
                                 >
                                     {processing ? (

@@ -117,7 +117,7 @@ export default function TeacherPublicationEdit({ auth, publication }) {
                                 id="type"
                                 value={data.type}
                                 onChange={(e) => setData('type', e.target.value)}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-legacy-green focus:ring-legacy-green"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                             >
                                 <option value="magazine">مجلة</option>
                                 <option value="booklet">كتيب</option>
@@ -149,7 +149,7 @@ export default function TeacherPublicationEdit({ auth, publication }) {
                                 value={data.description}
                                 onChange={(e) => setData('description', e.target.value)}
                                 rows={4}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-legacy-green focus:ring-legacy-green"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                             />
                             <InputError message={errors.description} className="mt-2" />
                         </div>
@@ -162,7 +162,7 @@ export default function TeacherPublicationEdit({ auth, publication }) {
                                 value={data.content}
                                 onChange={(e) => setData('content', e.target.value)}
                                 rows={15}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-legacy-green focus:ring-legacy-green font-mono text-sm"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042] font-mono text-sm"
                                 placeholder="يمكنك استخدام HTML هنا"
                             />
                             <InputError message={errors.content} className="mt-2" />
@@ -177,7 +177,7 @@ export default function TeacherPublicationEdit({ auth, publication }) {
                                     type="file"
                                     accept="image/*"
                                     onChange={handleCoverImageChange}
-                                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-legacy-green/10 file:text-legacy-green hover:file:bg-legacy-green/20"
+                                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#A3C042]/10 file:text-[#A3C042] hover:file:bg-[#A3C042]/20"
                                 />
                                 {coverPreview ? (
                                     <div className="mt-4">
@@ -274,7 +274,7 @@ export default function TeacherPublicationEdit({ auth, publication }) {
                             </Link>
                             <PrimaryButton
                                 disabled={processing}
-                                className="bg-gradient-to-r from-legacy-green to-legacy-blue"
+                                className="bg-gradient-to-r from-[#A3C042] to-legacy-blue"
                             >
                                 {processing ? (
                                     <>

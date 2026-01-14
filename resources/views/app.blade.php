@@ -7,13 +7,11 @@
 
     <title inertia>{{ config('app.name', 'إرث المبتكرين - Innovators Legacy') }}</title>
 
-    <!-- Fonts -->
+    <!-- Fonts - Cairo from Google Fonts CDN -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;800;900&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     <link rel="icon" type="image/jpeg" href="/images/logo.jpg">
     <link rel="icon" type="image/jpeg" sizes="32x32" href="/images/logo.jpg">
     <link rel="icon" type="image/jpeg" sizes="16x16" href="/images/logo.jpg">

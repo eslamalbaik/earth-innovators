@@ -93,7 +93,7 @@ const SectionTitle = ({
     const getAlignClasses = (align) => {
         switch (align) {
             case 'start':
-                return 'justify-start text-right';
+                return 'justify-start ';
             case 'center':
                 return 'justify-center text-center';
             case 'end':

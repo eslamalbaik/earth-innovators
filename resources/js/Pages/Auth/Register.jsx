@@ -7,7 +7,7 @@ import GuestLayout from '@/Layouts/GuestLayout';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Head, Link, useForm, usePage, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
-import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaPhone, FaChevronDown, FaExclamationTriangle, FaTimes, FaSchool } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaPhone, FaChevronDown, FaExclamationTriangle, FaTimes, FaSchool, FaUserGraduate, FaChalkboardTeacher, FaUniversity } from 'react-icons/fa';
 
 const DEFAULT_DIAL_CODE = '+966';
 
@@ -50,10 +50,10 @@ export default function Register({ schools = [] }) {
     });
 
     const roleOptions = [
-        { key: 'student', label: 'طالب', description: 'إنشاء حساب كطالب' },
-        { key: 'teacher', label: 'معلم', description: 'إنشاء حساب كمعلم' },
-        { key: 'school', label: 'مدرسة', description: 'إنشاء حساب كمدرسة' },
-        { key: 'educational_institution', label: 'مؤسسة تعليمية', description: 'إنشاء حساب كمؤسسة تعليمية' },
+        { key: 'student', label: 'طالب', description: 'إنشاء حساب كطالب', icon: FaUserGraduate },
+        { key: 'teacher', label: 'معلم', description: 'إنشاء حساب كمعلم', icon: FaChalkboardTeacher },
+        { key: 'school', label: 'مدرسة', description: 'إنشاء حساب كمدرسة', icon: FaSchool },
+        { key: 'educational_institution', label: 'مؤسسة تعليمية', description: 'إنشاء حساب كمؤسسة تعليمية', icon: FaUniversity },
     ];
 
     // الحصول على الأخطاء من Inertia (من usePage) أو من state المحلي أو من useForm
@@ -132,45 +132,43 @@ export default function Register({ schools = [] }) {
     return (
         <GuestLayout>
             <Head title="إنشاء حساب" />
-
-            <div className="flex items-center justify-center py-8 px-4">
-                <div className="max-w-md w-full space-y-6">
-                    <div className="flex flex-col items-center">
-                        <div>
-                            <Link href="/">
-                                <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
-                            </Link>
-                        </div>
-                        <h2 className="text-2xl font-bold text-gray-900">
-                            إنشاء حساب جديد
-                        </h2>
-                    </div>
-
-                    <div className="bg-white shadow-lg rounded-2xl px-4 py-10 min-w-[92vw] sm:min-w-[350px]">
-                        <form onSubmit={submit} className="space-y-6">
+            <div className="flex items-center justify-center sm:px-4">
+                <div className="w-full sm:space-y-8">
+                <div className="relative min-h-screen overflow-hidden bg-white shadow-lg sm:rounded-2xl px-4 py-10 w-[100vw] sm:w-[400px] md:w-[450px] max-w-5xl sm:mx-auto">
+                <form onSubmit={submit} className="space-y-6">
+                            <img src="/images/avatar.svg" alt="avatar" className="absolute -top-24 -left-24 w-48 h-48" />
+                            <img src="/images/avatar1.svg" alt="avatar" className="absolute -bottom-8 right-0 w-28 h-28" />
+                            <div className="flex flex-col items-center">
+                                <div>
+                                    <img
+                                        src="/images/logo-modified.png"
+                                        alt="إرث المبتكرين - Innovators Legacy"
+                                        className="h-24 w-auto object-contain"
+                                    />
+                                </div>
+                            </div>
                             <div>
-                                <InputLabel value="إنشاء حساب كـ" className="text-sm font-medium text-gray-700 mb-3" />
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div className='text-xs mb-1 opacity-75'>إنشاء حساب كـ</div>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5 md:gap-3">
                                     {roleOptions.map((roleOption) => {
                                         const isActive = data.role === roleOption.key;
+                                        const IconComponent = roleOption.icon;
                                         return (
                                             <button
                                                 key={roleOption.key}
                                                 type="button"
                                                 onClick={() => setData('role', roleOption.key)}
-                                                className={`relative flex flex-col items-start rounded-xl border px-4 py-3 transition duration-200 ${isActive
-                                                    ? 'border-legacy-green bg-gradient-to-br from-legacy-green/10 to-legacy-blue/10 text-legacy-green shadow-sm'
-                                                    : 'border-gray-200 bg-gray-50 hover:border-legacy-green/50 hover:bg-legacy-green/5'
+                                                className={`relative flex flex-col items-center justify-center rounded-xl border px-3 py-3 transition duration-200 ${isActive
+                                                    ? 'border-[#A3C042] bg-gradient-to-br from-[#A3C042]/10 to-legacy-blue/10 text-[#A3C042] shadow-sm'
+                                                    : 'border-gray-200 bg-gray-50 hover:border-[#A3C042]/50 hover:bg-[#A3C042]/5 text-gray-700'
                                                     }`}
                                             >
-                                                <span className="text-base font-semibold">
+                                                <IconComponent className={`h-4 w-4 md:h-5 md:w-5 mb-1 ${isActive ? 'text-[#A3C042]' : 'text-gray-500'}`} />
+                                                <span className="text-xs md:text-sm font-medium text-center">
                                                     {roleOption.label}
                                                 </span>
-                                                <span className="mt-1 text-xs text-gray-500">
-                                                    {roleOption.description}
-                                                </span>
                                                 {isActive && (
-                                                    <span className="absolute top-3 left-3 h-2 w-2 rounded-full bg-legacy-green" aria-hidden="true"></span>
+                                                    <span className="absolute top-3 left-3 h-2 w-2 rounded-full bg-[#A3C042]" aria-hidden="true"></span>
                                                 )}
                                             </button>
                                         );
@@ -182,7 +180,6 @@ export default function Register({ schools = [] }) {
                             {/* حقل اختيار المدرسة للطلاب والمعلمين */}
                             {(data.role === 'student' || data.role === 'teacher') && (
                                 <div>
-                                    <InputLabel htmlFor="school_id" value="اختر مدرستك *" className="text-sm font-medium text-gray-700 mb-2" />
                                     <div className="relative">
                                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                             <FaSchool className="h-5 w-5 text-gray-400" />
@@ -193,10 +190,10 @@ export default function Register({ schools = [] }) {
                                                 name="school_id"
                                                 value={data.school_id}
                                                 onChange={(e) => setData('school_id', e.target.value)}
-                                                className="block w-full pr-10 pl-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-legacy-green focus:border-legacy-green sm:text-sm"
+                                                className="block w-full ps-10 pe-3 py-3 border-2 border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-1 sm:text-sm transition-all"
                                                 required
                                             >
-                                                <option value="">-- اختر مدرستك --</option>
+                                                <option value="">اختر مدرستك</option>
                                                 {schools.map((school) => (
                                                     <option key={school.id} value={school.id}>
                                                         {school.name}
@@ -204,7 +201,7 @@ export default function Register({ schools = [] }) {
                                                 ))}
                                             </SelectInput>
                                         ) : (
-                                            <div className="block w-full pr-10 pl-3 py-2 border border-red-300 rounded-md shadow-sm bg-red-50 text-red-700 text-sm">
+                                            <div className="block w-full ps-10 pe-3 py-2 border border-red-300 rounded-md shadow-sm bg-red-50 text-red-700 text-sm">
                                                 <p className="font-semibold">تحذير: لا توجد مؤسسات تعليمية مسجلة في النظام</p>
                                                 <p className="text-xs mt-1">يرجى التواصل مع الإدارة لإنشاء حساب مدرسة أولاً</p>
                                             </div>
@@ -258,7 +255,6 @@ export default function Register({ schools = [] }) {
                             )}
 
                             <div>
-                                <InputLabel htmlFor="name" value="الاسم الكامل" className="text-sm font-medium text-gray-700 mb-2" />
                                 <div className="relative">
                                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                         <FaUser className="h-5 w-5 text-gray-400" />
@@ -267,7 +263,7 @@ export default function Register({ schools = [] }) {
                                         id="name"
                                         name="name"
                                         value={data.name}
-                                        className="block w-full pr-10 pl-3 py-3 border-2 border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-legacy-green focus:border-legacy-green sm:text-sm transition-all"
+                                        className="block w-full ps-10 pe-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
                                         autoComplete="name"
                                         isFocused={true}
                                         onChange={(e) => setData('name', e.target.value)}
@@ -279,7 +275,6 @@ export default function Register({ schools = [] }) {
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="email" value="البريد الإلكتروني" className="text-sm font-medium text-gray-700 mb-2" />
                                 <div className="relative">
                                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                         <FaEnvelope className="h-5 w-5 text-gray-400" />
@@ -289,10 +284,10 @@ export default function Register({ schools = [] }) {
                                         type="email"
                                         name="email"
                                         value={data.email}
-                                        className="block w-full pr-10 pl-3 py-3 border-2 border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-legacy-green focus:border-legacy-green sm:text-sm transition-all"
+                                        className="block w-full ps-10 pe-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
                                         autoComplete="username"
                                         onChange={(e) => setData('email', e.target.value)}
-                                        placeholder="example@email.com"
+                                        placeholder="البريد الإلكتروني"
                                         required
                                     />
                                 </div>
@@ -300,12 +295,11 @@ export default function Register({ schools = [] }) {
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="phone" value="رقم الجوال" className="text-sm font-medium text-gray-700 mb-2" />
                                 <div className="relative">
                                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                         <FaPhone className="h-5 w-5 text-gray-400" />
                                     </div>
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center z-10">
+                                    <div className="absolute inset-y-0 left-0 pe-3 flex items-center z-10">
                                         <div className="relative">
                                             <button
                                                 type="button"
@@ -332,7 +326,7 @@ export default function Register({ schools = [] }) {
                                                                     setSelectedDialCode(option.value);
                                                                     setShowDialCodeDropdown(false);
                                                                 }}
-                                                                className={`w-full text-right px-4 py-2 text-sm hover:bg-legacy-green/10 flex items-center justify-between ${selectedDialCode === option.value ? 'bg-gradient-to-r from-legacy-green/20 to-legacy-blue/20' : ''
+                                                                className={`w-full  px-4 py-2 text-sm hover:bg-[#A3C042]/10 flex items-center justify-between ${selectedDialCode === option.value ? 'bg-gradient-to-r from-[#A3C042]/20 to-legacy-blue/20' : ''
                                                                     }`}
                                                             >
                                                                 <span className="text-gray-700">{option.label}</span>
@@ -349,10 +343,10 @@ export default function Register({ schools = [] }) {
                                         type="tel"
                                         name="phone"
                                         value={data.phone || ''}
-                                        className="block w-full pr-10 pl-28 py-3 border-2 border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-legacy-green focus:border-legacy-green sm:text-sm transition-all"
+                                        className="block w-full ps-20 pe-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
                                         autoComplete="tel"
                                         onChange={handlePhoneInputChange}
-                                        placeholder="501234567 (اختياري)"
+                                        placeholder="رقم الجوال"
                                     />
                                 </div>
                                 <InputError
@@ -362,7 +356,6 @@ export default function Register({ schools = [] }) {
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="password" value="كلمة المرور" className="text-sm font-medium text-gray-700 mb-2" />
                                 <div className="relative">
                                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                         <FaLock className="h-5 w-5 text-gray-400" />
@@ -372,15 +365,15 @@ export default function Register({ schools = [] }) {
                                         type={showPassword ? 'text' : 'password'}
                                         name="password"
                                         value={data.password}
-                                        className="block w-full pr-10 pl-3 py-3 border-2 border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-legacy-green focus:border-legacy-green sm:text-sm transition-all"
+                                        className="block w-full ps-10 pe-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
                                         autoComplete="new-password"
                                         onChange={(e) => setData('password', e.target.value)}
-                                        placeholder="••••••••"
+                                        placeholder="كلمة المرور"
                                         required
                                     />
                                     <button
                                         type="button"
-                                        className="absolute inset-y-0 left-0 pl-3 flex items-center"
+                                        className="absolute inset-y-0 left-0 pe-3 flex items-center"
                                         onClick={() => setShowPassword(!showPassword)}
                                     >
                                         {showPassword ? (
@@ -394,11 +387,6 @@ export default function Register({ schools = [] }) {
                             </div>
 
                             <div>
-                                <InputLabel
-                                    htmlFor="password_confirmation"
-                                    value="تأكيد كلمة المرور"
-                                    className="text-sm font-medium text-gray-700 mb-2"
-                                />
                                 <div className="relative">
                                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                         <FaLock className="h-5 w-5 text-gray-400" />
@@ -408,15 +396,15 @@ export default function Register({ schools = [] }) {
                                         type={showConfirmPassword ? 'text' : 'password'}
                                         name="password_confirmation"
                                         value={data.password_confirmation}
-                                        className="block w-full pr-10 pl-3 py-3 border-2 border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-legacy-green focus:border-legacy-green sm:text-sm transition-all"
+                                        className="block w-full ps-10 pe-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
                                         autoComplete="new-password"
                                         onChange={(e) => setData('password_confirmation', e.target.value)}
-                                        placeholder="••••••••"
+                                        placeholder="تأكيد كلمة المرور"
                                         required
                                     />
                                     <button
                                         type="button"
-                                        className="absolute inset-y-0 left-0 pl-3 flex items-center"
+                                        className="absolute inset-y-0 left-0 pe-3 flex items-center"
                                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                                     >
                                         {showConfirmPassword ? (
@@ -434,7 +422,7 @@ export default function Register({ schools = [] }) {
 
                             <div>
                                 <PrimaryButton
-                                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-legacy-green to-legacy-blue hover:from-primary-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-legacy-green disabled:opacity-50"
+                                    className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white !bg-[#A3C042] hover:!bg-[#F9D536] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#A3C042] disabled:opacity-50"
                                     disabled={processing || ((data.role === 'student' || data.role === 'teacher') && !data.school_id) || (schools && schools.length === 0 && (data.role === 'student' || data.role === 'teacher'))}
                                 >
                                     {processing ? (
@@ -453,7 +441,7 @@ export default function Register({ schools = [] }) {
                                     لديك حساب بالفعل؟{' '}
                                     <Link
                                         href={route('login')}
-                                        className="font-medium text-legacy-green hover:text-primary-600"
+                                        className="font-medium text-[#A3C042] hover:text-[#F9D536]"
                                     >
                                         سجل الدخول
                                     </Link>

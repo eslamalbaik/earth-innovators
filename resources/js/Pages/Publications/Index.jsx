@@ -1,5 +1,8 @@
 import { Head, Link, router } from '@inertiajs/react';
-import MainLayout from '../../Layouts/MainLayout';
+import MobileAppLayout from '../../Layouts/MobileAppLayout';
+import MobileTopBar from '@/Components/Mobile/MobileTopBar';
+import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
+import DesktopFooter from '@/Components/Mobile/DesktopFooter';
 import { FaBook, FaFileAlt, FaCalendar, FaBuilding, FaHeart, FaArrowLeft, FaSearch, FaDownload, FaNewspaper } from 'react-icons/fa';
 import { useState } from 'react';
 import axios from 'axios';
@@ -93,7 +96,7 @@ export default function PublicationsIndex({ auth, publications, filters }) {
         };
 
         return (
-            <div key={publication.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition">
+            <div key={publication.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md transition">
                 {/* Image with tags */}
                 <div className="relative">
                     <img
@@ -118,9 +121,9 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                 </div>
 
                 {/* Content */}
-                <div className="p-6">
+                <div className="p-4">
                     {/* Title */}
-                    <h3 className="text-xl font-bold text-legacy-green mb-3">
+                    <h3 className="text-base font-bold text-gray-900 mb-2 line-clamp-2">
                         {publication.title}
                         {publication.issue_number && (
                             <span className="text-gray-600"> - العدد {publication.issue_number}</span>
@@ -128,64 +131,64 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                     </h3>
 
                     {/* Meta info */}
-                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-4">
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-gray-600 mb-2">
                         {publication.publish_date && (
-                            <div className="flex items-center gap-2">
-                                <FaCalendar className="text-xs" />
+                            <div className="flex items-center gap-1">
+                                <FaCalendar className="text-[10px]" />
                                 {formatDate(publication.publish_date)}
                             </div>
                         )}
                         {(publication.publisher_name || publication.school?.name) && (
-                            <div className="flex items-center gap-2">
-                                <FaBuilding className="text-xs" />
-                                {publication.publisher_name || publication.school?.name}
+                            <div className="flex items-center gap-1">
+                                <FaBuilding className="text-[10px]" />
+                                <span className="line-clamp-1">{publication.publisher_name || publication.school?.name}</span>
                             </div>
                         )}
                     </div>
 
                     {/* Description */}
                     {publication.description && (
-                        <p className="text-gray-700 mb-6 line-clamp-3 leading-relaxed">
+                        <p className="text-xs text-gray-700 mb-3 line-clamp-2 leading-relaxed">
                             {publication.description}
                         </p>
                     )}
 
                     {/* Actions */}
-                    <div className="flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
                             {publication.file && (
                                 <a
                                     href={publication.file.startsWith('http') || publication.file.startsWith('/storage/') || publication.file.startsWith('/images/')
                                         ? publication.file
                                         : `/storage/${publication.file}`}
                                     download
-                                    className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition border border-blue-200"
+                                    className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition border border-blue-200 text-xs font-semibold"
                                 >
-                                    <FaDownload className="text-sm" />
-                                    <span className="text-sm font-medium">تحميل</span>
+                                    <FaDownload className="text-xs" />
+                                    <span>تحميل</span>
                                 </a>
                             )}
                             {publication.content && (
                                 <Link
                                     href={`/publications/${publication.id}`}
-                                    className="flex items-center gap-2 px-4 py-2 bg-legacy-green/10 text-legacy-green rounded-lg hover:bg-legacy-green/20 transition border border-legacy-green/20"
+                                    className="flex items-center gap-1 px-3 py-1.5 bg-[#A3C042]/10 text-[#A3C042] rounded-xl hover:bg-[#A3C042]/20 transition border border-[#A3C042]/20 text-xs font-semibold"
                                 >
-                                    <FaBook className="text-sm" />
-                                    <span className="text-sm font-medium">قراءة</span>
+                                    <FaBook className="text-xs" />
+                                    <span>قراءة</span>
                                 </Link>
                             )}
                         </div>
                         <button
+                            type="button"
                             onClick={() => toggleLike(publication)}
-                            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition ${
-                                isLiked
+                            className={`flex items-center gap-1 px-2 py-1.5 rounded-xl transition text-xs ${isLiked
                                     ? 'bg-red-100 text-red-600 hover:bg-red-200'
                                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                            }`}
+                                }`}
                             title={isLiked ? 'إزالة الإعجاب' : 'إعجاب'}
                         >
                             <FaHeart className={isLiked ? 'fill-current' : ''} />
-                            <span className="text-sm">{publication.likes_count || 0}</span>
+                            <span>{publication.likes_count || 0}</span>
                         </button>
                     </div>
                 </div>
@@ -193,163 +196,168 @@ export default function PublicationsIndex({ auth, publications, filters }) {
         );
     };
 
-    return (
-        <MainLayout auth={auth}>
-            <Head title="الإصدارات - إرث المبتكرين" />
-
-            <div className="min-h-screen bg-gray-50" dir="rtl">
-                {/* Header */}
-                <div className="bg-white border-b border-gray-200">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <Link
-                                    href="/"
-                                    className="text-gray-600 hover:text-legacy-green transition"
-                                >
-                                    <FaArrowLeft className="text-xl" />
-                                </Link>
-                                <h1 className="text-3xl font-bold text-legacy-green">الإصدارات</h1>
-                            </div>
-                        </div>
+    const PublicationsContent = () => (
+        <div className="space-y-4">
+            {/* Search and Filters */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                    <div className="flex-1 relative">
+                        <input
+                            type="text"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                            placeholder="البحث عن الإصدارات..."
+                            className="w-full h-10 pr-10 pl-4 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042]"
+                        />
+                        <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
                     </div>
-                </div>
-
-                {/* Search and Filters */}
-                <div className="bg-white border-b border-gray-200">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                        <div className="flex flex-col md:flex-row gap-4">
-                            <div className="flex-1 relative">
-                                <input
-                                    type="text"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                                    placeholder="البحث عن الإصدارات..."
-                                    className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-legacy-green focus:border-legacy-green"
-                                />
-                                <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                            </div>
-                            <select
-                                value={selectedType}
-                                onChange={(e) => setSelectedType(e.target.value)}
-                                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-legacy-green focus:border-legacy-green"
-                            >
-                                <option value="">جميع الأنواع</option>
-                                <option value="magazine">مجلة</option>
-                                <option value="booklet">كتيب</option>
-                                <option value="report">تقرير</option>
-                            </select>
-                            <button
-                                onClick={handleSearch}
-                                className="px-6 py-2 bg-gradient-to-r from-legacy-green to-legacy-blue text-white rounded-lg hover:opacity-90 transition"
-                            >
-                                بحث
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Green Promotional Banner */}
-                <div className="bg-gradient-to-r from-legacy-green/20 to-legacy-green/10 border-b border-legacy-green/20">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                        <p className="text-legacy-green text-center md:text-right text-lg leading-relaxed">
-                            اكتشف محتوى مبتكر من الطلاب والمعلمين: مجلات، كتيبات وتقارير تعرض إبداع مؤسسات تعليميةنا.
-                            <span className="block mt-2 font-semibold">"اقرأ، تعلم، واستلهم من تجارب المبدعين حولك!"</span>
-                        </p>
-                    </div>
-                </div>
-
-                {/* Publications Content */}
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    {publications.data && publications.data.length > 0 ? (
-                        <>
-                            {/* Magazines Section */}
-                            {magazines.length > 0 && (
-                                <div className="mb-12">
-                                    <div className="flex items-center gap-3 mb-6">
-                                        <FaNewspaper className="text-2xl text-gray-700" />
-                                        <h2 className="text-2xl font-bold text-gray-900">مجلة إرث المبتكرين</h2>
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                        {magazines.map(renderPublicationCard)}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Booklets Section */}
-                            {booklets.length > 0 && (
-                                <div className="mb-12">
-                                    <div className="flex items-center gap-3 mb-6">
-                                        <FaBook className="text-2xl text-gray-700" />
-                                        <h2 className="text-2xl font-bold text-gray-900">كتيبات إبداعية</h2>
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                        {booklets.map(renderPublicationCard)}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Reports Section */}
-                            {reports.length > 0 && (
-                                <div className="mb-12">
-                                    <div className="flex items-center gap-3 mb-6">
-                                        <FaFileAlt className="text-2xl text-gray-700" />
-                                        <h2 className="text-2xl font-bold text-gray-900">تقارير</h2>
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                        {reports.map(renderPublicationCard)}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Articles Section */}
-                            {articles.length > 0 && (
-                                <div className="mb-12">
-                                    <div className="flex items-center gap-3 mb-6">
-                                        <FaFileAlt className="text-2xl text-gray-700" />
-                                        <h2 className="text-2xl font-bold text-gray-900">مقالات</h2>
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                        {articles.map(renderPublicationCard)}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* If no specific type matches, show all */}
-                            {magazines.length === 0 && booklets.length === 0 && reports.length === 0 && articles.length === 0 && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {publications.data.map(renderPublicationCard)}
-                                </div>
-                            )}
-                        </>
-                    ) : (
-                        <div className="text-center py-12">
-                            <p className="text-gray-500 text-lg">لا توجد إصدارات متاحة حالياً</p>
-                        </div>
-                    )}
-
-                    {/* Pagination */}
-                    {publications.links && publications.links.length > 3 && (
-                        <div className="mt-8 flex justify-center">
-                            <div className="flex gap-2">
-                                {publications.links.map((link, index) => (
-                                    <Link
-                                        key={index}
-                                        href={link.url || '#'}
-                                        className={`px-4 py-2 rounded-lg ${
-                                            link.active
-                                                ? 'bg-gradient-to-r from-legacy-green to-legacy-blue text-white'
-                                                : 'bg-white text-gray-700 hover:bg-gray-100'
-                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                        dangerouslySetInnerHTML={{ __html: link.label }}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                    <select
+                        value={selectedType}
+                        onChange={(e) => setSelectedType(e.target.value)}
+                        className="h-10 px-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042]"
+                    >
+                        <option value="">جميع الأنواع</option>
+                        <option value="magazine">مجلة</option>
+                        <option value="booklet">كتيب</option>
+                        <option value="report">تقرير</option>
+                    </select>
+                    <button
+                        type="button"
+                        onClick={handleSearch}
+                        className="h-10 px-4 bg-[#A3C042] text-white rounded-xl hover:bg-[#93b03a] transition font-bold text-sm"
+                    >
+                        بحث
+                    </button>
                 </div>
             </div>
-        </MainLayout>
+
+            {/* Publications Content */}
+            <div>
+                {publications.data && publications.data.length > 0 ? (
+                    <>
+                        {/* Magazines Section */}
+                        {magazines.length > 0 && (
+                            <div className="mb-6">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <FaNewspaper className="text-lg text-gray-700" />
+                                    <h2 className="text-lg font-bold text-gray-900">مجلة إرث المبتكرين</h2>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                    {magazines.map(renderPublicationCard)}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Booklets Section */}
+                        {booklets.length > 0 && (
+                            <div className="mb-6">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <FaBook className="text-lg text-gray-700" />
+                                    <h2 className="text-lg font-bold text-gray-900">كتيبات إبداعية</h2>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                    {booklets.map(renderPublicationCard)}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Reports Section */}
+                        {reports.length > 0 && (
+                            <div className="mb-6">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <FaFileAlt className="text-lg text-gray-700" />
+                                    <h2 className="text-lg font-bold text-gray-900">تقارير</h2>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                    {reports.map(renderPublicationCard)}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Articles Section */}
+                        {articles.length > 0 && (
+                            <div className="mb-6">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <FaFileAlt className="text-lg text-gray-700" />
+                                    <h2 className="text-lg font-bold text-gray-900">مقالات</h2>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                    {articles.map(renderPublicationCard)}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* If no specific type matches, show all */}
+                        {magazines.length === 0 && booklets.length === 0 && reports.length === 0 && articles.length === 0 && (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                {publications.data.map(renderPublicationCard)}
+                            </div>
+                        )}
+                    </>
+                ) : (
+                    <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
+                        <p className="text-sm text-gray-500">لا توجد إصدارات متاحة حالياً</p>
+                    </div>
+                )}
+
+                {/* Pagination */}
+                {publications.links && publications.links.length > 3 && (
+                    <div className="bg-white rounded-2xl border border-gray-100 p-3">
+                        <div className="flex flex-wrap gap-2 justify-center">
+                            {publications.links.map((link, index) => (
+                                <Link
+                                    key={index}
+                                    href={link.url || '#'}
+                                    className={`px-3 py-2 rounded-xl text-sm font-semibold transition ${link.active
+                                            ? 'bg-[#A3C042] text-white'
+                                            : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    dangerouslySetInnerHTML={{ __html: link.label }}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+
+    return (
+        <div dir="rtl" className="min-h-screen bg-gray-50">
+            <Head title="الإصدارات - إرث المبتكرين" />
+
+            {/* Mobile View */}
+            <div className="block md:hidden">
+                <MobileAppLayout
+                    auth={auth}
+                    title="إرث المبتكرين"
+                    activeNav="explore"
+                    unreadCount={auth?.unreadCount || 0}
+                    onNotifications={() => router.visit('/notifications')}
+                    onBack={() => router.visit('/')}
+                >
+                    <PublicationsContent />
+                </MobileAppLayout>
+            </div>
+
+            {/* Desktop View */}
+            <div className="hidden md:block">
+                <MobileTopBar
+                    title="إرث المبتكرين"
+                    unreadCount={auth?.unreadCount || 0}
+                    onNotifications={() => router.visit('/notifications')}
+                    onBack={() => router.visit('/')}
+                    reverseOrder={false}
+                />
+                <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-4">
+                    <div className="mx-auto w-full max-w-4xl">
+                        <PublicationsContent />
+                    </div>
+                </main>
+                <MobileBottomNav active="explore" role={auth?.user?.role} isAuthed={!!auth?.user} user={auth?.user} />
+                <DesktopFooter auth={auth} />
+            </div>
+        </div>
     );
 }

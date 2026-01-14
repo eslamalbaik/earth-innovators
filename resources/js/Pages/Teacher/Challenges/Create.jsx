@@ -173,7 +173,7 @@ export default function TeacherChallengeCreate({ auth, school }) {
                                 value={data.objective}
                                 onChange={(e) => setData('objective', e.target.value)}
                                 rows={3}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-legacy-green focus:ring-legacy-green"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                                 required
                             />
                             <InputError message={errors.objective} className="mt-2" />
@@ -187,7 +187,7 @@ export default function TeacherChallengeCreate({ auth, school }) {
                                 value={data.description}
                                 onChange={(e) => setData('description', e.target.value)}
                                 rows={4}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-legacy-green focus:ring-legacy-green"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                                 required
                             />
                             <InputError message={errors.description} className="mt-2" />
@@ -215,7 +215,7 @@ export default function TeacherChallengeCreate({ auth, school }) {
                                 ) : (
                                     <div
                                         onClick={() => imageInputRef.current?.click()}
-                                        className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-legacy-green transition"
+                                        className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-[#A3C042] transition"
                                     >
                                         <FaImage className="mx-auto text-gray-400 text-4xl mb-2" />
                                         <p className="text-gray-600">انقر لرفع صورة</p>
@@ -242,7 +242,7 @@ export default function TeacherChallengeCreate({ auth, school }) {
                                 value={data.instructions}
                                 onChange={(e) => setData('instructions', e.target.value)}
                                 rows={4}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-legacy-green focus:ring-legacy-green"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                                 required
                             />
                             <InputError message={errors.instructions} className="mt-2" />
@@ -255,7 +255,7 @@ export default function TeacherChallengeCreate({ auth, school }) {
                                 id="challenge_type"
                                 value={data.challenge_type}
                                 onChange={(e) => setData('challenge_type', e.target.value)}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-legacy-green focus:ring-legacy-green"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                                 required
                             >
                                 {challengeTypes.map((type) => (
@@ -274,7 +274,7 @@ export default function TeacherChallengeCreate({ auth, school }) {
                                 id="category"
                                 value={data.category}
                                 onChange={(e) => setData('category', e.target.value)}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-legacy-green focus:ring-legacy-green"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                                 required
                             >
                                 {categories.map((cat) => (
@@ -293,7 +293,7 @@ export default function TeacherChallengeCreate({ auth, school }) {
                                 id="age_group"
                                 value={data.age_group}
                                 onChange={(e) => setData('age_group', e.target.value)}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-legacy-green focus:ring-legacy-green"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                                 required
                             >
                                 {ageGroups.map((age) => (
@@ -368,7 +368,7 @@ export default function TeacherChallengeCreate({ auth, school }) {
                                 id="status"
                                 value={data.status}
                                 onChange={(e) => setData('status', e.target.value)}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-legacy-green focus:ring-legacy-green"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                             >
                                 <option value="draft">مسودة</option>
                                 <option value="active">نشط</option>

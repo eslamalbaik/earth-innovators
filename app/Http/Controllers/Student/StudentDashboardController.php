@@ -32,6 +32,26 @@ class StudentDashboardController extends Controller
 
             // Get recent badges
             $recentBadges = $activityService->getRecentBadges($user->id, 3);
+
+            // Get active challenges for student's school
+            $activeChallenges = [];
+            if ($user->school_id) {
+                $challengeService = app(\App\Services\ChallengeSubmissionService::class);
+                $challenges = $challengeService->getActiveChallengesForStudent($user->school_id, 2);
+                
+                // Load student submissions for each challenge
+                $challengeIds = $challenges->pluck('id');
+                $submissions = \App\Models\ChallengeSubmission::whereIn('challenge_id', $challengeIds)
+                    ->where('student_id', $user->id)
+                    ->get()
+                    ->keyBy('challenge_id');
+                
+                // Attach submission status to each challenge
+                $activeChallenges = $challenges->getCollection()->map(function ($challenge) use ($submissions) {
+                    $challenge->has_submission = $submissions->has($challenge->id);
+                    return $challenge;
+                })->toArray();
+            }
         } catch (\Exception $e) {
             // Fallback if services fail
             $stats = [
@@ -45,6 +65,7 @@ class StudentDashboardController extends Controller
             ];
             $activities = collect([]);
             $recentBadges = collect([]);
+            $activeChallenges = [];
         }
 
         // Get school info
@@ -76,9 +97,15 @@ class StudentDashboardController extends Controller
             'id' => $school->id,
             'name' => $school->name,
         ] : null;
+        $stats['activeChallenges'] = $activeChallenges;
+
+        // Calculate community score percentage (based on points, max 100 points = 100%)
+        $maxPoints = 100;
+        $communityScorePercent = min(100, max(0, round(($stats['totalPoints'] ?? 0) / $maxPoints * 100)));
 
         return Inertia::render('Student/Dashboard', [
             'stats' => $stats,
+            'communityScorePercent' => $communityScorePercent,
         ]);
     }
 }

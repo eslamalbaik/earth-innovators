@@ -477,19 +477,19 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                         <table className="min-w-full divide-y divide-gray-200">
                                             <thead className="bg-gray-50">
                                                 <tr>
-                                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                         الطالب
                                                     </th>
-                                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                         تاريخ التقديم
                                                     </th>
-                                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                         الحالة
                                                     </th>
-                                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                         التقييم
                                                     </th>
-                                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                         الإجراءات
                                                     </th>
                                                 </tr>
@@ -588,7 +588,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                     </div>
 
                     {/* Center - النص */}
-                    <div className="flex-1 text-center md:text-right">
+                    <div className="flex-1 text-center md:">
                         <h3 className="text-2xl font-bold mb-2">قم بتحفيز طلابك اليوم!</h3>
                         <p className="text-purple-100 text-sm md:text-base">
                             أفادت الدراسات أن المسابقات الودية تزيد من معدل إنتاجية الابتكار بنسبة 40%. اختر موضوعًا شيقًا وابدأ التحدي الآن.

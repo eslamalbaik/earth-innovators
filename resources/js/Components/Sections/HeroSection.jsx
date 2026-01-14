@@ -12,7 +12,7 @@ export default function HeroSection({
     };
 
     return (
-        <section className="relative min-h-screen px-24 flex items-center overflow-hidden bg-gradient-to-br from-legacy-green/10 via-white to-legacy-blue/10">
+        <section className="relative min-h-screen px-24 flex items-center overflow-hidden bg-gradient-to-br from-[#A3C042]/10 via-white to-legacy-blue/10">
             {/* Background decorative elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 {/* Dotted lines and arrows */}
@@ -36,13 +36,13 @@ export default function HeroSection({
                 </div>
 
                 {/* Large green/blue play button/arrow shape */}
-                <div className="absolute top-32 left-32 w-32 h-32 bg-legacy-green rounded-full opacity-10 transform rotate-45"></div>
+                <div className="absolute top-32 left-32 w-32 h-32 bg-[#A3C042] rounded-full opacity-10 transform rotate-45"></div>
                 <div className="absolute top-36 left-36 w-24 h-24 bg-legacy-blue rounded-full opacity-15 transform rotate-45"></div>
 
                 {/* Small decorative dots */}
-                <div className="absolute top-1/4 left-1/3 w-2 h-2 bg-legacy-green rounded-full"></div>
+                <div className="absolute top-1/4 left-1/3 w-2 h-2 bg-[#A3C042] rounded-full"></div>
                 <div className="absolute top-1/3 left-1/4 w-2 h-2 bg-legacy-blue rounded-full"></div>
-                <div className="absolute top-1/5 right-1/4 w-2 h-2 bg-legacy-green rounded-full"></div>
+                <div className="absolute top-1/5 right-1/4 w-2 h-2 bg-[#A3C042] rounded-full"></div>
                 <div className="absolute top-2/5 right-1/3 w-2 h-2 bg-legacy-blue rounded-full"></div>
             </div>
 
@@ -51,12 +51,12 @@ export default function HeroSection({
                     {/* Left side - Text and CTA Button */}
                     <div className="space-y-8 order-1 lg:order-1">
                         {/* Top small text */}
-                        <div className="text-legacy-green text-lg font-medium">
+                        <div className="text-[#A3C042] text-lg font-medium">
                             كل ما عليك هو التعلم
                         </div>
 
                         {/* Main headline */}
-                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-legacy-green to-legacy-blue bg-clip-text text-transparent leading-tight">
+                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-[#A3C042] to-legacy-blue bg-clip-text text-transparent leading-tight">
                             {title}
                         </h1>
 
@@ -69,7 +69,7 @@ export default function HeroSection({
                         <div className="mt-8">
                             <button
                                 onClick={handleStartJourney}
-                                className="bg-gradient-to-r from-legacy-green to-legacy-blue hover:from-primary-600 hover:to-blue-700 text-white px-12 py-4 rounded-xl font-semibold text-lg transition duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                                className="bg-gradient-to-r from-[#A3C042] to-legacy-blue hover:from-primary-600 hover:to-blue-700 text-white px-12 py-4 rounded-xl font-semibold text-lg transition duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
                             >
                                 ابدأ رحلتك معنا
                             </button>
@@ -89,43 +89,43 @@ export default function HeroSection({
                 </div>
 
                 {/* Statistics at the bottom */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16 pt-12 border-t border-legacy-green/20">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16 pt-12 border-t border-[#A3C042]/20">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-legacy-green/20 to-legacy-blue/20 rounded-full flex items-center justify-center">
-                            <FaProjectDiagram className="text-legacy-green text-xl" />
+                        <div className="w-12 h-12 bg-gradient-to-br from-[#A3C042]/20 to-legacy-blue/20 rounded-full flex items-center justify-center">
+                            <FaProjectDiagram className="text-[#A3C042] text-xl" />
                         </div>
                         <div>
-                            <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-legacy-green to-legacy-blue bg-clip-text text-transparent">٣٢ ألف</div>
+                            <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#A3C042] to-legacy-blue bg-clip-text text-transparent">٣٢ ألف</div>
                             <div className="text-sm text-gray-700">ساعة تعليمية</div>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-legacy-green/20 to-legacy-blue/20 rounded-full flex items-center justify-center">
+                        <div className="w-12 h-12 bg-gradient-to-br from-[#A3C042]/20 to-legacy-blue/20 rounded-full flex items-center justify-center">
                             <FaTrophy className="text-legacy-blue text-xl" />
                         </div>
                         <div>
-                            <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-legacy-green to-legacy-blue bg-clip-text text-transparent">٣.٤ ألف</div>
+                            <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#A3C042] to-legacy-blue bg-clip-text text-transparent">٣.٤ ألف</div>
                             <div className="text-sm text-gray-700">درس</div>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-legacy-green/20 to-legacy-blue/20 rounded-full flex items-center justify-center">
-                            <FaUsers className="text-legacy-green text-xl" />
+                        <div className="w-12 h-12 bg-gradient-to-br from-[#A3C042]/20 to-legacy-blue/20 rounded-full flex items-center justify-center">
+                            <FaUsers className="text-[#A3C042] text-xl" />
                         </div>
                         <div>
-                            <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-legacy-green to-legacy-blue bg-clip-text text-transparent">١٣٥.١ ألف</div>
+                            <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#A3C042] to-legacy-blue bg-clip-text text-transparent">١٣٥.١ ألف</div>
                             <div className="text-sm text-gray-700">طالب</div>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-legacy-green/20 to-legacy-blue/20 rounded-full flex items-center justify-center">
+                        <div className="w-12 h-12 bg-gradient-to-br from-[#A3C042]/20 to-legacy-blue/20 rounded-full flex items-center justify-center">
                             <FaProjectDiagram className="text-legacy-blue text-xl" />
                         </div>
                         <div>
-                            <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-legacy-green to-legacy-blue bg-clip-text text-transparent">٣١٧</div>
+                            <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#A3C042] to-legacy-blue bg-clip-text text-transparent">٣١٧</div>
                             <div className="text-sm text-gray-700">كورس</div>
                         </div>
                     </div>
