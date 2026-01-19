@@ -39,7 +39,6 @@ export default function AdminPackagesIndex({ packages, stats }) {
                     router.reload({ only: ['packages', 'stats'] });
                 },
                 onError: (errors) => {
-                    console.error('Delete error:', errors);
                     alert('حدث خطأ أثناء حذف الباقة: ' + (errors.message || 'خطأ غير معروف'));
                     setIsDeleting(false);
                 },

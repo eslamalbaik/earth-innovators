@@ -102,7 +102,7 @@ export default function TeacherDashboardLegacy({ auth, stats = {} }) {
                                 مشاريع تحتاج المراجعة
                             </h3>
                             <Link href="/teacher/projects/pending" className="text-[#A3C042] hover:text-legacy-blue text-sm font-medium">
-                                عرض الكل →
+                                عرض الكل
                             </Link>
                         </div>
                     </div>
@@ -142,7 +142,7 @@ export default function TeacherDashboardLegacy({ auth, stats = {} }) {
                                 تحدياتي
                             </h3>
                             <Link href="/teacher/challenges" className="text-[#A3C042] hover:text-legacy-blue text-sm font-medium">
-                                عرض الكل →
+                                عرض الكل
                             </Link>
                         </div>
                     </div>

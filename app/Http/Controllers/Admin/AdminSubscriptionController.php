@@ -11,14 +11,9 @@ use Illuminate\Support\Facades\DB;
 
 class AdminSubscriptionController extends Controller
 {
-    /**
-     * عرض صفحة الاشتراكات والمدفوعات
-     */
     public function index(Request $request)
     {
-        $type = $request->get('type', 'subscriptions'); // subscriptions or payments
-
-        // الاشتراكات (UserPackages)
+        $type = $request->get('type', 'subscriptions');
         $subscriptions = UserPackage::with(['user:id,name,email', 'package:id,name_ar,price,currency'])
             ->when($request->filled('search'), function ($q) use ($request) {
                 $search = $request->search;
@@ -65,7 +60,6 @@ class AdminSubscriptionController extends Controller
                 ];
             });
 
-        // المدفوعات (Payments)
         $payments = Payment::with([
             'student:id,name,email',
             'teacher:id,name_ar,user_id',
@@ -119,7 +113,6 @@ class AdminSubscriptionController extends Controller
                 ];
             });
 
-        // إحصائيات الاشتراكات
         $subscriptionStats = [
             'total' => UserPackage::count(),
             'active' => UserPackage::where('status', 'active')->count(),
@@ -129,7 +122,6 @@ class AdminSubscriptionController extends Controller
             'auto_renew_count' => UserPackage::where('auto_renew', true)->where('status', 'active')->count(),
         ];
 
-        // إحصائيات المدفوعات
         $paymentStats = [
             'total' => Payment::count(),
             'completed' => Payment::where('status', 'completed')->count(),
@@ -140,7 +132,6 @@ class AdminSubscriptionController extends Controller
             'pending_amount' => (float) Payment::where('status', 'pending')->sum('amount'),
         ];
 
-        // إحصائيات إجمالية
         $totalStats = [
             'total_subscriptions' => $subscriptionStats['total'],
             'total_payments' => $paymentStats['total'],

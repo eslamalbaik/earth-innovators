@@ -11,12 +11,8 @@ use Inertia\Inertia;
 
 class AdminPermissionsController extends Controller
 {
-    /**
-     * عرض صفحة إدارة الصلاحيات
-     */
     public function index(Request $request)
     {
-        // الحصول على جميع مستخدمي الإدارة (مشرفو النظام، منسقو دعم المؤسسات تعليمية، والمدراء)
         $adminUsers = User::whereIn('role', ['admin', 'system_supervisor', 'school_support_coordinator'])
             ->select('id', 'name', 'email', 'phone', 'role', 'created_at', 'email_verified_at')
             ->when($request->filled('search'), function ($q) use ($request) {
@@ -45,7 +41,6 @@ class AdminPermissionsController extends Controller
                 ];
             });
 
-        // الإحصائيات
         $stats = [
             'system_supervisors' => User::where('role', 'system_supervisor')->count(),
             'school_support_coordinators' => User::where('role', 'school_support_coordinator')->count(),
@@ -105,12 +100,8 @@ class AdminPermissionsController extends Controller
             ->with('success', 'تم إضافة المستخدم الإداري بنجاح');
     }
 
-    /**
-     * عرض نموذج تعديل مستخدم إداري
-     */
     public function edit(User $user)
     {
-        // التأكد من أن المستخدم هو مستخدم إداري
         if (!in_array($user->role, ['admin', 'system_supervisor', 'school_support_coordinator'])) {
             abort(404);
         }
@@ -126,17 +117,12 @@ class AdminPermissionsController extends Controller
         ]);
     }
 
-    /**
-     * تحديث مستخدم إداري
-     */
     public function update(Request $request, User $user)
     {
-        // التأكد من أن المستخدم هو مستخدم إداري
         if (!in_array($user->role, ['admin', 'system_supervisor', 'school_support_coordinator'])) {
             abort(404);
         }
 
-        // منع المستخدم من تعديل صلاحياته الخاصة
         if ($user->id === auth()->id() && $request->role !== $user->role) {
             return back()->withErrors([
                 'role' => 'لا يمكنك تعديل صلاحياتك الخاصة'
@@ -178,17 +164,15 @@ class AdminPermissionsController extends Controller
             ->with('success', 'تم تحديث المستخدم الإداري بنجاح');
     }
 
-    /**
+
      * حذف مستخدم إداري
      */
     public function destroy(User $user)
     {
-        // التأكد من أن المستخدم هو مستخدم إداري
         if (!in_array($user->role, ['admin', 'system_supervisor', 'school_support_coordinator'])) {
             abort(404);
         }
 
-        // منع حذف المستخدم الحالي
         if ($user->id === auth()->id()) {
             return back()->with('error', 'لا يمكنك حذف حسابك الخاص');
         }

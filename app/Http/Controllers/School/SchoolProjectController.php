@@ -217,21 +217,22 @@ class SchoolProjectController extends Controller
         \App\Jobs\SendNewProjectNotification::dispatch($project);
 
         // منح نقاط للطالب أو المعلم
+        $pointsService = app(\App\Services\PointsService::class);
         $user = $project->user;
+        
         if ($user && $user->role === 'student') {
             $pointsToAdd = 10; // نقاط عند قبول المشروع
-            $user->increment('points', $pointsToAdd);
+            // Use PointsService for proper integration
+            $pointsService->awardPoints(
+                $user->id,
+                $pointsToAdd,
+                'project_approval',
+                $project->id,
+                "Project approved: {$project->title}",
+                "تم قبول المشروع: {$project->title}"
+            );
 
-            // تسجيل النقاط في التاريخ
-            \App\Models\Point::create([
-                'user_id' => $user->id,
-                'points' => $pointsToAdd,
-                'type' => 'earned',
-                'source' => 'project_approval',
-                'source_id' => $project->id,
-                'description' => 'تم قبول المشروع: ' . $project->title,
-                'description_ar' => 'تم قبول المشروع: ' . $project->title,
-            ]);
+            // Note: PointsService handles Point::create and user->increment automatically
 
             $project->update(['points_earned' => $pointsToAdd]);
         } elseif ($project->teacher_id) {
@@ -239,17 +240,16 @@ class SchoolProjectController extends Controller
             $teacher = User::find($project->teacher_id);
             if ($teacher) {
                 $pointsToAdd = 15; // نقاط أكثر للمعلم
-                $teacher->increment('points', $pointsToAdd);
-
-                \App\Models\Point::create([
-                    'user_id' => $teacher->id,
-                    'points' => $pointsToAdd,
-                    'type' => 'earned',
-                    'source' => 'teacher_project_approval',
-                    'source_id' => $project->id,
-                    'description' => 'تم قبول مشروع المعلم: ' . $project->title,
-                    'description_ar' => 'تم قبول مشروع المعلم: ' . $project->title,
-                ]);
+                
+                // Use PointsService for proper integration
+                $pointsService->awardPoints(
+                    $teacher->id,
+                    $pointsToAdd,
+                    'teacher_project_approval',
+                    $project->id,
+                    "Teacher project approved: {$project->title}",
+                    "موافقة على مشروع المعلم: {$project->title}"
+                );
             }
         }
 

@@ -148,8 +148,6 @@ export default function StudentChallengeShow({ auth, challenge }) {
                 router.reload();
             },
             onError: (errors) => {
-                console.error('Submission errors:', errors);
-                // Show first error to user
                 const firstError = Object.values(errors)[0];
                 if (firstError) {
                     alert(Array.isArray(firstError) ? firstError[0] : firstError);

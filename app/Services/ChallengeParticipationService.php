@@ -77,6 +77,7 @@ class ChallengeParticipationService extends BaseService
                 'challenge_id' => $challengeId,
                 'user_id' => $userId,
                 'status' => 'joined',
+                'participation_type' => 'optional', // Default to optional when student joins voluntarily
                 'points_earned' => 0,
                 'joined_at' => now(),
             ]);

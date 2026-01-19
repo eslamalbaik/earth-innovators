@@ -19,7 +19,6 @@ const parseJsonArray = (value) => {
                 const parsed = JSON.parse(trimmed);
                 return Array.isArray(parsed) ? parsed : [];
             } catch (error) {
-                console.warn('Failed to parse JSON array', value, error);
             }
         }
 

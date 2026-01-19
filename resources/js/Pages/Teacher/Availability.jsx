@@ -45,7 +45,6 @@ export default function Availability({ auth, availabilities, subjects = [], filt
 
     const handleAddSubmit = (e) => {
         e.preventDefault();
-        console.log('Submitting data:', addData);
         addPost('/teacher/availability', {
             onSuccess: () => {
                 resetAddForm();
@@ -54,7 +53,6 @@ export default function Availability({ auth, availabilities, subjects = [], filt
                 showToast('تم إضافة الموعد بنجاح', 'success');
             },
             onError: (errors) => {
-                console.error('Errors:', errors);
                 const errorMessage = errors.message || Object.values(errors).flat().join(', ') || 'حدث خطأ أثناء إضافة الموعد';
                 showToast(errorMessage, 'error');
             },
@@ -82,7 +80,6 @@ export default function Availability({ auth, availabilities, subjects = [], filt
                 showToast('تم تحديث الموعد بنجاح', 'success');
             },
             onError: (errors) => {
-                console.error('Errors:', errors);
                 const errorMessage = errors.message || Object.values(errors).flat().join(', ') || 'حدث خطأ أثناء تحديث الموعد';
                 showToast(errorMessage, 'error');
             },

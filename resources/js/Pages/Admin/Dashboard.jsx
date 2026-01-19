@@ -151,7 +151,6 @@ export default function AdminDashboard({
         const yearInt = parseInt(year);
         if (isNaN(yearInt)) {
             setError('سنة غير صحيحة');
-            console.error('Invalid year:', year);
             return;
         }
 
@@ -160,7 +159,6 @@ export default function AdminDashboard({
         setError(null);
 
         try {
-            // Ensure CSRF token is set
             const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
             if (token) {
                 axios.defaults.headers.common['X-CSRF-TOKEN'] = token;
@@ -185,10 +183,8 @@ export default function AdminDashboard({
             } else {
                 const errorMsg = 'بيانات غير صحيحة من الخادم';
                 setError(errorMsg);
-                console.error('Invalid response data:', response.data);
             }
         } catch (error) {
-            console.error('Error fetching chart data:', error);
             let errorMsg = 'حدث خطأ أثناء جلب البيانات';
 
             if (error.response) {
@@ -199,14 +195,10 @@ export default function AdminDashboard({
                 } else if (error.response.data && error.response.data.error) {
                     errorMsg = error.response.data.error;
                 }
-                console.error('Response status:', error.response.status);
-                console.error('Response data:', error.response.data);
             } else if (error.request) {
                 errorMsg = 'لا يوجد اتصال بالخادم';
-                console.error('No response received:', error.request);
             } else {
                 errorMsg = error.message || 'خطأ غير معروف';
-                console.error('Error setting up request:', error.message);
             }
 
             setError(errorMsg);
@@ -361,7 +353,7 @@ export default function AdminDashboard({
     }), [currentYear]);
 
     return (
-        <DashboardLayout header="لوحة التحكم - أرث مبتكرين">
+        <DashboardLayout header="لوحة التحكم">
             <Head title="لوحة التحكم" />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {/* إجمالي المشاريع */}
@@ -432,7 +424,7 @@ export default function AdminDashboard({
                     </div>
                 </div>
             </div>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="">
                 {/* مؤشر تفاعل الطلاب - في الأعلى */}
                 <div className="mb-8">
                     <UserEngagementCard
@@ -515,7 +507,7 @@ export default function AdminDashboard({
                         href={route('admin.projects.index')}
                         className="text-blue-600 hover:text-blue-700 text-sm font-semibold"
                     >
-                        عرض الكل →
+                        عرض الكل
                     </Link>
                 </div>
                 <div className="overflow-x-auto">
@@ -583,7 +575,7 @@ export default function AdminDashboard({
                             href={route('payments.index')}
                             className="text-blue-600 hover:text-blue-700 text-sm font-semibold"
                         >
-                            عرض الكل →
+                            عرض الكل
                         </Link>
                     </div>
                     <div className="space-y-3">
@@ -631,7 +623,7 @@ export default function AdminDashboard({
                             href={route('admin.packages.index')}
                             className="text-blue-600 hover:text-blue-700 text-sm font-semibold"
                         >
-                            عرض الكل →
+                            عرض الكل
                         </Link>
                     </div>
                     <div className="space-y-3">
@@ -699,7 +691,7 @@ export default function AdminDashboard({
                             href={route('notifications.index')}
                             className="text-blue-600 hover:text-blue-700 text-sm font-semibold"
                         >
-                            عرض الكل →
+                            عرض الكل
                         </Link>
                     </div>
                 </div>

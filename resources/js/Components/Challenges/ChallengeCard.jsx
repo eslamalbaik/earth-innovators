@@ -9,9 +9,7 @@ export default function ChallengeCard({ challenge, user, participation = null, o
     const canJoin = user?.role === 'student' && !isParticipating && challenge.status === 'active';
     const [imageError, setImageError] = useState(false);
 
-    // Get image URL
     const getImageUrl = () => {
-        // Try image_url first (from accessor), then fallback to image
         const imagePath = challenge.image_url || challenge.image;
 
         if (!imagePath) return null;
@@ -25,7 +23,6 @@ export default function ChallengeCard({ challenge, user, participation = null, o
         return `/storage/${imagePath}`;
     };
 
-    // Calculate remaining time
     const getRemainingTime = () => {
         if (!challenge.deadline) return null;
 
@@ -47,7 +44,6 @@ export default function ChallengeCard({ challenge, user, participation = null, o
         }
     };
 
-    // Calculate progress percentage
     const getProgressPercentage = () => {
         if (!challenge.max_participants) return 0;
         return Math.min(100, (challenge.current_participants / challenge.max_participants) * 100);
@@ -59,66 +55,41 @@ export default function ChallengeCard({ challenge, user, participation = null, o
     const handleJoin = (e) => {
         e.preventDefault();
         e.stopPropagation();
-
-        // #region agent log
         fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ChallengeCard.jsx:59',message:'handleJoin called',data:{challengeId:challenge.id,userId:user?.id,userRole:user?.role},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-        // #endregion
-
         if (onJoin) {
             onJoin(challenge.id);
         } else {
-            // Use Inertia router to join and redirect to challenge page
-            // Check if user is student to use student route, otherwise use API
             if (user?.role === 'student') {
-                // #region agent log
                 fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ChallengeCard.jsx:69',message:'Posting to student join route',data:{url:`/student/challenges/${challenge.id}/join`},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-                // #endregion
 
                 router.post(`/student/challenges/${challenge.id}/join`, {}, {
                     preserveScroll: false,
                     preserveState: false,
                     onSuccess: (page) => {
-                        // #region agent log
                         fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ChallengeCard.jsx:78',message:'Join success callback',data:{pageUrl:page?.url,challengeId:challenge.id},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'C'})}).catch(()=>{});
-                        // #endregion
-
-                        // Check if we're already on the challenge page
                         const targetUrl = `/student/challenges/${challenge.id}`;
                         const currentUrl = window.location.pathname;
-
-                        // #region agent log
                         fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ChallengeCard.jsx:85',message:'Before redirect',data:{targetUrl,currentUrl,willRedirect:currentUrl !== targetUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'E'})}).catch(()=>{});
-                        // #endregion
 
-                        // Redirect to challenge page manually
                         if (currentUrl !== targetUrl) {
-                            // #region agent log
                             fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ChallengeCard.jsx:91',message:'Calling router.visit',data:{targetUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'F'})}).catch(()=>{});
-                            // #endregion
                             router.visit(targetUrl);
                         }
                     },
                     onError: (errors) => {
-                        // #region agent log
                         fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ChallengeCard.jsx:95',message:'Join error callback',data:{errors:JSON.stringify(errors)},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'D'})}).catch(()=>{});
-                        // #endregion
-                        console.error('Error joining challenge:', errors);
                     },
                     onFinish: () => {
-                        // #region agent log
                         fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ChallengeCard.jsx:101',message:'Join request finished',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'G'})}).catch(()=>{});
-                        // #endregion
                     },
                 });
             } else {
-                // Fallback to API for non-students (shouldn't happen, but just in case)
                 router.post(`/api/challenges/${challenge.id}/join`, {}, {
                     preserveScroll: true,
                     onSuccess: () => {
                         router.visit(`/challenges/${challenge.id}`);
                     },
                     onError: (errors) => {
-                        console.error('Error joining challenge:', errors);
                     },
                 });
             }
@@ -166,7 +137,6 @@ export default function ChallengeCard({ challenge, user, participation = null, o
                 href={`/challenges/${challenge.id}`}
                 className="block"
             >
-                {/* Challenge Image */}
                 {imageUrl && !imageError && (
                     <div className="w-full h-48 overflow-hidden bg-gray-100">
                         <img
@@ -179,7 +149,6 @@ export default function ChallengeCard({ challenge, user, participation = null, o
                 )}
 
                 <div className="p-6">
-                    {/* Header */}
                     <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center gap-2">
                             <FaTrophy className="text-yellow-600 text-xl" />
@@ -192,24 +161,20 @@ export default function ChallengeCard({ challenge, user, participation = null, o
                         )}
                     </div>
 
-                    {/* Title */}
                     <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition">
                         {challenge.title}
                     </h3>
 
-                    {/* Objective */}
                     {challenge.objective && (
                         <p className="text-gray-600 text-sm mb-2">
                             <span className="font-semibold">الهدف:</span> {challenge.objective}
                         </p>
                     )}
 
-                    {/* Description */}
                     <p className="text-gray-600 text-sm mb-4 line-clamp-2">
                         {challenge.description}
                     </p>
 
-                    {/* Progress Bar */}
                     {challenge.max_participants && (
                         <div className="mb-4">
                             <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
@@ -225,7 +190,6 @@ export default function ChallengeCard({ challenge, user, participation = null, o
                         </div>
                     )}
 
-                    {/* Footer Info */}
                     <div className="flex items-center justify-between text-sm text-gray-500 pt-4 border-t border-gray-200 mb-4">
                         <div className="flex items-center gap-2">
                             <FaGraduationCap className="text-gray-400" />
@@ -239,7 +203,6 @@ export default function ChallengeCard({ challenge, user, participation = null, o
                         )}
                     </div>
 
-                    {/* Points Reward */}
                     {challenge.points_reward > 0 && (
                         <div className="mb-4">
                             <div className="inline-flex items-center gap-2 px-3 py-1 bg-yellow-50 border border-yellow-200 rounded-full">
@@ -253,7 +216,6 @@ export default function ChallengeCard({ challenge, user, participation = null, o
                 </div>
             </Link>
 
-            {/* Join Button */}
             {canJoin && (
                 <div className="px-6 pb-6">
                     <PrimaryButton
@@ -265,7 +227,6 @@ export default function ChallengeCard({ challenge, user, participation = null, o
                 </div>
             )}
 
-            {/* Already Participating */}
             {isParticipating && !isCompleted && (
                 <div className="px-6 pb-6">
                     <Link
@@ -277,7 +238,6 @@ export default function ChallengeCard({ challenge, user, participation = null, o
                 </div>
             )}
 
-            {/* Completed */}
             {isCompleted && (
                 <div className="px-6 pb-6">
                     <div className="flex items-center justify-between">

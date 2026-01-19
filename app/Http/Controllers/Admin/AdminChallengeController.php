@@ -17,20 +17,16 @@ class AdminChallengeController extends Controller
     public function __construct(
         private ChallengeService $challengeService
     ) {}
-    /**
-     * عرض جميع التحديات
-     * PERFORMANCE OPTIMIZED: Reduced query size, cached stats, selective field loading
-     */
+
     public function index(Request $request)
     {
-        // Only fetch required fields - significantly reduces payload size
         $challenges = Challenge::select([
             'id', 'title', 'objective', 'description', 'instructions', 
             'challenge_type', 'category', 'age_group', 'status',
             'school_id', 'created_by', 'start_date', 'deadline',
             'points_reward', 'max_participants', 'current_participants', 'created_at'
         ])
-            ->with(['school:id,name', 'creator:id,name']) // Only load needed relations with minimal fields
+            ->with(['school:id,name', 'creator:id,name'])
             ->when($request->filled('search'), function ($q) use ($request) {
                 $search = $request->search;
                 $q->where(function ($query) use ($search) {
@@ -77,7 +73,6 @@ class AdminChallengeController extends Controller
                 ];
             });
 
-        // Cache stats for 5 minutes to avoid repeated queries
         $stats = \Illuminate\Support\Facades\Cache::remember('admin_challenge_stats', 300, function () {
             return [
                 'total' => Challenge::count(),
@@ -88,7 +83,6 @@ class AdminChallengeController extends Controller
             ];
         });
 
-        // Only fetch schools if not doing a partial reload
         $schools = [];
         if (!$request->has('only') || in_array('schools', explode(',', $request->get('only')))) {
             $schools = User::where('role', 'school')
@@ -97,7 +91,6 @@ class AdminChallengeController extends Controller
                 ->get();
         }
 
-        // Cache analytics data for 5 minutes
         $analytics = [];
         if (!$request->has('only') || in_array('analytics', explode(',', $request->get('only')))) {
             $analytics = \Illuminate\Support\Facades\Cache::remember('admin_challenge_analytics', 300, function () {
@@ -138,32 +131,68 @@ class AdminChallengeController extends Controller
      */
     public function store(StoreChallengeRequest $request)
     {
-        $data = $request->validated();
-        $data['created_by'] = auth()->id();
-        $data['status'] = $data['status'] ?? 'draft';
-        $data['current_participants'] = 0;
-        
-        // Convert date strings to datetime
-        if (isset($data['start_date']) && !str_contains($data['start_date'], ' ')) {
-            $data['start_date'] = $data['start_date'] . ' 00:00:00';
-        }
-        if (isset($data['deadline']) && !str_contains($data['deadline'], ' ')) {
-            $data['deadline'] = $data['deadline'] . ' 23:59:59';
-        }
-        
-        // Convert max_participants to null if empty
-        if (isset($data['max_participants']) && $data['max_participants'] === '') {
-            $data['max_participants'] = null;
-        }
-
         try {
-            // Use ChallengeService to ensure cache is cleared properly
-            $challenge = $this->challengeService->createChallenge($data);
+            $data = $request->validated();
             
-            // Clear cache for the school if school_id is set
-            if ($challenge->school_id) {
-                $this->challengeService->clearChallengeCache($challenge->school_id, $challenge->created_by);
+            Log::info('Admin challenge store - validated data', [
+                'data_keys' => array_keys($data),
+                'has_image' => isset($data['image']),
+                'image_type' => isset($data['image']) ? gettype($data['image']) : null,
+            ]);
+            
+            $data['created_by'] = auth()->id();
+            $data['status'] = $data['status'] ?? 'draft';
+            $data['current_participants'] = 0;
+            
+            // Handle date formatting
+            if (isset($data['start_date'])) {
+                if (!str_contains($data['start_date'], ' ')) {
+                    $data['start_date'] = $data['start_date'] . ' 00:00:00';
+                }
+                // Ensure it's a valid datetime
+                try {
+                    $data['start_date'] = \Carbon\Carbon::parse($data['start_date'])->format('Y-m-d H:i:s');
+                } catch (\Exception $e) {
+                    Log::warning('Invalid start_date format', ['start_date' => $data['start_date']]);
+                }
             }
+            
+            if (isset($data['deadline'])) {
+                if (!str_contains($data['deadline'], ' ')) {
+                    $data['deadline'] = $data['deadline'] . ' 23:59:59';
+                }
+                // Ensure it's a valid datetime
+                try {
+                    $data['deadline'] = \Carbon\Carbon::parse($data['deadline'])->format('Y-m-d H:i:s');
+                } catch (\Exception $e) {
+                    Log::warning('Invalid deadline format', ['deadline' => $data['deadline']]);
+                }
+            }
+            
+            // Handle nullable fields
+            if (isset($data['max_participants']) && ($data['max_participants'] === '' || $data['max_participants'] === null)) {
+                $data['max_participants'] = null;
+            }
+            
+            if (isset($data['school_id']) && ($data['school_id'] === '' || $data['school_id'] === null)) {
+                $data['school_id'] = null;
+            }
+            
+            // Ensure points_reward is set
+            if (!isset($data['points_reward']) || $data['points_reward'] === '') {
+                $data['points_reward'] = 0;
+            }
+
+            // Handle image - keep it as is, service will handle it
+            if (isset($data['image']) && empty($data['image']) && !($data['image'] instanceof \Illuminate\Http\UploadedFile)) {
+                unset($data['image']);
+            }
+
+            Log::info('Admin challenge store - calling service', [
+                'data_keys' => array_keys($data),
+            ]);
+
+            $challenge = $this->challengeService->createChallenge($data);
             
             Log::info('Admin challenge created successfully', [
                 'challenge_id' => $challenge->id,
@@ -175,9 +204,20 @@ class AdminChallengeController extends Controller
             return redirect()
                 ->route('admin.challenges.index')
                 ->with('success', 'تم إنشاء التحدي بنجاح');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation error creating admin challenge', [
+                'errors' => $e->errors(),
+            ]);
+            return back()
+                ->withErrors($e->errors())
+                ->withInput();
         } catch (\Exception $e) {
-            Log::error('Error creating admin challenge: ' . $e->getMessage(), [
+            Log::error('Error creating admin challenge', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString(),
+                'data' => $request->except(['image']), // Don't log file data
             ]);
 
             return back()
@@ -186,12 +226,18 @@ class AdminChallengeController extends Controller
         }
     }
 
-    /**
-     * عرض تفاصيل تحدٍ
-     */
     public function show(Challenge $challenge)
     {
-        $challenge->load(['school:id,name,email', 'creator:id,name,email']);
+        $challenge->load(['school:id,name,email', 'creator:id,name,email', 'participants.user:id,name,email']);
+
+        $assignedStudents = $challenge->participants->map(function ($participation) {
+            return [
+                'id' => $participation->user_id,
+                'name' => $participation->user->name ?? 'غير معروف',
+                'email' => $participation->user->email ?? '',
+                'participation_type' => $participation->participation_type ?? 'optional',
+            ];
+        });
 
         return Inertia::render('Admin/Challenges/Show', [
             'challenge' => [
@@ -222,6 +268,7 @@ class AdminChallengeController extends Controller
                 'badges_reward' => $challenge->badges_reward ?? [],
                 'max_participants' => $challenge->max_participants,
                 'current_participants' => $challenge->current_participants ?? 0,
+                'assigned_students' => $assignedStudents,
                 'created_at' => $challenge->created_at->format('Y-m-d H:i'),
                 'updated_at' => $challenge->updated_at->format('Y-m-d H:i'),
             ],
@@ -259,15 +306,10 @@ class AdminChallengeController extends Controller
         ]);
     }
 
-    /**
-     * تحديث تحدٍ
-     * PERFORMANCE OPTIMIZED: Stay on same page with partial reload support
-     */
     public function update(UpdateChallengeRequest $request, Challenge $challenge)
     {
         $data = $request->validated();
         
-        // Convert date strings to datetime
         if (isset($data['start_date']) && !str_contains($data['start_date'], ' ')) {
             $data['start_date'] = $data['start_date'] . ' 00:00:00';
         }
@@ -275,20 +317,15 @@ class AdminChallengeController extends Controller
             $data['deadline'] = $data['deadline'] . ' 23:59:59';
         }
         
-        // Convert max_participants to null if empty
         if (isset($data['max_participants']) && $data['max_participants'] === '') {
             $data['max_participants'] = null;
         }
 
         try {
-            // Use ChallengeService to ensure cache is cleared properly
             $this->challengeService->updateChallenge($challenge, $data);
-            
-            // Clear cached stats since we updated a challenge
-            \Illuminate\Support\Facades\Cache::forget('admin_challenge_stats');
+                        \Illuminate\Support\Facades\Cache::forget('admin_challenge_stats');
             \Illuminate\Support\Facades\Cache::forget('admin_challenge_analytics');
             
-            // If Inertia request expects JSON response (partial reload), return JSON
             if ($request->wantsJson() || $request->header('X-Inertia')) {
                 return back()->with('success', 'تم تحديث التحدي بنجاح');
             }
@@ -308,24 +345,17 @@ class AdminChallengeController extends Controller
         }
     }
 
-    /**
-     * حذف تحدٍ
-     * PERFORMANCE OPTIMIZED: Stay on same page with partial reload support
-     */
     public function destroy(Challenge $challenge)
     {
         try {
             $schoolId = $challenge->school_id;
             $createdBy = $challenge->created_by;
             
-            // Use ChallengeService to ensure cache is cleared properly
             $this->challengeService->deleteChallenge($challenge);
             
-            // Clear cached stats since we deleted a challenge
             \Illuminate\Support\Facades\Cache::forget('admin_challenge_stats');
             \Illuminate\Support\Facades\Cache::forget('admin_challenge_analytics');
 
-            // If Inertia request expects JSON response (partial reload), return JSON
             if (request()->wantsJson() || request()->header('X-Inertia')) {
                 return back()->with('success', 'تم حذف التحدي بنجاح');
             }

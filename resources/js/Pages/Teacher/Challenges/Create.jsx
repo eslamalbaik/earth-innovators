@@ -73,10 +73,8 @@ export default function TeacherChallengeCreate({ auth, school }) {
 
         post('/teacher/challenges', {
             onSuccess: () => {
-                // Form will redirect on success
             },
             onError: (errors) => {
-                console.error('Validation errors:', errors);
             },
         });
     };

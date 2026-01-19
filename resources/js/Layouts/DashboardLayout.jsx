@@ -2,8 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
 import axios from 'axios';
 import {
-    FaBars, FaTimes, FaHome, FaUsers, FaBookOpen,
-    FaCalendar, FaChartLine, FaUser, FaCog, FaSignOutAlt,
+    FaBars, FaTimes, FaUsers, FaBookOpen,
+    FaCalendar, FaChartLine, FaUser, FaSignOutAlt,
     FaGraduationCap, FaCommentDots, FaTachometerAlt, FaBell, FaBook,
     FaChevronDown, FaCreditCard, FaTrophy, FaProjectDiagram, FaMedal, FaFile,
     FaCheckCircle
@@ -11,7 +11,7 @@ import {
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import SidebarItem from '@/Components/SidebarItem';
 import SidebarSubMenu from '@/Components/SidebarSubMenu';
-import { getUserImageUrl, getInitials, getColorFromName } from '@/utils/imageUtils';
+import { getInitials, getColorFromName } from '@/utils/imageUtils';
 import { useToast } from '@/Contexts/ToastContext';
 import { useFlashNotifications } from '@/Hooks/useFlashNotifications';
 
@@ -19,7 +19,6 @@ export default function DashboardLayout({ children, header }) {
     const { auth } = usePage().props;
     const { showInfo } = useToast();
     
-    // Automatically show flash messages as non-intrusive popups
     useFlashNotifications();
     const [sidebarOpen, setSidebarOpen] = useState(() => {
         if (typeof window !== 'undefined') {
@@ -63,13 +62,10 @@ export default function DashboardLayout({ children, header }) {
         }
     };
 
-    // جلب الإشعارات وإعداد Real-time listeners
     useEffect(() => {
         if (auth?.user) {
             fetchNotifications();
-            
-            // إعداد Real-time notifications باستخدام Echo (Redis + Laravel Echo Server)
-            let notificationChannel = null;
+                        let notificationChannel = null;
             let pollingInterval = null;
             let reconnectAttempts = 0;
             const maxReconnectAttempts = 5;
@@ -79,21 +75,9 @@ export default function DashboardLayout({ children, header }) {
                     try {
                         const userId = auth.user.id;
                         const channelName = `App.Models.User.${userId}`;
-                        
-                        // Only log in development mode
-                        if (import.meta.env.DEV) {
-                            console.log('🔌 Setting up Echo listener for user:', userId);
-                        }
-                        
-                        // الاستماع للإشعارات الجديدة
                         notificationChannel = window.Echo.private(channelName);
-                        
-                        // Laravel يرسل الإشعارات عبر event: Illuminate\Notifications\Events\BroadcastNotificationCreated
-                        notificationChannel.listen('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', (e) => {
-                            console.log('📬 New notification received via Echo:', e);
-                            
+                        notificationChannel.listen('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', (e) => {                            
                             try {
-                                // Laravel يرسل البيانات في هيكل محدد
                                 const notification = {
                                     id: e.id || `notif_${Date.now()}_${Math.random()}`,
                                     type: e.type || 'notification',
@@ -116,110 +100,90 @@ export default function DashboardLayout({ children, header }) {
                                             minute: '2-digit'
                                         }),
                                 };
-                                
-                                console.log('✅ Processed notification:', notification);
-                                
+                                                                
                                 setNotifications(prev => {
-                                    // تجنب الإشعارات المكررة
                                     const exists = prev.find(n => n.id === notification.id);
                                     if (exists) {
-                                        console.log('⚠️ Notification already exists, skipping:', notification.id);
                                         return prev;
                                     }
-                                    console.log('➕ Adding new notification to list');
                                     return [notification, ...prev];
                                 });
                                 
                                 setUnreadCount(prev => {
                                     const newCount = prev + 1;
-                                    console.log('📊 Unread count updated:', newCount);
                                     return newCount;
                                 });
-                                
-                                // إعادة جلب الإشعارات للتأكد من التزامن مع قاعدة البيانات
                                 setTimeout(() => {
-                                    console.log('🔄 Refreshing notifications from server...');
                                     fetchNotifications();
                                 }, 500);
                             } catch (error) {
-                                console.error('❌ Error processing notification:', error);
-                                // إعادة جلب الإشعارات في حالة الخطأ
                                 fetchNotifications();
                             }
                         });
                         
-                        // معالجة الأخطاء في الاتصال
                         notificationChannel.error((error) => {
-                            console.error('❌ Echo channel error:', error);
                             reconnectAttempts++;
-                            
                             if (reconnectAttempts < maxReconnectAttempts) {
-                                console.log(`🔄 Attempting to reconnect (${reconnectAttempts}/${maxReconnectAttempts})...`);
                                 setTimeout(setupEchoListener, 2000 * reconnectAttempts);
                             } else {
-                                console.warn('⚠️ Max reconnection attempts reached, falling back to polling');
-                                // Fallback to polling on error
                                 if (pollingInterval) {
                                     clearInterval(pollingInterval);
                                 }
-                                pollingInterval = setInterval(fetchNotifications, 10000); // Poll every 10 seconds
+                                pollingInterval = setInterval(fetchNotifications, 10000);
                             }
                         });
                         
-                        // Connection status listeners
                         if (window.Echo.connector && window.Echo.connector.socket) {
                             window.Echo.connector.socket.on('connect', () => {
-                                console.log('✅ Echo connected successfully');
-                                reconnectAttempts = 0; // Reset on successful connection
+                                reconnectAttempts = 0;
                             });
                             
                             window.Echo.connector.socket.on('disconnect', () => {
-                                console.warn('⚠️ Echo disconnected');
                                 reconnectAttempts++;
                                 if (reconnectAttempts < maxReconnectAttempts) {
                                     setTimeout(setupEchoListener, 2000 * reconnectAttempts);
+                                } else {
+                                    // After max attempts, use polling only
+                                    if (pollingInterval) {
+                                        clearInterval(pollingInterval);
+                                    }
+                                    pollingInterval = setInterval(fetchNotifications, 10000);
+                                }
+                            });
+
+                            window.Echo.connector.socket.on('connect_error', () => {
+                                // Silent error - will use polling fallback
+                                if (reconnectAttempts >= maxReconnectAttempts) {
+                                    if (pollingInterval) {
+                                        clearInterval(pollingInterval);
+                                    }
+                                    pollingInterval = setInterval(fetchNotifications, 10000);
                                 }
                             });
                         }
-                        
-                        // Only log in development mode
-                        if (import.meta.env.DEV) {
-                            console.log('✅ Echo notification listener initialized for user:', userId, 'on channel:', channelName);
-                        }
-                        reconnectAttempts = 0; // Reset on successful setup
+                        reconnectAttempts = 0;
                     } catch (error) {
-                        console.error('❌ Error setting up Echo listener:', error);
                         reconnectAttempts++;
                         if (reconnectAttempts < maxReconnectAttempts) {
                             setTimeout(setupEchoListener, 2000 * reconnectAttempts);
                         } else {
-                            // Fallback to polling
                             pollingInterval = setInterval(fetchNotifications, 10000);
                         }
                     }
                 } else {
-                    // Fallback: تحديث الإشعارات كل 10 ثوانٍ إذا لم يكن Echo متاحاً
-                    console.warn('⚠️ Echo not available, using polling for notifications');
                     pollingInterval = setInterval(fetchNotifications, 10000);
                 }
             };
-            
-            // Initial setup
-            setupEchoListener();
-            
-            // تنظيف عند إلغاء التحميل
+                        setupEchoListener();
             return () => {
                 if (notificationChannel && window.Echo) {
                     try {
                         const channelName = `App.Models.User.${auth.user.id}`;
                         notificationChannel.stopListening('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated');
                         window.Echo.leave(channelName);
-                        // Only log in development mode
                         if (import.meta.env.DEV) {
-                            console.log('👋 Left Echo channel:', channelName);
                         }
                     } catch (error) {
-                        console.error('❌ Error leaving Echo channel:', error);
                     }
                 }
                 if (pollingInterval) {
@@ -235,7 +199,6 @@ export default function DashboardLayout({ children, header }) {
             setNotifications(response.data.notifications || []);
             setUnreadCount(response.data.unread_count || 0);
         } catch (error) {
-            console.error('Error fetching notifications:', error);
         }
     };
 
@@ -244,7 +207,6 @@ export default function DashboardLayout({ children, header }) {
             await axios.post(`/notifications/${notificationId}/read`);
             fetchNotifications();
         } catch (error) {
-            console.error('Error marking notification as read:', error);
         }
     };
 
@@ -253,7 +215,6 @@ export default function DashboardLayout({ children, header }) {
             await axios.post('/notifications/mark-all-read');
             fetchNotifications();
         } catch (error) {
-            console.error('Error marking all as read:', error);
         }
     };
 
@@ -281,15 +242,12 @@ export default function DashboardLayout({ children, header }) {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // Get current URL from Inertia page props
     const { url } = usePage();
     const pageProps = usePage().props;
 
-    // Detect dashboard changes and show toast notifications
     useEffect(() => {
         const currentUrl = url || window.location.pathname;
         
-        // Only track changes on dashboard pages
         const isDashboardPage = currentUrl.includes('/dashboard') || 
                                currentUrl.includes('/teacher/dashboard') ||
                                currentUrl.includes('/student/dashboard') ||
@@ -300,7 +258,6 @@ export default function DashboardLayout({ children, header }) {
             return;
         }
 
-        // Get current dashboard data
         const currentData = {
             url: currentUrl,
             stats: pageProps.stats || {},
@@ -309,10 +266,8 @@ export default function DashboardLayout({ children, header }) {
             timestamp: Date.now(),
         };
 
-        // Compare with previous data
         const previousData = previousDashboardDataRef.current;
         
-        // Determine dashboard type
         let dashboardType = 'لوحة التحكم';
         if (currentUrl.includes('/teacher')) {
             dashboardType = 'لوحة تحكم المعلم';
@@ -322,13 +277,11 @@ export default function DashboardLayout({ children, header }) {
             dashboardType = 'لوحة تحكم المدرسة';
         }
 
-        // If this is the first time on this dashboard, don't show toast
         if (!previousData) {
             previousDashboardDataRef.current = currentData;
             return;
         }
 
-        // If URL changed (navigated to different dashboard), show toast
         if (previousData.url !== currentData.url) {
             showInfo('تم تحميل البيانات', {
                 title: `${dashboardType}`,
@@ -339,13 +292,10 @@ export default function DashboardLayout({ children, header }) {
             return;
         }
 
-        // Same URL - check for data changes
         if (previousData.url === currentData.url) {
-            // Check for changes in stats (deep comparison of key values)
             const statsChanged = JSON.stringify(previousData.stats) !== JSON.stringify(currentData.stats);
             const teacherChanged = JSON.stringify(previousData.teacher) !== JSON.stringify(currentData.teacher);
             
-            // Only show toast if there's a meaningful change (not just timestamp)
             if (statsChanged || teacherChanged) {
                 showInfo('تم تحديث البيانات', {
                     title: `تحديث ${dashboardType}`,
@@ -354,17 +304,10 @@ export default function DashboardLayout({ children, header }) {
                 });
             }
         }
-
-        // Update previous data
         previousDashboardDataRef.current = currentData;
     }, [url, pageProps, showInfo]);
 
-    /**
-     * Check if a route is active
-     * Handles exact matches and path prefixes for better UX
-     */
     const isRouteActive = (href, currentUrl) => {
-        // Extract path and query from URLs
         const getPath = (url) => {
             const [path] = url.split('?');
             return path;
@@ -380,24 +323,17 @@ export default function DashboardLayout({ children, header }) {
         const hrefQuery = getQuery(href);
         const currentQuery = getQuery(currentUrl);
         
-        // Exact match (including query) always returns true
         if (currentUrl === href) {
             return true;
         }
         
-        // If href has query parameters, match path and query
         if (hrefQuery) {
-            // Parse query parameters
             const hrefParams = new URLSearchParams(hrefQuery);
             const currentParams = new URLSearchParams(currentQuery);
-            
-            // Check if paths match
-            if (currentPath !== hrefPath) {
+                        if (currentPath !== hrefPath) {
                 return false;
             }
-            
-            // Check if all href query parameters match current query parameters
-            let allMatch = true;
+                        let allMatch = true;
             for (const [key, value] of hrefParams.entries()) {
                 if (currentParams.get(key) !== value) {
                     allMatch = false;
@@ -407,52 +343,37 @@ export default function DashboardLayout({ children, header }) {
             return allMatch;
         }
         
-        // If current URL has query parameters but href doesn't, only match if path matches exactly
         if (currentQuery && !hrefQuery) {
             return currentPath === hrefPath;
         }
         
-        // For dashboard routes, only match exact
         if (hrefPath.includes('/dashboard')) {
             return currentPath === hrefPath;
         }
         
-        // Special handling for create routes - only match exact
         if (hrefPath.includes('/create')) {
             return currentPath === hrefPath;
         }
         
-        // If current URL is a create route, don't match parent routes
         if (currentPath.includes('/create')) {
-            // Don't match any parent routes when on a create route
             return false;
         }
         
-        // If current URL is a pending route, only match exact or parent
         if (currentPath.includes('/pending')) {
             if (hrefPath.includes('/pending')) {
                 return currentPath === hrefPath;
             }
-            // Match parent route if current is pending
             return currentPath === hrefPath + '/pending';
         }
         
-        // For pending routes in href, match exact or if it's the parent
         if (hrefPath.includes('/pending')) {
             return currentPath === hrefPath || currentPath === hrefPath.replace('/pending', '');
         }
         
-        // For other routes, match if current URL starts with the href
-        // But ensure we don't match parent when on a child route with different segments
         if (currentPath.startsWith(hrefPath)) {
-            // Check if there's a path segment after the href
             const remainingPath = currentPath.slice(hrefPath.length);
-            // If there's a remaining path and it's not just a slash, it's a child route
             if (remainingPath && remainingPath !== '/') {
-                // Only match if the remaining path is a valid continuation (e.g., /edit, /show)
-                // Don't match if it's a different route entirely (e.g., /create when href is /badges)
                 const nextSegment = remainingPath.split('/')[1];
-                // If next segment is 'create', don't match parent
                 if (nextSegment === 'create') {
                     return false;
                 }
@@ -472,7 +393,7 @@ export default function DashboardLayout({ children, header }) {
                 href: '/admin/publications',
                 icon: FaBook,
                 subItems: [
-                    { name: 'مراجعة مقالات المجلة', href: '/admin/publications?status=pending', icon: FaBookOpen },
+                    // { name: 'مراجعة مقالات المجلة', href: '/admin/publications?status=pending', icon: FaBookOpen },
                     { name: 'مقالات المدرسة', href: '/admin/publications', icon: FaBook },
                 ]
             },
@@ -480,7 +401,9 @@ export default function DashboardLayout({ children, header }) {
             { name: 'المستخدمون', href: '/admin/users', icon: FaUsers },
             { name: 'الشارات', href: '/admin/badges', icon: FaCommentDots },
             { name: 'الباقات', href: '/admin/packages', icon: FaCreditCard },
+            { name: 'الاشتراكات والمدفوعات', href: '/admin/subscriptions', icon: FaCreditCard },
             { name: 'الشهادات', href: '/admin/certificates', icon: FaGraduationCap },
+            { name: 'بوابات الدفع', href: '/admin/payment-gateways', icon: FaCreditCard },
             { name: 'معايير القبول', href: '/admin/acceptance-criteria', icon: FaCheckCircle },
             { name: 'الملف الشخصي', href: '/profile', icon: FaUser },
         ],
@@ -494,7 +417,7 @@ export default function DashboardLayout({ children, header }) {
                     { name: 'تسليمات المشاريع', href: '/teacher/submissions', icon: FaFile },
                     { name: 'مراجعة المشاريع', href: '/teacher/projects', icon: FaBookOpen },
                     { name: 'مشاريعي', href: '/teacher/projects', icon: FaProjectDiagram },
-                    { name: 'إنشاء مشروع', href: '/teacher/projects/create', icon: FaProjectDiagram },
+                    // { name: 'إنشاء مشروع', href: '/teacher/projects/create', icon: FaProjectDiagram },
                 ]
             },
             {
@@ -502,9 +425,9 @@ export default function DashboardLayout({ children, header }) {
                 href: '/teacher/publications',
                 icon: FaBook,
                 subItems: [
-                    { name: 'مراجعة مقالات المجلة', href: '/school/publications/pending', icon: FaBookOpen },
+                    // { name: 'مراجعة مقالات المجلة', href: '/school/publications/pending', icon: FaBookOpen },
                     { name: 'مقالات المدرسة', href: '/teacher/publications', icon: FaBook },
-                    { name: 'إنشاء مقال', href: '/teacher/publications/create', icon: FaBook },
+                    // { name: 'إنشاء مقال', href: '/teacher/publications/create', icon: FaBook },
                 ]
             },
             {
@@ -513,14 +436,14 @@ export default function DashboardLayout({ children, header }) {
                 icon: FaCalendar,
                 subItems: [
                     { name: 'تسليمات التحديات', href: '/teacher/challenge-submissions', icon: FaFile },
-                    { name: 'مراجعة التحديات', href: '/teacher/challenge-submissions?status=submitted', icon: FaBookOpen },
+                    // { name: 'مراجعة التحديات', href: '/teacher/challenge-submissions?status=submitted', icon: FaBookOpen },
                     { name: 'تحدياتي', href: '/teacher/challenges', icon: FaCalendar },
-                    { name: 'إنشاء تحدّي', href: '/teacher/challenges/create', icon: FaCalendar },
+                    // { name: 'إنشاء تحدّي', href: '/teacher/challenges/create', icon: FaCalendar },
                 ]
             },
             { name: 'الطلاب المتابعون', href: '/teacher/students', icon: FaGraduationCap },
             { name: 'شاراتي', href: '/teacher/badges', icon: FaMedal },
-            { name: 'إرسال شارة', href: '/teacher/badges/create', icon: FaCommentDots },
+            // { name: 'إرسال شارة', href: '/teacher/badges/create', icon: FaCommentDots },
             { name: 'الشهادات', href: '/teacher/certificates', icon: FaFile },
             { name: 'الملف الشخصي', href: '/teacher/profile', icon: FaUser },
         ],
@@ -534,7 +457,7 @@ export default function DashboardLayout({ children, header }) {
                     { name: 'تسليمات المشاريع', href: '/school/submissions', icon: FaFile },
                     { name: 'مراجعة المشاريع', href: '/school/projects/pending', icon: FaBookOpen },
                     { name: 'مشاريع المدرسة', href: '/school/projects', icon: FaProjectDiagram },
-                    { name: 'إنشاء مشروع', href: '/school/projects/create', icon: FaProjectDiagram },
+                    // { name: 'إنشاء مشروع', href: '/school/projects/create', icon: FaProjectDiagram },
                 ]
             },
             {
@@ -553,7 +476,7 @@ export default function DashboardLayout({ children, header }) {
                 icon: FaBook,
                 subItems: [
                     { name: 'مقالات المدرسة', href: '/school/publications', icon: FaBook },
-                    { name: 'إنشاء مقال', href: '/school/publications/create', icon: FaBook },
+                    // { name: 'إنشاء مقال', href: '/school/publications/create', icon: FaBook },
                 ]
             },
             {
@@ -563,7 +486,7 @@ export default function DashboardLayout({ children, header }) {
                 subItems: [
                     { name: 'تسليمات التحديات', href: '/school/challenge-submissions', icon: FaFile },
                     { name: 'تحديات المدرسة', href: '/school/challenges', icon: FaCalendar },
-                    { name: 'إنشاء تحدّي', href: '/school/challenges/create', icon: FaCalendar },
+                    // { name: 'إنشاء تحدّي', href: '/school/challenges/create', icon: FaCalendar },
                 ]
             },
             { name: 'الطلاب', href: '/school/students', icon: FaGraduationCap },
@@ -585,13 +508,11 @@ export default function DashboardLayout({ children, header }) {
 
     return (
         <div dir="rtl" className="min-h-screen bg-gray-50">
-            {/* Sidebar - Fixed on Right (Rounded, Floating) */}
             <aside
                 className={`fixed top-2 right-4 bottom-2 z-40 transition-all duration-300 ${
                     sidebarOpen ? 'translate-x-0 opacity-100' : 'translate-x-[120%] opacity-0 pointer-events-none'
                 } w-72 bg-white rounded-2xl shadow-2xl border border-gray-100`}
             >
-                {/* Logo */}
                 <div className="relative flex flex-col items-center justify-center h-24 px-6 border-b border-gray-100">
                     {sidebarOpen && (
                         <button
@@ -620,7 +541,6 @@ export default function DashboardLayout({ children, header }) {
                             {currentNavigation.map((item) => {
                                 const isActive = isRouteActive(item.href, url);
 
-                                // Check if item has subItems (submenu)
                                 if (item.subItems && item.subItems.length > 0) {
                                     return (
                                         <SidebarSubMenu
@@ -629,7 +549,6 @@ export default function DashboardLayout({ children, header }) {
                                             isActive={isActive}
                                             currentUrl={url}
                                             onSubItemClick={() => {
-                                                // Close sidebar on mobile after navigation
                                                 if (window.innerWidth < 1100) {
                                                     setSidebarOpen(false);
                                                 }
@@ -638,14 +557,12 @@ export default function DashboardLayout({ children, header }) {
                                     );
                                 }
 
-                                // Regular menu item
                                 return (
                                     <SidebarItem
                                         key={item.name}
                                         item={item}
                                         isActive={isActive}
                                         onClick={() => {
-                                            // Close sidebar on mobile after navigation
                                             if (window.innerWidth < 1100) {
                                                 setSidebarOpen(false);
                                             }
@@ -698,10 +615,8 @@ export default function DashboardLayout({ children, header }) {
                 </div>
             </aside>
 
-            {/* Main Content Area */}
-            <div className={`transition-all duration-300 ${sidebarOpen ? 'ms-80' : 'ms-0'}`}>
-                {/* Top Navbar - Enhanced Design */}
-                <header className={`sticky top-2 z-30 pt-0 mb-2 "${sidebarOpen ? 'max-w-7xl mx-6' : 'max-w-7xl mx-12'}`}>
+            <div className={`transition-all duration-300 ${sidebarOpen ? 'ms-[300px]' : 'ms-0'}`}>
+                <header className={`sticky top-2 z-30 pt-0 mb-2 mx-4 md:mx-6 lg:mx-8"${sidebarOpen ? 'max-w-full' : 'max-w-7xl'}`}> 
                     <div className="bg-white rounded-2xl shadow-lg border border-gray-100 backdrop-blur-sm">
                         <div className="flex items-center justify-between px-4 py-2">
                             <div className="flex items-center gap-4">
@@ -713,13 +628,12 @@ export default function DashboardLayout({ children, header }) {
                                 </button>
                                 {header && (
                                     <div className="flex items-center gap-3">
-                                        <h1 className="text-xl font-bold text-gray-900">{header}</h1>
+                                        <h1 className="text-base md:text-xl font-bold text-gray-900">{header}</h1>
                                     </div>
                                 )}
                             </div>
 
                             <div className="flex items-center gap-3">
-                            {/* صندوق الإشعارات */}
                             {(auth?.user?.role === 'student' || auth?.user?.role === 'teacher' || auth?.user?.role === 'school' || auth?.user?.role === 'educational_institution' || auth?.user?.role === 'admin') && (
                                 <div className="relative" ref={notificationsRef}>
                                     <button
@@ -769,17 +683,13 @@ export default function DashboardLayout({ children, header }) {
                                                                     if (!notification.read_at) {
                                                                         markAsRead(notification.id);
                                                                     }
-                                                                    // التنقل إلى رابط الإشعار إذا كان موجوداً
                                                                     let actionUrl = notification.data?.action_url || 
                                                                                    notification.data?.actions?.[0]?.url ||
                                                                                    null;
                                                                     
-                                                                    // إذا لم يكن هناك action_url، قم ببناء URL بناءً على البيانات المتاحة
                                                                     if (!actionUrl) {
                                                                         const userRole = auth?.user?.role || 'student';
-                                                                        
                                                                         if (notification.data?.challenge_id) {
-                                                                            // بناء URL التحدي بناءً على role المستخدم
                                                                             if (userRole === 'student') {
                                                                                 actionUrl = `/student/challenges/${notification.data.challenge_id}`;
                                                                             } else if (userRole === 'teacher') {
@@ -790,7 +700,6 @@ export default function DashboardLayout({ children, header }) {
                                                                                 actionUrl = `/student/challenges/${notification.data.challenge_id}`;
                                                                             }
                                                                         } else if (notification.data?.project_id) {
-                                                                            // بناء URL المشروع بناءً على role المستخدم
                                                                             if (userRole === 'student') {
                                                                                 actionUrl = `/student/projects/${notification.data.project_id}`;
                                                                             } else if (userRole === 'teacher') {
@@ -803,9 +712,7 @@ export default function DashboardLayout({ children, header }) {
                                                                         } else if (notification.data?.publication_id) {
                                                                             actionUrl = `/publications/${notification.data.publication_id}`;
                                                                         } else if (notification.data?.submission_id) {
-                                                                            // بناء URL التسليم بناءً على role المستخدم
                                                                             if (userRole === 'student') {
-                                                                                // للطلاب، اذهب إلى صفحة التحدي
                                                                                 if (notification.data?.challenge_id) {
                                                                                     actionUrl = `/student/challenges/${notification.data.challenge_id}`;
                                                                                 }
@@ -817,34 +724,23 @@ export default function DashboardLayout({ children, header }) {
                                                                         }
                                                                     }
                                                                     
-                                                                    // تنظيف URL من أي متغيرات غير مستبدلة
                                                                     if (actionUrl && typeof actionUrl === 'string') {
-                                                                        // إزالة أي {variable} غير مستبدلة
                                                                         actionUrl = actionUrl.replace(/\{[^}]+\}/g, '');
-                                                                        
-                                                                        // إذا كان هناك challenge_id في البيانات والـ URL يحتوي على placeholder، استبدله
-                                                                        if (notification.data?.challenge_id && actionUrl.includes('/challenges/') && actionUrl.includes('{')) {
+                                                                                                                                                if (notification.data?.challenge_id && actionUrl.includes('/challenges/') && actionUrl.includes('{')) {
                                                                             actionUrl = actionUrl.replace(/\{[^}]+\}/, notification.data.challenge_id);
                                                                         }
-                                                                        
-                                                                        // إذا كان هناك project_id في البيانات والـ URL يحتوي على placeholder، استبدله
-                                                                        if (notification.data?.project_id && actionUrl.includes('/projects/') && actionUrl.includes('{')) {
+                                                                                                                                                if (notification.data?.project_id && actionUrl.includes('/projects/') && actionUrl.includes('{')) {
                                                                             actionUrl = actionUrl.replace(/\{[^}]+\}/, notification.data.project_id);
                                                                         }
-                                                                        
-                                                                        // إذا كان هناك submission_id في البيانات والـ URL يحتوي على placeholder، استبدله
-                                                                        if (notification.data?.submission_id && actionUrl.includes('/submissions/') && actionUrl.includes('{')) {
+                                                                                                                                                if (notification.data?.submission_id && actionUrl.includes('/submissions/') && actionUrl.includes('{')) {
                                                                             actionUrl = actionUrl.replace(/\{[^}]+\}/, notification.data.submission_id);
                                                                         }
-                                                                        
-                                                                        console.log('🔗 Navigating to:', actionUrl, 'from notification:', notification);
-                                                                    }
+                                                                                                                                            }
                                                                     
                                                                     if (actionUrl && actionUrl.trim() !== '' && !actionUrl.includes('{')) {
                                                                         router.visit(actionUrl);
                                                                         setNotificationsOpen(false);
                                                                     } else {
-                                                                        console.warn('⚠️ No valid action URL found for notification:', notification, 'actionUrl:', actionUrl);
                                                                     }
                                                                 }}
                                                             >
@@ -937,7 +833,6 @@ export default function DashboardLayout({ children, header }) {
                                 </div>
                             )}
 
-                            {/* User Avatar */}
                             <div className="relative" ref={dropdownRef}>
                                 <button
                                     onClick={() => setUserDropdownOpen(!userDropdownOpen)}
@@ -1018,14 +913,13 @@ export default function DashboardLayout({ children, header }) {
                     </div>
                 </header>
 
-                <main className="p-6">
+                <main className="p-6 px-4 md:px-6">
                     <div className="max-w-7xl mx-auto">
                         {children}
                     </div>
                 </main>
             </div>
 
-            {/* Mobile Overlay */}
             {sidebarOpen && (
                 <div
                     className="fixed inset-0 bg-black/20 backdrop-blur-sm z-30 lg:hidden"

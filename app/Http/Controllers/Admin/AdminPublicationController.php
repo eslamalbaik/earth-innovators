@@ -85,8 +85,6 @@ class AdminPublicationController extends Controller
 
         $data = $request->validated();
         $data['author_id'] = $user->id;
-        // للأدمن، يمكن ربط المقال بمدرسة أو تركه فارغاً
-        // إذا لم يتم تحديد school_id، سيكون null (مقال عام من الأدمن)
         if (!empty($data['school_id'])) {
             $data['school_id'] = $data['school_id'];
         } else {
@@ -95,12 +93,8 @@ class AdminPublicationController extends Controller
         $data['status'] = 'approved';
         $data['approved_by'] = $user->id;
         $data['approved_at'] = now();
-        // تعيين اسم الناشر
         $data['publisher_name'] = $user->name;
-        // تعيين تاريخ النشر تلقائياً
         $data['publish_date'] = now()->toDateString();
-
-        // Handle file uploads
         if ($request->hasFile('cover_image')) {
             $data['cover_image'] = $request->file('cover_image');
         }
@@ -111,8 +105,6 @@ class AdminPublicationController extends Controller
 
         try {
             $publication = $this->publicationService->createPublication($data);
-
-            // إرسال إشعار لجميع المستخدمين إذا كان المقال مرتبط بمدرسة
             if ($publication->status === 'approved' && $publication->school_id) {
                 try {
                     $publication->refresh();
@@ -126,18 +118,9 @@ class AdminPublicationController extends Controller
                         try {
                             $user->notify(new \App\Notifications\NewPublicationNotification($publication));
                         } catch (\Exception $e) {
-                            \Log::error('Failed to send publication notification to user', [
-                                'user_id' => $user->id,
-                                'publication_id' => $publication->id,
-                                'error' => $e->getMessage(),
-                            ]);
                         }
                     }
                 } catch (\Exception $e) {
-                    \Log::error('Failed to send publication notifications', [
-                        'publication_id' => $publication->id,
-                        'error' => $e->getMessage(),
-                    ]);
                 }
             }
 
@@ -145,19 +128,12 @@ class AdminPublicationController extends Controller
                 ->route('admin.publications.index')
                 ->with('success', 'تم نشر المقال بنجاح!');
         } catch (\Exception $e) {
-            \Log::error('Error creating publication: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
-            ]);
-
             return back()
                 ->withErrors(['error' => 'حدث خطأ أثناء إنشاء المقال: ' . $e->getMessage()])
                 ->withInput();
         }
     }
 
-    /**
-     * عرض تفاصيل مقال
-     */
     public function show(Publication $publication): Response
     {
         $publication->load(['author:id,name,email', 'school:id,name', 'approver:id,name']);
@@ -167,9 +143,6 @@ class AdminPublicationController extends Controller
         ]);
     }
 
-    /**
-     * الموافقة على مقال
-     */
     public function approve(Publication $publication)
     {
         $user = auth()->user();
@@ -181,9 +154,6 @@ class AdminPublicationController extends Controller
             ->with('success', 'تم الموافقة على المقال بنجاح!');
     }
 
-    /**
-     * رفض مقال
-     */
     public function reject(Request $request, Publication $publication)
     {
         $user = auth()->user();
@@ -199,12 +169,8 @@ class AdminPublicationController extends Controller
             ->with('success', 'تم رفض المقال.');
     }
 
-    /**
-     * حذف مقال
-     */
     public function destroy(Publication $publication)
     {
-        // حذف الصور والملفات
         if ($publication->cover_image) {
             Storage::disk('public')->delete($publication->cover_image);
         }

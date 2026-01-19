@@ -46,7 +46,6 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                 }
             }
         } catch (error) {
-            console.error('Error toggling like:', error);
         }
     };
 
@@ -104,7 +103,6 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                         alt={publication.title}
                         className="w-full h-64 object-cover"
                         onError={(e) => {
-                            console.error('Failed to load publication image:', coverImage);
                             e.target.src = '/images/default-publication.jpg';
                         }}
                         loading="lazy"

@@ -75,14 +75,12 @@ export default function StudentPayments({ payments, stats, filters }) {
                     router.reload({ only: ['payments'] });
                 },
                 onError: (errors) => {
-                    console.error('Cancel error:', errors);
                 },
                 onFinish: () => {
                     setCancellingId(null);
                 },
             });
         } catch (error) {
-            console.error('Cancel error:', error);
             setCancellingId(null);
         }
     };
@@ -143,14 +141,12 @@ export default function StudentPayments({ payments, stats, filters }) {
                     router.reload({ only: ['payments'] });
                 },
                 onError: (errors) => {
-                    console.error('Refund error:', errors);
                 },
                 onFinish: () => {
                     setCancellingId(null);
                 },
             });
         } catch (error) {
-            console.error('Refund error:', error);
             setCancellingId(null);
         }
     };
@@ -176,14 +172,12 @@ export default function StudentPayments({ payments, stats, filters }) {
                     router.reload({ only: ['payments'] });
                 },
                 onError: (errors) => {
-                    console.error('Capture error:', errors);
                 },
                 onFinish: () => {
                     setCancellingId(null);
                 },
             });
         } catch (error) {
-            console.error('Capture error:', error);
             setCancellingId(null);
         }
     };

@@ -14,15 +14,9 @@ class ProjectSubmissionController extends Controller
         private SubmissionService $submissionService
     ) {}
 
-    /**
-     * تسليم مشروع من قبل طالب
-     */
     public function store(Request $request, Project $project)
     {
         $student = Auth::user();
-
-        // Verify project is available for student
-        // المشروع يجب أن يكون متاحاً للطالب: إما متاح لجميع المؤسسات تعليمية أو متاح لمدرسة الطالب
         $isAvailableForAllSchools = $project->school_id === null;
         $isAvailableForStudentSchool = $project->school_id === $student->school_id;
         
@@ -41,16 +35,28 @@ class ProjectSubmissionController extends Controller
         ]);
 
         try {
-            $data = $request->only(['files', 'comment']);
+            $data = [
+                'comment' => $request->input('comment'),
+            ];
+            
             if ($request->hasFile('files')) {
                 $data['files'] = $request->file('files');
+            } elseif ($request->has('files') && is_array($request->input('files'))) {
+                $data['files'] = [];
+            } else {
+                $data['files'] = [];
             }
 
             $this->submissionService->createSubmission($data, $project->id, $student->id);
 
             return redirect()->back()->with('success', 'تم تسليم المشروع بنجاح!');
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => $e->getMessage()]);
+            \Log::error('Project submission error: ' . $e->getMessage(), [
+                'project_id' => $project->id,
+                'student_id' => $student->id,
+                'exception' => $e,
+            ]);
+            return back()->withErrors(['error' => 'حدث خطأ أثناء تسليم المشروع: ' . $e->getMessage()]);
         }
     }
 
@@ -66,16 +72,27 @@ class ProjectSubmissionController extends Controller
         ]);
 
         try {
-            $data = $request->only(['files', 'comment']);
+            $data = [
+                'comment' => $request->input('comment'),
+            ];
+            
             if ($request->hasFile('files')) {
                 $data['files'] = $request->file('files');
+            } elseif ($request->has('files') && is_array($request->input('files'))) {
+                $data['files'] = [];
+            } else {
+                $data['files'] = [];
             }
 
             $this->submissionService->updateSubmission($submission, $data, Auth::id());
 
             return redirect()->back()->with('success', 'تم تحديث التسليم بنجاح!');
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => $e->getMessage()]);
+            \Log::error('Project submission update error: ' . $e->getMessage(), [
+                'submission_id' => $submission->id,
+                'exception' => $e,
+            ]);
+            return back()->withErrors(['error' => 'حدث خطأ أثناء تحديث التسليم: ' . $e->getMessage()]);
         }
     }
 }

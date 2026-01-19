@@ -69,11 +69,9 @@ export default function SchoolProjects({ projects, auth }) {
                 preserveScroll: false,
                 onSuccess: () => {
                     // رسالة النجاح تأتي تلقائياً من الخادم عبر flash messages
-                    // إعادة تحميل قائمة المشاريع بعد الحذف
                     router.reload({ only: ['projects'] });
                 },
                 onError: (errors) => {
-                    console.error('Delete error:', errors);
                     alert('حدث خطأ أثناء حذف المشروع');
                 },
             });

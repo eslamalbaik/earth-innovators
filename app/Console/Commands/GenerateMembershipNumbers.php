@@ -56,9 +56,7 @@ class GenerateMembershipNumbers extends Command
         foreach ($users as $user) {
             try {
                 $membershipNumber = $membershipService->generateMembershipNumber($user->role);
-                
-                // Ensure uniqueness
-                $attempts = 0;
+                                $attempts = 0;
                 while (User::where('membership_number', $membershipNumber)->where('id', '!=', $user->id)->exists() && $attempts < 10) {
                     $membershipNumber = $membershipService->generateMembershipNumber($user->role);
                     $attempts++;

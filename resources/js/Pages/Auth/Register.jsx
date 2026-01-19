@@ -90,40 +90,30 @@ export default function Register({ schools = [] }) {
     const submit = (e) => {
         e.preventDefault();
 
-        // إنشاء نسخة من البيانات
         const dataToSend = { ...data };
 
-        // تنظيف رقم الجوال فقط إذا كان موجوداً
         if (data.phone && data.phone.trim() !== '') {
             let cleanedPhone = String(data.phone || '').replace(/\D/g, '');
 
-            // إزالة 0 من البداية إذا كان موجوداً (مثل 0501234567 -> 501234567)
             if (cleanedPhone.startsWith('0')) {
                 cleanedPhone = cleanedPhone.substring(1);
             }
 
-            // استخدام المقدمة المختارة إذا كان هناك رقم
             const dialCode = selectedDialCode || DEFAULT_DIAL_CODE;
             const fullPhone = `${dialCode}${cleanedPhone}`;
             dataToSend.phone = fullPhone;
         } else {
-            // إذا كان رقم الجوال فارغاً، لا نرسله
             dataToSend.phone = null;
         }
 
-        // استخدام router.post لإرسال البيانات المخصصة
         router.post(route('register'), dataToSend, {
             preserveScroll: true,
             onSuccess: () => {
-                // إخفاء تنبيه الأخطاء عند النجاح ومسح الأخطاء
                 setShowErrorsAlert(false);
                 setPageErrors({});
             },
             onError: (errors) => {
-                console.error('Registration errors:', errors);
-                // حفظ الأخطاء في state المحلي
                 setPageErrors(errors);
-                // إظهار تنبيه الأخطاء عند وجود أخطاء
                 setShowErrorsAlert(true);
             },
         });

@@ -177,39 +177,31 @@ export default function EditSchoolProject({ auth, project }) {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // التحقق من أن البيانات الأساسية موجودة
         if (!data.title || !data.description || !data.category) {
-            console.error('Missing required fields:', { title: data.title, description: data.description, category: data.category });
             alert('يرجى ملء جميع الحقول المطلوبة');
             return;
         }
 
-        // إنشاء FormData مباشرة لضمان إرسال جميع البيانات بشكل صحيح
         const formData = new FormData();
-        
-        // إضافة الحقول الأساسية
-        formData.append('title', data.title || '');
+                formData.append('title', data.title || '');
         formData.append('description', data.description || '');
         formData.append('category', data.category || 'other');
         if (data.report) {
             formData.append('report', data.report);
         }
 
-        // إضافة existing_files - Laravel يتوقع array
         if (existingFiles && existingFiles.length > 0) {
             existingFiles.forEach((file, index) => {
                 formData.append(`existing_files[${index}]`, file);
             });
         }
 
-        // إضافة existing_images - Laravel يتوقع array
         if (existingImages && existingImages.length > 0) {
             existingImages.forEach((image, index) => {
                 formData.append(`existing_images[${index}]`, image);
             });
         }
 
-        // إضافة الملفات الجديدة
         if (data.files && data.files.length > 0) {
             data.files.forEach((file) => {
                 if (file instanceof File) {
@@ -218,7 +210,6 @@ export default function EditSchoolProject({ auth, project }) {
             });
         }
 
-        // إضافة الصور الجديدة
         if (data.images && data.images.length > 0) {
             data.images.forEach((image) => {
                 if (image instanceof File) {
@@ -227,21 +218,8 @@ export default function EditSchoolProject({ auth, project }) {
             });
         }
 
-        // تسجيل البيانات المرسلة للتشخيص
-        console.log('Sending form data:', {
-            title: data.title,
-            description: data.description,
-            category: data.category,
-            existing_files_count: existingFiles?.length || 0,
-            existing_images_count: existingImages?.length || 0,
-            files_count: data.files?.length || 0,
-            images_count: data.images?.length || 0,
-        });
-
-        // إضافة _method للـ method spoofing (Laravel يتطلب هذا)
         formData.append('_method', 'PUT');
 
-        // إرسال البيانات باستخدام router.post مع _method: PUT
         router.post(`/school/projects/${project.id}`, formData, {
             forceFormData: true,
             preserveScroll: false,
@@ -250,16 +228,6 @@ export default function EditSchoolProject({ auth, project }) {
                 router.visit('/school/projects');
             },
             onError: (errors) => {
-                console.error('Validation errors:', errors);
-                console.log('Form data sent:', {
-                    title: data.title,
-                    description: data.description,
-                    category: data.category,
-                    existing_files: existingFiles,
-                    existing_images: existingImages,
-                    files_count: data.files?.length || 0,
-                    images_count: data.images?.length || 0,
-                });
                 let errorMessage = 'حدث خطأ أثناء حفظ التعديلات';
                 if (errors.message) {
                     errorMessage = errors.message;
@@ -300,7 +268,6 @@ export default function EditSchoolProject({ auth, project }) {
 
                 <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg p-6">
                     <div className="space-y-6">
-                        {/* العنوان */}
                         <div>
                             <InputLabel htmlFor="title" value="عنوان المشروع *" />
                             <TextInput

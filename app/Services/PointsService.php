@@ -46,6 +46,9 @@ class PointsService extends BaseService
 
             DB::commit();
 
+            // Fire PointsAwarded event for proper integration
+            event(new \App\Events\PointsAwarded($user->fresh(), $point, $user->points));
+
             $this->forgetCacheTags([
                 "user_points_{$userId}",
                 "user_{$userId}",

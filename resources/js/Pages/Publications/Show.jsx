@@ -24,7 +24,6 @@ export default function PublicationShow({ auth, publication, isLiked: initialIsL
                 setLikesCount(response.data.likes_count);
             }
         } catch (error) {
-            console.error('Error toggling like:', error);
         }
     };
 
@@ -56,7 +55,6 @@ export default function PublicationShow({ auth, publication, isLiked: initialIsL
                                 alt={publication.title}
                             className="w-full h-auto"
                                 onError={(e) => {
-                                    console.error('Failed to load publication image:', coverImage);
                                     e.target.src = '/images/default-publication.jpg';
                                 }}
                                 loading="lazy"
@@ -64,7 +62,6 @@ export default function PublicationShow({ auth, publication, isLiked: initialIsL
                         </div>
                     )}
 
-                    {/* Title and Meta */}
                 <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
                     <h1 className="text-lg font-extrabold text-gray-900">
                             {publication.title}

@@ -194,7 +194,7 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                                 المشاريع المعلقة للمراجعة ({pendingProjects.length})
                             </h3>
                             <Link href="/school/projects/pending" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                                عرض الكل →
+                                عرض الكل
                             </Link>
                         </div>
                     </div>
@@ -253,7 +253,7 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                                 المشاريع المقبولة حديثاً
                             </h3>
                             <Link href="/school/projects" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                                عرض الكل →
+                                عرض الكل
                             </Link>
                         </div>
                     </div>

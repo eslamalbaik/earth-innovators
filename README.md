@@ -1,2 +1,0 @@
-# earth-innovators
-earth-innovators

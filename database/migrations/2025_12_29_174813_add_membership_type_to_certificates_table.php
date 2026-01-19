@@ -12,8 +12,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // For MySQL, we need to use raw SQL to modify the enum
-        DB::statement("ALTER TABLE certificates MODIFY COLUMN type ENUM('student', 'school', 'achievement', 'membership') DEFAULT 'student'");
+        $driver = DB::getDriverName();
+        
+        if ($driver !== 'sqlite') {
+            // For MySQL, we need to use raw SQL to modify the enum
+            DB::statement("ALTER TABLE certificates MODIFY COLUMN type ENUM('student', 'school', 'achievement', 'membership') DEFAULT 'student'");
+        }
+        // SQLite لا يدعم ENUM، لذا لا حاجة لتعديل
     }
 
     /**
@@ -21,8 +26,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Remove 'membership' from enum, but keep existing values
-        // Note: This may fail if there are existing 'membership' certificates
-        DB::statement("ALTER TABLE certificates MODIFY COLUMN type ENUM('student', 'school', 'achievement') DEFAULT 'student'");
+        $driver = DB::getDriverName();
+        
+        if ($driver !== 'sqlite') {
+            // Remove 'membership' from enum, but keep existing values
+            // Note: This may fail if there are existing 'membership' certificates
+            DB::statement("ALTER TABLE certificates MODIFY COLUMN type ENUM('student', 'school', 'achievement') DEFAULT 'student'");
+        }
     }
 };

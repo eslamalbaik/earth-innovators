@@ -18,8 +18,6 @@ class BadgeController extends Controller
     public function index(Request $request)
     {
         $allBadges = $this->badgeService->getActiveBadges();
-
-        // Separate badges by category
         $achievementBadges = $allBadges->filter(fn($badge) => $badge->badge_category === 'achievement')->values();
         $communityBadges = $allBadges->filter(fn($badge) => $badge->badge_category === 'community')->values();
 
@@ -31,17 +29,14 @@ class BadgeController extends Controller
             $userCommunityBadgeProgress = $this->badgeService->getUserCommunityBadgeProgress($userId);
         }
 
-        // Get school rankings (available for all users)
         $currentSchoolId = null;
         $user = $request->user();
         if ($user) {
             if ($user->isSchool()) {
                 $currentSchoolId = $user->id;
             } elseif ($user->isStudent() && $user->school_id) {
-                // للطلاب: إظهار ترتيب مدرستهم
                 $currentSchoolId = $user->school_id;
             } elseif ($user->isTeacher() && $user->school_id) {
-                // للمعلمين: إظهار ترتيب مدرستهم
                 $currentSchoolId = $user->school_id;
             }
         }
@@ -72,9 +67,6 @@ class BadgeController extends Controller
         ]);
     }
 
-    /**
-     * صفحة الإنجازات والنقاط
-     */
     public function achievements(Request $request)
     {
         $user = $request->user();
@@ -85,9 +77,7 @@ class BadgeController extends Controller
         if ($user) {
             $points = $user->points ?? 0;
             $userBadges = $this->badgeService->getUserBadges($user->id);
-            
-            // Get recent achievements (points history)
-            $pointsService = app(\App\Services\PointsService::class);
+                        $pointsService = app(\App\Services\PointsService::class);
             $pointsHistory = $pointsService->getUserPointsHistory($user->id, 5);
             
             $recentAchievements = $pointsHistory->getCollection()->map(function ($point) {
@@ -109,19 +99,11 @@ class BadgeController extends Controller
         ]);
     }
 
-    /**
-     * صفحة بطاقة عضوية المتجر
-     */
     public function storeMembership(Request $request)
     {
         $user = $request->user();
         $currentBalance = $user ? ($user->points ?? 0) : 0;
-        
-        // Get redeemable items (you can fetch from database or use default)
-        $redeemableItems = [];
-        
-        // TODO: Fetch redeemable items from database if you have a model for it
-        
+                $redeemableItems = [];        
         return Inertia::render('StoreMembership', [
             'user' => $user,
             'currentBalance' => $currentBalance,

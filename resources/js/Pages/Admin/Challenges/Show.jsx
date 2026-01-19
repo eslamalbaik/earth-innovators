@@ -1,6 +1,6 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link } from '@inertiajs/react';
-import { FaArrowRight, FaEdit, FaTrophy, FaUser, FaCalendar, FaFlag, FaClock, FaUsers, FaCoins } from 'react-icons/fa';
+import { FaArrowRight, FaEdit, FaTrophy, FaUser, FaCalendar, FaFlag, FaClock, FaUsers, FaCoins, FaUserPlus, FaExclamationCircle, FaStar, FaCheckCircle } from 'react-icons/fa';
 
 export default function AdminChallengesShow({ challenge }) {
     const getStatusBadge = (status) => {
@@ -61,13 +61,24 @@ export default function AdminChallengesShow({ challenge }) {
                         <h1 className="text-3xl font-bold text-gray-900 mb-2">{challenge.title}</h1>
                         {getStatusBadge(challenge.status)}
                     </div>
-                    <Link
-                        href={route('admin.challenges.edit', challenge.id)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2"
-                    >
-                        <FaEdit />
-                        تعديل
-                    </Link>
+                    <div className="flex gap-2">
+                        {challenge.school_id && (
+                            <Link
+                                href={route('admin.challenges.assign-students', challenge.id)}
+                                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2"
+                            >
+                                <FaUserPlus />
+                                تعيين طلاب
+                            </Link>
+                        )}
+                        <Link
+                            href={route('admin.challenges.edit', challenge.id)}
+                            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2"
+                        >
+                            <FaEdit />
+                            تعديل
+                        </Link>
+                    </div>
                 </div>
 
                 {challenge.objective && (
@@ -203,6 +214,68 @@ export default function AdminChallengesShow({ challenge }) {
                             </div>
                         </div>
                     </div>
+
+                    {/* Assigned Students */}
+                    {challenge.school_id && challenge.assigned_students && challenge.assigned_students.length > 0 && (
+                        <div className="bg-white rounded-xl shadow-lg p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <h2 className="text-xl font-bold text-gray-900">الطلاب المعينون</h2>
+                                <Link
+                                    href={route('admin.challenges.assign-students', challenge.id)}
+                                    className="text-blue-600 hover:text-blue-800 text-sm font-semibold"
+                                >
+                                    تعديل
+                                </Link>
+                            </div>
+                            <div className="space-y-2">
+                                {challenge.assigned_students.map((student) => {
+                                    const getTypeIcon = (type) => {
+                                        switch (type) {
+                                            case 'mandatory':
+                                                return <FaExclamationCircle className="text-red-500" />;
+                                            case 'favorite':
+                                                return <FaStar className="text-yellow-500" />;
+                                            default:
+                                                return <FaCheckCircle className="text-green-500" />;
+                                        }
+                                    };
+                                    const getTypeLabel = (type) => {
+                                        switch (type) {
+                                            case 'mandatory':
+                                                return 'إلزامي';
+                                            case 'favorite':
+                                                return 'مفضل';
+                                            default:
+                                                return 'اختياري';
+                                        }
+                                    };
+                                    const getTypeColor = (type) => {
+                                        switch (type) {
+                                            case 'mandatory':
+                                                return 'bg-red-100 text-red-800';
+                                            case 'favorite':
+                                                return 'bg-yellow-100 text-yellow-800';
+                                            default:
+                                                return 'bg-green-100 text-green-800';
+                                        }
+                                    };
+
+                                    return (
+                                        <div key={student.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                                            <div className="flex items-center gap-2">
+                                                <FaUser className="text-gray-400" />
+                                                <span className="text-sm font-medium text-gray-900">{student.name}</span>
+                                            </div>
+                                            <span className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${getTypeColor(student.participation_type)}`}>
+                                                {getTypeIcon(student.participation_type)}
+                                                {getTypeLabel(student.participation_type)}
+                                            </span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Timestamps */}
                     <div className="bg-white rounded-xl shadow-lg p-6">

@@ -420,7 +420,6 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
                     }, 100);
                 },
                 onError: (errors) => {
-                    console.error('Image update errors:', errors);
                     if (errors.image) {
                         alert('خطأ في رفع الصورة: ' + errors.image);
                     }
@@ -440,7 +439,6 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
                 alert('تم تحديث كلمة المرور بنجاح');
             },
             onError: (errors) => {
-                console.error('Password update errors:', errors);
             },
         });
     };
@@ -472,7 +470,6 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
                 });
             },
             onError: (errors) => {
-                console.error('School update errors:', errors);
                 if (errors.school_id) {
                     showError('خطأ في تحديث المدرسة: ' + errors.school_id);
                 } else if (errors.message) {

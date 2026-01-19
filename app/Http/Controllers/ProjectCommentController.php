@@ -14,14 +14,9 @@ class ProjectCommentController extends Controller
         private CommentService $commentService
     ) {}
 
-    /**
-     * إضافة تعليق على مشروع
-     */
     public function store(Request $request, Project $project)
     {
         $user = Auth::user();
-
-        // Verify project is available for student
         if ($user->isStudent() && $project->school_id !== $user->school_id) {
             return back()->withErrors(['error' => 'غير مصرح لك بالتعليق على هذا المشروع']);
         }

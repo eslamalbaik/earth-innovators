@@ -83,10 +83,8 @@ export default function SchoolChallengeEdit({ auth, challenge }) {
 
         put(`/school/challenges/${challenge.id}`, {
             onSuccess: () => {
-                // Form will redirect on success
             },
             onError: (errors) => {
-                console.error('Validation errors:', errors);
             },
         });
     };

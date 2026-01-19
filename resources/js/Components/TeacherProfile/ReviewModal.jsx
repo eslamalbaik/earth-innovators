@@ -88,16 +88,12 @@ export default function ReviewModal({ isOpen, onClose, teacherId, auth }) {
             teacher_id: Number(data.teacher_id),
         };
         
-        console.log('Submitting review data:', submitData);
         
         post(route('reviews.store'), {
             forceFormData: true,
             onSuccess: () => {
                 handleClose();
                 window.location.reload();
-            },
-            onError: (errors) => {
-                console.error('Review submission errors:', errors);
             },
         });
     };

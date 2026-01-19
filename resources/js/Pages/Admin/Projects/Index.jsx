@@ -107,17 +107,12 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
             });
             setShowEditModal(true);
         } catch (error) {
-            console.error('Error loading project:', error);
             alert('حدث خطأ أثناء تحميل بيانات المشروع');
         } finally {
             setIsLoadingProject(false);
         }
     }, [setEditData]);
 
-    /**
-     * PERFORMANCE OPTIMIZED: Edit submit with partial reload
-     * Only refreshes projects and stats, preserving scroll and other state
-     */
     const handleEditSubmit = useCallback((e) => {
         e.preventDefault();
         if (!projectToEdit) return;

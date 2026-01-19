@@ -10,6 +10,11 @@ use App\Http\Middleware\EnsureUserIsSystemSupervisor;
 use App\Http\Middleware\EnsureUserIsSchoolSupportCoordinator;
 
 return Application::configure(basePath: dirname(__DIR__))
+    ->withProviders([
+        ...(env('APP_ENV') === 'testing' && env('CACHE_STORE') === 'array' 
+            ? [\Tests\Providers\TestServiceProvider::class] 
+            : [])
+    ])
     ->withRouting(
         web: __DIR__ . '/../routes/web.php',
         commands: __DIR__ . '/../routes/console.php',

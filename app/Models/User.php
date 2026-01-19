@@ -74,6 +74,16 @@ class User extends Authenticatable
         return $this->role === 'student';
     }
 
+    public function isSchool(): bool
+    {
+        return $this->role === 'school' || $this->role === 'educational_institution';
+    }
+
+    public function isEducationalInstitution(): bool
+    {
+        return $this->role === 'educational_institution';
+    }
+
     public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class, 'student_email', 'email');
@@ -189,11 +199,6 @@ class User extends Authenticatable
     public function userPackages(): HasMany
     {
         return $this->hasMany(UserPackage::class);
-    }
-
-    public function isSchool(): bool
-    {
-        return $this->role === 'school' || $this->role === 'educational_institution';
     }
 
     public function isSystemSupervisor(): bool

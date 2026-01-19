@@ -13,6 +13,7 @@ class ChallengeParticipation extends Model
         'challenge_id',
         'user_id',
         'status',
+        'participation_type',
         'points_earned',
         'rank',
         'joined_at',

@@ -28,7 +28,6 @@ export default function StudentCertificateShow({ auth, user, stats, certificate 
                     url: window.location.href,
                 });
             } catch (error) {
-                console.log('Error sharing:', error);
             }
         } else {
             navigator.clipboard.writeText(window.location.href);

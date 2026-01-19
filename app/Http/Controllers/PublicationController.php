@@ -15,9 +15,7 @@ class PublicationController extends Controller
     public function __construct(
         private PublicationService $publicationService
     ) {}
-    /**
-     * عرض جميع الإصدارات للطلاب
-     */
+
     public function index(Request $request): Response
     {
         $publications = $this->publicationService->getApprovedPublications(
@@ -26,7 +24,6 @@ class PublicationController extends Controller
             12
         )->withQueryString();
 
-        // Accessor in Model handles image path normalization automatically
         $publications->getCollection()->transform(function ($publication) {
             $publication->is_liked = Auth::check() ? $publication->isLikedBy(Auth::id()) : false;
             return $publication;
@@ -41,9 +38,6 @@ class PublicationController extends Controller
         ]);
     }
 
-    /**
-     * عرض تفاصيل إصدار معين
-     */
     public function show(int $id): Response
     {
         $publication = $this->publicationService->getPublicationDetails($id, Auth::id());
@@ -52,17 +46,13 @@ class PublicationController extends Controller
             abort(404);
         }
 
-        // Accessor in Model handles image path normalization automatically
-
         return Inertia::render('Publications/Show', [
             'publication' => $publication,
             'isLiked' => $publication->is_liked ?? false,
         ]);
     }
 
-    /**
-     * إضافة/إزالة إعجاب
-     */
+
     public function toggleLike(Publication $publication)
     {
         $user = Auth::user();
@@ -74,12 +64,10 @@ class PublicationController extends Controller
         $isLiked = $publication->isLikedBy($user->id);
 
         if ($isLiked) {
-            // إزالة الإعجاب
             $publication->likedBy()->detach($user->id);
             $publication->decrement('likes_count');
             $liked = false;
         } else {
-            // إضافة الإعجاب
             $publication->likedBy()->attach($user->id);
             $publication->increment('likes_count');
             $liked = true;

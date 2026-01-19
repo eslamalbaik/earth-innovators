@@ -4,12 +4,13 @@ import { Head, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { FaPlus, FaEdit, FaTrash, FaInfoCircle, FaSave, FaTimes } from 'react-icons/fa';
 
-export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0 }) {
+export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0, projects = [], selectedProjectId = null }) {
     const { confirm } = useConfirmDialog();
     const [editingId, setEditingId] = useState(null);
     const [showAddForm, setShowAddForm] = useState(false);
     
     const { data: formData, setData: setFormData, post: submitForm, put: updateForm, processing, errors, reset } = useForm({
+        project_id: selectedProjectId || '',
         name_ar: '',
         description_ar: '',
         weight: 0,
@@ -18,6 +19,7 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
     });
 
     const { data: editData, setData: setEditData, put: updateEdit, processing: editProcessing, errors: editErrors, reset: resetEdit } = useForm({
+        project_id: null,
         name_ar: '',
         description_ar: '',
         weight: 0,
@@ -38,6 +40,7 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
     const handleEdit = (criterion) => {
         setEditingId(criterion.id);
         setEditData({
+            project_id: criterion.project_id || '',
             name_ar: criterion.name_ar,
             description_ar: criterion.description_ar || '',
             weight: criterion.weight,
@@ -81,10 +84,17 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
         }
     };
 
-    const getTotalWeightExcludingCurrent = (currentId) => {
+    const getTotalWeightExcludingCurrent = (currentId, projectId) => {
         return criteria
-            .filter(c => c.id !== currentId && editingId !== c.id)
+            .filter(c => c.id !== currentId && editingId !== c.id && c.project_id === projectId)
             .reduce((sum, c) => sum + parseFloat(c.weight || 0), 0);
+    };
+
+    const handleProjectChange = (projectId) => {
+        router.get(route('admin.acceptance-criteria.index'), { project_id: projectId || null }, {
+            preserveState: true,
+            preserveScroll: true,
+        });
     };
 
     return (
@@ -109,6 +119,30 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                     )}
                 </div>
 
+                {/* Project Filter */}
+                <div className="bg-white rounded-xl shadow-lg p-4 border border-gray-200">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        اختر المشروع
+                    </label>
+                    <select
+                        value={selectedProjectId || ''}
+                        onChange={(e) => handleProjectChange(e.target.value || null)}
+                        className="w-full md:w-1/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    >
+                        <option value="">جميع المعايير (عام)</option>
+                        {projects.map((project) => (
+                            <option key={project.id} value={project.id}>
+                                {project.title}
+                            </option>
+                        ))}
+                    </select>
+                    {selectedProjectId && (
+                        <p className="mt-2 text-sm text-gray-600">
+                            عرض معايير المشروع: {projects.find(p => p.id == selectedProjectId)?.title}
+                        </p>
+                    )}
+                </div>
+
                 {/* Add Form */}
                 {showAddForm && (
                     <div className="bg-white rounded-xl shadow-lg p-6 border-2 border-green-200">
@@ -125,6 +159,23 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                             </button>
                         </div>
                         <form onSubmit={handleAdd} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    المشروع (اختياري - اتركه فارغاً للمعايير العامة)
+                                </label>
+                                <select
+                                    value={formData.project_id || ''}
+                                    onChange={(e) => setFormData('project_id', e.target.value || null)}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                >
+                                    <option value="">معايير عامة</option>
+                                    {projects.map((project) => (
+                                        <option key={project.id} value={project.id}>
+                                            {project.title}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     اسم المعيار <span className="text-red-500">*</span>
@@ -221,38 +272,57 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                             <FaTimes />
                                         </button>
                                     </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-4">
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                اسم المعيار
+                                                المشروع (اختياري)
                                             </label>
-                                            <input
-                                                type="text"
-                                                value={editData.name_ar}
-                                                onChange={(e) => setEditData('name_ar', e.target.value)}
-                                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                                                    editErrors.name_ar ? 'border-red-500' : 'border-gray-300'
-                                                }`}
-                                            />
+                                            <select
+                                                value={editData.project_id || ''}
+                                                onChange={(e) => setEditData('project_id', e.target.value || null)}
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                            >
+                                                <option value="">معايير عامة</option>
+                                                {projects.map((project) => (
+                                                    <option key={project.id} value={project.id}>
+                                                        {project.title}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                الوزن (%)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                min="0"
-                                                max="100"
-                                                step="0.01"
-                                                value={editData.weight}
-                                                onChange={(e) => handleWeightChange(criterion.id, e.target.value)}
-                                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                                                    editErrors.weight ? 'border-red-500' : 'border-gray-300'
-                                                }`}
-                                            />
-                                            <p className="mt-1 text-xs text-gray-500">
-                                                المجموع الحالي (بدون هذا المعيار): {getTotalWeightExcludingCurrent(criterion.id).toFixed(2)}%
-                                            </p>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    اسم المعيار
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={editData.name_ar}
+                                                    onChange={(e) => setEditData('name_ar', e.target.value)}
+                                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                                                        editErrors.name_ar ? 'border-red-500' : 'border-gray-300'
+                                                    }`}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    الوزن (%)
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    max="100"
+                                                    step="0.01"
+                                                    value={editData.weight}
+                                                    onChange={(e) => handleWeightChange(criterion.id, e.target.value)}
+                                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                                                        editErrors.weight ? 'border-red-500' : 'border-gray-300'
+                                                    }`}
+                                                />
+                                                <p className="mt-1 text-xs text-gray-500">
+                                                    المجموع الحالي (بدون هذا المعيار): {getTotalWeightExcludingCurrent(criterion.id, editData.project_id || null).toFixed(2)}%
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                     <div>
@@ -296,6 +366,11 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                     
                                     {/* Content */}
                                     <div className="flex-1">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                                {criterion.project_title || 'عام'}
+                                            </span>
+                                        </div>
                                         <h3 className="text-xl font-bold text-gray-900 mb-2">
                                             {criterion.name_ar}
                                         </h3>

@@ -121,14 +121,24 @@ class ZiinaWebhookController extends Controller
                         'start_date' => now(),
                     ]);
 
-                    // Add bonus points
+                    // Add bonus points using PointsService for proper integration
                     if ($userPackage->package && $userPackage->package->points_bonus > 0) {
                         $user = $userPackage->user;
                         if ($user) {
-                            $user->increment('points', $userPackage->package->points_bonus);
-                            Log::info('Added bonus points to user', [
+                            $pointsService = app(\App\Services\PointsService::class);
+                            $pointsService->awardPoints(
+                                $user->id,
+                                $userPackage->package->points_bonus,
+                                'package_bonus',
+                                $userPackage->package_id,
+                                "Package subscription bonus: {$userPackage->package->name}",
+                                "مكافأة اشتراك الباقة: {$userPackage->package->name_ar}"
+                            );
+                            
+                            Log::info('Added bonus points to user via PointsService', [
                                 'user_id' => $user->id,
                                 'points' => $userPackage->package->points_bonus,
+                                'package_id' => $userPackage->package_id,
                             ]);
                         }
                     }

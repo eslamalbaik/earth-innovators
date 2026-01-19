@@ -95,7 +95,6 @@ class PackageSubscriptionController extends Controller
             return redirect()->route('login')->with('error', 'يرجى تسجيل الدخول أولاً');
         }
 
-        // Check if user already has an active subscription
         $activeSubscription = UserPackage::where('user_id', $user->id)
             ->where('status', 'active')
             ->first();
@@ -107,7 +106,6 @@ class PackageSubscriptionController extends Controller
         try {
             DB::beginTransaction();
 
-            // Create user package record with pending status
             $userPackage = UserPackage::create([
                 'user_id' => $user->id,
                 'package_id' => $package->id,
@@ -120,7 +118,6 @@ class PackageSubscriptionController extends Controller
                 'transaction_id' => 'TXN-' . Str::upper(Str::random(12)),
             ]);
 
-            // Create payment record
             $payment = Payment::create([
                 'student_id' => $user->id,
                 'amount' => $package->price,
@@ -132,7 +129,6 @@ class PackageSubscriptionController extends Controller
                 'payment_reference' => 'PKG-' . $package->id . '-' . $user->id . '-' . time(),
             ]);
 
-            // Create Ziina payment request
             $paymentData = [
                 'amount' => $package->price,
                 'currency' => $package->currency,
@@ -160,7 +156,6 @@ class PackageSubscriptionController extends Controller
                 return redirect()->back()->with('error', $ziinaResponse['message'] ?? 'فشل في إنشاء طلب الدفع');
             }
 
-            // Update payment with Ziina response
             $payment->update([
                 'gateway_payment_id' => $ziinaResponse['id'] ?? null,
                 'gateway_response' => $ziinaResponse,
@@ -168,7 +163,6 @@ class PackageSubscriptionController extends Controller
 
             DB::commit();
 
-            // Redirect to Ziina payment page
             if (isset($ziinaResponse['payment_url'])) {
                 return redirect($ziinaResponse['payment_url']);
             }
@@ -188,26 +182,21 @@ class PackageSubscriptionController extends Controller
         }
     }
 
-    /**
-     * Handle successful payment
-     */
+
     public function paymentSuccess(Payment $payment)
     {
         try {
-            // Verify payment status with Ziina
             $paymentRequest = $this->ziinaService->getPaymentRequest($payment->gateway_payment_id);
 
             if ($paymentRequest && isset($paymentRequest['status']) && $paymentRequest['status'] === 'paid') {
                 DB::beginTransaction();
 
-                // Update payment status
                 $payment->update([
                     'status' => 'completed',
                     'paid_at' => now(),
                     'gateway_response' => $paymentRequest,
                 ]);
 
-                // Get user package from metadata
                 $metadata = $payment->gateway_response['metadata'] ?? [];
                 $userPackageId = $metadata['user_package_id'] ?? null;
 
@@ -219,10 +208,18 @@ class PackageSubscriptionController extends Controller
                             'start_date' => now(),
                         ]);
 
-                        // Add bonus points to user if applicable
                         if ($userPackage->package->points_bonus > 0) {
                             $user = $userPackage->user;
-                            $user->increment('points', $userPackage->package->points_bonus);
+                            // Use PointsService for proper integration
+                            $pointsService = app(\App\Services\PointsService::class);
+                            $pointsService->awardPoints(
+                                $user->id,
+                                $userPackage->package->points_bonus,
+                                'package_bonus',
+                                $userPackage->package_id,
+                                "Package subscription bonus: {$userPackage->package->name}",
+                                "مكافأة اشتراك الباقة: {$userPackage->package->name_ar}"
+                            );
                         }
                     }
                 }
@@ -253,7 +250,6 @@ class PackageSubscriptionController extends Controller
         try {
             $payment->update(['status' => 'cancelled']);
 
-            // Update user package status
             $metadata = $payment->gateway_response['metadata'] ?? [];
             $userPackageId = $metadata['user_package_id'] ?? null;
 

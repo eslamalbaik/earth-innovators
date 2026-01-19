@@ -29,14 +29,9 @@ export default function CustomizePackageModal({ onClose }) {
         setErrors({});
 
         try {
-            // Get CSRF token
             const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-            
-            // Use window.axios which is configured in bootstrap.js
-            const axios = window.axios || (await import('axios')).default;
-            
+            const axios = window.axios || (await import('axios')).default;  
             const url = '/api/customize-package-request';
-            console.log('Submitting to:', url, 'with data:', formData);
             
             const response = await axios.post(url, formData, {
                 headers: {
@@ -59,7 +54,6 @@ export default function CustomizePackageModal({ onClose }) {
                 onClose();
             }
         } catch (error) {
-            console.error('Error submitting form:', error);
             if (error.response && error.response.data && error.response.data.errors) {
                 setErrors(error.response.data.errors);
             } else if (error.response && error.response.data && error.response.data.message) {
@@ -91,7 +85,6 @@ export default function CustomizePackageModal({ onClose }) {
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* اسم المدرسة / الجهة */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 اسم المدرسة / الجهة
@@ -110,7 +103,6 @@ export default function CustomizePackageModal({ onClose }) {
                             )}
                         </div>
 
-                        {/* اسم المسؤول */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 اسم المسؤول
@@ -129,7 +121,6 @@ export default function CustomizePackageModal({ onClose }) {
                             )}
                         </div>
 
-                        {/* رقم الجوال */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 رقم الجوال
@@ -148,7 +139,6 @@ export default function CustomizePackageModal({ onClose }) {
                             )}
                         </div>
 
-                        {/* العدد المتوقع للطلاب */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 العدد المتوقع للطلاب
@@ -169,7 +159,6 @@ export default function CustomizePackageModal({ onClose }) {
                         </div>
                     </div>
 
-                    {/* ملاحظات إضافية */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             ملاحظات إضافية
@@ -188,7 +177,6 @@ export default function CustomizePackageModal({ onClose }) {
                         )}
                     </div>
 
-                    {/* زر الإرسال */}
                     <div className="flex justify-end gap-4 pt-4">
                         <button
                             type="button"

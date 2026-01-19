@@ -110,10 +110,8 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
     const [bookingMessage, setBookingMessage] = useState(null);
     const [bookingError, setBookingError] = useState(null);
 
-    // استعادة الحالة المحفوظة عند فتح الـ modal
     useEffect(() => {
         if (isOpen && restoredState) {
-            console.log('Restoring booking state:', restoredState);
             if (restoredState.selectedSubject) {
                 setSelectedSubject(restoredState.selectedSubject);
             }
@@ -131,7 +129,6 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
 
     useEffect(() => {
         if (isOpen && subjects.length > 0) {
-            // إذا لم تكن هناك حالة مستعادة، استخدم أول مادة
             if (!restoredState || !restoredState.selectedSubject) {
                 setSelectedSubject(subjects[0]);
             }
@@ -163,7 +160,6 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
                 setAvailabilities(response.data.availabilities || {});
             }
         } catch (err) {
-            console.error('Error fetching availabilities:', err);
             setError('فشل تحميل المواعيد');
         } finally {
             setLoading(false);
@@ -230,15 +226,11 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
 
     const handleTimeSlotClick = (dayData, slot) => {
         if (slot.status === 'unavailable' || slot.status === 'booked') return;
-
-        // استخدام availabilityId كمعرف فريد للموعد (نفس الموعد لا يمكن حجزه مرتين بغض النظر عن المادة)
         const isAlreadySelected = selectedSessions.some(s => s.availabilityId === slot.id);
 
         if (isAlreadySelected) {
-            // إزالة الموعد المختار
             setSelectedSessions(selectedSessions.filter(s => s.availabilityId !== slot.id));
         } else {
-            // إضافة الموعد الجديد
             const sessionId = `${dayData.id}-${slot.id}-${selectedSubject}`;
             const newSession = {
                 id: sessionId,
@@ -255,7 +247,6 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
     };
 
     const isSlotSelected = (dayData, slot) => {
-        // التحقق من وجود availabilityId في المواعيد المختارة (بغض النظر عن المادة)
         return selectedSessions.some(s => s.availabilityId === slot.id);
     };
 
@@ -339,34 +330,21 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
             })),
         };
 
-        console.log('Sending booking request:', bookingData);
-
         try {
             const response = await axios.post('/bookings', bookingData);
-            console.log('Booking response:', response.data);
-
             if (response.data?.success) {
                 const bookingId = response.data?.data?.id;
-                console.log('Booking ID from response:', bookingId);
                 if (bookingId) {
-                    console.log('Redirecting to payment page:', `/payment/${bookingId}`);
                     window.location.href = `/payment/${bookingId}`;
                     return;
                 } else {
-                    console.error('No booking ID in response:', response.data);
                     setBookingError('تم إنشاء الحجز لكن لم يتم العثور على رقم الحجز. يرجى التحقق من حجوزاتك.');
                 }
             } else {
-                console.error('Booking failed:', response.data);
                 setBookingError(response.data?.message || 'تعذر إنشاء الحجز. يرجى المحاولة مرة أخرى.');
             }
         } catch (e) {
-            console.error('Booking error:', e);
-            console.error('Error response:', e?.response?.data);
-            console.error('Error status:', e?.response?.status);
-
             if (e?.response?.status === 401) {
-                // حفظ بيانات الحجز في sessionStorage
                 const bookingState = {
                     teacher: {
                         id: teacher.id,
@@ -392,9 +370,7 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
 
                 try {
                     sessionStorage.setItem('pendingBooking', JSON.stringify(bookingState));
-                    console.log('Booking state saved to sessionStorage');
                 } catch (storageError) {
-                    console.error('Failed to save booking state:', storageError);
                 }
 
                 const intended = encodeURIComponent('/dashboard');

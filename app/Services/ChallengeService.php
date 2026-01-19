@@ -186,8 +186,28 @@ class ChallengeService extends BaseService
         DB::beginTransaction();
         try {
             // Handle image upload
-            if (isset($data['image']) && is_file($data['image'])) {
-                $data['image'] = $data['image']->store('challenges/images', 'public');
+            if (isset($data['image'])) {
+                if ($data['image'] instanceof \Illuminate\Http\UploadedFile && $data['image']->isValid()) {
+                    $data['image'] = $data['image']->store('challenges/images', 'public');
+                } elseif (is_string($data['image']) && $data['image'] !== '') {
+                    // Keep existing image path
+                    // Do nothing, keep the string value
+                } else {
+                    // Remove invalid image data
+                    unset($data['image']);
+                }
+            }
+
+            // Ensure required fields have defaults
+            $data['current_participants'] = $data['current_participants'] ?? 0;
+            $data['points_reward'] = $data['points_reward'] ?? 0;
+            
+            // Convert empty strings to null for nullable fields
+            if (isset($data['max_participants']) && $data['max_participants'] === '') {
+                $data['max_participants'] = null;
+            }
+            if (isset($data['school_id']) && $data['school_id'] === '') {
+                $data['school_id'] = null;
             }
 
             $challenge = Challenge::create($data);
@@ -205,6 +225,11 @@ class ChallengeService extends BaseService
             return $challenge;
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Error creating challenge', [
+                'data' => $data,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             throw $e;
         }
     }

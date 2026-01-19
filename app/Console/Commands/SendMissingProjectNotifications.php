@@ -43,8 +43,6 @@ class SendMissingProjectNotifications extends Command
                 $this->warn("Skipping project {$project->id}: School not found or invalid role");
                 continue;
             }
-
-            // تحقق من وجود إشعار سابق
             $existingNotification = $school->notifications()
                 ->where('type', 'App\Notifications\TeacherProjectCreatedNotification')
                 ->whereJsonContains('data->project_id', $project->id)

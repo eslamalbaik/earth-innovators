@@ -257,14 +257,14 @@ class BadgeService extends BaseService
             ]
         );
 
-        // إرسال إشعار للطالب عند منح الشارة (فقط إذا كانت جديدة)
+        // Fire event when badge is awarded (only if it's new)
         if ($wasCreated) {
             $student = \App\Models\User::find($userId);
             $badge = Badge::find($badgeId);
-            $awardedByUser = \App\Models\User::find($awardedById);
 
-            if ($student && $badge && $awardedByUser) {
-                \App\Jobs\SendBadgeAwardedNotification::dispatch($student, $badge, $awardedByUser);
+            if ($student && $badge) {
+                // Fire BadgeGranted event for proper integration
+                event(new \App\Events\BadgeGranted($student, $badge));
             }
         }
 
@@ -411,7 +411,7 @@ class BadgeService extends BaseService
                     $badge->id,
                     null, // project_id
                     null, // challenge_id
-                    "Automatically earned for reaching {$badge->points_required} points",
+                    "تم الحصول عليها تلقائياً عند الوصول إلى {$badge->points_required} نقطة",
                     null  // awarded_by (system)
                 );
             }

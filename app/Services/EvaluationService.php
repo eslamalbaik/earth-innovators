@@ -152,20 +152,19 @@ class EvaluationService extends BaseService
         $pointsToAward = (int) round(($score / 100) * $challenge->points_reward);
 
         if ($pointsToAward > 0) {
+            // Use PointsService for proper integration
+            $pointsService = app(\App\Services\PointsService::class);
+            
             // Update submission points
             $submission->update(['points_earned' => $pointsToAward]);
 
-            // Add points to student
-            \App\Models\Point::create([
-                'user_id' => $submission->student_id,
-                'amount' => $pointsToAward,
-                'source' => 'challenge',
-                'source_id' => $challenge->id,
-                'description' => 'نقاط من تقييم تحدّي: ' . $challenge->title,
-            ]);
-
-            // Update user total points
-            $submission->student->increment('points', $pointsToAward);
+            // Award points using PointsService
+            $pointsService->awardChallengePoints(
+                $submission->student_id,
+                $challenge->id,
+                $pointsToAward,
+                "تقييم تحدّي: {$challenge->title} (النتيجة: {$score}%)"
+            );
         }
     }
 
@@ -188,19 +187,30 @@ class EvaluationService extends BaseService
             // Update submission points
             $submission->update(['points_earned' => $newPoints]);
 
-            // Update student points
+            // Update student points using PointsService
+            $pointsService = app(\App\Services\PointsService::class);
+            
             if ($pointsDiff > 0) {
-                \App\Models\Point::create([
-                    'user_id' => $submission->student_id,
-                    'amount' => $pointsDiff,
-                    'source' => 'challenge',
-                    'source_id' => $challenge->id,
-                    'description' => 'تحديث نقاط من تقييم تحدّي: ' . $challenge->title,
-                ]);
-                $submission->student->increment('points', $pointsDiff);
+                // Award additional points
+                $pointsService->awardChallengePoints(
+                    $submission->student_id,
+                    $challenge->id,
+                    $pointsDiff,
+                    "تحديث نقاط من تقييم تحدّي: {$challenge->title}"
+                );
             } else {
                 // Deduct points (should be rare, but handle it)
+                // Note: PointsService doesn't have a deduct method, so we'll handle it manually
+                // but this should be logged and reviewed
                 $submission->student->decrement('points', abs($pointsDiff));
+                
+                // Log the deduction for audit purposes
+                \Illuminate\Support\Facades\Log::warning('Points deducted from user', [
+                    'user_id' => $submission->student_id,
+                    'points_deducted' => abs($pointsDiff),
+                    'challenge_id' => $challenge->id,
+                    'reason' => 'Score decreased in evaluation update'
+                ]);
             }
         }
     }

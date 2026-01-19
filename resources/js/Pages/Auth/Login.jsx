@@ -24,28 +24,20 @@ export default function Login({ status, canResetPassword }) {
         post(route('login'), {
             onFinish: () => reset('password'),
             onSuccess: () => {
-                // التحقق من وجود pendingBooking في sessionStorage
                 try {
                     const pendingBooking = sessionStorage.getItem('pendingBooking');
                     if (pendingBooking) {
-                        // التحقق من صلاحية البيانات (أقل من 24 ساعة)
                         const bookingState = JSON.parse(pendingBooking);
                         const oneDayInMs = 24 * 60 * 60 * 1000;
                         if (Date.now() - bookingState.timestamp < oneDayInMs) {
-                            // إذا كان هناك حجز معلق، التوجيه إلى الصفحة الرئيسية
-                            // استخدام window.location.href للتأكد من التوجيه حتى لو كان هناك redirect من الـ server
-                            window.location.href = '/';
+                             window.location.href = '/';
                             return;
                         } else {
-                            // حذف البيانات القديمة
                             sessionStorage.removeItem('pendingBooking');
                         }
                     }
-                    // إذا لم يكن هناك حجز معلق، السماح بالسلوك الافتراضي (التوجيه إلى /dashboard)
                 } catch (error) {
-                    console.error('Error checking pending booking:', error);
                     sessionStorage.removeItem('pendingBooking');
-                    // في حالة الخطأ، السماح بالسلوك الافتراضي
                 }
             },
         });

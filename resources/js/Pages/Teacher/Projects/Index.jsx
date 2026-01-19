@@ -29,10 +29,8 @@ export default function TeacherProjects({ projects, auth }) {
             router.delete(`/teacher/projects/${projectId}`, {
                 preserveScroll: true,
                 onSuccess: () => {
-                    // تم الحذف بنجاح
                 },
                 onError: (errors) => {
-                    console.error('Error deleting project:', errors);
                     showError('حدث خطأ أثناء حذف المشروع. يرجى المحاولة مرة أخرى.');
                 },
             });

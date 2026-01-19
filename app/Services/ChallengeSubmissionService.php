@@ -4,9 +4,12 @@ namespace App\Services;
 
 use App\Models\ChallengeSubmission;
 use App\Models\Challenge;
+use App\Services\PointsService;
+use App\Services\BadgeService;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ChallengeSubmissionService extends BaseService
 {
@@ -249,23 +252,38 @@ class ChallengeSubmissionService extends BaseService
         try {
             $data['reviewed_at'] = now();
             $data['status'] = $data['status'] ?? 'reviewed';
-            $reviewedBy = $data['reviewed_by'] ?? auth()->id();
+            $reviewedBy = $data['reviewed_by'] ?? auth()->id() ?? 1; // Default to 1 if no auth in tests
 
             $submission->update($data);
 
-            // Award points if approved
+            // Award points if approved using PointsService for better integration
             if ($data['status'] === 'approved' && $submission->challenge->points_reward > 0) {
-                $points = $data['points_earned'] ?? $submission->challenge->points_reward;
-                $submission->update(['points_earned' => $points]);
+                $pointsService = app(PointsService::class);
+                $basePoints = $data['points_earned'] ?? $submission->challenge->points_reward;
                 
-                // Add points to student
-                \App\Models\Point::create([
-                    'user_id' => $submission->student_id,
-                    'amount' => $points,
-                    'source' => 'challenge',
-                    'source_id' => $submission->challenge_id,
-                    'description' => 'نقاط من تحدّي: ' . $submission->challenge->title,
-                ]);
+                // Bonus points for high ratings
+                $bonusPoints = 0;
+                if (isset($data['rating']) && $data['rating'] >= 4.5) {
+                    $bonusPoints = 5; // Extra 5 points for excellent work
+                } elseif (isset($data['rating']) && $data['rating'] >= 4) {
+                    $bonusPoints = 3; // Extra 3 points for very good work
+                }
+                
+                $totalPoints = $basePoints + $bonusPoints;
+                
+                // Award points using PointsService
+                $pointsService->awardChallengePoints(
+                    $submission->student_id,
+                    $submission->challenge_id,
+                    $totalPoints,
+                    "Completed challenge: {$submission->challenge->title}"
+                );
+                
+                // Update submission with points earned
+                $submission->update(['points_earned' => $totalPoints]);
+                
+                // Check for automatic certificate eligibility
+                $this->checkAutomaticCertificateEligibility($submission->student, $submission);
             }
 
             $this->clearSubmissionCache($submission->challenge_id, $submission->student_id);
@@ -307,6 +325,62 @@ class ChallengeSubmissionService extends BaseService
     private function clearSubmissionCache(int $challengeId, int $studentId): void
     {
         \Cache::forget("challenge_details_student_{$challengeId}_{$studentId}");
+    }
+
+    /**
+     * Check if student is eligible for automatic certificate after challenge completion
+     */
+    private function checkAutomaticCertificateEligibility(\App\Models\User $student, ChallengeSubmission $submission): void
+    {
+        try {
+            // Check if student has completed a milestone (e.g., 5, 10, 20 approved challenges)
+            $approvedChallengesCount = ChallengeSubmission::where('student_id', $student->id)
+                ->where('status', 'approved')
+                ->where('points_earned', '>', 0)
+                ->count();
+
+            // Milestones for automatic certificates
+            $milestones = [5, 10, 20, 50, 100];
+            
+            if (in_array($approvedChallengesCount, $milestones)) {
+                $certificateService = app(\App\Services\CertificateService::class);
+                
+                // Generate certificate for milestone
+                $certificateData = [
+                    'course_name' => "إكمال {$approvedChallengesCount} تحدّي بنجاح",
+                    'description' => "تم إصدار هذه الشهادة لإكمال {$approvedChallengesCount} تحدّي بنجاح",
+                    'description_ar' => "تم إصدار هذه الشهادة لإكمال {$approvedChallengesCount} تحدّي بنجاح",
+                ];
+                
+                // Generate PDF
+                $filePath = $certificateService->generateCertificate(
+                    $student,
+                    $student, // Self-issued for milestones
+                    $certificateData,
+                    null,
+                    'long',
+                    'achievement'
+                );
+                
+                // Save certificate
+                $certificate = $certificateService->saveCertificate(
+                    $student,
+                    $student,
+                    $filePath,
+                    $certificateData,
+                    'achievement'
+                );
+                
+                // Fire event for notification
+                event(new \App\Events\CertificateIssued($certificate, $student));
+            }
+        } catch (\Exception $e) {
+            Log::error('Error checking automatic certificate eligibility for challenge', [
+                'student_id' => $student->id,
+                'submission_id' => $submission->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }
 

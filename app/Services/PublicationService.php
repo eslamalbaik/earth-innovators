@@ -209,6 +209,30 @@ class PublicationService extends BaseService
             'approved_at' => now(),
         ]);
 
+        // Award points to author for publication approval
+        if ($publication->author_id) {
+            try {
+                $pointsService = app(\App\Services\PointsService::class);
+                $pointsService->awardPoints(
+                    $publication->author_id,
+                    20, // Points for publication approval
+                    'publication_approval',
+                    $publication->id,
+                    "Publication approved: {$publication->title}",
+                    "تم الموافقة على المقال: {$publication->title}"
+                );
+            } catch (\Exception $e) {
+                \Log::error('Failed to award points for publication approval', [
+                    'publication_id' => $publication->id,
+                    'author_id' => $publication->author_id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        // Fire ArticleApproved event for proper integration
+        event(new \App\Events\ArticleApproved($publication->fresh()));
+
         // إرسال إشعار لجميع الطلاب والمعلمين في المدرسة مباشرة
         try {
             $publication = $publication->fresh(['author', 'school']);

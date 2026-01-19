@@ -60,10 +60,8 @@ export default function TeacherBookings({ bookings }) {
                 alert(response.data.message || 'حدث خطأ أثناء تحديث الحالة');
             }
         } catch (error) {
-            console.error('Status update error:', error);
             const errorMessage = error.response?.data?.message || error.response?.data?.error || 'حدث خطأ أثناء تحديث الحالة';
             alert(errorMessage);
-            // إعادة تحميل الصفحة لإعادة الحالة الأصلية
             router.reload({ only: ['bookings'] });
         } finally {
             setUpdating(null);

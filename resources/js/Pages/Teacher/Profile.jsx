@@ -57,29 +57,13 @@ export default function Profile({ teacher, subjects, cities }) {
                 }
                 return;
             }
-            console.log('Image selected:', {
-                name: file.name,
-                size: file.size,
-                type: file.type,
-                isFile: file instanceof File,
-            });
             setSelectedImage(file);
             setImagePreview(URL.createObjectURL(file));
-            console.log('Image set in selectedImage state');
         }
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        console.log('Submitting form data:', {
-            hasImage: !!selectedImage,
-            imageType: selectedImage?.constructor?.name,
-            imageName: selectedImage?.name,
-            imageSize: selectedImage?.size,
-            isFile: selectedImage instanceof File,
-        });
-
         const formData = new FormData();
         formData.append('name_ar', data.name_ar);
         formData.append('name_en', data.name_en);
@@ -112,24 +96,16 @@ export default function Profile({ teacher, subjects, cities }) {
         }
 
         if (selectedImage) {
-            console.log('Adding image to FormData:', selectedImage);
             formData.append('image', selectedImage);
         } else {
-            console.log('No image to add');
         }
 
         formData.append('_method', 'PUT');
-
-        console.log('FormData entries:');
-        for (let pair of formData.entries()) {
-            console.log(pair[0] + ': ' + (pair[1] instanceof File ? `${pair[1].name} (${pair[1].size} bytes)` : pair[1]));
-        }
 
         router.post('/teacher/profile', formData, {
             forceFormData: true,
             preserveScroll: false,
             onSuccess: (page) => {
-                console.log('Profile updated successfully');
                 setIsEditing(false);
                 setImagePreview(null);
                 setSelectedImage(null);
@@ -144,9 +120,6 @@ export default function Profile({ teacher, subjects, cities }) {
                 }, 200);
             },
             onError: (errors) => {
-                console.error('Profile update errors:', errors);
-                console.error('Full error response:', JSON.stringify(errors, null, 2));
-
                 let errorMessage = 'حدث خطأ أثناء حفظ البيانات:\n';
                 if (errors.image) {
                     errorMessage += 'الصورة: ' + (Array.isArray(errors.image) ? errors.image.join(', ') : errors.image) + '\n';

@@ -77,17 +77,14 @@ export default function SchoolPublicationEdit({ auth, publication }) {
             forceFormData: true,
             preserveScroll: true,
             onSuccess: (page) => {
-                // Clean up blob URL if exists
                 if (coverPreview && coverPreview.startsWith('blob:')) {
                     URL.revokeObjectURL(coverPreview);
                 }
-                // Update preview with the new image path if available
                 if (page?.props?.publication?.cover_image) {
                     setCoverPreview(getImageUrl(page.props.publication.cover_image));
                 }
             },
             onError: (errors) => {
-                console.error('Update errors:', errors);
             },
         });
     };
@@ -185,9 +182,7 @@ export default function SchoolPublicationEdit({ auth, publication }) {
                                             alt="Preview"
                                             className="w-48 h-48 object-cover rounded-lg border border-gray-300"
                                             onError={(e) => {
-                                                console.error('Failed to load image:', coverPreview);
                                                 e.target.style.display = 'none';
-                                                // Show error message
                                                 const errorDiv = document.createElement('div');
                                                 errorDiv.className = 'mt-2 text-sm text-red-600';
                                                 errorDiv.textContent = 'فشل تحميل الصورة';

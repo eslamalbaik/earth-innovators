@@ -205,10 +205,70 @@ class TeacherProjectController extends Controller
             abort(403, 'غير مصرح لك بعرض هذا المشروع');
         }
 
-        $project->load(['school', 'approver', 'user', 'teacher']);
+        $project->load(['school', 'approver', 'user', 'teacher', 'submissions.student']);
+
+        // Format files and images URLs
+        $files = [];
+        if ($project->files && is_array($project->files)) {
+            foreach ($project->files as $file) {
+                $files[] = $file;
+            }
+        }
+
+        $images = [];
+        if ($project->images && is_array($project->images)) {
+            foreach ($project->images as $image) {
+                $images[] = $image;
+            }
+        }
+
+        // Format submissions
+        $submissions = $project->submissions->map(function ($submission) {
+            return [
+                'id' => $submission->id,
+                'student' => $submission->student ? [
+                    'id' => $submission->student->id,
+                    'name' => $submission->student->name,
+                    'email' => $submission->student->email,
+                ] : null,
+                'comment' => $submission->comment,
+                'files' => $submission->files ?? [],
+                'status' => $submission->status,
+                'submitted_at' => $submission->submitted_at?->format('Y-m-d H:i:s'),
+                'evaluated_at' => $submission->evaluated_at?->format('Y-m-d H:i:s'),
+            ];
+        });
 
         return Inertia::render('Teacher/Projects/Show', [
-            'project' => $project,
+            'project' => [
+                'id' => $project->id,
+                'title' => $project->title,
+                'description' => $project->description,
+                'category' => $project->category,
+                'status' => $project->status,
+                'files' => $files,
+                'images' => $images,
+                'views' => $project->views ?? 0,
+                'likes' => $project->likes ?? 0,
+                'rating' => $project->rating ?? 0,
+                'points_earned' => $project->points_earned ?? 0,
+                'user' => $project->user ? [
+                    'id' => $project->user->id,
+                    'name' => $project->user->name,
+                    'email' => $project->user->email,
+                ] : null,
+                'school' => $project->school ? [
+                    'id' => $project->school->id,
+                    'name' => $project->school->name,
+                ] : null,
+                'teacher' => $project->teacher ? [
+                    'id' => $project->teacher->id,
+                    'name_ar' => $project->teacher->name_ar,
+                ] : null,
+                'created_at' => $project->created_at->format('Y-m-d H:i:s'),
+                'approved_at' => $project->approved_at?->format('Y-m-d H:i:s'),
+                'submissions' => $submissions,
+            ],
         ]);
     }
 
@@ -282,7 +342,7 @@ class TeacherProjectController extends Controller
             'category' => 'nullable|in:science,technology,engineering,mathematics,arts,other',
             'school_id' => 'nullable|exists:users,id',
             'files' => 'nullable|array',
-            'files.*' => 'file|max:10240|mimes:pdf,doc,docx,jpg,jpeg,png,gif,mp4,avi,mov',
+            'files.*' => 'file|max:10240',
             'remove_files' => 'nullable|array',
             'remove_files.*' => 'string',
         ], [
@@ -325,17 +385,26 @@ class TeacherProjectController extends Controller
         // رفع الملفات الجديدة
         if ($request->hasFile('files')) {
             $uploadedFiles = $project->files ?? [];
-            foreach ($request->file('files') as $file) {
-                // تحديد نوع الملف (صورة أو فيديو أو PDF)
-                $mimeType = $file->getMimeType();
-                if (str_starts_with($mimeType, 'image/')) {
-                    $path = $file->store('projects/images', 'public');
-                } elseif (str_starts_with($mimeType, 'video/')) {
-                    $path = $file->store('projects/videos', 'public');
-                } else {
-                    $path = $file->store('projects/files', 'public');
+            $files = $request->file('files');
+            
+            // التأكد من أن files هو array
+            if (!is_array($files)) {
+                $files = [$files];
+            }
+            
+            foreach ($files as $file) {
+                if ($file && $file->isValid()) {
+                    // تحديد نوع الملف (صورة أو فيديو أو PDF)
+                    $mimeType = $file->getMimeType();
+                    if (str_starts_with($mimeType, 'image/')) {
+                        $path = $file->store('projects/images', 'public');
+                    } elseif (str_starts_with($mimeType, 'video/')) {
+                        $path = $file->store('projects/videos', 'public');
+                    } else {
+                        $path = $file->store('projects/files', 'public');
+                    }
+                    $uploadedFiles[] = $path;
                 }
-                $uploadedFiles[] = $path;
             }
             $project->files = $uploadedFiles;
         }

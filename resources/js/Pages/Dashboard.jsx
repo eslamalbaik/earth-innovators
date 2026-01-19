@@ -300,7 +300,7 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                             href="/my-bookings"
                             className="text-blue-600 hover:text-blue-700 text-sm font-medium"
                         >
-                            عرض الكل →
+                            عرض الكل
                         </Link>
                     </div>
                     <div className="overflow-x-auto">

@@ -273,18 +273,6 @@ export default function JoinTeacherForm({ subjects = [], cities = [] }) {
                 formDataToSend.append('experiences', JSON.stringify(formData.experiences));
             }
 
-            // Log البيانات المرسلة للتشخيص
-            console.log('Form data being sent:', {
-                name: formData.name,
-                email: formData.email,
-                phone: fullPhone,
-                city: formData.city,
-                subjects: formData.subjects,
-                stages: formData.stages,
-                price_per_hour: price,
-                hasProfileImage: !!formData.profile_image,
-            });
-
             const response = await axios.post('/join-teacher', formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -292,7 +280,6 @@ export default function JoinTeacherForm({ subjects = [], cities = [] }) {
             });
 
             if (response.data.success) {
-                console.log('✅ Form submitted successfully!');
                 if (response.data.redirect) {
                     router.visit(response.data.redirect);
                     return;
@@ -303,19 +290,12 @@ export default function JoinTeacherForm({ subjects = [], cities = [] }) {
                 }, 3000);
             }
         } catch (err) {
-            console.error('Error submitting form:', err);
-            console.error('Error response:', err.response?.data);
-
             if (err.response?.data?.errors) {
                 const errorMessages = Object.values(err.response.data.errors).flat();
-                console.error('Validation errors:', errorMessages);
-                console.error('Validation errors details:', err.response.data.errors);
                 setError('يرجى تصحيح الأخطاء التالية: ' + errorMessages.join(', '));
             } else if (err.response?.data?.message) {
-                console.error('Error message:', err.response.data.message);
                 setError(err.response.data.message);
             } else {
-                console.error('General error:', err.message);
                 setError('حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.');
             }
         } finally {

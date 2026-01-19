@@ -23,7 +23,6 @@ export default function MembershipCertificateShow({ auth, certificate, eligibili
                 router.reload();
             }
         } catch (error) {
-            console.error('Error checking eligibility:', error);
         }
     };
 

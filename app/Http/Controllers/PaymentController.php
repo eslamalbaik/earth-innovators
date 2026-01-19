@@ -110,7 +110,6 @@ class PaymentController extends Controller
                 return redirect()->route('bookings.student')->with('error', 'رقم الجوال غير صالح.');
             }
 
-            // التحقق من أن رقم الجوال بمقدمة سعودية (+966)
             if (!preg_match('/^\+966/', $phone)) {
                 return redirect()->route('bookings.student')->with('error', 'لا يمكن الدفع لأن رقم الجوال يجب أن يكون بمقدمة سعودية (+966). يرجى تحديث رقم الجوال في إعدادات الحساب.');
             }

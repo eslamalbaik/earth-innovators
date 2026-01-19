@@ -32,8 +32,6 @@ class AwardMembershipCertificate extends Command
         }
 
         $this->info("Found user: {$user->name} (ID: {$user->id}, Role: {$user->role})");
-
-        // Check eligibility
         $eligibility = $this->membershipCertificateService->getEligibilityStatus(
             $user->id,
             $user->role
@@ -50,8 +48,6 @@ class AwardMembershipCertificate extends Command
             $this->info("Use --force flag to award certificate anyway, or update user data to meet requirements.");
             return 1;
         }
-
-        // Award certificate
         $this->info("\nAwarding membership certificate...");
         
         try {

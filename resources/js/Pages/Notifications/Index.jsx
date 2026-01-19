@@ -37,11 +37,7 @@ export default function Index({ auth, notifications, unread_count }) {
         try {
             notificationChannel = window.Echo.private(channelName);
 
-            // Listen for new notifications
-            notificationChannel.listen('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', (e) => {
-                console.log('🔔 New notification received:', e);
-                
-                // Add new notification to the top of the list
+            notificationChannel.listen('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', (e) => {                
                 if (e.notification) {
                     const newNotification = {
                         id: e.notification.id,
@@ -56,10 +52,7 @@ export default function Index({ auth, notifications, unread_count }) {
                     setUnreadCount(prev => prev + 1);
                 }
             });
-
-            console.log('✅ Real-time notifications listener set up');
         } catch (error) {
-            console.warn('⚠️ Failed to set up real-time notifications:', error);
         }
 
         return () => {
@@ -67,7 +60,6 @@ export default function Index({ auth, notifications, unread_count }) {
                 try {
                     window.Echo.leave(channelName);
                 } catch (error) {
-                    console.warn('Error leaving notification channel:', error);
                 }
             }
         };
@@ -89,7 +81,6 @@ export default function Index({ auth, notifications, unread_count }) {
                     setUnreadCount(data.unread_count);
                 }
             } catch (error) {
-                console.warn('Failed to poll unread count:', error);
             }
         };
 

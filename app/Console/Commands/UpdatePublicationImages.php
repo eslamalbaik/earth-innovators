@@ -20,21 +20,15 @@ class UpdatePublicationImages extends Command
         Publication::chunk(100, function ($publications) use ($imagePath, $imageHtml, &$count, &$contentCount) {
             foreach ($publications as $publication) {
                 $updated = false;
-                
-                // تحديث cover_image
-                if ($publication->cover_image !== $imagePath) {
+                                if ($publication->cover_image !== $imagePath) {
                     $publication->cover_image = $imagePath;
                     $updated = true;
                     $count++;
                 }
-                
-                // إضافة الصورة في المحتوى إذا لم تكن موجودة
-                if ($publication->content && !str_contains($publication->content, 'methods-of-generating-an-innovative-idea.png')) {
-                    // إضافة الصورة بعد العنوان الأول
+                                if ($publication->content && !str_contains($publication->content, 'methods-of-generating-an-innovative-idea.png')) {
                     if (preg_match('/<h1[^>]*>.*?<\/h1>/s', $publication->content, $matches)) {
                         $publication->content = str_replace($matches[0], $matches[0] . "\n\n" . $imageHtml, $publication->content);
                     } else {
-                        // إذا لم يكن هناك h1، أضف الصورة في البداية
                         $publication->content = $imageHtml . $publication->content;
                     }
                     $updated = true;

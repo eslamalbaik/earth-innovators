@@ -25,14 +25,8 @@ class AdminDashboardController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-
-        // KPIs - المؤشرات الرئيسية
         $kpis = $this->getKPIs();
-
-        // المستخدمون حسب التصنيف
         $usersByRole = $this->getUsersByRole();
-
-        // المشاريع المنشورة (التي تم الموافقة عليها)
         $publishedProjects = Project::with(['user:id,name,email', 'school:id,name', 'teacher:id,name_ar'])
             ->where('status', 'approved')
             ->select('id', 'title', 'user_id', 'school_id', 'teacher_id', 'status', 'views', 'likes', 'created_at', 'approved_at')
@@ -53,7 +47,6 @@ class AdminDashboardController extends Controller
                 ];
             });
 
-        // المدفوعات الأخيرة (للاشتراكات)
         $recentPayments = Payment::with(['student:id,name,email'])
             ->where('status', 'completed')
             ->select('id', 'student_id', 'amount', 'currency', 'status', 'payment_method', 'created_at', 'paid_at')
@@ -71,7 +64,6 @@ class AdminDashboardController extends Controller
                 ];
             });
 
-        // طلبات الاشتراك (UserPackages)
         $subscriptions = UserPackage::with(['user:id,name,email,role', 'package:id,name_ar,price'])
             ->select('id', 'user_id', 'package_id', 'status', 'start_date', 'end_date', 'paid_amount', 'created_at')
             ->latest()
@@ -91,7 +83,6 @@ class AdminDashboardController extends Controller
                 ];
             });
 
-        // إحصائيات المدفوعات
         $paymentStats = [
             'total_revenue' => Payment::where('status', 'completed')->sum('amount'),
             'pending_payments' => Payment::where('status', 'pending')->count(),
@@ -99,7 +90,6 @@ class AdminDashboardController extends Controller
             'failed_payments' => Payment::where('status', 'failed')->count(),
         ];
 
-        // إحصائيات الاشتراكات
         $subscriptionStats = [
             'total_subscriptions' => UserPackage::count(),
             'active_subscriptions' => UserPackage::where('status', 'active')->count(),
@@ -107,15 +97,10 @@ class AdminDashboardController extends Controller
             'subscription_revenue' => UserPackage::where('status', 'active')->sum('paid_amount'),
         ];
 
-        // Chart data for analytical reports
         $selectedYear = $request->get('year', date('Y'));
         $chartData = $this->getChartData($selectedYear);
         $availableYears = $this->getAvailableYears();
-
-        // بيانات تفاعل الطلاب
         $engagementData = $this->getStudentEngagementData();
-
-        // جلب الإشعارات للأدمن
         $notifications = $this->notificationService->getUserNotifications($user->id, 10);
         $unreadCount = $this->notificationService->getUnreadCount($user->id);
 
@@ -172,14 +157,8 @@ class AdminDashboardController extends Controller
         ];
     }
 
-    /**
-     * Get available years that have data
-     * 
-     * @return array
-     */
     private function getAvailableYears(): array
     {
-        // Get years from users and projects
         $userYears = User::where('role', '!=', 'admin')
             ->selectRaw('YEAR(created_at) as year')
             ->distinct()
@@ -192,15 +171,13 @@ class AdminDashboardController extends Controller
             ->toArray();
 
         $years = array_unique(array_merge($userYears, $projectYears));
-        rsort($years); // Sort descending
+        rsort($years);
 
-        // If no data, return current year and a few previous years
         if (empty($years)) {
             $currentYear = (int)date('Y');
             return range($currentYear, $currentYear - 3);
         }
 
-        // Add current year if not exists
         $currentYear = (int)date('Y');
         if (!in_array($currentYear, $years)) {
             array_unshift($years, $currentYear);
@@ -225,7 +202,6 @@ class AdminDashboardController extends Controller
             'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
         ];
 
-        // Get actual data from database for the specified year
         $usersData = [];
         $projectsData = [];
 
@@ -233,12 +209,10 @@ class AdminDashboardController extends Controller
             $startDate = \Carbon\Carbon::create($year, $month, 1)->startOfMonth();
             $endDate = \Carbon\Carbon::create($year, $month, 1)->endOfMonth();
 
-            // Count users created in this month (excluding admins)
             $usersCount = User::where('role', '!=', 'admin')
                 ->whereBetween('created_at', [$startDate, $endDate])
                 ->count();
 
-            // Count projects created in this month
             $projectsCount = Project::whereBetween('created_at', [$startDate, $endDate])
                 ->count();
 
@@ -246,14 +220,10 @@ class AdminDashboardController extends Controller
             $projectsData[] = $projectsCount;
         }
 
-        // If no data exists for the selected year, use static data matching the image pattern
         $totalUsers = array_sum($usersData);
         $totalProjects = array_sum($projectsData);
 
         if ($totalUsers == 0 && $totalProjects == 0) {
-            // Static data matching the image description pattern
-            // Projects: starts low (10-15), gradually rises to 90-100
-            // Users: starts higher (20-25), rises more rapidly to 140-150
             $projectsData = [12, 18, 25, 35, 50, 65, 75, 85, 92, 96, 98, 100];
             $usersData = [22, 30, 45, 65, 85, 110, 125, 135, 142, 146, 148, 150];
         }
@@ -278,7 +248,6 @@ class AdminDashboardController extends Controller
             $year = $request->get('year', date('Y'));
             $year = (int)$year;
             
-            // Validate year range (reasonable range)
             if ($year < 2000 || $year > 2100) {
                 return response()->json([
                     'error' => 'Invalid year. Year must be between 2000 and 2100.',
@@ -309,28 +278,19 @@ class AdminDashboardController extends Controller
             return null;
         }
 
-        // If it's already a full URL (http/https), return as is
         if (strpos($imagePath, 'http://') === 0 || strpos($imagePath, 'https://') === 0) {
             return $imagePath;
         }
 
-        // If it already starts with /storage/, return as is
         if (strpos($imagePath, '/storage/') === 0) {
             return $imagePath;
         }
 
-        // Otherwise, prepend /storage/
         return '/storage/' . $imagePath;
     }
 
-    /**
-     * Get student engagement analytics data
-     * 
-     * @return array
-     */
     private function getStudentEngagementData(): array
     {
-        // Get top engaged students with their project stats
         $topStudents = User::where('role', 'student')
             ->withCount([
                 'projects as approved_projects_count' => function ($query) {
@@ -349,13 +309,10 @@ class AdminDashboardController extends Controller
             }])
             ->get()
             ->map(function ($student) {
-                // Calculate engagement score
                 $approvedProjects = $student->approved_projects_count ?? 0;
                 $badges = $student->badges_count ?? 0;
                 $points = $student->points ?? 0;
                 $challengesCompleted = $student->challenges_participated ?? 0;
-                
-                // Get total views and likes from approved projects using DB query
                 $projectStats = DB::table('projects')
                     ->where('user_id', $student->id)
                     ->where('status', 'approved')
@@ -365,15 +322,6 @@ class AdminDashboardController extends Controller
                 $totalViews = $projectStats->total_views ?? 0;
                 $totalLikes = $projectStats->total_likes ?? 0;
                 
-                // Calculate engagement percentage
-                // Formula: Weighted scoring system
-                // Projects: 30% weight (max 5 projects = 100%)
-                // Badges: 25% weight (max 10 badges = 100%)
-                // Points: 20% weight (max 500 points = 100%)
-                // Views: 15% weight (max 1000 views = 100%)
-                // Likes: 10% weight (max 100 likes = 100%)
-                // Challenges: 10% weight (max 5 challenges = 100%)
-                
                 $projectScore = min(100, ($approvedProjects / 5) * 100);
                 $badgeScore = min(100, ($badges / 10) * 100);
                 $pointScore = min(100, ($points / 500) * 100);
@@ -381,7 +329,6 @@ class AdminDashboardController extends Controller
                 $likeScore = min(100, ($totalLikes / 100) * 100);
                 $challengeScore = min(100, ($challengesCompleted / 5) * 100);
                 
-                // Weighted average
                 $engagementScore = 
                     ($projectScore * 0.30) + 
                     ($badgeScore * 0.25) + 
@@ -390,10 +337,7 @@ class AdminDashboardController extends Controller
                     ($likeScore * 0.10) + 
                     ($challengeScore * 0.10);
                 
-                // Get latest project for display
                 $latestProject = $student->projects->first();
-                
-                // Get total badges count for project display
                 $totalBadges = $student->badges_count ?? 0;
                 
                 return [
@@ -407,14 +351,13 @@ class AdminDashboardController extends Controller
                         ? 'منشور في ' . $latestProject->approved_at->format('d | n | Y')
                         : ($student->created_at ? 'منشور في ' . $student->created_at->format('d | n | Y') : 'لا يوجد منشورات'),
                     'image' => $this->formatUserImageUrl($student->image),
-                    'badge' => null, // Will be set based on ranking
+                    'badge' => null,
                     'approved_projects' => $approvedProjects,
                     'badges_count' => $badges,
                     'points' => $points,
                 ];
             })
             ->filter(function ($student) {
-                // Only include students with some activity
                 return $student['activity'] > 0;
             })
             ->sortByDesc('activity')
@@ -425,7 +368,6 @@ class AdminDashboardController extends Controller
                 return $student;
             });
 
-        // Get monthly engagement points (last 6 months)
         $monthlyData = [];
         $months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'];
         
@@ -433,8 +375,6 @@ class AdminDashboardController extends Controller
             $date = now()->subMonths($i);
             $startDate = $date->copy()->startOfMonth();
             $endDate = $date->copy()->endOfMonth();
-            
-            // Get all students and calculate their engagement for this month
             $students = User::where('role', 'student')->get();
             
             if ($students->isEmpty()) {
@@ -447,22 +387,18 @@ class AdminDashboardController extends Controller
             
             $engagementScores = [];
             foreach ($students as $student) {
-                // Count approved projects in this month
                 $approvedProjects = Project::where('user_id', $student->id)
                     ->where('status', 'approved')
                     ->whereBetween('approved_at', [$startDate, $endDate])
                     ->count();
                 
-                // Count badges earned in this month
                 $badges = DB::table('user_badges')
                     ->where('user_id', $student->id)
                     ->whereBetween('created_at', [$startDate, $endDate])
                     ->count();
                 
-                // Get current points (accumulated)
                 $points = $student->points ?? 0;
                 
-                // Get project stats for this month
                 $projectStats = DB::table('projects')
                     ->where('user_id', $student->id)
                     ->where('status', 'approved')
@@ -473,7 +409,6 @@ class AdminDashboardController extends Controller
                 $totalViews = $projectStats->total_views ?? 0;
                 $totalLikes = $projectStats->total_likes ?? 0;
                 
-                // Calculate engagement score using same weighted formula
                 $projectScore = min(100, ($approvedProjects / 5) * 100);
                 $badgeScore = min(100, ($badges / 10) * 100);
                 $pointScore = min(100, ($points / 500) * 100);
@@ -501,7 +436,6 @@ class AdminDashboardController extends Controller
             ];
         }
 
-        // Calculate trend percentage (compare current month with previous month)
         $currentMonthValue = $monthlyData[count($monthlyData) - 1]['value'] ?? 0;
         $previousMonthValue = count($monthlyData) > 1 ? $monthlyData[count($monthlyData) - 2]['value'] : 0;
         

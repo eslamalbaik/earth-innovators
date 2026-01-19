@@ -157,7 +157,7 @@ export default function AdminDashboardLegacy({ auth, stats = {} }) {
                                 مشاريع قيد المراجعة
                             </h3>
                             <Link href="/admin/projects/pending" className="text-[#A3C042] hover:text-legacy-blue text-sm font-medium">
-                                عرض الكل →
+                                عرض الكل
                             </Link>
                         </div>
                     </div>
@@ -194,7 +194,7 @@ export default function AdminDashboardLegacy({ auth, stats = {} }) {
                                 التحديات النشطة
                             </h3>
                             <Link href="/admin/challenges" className="text-[#A3C042] hover:text-legacy-blue text-sm font-medium">
-                                عرض الكل →
+                                عرض الكل
                             </Link>
                         </div>
                     </div>

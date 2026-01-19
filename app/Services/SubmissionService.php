@@ -4,9 +4,16 @@ namespace App\Services;
 
 use App\Models\Project;
 use App\Models\ProjectSubmission;
+use App\Models\User;
+use App\Services\PointsService;
+use App\Services\BadgeService;
+use App\Services\CertificateService;
+use App\Services\MembershipCertificateService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Http\UploadedFile;
 
 class SubmissionService extends BaseService
 {
@@ -30,10 +37,27 @@ class SubmissionService extends BaseService
 
         // Handle file uploads
         $uploadedFiles = [];
-        if (isset($data['files']) && is_array($data['files'])) {
-            foreach ($data['files'] as $file) {
-                if (is_file($file)) {
+        if (isset($data['files']) && is_array($data['files']) && !empty($data['files'])) {
+            Log::info('Processing files for submission', [
+                'files_count' => count($data['files']),
+                'project_id' => $projectId,
+                'student_id' => $studentId,
+            ]);
+            
+            foreach ($data['files'] as $index => $file) {
+                // Check if it's an UploadedFile instance
+                if ($file instanceof UploadedFile && $file->isValid()) {
+                    try {
                     $mimeType = $file->getMimeType();
+                        $originalName = $file->getClientOriginalName();
+                        
+                        Log::info('Uploading file', [
+                            'index' => $index,
+                            'name' => $originalName,
+                            'mime_type' => $mimeType,
+                            'size' => $file->getSize(),
+                        ]);
+                        
                     if (str_starts_with($mimeType, 'image/')) {
                         $path = $file->store('project-submissions/images', 'public');
                     } elseif (str_starts_with($mimeType, 'video/')) {
@@ -41,9 +65,31 @@ class SubmissionService extends BaseService
                     } else {
                         $path = $file->store('project-submissions/files', 'public');
                     }
+                        
                     $uploadedFiles[] = $path;
+                        Log::info('File uploaded successfully', ['path' => $path]);
+                    } catch (\Exception $e) {
+                        Log::error('Error uploading file', [
+                            'file_name' => $file->getClientOriginalName(),
+                            'error' => $e->getMessage(),
+                        ]);
+                        throw new \Exception('فشل في رفع الملف: ' . $file->getClientOriginalName() . ' - ' . $e->getMessage());
+                    }
+                } else {
+                    Log::warning('Invalid file in submission', [
+                        'index' => $index,
+                        'file_type' => gettype($file),
+                        'is_uploaded_file' => $file instanceof UploadedFile,
+                        'is_valid' => $file instanceof UploadedFile ? $file->isValid() : 'N/A',
+                    ]);
                 }
             }
+        } else {
+            Log::info('No files provided for submission', [
+                'has_files_key' => isset($data['files']),
+                'is_array' => isset($data['files']) && is_array($data['files']),
+                'is_empty' => isset($data['files']) && empty($data['files']),
+            ]);
         }
 
         $submission = ProjectSubmission::create([
@@ -86,7 +132,8 @@ class SubmissionService extends BaseService
 
             $uploadedFiles = [];
             foreach ($data['files'] as $file) {
-                if (is_file($file)) {
+                // Check if it's an UploadedFile instance
+                if ($file instanceof \Illuminate\Http\UploadedFile && $file->isValid()) {
                     $mimeType = $file->getMimeType();
                     if (str_starts_with($mimeType, 'image/')) {
                         $path = $file->store('project-submissions/images', 'public');
@@ -273,55 +320,67 @@ class SubmissionService extends BaseService
             'badges' => $data['badges'] ?? [],
         ]);
 
-        // Award badges
+        // Award badges using BadgeService for better integration
         if (!empty($data['badges'])) {
+            $badgeService = app(BadgeService::class);
             $reviewer = \App\Models\User::find($reviewerId);
+            
             foreach ($data['badges'] as $badgeId) {
                 $badge = \App\Models\Badge::find($badgeId);
                 if ($badge) {
+                    // Check if user already has this badge for this project
                     $existingBadge = \App\Models\UserBadge::where('user_id', $submission->student_id)
                         ->where('badge_id', $badgeId)
                         ->where('project_id', $submission->project_id)
                         ->first();
 
                     if (!$existingBadge) {
-                        \App\Models\UserBadge::create([
-                            'user_id' => $submission->student_id,
-                            'badge_id' => $badgeId,
-                            'awarded_by' => $reviewerId,
-                            'project_id' => $submission->project_id,
-                            'reason' => 'تقييم مشروع: ' . $submission->project->title,
-                            'earned_at' => now(),
-                        ]);
-
-                        // إرسال إشعار للطالب عند منح الشارة
-                        $student = $submission->student;
-                        if ($student && $reviewer) {
-                            \App\Jobs\SendBadgeAwardedNotification::dispatch($student, $badge, $reviewer);
-                        }
+                        $badgeService->awardBadge(
+                            $submission->student_id,
+                            $badgeId,
+                            $submission->project_id, // project_id
+                            null, // challenge_id
+                            'تقييم مشروع: ' . $submission->project->title,
+                            $reviewerId // awarded_by
+                        );
                     }
                 }
             }
         }
 
-        // Award points
-        if ($data['status'] === 'approved' && $data['rating'] >= 3) {
-            $pointsToAdd = (int) ($data['rating'] * 2);
-            $submission->student->increment('points', $pointsToAdd);
-
-            \App\Models\Point::create([
-                'user_id' => $submission->student_id,
-                'points' => $pointsToAdd,
-                'type' => 'earned',
-                'source' => 'project_submission_rating',
-                'source_id' => $submission->id,
-                'description' => 'تقييم تسليم مشروع: ' . $submission->project->title,
-                'description_ar' => 'تقييم تسليم مشروع: ' . $submission->project->title,
-            ]);
+        // Award points using PointsService for better integration
+        if ($data['status'] === 'approved' && isset($data['rating']) && $data['rating'] >= 3) {
+            $pointsService = app(PointsService::class);
+            $basePoints = (int) ($data['rating'] * 2);
+            
+            // Bonus points for high ratings
+            $bonusPoints = 0;
+            if ($data['rating'] >= 4.5) {
+                $bonusPoints = 5; // Extra 5 points for excellent work
+            } elseif ($data['rating'] >= 4) {
+                $bonusPoints = 3; // Extra 3 points for very good work
+            }
+            
+            $totalPoints = $basePoints + $bonusPoints;
+            
+            $pointsService->awardPoints(
+                $submission->student_id,
+                $totalPoints,
+                'project_submission',
+                $submission->id,
+                "Project evaluation: {$submission->project->title} (Rating: {$data['rating']})",
+                "تقييم مشروع: {$submission->project->title} (التقييم: {$data['rating']})"
+            );
+            
+            // Update submission with points earned
+            $submission->update(['points_earned' => $totalPoints]);
+            
+            // Check for automatic certificate eligibility
+            $this->checkAutomaticCertificateEligibility($submission->student, $submission);
         }
 
-        // Send notification (async)
-        \App\Jobs\SendProjectEvaluatedNotification::dispatch($submission);
+        // Fire ProjectEvaluated event for proper integration
+        event(new \App\Events\ProjectEvaluated($submission->fresh()));
 
         // Clear cache
         $this->forgetCacheTags([
@@ -332,6 +391,62 @@ class SubmissionService extends BaseService
         ]);
 
         return $submission->fresh();
+    }
+
+    /**
+     * Check if student is eligible for automatic certificate after project completion
+     */
+    private function checkAutomaticCertificateEligibility(User $student, ProjectSubmission $submission): void
+    {
+        try {
+            // Check if student has completed a milestone (e.g., 5, 10, 20 approved projects)
+            $approvedProjectsCount = ProjectSubmission::where('student_id', $student->id)
+                ->where('status', 'approved')
+                ->where('rating', '>=', 4)
+                ->count();
+
+            // Milestones for automatic certificates
+            $milestones = [5, 10, 20, 50, 100];
+            
+            if (in_array($approvedProjectsCount, $milestones)) {
+                $certificateService = app(CertificateService::class);
+                
+                // Generate certificate for milestone
+                $certificateData = [
+                    'course_name' => "إكمال {$approvedProjectsCount} مشروع بتميز",
+                    'description' => "تم إصدار هذه الشهادة لإكمال {$approvedProjectsCount} مشروع بتقييم ممتاز",
+                    'description_ar' => "تم إصدار هذه الشهادة لإكمال {$approvedProjectsCount} مشروع بتقييم ممتاز",
+                ];
+                
+                // Generate PDF
+                $filePath = $certificateService->generateCertificate(
+                    $student,
+                    $student, // Self-issued for milestones
+                    $certificateData,
+                    null,
+                    'long',
+                    'achievement'
+                );
+                
+                // Save certificate
+                $certificate = $certificateService->saveCertificate(
+                    $student,
+                    $student,
+                    $filePath,
+                    $certificateData,
+                    'achievement'
+                );
+                
+                // Fire event for notification
+                event(new \App\Events\CertificateIssued($certificate, $student));
+            }
+        } catch (\Exception $e) {
+            Log::error('Error checking automatic certificate eligibility', [
+                'student_id' => $student->id,
+                'submission_id' => $submission->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }
 

@@ -30,19 +30,16 @@ class MembershipCertificateController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        // Get membership certificate
         $certificate = $this->membershipCertificateService->getUserMembershipCertificate(
             $user->id,
             $user->role
         );
 
-        // Get eligibility status
         $eligibility = $this->membershipCertificateService->getEligibilityStatus(
             $user->id,
             $user->role
         );
 
-        // Check if user can view this certificate
         if ($certificate && !$this->canViewCertificate($user, $certificate)) {
             abort(403, 'You do not have permission to view this certificate');
         }
@@ -76,12 +73,10 @@ class MembershipCertificateController extends Controller
         $user = Auth::user();
         $certificate = Certificate::findOrFail($id);
 
-        // Check if user can download this certificate
         if (!$this->canViewCertificate($user, $certificate)) {
             abort(403, 'You do not have permission to download this certificate');
         }
 
-        // Check if certificate file exists
         if (!$certificate->file_path || !Storage::disk('public')->exists($certificate->file_path)) {
             abort(404, 'Certificate file not found');
         }
@@ -117,7 +112,6 @@ class MembershipCertificateController extends Controller
             $user->role
         );
 
-        // Try to award certificate if eligible
         if ($eligibility['eligible']) {
             if ($user->role === 'student') {
                 $certificate = $this->membershipCertificateService->checkAndAwardStudentMembership($user->id);
@@ -135,27 +129,20 @@ class MembershipCertificateController extends Controller
         ]);
     }
 
-    /**
-     * Check if user can view certificate
-     */
     protected function canViewCertificate($user, Certificate $certificate): bool
     {
-        // Admin can view any certificate
         if ($user->isAdmin()) {
             return true;
         }
 
-        // User can view their own certificate
         if ($certificate->user_id && $certificate->user_id === $user->id) {
             return true;
         }
 
-        // School can view certificates of their students
         if ($certificate->school_id && $certificate->school_id === $user->id) {
             return true;
         }
 
-        // School can view their own certificate
         if ($user->isSchool() && $certificate->school_id === $user->id && !$certificate->user_id) {
             return true;
         }

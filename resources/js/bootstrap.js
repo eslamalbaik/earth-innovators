@@ -10,7 +10,6 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
         const EchoModule = await import('laravel-echo');
         const Echo = EchoModule.default || EchoModule;
 
-        // Try Socket.IO first (for Laravel Echo Server / Reverb)
         if (import.meta.env.VITE_ECHO_SERVER_URL || import.meta.env.VITE_ECHO_HOST) {
             try {
                 const SocketIOModule = await import('socket.io-client');
@@ -33,50 +32,52 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
                     enabledTransports: ['ws', 'wss'],
                 });
 
+                // Suppress connection errors in console
+                let connectionAttempts = 0;
+                const maxConnectionAttempts = 3;
+
                 if (window.Echo.connector && window.Echo.connector.socket) {
                     window.Echo.connector.socket.on('connect', () => {
-                        console.log('✅ Laravel Echo connected (Socket.IO):', echoServerUrl);
-                        window.Echo._connectionErrorLogged = false; // Reset on successful connection
-                    });
-
-                    window.Echo.connector.socket.on('disconnect', () => {
-                        // Only log if we had a successful connection before
-                        if (!window.Echo._connectionErrorLogged) {
-                        console.warn('⚠️ Laravel Echo disconnected - notifications will use polling');
+                        connectionAttempts = 0;
+                        window.Echo._connectionErrorLogged = false;
+                        if (import.meta.env.DEV) {
+                            console.log('✅ Laravel Echo connected successfully');
                         }
                     });
 
-                    // Suppress all error events to avoid console spam
-                    window.Echo.connector.socket.on('error', () => {
-                        // Silently ignore - polling will be used as fallback
+                    window.Echo.connector.socket.on('disconnect', () => {
+                        // Silent disconnect - will use polling fallback
                     });
 
-                    // Handle connection errors silently
+                    window.Echo.connector.socket.on('error', () => {
+                        // Silent error - will use polling fallback
+                    });
+
                     window.Echo.connector.socket.on('connect_error', (error) => {
-                        // Silently handle all connection errors - polling will be used as fallback
-                        // Only log once to avoid spam
-                        if (!window.Echo._connectionErrorLogged) {
-                            // Suppress all connection errors completely
-                                window.Echo._connectionErrorLogged = true;
+                        connectionAttempts++;
+                        if (connectionAttempts <= maxConnectionAttempts && !window.Echo._connectionErrorLogged) {
+                            if (import.meta.env.DEV) {
+                                console.warn('⚠️ Laravel Echo connection failed, using polling fallback');
                             }
+                            window.Echo._connectionErrorLogged = true;
+                        }
+                        // After max attempts, stop trying and use polling
+                        if (connectionAttempts > maxConnectionAttempts) {
+                            window.Echo.disconnect();
+                            window.Echo = null;
+                        }
                     });
                     
-                    // Suppress polling transport errors
                     if (window.Echo.connector.socket.io) {
                         window.Echo.connector.socket.io.on('error', () => {
-                            // Silently ignore polling errors
-                    });
+                            // Silent error
+                        });
                     }
                 }
-
-                console.log('🚀 Laravel Echo initialized with Socket.IO');
             } catch (socketError) {
-                console.warn('⚠️ Socket.IO setup failed, trying Pusher...', socketError);
-                // Fall through to Pusher
             }
         }
 
-        // Fallback to Pusher if Socket.IO is not configured or failed
         if (!window.Echo && import.meta.env.VITE_PUSHER_APP_KEY) {
             try {
                 const PusherModule = await import('pusher-js');
@@ -97,19 +98,10 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
                     },
                 });
 
-                console.log('🚀 Laravel Echo initialized with Pusher');
             } catch (pusherError) {
-                console.warn('⚠️ Pusher setup failed:', pusherError);
             }
         }
-
-        // If neither works, Echo will be null and polling will be used
-        if (!window.Echo) {
-            console.warn('⚠️ No broadcasting service configured. Real-time notifications will use polling.');
-        }
     } catch (error) {
-        console.error('❌ Failed to initialize Laravel Echo:', error);
-        console.warn('⚠️ Real-time notifications will use polling instead.');
         window.Echo = null;
     }
 })();

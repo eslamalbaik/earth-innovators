@@ -26,7 +26,6 @@ class NotificationPreferencesController extends Controller
             })
             ->toArray();
 
-        // Default preferences for admin
         $defaultPreferences = [
             'email_notifications' => [
                 'enabled' => $preferences['email_notifications']['enabled'] ?? true,

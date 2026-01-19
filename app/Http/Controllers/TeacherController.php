@@ -88,14 +88,10 @@ class TeacherController extends Controller
                 }
 
                 $teacher->subjects_display = array_values(array_unique($subjectNames));
-
-                // حساب التقييم الديناميكي
                 $teacher->rating = (float) $teacher->calculateRating();
-
                 return $teacher;
             });
 
-            // الحصول على قائمة المدن للفلترة
             $cities = Teacher::whereNotNull('city')
                 ->distinct()
                 ->orderBy('city')
@@ -955,7 +951,6 @@ class TeacherController extends Controller
             ->orderBy('start_time', 'desc')
             ->get()
             ->map(function ($availability) {
-                // تحويل start_time و end_time إلى Carbon إذا كانا string
                 $startTime = $availability->start_time;
                 $endTime = $availability->end_time;
 
@@ -989,7 +984,6 @@ class TeacherController extends Controller
                 ];
             });
 
-        // الحصول على المواد الدراسية التي يدرسها المعلم
         $subjects = $teacher->subjectsRelation()->get()->map(function ($subject) {
             return [
                 'id' => $subject->id,
@@ -1018,7 +1012,6 @@ class TeacherController extends Controller
         if ($request->has('subject_id') && $request->subject_id !== '' && $request->subject_id !== null && $request->subject_id !== 'null') {
             $subjectId = $validated['subject_id'];
 
-            // التحقق من أن المعلم يدرس هذه المادة
             $teachesSubject = $teacher->subjectsRelation()->where('subjects.id', $subjectId)->exists();
             if (!$teachesSubject) {
                 return redirect()->back()
@@ -1030,7 +1023,6 @@ class TeacherController extends Controller
         $startDateTime = \Carbon\Carbon::parse($validated['date'] . ' ' . $validated['start_time']);
         $endDateTime = \Carbon\Carbon::parse($validated['date'] . ' ' . $validated['end_time']);
 
-        // التحقق من التداخل
         $overlapping = \App\Models\TeacherAvailability::where('teacher_id', $teacher->id)
             ->where('date', $validated['date'])
             ->where(function ($query) use ($subjectId) {
@@ -1094,7 +1086,6 @@ class TeacherController extends Controller
         if ($request->has('subject_id') && $request->subject_id !== '' && $request->subject_id !== null && $request->subject_id !== 'null') {
             $subjectId = $validated['subject_id'];
 
-            // التحقق من أن المعلم يدرس هذه المادة
             $teachesSubject = $teacher->subjectsRelation()->where('subjects.id', $subjectId)->exists();
             if (!$teachesSubject) {
                 return redirect()->back()
@@ -1106,7 +1097,6 @@ class TeacherController extends Controller
         $startDateTime = \Carbon\Carbon::parse($validated['date'] . ' ' . $validated['start_time']);
         $endDateTime = \Carbon\Carbon::parse($validated['date'] . ' ' . $validated['end_time']);
 
-        // التحقق من التداخل (استثناء الموعد الحالي)
         $overlapping = \App\Models\TeacherAvailability::where('teacher_id', $teacher->id)
             ->where('id', '!=', $id)
             ->where('date', $validated['date'])

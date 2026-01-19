@@ -188,10 +188,8 @@ export default function VerifyOtp() {
                 setPageErrors({});
             },
             onError: (errors) => {
-                console.error('OTP verification errors:', errors);
                 setPageErrors(errors);
                 setShowErrorsAlert(true);
-                // مسح OTP عند الخطأ
                 setOtpValues(['', '', '', '']);
                 setActiveIndex(0);
                 inputRefs[0].current?.focus();

@@ -102,7 +102,6 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                 }, 100);
             },
             onError: (errors) => {
-                console.error('Profile update errors:', errors);
                 if (errors.image) {
                     alert('خطأ في رفع الصورة: ' + errors.image);
                 }
@@ -148,7 +147,6 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                 }, 100);
             },
             onError: (errors) => {
-                console.error('Teacher profile update errors:', errors);
                 let errorMessage = 'حدث خطأ أثناء حفظ البيانات:\n';
                 if (errors.teacher_image) {
                     errorMessage += 'الصورة: ' + (Array.isArray(errors.teacher_image) ? errors.teacher_image.join(', ') : errors.teacher_image) + '\n';

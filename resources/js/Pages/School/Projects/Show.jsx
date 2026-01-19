@@ -50,7 +50,6 @@ export default function ShowSchoolProject({ project, auth }) {
                     router.visit('/school/projects');
                 },
                 onError: (errors) => {
-                    console.error('Delete error:', errors);
                     alert('حدث خطأ أثناء حذف المشروع');
                 },
             });

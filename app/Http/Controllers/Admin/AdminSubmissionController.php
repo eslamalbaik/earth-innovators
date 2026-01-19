@@ -16,19 +16,14 @@ class AdminSubmissionController extends Controller
         private SubmissionService $submissionService
     ) {}
 
-    /**
-     * عرض تسليم مشروع
-     */
+
     public function show(ProjectSubmission $submission)
     {
         $submission->load(['project', 'student', 'reviewer']);
-
-        // الحصول على الشارات المتاحة
         $availableBadges = Badge::where('is_active', true)
             ->where('status', 'approved')
             ->get();
 
-        // Format files
         $files = [];
         if ($submission->files && is_array($submission->files)) {
             $files = array_map(function ($file) {
@@ -73,9 +68,6 @@ class AdminSubmissionController extends Controller
         ]);
     }
 
-    /**
-     * تقييم تسليم مشروع
-     */
     public function evaluate(Request $request, ProjectSubmission $submission)
     {
         $request->validate([
@@ -96,9 +88,9 @@ class AdminSubmissionController extends Controller
                 $submission,
                 $request->only(['rating', 'feedback', 'status', 'badges']),
                 Auth::id(),
-                null, // school_id
-                null, // teacher_id
-                true  // isAdmin
+                null,
+                null,
+                true 
             );
 
             return redirect()->back()->with('success', 'تم تقييم التسليم بنجاح!');

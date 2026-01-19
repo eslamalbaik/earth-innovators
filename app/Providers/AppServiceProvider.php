@@ -347,6 +347,11 @@ class AppServiceProvider extends ServiceProvider
             SendArticleApprovedNotification::class
         );
 
+        Event::listen(
+            ArticleApproved::class,
+            CheckMembershipCertificateEligibility::class
+        );
+
         // Check membership certificate eligibility when points are awarded or projects are approved
         Event::listen(
             ProjectApproved::class,
@@ -365,6 +370,12 @@ class AppServiceProvider extends ServiceProvider
 
         Event::listen(
             ChallengeSubmissionReviewed::class,
+            CheckMembershipCertificateEligibility::class
+        );
+
+        // Points awarded event - check for membership certificate eligibility
+        Event::listen(
+            \App\Events\PointsAwarded::class,
             CheckMembershipCertificateEligibility::class
         );
     }

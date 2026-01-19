@@ -47,7 +47,6 @@ class ProfileController extends Controller
             );
         }
 
-        // Redirect based on user role
         if ($user->isStudent()) {
             return Redirect::route('student.profile')
                 ->with('success', 'تم تحديث الملف الشخصي بنجاح');
@@ -56,7 +55,6 @@ class ProfileController extends Controller
                 ->with('success', 'تم تحديث الملف الشخصي بنجاح');
         }
 
-        // For school and other roles, redirect to generic profile
         return Redirect::route('profile.edit')
             ->with('success', 'تم تحديث الملف الشخصي بنجاح');
     }

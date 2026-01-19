@@ -130,10 +130,68 @@ export default function EditProject({ auth, project, school, schools = [] }) {
 
     const submit = (e) => {
         e.preventDefault();
-        put(`/teacher/projects/${project.id}`, {
+
+        // التحقق من البيانات الأساسية
+        if (!data.title || !data.description) {
+            alert('يرجى ملء جميع الحقول المطلوبة');
+            return;
+        }
+
+        // التحقق من حالة المشروع
+        if (project?.status !== 'pending') {
+            alert('لا يمكن تعديل المشروع بعد الموافقة عليه أو رفضه');
+            return;
+        }
+
+        // إنشاء FormData لضمان إرسال الملفات بشكل صحيح
+        const formData = new FormData();
+        
+        // إضافة الحقول الأساسية
+        formData.append('title', data.title);
+        formData.append('description', data.description);
+        formData.append('category', data.category || 'other');
+        formData.append('_method', 'PUT');
+        
+        if (data.school_id) {
+            formData.append('school_id', data.school_id);
+        }
+
+        // إضافة الملفات الجديدة
+        if (data.files && data.files.length > 0) {
+            data.files.forEach((file) => {
+                if (file instanceof File) {
+                    formData.append('files[]', file);
+                }
+            });
+        }
+
+        // إضافة الملفات المراد حذفها
+        if (data.remove_files && data.remove_files.length > 0) {
+            data.remove_files.forEach((filePath) => {
+                formData.append('remove_files[]', filePath);
+            });
+        }
+
+        // إرسال البيانات باستخدام router.post مع _method: PUT
+        router.post(`/teacher/projects/${project.id}`, formData, {
             forceFormData: true,
+            preserveScroll: false,
             onSuccess: () => {
                 router.visit('/teacher/projects');
+            },
+            onError: (errors) => {
+                let errorMessage = 'حدث خطأ أثناء حفظ التعديلات';
+                if (errors.message) {
+                    errorMessage = errors.message;
+                } else if (typeof errors === 'object' && Object.keys(errors).length > 0) {
+                    const firstError = Object.values(errors)[0];
+                    if (Array.isArray(firstError)) {
+                        errorMessage = firstError[0];
+                    } else if (typeof firstError === 'string') {
+                        errorMessage = firstError;
+                    }
+                }
+                alert('خطأ: ' + errorMessage);
             },
         });
     };

@@ -1091,6 +1091,17 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('badges', \App\Http\Controllers\Admin\BadgeController::class);
     Route::post('/badges/{badge}/award', [\App\Http\Controllers\Admin\BadgeController::class, 'award'])->name('badges.award');
 
+    // Certificates Management
+    Route::resource('certificates', \App\Http\Controllers\Admin\CertificateController::class);
+    Route::get('/certificates/{certificate}/download', [\App\Http\Controllers\Admin\CertificateController::class, 'download'])->name('certificates.download');
+    Route::post('/certificates/{certificate}/toggle-status', [\App\Http\Controllers\Admin\CertificateController::class, 'toggleStatus'])->name('certificates.toggle-status');
+
+    // Payment Gateways Management
+    Route::get('/payment-gateways', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'index'])->name('payment-gateways.index');
+    Route::put('/payment-gateways/{paymentGateway}', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'update'])->name('payment-gateways.update');
+    Route::post('/payment-gateways/{paymentGateway}/toggle-status', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'toggleStatus'])->name('payment-gateways.toggle-status');
+    Route::post('/payment-gateways/{paymentGateway}/test-connection', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'testConnection'])->name('payment-gateways.test-connection');
+
     // Packages Management
     Route::resource('packages', \App\Http\Controllers\Admin\PackageController::class);
     Route::post('/packages/{package}/toggle-status', [\App\Http\Controllers\Admin\PackageController::class, 'toggleStatus'])->name('packages.toggle-status');
@@ -1110,6 +1121,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // إدارة التحديات - CRUD كامل
     Route::resource('challenges', \App\Http\Controllers\Admin\AdminChallengeController::class);
+    Route::get('/challenges/{challenge}/assign-students', [\App\Http\Controllers\Admin\ChallengeStudentController::class, 'show'])->name('challenges.assign-students');
+    Route::post('/challenges/{challenge}/assign-students', [\App\Http\Controllers\Admin\ChallengeStudentController::class, 'assign'])->name('challenges.assign-students');
 
     // إدارة المشاريع - CRUD كامل
     Route::get('/projects', [\App\Http\Controllers\Admin\AdminProjectController::class, 'index'])->name('projects.index');

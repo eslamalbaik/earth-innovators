@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Project extends Model
 {
+    use HasFactory;
     protected $fillable = [
         'user_id',
         'teacher_id',
@@ -80,5 +82,10 @@ class Project extends Model
     public function allComments(): HasMany
     {
         return $this->hasMany(ProjectComment::class);
+    }
+
+    public function acceptanceCriteria(): HasMany
+    {
+        return $this->hasMany(AcceptanceCriterion::class)->ordered();
     }
 }
