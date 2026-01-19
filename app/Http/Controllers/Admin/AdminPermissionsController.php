@@ -164,7 +164,7 @@ class AdminPermissionsController extends Controller
             ->with('success', 'تم تحديث المستخدم الإداري بنجاح');
     }
 
-
+    /**
      * حذف مستخدم إداري
      */
     public function destroy(User $user)
