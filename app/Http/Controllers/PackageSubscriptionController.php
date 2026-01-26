@@ -59,6 +59,7 @@ class PackageSubscriptionController extends Controller
             if ($activeSubscription) {
                 $userPackage = [
                     'id' => $activeSubscription->id,
+                    'package_id' => $activeSubscription->package->id,
                     'package' => [
                         'id' => $activeSubscription->package->id,
                         'name' => $activeSubscription->package->name,
@@ -76,6 +77,7 @@ class PackageSubscriptionController extends Controller
             'userPackage' => $userPackage,
             'auth' => [
                 'user' => Auth::check() ? Auth::user() : null,
+                'unreadCount' => Auth::check() ? Auth::user()->unreadNotifications()->count() : 0,
             ],
         ]);
     }
@@ -334,6 +336,10 @@ class PackageSubscriptionController extends Controller
 
         return Inertia::render('Packages/MySubscriptions', [
             'subscriptions' => $subscriptions,
+            'auth' => [
+                'user' => $user,
+                'unreadCount' => $user->unreadNotifications()->count(),
+            ],
         ]);
     }
 }
