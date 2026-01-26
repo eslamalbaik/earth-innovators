@@ -216,7 +216,7 @@ export function formatDate(date, options = {}) {
 
     if (includeGregorian) {
         const gregorianDate = new Date(date);
-        const gregorianStr = gregorianDate.toLocaleDateString('ar-SA');
+        const gregorianStr = gregorianDate.toLocaleDateString('en-US');
         result += ` (${gregorianStr})`;
     }
 

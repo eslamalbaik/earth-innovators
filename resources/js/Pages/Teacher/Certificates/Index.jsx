@@ -120,7 +120,7 @@ export default function Index({ auth, students, description }) {
             ];
             return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
         } else if (format === 'short') {
-            return date.toLocaleDateString('ar-SA', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            return date.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' });
         } else {
             return date.toISOString().split('T')[0];
         }
@@ -407,7 +407,7 @@ export default function Index({ auth, students, description }) {
                             )}
                             {certificateType === 'membership' && (
                                 <>
-                                    <div><strong>وقت الإصدار:</strong> {new Date().toLocaleTimeString('ar-SA')}</div>
+                                    <div><strong>وقت الإصدار:</strong> {new Date().toLocaleTimeString('en-US')}</div>
                                     <div><strong>تاريخ اليوم:</strong> {formatDatePreview(new Date().toISOString().split('T')[0], previewData.date_format)}</div>
                                 </>
                             )}

@@ -67,11 +67,11 @@ export default function TeacherPublications({ publications, auth }) {
                                                             <span>•</span>
                                                         </>
                                                     )}
-                                                    <span>تاريخ الإرسال: {new Date(publication.created_at).toLocaleDateString('ar-SA')}</span>
+                                                    <span>تاريخ الإرسال: {new Date(publication.created_at).toLocaleDateString('en-US')}</span>
                                                     {publication.approved_at && (
                                                         <>
                                                             <span>•</span>
-                                                            <span>تاريخ الموافقة: {new Date(publication.approved_at).toLocaleDateString('ar-SA')}</span>
+                                                            <span>تاريخ الموافقة: {new Date(publication.approved_at).toLocaleDateString('en-US')}</span>
                                                         </>
                                                     )}
                                                 </div>

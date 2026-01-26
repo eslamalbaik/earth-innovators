@@ -42,7 +42,10 @@ class ChallengeSubmissionService extends BaseService
         $cacheTag = "school_challenges_{$schoolId}";
         
         return $this->cacheTags($cacheTag, $cacheKey, function () use ($schoolId, $status, $perPage, $search, $category) {
-            $query = Challenge::where('school_id', $schoolId)
+            $query = Challenge::where(function ($q) use ($schoolId) {
+                    $q->where('school_id', $schoolId)
+                      ->orWhereNull('school_id'); // Include global challenges
+                })
                 ->where('status', '!=', 'cancelled')
                 ->with(['creator', 'school'])
                 ->withCount(['submissions as submissions_count', 'participants as participants_count'])

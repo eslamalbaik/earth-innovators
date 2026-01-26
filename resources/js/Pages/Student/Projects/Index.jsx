@@ -1,12 +1,11 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { useState, useMemo } from 'react';
-import { FaFilter, FaChevronDown, FaTrash, FaEdit, FaImage } from 'react-icons/fa';
+import { FaFilter, FaChevronDown, FaImage, FaEye, FaStar, FaTrophy, FaTrash } from 'react-icons/fa';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import { useToast } from '@/Contexts/ToastContext';
 
 export default function StudentProjectsIndex({ auth, projects, message }) {
-    const { showError } = useToast();
     const [filter, setFilter] = useState('all'); // all | pending | evaluated | winners
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
 
@@ -65,30 +64,15 @@ export default function StudentProjectsIndex({ auth, projects, message }) {
         return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
     };
 
-    const handleDelete = (projectId, e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (confirm('هل أنت متأكد من حذف هذا المشروع؟')) {
-            router.delete(`/student/projects/${projectId}`, {
-            preserveScroll: true,
-                onError: () => {
-                    showError('حدث خطأ أثناء حذف المشروع');
-                },
-            });
-        }
-    };
-
-    const handleEdit = (projectId, e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        router.visit(`/student/projects/${projectId}/edit`);
+    const handleViewProject = (projectId) => {
+        router.visit(`/student/projects/${projectId}`);
     };
 
     const ProjectsContent = () => (
         <div className="space-y-4">
             {/* Header */}
             <div className="flex items-center justify-between mb-3">
-            <div className="text-lg font-extrabold text-gray-900">المشاريع</div>
+                <div className="text-lg font-extrabold text-gray-900">المشاريع</div>
                 <div className="flex items-center gap-2 text-gray-400 relative">
                     <button
                         type="button"
@@ -121,39 +105,35 @@ export default function StudentProjectsIndex({ auth, projects, message }) {
                 <button
                     type="button"
                     onClick={() => setFilter('all')}
-                    className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${
-                        filter === 'all' ? 'bg-[#A3C042] text-white' : 'bg-white text-gray-700'
-                    }`}
+                    className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${filter === 'all' ? 'bg-[#A3C042] text-white' : 'bg-white text-gray-700'
+                        }`}
                 >
                     الكل
                 </button>
                 <button
                     type="button"
                     onClick={() => setFilter('pending')}
-                    className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${
-                        filter === 'pending' ? 'bg-[#A3C042] text-white' : 'bg-white text-gray-700'
-                    }`}
+                    className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${filter === 'pending' ? 'bg-[#A3C042] text-white' : 'bg-white text-gray-700'
+                        }`}
                 >
                     تحت التقييم
                 </button>
                 <button
                     type="button"
                     onClick={() => setFilter('evaluated')}
-                    className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${
-                        filter === 'evaluated' ? 'bg-[#A3C042] text-white' : 'bg-white text-gray-700'
-                    }`}
+                    className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${filter === 'evaluated' ? 'bg-[#A3C042] text-white' : 'bg-white text-gray-700'
+                        }`}
                 >
                     تم التقييم
                 </button>
-                        <button
+                <button
                     type="button"
                     onClick={() => setFilter('winners')}
-                    className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${
-                        filter === 'winners' ? 'bg-[#A3C042] text-white' : 'bg-white text-gray-700'
-                    }`}
-                        >
+                    className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${filter === 'winners' ? 'bg-[#A3C042] text-white' : 'bg-white text-gray-700'
+                        }`}
+                >
                     الفائزيين
-                        </button>
+                </button>
             </div>
 
             {/* Projects List */}
@@ -173,7 +153,8 @@ export default function StudentProjectsIndex({ auth, projects, message }) {
                         return (
                             <div
                                 key={project.id}
-                                className="bg-white rounded-2xl border border-gray-100 p-4 flex items-start gap-4"
+                                onClick={() => handleViewProject(project.id)}
+                                className="bg-white rounded-2xl border border-gray-100 p-4 flex items-start gap-4 cursor-pointer hover:shadow-md transition"
                             >
                                 {/* Project Image */}
                                 <div className="flex-shrink-0">
@@ -199,6 +180,7 @@ export default function StudentProjectsIndex({ auth, projects, message }) {
                                             </h3>
                                             <p className="text-xs text-gray-500">{projectDate || '2 أغسطس 2025'}</p>
                                         </div>
+                                        <FaEye className="text-gray-400 text-sm flex-shrink-0" />
                                     </div>
 
                                     <div className="flex items-center gap-2 flex-wrap mb-2">
@@ -210,56 +192,53 @@ export default function StudentProjectsIndex({ auth, projects, message }) {
                                         </span>
                                     </div>
 
-                                    {/* Action Buttons */}
-                                    <div className="flex items-center gap-2 mt-2">
-                                        <button
-                                            type="button"
-                                            onClick={(e) => handleDelete(project.id, e)}
-                                            className="h-6 w-6 rounded-full bg-red-50 flex items-center justify-center hover:bg-red-100 transition"
-                                            aria-label="حذف"
-                                        >
-                                            <FaTrash className="text-red-500 text-xs" />
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={(e) => handleEdit(project.id, e)}
-                                            className="h-6 w-6 rounded-full bg-gray-50 flex items-center justify-center hover:bg-gray-100 transition"
-                                            aria-label="تعديل"
-                                        >
-                                            <FaEdit className="text-gray-500 text-xs" />
-                                        </button>
-                                    </div>
+                                    {/* Rating and Points */}
+                                    {(project.rating > 0 || project.points_earned > 0) && (
+                                        <div className="flex items-center gap-3 mt-2">
+                                            {project.rating > 0 && (
+                                                <div className="flex items-center gap-1 text-xs text-yellow-600">
+                                                    <FaStar className="text-yellow-500" />
+                                                    <span className="font-semibold">{project.rating.toFixed(1)}</span>
+                                                </div>
+                                            )}
+                                            {project.points_earned > 0 && (
+                                                <div className="flex items-center gap-1 text-xs text-blue-600">
+                                                    <FaTrophy className="text-blue-500" />
+                                                    <span className="font-semibold">{project.points_earned} نقطة</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         );
                     })}
-                    </div>
-                ) : (
+                </div>
+            ) : (
                 <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
                     <p className="text-gray-500 text-sm">لا توجد مشاريع</p>
-                    </div>
-                )}
+                </div>
+            )}
 
-                {/* Pagination */}
+            {/* Pagination */}
             {projects?.links && projects.links.length > 3 && (
                 <div className="bg-white rounded-2xl border border-gray-100 p-3">
                     <div className="flex flex-wrap gap-2 justify-center">
-                            {projects.links.map((link, index) => (
+                        {projects.links.map((link, index) => (
                             <Link
-                                    key={index}
+                                key={index}
                                 href={link.url || '#'}
-                                className={`px-3 py-2 rounded-xl text-sm font-semibold transition ${
-                                        link.active
+                                className={`px-3 py-2 rounded-xl text-sm font-semibold transition ${link.active
                                         ? 'bg-[#A3C042] text-white'
                                         : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-                                } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                    dangerouslySetInnerHTML={{ __html: link.label }}
-                                />
-                            ))}
-                        </div>
+                                    } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                dangerouslySetInnerHTML={{ __html: link.label }}
+                            />
+                        ))}
                     </div>
-                )}
-            </div>
+                </div>
+            )}
+        </div>
     );
 
     return (

@@ -6,7 +6,7 @@ import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import Modal from '@/Components/Modal';
 import DangerButton from '@/Components/DangerButton';
 import { useToast } from '@/Contexts/ToastContext';
-import { FaChevronLeft, FaStar, FaMedal, FaBookmark, FaHeart, FaAward, FaEdit, FaCog, FaIdCard, FaArrowRight, FaTrophy, FaChartLine, FaGift, FaCamera, FaLock, FaTrash, FaSave, FaTimes } from 'react-icons/fa';
+import { FaChevronLeft, FaStar, FaMedal, FaBookmark, FaHeart, FaAward, FaEdit, FaCog, FaIdCard, FaArrowRight, FaTrophy, FaChartLine, FaGift, FaCamera, FaLock, FaTrash, FaSave, FaTimes, FaCreditCard } from 'react-icons/fa';
 import { getInitials, getColorFromName, getUserImageUrl } from '@/utils/imageUtils';
 
 function StudentProfileContent({ user, stats = {}, badges = [], projects = [], activities = [], school, availableSchools = [], tags = [], onImageChange, imageInputRef, imagePreview, showPasswordModal, setShowPasswordModal, showDeleteModal, setShowDeleteModal, onSchoolChange, showSchoolModal, setShowSchoolModal, selectedSchoolId, setSelectedSchoolId }) {
@@ -221,6 +221,24 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                         <div className="flex-1">
                             <div className="text-white font-bold text-sm">النقاط</div>
                             <div className="text-white/80 text-xs mt-0.5">تتبع نقاطك</div>
+                        </div>
+                        <FaChevronLeft className="text-white/80 text-sm" />
+                    </div>
+                </Link>
+
+                {/* الباقات */}
+                <Link
+                    href="/packages"
+                    className="group relative bg-gradient-to-br from-[#A3C042] via-[#93b03a] to-[#7a9a2f] rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all transform hover:scale-105 overflow-hidden"
+                >
+                    <div className="absolute top-0 right-0 w-20 h-20 bg-white/20 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+                    <div className="relative flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-xl bg-white/30 backdrop-blur-sm flex items-center justify-center shadow-lg">
+                            <FaCreditCard className="text-white text-xl" />
+                        </div>
+                        <div className="flex-1">
+                            <div className="text-white font-bold text-sm">الباقات</div>
+                            <div className="text-white/80 text-xs mt-0.5">اشترك واحصل على ميزات</div>
                         </div>
                         <FaChevronLeft className="text-white/80 text-sm" />
                     </div>

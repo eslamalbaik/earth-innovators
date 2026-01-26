@@ -67,7 +67,7 @@ export default function TeacherBadges({ badges, auth }) {
                                                 <p><strong>المدرسة:</strong> {badge.school.name}</p>
                                             )}
                                             {badge.approved_at && (
-                                                <p><strong>تاريخ الموافقة:</strong> {new Date(badge.approved_at).toLocaleDateString('ar-SA')}</p>
+                                                <p><strong>تاريخ الموافقة:</strong> {new Date(badge.approved_at).toLocaleDateString('en-US')}</p>
                                             )}
                                             {badge.rejection_reason && (
                                                 <p className="text-red-600 mt-2"><strong>سبب الرفض:</strong> {badge.rejection_reason}</p>

@@ -34,7 +34,7 @@ export default function Packages({ auth, packages = [], userPackage = null }) {
                                 <h2 className="text-2xl font-bold text-gray-900 mb-2">باقتي الحالية</h2>
                                 <p className="text-gray-600">
                                     {userPackage.package?.name_ar || userPackage.package?.name} - 
-                                    تنتهي في {new Date(userPackage.end_date).toLocaleDateString('ar-SA')}
+                                    تنتهي في {new Date(userPackage.end_date).toLocaleDateString('en-US')}
                                 </p>
                             </div>
                             <div className={`px-4 py-2 rounded-lg font-semibold ${

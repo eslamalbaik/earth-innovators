@@ -174,7 +174,7 @@ export default function AdminChallengesShow({ challenge }) {
                                 <FaCalendar className="text-green-500" />
                                 <div>
                                     <p className="text-sm text-gray-600">تاريخ البدء</p>
-                                    <p className="font-semibold text-gray-900">{new Date(challenge.start_date).toLocaleString('ar-SA')}</p>
+                                    <p className="font-semibold text-gray-900">{new Date(challenge.start_date).toLocaleString('en-US')}</p>
                                 </div>
                             </div>
 
@@ -182,7 +182,7 @@ export default function AdminChallengesShow({ challenge }) {
                                 <FaClock className="text-red-500" />
                                 <div>
                                     <p className="text-sm text-gray-600">تاريخ الانتهاء</p>
-                                    <p className="font-semibold text-gray-900">{new Date(challenge.deadline).toLocaleString('ar-SA')}</p>
+                                    <p className="font-semibold text-gray-900">{new Date(challenge.deadline).toLocaleString('en-US')}</p>
                                 </div>
                             </div>
                         </div>

@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { useToast } from '@/Contexts/ToastContext';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
@@ -8,6 +8,7 @@ import HomeCurrentChallengeSection from '@/Pages/Home/HomeCurrentChallengeSectio
 import HomeLatestProjectsSection from '@/Pages/Home/HomeLatestProjectsSection';
 import HomeSuggestChallengeCard from '@/Pages/Home/HomeSuggestChallengeCard';
 import HomeWelcomeCard from '@/Pages/Home/HomeWelcomeCard';
+import { FaCreditCard, FaChevronLeft } from 'react-icons/fa';
 
 export default function Home({ auth, cities = [], subjects = [], featuredTeachers = [], testimonials = [], stats = [], featuredPublications = [], featuredProjects = [], uaeSchools = [], packages = [] }) {
     const user = auth?.user || null;
@@ -52,6 +53,27 @@ export default function Home({ auth, cities = [], subjects = [], featuredTeacher
                                 percent={35}
                                 points={isAuthed ? (user?.points || 0) : 0}
                             />
+
+                            {/* Packages Card for Students */}
+                            {isAuthed && user?.role === 'student' && (
+                                <Link
+                                    href="/packages"
+                                    className="group relative bg-gradient-to-br from-[#A3C042] via-[#93b03a] to-[#7a9a2f] rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02] overflow-hidden block"
+                                >
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/15 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+                                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/15 rounded-full -ml-12 -mb-12 blur-2xl"></div>
+                                    <div className="relative flex items-center gap-4">
+                                        <div className="w-14 h-14 rounded-xl bg-white/30 backdrop-blur-sm flex items-center justify-center shadow-lg">
+                                            <FaCreditCard className="text-white text-2xl" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="text-white font-bold text-base">باقات الاشتراك</div>
+                                            <div className="text-white/90 text-xs mt-1">احصل على ميزات حصرية وإمكانيات متقدمة</div>
+                                        </div>
+                                        <FaChevronLeft className="text-white/80 text-base" />
+                                    </div>
+                                </Link>
+                            )}
 
                             <HomeLatestProjectsSection
                                 projects={featuredProjects || []}
@@ -102,6 +124,27 @@ export default function Home({ auth, cities = [], subjects = [], featuredTeacher
                                     percent={35}
                                     points={isAuthed ? (user?.points || 0) : 0}
                                 />
+
+                                {/* Packages Card for Students */}
+                                {isAuthed && user?.role === 'student' && (
+                                    <Link
+                                        href="/packages"
+                                        className="group relative bg-gradient-to-br from-[#A3C042] via-[#93b03a] to-[#7a9a2f] rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02] overflow-hidden block"
+                                    >
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/15 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+                                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/15 rounded-full -ml-12 -mb-12 blur-2xl"></div>
+                                        <div className="relative flex items-center gap-4">
+                                            <div className="w-14 h-14 rounded-xl bg-white/30 backdrop-blur-sm flex items-center justify-center shadow-lg">
+                                                <FaCreditCard className="text-white text-2xl" />
+                                            </div>
+                                            <div className="flex-1">
+                                                <div className="text-white font-bold text-base">باقات الاشتراك</div>
+                                                <div className="text-white/90 text-xs mt-1">احصل على ميزات حصرية وإمكانيات متقدمة</div>
+                                            </div>
+                                            <FaChevronLeft className="text-white/80 text-base" />
+                                        </div>
+                                    </Link>
+                                )}
                             </div>
 
                             <div className="space-y-4 lg:col-span-7">

@@ -79,14 +79,22 @@ class AcceptanceCriteriaController extends Controller
             'project_id.exists' => 'المشروع المحدد غير موجود',
         ]);
 
+        // Check if weight exceeds 100% for single criterion
+        if ($validated['weight'] > 100) {
+            return back()->withErrors([
+                'weight' => "الوزن يجب ألا يتجاوز 100% للمعيار الواحد"
+            ])->withInput();
+        }
+
         // Check if total weight exceeds 100% for this project
         $projectId = $validated['project_id'] ?? null;
         $currentTotal = AcceptanceCriterion::where('project_id', $projectId)->sum('weight');
         $newTotal = $currentTotal + $validated['weight'];
         
         if ($newTotal > 100) {
+            $maxAllowed = 100 - $currentTotal;
             return back()->withErrors([
-                'weight' => "مجموع الأوزان للمشروع المحدد سيكون {$newTotal}% وهو أكبر من 100%. المجموع الحالي: {$currentTotal}%"
+                'weight' => "مجموع الأوزان للمشروع المحدد سيكون {$newTotal}% وهو أكبر من 100%. المجموع الحالي: {$currentTotal}%. الحد الأقصى المسموح: {$maxAllowed}%"
             ])->withInput();
         }
 
@@ -127,6 +135,13 @@ class AcceptanceCriteriaController extends Controller
             'project_id.exists' => 'المشروع المحدد غير موجود',
         ]);
 
+        // Check if weight exceeds 100% for single criterion
+        if ($validated['weight'] > 100) {
+            return back()->withErrors([
+                'weight' => "الوزن يجب ألا يتجاوز 100% للمعيار الواحد"
+            ])->withInput();
+        }
+
         // Check if total weight exceeds 100% for this project
         $projectId = $validated['project_id'] ?? null;
         $currentTotal = AcceptanceCriterion::where('project_id', $projectId)
@@ -135,8 +150,9 @@ class AcceptanceCriteriaController extends Controller
         $newTotal = $currentTotal + $validated['weight'];
         
         if ($newTotal > 100) {
+            $maxAllowed = 100 - $currentTotal;
             return back()->withErrors([
-                'weight' => "مجموع الأوزان للمشروع المحدد سيكون {$newTotal}% وهو أكبر من 100%. المجموع الحالي (بدون هذا المعيار): {$currentTotal}%"
+                'weight' => "مجموع الأوزان للمشروع المحدد سيكون {$newTotal}% وهو أكبر من 100%. المجموع الحالي (بدون هذا المعيار): {$currentTotal}%. الحد الأقصى المسموح: {$maxAllowed}%"
             ])->withInput();
         }
 

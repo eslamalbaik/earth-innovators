@@ -123,7 +123,7 @@ export default function PendingBadges({ badges, auth }) {
                                                 )}
                                                 <span>النقاط المطلوبة: {badge.points_required}</span>
                                                 <span>•</span>
-                                                <span>تاريخ الإرسال: {new Date(badge.created_at).toLocaleDateString('ar-SA')}</span>
+                                                <span>تاريخ الإرسال: {new Date(badge.created_at).toLocaleDateString('en-US')}</span>
                                             </div>
                                             <div className="text-sm">
                                                 <p><strong>النوع:</strong> {badge.type}</p>

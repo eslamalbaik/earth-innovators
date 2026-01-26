@@ -17,7 +17,10 @@ class ProjectCommentController extends Controller
     public function store(Request $request, Project $project)
     {
         $user = Auth::user();
-        if ($user->isStudent() && $project->school_id !== $user->school_id) {
+        // Allow students to comment on:
+        // 1. Projects from their school (school_id matches)
+        // 2. General projects (school_id is null - from teachers or admin)
+        if ($user->isStudent() && $project->school_id !== null && $project->school_id !== $user->school_id) {
             return back()->withErrors(['error' => 'غير مصرح لك بالتعليق على هذا المشروع']);
         }
 

@@ -43,7 +43,7 @@ export default function DesktopFooter({ auth }) {
                                 <div className="text-xl font-extrabold bg-gradient-to-r from-[#A3C042] to-[#93b03a] bg-clip-text text-transparent">
                                     إرث المبتكرين
                                 </div>
-                                <div className="text-xs text-gray-400">Legacy of Innovators</div>
+                                <div className="text-xs text-gray-400">Innovators Legacy</div>
                             </div>
                         </Link>
                         <p className="text-gray-400 text-sm leading-relaxed mb-4">

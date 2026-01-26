@@ -248,7 +248,7 @@ export default function AdminCertificatesIndex({ certificates, stats, users, fil
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {new Date(certificate.issue_date).toLocaleDateString('ar-SA')}
+                                                {new Date(certificate.issue_date).toLocaleDateString('en-US')}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 {getStatusBadge(certificate.is_active)}

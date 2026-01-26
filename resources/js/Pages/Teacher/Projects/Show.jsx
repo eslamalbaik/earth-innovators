@@ -60,7 +60,7 @@ export default function TeacherProjectShow({ project, auth }) {
     const formatDate = (dateString) => {
         if (!dateString) return 'غير محدد';
         const date = new Date(dateString);
-        return date.toLocaleDateString('ar-SA', {
+        return date.toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',

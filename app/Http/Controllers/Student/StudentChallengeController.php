@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Student;
 use App\Http\Controllers\Controller;
 use App\Models\Challenge;
 use App\Models\ChallengeSubmission;
+use App\Models\Category;
 use App\Services\ChallengeSubmissionService;
 use App\Services\ChallengeParticipationService;
 use Illuminate\Http\Request;
@@ -61,10 +62,54 @@ class StudentChallengeController extends Controller
             return $challenge;
         });
 
+        // Get categories from database that have available challenges
+        // First, get all unique category slugs from available challenges (both school-specific and global)
+        $availableCategorySlugs = Challenge::where(function ($q) use ($student) {
+                $q->where('school_id', $student->school_id)
+                  ->orWhereNull('school_id');
+            })
+            ->where('status', '!=', 'cancelled')
+            ->whereNotNull('category')
+            ->distinct()
+            ->pluck('category')
+            ->toArray();
+
+        // Get categories from database that match available challenge categories
+        $allCategories = Category::where('is_active', true)
+            ->whereIn('slug', $availableCategorySlugs)
+            ->orderBy('name')
+            ->get();
+
+        // Separate "other" category from others
+        $otherCategory = $allCategories->firstWhere('slug', 'other');
+        $otherCategories = $allCategories->filter(function ($category) {
+            return $category->slug !== 'other';
+        });
+
+        // Build categories array: "الكل" first, then other categories, then "أخرى" last
+        $categories = collect([['value' => '', 'label' => 'الكل']])
+            ->merge($otherCategories->map(function ($category) {
+                return [
+                    'value' => $category->slug,
+                    'label' => $category->name,
+                ];
+            }))
+            ->when($otherCategory, function ($collection) use ($otherCategory) {
+                return $collection->push([
+                    'value' => $otherCategory->slug,
+                    'label' => $otherCategory->name,
+                ]);
+            })
+            ->toArray();
+
         return Inertia::render('Student/Challenges/Index', [
             'challenges' => $challenges,
             'filters' => [
                 'status' => $status,
+            ],
+            'categories' => $categories,
+            'auth' => [
+                'user' => $student,
             ],
         ]);
     }

@@ -1,5 +1,7 @@
 import { Head, Link, useForm, router } from '@inertiajs/react';
-import DashboardLayout from '../../../Layouts/DashboardLayout';
+import MobileAppLayout from '@/Layouts/MobileAppLayout';
+import MobileTopBar from '@/Components/Mobile/MobileTopBar';
+import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import { useState, useRef } from 'react';
 import {
     FaArrowLeft,
@@ -163,7 +165,14 @@ export default function StudentChallengeShow({ auth, challenge }) {
                      new Date(challenge.deadline) >= new Date();
 
     return (
-        <DashboardLayout auth={auth}>
+        <MobileAppLayout
+                    auth={auth}
+                    title={challenge.title}
+                    activeNav="challenges"
+                    unreadCount={auth?.unreadCount || 0}
+                    onNotifications={() => router.visit('/notifications')}
+                    onBack={() => router.visit('/student/challenges')}
+                >
             <Head title={challenge.title} />
 
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -406,7 +415,10 @@ export default function StudentChallengeShow({ auth, challenge }) {
                     )}
                 </div>
             </div>
-        </DashboardLayout>
+        </MobileAppLayout>
     );
 }
+
+
+
 

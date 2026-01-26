@@ -4,13 +4,14 @@ import { FaSearch, FaFilter, FaTrophy, FaTimes, FaUsers, FaCalendar, FaClock, Fa
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 
-export default function StudentChallengesIndex({ auth, challenges, filters, message }) {
+export default function StudentChallengesIndex({ auth, challenges, filters, message, categories = [] }) {
     const [search, setSearch] = useState('');
     const [selectedStatus, setSelectedStatus] = useState(filters?.status || '');
     const [showFilterModal, setShowFilterModal] = useState(false);
     const [category, setCategory] = useState('');
 
-    const categories = [
+    // Use categories from database, fallback to default if empty
+    const categoriesList = categories && categories.length > 0 ? categories : [
         { value: '', label: 'الكل' },
         { value: 'science', label: 'علمي' },
         { value: 'arts', label: 'فني' },
@@ -116,7 +117,7 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
     };
 
     const getCategoryLabel = (cat) => {
-        const found = categories.find((c) => c.value === cat);
+        const found = categoriesList.find((c) => c.value === cat);
         return found ? found.label : 'أخرى';
     };
 
@@ -167,7 +168,7 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
 
             {/* Category Filter Tabs */}
             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                {categories.map((cat) => (
+                {categoriesList.map((cat) => (
                         <button
                         key={cat.value}
                         type="button"
@@ -299,7 +300,7 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
                     <div className="space-y-3">
                         {[
                             { 
-                                text: 'التسجيل في التطبيق', 
+                                text: 'التسجيل في الموقع', 
                                 icon: FaExclamationCircle, 
                                 tag: 'إلزامي', 
                                 tagColor: 'bg-red-100 text-red-700 border-red-300' 

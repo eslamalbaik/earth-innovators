@@ -29,6 +29,25 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
 
     const handleAdd = (e) => {
         e.preventDefault();
+        
+        // التحقق من أن الوزن لا يتجاوز الحد المسموح
+        const maxAllowed = getMaxAllowedWeightForAdd(formData.project_id || null);
+        if (parseFloat(formData.weight) > maxAllowed) {
+            alert(`الوزن المدخل (${formData.weight}%) يتجاوز الحد الأقصى المسموح (${maxAllowed.toFixed(2)}%)`);
+            return;
+        }
+
+        // التحقق من أن مجموع الأوزان لا يتجاوز 100%
+        const currentTotal = formData.project_id 
+            ? getTotalWeightForProject(formData.project_id)
+            : criteria.filter(c => !c.project_id).reduce((sum, c) => sum + parseFloat(c.weight || 0), 0);
+        const newTotal = currentTotal + parseFloat(formData.weight);
+        
+        if (newTotal > 100) {
+            alert(`مجموع الأوزان سيكون ${newTotal.toFixed(2)}% وهو أكبر من 100%. الحد الأقصى المسموح: ${maxAllowed.toFixed(2)}%`);
+            return;
+        }
+
         submitForm(route('admin.acceptance-criteria.store'), {
             onSuccess: () => {
                 reset();
@@ -50,6 +69,22 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
     };
 
     const handleUpdate = (id) => {
+        // التحقق من أن الوزن لا يتجاوز الحد المسموح
+        const maxAllowed = getMaxAllowedWeight(id, editData.project_id || null);
+        if (parseFloat(editData.weight) > maxAllowed) {
+            alert(`الوزن المدخل (${editData.weight}%) يتجاوز الحد الأقصى المسموح (${maxAllowed.toFixed(2)}%)`);
+            return;
+        }
+
+        // التحقق من أن مجموع الأوزان لا يتجاوز 100%
+        const currentTotal = getTotalWeightExcludingCurrent(id, editData.project_id || null);
+        const newTotal = currentTotal + parseFloat(editData.weight);
+        
+        if (newTotal > 100) {
+            alert(`مجموع الأوزان سيكون ${newTotal.toFixed(2)}% وهو أكبر من 100%. الحد الأقصى المسموح: ${maxAllowed.toFixed(2)}%`);
+            return;
+        }
+
         updateEdit(route('admin.acceptance-criteria.update', id), {
             onSuccess: () => {
                 setEditingId(null);
@@ -77,17 +112,57 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
     const handleWeightChange = (id, newWeight) => {
         const criterion = criteria.find(c => c.id === id);
         if (criterion) {
+            let weightValue = parseFloat(newWeight) || 0;
+            // منع الوزن من تجاوز 100%
+            if (weightValue > 100) {
+                weightValue = 100;
+            }
+            if (weightValue < 0) {
+                weightValue = 0;
+            }
             setEditData({
                 ...editData,
-                weight: parseFloat(newWeight),
+                weight: weightValue,
             });
         }
+    };
+
+    const handleAddWeightChange = (newWeight) => {
+        let weightValue = parseFloat(newWeight) || 0;
+        // منع الوزن من تجاوز 100%
+        if (weightValue > 100) {
+            weightValue = 100;
+        }
+        if (weightValue < 0) {
+            weightValue = 0;
+        }
+        setFormData('weight', weightValue);
     };
 
     const getTotalWeightExcludingCurrent = (currentId, projectId) => {
         return criteria
             .filter(c => c.id !== currentId && editingId !== c.id && c.project_id === projectId)
             .reduce((sum, c) => sum + parseFloat(c.weight || 0), 0);
+    };
+
+    const getTotalWeightForProject = (projectId) => {
+        return criteria
+            .filter(c => c.project_id === projectId)
+            .reduce((sum, c) => sum + parseFloat(c.weight || 0), 0);
+    };
+
+    const getMaxAllowedWeight = (currentId, projectId) => {
+        const currentTotal = getTotalWeightExcludingCurrent(currentId, projectId);
+        return Math.max(0, 100 - currentTotal);
+    };
+
+    const getMaxAllowedWeightForAdd = (projectId) => {
+        const currentTotal = projectId 
+            ? getTotalWeightForProject(projectId)
+            : criteria
+                .filter(c => !c.project_id)
+                .reduce((sum, c) => sum + parseFloat(c.weight || 0), 0);
+        return Math.max(0, 100 - currentTotal);
     };
 
     const handleProjectChange = (projectId) => {
@@ -213,10 +288,10 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                 <input
                                     type="number"
                                     min="0"
-                                    max="100"
+                                    max={getMaxAllowedWeightForAdd(formData.project_id || null)}
                                     step="0.01"
                                     value={formData.weight}
-                                    onChange={(e) => setFormData('weight', parseFloat(e.target.value) || 0)}
+                                    onChange={(e) => handleAddWeightChange(e.target.value)}
                                     className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
                                         errors.weight ? 'border-red-500' : 'border-gray-300'
                                     }`}
@@ -224,6 +299,23 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                 />
                                 {errors.weight && (
                                     <p className="mt-1 text-sm text-red-600">{errors.weight}</p>
+                                )}
+                                <p className="mt-1 text-xs text-gray-500">
+                                    الحد الأقصى المسموح: {getMaxAllowedWeightForAdd(formData.project_id || null).toFixed(2)}%
+                                    {formData.project_id ? (
+                                        <span className="block mt-1">
+                                            المجموع الحالي للمشروع: {getTotalWeightForProject(formData.project_id).toFixed(2)}%
+                                        </span>
+                                    ) : (
+                                        <span className="block mt-1">
+                                            المجموع الحالي للمعايير العامة: {criteria.filter(c => !c.project_id).reduce((sum, c) => sum + parseFloat(c.weight || 0), 0).toFixed(2)}%
+                                        </span>
+                                    )}
+                                </p>
+                                {parseFloat(formData.weight) + (formData.project_id ? getTotalWeightForProject(formData.project_id) : criteria.filter(c => !c.project_id).reduce((sum, c) => sum + parseFloat(c.weight || 0), 0)) > 100 && (
+                                    <p className="mt-1 text-sm text-red-600 font-semibold">
+                                        ⚠️ تحذير: مجموع الأوزان سيتجاوز 100%!
+                                    </p>
                                 )}
                             </div>
                             <div className="flex gap-4">
@@ -311,7 +403,7 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                                 <input
                                                     type="number"
                                                     min="0"
-                                                    max="100"
+                                                    max={getMaxAllowedWeight(criterion.id, editData.project_id || null)}
                                                     step="0.01"
                                                     value={editData.weight}
                                                     onChange={(e) => handleWeightChange(criterion.id, e.target.value)}
@@ -322,6 +414,14 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                                 <p className="mt-1 text-xs text-gray-500">
                                                     المجموع الحالي (بدون هذا المعيار): {getTotalWeightExcludingCurrent(criterion.id, editData.project_id || null).toFixed(2)}%
                                                 </p>
+                                                <p className="mt-1 text-xs text-blue-600">
+                                                    الحد الأقصى المسموح: {getMaxAllowedWeight(criterion.id, editData.project_id || null).toFixed(2)}%
+                                                </p>
+                                                {parseFloat(editData.weight) + getTotalWeightExcludingCurrent(criterion.id, editData.project_id || null) > 100 && (
+                                                    <p className="mt-1 text-sm text-red-600 font-semibold">
+                                                        ⚠️ تحذير: مجموع الأوزان سيتجاوز 100%!
+                                                    </p>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

@@ -5,7 +5,7 @@ import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import DesktopFooter from '@/Components/Mobile/DesktopFooter';
 
-export default function ProjectsIndex({ auth, projects, userRole }) {
+export default function ProjectsIndex({ auth, projects, userRole, categories = [] }) {
     const [search, setSearch] = useState('');
     const [category, setCategory] = useState('');
     const [showFilterModal, setShowFilterModal] = useState(false);
@@ -13,14 +13,18 @@ export default function ProjectsIndex({ auth, projects, userRole }) {
     const [filterSchool, setFilterSchool] = useState('');
     const [filterSubject, setFilterSubject] = useState('');
 
-    const categories = [
+    // استخدام الفئات من قاعدة البيانات أو الفئات الافتراضية
+    const defaultCategories = [
         { value: '', label: 'الكل' },
-        { value: 'science', label: 'علمي' },
-        { value: 'arts', label: 'فني' },
-        { value: 'technology', label: 'تقني' },
-        { value: 'heritage', label: 'تراثي' },
-        { value: 'environmental', label: 'بيئي' },
+        { value: 'science', label: 'علوم' },
+        { value: 'technology', label: 'تقنية' },
+        { value: 'engineering', label: 'هندسة' },
+        { value: 'mathematics', label: 'رياضيات' },
+        { value: 'arts', label: 'فنون' },
+        { value: 'other', label: 'أخرى' },
     ];
+    
+    const categoriesList = categories && categories.length > 0 ? categories : defaultCategories;
 
     const ageGroups = [
         { value: '6-9', label: '6-9 سنوات' },
@@ -36,13 +40,11 @@ export default function ProjectsIndex({ auth, projects, userRole }) {
         { value: 'university', label: 'الجامعة' },
     ];
 
-    const subjects = [
-        { value: 'technology', label: 'التكنولوجيا' },
-        { value: 'science', label: 'العلوم' },
-        { value: 'mathematics', label: 'الرياضيات' },
-        { value: 'engineering', label: 'الهندسة' },
-        { value: 'arts', label: 'الفنون' },
-    ];
+    // استخدام الفئات من قاعدة البيانات للفلترة أيضاً
+    const subjects = categoriesList.filter(c => c.value !== '').map(cat => ({
+        value: cat.value,
+        label: cat.label,
+    }));
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -77,7 +79,7 @@ export default function ProjectsIndex({ auth, projects, userRole }) {
     };
 
     const getCategoryLabel = (cat) => {
-        const found = categories.find((c) => c.value === cat);
+        const found = categoriesList.find((c) => c.value === cat);
         return found ? found.label : 'أخرى';
     };
 
@@ -120,7 +122,7 @@ export default function ProjectsIndex({ auth, projects, userRole }) {
 
             {/* Category Filter Tabs */}
             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                {categories.map((cat) => (
+                {categoriesList.map((cat) => (
                     <button
                         key={cat.value}
                         type="button"
@@ -137,10 +139,10 @@ export default function ProjectsIndex({ auth, projects, userRole }) {
                                 : 'bg-white text-gray-700'
                         }`}
                     >
-                                        {cat.label}
+                        {cat.label}
                     </button>
-                                ))}
-                        </div>
+                ))}
+            </div>
 
             {/* Projects Count */}
             <div className="text-sm text-gray-700">
@@ -339,22 +341,26 @@ export default function ProjectsIndex({ auth, projects, userRole }) {
                                 </div>
                             </div>
 
-                            {/* Subject */}
+                            {/* Subject/Category */}
                             <div>
-                                <div className="text-sm font-bold text-gray-900 mb-3">الموضوع</div>
+                                <div className="text-sm font-bold text-gray-900 mb-3">الفئة</div>
                                 <div className="grid grid-cols-2 gap-2">
-                                    {subjects.map((subject) => (
+                                    {categoriesList.filter(c => c.value !== '').map((cat) => (
                                         <button
-                                            key={subject.value}
+                                            key={cat.value}
                                             type="button"
-                                            onClick={() => setFilterSubject(filterSubject === subject.value ? '' : subject.value)}
+                                            onClick={() => {
+                                                const newCategory = category === cat.value ? '' : cat.value;
+                                                setCategory(newCategory);
+                                                setFilterSubject(newCategory);
+                                            }}
                                             className={`px-4 py-3 rounded-xl text-sm font-semibold transition ${
-                                                filterSubject === subject.value
+                                                category === cat.value
                                                     ? 'bg-[#eef8d6] text-[#6b7f2c] border-2 border-[#A3C042]'
                                                     : 'bg-white text-gray-700 border border-gray-200'
                                             }`}
                                         >
-                                            {subject.label}
+                                            {cat.label}
                                         </button>
                                     ))}
                                 </div>

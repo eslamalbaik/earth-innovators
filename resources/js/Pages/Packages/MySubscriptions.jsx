@@ -1,195 +1,216 @@
-import React, { useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Head, router } from '@inertiajs/react';
+import MobileAppLayout from '@/Layouts/MobileAppLayout';
+import MobileTopBar from '@/Components/Mobile/MobileTopBar';
+import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
+import { useState } from 'react';
+import {
+    FaCheckCircle,
+    FaTimesCircle,
+    FaClock,
+    FaCalendar,
+    FaCreditCard,
+    FaBox,
+    FaSpinner,
+    FaTrash
+} from 'react-icons/fa';
+import { useToast } from '@/Contexts/ToastContext';
+import { useConfirmDialog } from '@/Contexts/ConfirmContext';
+import { toHijriDate } from '@/utils/dateUtils';
 
-export default function MySubscriptions({ subscriptions }) {
+export default function MySubscriptions({ auth, subscriptions = [] }) {
+    const { showSuccess, showError } = useToast();
+    const { confirm } = useConfirmDialog();
     const [cancellingId, setCancellingId] = useState(null);
-
-    const handleCancelSubscription = (subscriptionId) => {
-        if (confirm('هل أنت متأكد من إلغاء هذا الاشتراك؟')) {
-            router.post(
-                route('packages.subscription.cancel', subscriptionId),
-                {},
-                {
-                    onStart: () => setCancellingId(subscriptionId),
-                    onFinish: () => setCancellingId(null),
-                }
-            );
-        }
-    };
 
     const getStatusBadge = (status) => {
         const badges = {
-            active: {
-                color: 'bg-green-100 text-green-800',
-                label: 'نشط',
-            },
-            expired: {
-                color: 'bg-red-100 text-red-800',
-                label: 'منتهي',
-            },
-            cancelled: {
-                color: 'bg-gray-100 text-gray-800',
-                label: 'ملغي',
-            },
-            pending: {
-                color: 'bg-yellow-100 text-yellow-800',
-                label: 'قيد الانتظار',
-            },
-            failed: {
-                color: 'bg-red-100 text-red-800',
-                label: 'فشل',
-            },
+            active: { bg: 'bg-green-100', text: 'text-green-700', label: 'نشط', icon: FaCheckCircle },
+            pending: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'قيد المعالجة', icon: FaClock },
+            expired: { bg: 'bg-red-100', text: 'text-red-700', label: 'منتهي', icon: FaTimesCircle },
+            cancelled: { bg: 'bg-gray-100', text: 'text-gray-700', label: 'ملغى', icon: FaTimesCircle },
         };
-
-        const badge = badges[status] || badges.pending;
-
-        return (
-            <span
-                className={`px-3 py-1 rounded-full text-xs font-semibold ${badge.color}`}
-            >
-                {badge.label}
-            </span>
-        );
+        return badges[status] || badges.cancelled;
     };
 
-    return (
-        <AuthenticatedLayout
-            header={
-                <div className="flex justify-between items-center">
-                    <h2 className="text-2xl font-bold text-gray-800">اشتراكاتي</h2>
-                    <Link
-                        href={route('packages.index')}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+    const handleCancelSubscription = async (subscriptionId) => {
+        const confirmed = await confirm({
+            title: 'تأكيد الإلغاء',
+            message: 'هل أنت متأكد من إلغاء هذا الاشتراك؟ لن تتمكن من استخدام ميزات الباقة بعد الإلغاء.',
+            confirmText: 'إلغاء الاشتراك',
+            cancelText: 'تراجع',
+            variant: 'danger',
+        });
+
+        if (!confirmed) return;
+
+        setCancellingId(subscriptionId);
+        try {
+            router.post(`/packages/subscriptions/${subscriptionId}/cancel`, {}, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    showSuccess('تم إلغاء الاشتراك بنجاح');
+                    setCancellingId(null);
+                },
+                onError: (errors) => {
+                    setCancellingId(null);
+                    const errorMessage = errors.error || Object.values(errors)[0] || 'حدث خطأ أثناء إلغاء الاشتراك';
+                    showError(Array.isArray(errorMessage) ? errorMessage[0] : errorMessage);
+                },
+            });
+        } catch (error) {
+            setCancellingId(null);
+            showError('حدث خطأ أثناء إلغاء الاشتراك');
+        }
+    };
+
+    const SubscriptionsContent = () => (
+        <div className="space-y-4">
+            {/* Header */}
+            <div className="mb-4">
+                <h1 className="text-lg font-extrabold text-gray-900 mb-2">اشتراكاتي</h1>
+                <p className="text-sm text-gray-600">
+                    عرض وإدارة جميع اشتراكاتك في الباقات
+                </p>
+            </div>
+
+            {/* Subscriptions List */}
+            {subscriptions.length > 0 ? (
+                <div className="space-y-4">
+                    {subscriptions.map((subscription) => {
+                        const statusBadge = getStatusBadge(subscription.status);
+                        const StatusIcon = statusBadge.icon;
+                        const isActive = subscription.status === 'active';
+                        const isCancelling = cancellingId === subscription.id;
+
+                        return (
+                            <div
+                                key={subscription.id}
+                                className={`bg-white rounded-2xl border-2 p-4 ${
+                                    isActive ? 'border-green-300 bg-green-50' : 'border-gray-200'
+                                }`}
+                            >
+                                {/* Package Info */}
+                                <div className="flex items-start justify-between mb-3">
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <FaBox className="text-gray-400 text-sm" />
+                                            <h3 className="text-sm font-bold text-gray-900">
+                                                {subscription.package?.name_ar || subscription.package?.name}
+                                            </h3>
+                                        </div>
+                                        <div className="flex items-center gap-4 text-xs text-gray-600 mb-2">
+                                            <div className="flex items-center gap-1">
+                                                <FaCalendar className="text-gray-400" />
+                                                <span>من: {toHijriDate(subscription.start_date)}</span>
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                <FaCalendar className="text-gray-400" />
+                                                <span>إلى: {toHijriDate(subscription.end_date)}</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-4 text-xs text-gray-600">
+                                            <div className="flex items-center gap-1">
+                                                <FaCreditCard className="text-gray-400" />
+                                                <span>{subscription.paid_amount} {subscription.package?.currency}</span>
+                                            </div>
+                                            {subscription.transaction_id && (
+                                                <span className="text-gray-500">
+                                                    رقم المعاملة: {subscription.transaction_id}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${statusBadge.bg} ${statusBadge.text}`}>
+                                        <StatusIcon className="text-[10px]" />
+                                        {statusBadge.label}
+                                    </span>
+                                </div>
+
+                                {/* Actions */}
+                                {isActive && (
+                                    <div className="pt-3 border-t border-gray-200">
+                                        <button
+                                            onClick={() => handleCancelSubscription(subscription.id)}
+                                            disabled={isCancelling}
+                                            className="w-full px-4 py-2 bg-red-50 text-red-700 rounded-xl hover:bg-red-100 transition text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                        >
+                                            {isCancelling ? (
+                                                <>
+                                                    <FaSpinner className="animate-spin" />
+                                                    جاري الإلغاء...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <FaTrash />
+                                                    إلغاء الاشتراك
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+            ) : (
+                <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
+                    <FaBox className="mx-auto text-4xl text-gray-300 mb-3" />
+                    <p className="text-sm text-gray-500 mb-4">لا توجد اشتراكات حالياً</p>
+                    <button
+                        onClick={() => router.visit('/packages')}
+                        className="px-4 py-2 bg-[#A3C042] text-white rounded-xl hover:bg-[#93b03a] transition text-sm font-semibold"
                     >
                         تصفح الباقات
-                    </Link>
+                    </button>
                 </div>
-            }
-        >
-            <Head title="اشتراكاتي" />
+            )}
 
-            <div className="py-12 bg-gray-50 min-h-screen">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    {subscriptions.length === 0 ? (
-                        <div className="bg-white rounded-xl shadow-lg p-12 text-center">
-                            <div className="text-6xl mb-4">📦</div>
-                            <h3 className="text-2xl font-bold text-gray-800 mb-2">
-                                لا توجد اشتراكات
-                            </h3>
-                            <p className="text-gray-600 mb-6">
-                                لم تقم بالاشتراك في أي باقة بعد
-                            </p>
-                            <Link
-                                href={route('packages.index')}
-                                className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold"
-                            >
-                                تصفح الباقات المتاحة
-                            </Link>
-                        </div>
-                    ) : (
-                        <div className="space-y-6">
-                            {subscriptions.map((subscription) => (
-                                <div
-                                    key={subscription.id}
-                                    className="bg-white rounded-xl shadow-lg overflow-hidden"
-                                >
-                                    <div className="p-6">
-                                        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                                            <div className="mb-4 md:mb-0">
-                                                <h3 className="text-2xl font-bold text-gray-800 mb-2">
-                                                    {subscription.package.name_ar}
-                                                </h3>
-                                                <p className="text-gray-600 text-sm">
-                                                    معرف الاشتراك: #{subscription.id}
-                                                </p>
-                                            </div>
-                                            <div>
-                                                {getStatusBadge(subscription.status)}
-                                            </div>
-                                        </div>
-
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                                            <div className="bg-gray-50 rounded-lg p-4">
-                                                <p className="text-gray-600 text-sm mb-1">
-                                                    تاريخ البدء
-                                                </p>
-                                                <p className="text-gray-800 font-semibold">
-                                                    {subscription.start_date}
-                                                </p>
-                                            </div>
-                                            <div className="bg-gray-50 rounded-lg p-4">
-                                                <p className="text-gray-600 text-sm mb-1">
-                                                    تاريخ الانتهاء
-                                                </p>
-                                                <p className="text-gray-800 font-semibold">
-                                                    {subscription.end_date}
-                                                </p>
-                                            </div>
-                                            <div className="bg-gray-50 rounded-lg p-4">
-                                                <p className="text-gray-600 text-sm mb-1">
-                                                    المبلغ المدفوع
-                                                </p>
-                                                <p className="text-gray-800 font-semibold">
-                                                    {subscription.paid_amount}{' '}
-                                                    {subscription.package.currency}
-                                                </p>
-                                            </div>
-                                            <div className="bg-gray-50 rounded-lg p-4">
-                                                <p className="text-gray-600 text-sm mb-1">
-                                                    طريقة الدفع
-                                                </p>
-                                                <p className="text-gray-800 font-semibold capitalize">
-                                                    {subscription.payment_method || 'N/A'}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        {subscription.transaction_id && (
-                                            <div className="bg-blue-50 rounded-lg p-4 mb-4">
-                                                <p className="text-blue-800 text-sm">
-                                                    <span className="font-semibold">
-                                                        رقم المعاملة:
-                                                    </span>{' '}
-                                                    {subscription.transaction_id}
-                                                </p>
-                                            </div>
-                                        )}
-
-                                        {subscription.status === 'active' && (
-                                            <div className="flex justify-end">
-                                                <button
-                                                    onClick={() =>
-                                                        handleCancelSubscription(subscription.id)
-                                                    }
-                                                    disabled={cancellingId === subscription.id}
-                                                    className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-semibold"
-                                                >
-                                                    {cancellingId === subscription.id
-                                                        ? 'جاري الإلغاء...'
-                                                        : 'إلغاء الاشتراك'}
-                                                </button>
-                                            </div>
-                                        )}
-
-                                        {subscription.status === 'expired' && (
-                                            <div className="text-center">
-                                                <Link
-                                                    href={route('packages.index')}
-                                                    className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-semibold"
-                                                >
-                                                    تجديد الاشتراك
-                                                </Link>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
+            {/* Back to Packages */}
+            <div className="pt-4">
+                <button
+                    onClick={() => router.visit('/packages')}
+                    className="w-full px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition text-sm font-semibold"
+                >
+                    ← العودة إلى الباقات
+                </button>
             </div>
-        </AuthenticatedLayout>
+        </div>
+    );
+
+    return (
+        <div dir="rtl" className="min-h-screen bg-gray-50">
+            <Head title="اشتراكاتي - إرث المبتكرين" />
+
+            {/* Mobile View */}
+            <div className="block md:hidden">
+                <MobileAppLayout
+                    auth={auth}
+                    title="اشتراكاتي"
+                    activeNav="packages"
+                    unreadCount={auth?.unreadCount || 0}
+                    onNotifications={() => router.visit('/notifications')}
+                    onBack={() => router.visit('/packages')}
+                >
+                    <SubscriptionsContent />
+                </MobileAppLayout>
+            </div>
+
+            {/* Desktop View */}
+            <div className="hidden md:block">
+                <MobileTopBar
+                    title="اشتراكاتي"
+                    unreadCount={auth?.unreadCount || 0}
+                    onNotifications={() => router.visit('/notifications')}
+                    onBack={() => router.visit('/packages')}
+                    auth={auth}
+                />
+                <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-4">
+                    <div className="mx-auto w-full max-w-3xl">
+                        <SubscriptionsContent />
+                    </div>
+                </main>
+                <MobileBottomNav active="packages" role={auth?.user?.role} isAuthed={!!auth?.user} user={auth?.user} />
+            </div>
+        </div>
     );
 }
-

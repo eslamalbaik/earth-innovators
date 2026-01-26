@@ -171,7 +171,7 @@ export default function StudentSubjects({ studentSubjects, allSubjects }) {
                                         href={`/teachers?subject=${encodeURIComponent(subject.name_ar)}`}
                                         className="text-blue-600 hover:text-blue-700 text-sm font-medium"
                                     >
-                                        عرض المعلمين →
+                                        عرض المعلمين
                                     </Link>
                                 </div>
                             </div>

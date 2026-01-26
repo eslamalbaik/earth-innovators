@@ -1,4 +1,4 @@
-import { FaBell, FaArrowRight, FaHome, FaFolderOpen, FaCompass, FaTrophy, FaBook, FaMedal, FaUser, FaSignOutAlt, FaChevronDown } from 'react-icons/fa';
+import { FaBell, FaArrowRight, FaHome, FaFolderOpen, FaCompass, FaTrophy, FaBook, FaMedal, FaUser, FaSignOutAlt, FaChevronDown, FaTachometerAlt } from 'react-icons/fa';
 import { Link, usePage, router } from '@inertiajs/react';
 import { useState, useRef, useEffect } from 'react';
 import { getUserImageUrl, getInitials, getColorFromName } from '@/utils/imageUtils';
@@ -60,6 +60,7 @@ export default function MobileTopBar({
         if (role === 'teacher') {
             return {
                 home: '/teacher/dashboard',
+                dashboard: '/teacher/dashboard',
                 projects: '/teacher/projects',
                 challenges: '/teacher/challenges',
                 profile: '/teacher/profile',
@@ -68,6 +69,7 @@ export default function MobileTopBar({
         if (role === 'school') {
             return {
                 home: '/school/dashboard',
+                dashboard: '/school/dashboard',
                 projects: '/school/projects',
                 challenges: '/school/challenges',
                 profile: '/profile',
@@ -76,13 +78,24 @@ export default function MobileTopBar({
         if (role === 'student') {
             return {
                 home: '/student/dashboard',
+                dashboard: '/student/dashboard',
                 projects: '/student/projects',
                 challenges: '/student/challenges',
                 profile: '/student/profile',
             };
         }
+        if (role === 'admin') {
+            return {
+                home: '/admin/dashboard',
+                dashboard: '/admin/dashboard',
+                projects: '/projects',
+                challenges: '/challenges',
+                profile: '/profile',
+            };
+        }
         return {
             home: '/',
+            dashboard: '/dashboard',
             projects: '/projects',
             challenges: '/challenges',
             profile: '/profile',
@@ -164,7 +177,7 @@ export default function MobileTopBar({
                                 <p className="text-xl font-bold bg-gradient-to-r from-[#A3C042] to-[#93b03a] bg-clip-text text-transparent">
                                     إرث المبتكرين
                                 </p>
-                                <p className="text-xs text-gray-500">Legacy of Innovators</p>
+                                <p className="text-xs text-gray-500">Innovators Legacy</p>
                             </div>
                         </Link>
                     </div>
@@ -263,6 +276,20 @@ export default function MobileTopBar({
                                             <div className="text-xs text-gray-500 mt-1">{user?.email || ''}</div>
                                         </div>
                                         <div className="py-2">
+                                            {/* لوحة التحكم - تظهر لجميع الأدوار */}
+                                            {(user?.role === 'admin' || user?.role === 'teacher' || user?.role === 'school' || user?.role === 'student') && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        router.visit(links.dashboard);
+                                                        setUserMenuOpen(false);
+                                                    }}
+                                                    className="w-full px-4 py-3 text-sm font-semibold text-[#A3C042] hover:bg-[#A3C042]/10 transition flex items-center justify-between gap-2 border-b border-gray-100"
+                                                >
+                                                    <span>لوحة التحكم</span>
+                                                    <FaTachometerAlt className="text-[#A3C042]" />
+                                                </button>
+                                            )}
                                             <button
                                                 type="button"
                                                 onClick={() => {
@@ -306,7 +333,7 @@ export default function MobileTopBar({
                                                     handleLogout();
                                                     setUserMenuOpen(false);
                                                 }}
-                                                className="w-full  px-4 py-3 text-sm font-semibold text-red-600 hover:bg-red-50 transition flex items-center justify-between gap-2"
+                                                className="w-full px-4 py-3 text-sm font-semibold text-red-600 hover:bg-red-50 transition flex items-center justify-between gap-2"
                                             >
                                                 <span>تسجيل الخروج</span>
                                                 <FaSignOutAlt className="text-xs" />

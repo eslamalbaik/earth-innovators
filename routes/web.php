@@ -693,6 +693,7 @@ Route::get('/projects/{project}', [App\Http\Controllers\ProjectController::class
 
 // التحديات النشطة (عام - متاح لجميع المستخدمين)
 Route::get('/challenges', [App\Http\Controllers\ChallengeController::class, 'index'])->name('challenges.index');
+Route::get('/challenges/winners', [App\Http\Controllers\ChallengeController::class, 'winners'])->name('challenges.winners');
 Route::get('/challenges/{challenge}', [App\Http\Controllers\ChallengeController::class, 'show'])->name('challenges.show');
 
 // API Routes for Challenges
@@ -918,6 +919,10 @@ Route::middleware(['auth', 'school'])->prefix('school')->name('school.')->group(
     Route::delete('/students/{id}', [\App\Http\Controllers\School\SchoolStudentController::class, 'destroy'])->name('students.destroy');
     Route::post('/students/{id}/award-badge', [\App\Http\Controllers\School\SchoolStudentController::class, 'awardBadge'])->name('students.award-badge');
     Route::delete('/students/{studentId}/badges/{badgeId}', [\App\Http\Controllers\School\SchoolStudentController::class, 'removeBadge'])->name('students.remove-badge');
+    
+    // تقارير تقييم الطلاب
+    Route::get('/students/evaluation-report', [\App\Http\Controllers\School\StudentEvaluationController::class, 'index'])->name('students.evaluation-report');
+    Route::get('/students/{studentId}/evaluation', [\App\Http\Controllers\School\StudentEvaluationController::class, 'show'])->name('students.evaluation');
 
     // الترتيب والشارات
     Route::get('/ranking', [\App\Http\Controllers\School\SchoolRankingController::class, 'index'])->name('ranking');
@@ -956,6 +961,10 @@ Route::middleware(['auth', 'teacher'])->group(function () {
     Route::get('/teacher/dashboard', [TeacherDashboardController::class, 'index'])->name('teacher.dashboard');
 
     Route::get('/teacher/students', [\App\Http\Controllers\Teacher\TeacherStudentController::class, 'index'])->name('teacher.students.index');
+    
+    // تقارير تقييم الطلاب
+    Route::get('/teacher/students/evaluation-report', [\App\Http\Controllers\Teacher\StudentEvaluationController::class, 'index'])->name('teacher.students.evaluation-report');
+    Route::get('/teacher/students/{studentId}/evaluation', [\App\Http\Controllers\Teacher\StudentEvaluationController::class, 'show'])->name('teacher.students.evaluation');
 
     Route::get('/teacher/profile', [App\Http\Controllers\Teacher\TeacherProfileController::class, 'index'])->name('teacher.profile');
     Route::put('/teacher/profile', [App\Http\Controllers\Teacher\TeacherProfileController::class, 'update'])->name('teacher.profile.update');

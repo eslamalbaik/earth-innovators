@@ -178,7 +178,7 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                             href="/school/submissions"
                             className="block mt-4 text-center text-indigo-600 hover:text-indigo-700 font-medium text-sm"
                         >
-                            عرض جميع التسليمات →
+                            عرض جميع التسليمات
                         </Link>
                     </div>
                 )}

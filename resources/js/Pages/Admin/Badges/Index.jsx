@@ -298,7 +298,7 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                                         </td>
                                         <td className="py-4 px-6">{getStatusBadge(badge.is_active)}</td>
                                         <td className="py-4 px-6 text-sm text-gray-700">
-                                            {badge.created_at ? new Date(badge.created_at).toLocaleDateString('ar-SA') : '-'}
+                                            {badge.created_at ? new Date(badge.created_at).toLocaleDateString('en-US') : '-'}
                                         </td>
                                         <td className="py-4 px-6">
                                             <div className="flex items-center gap-2">

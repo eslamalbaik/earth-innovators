@@ -1,6 +1,6 @@
 import DashboardLayout from '../../../Layouts/DashboardLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { FaTrophy, FaPlus, FaCalendar, FaEye, FaEdit, FaTrash, FaUsers, FaCheckCircle, FaTimes, FaTable, FaTh, FaSearch, FaUser, FaStar, FaClock, FaArrowLeft } from 'react-icons/fa';
+import { FaTrophy, FaPlus, FaCalendar, FaEye, FaEdit, FaTrash, FaUsers, FaCheckCircle, FaTimes, FaTable, FaTh, FaSearch, FaUser, FaStar, FaClock, FaArrowRight } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
 import ChallengeTable from '@/Components/Challenges/ChallengeTable';
 import ChallengeCardGrid from '@/Components/Challenges/ChallengeCardGrid';
@@ -278,7 +278,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                     }}
                                     className="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-semibold"
                                 >
-                                    <FaArrowLeft />
+                                    <FaArrowRight />
                                     العودة إلى التحديات
                                 </button>
                             )}

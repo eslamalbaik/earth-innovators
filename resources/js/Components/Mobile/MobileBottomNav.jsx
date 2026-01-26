@@ -1,12 +1,13 @@
 import { router } from '@inertiajs/react';
 import { useState, useRef, useEffect } from 'react';
-import { FaHome, FaFolderOpen, FaCompass, FaTrophy, FaUser, FaSignOutAlt, FaBook, FaMedal } from 'react-icons/fa';
+import { FaHome, FaFolderOpen, FaCompass, FaTrophy, FaUser, FaSignOutAlt, FaBook, FaMedal, FaTachometerAlt, FaCreditCard } from 'react-icons/fa';
 import { getUserImageUrl, getInitials, getColorFromName } from '@/utils/imageUtils';
 
 const getRoleLinks = (role) => {
     if (role === 'teacher') {
         return {
             home: '/teacher/dashboard',
+            dashboard: '/teacher/dashboard',
             projects: '/teacher/projects',
             challenges: '/teacher/challenges',
             profile: '/teacher/profile',
@@ -15,6 +16,7 @@ const getRoleLinks = (role) => {
     if (role === 'school') {
         return {
             home: '/school/dashboard',
+            dashboard: '/school/dashboard',
             projects: '/school/projects',
             challenges: '/school/challenges',
             profile: '/profile',
@@ -23,13 +25,24 @@ const getRoleLinks = (role) => {
     if (role === 'student') {
         return {
             home: '/student/dashboard',
+            dashboard: '/student/dashboard',
             projects: '/student/projects',
             challenges: '/student/challenges',
             profile: '/student/profile',
         };
     }
+    if (role === 'admin') {
+        return {
+            home: '/admin/dashboard',
+            dashboard: '/admin/dashboard',
+            projects: '/projects',
+            challenges: '/challenges',
+            profile: '/profile',
+        };
+    }
     return {
         home: '/',
+        dashboard: '/dashboard',
         projects: '/projects',
         challenges: '/challenges',
         profile: '/profile',
@@ -122,6 +135,14 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                         <div className="pt-6 border-t border-gray-200">
                             <h3 className="text-xs font-bold text-gray-500 uppercase mb-4 px-3">روابط سريعة</h3>
                             <div className="space-y-1">
+                                <button
+                                    type="button"
+                                    onClick={() => router.visit('/packages')}
+                                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-gray-700 hover:bg-gray-50 transition"
+                                >
+                                    <FaCreditCard className="text-base" />
+                                    <span>الباقات</span>
+                                </button>
                                 <button
                                     type="button"
                                     onClick={() => router.visit('/publications')}
@@ -271,6 +292,23 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                             {/* User Dropdown Menu */}
                             {userDropdownOpen && (
                                 <div className="absolute bottom-full left-0 mb-2 w-40 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden z-50">
+                                    {/* لوحة التحكم - تظهر لجميع الأدوار */}
+                                    {(role === 'admin' || role === 'teacher' || role === 'school' || role === 'student') && (
+                                        <>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    router.visit(links.dashboard);
+                                                    setUserDropdownOpen(false);
+                                                }}
+                                                className="w-full px-4 py-3 text-sm font-semibold text-[#A3C042] hover:bg-[#A3C042]/10 transition flex items-center justify-between gap-2"
+                                            >
+                                                <span>لوحة التحكم</span>
+                                                <FaTachometerAlt className="text-xs" />
+                                            </button>
+                                            <div className="border-t border-gray-100" />
+                                        </>
+                                    )}
                                     <button
                                         type="button"
                                         onClick={() => {
@@ -281,6 +319,22 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                                     >
                                         <span>الملف الشخصي</span>
                                     </button>
+                                    {role === 'student' && (
+                                        <>
+                                            <div className="border-t border-gray-100" />
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    router.visit('/packages');
+                                                    setUserDropdownOpen(false);
+                                                }}
+                                                className="w-full  px-4 py-3 text-sm font-semibold text-[#A3C042] hover:bg-[#A3C042]/10 transition flex items-center justify-between gap-2"
+                                            >
+                                                <span>الباقات</span>
+                                                <FaCreditCard className="text-xs" />
+                                            </button>
+                                        </>
+                                    )}
                                     <div className="border-t border-gray-100" />
                                     <button
                                         type="button"

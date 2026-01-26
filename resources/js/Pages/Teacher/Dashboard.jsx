@@ -171,7 +171,7 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
                             href="/teacher/projects"
                             className="block mt-4 text-center text-blue-600 hover:text-blue-700 font-medium"
                         >
-                            عرض جميع المشاريع →
+                            عرض جميع المشاريع
                         </Link>
                     </div>
 
@@ -209,7 +209,7 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
                             href="/teacher/publications"
                             className="block mt-4 text-center text-green-600 hover:text-green-700 font-medium"
                         >
-                            عرض جميع المقالات →
+                            عرض جميع المقالات
                         </Link>
                     </div>
 
@@ -239,7 +239,7 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
                             href="/teacher/challenges"
                             className="block mt-4 text-center text-orange-600 hover:text-orange-700 font-medium"
                         >
-                            عرض جميع التحديات →
+                            عرض جميع التحديات
                         </Link>
                     </div>
 
@@ -270,7 +270,7 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
                                 href="/teacher/submissions"
                                 className="block mt-4 text-center text-indigo-600 hover:text-indigo-700 font-medium"
                             >
-                                عرض جميع التسليمات →
+                                عرض جميع التسليمات
                             </Link>
                         </div>
                     )}
@@ -343,7 +343,7 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
                                         href="/teacher/projects/create"
                                         className="inline-block text-blue-600 hover:text-blue-700 font-medium"
                                     >
-                                        إنشاء مشروع جديد →
+                                        إنشاء مشروع جديد
                                     </Link>
                                 </div>
                             ) : (
@@ -385,7 +385,7 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
                                 href="/teacher/projects"
                                 className="block mt-4 text-center text-blue-600 hover:text-blue-700 font-medium"
                             >
-                                عرض جميع المشاريع →
+                                عرض جميع المشاريع 
                             </Link>
                         </div>
                     </div>
@@ -407,7 +407,7 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
                                         href="/teacher/publications/create"
                                         className="inline-block text-green-600 hover:text-green-700 font-medium"
                                     >
-                                        نشر مقال جديد →
+                                        نشر مقال جديد
                                     </Link>
                                 </div>
                             ) : (
@@ -450,7 +450,7 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
                                 href="/teacher/publications"
                                 className="block mt-4 text-center text-green-600 hover:text-green-700 font-medium"
                             >
-                                عرض جميع المقالات →
+                                عرض جميع المقالات
                             </Link>
                         </div>
                     </div>

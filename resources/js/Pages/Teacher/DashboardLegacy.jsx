@@ -43,7 +43,7 @@ export default function TeacherDashboardLegacy({ auth, stats = {} }) {
                         </div>
                     </div>
                     <Link href="/teacher/projects/pending" className="text-sm text-gray-500 hover:text-[#A3C042]">
-                        مراجعة الآن →
+                        مراجعة الآن
                     </Link>
                 </div>
 
@@ -88,7 +88,7 @@ export default function TeacherDashboardLegacy({ auth, stats = {} }) {
                         </div>
                     </div>
                     <Link href="/teacher/students" className="text-sm text-gray-500 hover:text-[#A3C042]">
-                        إدارة الطلاب →
+                        إدارة الطلاب
                     </Link>
                 </div>
             </div>
@@ -117,7 +117,7 @@ export default function TeacherDashboardLegacy({ auth, stats = {} }) {
                                                 <span className="text-xs text-gray-500">بواسطة {project.user?.name}</span>
                                             </div>
                                             <p className="text-sm text-gray-600 line-clamp-2">{project.description?.substring(0, 80)}...</p>
-                                            <p className="text-xs text-gray-500 mt-2">{new Date(project.created_at).toLocaleDateString('ar-SA')}</p>
+                                            <p className="text-xs text-gray-500 mt-2">{new Date(project.created_at).toLocaleDateString('en-US')}</p>
                                         </div>
                                         <Link href={`/teacher/projects/${project.id}/evaluate`} className="ml-4 bg-[#A3C042] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary-600 transition">
                                             تقييم
@@ -164,7 +164,7 @@ export default function TeacherDashboardLegacy({ auth, stats = {} }) {
                                         <p className="text-sm text-gray-600 mb-2">{challenge.description?.substring(0, 80)}...</p>
                                         <div className="flex items-center justify-between text-xs text-gray-500">
                                             <span>{challenge.current_participants} مشارك</span>
-                                            <span>الموعد النهائي: {new Date(challenge.deadline).toLocaleDateString('ar-SA')}</span>
+                                            <span>الموعد النهائي: {new Date(challenge.deadline).toLocaleDateString('en-US')}</span>
                                         </div>
                                     </div>
                                 ))}

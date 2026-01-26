@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Event;
  * Full System Integration Test
  * 
  * Tests the complete integration flow:
- * Projects/Challenges/Publications → Points → Badges → Certificates
+ * Projects/Challenges/Publications Points Badges Certificates
  */
 class FullSystemIntegrationTest extends TestCase
 {

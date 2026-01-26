@@ -5,14 +5,15 @@ import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import DesktopFooter from '@/Components/Mobile/DesktopFooter';
 
-export default function ChallengesIndex({ auth, challenges, userRole, previousWinners = [], participationConditions = [] }) {
+export default function ChallengesIndex({ auth, challenges, userRole, previousWinners = [], participationConditions = [], categories = [] }) {
     const [search, setSearch] = useState('');
     const [category, setCategory] = useState('');
     const [challengeType, setChallengeType] = useState('');
     const [showFilterModal, setShowFilterModal] = useState(false);
     const [filterStatus, setFilterStatus] = useState('');
 
-    const categories = [
+    // Use categories from database, fallback to default if empty
+    const categoriesList = categories && categories.length > 0 ? categories : [
         { value: '', label: 'الكل' },
         { value: 'science', label: 'علمي' },
         { value: 'arts', label: 'فني' },
@@ -76,7 +77,7 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
     };
 
     const getCategoryLabel = (cat) => {
-        const found = categories.find((c) => c.value === cat);
+        const found = categoriesList.find((c) => c.value === cat);
         return found ? found.label : 'أخرى';
     };
 
@@ -139,7 +140,7 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
 
             {/* Category Filter Tabs */}
             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                {categories.map((cat) => (
+                {categoriesList.map((cat) => (
                     <button
                         key={cat.value}
                         type="button"

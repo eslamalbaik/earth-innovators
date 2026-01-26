@@ -85,14 +85,14 @@ export default function DashboardLayout({ children, header }) {
                                     read_at: e.read_at || null,
                                     created_at: e.created_at || new Date().toISOString(),
                                     created_at_human: e.created_at 
-                                        ? new Date(e.created_at).toLocaleString('ar-SA', {
+                                        ? new Date(e.created_at).toLocaleString('en-US', {
                                             year: 'numeric',
                                             month: 'long',
                                             day: 'numeric',
                                             hour: '2-digit',
                                             minute: '2-digit'
                                         })
-                                        : new Date().toLocaleString('ar-SA', {
+                                        : new Date().toLocaleString('en-US', {
                                             year: 'numeric',
                                             month: 'long',
                                             day: 'numeric',
@@ -798,7 +798,7 @@ export default function DashboardLayout({ children, header }) {
                                                                         )}
                                                                         <p className="text-xs text-gray-500">
                                                                             {notification.created_at_human || 
-                                                                             (notification.created_at ? new Date(notification.created_at).toLocaleString('ar-SA', {
+                                                                             (notification.created_at ? new Date(notification.created_at).toLocaleString('en-US', {
                                                                                  year: 'numeric',
                                                                                  month: 'short',
                                                                                  day: 'numeric',
@@ -879,6 +879,28 @@ export default function DashboardLayout({ children, header }) {
                                 {userDropdownOpen && (
                                     <div className="absolute left-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
                                         <div className="py-2">
+                                            {/* لوحة التحكم */}
+                                            {(auth?.user?.role === 'admin' || auth?.user?.role === 'teacher' || auth?.user?.role === 'school' || auth?.user?.role === 'student') && (
+                                                <>
+                                                    <Link
+                                                        href={
+                                                            auth?.user?.role === 'admin'
+                                                                ? '/admin/dashboard'
+                                                                : auth?.user?.role === 'teacher'
+                                                                ? '/teacher/dashboard'
+                                                                : auth?.user?.role === 'school'
+                                                                ? '/school/dashboard'
+                                                                : '/student/dashboard'
+                                                        }
+                                                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#A3C042] hover:bg-[#A3C042]/10 transition font-semibold"
+                                                        onClick={() => setUserDropdownOpen(false)}
+                                                    >
+                                                        <FaTachometerAlt className="text-[#A3C042]" />
+                                                        لوحة التحكم
+                                                    </Link>
+                                                    <div className="border-t border-gray-100 my-1" />
+                                                </>
+                                            )}
                                             <Link
                                                 href={
                                                     auth?.user?.role === 'teacher' 

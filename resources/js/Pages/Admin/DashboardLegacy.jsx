@@ -96,7 +96,7 @@ export default function AdminDashboardLegacy({ auth, stats = {} }) {
                         </div>
                     </div>
                     <Link href="/admin/badges" className="text-sm text-gray-500 hover:text-[#A3C042]">
-                        إدارة الشارات →
+                        إدارة الشارات
                     </Link>
                 </div>
             </div>
@@ -113,7 +113,7 @@ export default function AdminDashboardLegacy({ auth, stats = {} }) {
                         </div>
                     </div>
                     <Link href="/admin/certificates" className="text-sm text-gray-500 hover:text-[#A3C042]">
-                        إدارة الشهادات →
+                        إدارة الشهادات
                     </Link>
                 </div>
 
@@ -143,7 +143,7 @@ export default function AdminDashboardLegacy({ auth, stats = {} }) {
                         </div>
                     </div>
                     <Link href="/admin/schools" className="text-sm text-gray-500 hover:text-[#A3C042]">
-                        إدارة المؤسسات تعليمية →
+                        إدارة المؤسسات تعليمية
                     </Link>
                 </div>
             </div>
@@ -169,7 +169,7 @@ export default function AdminDashboardLegacy({ auth, stats = {} }) {
                                         <div className="flex-1">
                                             <p className="font-semibold text-gray-900">{project.title}</p>
                                             <p className="text-sm text-gray-600">بواسطة {project.user?.name}</p>
-                                            <p className="text-xs text-gray-500">{new Date(project.created_at).toLocaleDateString('ar-SA')}</p>
+                                            <p className="text-xs text-gray-500">{new Date(project.created_at).toLocaleDateString('en-US')}</p>
                                         </div>
                                         <Link href={`/admin/projects/${project.id}`} className="ml-4 bg-[#A3C042] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary-600 transition">
                                             مراجعة
@@ -208,7 +208,7 @@ export default function AdminDashboardLegacy({ auth, stats = {} }) {
                                             <span className="text-xs text-green-600 font-semibold">{challenge.current_participants} مشارك</span>
                                         </div>
                                         <p className="text-sm text-gray-600 mb-2">{challenge.description?.substring(0, 80)}...</p>
-                                        <p className="text-xs text-gray-500">الموعد النهائي: {new Date(challenge.deadline).toLocaleDateString('ar-SA')}</p>
+                                        <p className="text-xs text-gray-500">الموعد النهائي: {new Date(challenge.deadline).toLocaleDateString('en-US')}</p>
                                     </div>
                                 ))}
                             </div>

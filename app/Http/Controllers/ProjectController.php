@@ -30,9 +30,33 @@ class ProjectController extends Controller
             12
         )->withQueryString();
 
+        // الحصول على الفئات الفريدة من المشاريع المعتمدة
+        $categories = Project::where('status', 'approved')
+            ->select('category')
+            ->distinct()
+            ->orderBy('category')
+            ->pluck('category')
+            ->map(function ($category) {
+                $labels = [
+                    'science' => 'علوم',
+                    'technology' => 'تقنية',
+                    'engineering' => 'هندسة',
+                    'mathematics' => 'رياضيات',
+                    'arts' => 'فنون',
+                    'other' => 'أخرى',
+                ];
+                
+                return [
+                    'value' => $category,
+                    'label' => $labels[$category] ?? $category,
+                ];
+            })
+            ->prepend(['value' => '', 'label' => 'الكل']);
+
         return Inertia::render('Projects/Index', [
             'projects' => $projects,
             'userRole' => $user ? $user->role : null,
+            'categories' => $categories,
         ]);
     }
 

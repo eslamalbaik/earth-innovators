@@ -1,6 +1,6 @@
 import DashboardLayout from '../../../Layouts/DashboardLayout';
 import { Head, useForm, Link } from '@inertiajs/react';
-import { FaTrophy, FaSpinner, FaArrowLeft, FaImage, FaTrash } from 'react-icons/fa';
+import { FaTrophy, FaSpinner, FaArrowRight, FaImage, FaTrash } from 'react-icons/fa';
 import TextInput from '../../../Components/TextInput';
 import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
@@ -119,7 +119,7 @@ export default function TeacherChallengeCreate({ auth, school }) {
                                 href="/teacher/challenges"
                                 className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition"
                             >
-                                <FaArrowLeft />
+                                <FaArrowRight />
                                 العودة
                             </Link>
                         </div>
@@ -143,7 +143,7 @@ export default function TeacherChallengeCreate({ auth, school }) {
                             href="/teacher/challenges"
                             className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900"
                         >
-                            <FaArrowLeft />
+                            <FaArrowRight />
                             العودة إلى التحديات
                         </Link>
                     </div>
