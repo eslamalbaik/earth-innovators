@@ -288,8 +288,7 @@ class PublicationService extends BaseService
         $publication->update([
             'status' => 'rejected',
             'approved_by' => $rejectedBy,
-            // Note: rejection_reason field doesn't exist in publications table
-            // If needed, add a migration to add this field
+            'rejection_reason' => $reason,
         ]);
 
         // Clear cache

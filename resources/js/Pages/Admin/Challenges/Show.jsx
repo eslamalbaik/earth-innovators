@@ -1,6 +1,6 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link } from '@inertiajs/react';
-import { FaArrowRight, FaEdit, FaTrophy, FaUser, FaCalendar, FaFlag, FaClock, FaUsers, FaCoins, FaUserPlus, FaExclamationCircle, FaStar, FaCheckCircle } from 'react-icons/fa';
+import { FaArrowRight, FaEdit, FaTrophy, FaUser, FaCalendar, FaFlag, FaClock, FaUsers, FaCoins, FaUserPlus, FaExclamationCircle, FaStar, FaCheckCircle, FaFile } from 'react-icons/fa';
 
 export default function AdminChallengesShow({ challenge }) {
     const getStatusBadge = (status) => {
@@ -71,6 +71,13 @@ export default function AdminChallengesShow({ challenge }) {
                                 تعيين طلاب
                             </Link>
                         )}
+                        <Link
+                            href={route('admin.challenge-submissions.index', challenge.id)}
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2"
+                        >
+                            <FaFile />
+                            التسليمات
+                        </Link>
                         <Link
                             href={route('admin.challenges.edit', challenge.id)}
                             className="bg-[#A3C042] hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2"

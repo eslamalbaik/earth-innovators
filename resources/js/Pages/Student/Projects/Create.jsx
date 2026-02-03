@@ -9,8 +9,6 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
     const { showError, showSuccess } = useToast();
     const { data, setData, post, processing, errors } = useForm({
         project_id: '',
-        title: '',
-        description: '',
         files: [],
         comment: '',
     });
@@ -103,16 +101,6 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
             return;
         }
 
-        if (!data.title) {
-            showError('يرجى إدخال عنوان المشروع');
-            return;
-        }
-
-        if (!data.description) {
-            showError('يرجى إدخال وصف المشروع');
-            return;
-        }
-
         if (data.files.length === 0) {
             showError('يرجى إرفاق ملف واحد على الأقل');
             return;
@@ -165,33 +153,18 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
                 </div>
             )}
 
-            {/* Project Title */}
+            {/* Comment */}
             <div>
-                <label className="block text-sm font-bold text-gray-900 mb-2">عنوان المشروع</label>
-                <input
-                    type="text"
-                    value={data.title}
-                    onChange={(e) => setData('title', e.target.value)}
-                    placeholder="أدخل عنوان المشروع"
-                    className="w-full h-12 px-4 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042] text-sm"
-                />
-                {errors.title && (
-                    <p className="mt-1 text-xs text-red-500">{errors.title}</p>
-                )}
-            </div>
-
-            {/* Project Description */}
-            <div>
-                <label className="block text-sm font-bold text-gray-900 mb-2">وصف المشروع</label>
+                <label className="block text-sm font-bold text-gray-900 mb-2">ملاحظات / تعليق</label>
                 <textarea
-                    value={data.description}
-                    onChange={(e) => setData('description', e.target.value)}
-                    placeholder="أدخل وصفاً للمشروع"
+                    value={data.comment}
+                    onChange={(e) => setData('comment', e.target.value)}
+                    placeholder="أضف أي ملاحظات حول تسليمك..."
                     rows={4}
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042] text-sm resize-none"
                 />
-                {errors.description && (
-                    <p className="mt-1 text-xs text-red-500">{errors.description}</p>
+                {errors.comment && (
+                    <p className="mt-1 text-xs text-red-500">{errors.comment}</p>
                 )}
             </div>
 

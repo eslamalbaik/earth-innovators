@@ -17,6 +17,7 @@ class ProjectController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
+        $schoolId = null;
         
         if ($user) {
             if ($user->isStudent() && $user->school_id) {

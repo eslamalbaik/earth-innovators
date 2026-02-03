@@ -10,14 +10,14 @@ class ZiinaService
     private ?string $apiKey;
     private string $baseUrl;
     private bool $testMode;
+    protected $paymentService;
 
-    public function __construct()
+    public function __construct(\App\Services\PaymentService $paymentService)
     {
         $this->apiKey = config('services.ziina.api_key') ?? '';
         $this->testMode = config('services.ziina.test_mode', true);
+        $this->paymentService = $paymentService;
         
-        // Ziina uses the same base URL for both test and production
-        // Test mode is controlled via the 'test' parameter in API calls
         $this->baseUrl = 'https://api-v2.ziina.com/api';
     }
 
@@ -210,10 +210,27 @@ class ZiinaService
      */
     private function handlePaymentSuccess(array $paymentRequest): bool
     {
-        Log::info('Handling successful Ziina payment', ['payment' => $paymentRequest]);
+        Log::info('Handling successful Ziina payment webhook', ['payment' => $paymentRequest]);
         
-        // This will be implemented in the controller/service layer
-        return true;
+        $metadata = $paymentRequest['metadata'] ?? [];
+        $paymentId = $metadata['payment_id'] ?? null;
+        
+        if (!$paymentId) {
+            $gatewayId = $paymentRequest['id'] ?? null;
+            if ($gatewayId) {
+                $payment = \App\Models\Payment::where('gateway_payment_id', $gatewayId)->first();
+            }
+        } else {
+            $payment = \App\Models\Payment::find($paymentId);
+        }
+
+        if (isset($payment)) {
+            $this->paymentService->finalizePackageSubscription($payment, $paymentRequest);
+            return true;
+        }
+
+        Log::warning('Payment not found for Ziina webhook', ['metadata' => $metadata]);
+        return false;
     }
 
     /**
@@ -224,7 +241,21 @@ class ZiinaService
      */
     private function handlePaymentFailed(array $paymentRequest): bool
     {
-        Log::info('Handling failed Ziina payment', ['payment' => $paymentRequest]);
+        Log::info('Handling failed Ziina payment webhook', ['payment' => $paymentRequest]);
+        
+        $metadata = $paymentRequest['metadata'] ?? [];
+        $paymentId = $metadata['payment_id'] ?? null;
+        
+        if ($paymentId) {
+            $payment = \App\Models\Payment::find($paymentId);
+            if ($payment) {
+                $payment->update([
+                    'status' => 'failed',
+                    'failed_at' => now(),
+                    'gateway_response' => array_merge($payment->gateway_response ?? [], $paymentRequest),
+                ]);
+            }
+        }
         
         return true;
     }
@@ -237,8 +268,21 @@ class ZiinaService
      */
     private function handlePaymentCancelled(array $paymentRequest): bool
     {
-        Log::info('Handling cancelled Ziina payment', ['payment' => $paymentRequest]);
+        Log::info('Handling cancelled Ziina payment webhook', ['payment' => $paymentRequest]);
         
+        $metadata = $paymentRequest['metadata'] ?? [];
+        $paymentId = $metadata['payment_id'] ?? null;
+        
+        if ($paymentId) {
+            $payment = \App\Models\Payment::find($paymentId);
+            if ($payment) {
+                $payment->update([
+                    'status' => 'cancelled',
+                    'gateway_response' => array_merge($payment->gateway_response ?? [], $paymentRequest),
+                ]);
+            }
+        }
+
         return true;
     }
 
@@ -252,4 +296,3 @@ class ZiinaService
         return $this->testMode;
     }
 }
-

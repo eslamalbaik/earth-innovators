@@ -91,6 +91,7 @@ class TeacherProjectController extends Controller
             'school_id' => 'nullable|exists:users,id',
             'files' => 'nullable|array',
             'files.*' => 'file|max:10240|mimes:pdf,doc,docx,jpg,jpeg,png,gif,mp4,avi,mov',
+            'evaluation' => 'nullable|array',
         ], [
             'title.required' => 'عنوان المشروع مطلوب',
             'description.required' => 'وصف المشروع مطلوب',
@@ -123,6 +124,7 @@ class TeacherProjectController extends Controller
             'title' => $validated['title'],
             'description' => $validated['description'],
             'category' => $validated['category'] ?? 'other',
+            'self_evaluation' => $validated['evaluation'] ?? null,
             'status' => 'pending', // بانتظار موافقة المدرسة (إن وجدت)
         ]);
 
@@ -345,6 +347,7 @@ class TeacherProjectController extends Controller
             'files.*' => 'file|max:10240',
             'remove_files' => 'nullable|array',
             'remove_files.*' => 'string',
+            'evaluation' => 'nullable|array',
         ], [
             'title.required' => 'عنوان المشروع مطلوب',
             'description.required' => 'وصف المشروع مطلوب',
@@ -416,6 +419,10 @@ class TeacherProjectController extends Controller
             'category' => $validated['category'] ?? 'other',
             'school_id' => $schoolId,
         ]);
+
+        if (isset($validated['evaluation'])) {
+            $project->update(['self_evaluation' => $validated['evaluation']]);
+        }
 
         // مسح الكاش
         $this->projectService->clearProjectCache($project->id, null, $teacher->id, $schoolId);

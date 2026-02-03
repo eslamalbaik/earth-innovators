@@ -187,45 +187,13 @@ class PackageSubscriptionController extends Controller
     public function paymentSuccess(Payment $payment)
     {
         try {
-            $paymentRequest = $this->ziinaService->getPaymentRequest($payment->gateway_payment_id);
+                $this->ziinaService = app(ZiinaService::class);
+                $paymentRequest = $this->ziinaService->getPaymentRequest($payment->gateway_payment_id);
 
-            if ($paymentRequest && isset($paymentRequest['status']) && $paymentRequest['status'] === 'paid') {
-                DB::beginTransaction();
-
-                $payment->update([
-                    'status' => 'completed',
-                    'paid_at' => now(),
-                    'gateway_response' => $paymentRequest,
-                ]);
-
-                $metadata = $payment->gateway_response['metadata'] ?? [];
-                $userPackageId = $metadata['user_package_id'] ?? null;
-
-                if ($userPackageId) {
-                    $userPackage = UserPackage::find($userPackageId);
-                    if ($userPackage) {
-                        $userPackage->update([
-                            'status' => 'active',
-                            'start_date' => now(),
-                        ]);
-
-                        if ($userPackage->package->points_bonus > 0) {
-                            $user = $userPackage->user;
-                            // Use PointsService for proper integration
-                            $pointsService = app(\App\Services\PointsService::class);
-                            $pointsService->awardPoints(
-                                $user->id,
-                                $userPackage->package->points_bonus,
-                                'package_bonus',
-                                $userPackage->package_id,
-                                "Package subscription bonus: {$userPackage->package->name}",
-                                "مكافأة اشتراك الباقة: {$userPackage->package->name_ar}"
-                            );
-                        }
-                    }
-                }
-
-                DB::commit();
+                if ($paymentRequest && isset($paymentRequest['status']) && $paymentRequest['status'] === 'paid') {
+                    // Use PaymentService to finalize subscription (centralized logic)
+                    $paymentService = app(\App\Services\PaymentService::class);
+                    $paymentService->finalizePackageSubscription($payment, $paymentRequest);
 
                 return redirect()->route('packages.index')->with('success', 'تم الاشتراك بنجاح! تم تفعيل باقتك.');
             }

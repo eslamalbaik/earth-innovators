@@ -41,7 +41,10 @@ export default function AdminPayments({ payments, stats, teachers, filters }) {
     const methodLabels = {
         stripe: 'Stripe',
         paypal: 'PayPal',
+        ziina: 'Ziina',
+        tamara: 'Tamara',
         mada: 'مدى',
+        bank_transfer: 'تحويل بنكي',
     };
 
     const handleFilter = () => {

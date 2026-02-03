@@ -16,6 +16,7 @@ class TeacherAvailability extends Model
         'end_time',
         'status',
         'notes',
+        'booking_id',
     ];
 
     protected $casts = [

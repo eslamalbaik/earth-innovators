@@ -29,6 +29,7 @@ class Publication extends Model
         'publisher_name',
         'views',
         'likes_count',
+        'rejection_reason',
     ];
 
     protected $casts = [

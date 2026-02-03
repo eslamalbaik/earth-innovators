@@ -12,6 +12,7 @@ class Review extends Model
         'student_id',
         'booking_id',
         'reviewer_name',
+        'reviewer_image',
         'reviewer_location',
         'rating',
         'comment',

@@ -28,11 +28,13 @@ class Project extends Model
         'likes',
         'rating',
         'points_earned',
+        'self_evaluation',
     ];
 
     protected $casts = [
         'files' => 'array',
         'images' => 'array',
+        'self_evaluation' => 'array',
         'rating' => 'decimal:2',
         'approved_at' => 'datetime',
     ];

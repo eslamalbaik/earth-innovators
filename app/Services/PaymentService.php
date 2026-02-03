@@ -668,4 +668,43 @@ class PaymentService extends BaseService
 
         return $cancelData;
     }
+    public function finalizePackageSubscription(Payment $payment, array $gatewayData = []): void
+    {
+        if ($payment->status === 'completed') {
+            return;
+        }
+
+        DB::transaction(function () use ($payment, $gatewayData) {
+            $payment->update([
+                'status' => 'completed',
+                'paid_at' => now(),
+                'gateway_response' => array_merge($payment->gateway_response ?? [], $gatewayData),
+            ]);
+
+            $userPackage = $payment->userPackage;
+            if (!$userPackage && $payment->user_package_id) {
+                $userPackage = \App\Models\UserPackage::find($payment->user_package_id);
+            }
+
+            if ($userPackage) {
+                $userPackage->update([
+                    'status' => 'active',
+                    'start_date' => now(),
+                ]);
+
+                if ($userPackage->package->points_bonus > 0) {
+                    $user = $userPackage->user;
+                    $pointsService = app(\App\Services\PointsService::class);
+                    $pointsService->awardPoints(
+                        $user->id,
+                        $userPackage->package->points_bonus,
+                        'package_bonus',
+                        $userPackage->package_id,
+                        "Package subscription bonus: {$userPackage->package->name}",
+                        "مكافأة اشتراك الباقة: {$userPackage->package->name_ar}"
+                    );
+                }
+            }
+        });
+    }
 }
