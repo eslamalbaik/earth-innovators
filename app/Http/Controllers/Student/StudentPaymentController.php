@@ -14,8 +14,13 @@ class StudentPaymentController extends Controller
     {
         $user = Auth::user();
 
-        $query = Payment::with(['booking:id,teacher_id,subject', 'booking.teacher:id,name_ar,user_id', 'booking.teacher.user:id,name'])
-            ->select('id', 'booking_id', 'amount', 'currency', 'status', 'payment_method', 'payment_gateway', 'transaction_id', 'payment_reference', 'paid_at', 'failed_at', 'created_at')
+        $query = Payment::with([
+            'booking:id,teacher_id,subject',
+            'booking.teacher:id,name_ar,user_id',
+            'booking.teacher.user:id,name',
+            'package:id,name,name_ar'
+        ])
+            ->select('id', 'booking_id', 'package_id', 'amount', 'currency', 'status', 'payment_method', 'payment_gateway', 'transaction_id', 'payment_reference', 'paid_at', 'failed_at', 'created_at')
             ->where('student_id', $user->id);
 
         if ($request->has('status') && $request->status !== 'all') {
@@ -29,11 +34,23 @@ class StudentPaymentController extends Controller
         $payments = $query->orderBy('created_at', 'desc')
             ->paginate(15)
             ->through(function ($payment) {
+                $teacher_name = '—';
+                $subject = '—';
+
+                if ($payment->booking) {
+                    $teacher_name = $payment->booking->teacher->name_ar ?? $payment->booking->teacher->user->name ?? 'N/A';
+                    $subject = $payment->booking->subject ?? '—';
+                } elseif ($payment->package) {
+                    $teacher_name = 'المنصة (اشتراك باقة)';
+                    $subject = $payment->package->name_ar ?? $payment->package->name;
+                }
+
                 return [
                     'id' => $payment->id,
                     'booking_id' => $payment->booking_id,
-                    'teacher_name' => $payment->booking->teacher->name_ar ?? $payment->booking->teacher->user->name ?? 'N/A',
-                    'subject' => $payment->booking->subject ?? '—',
+                    'package_id' => $payment->package_id,
+                    'teacher_name' => $teacher_name,
+                    'subject' => $subject,
                     'amount' => $payment->amount,
                     'currency' => $payment->currency,
                     'status' => $payment->status,

@@ -21,10 +21,11 @@ class PaymentController extends Controller
             'booking.student:id,name',
             'booking.teacher:id,name_ar,user_id',
             'booking.teacher.user:id,name',
+            'package:id,name,name_ar',
             'student:id,name',
             'teacher:id,name_ar'
         ])
-        ->select('id', 'booking_id', 'student_id', 'teacher_id', 'amount', 'currency', 'status', 'payment_method', 'payment_gateway', 'transaction_id', 'payment_reference', 'card_last_four', 'card_brand', 'paid_at', 'failed_at', 'failure_reason', 'created_at');
+        ->select('id', 'booking_id', 'package_id', 'student_id', 'teacher_id', 'amount', 'currency', 'status', 'payment_method', 'payment_gateway', 'transaction_id', 'payment_reference', 'card_last_four', 'card_brand', 'paid_at', 'failed_at', 'failure_reason', 'created_at');
 
         if ($request->has('status') && $request->status !== 'all') {
             $query->where('status', $request->status);
@@ -48,12 +49,24 @@ class PaymentController extends Controller
         $payments = $query->orderBy('created_at', 'desc')
             ->paginate(20)
             ->through(function ($payment) {
+                $teacher_name = '—';
+                $subject = '—';
+
+                if ($payment->booking) {
+                    $teacher_name = $payment->teacher->name_ar ?? $payment->booking->teacher->user->name ?? 'N/A';
+                    $subject = $payment->booking->subject ?? '—';
+                } elseif ($payment->package) {
+                    $teacher_name = 'المنصة (اشتراك باقة)';
+                    $subject = $payment->package->name_ar ?? $payment->package->name;
+                }
+
                 return [
                     'id' => $payment->id,
                     'booking_id' => $payment->booking_id,
+                    'package_id' => $payment->package_id,
                     'student_name' => $payment->student->name ?? $payment->booking->student_name ?? 'N/A',
-                    'teacher_name' => $payment->teacher->name_ar ?? $payment->booking->teacher->user->name ?? 'N/A',
-                    'subject' => $payment->booking->subject ?? '—',
+                    'teacher_name' => $teacher_name,
+                    'subject' => $subject,
                     'amount' => $payment->amount,
                     'currency' => $payment->currency,
                     'status' => $payment->status,

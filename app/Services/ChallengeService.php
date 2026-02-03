@@ -212,6 +212,21 @@ class ChallengeService extends BaseService
                 $data['school_id'] = null;
             }
 
+            // Validate dates
+            if (isset($data['start_date']) && isset($data['deadline'])) {
+                $startDate = \Carbon\Carbon::parse($data['start_date']);
+                $deadline = \Carbon\Carbon::parse($data['deadline']);
+                
+                if ($deadline->lte($startDate)) {
+                    throw new \Exception('Deadline must be after start date');
+                }
+                
+                // Optional: Ensure dates are in the future (can be commented out if not needed)
+                // if ($startDate->lt(now())) {
+                //     throw new \Exception('Start date must be in the future');
+                // }
+            }
+
             $challenge = Challenge::create($data);
 
             $this->clearChallengeCache($challenge->school_id, $challenge->created_by);
@@ -261,6 +276,14 @@ class ChallengeService extends BaseService
                     // Keep existing image if not provided
                     unset($data['image']);
                 }
+            }
+
+            // Validate dates
+            $startDate = isset($data['start_date']) ? \Carbon\Carbon::parse($data['start_date']) : $challenge->start_date;
+            $deadline = isset($data['deadline']) ? \Carbon\Carbon::parse($data['deadline']) : $challenge->deadline;
+            
+            if ($deadline && $startDate && $deadline->lte($startDate)) {
+                throw new \Exception('Deadline must be after start date');
             }
 
             $challenge->update($data);

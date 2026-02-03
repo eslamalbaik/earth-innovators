@@ -15,19 +15,10 @@ class ChallengeParticipationService extends BaseService
      */
     public function joinChallenge(int $userId, int $challengeId): ChallengeParticipation
     {
-        // #region agent log
-        $logPath = base_path('.cursor/debug.log');
-        $logData = json_encode([
-            'sessionId' => 'debug-session',
-            'runId' => 'run1',
-            'hypothesisId' => 'A',
-            'location' => 'ChallengeParticipationService.php:16',
-            'message' => 'joinChallenge called',
-            'data' => ['userId' => $userId, 'challengeId' => $challengeId, 'table' => (new ChallengeParticipation())->getTable()],
-            'timestamp' => now()->timestamp * 1000
-        ]) . "\n";
-        file_put_contents($logPath, $logData, FILE_APPEND);
-        // #endregion
+        Log::info('User joining challenge', [
+            'user_id' => $userId,
+            'challenge_id' => $challengeId
+        ]);
 
         DB::beginTransaction();
         try {
@@ -38,19 +29,6 @@ class ChallengeParticipationService extends BaseService
             $this->validateJoinRequest($user, $challenge);
 
             // Check if already participating
-            // #region agent log
-            $logData2 = json_encode([
-                'sessionId' => 'debug-session',
-                'runId' => 'run1',
-                'hypothesisId' => 'B',
-                'location' => 'ChallengeParticipationService.php:27',
-                'message' => 'Before checking existing participation',
-                'data' => ['table' => (new ChallengeParticipation())->getTable(), 'query' => "SELECT * FROM challenge_participants WHERE challenge_id = {$challengeId} AND user_id = {$userId}"],
-                'timestamp' => now()->timestamp * 1000
-            ]) . "\n";
-            file_put_contents($logPath, $logData2, FILE_APPEND);
-            // #endregion
-
             $existing = ChallengeParticipation::where('challenge_id', $challengeId)
                 ->where('user_id', $userId)
                 ->first();
@@ -60,19 +38,6 @@ class ChallengeParticipationService extends BaseService
             }
 
             // Create participation
-            // #region agent log
-            $logData3 = json_encode([
-                'sessionId' => 'debug-session',
-                'runId' => 'run1',
-                'hypothesisId' => 'C',
-                'location' => 'ChallengeParticipationService.php:36',
-                'message' => 'Before creating participation',
-                'data' => ['table' => (new ChallengeParticipation())->getTable()],
-                'timestamp' => now()->timestamp * 1000
-            ]) . "\n";
-            file_put_contents($logPath, $logData3, FILE_APPEND);
-            // #endregion
-
             $participation = ChallengeParticipation::create([
                 'challenge_id' => $challengeId,
                 'user_id' => $userId,
@@ -96,20 +61,59 @@ class ChallengeParticipationService extends BaseService
             return $participation->fresh(['challenge', 'user']);
         } catch (\Exception $e) {
             DB::rollBack();
-            // #region agent log
-            $logData4 = json_encode([
-                'sessionId' => 'debug-session',
-                'runId' => 'run1',
-                'hypothesisId' => 'D',
-                'location' => 'ChallengeParticipationService.php:57',
-                'message' => 'Error in joinChallenge',
-                'data' => ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()],
-                'timestamp' => now()->timestamp * 1000
-            ]) . "\n";
-            file_put_contents($logPath, $logData4, FILE_APPEND);
-            // #endregion
-
             $this->logError('Failed to join challenge', [
+                'user_id' => $userId,
+                'challenge_id' => $challengeId,
+                'error' => $e->getMessage(),
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Leave a challenge (abandon participation)
+     */
+    public function leaveChallenge(int $userId, int $challengeId): bool
+    {
+        Log::info('User leaving challenge', [
+            'user_id' => $userId,
+            'challenge_id' => $challengeId
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $participation = ChallengeParticipation::where('challenge_id', $challengeId)
+                ->where('user_id', $userId)
+                ->first();
+
+            if (!$participation) {
+                throw new \Exception('You are not participating in this challenge');
+            }
+
+            // Don't allow leaving if already completed
+            if ($participation->status === 'completed') {
+                throw new \Exception('Cannot leave a completed challenge');
+            }
+
+            // Update status to abandoned
+            $participation->update(['status' => 'abandoned']);
+
+            // Decrement participant count
+            $challenge = Challenge::findOrFail($challengeId);
+            $challenge->decrement('current_participants');
+
+            DB::commit();
+
+            $this->forgetCacheTags([
+                "challenge_{$challengeId}",
+                "user_challenges_{$userId}",
+                "active_challenges",
+            ]);
+
+            return true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $this->logError('Failed to leave challenge', [
                 'user_id' => $userId,
                 'challenge_id' => $challengeId,
                 'error' => $e->getMessage(),

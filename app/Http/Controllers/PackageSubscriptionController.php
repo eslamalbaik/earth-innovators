@@ -122,6 +122,8 @@ class PackageSubscriptionController extends Controller
 
             $payment = Payment::create([
                 'student_id' => $user->id,
+                'package_id' => $package->id,
+                'user_package_id' => $userPackage->id,
                 'amount' => $package->price,
                 'currency' => $package->currency,
                 'status' => 'pending',
@@ -137,9 +139,6 @@ class PackageSubscriptionController extends Controller
                 'description' => app()->getLocale() === 'ar' 
                     ? "اشتراك في باقة: {$package->name_ar}"
                     : "Subscription to package: {$package->name}",
-                'customer_name' => $user->name,
-                'customer_email' => $user->email,
-                'customer_phone' => $user->phone,
                 'metadata' => [
                     'user_id' => $user->id,
                     'package_id' => $package->id,
@@ -148,7 +147,6 @@ class PackageSubscriptionController extends Controller
                 ],
                 'success_url' => route('packages.payment.success', $payment->id),
                 'cancel_url' => route('packages.payment.cancel', $payment->id),
-                'webhook_url' => route('webhook.ziina'),
             ];
 
             $ziinaResponse = $this->ziinaService->createPaymentRequest($paymentData);
@@ -165,8 +163,9 @@ class PackageSubscriptionController extends Controller
 
             DB::commit();
 
-            if (isset($ziinaResponse['payment_url'])) {
-                return redirect($ziinaResponse['payment_url']);
+            // Ziina v2 API returns 'redirect_url' for payment page
+            if (isset($ziinaResponse['redirect_url'])) {
+                return redirect($ziinaResponse['redirect_url']);
             }
 
             return redirect()->back()->with('error', 'لم يتم الحصول على رابط الدفع');

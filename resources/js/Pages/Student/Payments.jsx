@@ -296,7 +296,7 @@ export default function StudentPayments({ payments, stats, filters }) {
                                 payments?.data?.map((payment) => (
                                     <tr key={payment.id} className="hover:bg-gray-50">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                            #{payment.booking_id}
+                                            {payment.booking_id ? `#${payment.booking_id}` : 'اشتراك باقة'}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center gap-2">

@@ -177,18 +177,33 @@ class PaymentGatewayController extends Controller
     private function testZiinaConnection(PaymentGatewaySetting $gateway)
     {
         try {
-            $baseUrl = $gateway->is_test_mode 
-                ? 'https://api.sandbox.ziina.com/v1'
-                : 'https://api.ziina.com/v1';
+            // Ziina uses the same base URL for test and production
+            $baseUrl = 'https://api-v2.ziina.com/api';
 
+            // Try to create a minimal test payment intent to verify credentials
             $response = \Illuminate\Support\Facades\Http::withHeaders([
                 'Authorization' => 'Bearer ' . $gateway->api_key,
-            ])->get("{$baseUrl}/health");
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])->post("{$baseUrl}/payment_intent", [
+                'amount' => 200, // 2 AED in fils (minimum amount)
+                'currency_code' => 'AED',
+                'success_url' => 'https://example.com/success',
+                'cancel_url' => 'https://example.com/cancel',
+            ]);
 
             if ($response->successful()) {
                 return [
                     'success' => true,
                     'message' => 'تم الاتصال بنجاح مع Ziina',
+                ];
+            }
+
+            // Check if it's an authentication error
+            if ($response->status() === 401) {
+                return [
+                    'success' => false,
+                    'message' => 'فشل الاتصال: مفتاح API غير صحيح (Authentication Required)',
                 ];
             }
 

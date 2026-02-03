@@ -13,6 +13,8 @@ class Payment extends Model
         'booking_id',
         'student_id',
         'teacher_id',
+        'package_id',
+        'user_package_id',
         'amount',
         'currency',
         'status',
@@ -42,6 +44,16 @@ class Payment extends Model
     public function booking(): BelongsTo
     {
         return $this->belongsTo(Booking::class);
+    }
+
+    public function package(): BelongsTo
+    {
+        return $this->belongsTo(Package::class);
+    }
+
+    public function userPackage(): BelongsTo
+    {
+        return $this->belongsTo(UserPackage::class);
     }
 
     public function student(): BelongsTo

@@ -16,14 +16,13 @@ class ZiinaService
         $this->apiKey = config('services.ziina.api_key') ?? '';
         $this->testMode = config('services.ziina.test_mode', true);
         
-        // Ziina test/sandbox URL vs production URL
-        $this->baseUrl = $this->testMode 
-            ? 'https://api.sandbox.ziina.com/v1' 
-            : 'https://api.ziina.com/v1';
+        // Ziina uses the same base URL for both test and production
+        // Test mode is controlled via the 'test' parameter in API calls
+        $this->baseUrl = 'https://api-v2.ziina.com/api';
     }
 
     /**
-     * Create a payment request for package subscription
+     * Create a payment intent for package subscription
      *
      * @param array $data
      * @return array|null
@@ -39,45 +38,53 @@ class ZiinaService
         }
 
         try {
-            Log::info('Creating Ziina payment request', ['data' => $data]);
+            Log::info('Creating Ziina payment intent', ['data' => $data]);
+
+            // Convert amount to fils (base currency unit)
+            // For example: 100 AED = 10000 fils
+            $amountInFils = (int) ($data['amount'] * 100);
+
+            $payload = [
+                'amount' => $amountInFils,
+                'currency_code' => $data['currency'] ?? 'AED',
+                'success_url' => $data['success_url'],
+                'cancel_url' => $data['cancel_url'],
+            ];
+
+            // Add optional fields
+            if (isset($data['description'])) {
+                $payload['description'] = $data['description'];
+            }
+
+            if (isset($data['metadata'])) {
+                $payload['metadata'] = $data['metadata'];
+            }
 
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->apiKey,
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
-            ])->post($this->baseUrl . '/payment-requests', [
-                'amount' => $data['amount'],
-                'currency' => $data['currency'] ?? 'AED',
-                'description' => $data['description'],
-                'customer' => [
-                    'name' => $data['customer_name'],
-                    'email' => $data['customer_email'],
-                    'phone' => $data['customer_phone'] ?? null,
-                ],
-                'metadata' => $data['metadata'] ?? [],
-                'success_url' => $data['success_url'],
-                'cancel_url' => $data['cancel_url'],
-                'webhook_url' => $data['webhook_url'] ?? null,
-            ]);
+            ])->post($this->baseUrl . '/payment_intent', $payload);
 
             if ($response->successful()) {
                 $result = $response->json();
-                Log::info('Ziina payment request created successfully', ['response' => $result]);
+                Log::info('Ziina payment intent created successfully', ['response' => $result]);
                 return $result;
             }
 
-            Log::error('Ziina payment request failed', [
+            Log::error('Ziina payment intent failed', [
                 'status' => $response->status(),
                 'body' => $response->body(),
             ]);
 
             return [
                 'error' => true,
-                'message' => $response->json('message') ?? 'Failed to create payment request',
+                'message' => $response->json('message') ?? 'Failed to create payment intent',
                 'status' => $response->status(),
+                'details' => $response->json(),
             ];
         } catch (\Exception $e) {
-            Log::error('Exception in Ziina payment request', [
+            Log::error('Exception in Ziina payment intent', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
@@ -90,12 +97,12 @@ class ZiinaService
     }
 
     /**
-     * Get payment request status
+     * Get payment intent status
      *
-     * @param string $paymentRequestId
+     * @param string $paymentIntentId
      * @return array|null
      */
-    public function getPaymentRequest(string $paymentRequestId): ?array
+    public function getPaymentRequest(string $paymentIntentId): ?array
     {
         if (empty($this->apiKey)) {
             Log::error('Ziina API key is not configured');
@@ -103,27 +110,27 @@ class ZiinaService
         }
 
         try {
-            Log::info('Getting Ziina payment request', ['id' => $paymentRequestId]);
+            Log::info('Getting Ziina payment intent', ['id' => $paymentIntentId]);
 
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->apiKey,
                 'Accept' => 'application/json',
-            ])->get($this->baseUrl . '/payment-requests/' . $paymentRequestId);
+            ])->get($this->baseUrl . '/payment_intent/' . $paymentIntentId);
 
             if ($response->successful()) {
                 return $response->json();
             }
 
-            Log::error('Failed to get Ziina payment request', [
-                'id' => $paymentRequestId,
+            Log::error('Failed to get Ziina payment intent', [
+                'id' => $paymentIntentId,
                 'status' => $response->status(),
                 'body' => $response->body(),
             ]);
 
             return null;
         } catch (\Exception $e) {
-            Log::error('Exception getting Ziina payment request', [
-                'id' => $paymentRequestId,
+            Log::error('Exception getting Ziina payment intent', [
+                'id' => $paymentIntentId,
                 'message' => $e->getMessage(),
             ]);
 

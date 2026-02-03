@@ -54,6 +54,7 @@ class Badge extends Model
 
     public function school(): BelongsTo
     {
+        // School is a User with role 'school'
         return $this->belongsTo(User::class, 'school_id');
     }
 
