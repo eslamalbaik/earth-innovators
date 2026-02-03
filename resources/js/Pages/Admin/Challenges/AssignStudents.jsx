@@ -49,7 +49,7 @@ export default function AdminChallengesAssignStudents({ challenge, students, ass
 
         setData('students', studentsArray);
 
-        post(route('admin.challenges.assign-students', challenge.id), {
+        post(route('admin.challenges.assign-students.store', challenge.id), {
             preserveScroll: true,
         });
     };
@@ -127,8 +127,8 @@ export default function AdminChallengesAssignStudents({ challenge, students, ass
                                 <div
                                     key={student.id}
                                     className={`p-4 rounded-lg border-2 transition ${isSelected
-                                            ? 'border-blue-500 bg-blue-50'
-                                            : 'border-gray-200 bg-white hover:border-gray-300'
+                                        ? 'border-blue-500 bg-blue-50'
+                                        : 'border-gray-200 bg-white hover:border-gray-300'
                                         }`}
                                 >
                                     <div className="flex items-center justify-between">

@@ -841,7 +841,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // إدارة التحديات - CRUD كامل
     Route::resource('challenges', \App\Http\Controllers\Admin\AdminChallengeController::class);
     Route::get('/challenges/{challenge}/assign-students', [\App\Http\Controllers\Admin\ChallengeStudentController::class, 'show'])->name('challenges.assign-students');
-    Route::post('/challenges/{challenge}/assign-students', [\App\Http\Controllers\Admin\ChallengeStudentController::class, 'assign'])->name('challenges.assign-students');
+    Route::post('/challenges/{challenge}/assign-students', [\App\Http\Controllers\Admin\ChallengeStudentController::class, 'assign'])->name('challenges.assign-students.store');
 
     // إدارة تقديمات التحديات
     Route::get('/challenges/{challenge}/submissions', [\App\Http\Controllers\Admin\AdminChallengeSubmissionController::class, 'index'])->name('challenge-submissions.index');
