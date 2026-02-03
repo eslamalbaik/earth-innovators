@@ -33,7 +33,7 @@ const defaultFeatures = [
         icon: FaStar,
         title: "شهادات تقدير",
         description: "احصل على شهادات تقدير للمؤسسات تعليمية والطلاب المتميزين في الابتكار والإبداع.",
-        color: "from-[#A3C042]/20 to-[#93b03a]/20",
+        color: "from-[#A3C042]/20 to-[#8CA635]/20",
         iconColor: "text-[#A3C042]"
     },
     {
@@ -54,7 +54,7 @@ export default function PlatformFeaturesSection({
     return (
         <div className="space-y-4 md:space-y-6">
             <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-[#A3C042]/20 to-[#93b03a]/20 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-xl flex items-center justify-center">
                     <FaLightbulb className="text-[#A3C042] text-xl" />
                 </div>
                 <h2 className="text-xl md:text-2xl font-bold text-gray-900">{title}</h2>

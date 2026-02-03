@@ -166,7 +166,7 @@ export default function AdminCertificatesIndex({ certificates, stats, users, fil
                         </select>
                         <button
                             onClick={handleFilter}
-                            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                            className="px-6 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
                         >
                             <FaFilter />
                             تصفية
@@ -178,7 +178,7 @@ export default function AdminCertificatesIndex({ certificates, stats, users, fil
                         </div>
                         <Link
                             href={route('admin.certificates.create')}
-                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+                            className="px-4 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-[#8CA635] flex items-center gap-2"
                         >
                             <FaPlus />
                             إضافة شهادة جديدة
@@ -311,11 +311,10 @@ export default function AdminCertificatesIndex({ certificates, stats, users, fil
                                     <Link
                                         key={index}
                                         href={link.url || '#'}
-                                        className={`px-3 py-2 rounded-lg ${
-                                            link.active
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        className={`px-3 py-2 rounded-lg ${link.active
+                                            ? 'bg-[#A3C042] text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
                                 ))}

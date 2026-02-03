@@ -21,7 +21,7 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
-            'role' => ['required', 'string', 'in:student,teacher,school,admin'],
+            'role' => ['required', 'string', 'in:student,teacher,school,admin,educational_institution'],
         ];
     }
 

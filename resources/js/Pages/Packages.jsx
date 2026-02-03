@@ -14,7 +14,7 @@ export default function Packages({ auth, packages = [], userPackage = null }) {
         <MainLayout auth={auth}>
             <Head title="الباقات - إرث المبتكرين" />
 
-            <div className="bg-gradient-to-r from-[#A3C042] to-legacy-blue py-16 text-white">
+            <div className="bg-[#A3C042] py-16 text-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center">
                         <FaBox className="mx-auto text-6xl mb-4 opacity-90" />
@@ -33,15 +33,14 @@ export default function Packages({ auth, packages = [], userPackage = null }) {
                             <div>
                                 <h2 className="text-2xl font-bold text-gray-900 mb-2">باقتي الحالية</h2>
                                 <p className="text-gray-600">
-                                    {userPackage.package?.name_ar || userPackage.package?.name} - 
+                                    {userPackage.package?.name_ar || userPackage.package?.name} -
                                     تنتهي في {new Date(userPackage.end_date).toLocaleDateString('en-US')}
                                 </p>
                             </div>
-                            <div className={`px-4 py-2 rounded-lg font-semibold ${
-                                userPackage.status === 'active' ? 'bg-green-100 text-green-700' :
-                                userPackage.status === 'expired' ? 'bg-red-100 text-red-700' :
-                                'bg-gray-100 text-gray-700'
-                            }`}>
+                            <div className={`px-4 py-2 rounded-lg font-semibold ${userPackage.status === 'active' ? 'bg-green-100 text-green-700' :
+                                    userPackage.status === 'expired' ? 'bg-red-100 text-red-700' :
+                                        'bg-gray-100 text-gray-700'
+                                }`}>
                                 {userPackage.status === 'active' ? 'نشطة' : userPackage.status === 'expired' ? 'منتهية' : 'ملغاة'}
                             </div>
                         </div>
@@ -57,22 +56,20 @@ export default function Packages({ auth, packages = [], userPackage = null }) {
                         return (
                             <div
                                 key={pkg.id}
-                                className={`bg-white rounded-xl shadow-lg overflow-hidden border-2 transition-all relative ${
-                                    isPopular
+                                className={`bg-white rounded-xl shadow-lg overflow-hidden border-2 transition-all relative ${isPopular
                                         ? 'border-[#A3C042] shadow-[#A3C042]/20 transform scale-105'
                                         : 'border-gray-200 hover:border-[#A3C042]/50'
-                                }`}
+                                    }`}
                             >
                                 {isPopular && (
-                                    <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white text-center py-2 font-bold text-sm">
+                                    <div className="absolute top-0 left-0 right-0 bg-[#A3C042] text-white text-center py-2 font-bold text-sm">
                                         ⭐ الأكثر شعبية
                                     </div>
                                 )}
                                 <div className={`p-8 ${isPopular ? 'pt-12' : ''}`}>
                                     <div className="text-center mb-6">
-                                        <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${
-                                            isPopular ? 'bg-gradient-to-br from-[#A3C042] to-legacy-blue' : 'bg-gray-100'
-                                        }`}>
+                                        <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${isPopular ? 'bg-gradient-to-br from-[#A3C042] to-legacy-blue' : 'bg-gray-100'
+                                            }`}>
                                             <Icon className={`text-3xl ${isPopular ? 'text-white' : 'text-gray-600'}`} />
                                         </div>
                                         <h3 className="text-2xl font-bold text-gray-900 mb-2">
@@ -145,22 +142,20 @@ export default function Packages({ auth, packages = [], userPackage = null }) {
                                     {auth?.user ? (
                                         <Link
                                             href={`/packages/${pkg.id}/subscribe`}
-                                            className={`block w-full text-center px-6 py-3 rounded-lg font-semibold transition ${
-                                                isPopular
-                                                    ? 'bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white hover:shadow-lg'
+                                            className={`block w-full text-center px-6 py-3 rounded-lg font-semibold transition ${isPopular
+                                                    ? 'bg-[#A3C042] text-white hover:shadow-lg'
                                                     : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                                            }`}
+                                                }`}
                                         >
                                             {userPackage?.package_id === pkg.id ? 'تجديد الاشتراك' : 'اشترك الآن'}
                                         </Link>
                                     ) : (
                                         <Link
                                             href="/register"
-                                            className={`block w-full text-center px-6 py-3 rounded-lg font-semibold transition ${
-                                                isPopular
-                                                    ? 'bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white hover:shadow-lg'
+                                            className={`block w-full text-center px-6 py-3 rounded-lg font-semibold transition ${isPopular
+                                                    ? 'bg-[#A3C042] text-white hover:shadow-lg'
                                                     : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                                            }`}
+                                                }`}
                                         >
                                             سجل للاشتراك
                                         </Link>

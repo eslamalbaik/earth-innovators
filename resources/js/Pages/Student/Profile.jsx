@@ -38,7 +38,7 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
             const imageUrl = badge.image.startsWith('/') ? badge.image : `/storage/${badge.image}`;
             return <img src={imageUrl} alt={badge.name_ar || badge.name} className="w-12 h-12 object-contain" />;
         }
-        
+
         // Handle icon types
         if (badge.icon === '3' || badge.icon === 3) {
             return <span className="text-3xl font-black text-white">3</span>;
@@ -49,7 +49,7 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
         if (badge.icon === 'star') {
             return <FaStar className="text-3xl text-white" />;
         }
-        
+
         // Default icon
         return <FaAward className="text-3xl text-white" />;
     };
@@ -75,7 +75,7 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
             {/* Header (as in screenshot) */}
             <div className="bg-white rounded-3xl shadow-sm p-4 border border-gray-100">
                 <div className="flex items-start justify-between gap-4">
-                    
+
                     {/* Avatar */}
                     <div className="relative">
                         <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 relative">
@@ -105,7 +105,7 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                         {/* Edit Image Button */}
                         <button
                             onClick={() => imageInputRef.current?.click()}
-                            className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center shadow hover:bg-green-600 transition"
+                            className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center shadow hover:bg-[#A3C042] transition"
                             aria-label="تعديل الصورة"
                         >
                             <FaCamera className="text-sm" />
@@ -145,16 +145,16 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
 
                     {/* Left floating actions */}
                     <div className="flex flex-col gap-3 pt-1">
-                        <button 
-                            type="button" 
+                        <button
+                            type="button"
                             onClick={() => setShowPasswordModal(true)}
                             className="w-11 h-11 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shadow hover:bg-blue-200 transition"
                             aria-label="تغيير كلمة المرور"
                         >
                             <FaLock className="text-lg" />
                         </button>
-                        <button 
-                            type="button" 
+                        <button
+                            type="button"
                             onClick={() => setShowDeleteModal(true)}
                             className="w-11 h-11 rounded-full bg-red-100 text-red-600 flex items-center justify-center shadow hover:bg-red-200 transition"
                             aria-label="حذف الحساب"
@@ -229,7 +229,7 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                 {/* الباقات */}
                 <Link
                     href="/packages"
-                    className="group relative bg-gradient-to-br from-[#A3C042] via-[#93b03a] to-[#7a9a2f] rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all transform hover:scale-105 overflow-hidden"
+                    className="group relative bg-gradient-to-br from-[#A3C042] via-[#8CA635] to-[#7a9a2f] rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all transform hover:scale-105 overflow-hidden"
                 >
                     <div className="absolute top-0 right-0 w-20 h-20 bg-white/20 rounded-full -mr-10 -mt-10 blur-2xl"></div>
                     <div className="relative flex items-center gap-3">
@@ -270,10 +270,10 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
     // Right Column Content (Projects + Activities)
     const rightColumnContent = (
         <>
-                    {/* Badges */}
-                    <div className="bg-white rounded-3xl shadow-sm p-4 border border-gray-100">
+            {/* Badges */}
+            <div className="bg-white rounded-3xl shadow-sm p-4 border border-gray-100">
                 <div className="flex items-center justify-between mb-3">
-                <div className=" font-bold text-gray-900">شاراتي</div>
+                    <div className=" font-bold text-gray-900">شاراتي</div>
                     <Link href="/student/badges" className="text-[#A3C042] text-sm font-semibold">عرض الكل</Link>
                 </div>
 
@@ -296,7 +296,7 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
             {/* Projects */}
             <div className="bg-white rounded-3xl shadow-sm p-4 border border-gray-100">
                 <div className="flex items-center justify-between mb-3">
-                <div className=" font-bold text-gray-900">مشاريعي</div>
+                    <div className=" font-bold text-gray-900">مشاريعي</div>
                     <Link href="/student/projects" className="text-[#A3C042] text-sm font-semibold">عرض الكل</Link>
                 </div>
 
@@ -306,11 +306,10 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                             <div key={project.id} className="bg-gray-50 rounded-2xl p-3 border border-gray-100">
                                 <div className="flex items-center justify-between mb-2">
                                     <span className="text-sm font-bold text-gray-900 line-clamp-1">{project.title}</span>
-                                    <span className={`text-[11px] font-bold px-2 py-1 rounded-full ${
-                                        project.status === 'approved'
-                                            ? 'bg-green-100 text-green-700'
-                                            : 'bg-yellow-100 text-yellow-700'
-                                    }`}>
+                                    <span className={`text-[11px] font-bold px-2 py-1 rounded-full ${project.status === 'approved'
+                                        ? 'bg-green-100 text-green-700'
+                                        : 'bg-yellow-100 text-yellow-700'
+                                        }`}>
                                         {project.status === 'approved' ? 'تمت المراجعة' : 'قيد المراجعة'}
                                     </span>
                                 </div>
@@ -415,7 +414,7 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
         if (file) {
             imageForm.setData('image', file);
             setImagePreview(URL.createObjectURL(file));
-            
+
             // Auto-submit image
             const formData = new FormData();
             formData.append('name', user?.name || '');
@@ -513,11 +512,11 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
                     onNotifications={() => router.visit('/profile')}
                     onBack={() => router.visit('/student/dashboard')}
                 >
-                    <StudentProfileContent 
-                        user={user} 
-                        stats={stats} 
-                        badges={badges} 
-                        projects={projects} 
+                    <StudentProfileContent
+                        user={user}
+                        stats={stats}
+                        badges={badges}
+                        projects={projects}
                         activities={activities}
                         school={school}
                         availableSchools={availableSchools}
@@ -559,11 +558,11 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
                 />
                 <main className="mx-auto w-full max-w-5xl px-4 pb-24 pt-6">
                     <div className="mx-auto w-full">
-                        <StudentProfileContent 
-                            user={user} 
-                            stats={stats} 
-                            badges={badges} 
-                            projects={projects} 
+                        <StudentProfileContent
+                            user={user}
+                            stats={stats}
+                            badges={badges}
+                            projects={projects}
                             activities={activities}
                             school={school}
                             availableSchools={availableSchools}
@@ -670,7 +669,7 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
                             <button
                                 type="submit"
                                 disabled={passwordForm.processing}
-                                className="flex-1 bg-[#A3C042] hover:bg-[#93b03a] text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 transition disabled:opacity-50"
+                                className="flex-1 bg-[#A3C042] hover:bg-[#8CA635] text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 transition disabled:opacity-50"
                             >
                                 <FaSave />
                                 {passwordForm.processing ? 'جاري الحفظ...' : 'تحديث كلمة المرور'}
@@ -802,7 +801,7 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
                                     }
                                 }}
                                 disabled={!selectedSchoolId || selectedSchoolId === (school?.id || user?.school_id)}
-                                className="flex-1 bg-[#A3C042] hover:bg-[#93b03a] text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex-1 bg-[#A3C042] hover:bg-[#8CA635] text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <FaSave />
                                 حفظ التغيير

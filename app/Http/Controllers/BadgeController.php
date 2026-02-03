@@ -17,20 +17,8 @@ class BadgeController extends Controller
 
     public function index(Request $request)
     {
-        $allBadges = $this->badgeService->getActiveBadges();
-        $achievementBadges = $allBadges->filter(fn($badge) => $badge->badge_category === 'achievement')->values();
-        $communityBadges = $allBadges->filter(fn($badge) => $badge->badge_category === 'community')->values();
-
-        $userBadges = [];
-        $userCommunityBadgeProgress = [];
-        if ($request->user()) {
-            $userId = $request->user()->id;
-            $userBadges = $this->badgeService->getUserBadges($userId);
-            $userCommunityBadgeProgress = $this->badgeService->getUserCommunityBadgeProgress($userId);
-        }
-
-        $currentSchoolId = null;
         $user = $request->user();
+        $currentSchoolId = null;
         if ($user) {
             if ($user->isSchool()) {
                 $currentSchoolId = $user->id;
@@ -40,6 +28,19 @@ class BadgeController extends Controller
                 $currentSchoolId = $user->school_id;
             }
         }
+
+        $allBadges = $this->badgeService->getActiveBadges($currentSchoolId);
+        $achievementBadges = $allBadges->filter(fn($badge) => $badge->badge_category === 'achievement')->values();
+        $communityBadges = $allBadges->filter(fn($badge) => $badge->badge_category === 'community')->values();
+
+        $userBadges = [];
+        $userCommunityBadgeProgress = [];
+        if ($user) {
+            $userId = $user->id;
+            $userBadges = $this->badgeService->getUserBadges($userId);
+            $userCommunityBadgeProgress = $this->badgeService->getUserCommunityBadgeProgress($userId);
+        }
+
         $rankings = $this->rankingService->getSchoolRankings($currentSchoolId);
 
         return Inertia::render('Badges', [

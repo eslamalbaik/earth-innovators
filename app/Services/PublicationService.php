@@ -82,8 +82,11 @@ class PublicationService extends BaseService
         $cacheTag = "school_publications_{$schoolId}";
 
         return $this->cacheTags($cacheTag, $cacheKey, function () use ($schoolId, $status, $perPage) {
-            $query = Publication::where('school_id', $schoolId)
-                ->with('author:id,name')
+            $query = Publication::query();
+            if ($schoolId > 0) {
+                $query->where('school_id', $schoolId);
+            }
+            $query->with('author:id,name')
                 ->select('id', 'title', 'description', 'type', 'status', 'cover_image', 'file', 'content', 'issue_number', 'publish_date', 'publisher_name', 'likes_count', 'author_id', 'created_at')
                 ->orderBy('created_at', 'desc');
 
@@ -101,8 +104,11 @@ class PublicationService extends BaseService
         $cacheTag = "school_publications_{$schoolId}";
 
         return $this->cacheTags($cacheTag, $cacheKey, function () use ($schoolId, $perPage) {
-            return Publication::where('school_id', $schoolId)
-                ->where('status', 'pending')
+            $query = Publication::query();
+            if ($schoolId > 0) {
+                $query->where('school_id', $schoolId);
+            }
+            return $query->where('status', 'pending')
                 ->whereColumn('author_id', '!=', 'school_id') // Not from school itself
                 ->with('author:id,name')
                 ->select('id', 'title', 'description', 'type', 'status', 'cover_image', 'author_id', 'created_at')
@@ -117,10 +123,14 @@ class PublicationService extends BaseService
         $cacheTag = "school_publications_{$schoolId}";
 
         return $this->cacheTags($cacheTag, $cacheKey, function () use ($schoolId) {
+            $query = Publication::query();
+            if ($schoolId > 0) {
+                $query->where('school_id', $schoolId);
+            }
             return [
-                'total' => Publication::where('school_id', $schoolId)->count(),
-                'pending' => Publication::where('school_id', $schoolId)->where('status', 'pending')->count(),
-                'approved' => Publication::where('school_id', $schoolId)->where('status', 'approved')->count(),
+                'total' => (clone $query)->count(),
+                'pending' => (clone $query)->where('status', 'pending')->count(),
+                'approved' => (clone $query)->where('status', 'approved')->count(),
             ];
         }, 300); // Cache for 5 minutes
     }

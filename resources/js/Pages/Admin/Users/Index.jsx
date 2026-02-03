@@ -2,12 +2,12 @@ import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { useState, useEffect, useCallback } from 'react';
 import { useOptimisticCRUD } from '@/Hooks/useOptimisticCRUD';
-import { 
-    FaSearch, 
-    FaFilter, 
-    FaEye, 
-    FaEdit, 
-    FaTrash, 
+import {
+    FaSearch,
+    FaFilter,
+    FaEye,
+    FaEdit,
+    FaTrash,
     FaPlus,
     FaUser,
     FaUsers,
@@ -169,7 +169,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
         const params = new URLSearchParams();
         if (search) params.append('search', search);
         if (roleFilter !== 'all') params.append('role', roleFilter);
-        
+
         window.location.href = route('admin.users.export') + (params.toString() ? '?' + params.toString() : '');
     };
 
@@ -323,7 +323,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                         </div>
                         <button
                             onClick={handleSearch}
-                            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
+                            className="px-6 py-2 bg-[#A3C042] hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
                         >
                             <FaFilter />
                             بحث
@@ -341,14 +341,14 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                         )}
                         <button
                             onClick={handleExportExcel}
-                            className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
+                            className="px-6 py-2 bg-[#A3C042] hover:bg-[#8CA635] text-white font-semibold rounded-lg flex items-center justify-center gap-2"
                         >
                             <FaFileExcel />
                             تصدير Excel
                         </button>
                         <Link
                             href={route('admin.users.create')}
-                            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
+                            className="px-6 py-2 bg-[#A3C042] hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
                         >
                             <FaPlus />
                             إضافة مستخدم جديد
@@ -387,67 +387,67 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                 optimizedUsers.map((user) => {
                                     const deleting = isDeleting(user.id);
                                     return (
-                                    <tr 
-                                        key={user.id} 
-                                        className={`hover:bg-gray-50 ${selectedUsers.includes(user.id) ? 'bg-blue-50' : ''} ${deleting ? 'opacity-50 pointer-events-none' : ''}`}
-                                    >
-                                        <td className="py-4 px-6">
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedUsers.includes(user.id)}
-                                                onChange={() => handleSelectUser(user.id)}
-                                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                            />
-                                        </td>
-                                        <td className="py-4 px-6 text-sm font-medium text-gray-900">#{user.id}</td>
-                                        <td className="py-4 px-6">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                                                    <FaUser className="text-blue-600" />
+                                        <tr
+                                            key={user.id}
+                                            className={`hover:bg-gray-50 ${selectedUsers.includes(user.id) ? 'bg-blue-50' : ''} ${deleting ? 'opacity-50 pointer-events-none' : ''}`}
+                                        >
+                                            <td className="py-4 px-6">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedUsers.includes(user.id)}
+                                                    onChange={() => handleSelectUser(user.id)}
+                                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                                />
+                                            </td>
+                                            <td className="py-4 px-6 text-sm font-medium text-gray-900">#{user.id}</td>
+                                            <td className="py-4 px-6">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                                        <FaUser className="text-blue-600" />
+                                                    </div>
+                                                    <span className="font-medium text-gray-900">{user.name}</span>
                                                 </div>
-                                                <span className="font-medium text-gray-900">{user.name}</span>
-                                            </div>
-                                        </td>
-                                        <td className="py-4 px-6 text-sm text-gray-700">{user.email}</td>
-                                        <td className="py-4 px-6">{getRoleBadge(user.role, user.account_type)}</td>
-                                        <td className="py-4 px-6 text-sm text-gray-700">{user.school_name}</td>
-                                        <td className="py-4 px-6">
-                                            <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
-                                                {user.points || 0}
-                                            </span>
-                                        </td>
-                                        <td className="py-4 px-6 text-sm text-gray-700">{user.created_at}</td>
-                                        <td className="py-4 px-6">
-                                            <div className="flex items-center gap-2">
-                                                <Link
-                                                    href={route('admin.users.show', user.id)}
-                                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
-                                                    title="عرض التفاصيل"
-                                                >
-                                                    <FaEye />
-                                                </Link>
-                                                <button
-                                                    onClick={() => handleEdit(user)}
-                                                    className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg transition"
-                                                    title="تعديل"
-                                                >
-                                                    <FaEdit />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(user)}
-                                                    disabled={deleting}
-                                                    className={`p-2 text-red-600 hover:bg-red-50 rounded-lg transition ${deleting ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                    title={deleting ? 'جاري الحذف...' : 'حذف'}
-                                                >
-                                                    {deleting ? (
-                                                        <span className="animate-spin text-xs">⏳</span>
-                                                    ) : (
-                                                        <FaTrash />
-                                                    )}
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                            </td>
+                                            <td className="py-4 px-6 text-sm text-gray-700">{user.email}</td>
+                                            <td className="py-4 px-6">{getRoleBadge(user.role, user.account_type)}</td>
+                                            <td className="py-4 px-6 text-sm text-gray-700">{user.school_name}</td>
+                                            <td className="py-4 px-6">
+                                                <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
+                                                    {user.points || 0}
+                                                </span>
+                                            </td>
+                                            <td className="py-4 px-6 text-sm text-gray-700">{user.created_at}</td>
+                                            <td className="py-4 px-6">
+                                                <div className="flex items-center gap-2">
+                                                    <Link
+                                                        href={route('admin.users.show', user.id)}
+                                                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                                                        title="عرض التفاصيل"
+                                                    >
+                                                        <FaEye />
+                                                    </Link>
+                                                    <button
+                                                        onClick={() => handleEdit(user)}
+                                                        className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg transition"
+                                                        title="تعديل"
+                                                    >
+                                                        <FaEdit />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(user)}
+                                                        disabled={deleting}
+                                                        className={`p-2 text-red-600 hover:bg-red-50 rounded-lg transition ${deleting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                        title={deleting ? 'جاري الحذف...' : 'حذف'}
+                                                    >
+                                                        {deleting ? (
+                                                            <span className="animate-spin text-xs">⏳</span>
+                                                        ) : (
+                                                            <FaTrash />
+                                                        )}
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
                                     );
                                 })
                             ) : (
@@ -473,11 +473,10 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                     <Link
                                         key={index}
                                         href={link.url || '#'}
-                                        className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                                            link.active
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium ${link.active
+                                            ? 'bg-[#A3C042] text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
                                 ))}
@@ -512,9 +511,8 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                         type="text"
                                         value={editData.name}
                                         onChange={(e) => setEditData('name', e.target.value)}
-                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            editErrors.name ? 'border-red-500' : 'border-gray-300'
-                                        }`}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.name ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                         required
                                     />
                                     {editErrors.name && (
@@ -531,9 +529,8 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                         type="email"
                                         value={editData.email}
                                         onChange={(e) => setEditData('email', e.target.value)}
-                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            editErrors.email ? 'border-red-500' : 'border-gray-300'
-                                        }`}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.email ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                         required
                                     />
                                     {editErrors.email && (
@@ -550,9 +547,8 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                         type="tel"
                                         value={editData.phone}
                                         onChange={(e) => setEditData('phone', e.target.value)}
-                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            editErrors.phone ? 'border-red-500' : 'border-gray-300'
-                                        }`}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.phone ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                     />
                                     {editErrors.phone && (
                                         <p className="mt-1 text-sm text-red-600">{editErrors.phone}</p>
@@ -567,9 +563,8 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                     <select
                                         value={editData.account_type}
                                         onChange={(e) => setEditData('account_type', e.target.value)}
-                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            editErrors.account_type ? 'border-red-500' : 'border-gray-300'
-                                        }`}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.account_type ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                         required
                                     >
                                         <option value="regular">حساب عادي</option>
@@ -588,9 +583,8 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                     <select
                                         value={editData.role}
                                         onChange={(e) => setEditData('role', e.target.value)}
-                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            editErrors.role ? 'border-red-500' : 'border-gray-300'
-                                        }`}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.role ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                         required
                                     >
                                         <option value="student">طالب</option>
@@ -619,9 +613,8 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                         <select
                                             value={editData.membership_type}
                                             onChange={(e) => setEditData('membership_type', e.target.value)}
-                                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                                editErrors.membership_type ? 'border-red-500' : 'border-gray-300'
-                                            }`}
+                                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.membership_type ? 'border-red-500' : 'border-gray-300'
+                                                }`}
                                         >
                                             <option value="">بدون عضوية</option>
                                             <option value="basic">عضوية أساسية</option>
@@ -642,9 +635,8 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                         <select
                                             value={editData.school_id}
                                             onChange={(e) => setEditData('school_id', e.target.value)}
-                                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                                editErrors.school_id ? 'border-red-500' : 'border-gray-300'
-                                            }`}
+                                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.school_id ? 'border-red-500' : 'border-gray-300'
+                                                }`}
                                         >
                                             <option value="">اختر مدرسة</option>
                                             {schools.map((school) => (
@@ -670,9 +662,8 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                             min="0"
                                             value={editData.points}
                                             onChange={(e) => setEditData('points', parseInt(e.target.value) || 0)}
-                                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                                editErrors.points ? 'border-red-500' : 'border-gray-300'
-                                            }`}
+                                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.points ? 'border-red-500' : 'border-gray-300'
+                                                }`}
                                         />
                                         {editErrors.points && (
                                             <p className="mt-1 text-sm text-red-600">{editErrors.points}</p>
@@ -689,9 +680,8 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                         type="password"
                                         value={editData.password}
                                         onChange={(e) => setEditData('password', e.target.value)}
-                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            editErrors.password ? 'border-red-500' : 'border-gray-300'
-                                        }`}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.password ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                     />
                                     {editErrors.password && (
                                         <p className="mt-1 text-sm text-red-600">{editErrors.password}</p>
@@ -708,9 +698,8 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                             type="password"
                                             value={editData.password_confirmation}
                                             onChange={(e) => setEditData('password_confirmation', e.target.value)}
-                                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                                editErrors.password_confirmation ? 'border-red-500' : 'border-gray-300'
-                                            }`}
+                                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.password_confirmation ? 'border-red-500' : 'border-gray-300'
+                                                }`}
                                         />
                                         {editErrors.password_confirmation && (
                                             <p className="mt-1 text-sm text-red-600">{editErrors.password_confirmation}</p>
@@ -724,7 +713,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                 <button
                                     type="submit"
                                     disabled={editProcessing}
-                                    className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50"
+                                    className="px-6 py-2 bg-[#A3C042] hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50"
                                 >
                                     <FaSave />
                                     {editProcessing ? 'جاري التحديث...' : 'تحديث'}

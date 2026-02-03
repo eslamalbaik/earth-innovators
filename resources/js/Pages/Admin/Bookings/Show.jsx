@@ -145,7 +145,7 @@ export default function BookingShow({ booking, auth }) {
                             <div className="flex items-center space-x-4 space-x-reverse">
                                 <button
                                     onClick={handleSendEmail}
-                                    className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300"
+                                    className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-[#A3C042] transition duration-300"
                                 >
                                     <FaEnvelope className="ml-2" />
                                     إرسال إيميل
@@ -351,7 +351,7 @@ export default function BookingShow({ booking, auth }) {
                                 <div className="space-y-3">
                                     <button
                                         onClick={() => handleStatusUpdate('approved')}
-                                        className="w-full flex items-center justify-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300"
+                                        className="w-full flex items-center justify-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-[#A3C042] transition duration-300"
                                     >
                                         <FaCheck className="ml-2" />
                                         موافقة
@@ -365,7 +365,7 @@ export default function BookingShow({ booking, auth }) {
                                     </button>
                                     <button
                                         onClick={() => handleStatusUpdate('completed')}
-                                        className="w-full flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300"
+                                        className="w-full flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-[#A3C042] transition duration-300"
                                     >
                                         <FaCheck className="ml-2" />
                                         إكمال

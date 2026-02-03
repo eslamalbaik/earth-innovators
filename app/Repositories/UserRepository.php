@@ -16,7 +16,9 @@ class UserRepository extends BaseRepository
     public function findBySchoolId(int $schoolId, string $role = 'student'): Collection
     {
         return $this->model
-            ->where('school_id', $schoolId)
+            ->when($schoolId > 0, function($q) use ($schoolId) {
+                return $q->where('school_id', $schoolId);
+            })
             ->where('role', $role)
             ->get();
     }
@@ -24,7 +26,9 @@ class UserRepository extends BaseRepository
     public function paginateBySchoolId(int $schoolId, string $role = 'student', int $perPage = 20): LengthAwarePaginator
     {
         return $this->model
-            ->where('school_id', $schoolId)
+            ->when($schoolId > 0, function($q) use ($schoolId) {
+                return $q->where('school_id', $schoolId);
+            })
             ->where('role', $role)
             ->paginate($perPage);
     }
@@ -32,7 +36,9 @@ class UserRepository extends BaseRepository
     public function searchBySchoolId(int $schoolId, string $role, ?string $search, int $perPage = 20): LengthAwarePaginator
     {
         $query = $this->model
-            ->where('school_id', $schoolId)
+            ->when($schoolId > 0, function($q) use ($schoolId) {
+                return $q->where('school_id', $schoolId);
+            })
             ->where('role', $role);
 
         if ($search) {
@@ -51,7 +57,9 @@ class UserRepository extends BaseRepository
     {
         return $this->model
             ->where('id', $id)
-            ->where('school_id', $schoolId)
+            ->when($schoolId > 0, function($q) use ($schoolId) {
+                return $q->where('school_id', $schoolId);
+            })
             ->where('role', $role)
             ->first();
     }

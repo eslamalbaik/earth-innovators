@@ -96,9 +96,8 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                                 type="text"
                                 value={data.title}
                                 onChange={(e) => setData('title', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.title ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.title ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             />
                             {errors.title && (
@@ -115,9 +114,8 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                                 value={data.objective}
                                 onChange={(e) => setData('objective', e.target.value)}
                                 rows={3}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.objective ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.objective ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             />
                             {errors.objective && (
@@ -134,9 +132,8 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                                 value={data.description}
                                 onChange={(e) => setData('description', e.target.value)}
                                 rows={4}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.description ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.description ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             />
                             {errors.description && (
@@ -182,7 +179,7 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                                         <button
                                             type="button"
                                             onClick={() => imageInputRef.current?.click()}
-                                            className="absolute bottom-2 right-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+                                            className="absolute bottom-2 right-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-[#A3C042] transition"
                                         >
                                             تغيير الصورة
                                         </button>
@@ -220,9 +217,8 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                                 value={data.instructions}
                                 onChange={(e) => setData('instructions', e.target.value)}
                                 rows={4}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.instructions ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.instructions ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             />
                             {errors.instructions && (
@@ -238,9 +234,8 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                             <select
                                 value={data.challenge_type}
                                 onChange={(e) => setData('challenge_type', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.challenge_type ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.challenge_type ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             >
                                 <option value="">اختر نوع التحدي</option>
@@ -264,9 +259,8 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                             <select
                                 value={data.category}
                                 onChange={(e) => setData('category', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.category ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.category ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             >
                                 <option value="">اختر الفئة</option>
@@ -290,9 +284,8 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                             <select
                                 value={data.age_group}
                                 onChange={(e) => setData('age_group', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.age_group ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.age_group ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             >
                                 <option value="">اختر الفئة العمرية</option>
@@ -314,9 +307,8 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                             <select
                                 value={data.school_id}
                                 onChange={(e) => setData('school_id', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.school_id ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.school_id ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                             >
                                 <option value="">اختر مدرسة</option>
                                 {schools.map((school) => (
@@ -339,9 +331,8 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                                 type="datetime-local"
                                 value={data.start_date}
                                 onChange={(e) => setData('start_date', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.start_date ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.start_date ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             />
                             {errors.start_date && (
@@ -358,9 +349,8 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                                 type="datetime-local"
                                 value={data.deadline}
                                 onChange={(e) => setData('deadline', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.deadline ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.deadline ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             />
                             {errors.deadline && (
@@ -376,9 +366,8 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                             <select
                                 value={data.status}
                                 onChange={(e) => setData('status', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.status ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.status ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                             >
                                 <option value="draft">مسودة</option>
                                 <option value="active">نشط</option>
@@ -400,9 +389,8 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                                 min="0"
                                 value={data.points_reward}
                                 onChange={(e) => setData('points_reward', parseInt(e.target.value) || 0)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.points_reward ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.points_reward ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                             />
                             {errors.points_reward && (
                                 <p className="mt-1 text-sm text-red-600">{errors.points_reward}</p>
@@ -419,9 +407,8 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                                 min="1"
                                 value={data.max_participants || ''}
                                 onChange={(e) => setData('max_participants', e.target.value ? parseInt(e.target.value) : null)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.max_participants ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.max_participants ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 placeholder="غير محدود"
                             />
                             {errors.max_participants && (
@@ -435,7 +422,7 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                         <button
                             type="submit"
                             disabled={processing}
-                            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50"
+                            className="px-6 py-2 bg-[#A3C042] hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50"
                         >
                             <FaSave />
                             {processing ? 'جاري الحفظ...' : 'حفظ التغييرات'}

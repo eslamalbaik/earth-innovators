@@ -1,11 +1,11 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState, useCallback } from 'react';
-import { 
-    FaSearch, 
-    FaFilter, 
-    FaEdit, 
-    FaTrash, 
+import {
+    FaSearch,
+    FaFilter,
+    FaEdit,
+    FaTrash,
     FaPlus,
     FaUser,
     FaShieldAlt,
@@ -139,7 +139,7 @@ export default function PermissionsIndex({ adminUsers, stats, filters, auth }) {
                         </div>
                         <button
                             onClick={handleSearch}
-                            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
+                            className="px-6 py-2 bg-[#A3C042] hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
                         >
                             <FaFilter />
                             بحث
@@ -147,7 +147,7 @@ export default function PermissionsIndex({ adminUsers, stats, filters, auth }) {
                     </div>
                     <Link
                         href={route('admin.permissions.create')}
-                        className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
+                        className="px-6 py-2 bg-[#A3C042] hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
                     >
                         <FaPlus />
                         إضافة مستخدم إداري
@@ -266,11 +266,10 @@ export default function PermissionsIndex({ adminUsers, stats, filters, auth }) {
                                         <Link
                                             key={index}
                                             href={link.url || '#'}
-                                            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                                                link.active
+                                            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${link.active
                                                     ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
                                                     : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                                            } ${index === 0 ? 'rounded-r-md' : index === adminUsers.links.length - 1 ? 'rounded-l-md' : ''}`}
+                                                } ${index === 0 ? 'rounded-r-md' : index === adminUsers.links.length - 1 ? 'rounded-l-md' : ''}`}
                                             dangerouslySetInnerHTML={{ __html: link.label }}
                                         />
                                     ))}

@@ -337,7 +337,7 @@ export default function StudentReviews({ reviews, reviewableBookings, stats }) {
                                         <div className="flex items-center gap-2 mt-3">
                                             <button
                                                 onClick={() => handleEdit(review)}
-                                                className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg transition flex items-center gap-2"
+                                                className="px-4 py-2 bg-blue-500 hover:bg-[#A3C042] text-white text-sm rounded-lg transition flex items-center gap-2"
                                             >
                                                 <FaEdit />
                                                 تعديل

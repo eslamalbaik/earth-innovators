@@ -49,9 +49,8 @@ export default function UsersEdit({ user, schools, auth }) {
                                 type="text"
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.name ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.name ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             />
                             {errors.name && (
@@ -68,9 +67,8 @@ export default function UsersEdit({ user, schools, auth }) {
                                 type="email"
                                 value={data.email}
                                 onChange={(e) => setData('email', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.email ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.email ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             />
                             {errors.email && (
@@ -87,9 +85,8 @@ export default function UsersEdit({ user, schools, auth }) {
                                 type="tel"
                                 value={data.phone}
                                 onChange={(e) => setData('phone', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.phone ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.phone ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                             />
                             {errors.phone && (
                                 <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
@@ -104,9 +101,8 @@ export default function UsersEdit({ user, schools, auth }) {
                             <select
                                 value={data.account_type}
                                 onChange={(e) => setData('account_type', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.account_type ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.account_type ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             >
                                 <option value="regular">حساب عادي</option>
@@ -125,9 +121,8 @@ export default function UsersEdit({ user, schools, auth }) {
                             <select
                                 value={data.role}
                                 onChange={(e) => setData('role', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.role ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.role ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             >
                                 <option value="student">طالب</option>
@@ -156,9 +151,8 @@ export default function UsersEdit({ user, schools, auth }) {
                                 <select
                                     value={data.membership_type}
                                     onChange={(e) => setData('membership_type', e.target.value)}
-                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                        errors.membership_type ? 'border-red-500' : 'border-gray-300'
-                                    }`}
+                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.membership_type ? 'border-red-500' : 'border-gray-300'
+                                        }`}
                                 >
                                     <option value="">بدون عضوية</option>
                                     <option value="basic">عضوية أساسية</option>
@@ -179,9 +173,8 @@ export default function UsersEdit({ user, schools, auth }) {
                                 <select
                                     value={data.school_id}
                                     onChange={(e) => setData('school_id', e.target.value)}
-                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                        errors.school_id ? 'border-red-500' : 'border-gray-300'
-                                    }`}
+                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.school_id ? 'border-red-500' : 'border-gray-300'
+                                        }`}
                                 >
                                     <option value="">اختر مدرسة</option>
                                     {schools.map((school) => (
@@ -207,9 +200,8 @@ export default function UsersEdit({ user, schools, auth }) {
                                     min="0"
                                     value={data.points}
                                     onChange={(e) => setData('points', parseInt(e.target.value) || 0)}
-                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                        errors.points ? 'border-red-500' : 'border-gray-300'
-                                    }`}
+                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.points ? 'border-red-500' : 'border-gray-300'
+                                        }`}
                                 />
                                 {errors.points && (
                                     <p className="mt-1 text-sm text-red-600">{errors.points}</p>
@@ -226,9 +218,8 @@ export default function UsersEdit({ user, schools, auth }) {
                                 type="password"
                                 value={data.password}
                                 onChange={(e) => setData('password', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.password ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.password ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                             />
                             {errors.password && (
                                 <p className="mt-1 text-sm text-red-600">{errors.password}</p>
@@ -245,9 +236,8 @@ export default function UsersEdit({ user, schools, auth }) {
                                     type="password"
                                     value={data.password_confirmation}
                                     onChange={(e) => setData('password_confirmation', e.target.value)}
-                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                        errors.password_confirmation ? 'border-red-500' : 'border-gray-300'
-                                    }`}
+                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.password_confirmation ? 'border-red-500' : 'border-gray-300'
+                                        }`}
                                 />
                                 {errors.password_confirmation && (
                                     <p className="mt-1 text-sm text-red-600">{errors.password_confirmation}</p>
@@ -261,7 +251,7 @@ export default function UsersEdit({ user, schools, auth }) {
                         <button
                             type="submit"
                             disabled={processing}
-                            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50"
+                            className="px-6 py-2 bg-[#A3C042] hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50"
                         >
                             <FaSave />
                             {processing ? 'جاري التحديث...' : 'تحديث'}

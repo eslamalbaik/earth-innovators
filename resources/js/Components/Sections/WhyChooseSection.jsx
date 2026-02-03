@@ -11,7 +11,7 @@ export default function WhyChooseSection({
     return (
         <div className="space-y-4 md:space-y-6">
             <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-[#A3C042]/20 to-[#93b03a]/20 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-xl flex items-center justify-center">
                     <FaRocket className="text-[#A3C042] text-xl" />
                 </div>
                 <h2 className="text-xl md:text-2xl font-bold text-gray-900">{title}</h2>
@@ -25,7 +25,7 @@ export default function WhyChooseSection({
                 {benefits.map((benefit, index) => (
                     <div key={index} className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm hover:shadow-md transition">
                         <div className="flex items-start gap-3">
-                            <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-[#A3C042]/20 to-[#93b03a]/20 rounded-xl flex items-center justify-center mt-1">
+                            <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-xl flex items-center justify-center mt-1">
                                 <FaCheck className="text-[#A3C042] text-sm" />
                             </div>
                             <div className="flex-1">

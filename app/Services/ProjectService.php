@@ -130,34 +130,42 @@ class ProjectService extends BaseService
         }, 60); // تقليل وقت الكاش إلى دقيقة واحدة
     }
 
-    public function getSchoolProjects(int $schoolId, ?string $search = null, ?string $status = null, ?string $category = null, int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator
+    public function getSchoolProjects(int $schoolId, ?string $search = null, ?string $status = null, ?string $category = null, int $perPage = 15, bool $includeGlobal = true): \Illuminate\Pagination\LengthAwarePaginator
     {
-        $cacheKey = "school_projects_{$schoolId}_" . md5(json_encode([$search, $status, $category, $perPage]));
+        $cacheKey = "school_projects_{$schoolId}_" . md5(json_encode([$search, $status, $category, $perPage, $includeGlobal]));
         $cacheTag = "school_projects_{$schoolId}";
 
-        return $this->cacheTags($cacheTag, $cacheKey, function () use ($schoolId, $search, $status, $category, $perPage) {
-            // Get student IDs
-            $studentIds = \App\Models\User::where('school_id', $schoolId)
-                ->where('role', 'student')
-                ->pluck('id')
-                ->toArray();
+        return $this->cacheTags($cacheTag, $cacheKey, function () use ($schoolId, $search, $status, $category, $perPage, $includeGlobal) {
+            $query = Project::query();
 
-            $query = Project::where(function ($q) use ($studentIds, $schoolId) {
-                $q->whereIn('user_id', $studentIds)
-                  ->orWhere(function ($sq) use ($schoolId) {
-                      $sq->where('school_id', $schoolId)
-                         ->where('user_id', $schoolId);
-                  })
-                  ->orWhere(function ($tq) use ($schoolId) {
-                      $tq->whereNotNull('teacher_id')
-                         ->where('school_id', $schoolId);
-                  })
-                  ->orWhere(function ($aq) {
-                      // المشاريع المتاحة لجميع المؤسسات تعليمية (school_id = null)
-                      $aq->whereNull('school_id');
-                  });
-            })
-            ->with([
+            if ($schoolId > 0) {
+                // Get student IDs
+                $studentIds = \App\Models\User::where('school_id', $schoolId)
+                    ->where('role', 'student')
+                    ->pluck('id')
+                    ->toArray();
+
+                $query->where(function ($q) use ($studentIds, $schoolId, $includeGlobal) {
+                    $q->whereIn('user_id', $studentIds)
+                      ->orWhere(function ($sq) use ($schoolId) {
+                          $sq->where('school_id', $schoolId)
+                             ->where('user_id', $schoolId);
+                      })
+                      ->orWhere(function ($tq) use ($schoolId) {
+                          $tq->whereNotNull('teacher_id')
+                             ->where('school_id', $schoolId);
+                      });
+
+                    if ($includeGlobal) {
+                        $q->orWhereNull('school_id');
+                    }
+                });
+            } elseif ($includeGlobal) {
+                // Or show global projects even if no schoolId
+                $query->whereNull('school_id');
+            }
+
+            $query->with([
                 'user:id,name',
                 'teacher:id,name_ar,user_id',
                 'teacher.user:id,name'
@@ -195,20 +203,25 @@ class ProjectService extends BaseService
         $cacheTag = "school_projects_{$schoolId}";
 
         return $this->cacheTags($cacheTag, $cacheKey, function () use ($schoolId, $search, $category, $perPage) {
-            // Get student IDs
-            $studentIds = \App\Models\User::where('school_id', $schoolId)
-                ->where('role', 'student')
-                ->pluck('id')
-                ->toArray();
+            $query = Project::query();
 
-            $query = Project::where(function ($q) use ($studentIds, $schoolId) {
-                $q->whereIn('user_id', $studentIds)
-                  ->orWhere(function ($sq) use ($schoolId) {
-                      $sq->whereNotNull('teacher_id')
-                         ->where('school_id', $schoolId);
-                  });
-            })
-            ->where('status', 'pending')
+            if ($schoolId > 0) {
+                // Get student IDs
+                $studentIds = \App\Models\User::where('school_id', $schoolId)
+                    ->where('role', 'student')
+                    ->pluck('id')
+                    ->toArray();
+
+                $query->where(function ($q) use ($studentIds, $schoolId) {
+                    $q->whereIn('user_id', $studentIds)
+                      ->orWhere(function ($sq) use ($schoolId) {
+                          $sq->whereNotNull('teacher_id')
+                             ->where('school_id', $schoolId);
+                      });
+                });
+            }
+
+            $query->where('status', 'pending')
             ->with([
                 'user:id,name',
                 'teacher:id,name_ar,user_id',

@@ -205,7 +205,7 @@ export default function TeacherProjects({ projects, auth }) {
             <div className="mt-4">
                 <Link
                     href="/teacher/projects/create"
-                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#A3C042] py-3 text-sm font-extrabold text-white hover:bg-[#93b03a] transition"
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#A3C042] py-3 text-sm font-extrabold text-white hover:bg-[#8CA635] transition"
                 >
                     <FaPlus />
                     رفع مشروع جديد

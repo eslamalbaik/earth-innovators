@@ -118,11 +118,10 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                                         key={item.key}
                                         type="button"
                                         onClick={() => router.visit(item.href)}
-                                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all mb-1 ${
-                                            isActive
+                                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all mb-1 ${isActive
                                                 ? 'bg-[#A3C042]/10 text-[#A3C042] border border-[#A3C042]/20'
                                                 : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                                        }`}
+                                            }`}
                                     >
                                         <Icon className="text-lg" />
                                         <span>{item.label}</span>
@@ -173,7 +172,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                         {/* User Profile Section */}
                         {isAuthed && user && (
                             <div className="pt-6 border-t border-gray-200 mt-6">
-                                <div className="px-4 py-3 bg-gradient-to-r from-[#A3C042]/5 to-[#93b03a]/5 rounded-xl border border-[#A3C042]/10">
+                                <div className="px-4 py-3 bg-gradient-to-r from-[#A3C042]/5 to-[#8CA635]/5 rounded-xl border border-[#A3C042]/10">
                                     <div className="flex items-center gap-3 mb-2">
                                         <div className="relative">
                                             {userImage ? (
@@ -189,9 +188,8 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                                                 />
                                             ) : null}
                                             <div
-                                                className={`w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold border-2 border-[#A3C042]/20 ${
-                                                    userImage ? 'hidden' : 'flex'
-                                                }`}
+                                                className={`w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold border-2 border-[#A3C042]/20 ${userImage ? 'hidden' : 'flex'
+                                                    }`}
                                                 style={{
                                                     background: `linear-gradient(135deg, ${getColorFromName(userName)})`
                                                 }}
@@ -211,7 +209,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                                     <button
                                         type="button"
                                         onClick={() => router.visit(links.profile)}
-                                        className="w-full mt-2 px-3 py-2 bg-[#A3C042] text-white rounded-lg text-xs font-semibold hover:bg-[#93b03a] transition"
+                                        className="w-full mt-2 px-3 py-2 bg-[#A3C042] text-white rounded-lg text-xs font-semibold hover:bg-[#8CA635] transition"
                                     >
                                         عرض الملف الشخصي
                                     </button>
@@ -231,166 +229,163 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                 <div className="px-2">
                     <div className={`grid py-2 ${isAuthed && role ? 'grid-cols-5' : 'grid-cols-4'}`}>
                         {filteredItems.map((item) => {
-                        const isActive = item.key === active;
-                        const Icon = item.icon;
-                        return (
-                            <button
-                                key={item.key}
-                                type="button"
-                                onClick={() => router.visit(item.href)}
-                                className="flex flex-col items-center justify-center gap-1 py-2"
-                            >
-                                <Icon className={`text-lg ${isActive ? 'text-[#A3C042]' : 'text-gray-300'}`} />
-                                <span className={`text-[11px] font-semibold ${isActive ? 'text-[#A3C042]' : 'text-gray-400'}`}>
-                                    {item.label}
-                                </span>
-                            </button>
-                        );
-                    })}
+                            const isActive = item.key === active;
+                            const Icon = item.icon;
+                            return (
+                                <button
+                                    key={item.key}
+                                    type="button"
+                                    onClick={() => router.visit(item.href)}
+                                    className="flex flex-col items-center justify-center gap-1 py-2"
+                                >
+                                    <Icon className={`text-lg ${isActive ? 'text-[#A3C042]' : 'text-gray-300'}`} />
+                                    <span className={`text-[11px] font-semibold ${isActive ? 'text-[#A3C042]' : 'text-gray-400'}`}>
+                                        {item.label}
+                                    </span>
+                                </button>
+                            );
+                        })}
 
-                    {/* Profile/Auth Section */}
-                    {isAuthed && user ? (
-                        <div className="relative" ref={userDropdownRef}>
-                            <button
-                                type="button"
-                                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                                className={`flex flex-col items-center justify-center gap-1 py-2 w-full ${
-                                    active === 'profile' ? 'text-[#A3C042]' : ''
-                                }`}
-                            >
-                                <div className="relative">
-                                    {userImage ? (
-                                        <img
-                                            src={userImage}
-                                            alt={userName}
-                                            className="w-6 h-6 rounded-full object-cover border-2 border-gray-200"
-                                            onError={(e) => {
-                                                e.target.style.display = 'none';
-                                                const fallback = e.target.nextElementSibling;
-                                                if (fallback) fallback.style.display = 'flex';
-                                            }}
-                                        />
-                                    ) : null}
-                                    <div
-                                        className={`w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold border-2 border-gray-200 ${
-                                            userImage ? 'hidden' : 'flex'
+                        {/* Profile/Auth Section */}
+                        {isAuthed && user ? (
+                            <div className="relative" ref={userDropdownRef}>
+                                <button
+                                    type="button"
+                                    onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                                    className={`flex flex-col items-center justify-center gap-1 py-2 w-full ${active === 'profile' ? 'text-[#A3C042]' : ''
                                         }`}
-                                        style={{
-                                            background: `linear-gradient(135deg, ${getColorFromName(userName)})`
-                                        }}
-                                    >
-                                        {getInitials(userName)}
+                                >
+                                    <div className="relative">
+                                        {userImage ? (
+                                            <img
+                                                src={userImage}
+                                                alt={userName}
+                                                className="w-6 h-6 rounded-full object-cover border-2 border-gray-200"
+                                                onError={(e) => {
+                                                    e.target.style.display = 'none';
+                                                    const fallback = e.target.nextElementSibling;
+                                                    if (fallback) fallback.style.display = 'flex';
+                                                }}
+                                            />
+                                        ) : null}
+                                        <div
+                                            className={`w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold border-2 border-gray-200 ${userImage ? 'hidden' : 'flex'
+                                                }`}
+                                            style={{
+                                                background: `linear-gradient(135deg, ${getColorFromName(userName)})`
+                                            }}
+                                        >
+                                            {getInitials(userName)}
+                                        </div>
                                     </div>
-                                </div>
-                                <span className={`text-[11px] font-semibold truncate max-w-[60px] ${
-                                    active === 'profile' ? 'text-[#A3C042]' : 'text-gray-400'
-                                }`}>
-                                    {userName.split(' ')[0] || 'الملف'}
-                                </span>
-                            </button>
+                                    <span className={`text-[11px] font-semibold truncate max-w-[60px] ${active === 'profile' ? 'text-[#A3C042]' : 'text-gray-400'
+                                        }`}>
+                                        {userName.split(' ')[0] || 'الملف'}
+                                    </span>
+                                </button>
 
-                            {/* User Dropdown Menu */}
-                            {userDropdownOpen && (
-                                <div className="absolute bottom-full left-0 mb-2 w-40 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden z-50">
-                                    {/* لوحة التحكم - تظهر لجميع الأدوار */}
-                                    {(role === 'admin' || role === 'teacher' || role === 'school' || role === 'student') && (
-                                        <>
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    router.visit(links.dashboard);
-                                                    setUserDropdownOpen(false);
-                                                }}
-                                                className="w-full px-4 py-3 text-sm font-semibold text-[#A3C042] hover:bg-[#A3C042]/10 transition flex items-center justify-between gap-2"
-                                            >
-                                                <span>لوحة التحكم</span>
-                                                <FaTachometerAlt className="text-xs" />
-                                            </button>
-                                            <div className="border-t border-gray-100" />
-                                        </>
-                                    )}
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            router.visit(links.profile);
-                                            setUserDropdownOpen(false);
-                                        }}
-                                        className="w-full  px-4 py-3 text-sm font-semibold text-gray-900 hover:bg-gray-50 transition flex items-center justify-between"
-                                    >
-                                        <span>الملف الشخصي</span>
-                                    </button>
-                                    {role === 'student' && (
-                                        <>
-                                            <div className="border-t border-gray-100" />
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    router.visit('/packages');
-                                                    setUserDropdownOpen(false);
-                                                }}
-                                                className="w-full  px-4 py-3 text-sm font-semibold text-[#A3C042] hover:bg-[#A3C042]/10 transition flex items-center justify-between gap-2"
-                                            >
-                                                <span>الباقات</span>
-                                                <FaCreditCard className="text-xs" />
-                                            </button>
-                                        </>
-                                    )}
-                                    <div className="border-t border-gray-100" />
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            handleLogout();
-                                            setUserDropdownOpen(false);
-                                        }}
-                                        className="w-full  px-4 py-3 text-sm font-semibold text-red-600 hover:bg-red-50 transition flex items-center justify-between gap-2"
-                                    >
-                                        <span>تسجيل الخروج</span>
-                                        <FaSignOutAlt className="text-xs" />
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <div className="relative" ref={dropdownRef}>
-                            <button
-                                type="button"
-                                onClick={() => setDropdownOpen(!dropdownOpen)}
-                                className="flex flex-col items-center justify-center gap-1 py-2 w-full"
-                            >
-                                <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
-                                    <FaUser className="text-gray-400 text-xs" />
-                                </div>
-                                <span className="text-[11px] font-semibold text-gray-400">تسجيل</span>
-                            </button>
+                                {/* User Dropdown Menu */}
+                                {userDropdownOpen && (
+                                    <div className="absolute bottom-full left-0 mb-2 w-40 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden z-50">
+                                        {/* لوحة التحكم - تظهر لجميع الأدوار */}
+                                        {(role === 'admin' || role === 'teacher' || role === 'school' || role === 'student') && (
+                                            <>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        router.visit(links.dashboard);
+                                                        setUserDropdownOpen(false);
+                                                    }}
+                                                    className="w-full px-4 py-3 text-sm font-semibold text-[#A3C042] hover:bg-[#A3C042]/10 transition flex items-center justify-between gap-2"
+                                                >
+                                                    <span>لوحة التحكم</span>
+                                                    <FaTachometerAlt className="text-xs" />
+                                                </button>
+                                                <div className="border-t border-gray-100" />
+                                            </>
+                                        )}
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                router.visit(links.profile);
+                                                setUserDropdownOpen(false);
+                                            }}
+                                            className="w-full  px-4 py-3 text-sm font-semibold text-gray-900 hover:bg-gray-50 transition flex items-center justify-between"
+                                        >
+                                            <span>الملف الشخصي</span>
+                                        </button>
+                                        {role === 'student' && (
+                                            <>
+                                                <div className="border-t border-gray-100" />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        router.visit('/packages');
+                                                        setUserDropdownOpen(false);
+                                                    }}
+                                                    className="w-full  px-4 py-3 text-sm font-semibold text-[#A3C042] hover:bg-[#A3C042]/10 transition flex items-center justify-between gap-2"
+                                                >
+                                                    <span>الباقات</span>
+                                                    <FaCreditCard className="text-xs" />
+                                                </button>
+                                            </>
+                                        )}
+                                        <div className="border-t border-gray-100" />
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                handleLogout();
+                                                setUserDropdownOpen(false);
+                                            }}
+                                            className="w-full  px-4 py-3 text-sm font-semibold text-red-600 hover:bg-red-50 transition flex items-center justify-between gap-2"
+                                        >
+                                            <span>تسجيل الخروج</span>
+                                            <FaSignOutAlt className="text-xs" />
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="relative" ref={dropdownRef}>
+                                <button
+                                    type="button"
+                                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                                    className="flex flex-col items-center justify-center gap-1 py-2 w-full"
+                                >
+                                    <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
+                                        <FaUser className="text-gray-400 text-xs" />
+                                    </div>
+                                    <span className="text-[11px] font-semibold text-gray-400">تسجيل</span>
+                                </button>
 
-                            {/* Dropdown Menu */}
-                            {dropdownOpen && (
-                                <div className="absolute bottom-full left-0 mb-2 w-40 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden z-50">
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            router.visit('/login');
-                                            setDropdownOpen(false);
-                                        }}
-                                        className="w-full  px-4 py-3 text-sm font-semibold text-gray-900 hover:bg-gray-50 transition flex items-center justify-between"
-                                    >
-                                        <span>تسجيل الدخول</span>
-                                    </button>
-                                    <div className="border-t border-gray-100" />
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            router.visit('/register');
-                                            setDropdownOpen(false);
-                                        }}
-                                        className="w-full  px-4 py-3 text-sm font-semibold text-[#A3C042] hover:bg-[#A3C042]/5 transition flex items-center justify-between"
-                                    >
-                                        <span>إنشاء حساب</span>
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    )}
+                                {/* Dropdown Menu */}
+                                {dropdownOpen && (
+                                    <div className="absolute bottom-full left-0 mb-2 w-40 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden z-50">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                router.visit('/login');
+                                                setDropdownOpen(false);
+                                            }}
+                                            className="w-full  px-4 py-3 text-sm font-semibold text-gray-900 hover:bg-gray-50 transition flex items-center justify-between"
+                                        >
+                                            <span>تسجيل الدخول</span>
+                                        </button>
+                                        <div className="border-t border-gray-100" />
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                router.visit('/register');
+                                                setDropdownOpen(false);
+                                            }}
+                                            className="w-full  px-4 py-3 text-sm font-semibold text-[#A3C042] hover:bg-[#A3C042]/5 transition flex items-center justify-between"
+                                        >
+                                            <span>إنشاء حساب</span>
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             </nav>

@@ -93,7 +93,7 @@ export default function TeacherSubmissionShow({ auth, submission, availableBadge
                         صفحة التقييم
                     </Link>
                 </div>
-                </div>
+            </div>
 
             <div className="mt-4 rounded-2xl bg-[#eef8d6] px-4 py-3">
                 <h1 className="text-xl font-extrabold text-gray-900 text-center">تقييم المشاريع</h1>
@@ -101,102 +101,101 @@ export default function TeacherSubmissionShow({ auth, submission, availableBadge
 
             <div className="mt-4 bg-white rounded-2xl border border-gray-100 p-4">
                 <div className="text-lg font-extrabold text-gray-900">{submission.project?.title}</div>
-                            {submission.project?.description && (
+                {submission.project?.description && (
                     <div className="mt-1 text-sm text-gray-600">{submission.project.description}</div>
-                            )}
+                )}
 
                 <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
                     <div className="flex items-center gap-2">
-                                    <FaUser className="text-gray-400" />
+                        <FaUser className="text-gray-400" />
                         <span>{submission.student?.name || 'غير محدد'}</span>
-                                </div>
+                    </div>
                     <div className="flex items-center gap-2">
-                                    <FaCalendar className="text-gray-400" />
-                                    <span>{formatDate(submission.submitted_at)}</span>
-                                </div>
-                            </div>
+                        <FaCalendar className="text-gray-400" />
+                        <span>{formatDate(submission.submitted_at)}</span>
+                    </div>
+                </div>
 
-                            {submission.files && submission.files.length > 0 && (
+                {submission.files && submission.files.length > 0 && (
                     <div className="mt-4">
                         <div className="text-sm font-bold text-gray-900 mb-2">الملفات المرفقة:</div>
-                                    <div className="space-y-2">
-                                        {submission.files.map((file, index) => (
+                        <div className="space-y-2">
+                            {submission.files.map((file, index) => (
                                 <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
-                                                {getFileIcon(file.split('/').pop())}
-                                                <span className="flex-1 text-sm text-gray-900">{file.split('/').pop()}</span>
-                                                <a
-                                                    href={getFileUrl(file)}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-blue-600 hover:text-blue-700"
-                                                >
-                                                    <FaDownload />
-                                                </a>
-                                            </div>
-                                        ))}
-                                    </div>
+                                    {getFileIcon(file.split('/').pop())}
+                                    <span className="flex-1 text-sm text-gray-900">{file.split('/').pop()}</span>
+                                    <a
+                                        href={getFileUrl(file)}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 hover:text-blue-700"
+                                    >
+                                        <FaDownload />
+                                    </a>
                                 </div>
-                            )}
+                            ))}
                         </div>
+                    </div>
+                )}
+            </div>
 
             <div className="mt-4 bg-white rounded-2xl border border-gray-100 p-4">
                 <div className="text-sm font-bold text-gray-900 mb-2">التقييم</div>
                 <div className="flex items-center gap-2" dir="ltr">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                    <button
-                                        key={star}
-                                        type="button"
-                                        onClick={() => handleRatingClick(star)}
-                                        onMouseEnter={() => setHoveredRating(star)}
-                                        onMouseLeave={() => setHoveredRating(0)}
-                                        className="focus:outline-none"
-                                    >
-                                        <FaStar
-                                className={`text-2xl transition ${
-                                    star <= (hoveredRating || rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'
-                                            }`}
-                                        />
-                                    </button>
-                                ))}
-                            </div>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                            key={star}
+                            type="button"
+                            onClick={() => handleRatingClick(star)}
+                            onMouseEnter={() => setHoveredRating(star)}
+                            onMouseLeave={() => setHoveredRating(0)}
+                            className="focus:outline-none"
+                        >
+                            <FaStar
+                                className={`text-2xl transition ${star <= (hoveredRating || rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'
+                                    }`}
+                            />
+                        </button>
+                    ))}
+                </div>
                 <InputError message={errors.rating} className="mt-2" />
-                        </div>
+            </div>
 
             <div className="mt-4 bg-white rounded-2xl border border-gray-100 p-4">
                 <div className="text-sm font-bold text-gray-900 mb-2">التعليقات</div>
                 <div className="bg-gray-50 rounded-xl p-4 mb-3 text-center text-gray-500 text-sm">
                     {submission.feedback ? submission.feedback : 'لا توجد تعليقات بعد'}
-                                </div>
-                            <div className="flex items-center gap-2">
+                </div>
+                <div className="flex items-center gap-2">
                     <button
                         type="button"
-                        className="h-10 w-10 rounded-lg bg-blue-600 text-white flex items-center justify-center"
+                        className="h-10 w-10 rounded-lg bg-[#A3C042] text-white flex items-center justify-center"
                         aria-label="إرسال"
                     >
                         <FaPaperPlane />
                     </button>
-                                <input
-                                    type="text"
-                                    value={comment}
-                                    onChange={(e) => setComment(e.target.value)}
+                    <input
+                        type="text"
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
                         placeholder="أضف تعليق..."
                         className="flex-1 h-10 px-4 border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
-                                />
-                            </div>
-                        </div>
+                    />
+                </div>
+            </div>
 
             <form onSubmit={handleSubmit} className="mt-4 space-y-4">
                 <div className="bg-white rounded-2xl border border-gray-100 p-4">
                     <div className="text-sm font-bold text-gray-900 mb-2">ملاحظات تقييمية</div>
-                                <textarea
-                                    value={data.feedback}
-                                    onChange={(e) => setData('feedback', e.target.value)}
+                    <textarea
+                        value={data.feedback}
+                        onChange={(e) => setData('feedback', e.target.value)}
                         rows={5}
                         className="w-full rounded-xl border border-gray-200 bg-white p-3 focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30"
                         placeholder="أضف ملاحظات حول المشروع..."
-                                />
+                    />
                     <InputError message={errors.feedback} className="mt-2" />
-                            </div>
+                </div>
 
                 {/* احتفظنا بالقيم (بدون عرض UI إضافي) */}
                 <input type="hidden" value={data.status} readOnly />
@@ -204,7 +203,7 @@ export default function TeacherSubmissionShow({ auth, submission, availableBadge
                 <button
                     type="submit"
                     disabled={processing}
-                    className="w-full rounded-xl bg-[#A3C042] py-3 text-sm font-extrabold text-white hover:bg-[#93b03a] transition disabled:opacity-60"
+                    className="w-full rounded-xl bg-[#A3C042] py-3 text-sm font-extrabold text-white hover:bg-[#8CA635] transition disabled:opacity-60"
                 >
                     {processing ? 'جاري الحفظ...' : 'حفظ التقييم'}
                 </button>
@@ -219,15 +218,14 @@ export default function TeacherSubmissionShow({ auth, submission, availableBadge
                             <Link
                                 key={sub.id}
                                 href={`/teacher/submissions/${sub.id}`}
-                                className={`block p-3 rounded-xl border transition ${
-                                    sub.id === submission.id
-                                        ? 'border-blue-500 bg-blue-50'
-                                        : 'border-gray-100 bg-white hover:bg-gray-50'
-                                }`}
+                                className={`block p-3 rounded-xl border transition ${sub.id === submission.id
+                                    ? 'border-blue-500 bg-blue-50'
+                                    : 'border-gray-100 bg-white hover:bg-gray-50'
+                                    }`}
                             >
                                 <div className="text-sm font-semibold text-gray-900 line-clamp-1">
                                     {sub.project_title || sub.project?.title || 'مشروع غير محدد'}
-                                                </div>
+                                </div>
                                 <div className="text-xs text-gray-500 mt-1">
                                     {sub.student_name || sub.student?.name || 'طالب غير محدد'} • {sub.submitted_at || formatDate(sub.submitted_at)}
                                 </div>
@@ -271,7 +269,7 @@ export default function TeacherSubmissionShow({ auth, submission, availableBadge
                         {/* Left Column - Main Content */}
                         <div className="lg:col-span-8 space-y-4">
                             <SubmissionContent />
-                    </div>
+                        </div>
 
                         {/* Right Column - Submissions List */}
                         {allSubmissions && allSubmissions.length > 0 && (
@@ -279,28 +277,27 @@ export default function TeacherSubmissionShow({ auth, submission, availableBadge
                                 <div className="bg-white rounded-2xl border border-gray-100 p-4 sticky top-24">
                                     <div className="text-sm font-bold text-gray-900 mb-3">المشاريع المقدمة</div>
                                     <div className="space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto">
-                                    {allSubmissions.map((sub) => (
-                                        <Link
-                                            key={sub.id}
-                                            href={`/teacher/submissions/${sub.id}`}
-                                                className={`block p-3 rounded-xl border transition ${
-                                                sub.id === submission.id
-                                                        ? 'border-blue-500 bg-blue-50'
-                                                        : 'border-gray-100 bg-white hover:bg-gray-50'
-                                            }`}
-                                        >
+                                        {allSubmissions.map((sub) => (
+                                            <Link
+                                                key={sub.id}
+                                                href={`/teacher/submissions/${sub.id}`}
+                                                className={`block p-3 rounded-xl border transition ${sub.id === submission.id
+                                                    ? 'border-blue-500 bg-blue-50'
+                                                    : 'border-gray-100 bg-white hover:bg-gray-50'
+                                                    }`}
+                                            >
                                                 <div className="text-sm font-semibold text-gray-900 line-clamp-1">
                                                     {sub.project_title || sub.project?.title || 'مشروع غير محدد'}
                                                 </div>
                                                 <div className="text-xs text-gray-500 mt-1">
                                                     {sub.student_name || sub.student?.name || 'طالب غير محدد'} • {sub.submitted_at || formatDate(sub.submitted_at)}
                                                 </div>
-                                        </Link>
-                                    ))}
+                                            </Link>
+                                        ))}
+                                    </div>
                                 </div>
-                                </div>
-                                </div>
-                            )}
+                            </div>
+                        )}
                     </div>
                 </main>
                 <MobileBottomNav active="profile" role={auth?.user?.role} isAuthed={!!auth?.user} user={auth?.user} />

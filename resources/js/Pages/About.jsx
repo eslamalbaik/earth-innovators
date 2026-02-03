@@ -34,7 +34,7 @@ export default function About({ auth }) {
     const AboutContent = ({ isDesktop = false }) => (
         <div className={`space-y-6 ${isDesktop ? 'lg:space-y-8' : ''}`}>
             {/* Hero Section */}
-            <div className="relative bg-gradient-to-br from-[#A3C042] via-[#93b03a] to-[#7a9a2f] rounded-3xl p-6 md:p-12 text-white overflow-hidden">
+            <div className="relative bg-gradient-to-br from-[#A3C042] via-[#8CA635] to-[#7a9a2f] rounded-3xl p-6 md:p-12 text-white overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full -ml-24 -mb-24 blur-2xl"></div>
                 <div className="relative z-10">
@@ -54,7 +54,7 @@ export default function About({ auth }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition">
                     <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 bg-gradient-to-br from-[#A3C042]/20 to-[#93b03a]/20 rounded-xl flex items-center justify-center">
+                        <div className="w-10 h-10 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-xl flex items-center justify-center">
                             <FaUsers className="text-[#A3C042] text-xl" />
                         </div>
                         <h3 className="text-lg font-bold text-gray-900">مجتمع المبتكرين</h3>
@@ -80,7 +80,7 @@ export default function About({ auth }) {
             {/* Achievements Section */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8 shadow-sm">
                 <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 bg-gradient-to-br from-[#A3C042]/20 to-[#93b03a]/20 rounded-xl flex items-center justify-center">
+                    <div className="w-10 h-10 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-xl flex items-center justify-center">
                         <FaTrophy className="text-[#A3C042] text-xl" />
                     </div>
                     <h2 className="text-xl md:text-2xl font-bold text-gray-900">إنجازاتنا</h2>
@@ -109,7 +109,7 @@ export default function About({ auth }) {
                 {/* Vision Card */}
                 <div className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8 shadow-sm hover:shadow-md transition">
                     <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 bg-gradient-to-br from-[#A3C042]/20 to-[#93b03a]/20 rounded-xl flex items-center justify-center">
+                        <div className="w-10 h-10 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-xl flex items-center justify-center">
                             <FaLightbulb className="text-[#A3C042] text-xl" />
                         </div>
                         <h2 className="text-xl md:text-2xl font-bold text-gray-900">رؤيتنا</h2>
@@ -130,7 +130,7 @@ export default function About({ auth }) {
                     <div className="space-y-3">
                         {goals.map((goal, index) => (
                             <div key={index} className="flex items-start gap-3">
-                                <div className="w-6 h-6 bg-gradient-to-br from-[#A3C042]/20 to-[#93b03a]/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <div className="w-6 h-6 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
                                     <FaCheckCircle className="text-[#A3C042] text-xs" />
                                 </div>
                                 <p className="text-gray-700 text-sm md:text-base leading-relaxed flex-1">{goal}</p>
@@ -143,7 +143,7 @@ export default function About({ auth }) {
             {/* Contact Section */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8 shadow-sm">
                 <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 bg-gradient-to-br from-[#A3C042]/20 to-[#93b03a]/20 rounded-xl flex items-center justify-center">
+                    <div className="w-10 h-10 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-xl flex items-center justify-center">
                         <FaEnvelope className="text-[#A3C042] text-xl" />
                     </div>
                     <h2 className="text-xl md:text-2xl font-bold text-gray-900">تواصل معنا</h2>

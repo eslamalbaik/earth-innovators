@@ -71,9 +71,8 @@ const ModernChallengeCard = memo(function ModernChallengeCard({
 
     return (
         <div
-            className={`bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-200 overflow-hidden group ${
-                isDeleting ? 'opacity-50 pointer-events-none' : ''
-            } ${isUpdating ? 'ring-2 ring-blue-300' : ''}`}
+            className={`bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-200 overflow-hidden group ${isDeleting ? 'opacity-50 pointer-events-none' : ''
+                } ${isUpdating ? 'ring-2 ring-blue-300' : ''}`}
         >
             {/* Card Header - Points & Status */}
             <div className="bg-gradient-to-r from-primary-50 to-secondary-50 px-6 py-4 border-b border-gray-200">
@@ -184,7 +183,7 @@ const ModernChallengeCard = memo(function ModernChallengeCard({
                     {challenge.max_participants && (
                         <div className="w-full bg-gray-200 rounded-full h-2.5">
                             <div
-                                className="bg-gradient-to-r from-primary-500 to-secondary-500 h-2.5 rounded-full transition-all duration-300"
+                                className="bg-[#A3C042] h-2.5 rounded-full transition-all duration-300"
                                 style={{ width: `${participantPercentage}%` }}
                             />
                         </div>

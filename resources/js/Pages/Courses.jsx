@@ -112,7 +112,7 @@ export default function Courses({ auth, courses = [] }) {
 
                             <Link
                                 href={`/courses/${course.id}`}
-                                className="block w-full text-center bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+                                className="block w-full text-center bg-[#A3C042] text-white py-2 rounded-lg hover:bg-blue-700 transition"
                             >
                                 عرض التفاصيل
                             </Link>

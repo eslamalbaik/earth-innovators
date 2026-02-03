@@ -68,7 +68,7 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
         e.preventDefault();
         e.stopPropagation();
         setDragActive(false);
-        
+
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
             handleFiles(e.dataTransfer.files);
         }
@@ -97,7 +97,7 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
 
     const submit = (e) => {
         e.preventDefault();
-        
+
         if (!data.project_id) {
             showError('يرجى اختيار المشروع');
             return;
@@ -204,11 +204,10 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
                     onDragOver={handleDrag}
                     onDrop={handleDrop}
                     onClick={() => fileInputRef.current?.click()}
-                    className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition ${
-                        dragActive
-                            ? 'border-[#A3C042] bg-[#A3C042]/5'
-                            : 'border-gray-200 bg-gray-50 hover:bg-gray-100'
-                    }`}
+                    className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition ${dragActive
+                        ? 'border-[#A3C042] bg-[#A3C042]/5'
+                        : 'border-gray-200 bg-gray-50 hover:bg-gray-100'
+                        }`}
                 >
                     <input
                         ref={fileInputRef}
@@ -237,8 +236,8 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
                             >
                                 <div className="flex items-center gap-2 flex-1 min-w-0">
                                     <span className="text-lg">
-                                        {fileItem.type.startsWith('image/') ? '🖼️' : 
-                                         fileItem.type.startsWith('video/') ? '🎥' : '📄'}
+                                        {fileItem.type.startsWith('image/') ? '🖼️' :
+                                            fileItem.type.startsWith('video/') ? '🎥' : '📄'}
                                     </span>
                                     <div className="flex-1 min-w-0">
                                         <p className="text-xs font-semibold text-gray-900 truncate">
@@ -269,7 +268,7 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
             <button
                 type="submit"
                 disabled={processing}
-                className="w-full h-12 rounded-xl bg-[#A3C042] text-white font-bold text-sm hover:bg-[#93b03a] transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full h-12 rounded-xl bg-[#A3C042] text-white font-bold text-sm hover:bg-[#8CA635] transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 {processing ? (
                     <>
@@ -381,11 +380,10 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
                                     {[1, 2, 3, 4, 5].map((star) => (
                                         <FaStar
                                             key={star}
-                                            className={`text-2xl ${
-                                                star <= Math.round(currentSubmission.rating)
-                                                    ? 'text-yellow-400 fill-current'
-                                                    : 'text-gray-300'
-                                            }`}
+                                            className={`text-2xl ${star <= Math.round(currentSubmission.rating)
+                                                ? 'text-yellow-400 fill-current'
+                                                : 'text-gray-300'
+                                                }`}
                                         />
                                     ))}
                                 </div>
@@ -422,11 +420,10 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
                                     key={sub.id}
                                     type="button"
                                     onClick={() => setSelectedSubmission(sub)}
-                                    className={`w-full  p-3 rounded-xl border transition ${
-                                        currentSubmission?.id === sub.id
-                                            ? 'border-blue-500 bg-blue-50'
-                                            : 'border-gray-100 bg-white hover:bg-gray-50'
-                                    }`}
+                                    className={`w-full  p-3 rounded-xl border transition ${currentSubmission?.id === sub.id
+                                        ? 'border-blue-500 bg-blue-50'
+                                        : 'border-gray-100 bg-white hover:bg-gray-50'
+                                        }`}
                                 >
                                     <div className="text-sm font-semibold text-gray-900 line-clamp-1">
                                         {sub.project?.title || 'مشروع غير محدد'}
@@ -463,22 +460,20 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
                             <button
                                 type="button"
                                 onClick={() => setActiveTab('evaluation')}
-                                className={`rounded-xl py-2.5 text-sm font-bold transition ${
-                                    activeTab === 'evaluation'
-                                        ? 'bg-[#A3C042] text-white'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                }`}
+                                className={`rounded-xl py-2.5 text-sm font-bold transition ${activeTab === 'evaluation'
+                                    ? 'bg-[#A3C042] text-white'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    }`}
                             >
                                 صفحة التقييم
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setActiveTab('upload')}
-                                className={`rounded-xl py-2.5 text-sm font-bold transition ${
-                                    activeTab === 'upload'
-                                        ? 'bg-[#A3C042] text-white'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                }`}
+                                className={`rounded-xl py-2.5 text-sm font-bold transition ${activeTab === 'upload'
+                                    ? 'bg-[#A3C042] text-white'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    }`}
                             >
                                 رفع المشروع
                             </button>
@@ -488,9 +483,9 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
                     {/* Content */}
                     <div className="bg-white rounded-2xl border border-gray-100 p-4">
                         {activeTab === 'upload' ? (
-                            <ProjectUploadContent />
+                            ProjectUploadContent()
                         ) : (
-                            <EvaluationContent />
+                            EvaluationContent()
                         )}
                     </div>
                 </main>
@@ -516,22 +511,20 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
                                     <button
                                         type="button"
                                         onClick={() => setActiveTab('upload')}
-                                        className={`rounded-xl py-2.5 text-sm font-bold transition ${
-                                            activeTab === 'upload'
-                                                ? 'bg-[#A3C042] text-white'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        }`}
+                                        className={`rounded-xl py-2.5 text-sm font-bold transition ${activeTab === 'upload'
+                                            ? 'bg-[#A3C042] text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            }`}
                                     >
                                         رفع المشروع
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setActiveTab('evaluation')}
-                                        className={`rounded-xl py-2.5 text-sm font-bold transition ${
-                                            activeTab === 'evaluation'
-                                                ? 'bg-[#A3C042] text-white'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        }`}
+                                        className={`rounded-xl py-2.5 text-sm font-bold transition ${activeTab === 'evaluation'
+                                            ? 'bg-[#A3C042] text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            }`}
                                     >
                                         صفحة التقييم
                                     </button>
@@ -541,9 +534,9 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
                             {/* Content */}
                             <div className="bg-white rounded-2xl border border-gray-100 p-6">
                                 {activeTab === 'upload' ? (
-                                    <ProjectUploadContent />
+                                    ProjectUploadContent()
                                 ) : (
-                                    <EvaluationContent />
+                                    EvaluationContent()
                                 )}
                             </div>
                         </div>
@@ -561,11 +554,10 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
                                                     key={sub.id}
                                                     type="button"
                                                     onClick={() => setSelectedSubmission(sub)}
-                                                    className={`w-full  p-3 rounded-xl border transition ${
-                                                        currentSubmission?.id === sub.id
-                                                            ? 'border-blue-500 bg-blue-50'
-                                                            : 'border-gray-100 bg-white hover:bg-gray-50'
-                                                    }`}
+                                                    className={`w-full  p-3 rounded-xl border transition ${currentSubmission?.id === sub.id
+                                                        ? 'border-blue-500 bg-blue-50'
+                                                        : 'border-gray-100 bg-white hover:bg-gray-50'
+                                                        }`}
                                                 >
                                                     <div className="text-sm font-semibold text-gray-900 line-clamp-1">
                                                         {sub.project?.title || 'مشروع غير محدد'}

@@ -48,7 +48,7 @@ export default function VerifyEmail({ status }) {
                             </div>
 
                             <div className="text-center">
-                                <div className="w-16 h-16 bg-gradient-to-br from-[#A3C042]/20 to-[#93b03a]/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                <div className="w-16 h-16 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
                                     <FaEnvelope className="text-[#A3C042] text-2xl" />
                                 </div>
                                 <h2 className="text-2xl font-extrabold text-gray-900 mb-2">

@@ -1,10 +1,10 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
-import { 
-    FaArrowRight, 
-    FaCheckCircle, 
-    FaTimesCircle, 
+import {
+    FaArrowRight,
+    FaCheckCircle,
+    FaTimesCircle,
     FaTrash,
     FaUser,
     FaSchool,
@@ -163,7 +163,7 @@ export default function AdminPublicationShow({ publication }) {
                                     href={publication.file}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#A3C042] hover:bg-blue-700 text-white rounded-lg transition"
                                 >
                                     <FaDownload />
                                     تحميل الملف
@@ -178,7 +178,7 @@ export default function AdminPublicationShow({ publication }) {
                     {/* Publication Details */}
                     <div className="bg-white rounded-xl shadow-lg p-6">
                         <h2 className="text-xl font-bold text-gray-900 mb-4">معلومات المقال</h2>
-                        
+
                         <div className="space-y-4">
                             <div>
                                 <p className="text-sm text-gray-600 mb-1">تاريخ الإنشاء</p>
@@ -257,7 +257,7 @@ export default function AdminPublicationShow({ publication }) {
                                 <>
                                     <button
                                         onClick={handleApprove}
-                                        className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
+                                        className="w-full bg-[#A3C042] hover:bg-[#8CA635] text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
                                     >
                                         <FaCheckCircle />
                                         الموافقة على المقال
@@ -274,7 +274,7 @@ export default function AdminPublicationShow({ publication }) {
                             <a
                                 href={route('publications.show', publication.id)}
                                 target="_blank"
-                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
+                                className="w-full bg-[#A3C042] hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
                             >
                                 <FaEye />
                                 عرض المقال

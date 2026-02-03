@@ -24,7 +24,7 @@ class SchoolProjectController extends Controller
         $school = Auth::user();
 
         $projects = $this->projectService->getSchoolPendingProjects(
-            $school->id,
+            $school->canAccessAllSchoolData() ? 0 : $school->id,
             $request->get('search'),
             $request->get('category'),
             15
@@ -41,11 +41,12 @@ class SchoolProjectController extends Controller
         $school = Auth::user();
 
         $projects = $this->projectService->getSchoolProjects(
-            $school->id,
+            $school->canAccessAllSchoolData() ? 0 : $school->id,
             $request->get('search'),
             $request->get('status'),
             $request->get('category'),
-            15
+            15,
+            false
         )->withQueryString();
 
         return Inertia::render('School/Projects/Index', [
@@ -149,7 +150,7 @@ class SchoolProjectController extends Controller
             'students' => $students,
         ]);
 
-        if ((!$isStudentProject && !$isTeacherProject) || $project->status !== 'pending') {
+        if (!$school->canAccessAllSchoolData() && ((!$isStudentProject && !$isTeacherProject) || $project->status !== 'pending')) {
             Log::warning('Project approval denied', [
                 'project_id' => $project->id,
                 'reason' => !$isStudentProject && !$isTeacherProject ? 'not_authorized' : 'not_pending',
@@ -266,7 +267,7 @@ class SchoolProjectController extends Controller
         $isStudentProject = in_array($project->user_id, $students->toArray());
         $isTeacherProject = $project->teacher_id !== null && $project->school_id === $school->id;
 
-        if ((!$isStudentProject && !$isTeacherProject) || $project->status !== 'pending') {
+        if (!$school->canAccessAllSchoolData() && ((!$isStudentProject && !$isTeacherProject) || $project->status !== 'pending')) {
             abort(403, 'غير مصرح لك برفض هذا المشروع');
         }
 
@@ -289,7 +290,7 @@ class SchoolProjectController extends Controller
         $students = User::where('school_id', $school->id)->where('role', 'student')->pluck('id');
 
         // التحقق من الصلاحية
-        if (!in_array($project->user_id, $students->toArray()) && $project->school_id !== $school->id) {
+        if (!$school->canAccessAllSchoolData() && !in_array($project->user_id, $students->toArray()) && $project->school_id !== $school->id) {
             abort(403, 'غير مصرح لك بعرض هذا المشروع');
         }
 
@@ -310,8 +311,7 @@ class SchoolProjectController extends Controller
         $isSchoolProject = $project->school_id === $school->id && $project->user_id === $school->id;
         $isStudentProject = in_array($project->user_id, $students) && $project->school_id === $school->id;
         $isTeacherProject = $project->teacher_id !== null && $project->school_id === $school->id;
-
-        if (!$isSchoolProject && !$isStudentProject && !$isTeacherProject) {
+        if (!$school->canAccessAllSchoolData() && !$isSchoolProject && !$isStudentProject && !$isTeacherProject) {
             abort(403, 'غير مصرح لك بتعديل هذا المشروع');
         }
 
@@ -330,8 +330,7 @@ class SchoolProjectController extends Controller
         $isSchoolProject = $project->school_id === $school->id && $project->user_id === $school->id;
         $isStudentProject = in_array($project->user_id, $students) && $project->school_id === $school->id;
         $isTeacherProject = $project->teacher_id !== null && $project->school_id === $school->id;
-
-        if (!$isSchoolProject && !$isStudentProject && !$isTeacherProject) {
+        if (!$school->canAccessAllSchoolData() && !$isSchoolProject && !$isStudentProject && !$isTeacherProject) {
             abort(403, 'غير مصرح لك بتعديل هذا المشروع');
         }
 
@@ -458,7 +457,7 @@ class SchoolProjectController extends Controller
         $isStudentProject = in_array($project->user_id, $students) && $project->school_id === $school->id;
         $isTeacherProject = $project->teacher_id !== null && $project->school_id === $school->id;
 
-        if (!$isSchoolProject && !$isStudentProject && !$isTeacherProject) {
+        if (!$school->canAccessAllSchoolData() && !$isSchoolProject && !$isStudentProject && !$isTeacherProject) {
             abort(403, 'غير مصرح لك بحذف هذا المشروع');
         }
 

@@ -27,9 +27,11 @@ class SchoolCertificateController extends Controller
         $school = Auth::user();
 
         // Get all students for this school
-        $query = User::where('school_id', $school->id)
-            ->where('role', 'student')
-            ->withCount('certificates');
+        $query = User::where('role', 'student');
+        if (!$school->canAccessAllSchoolData()) {
+            $query->where('school_id', $school->id);
+        }
+        $query->withCount('certificates');
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -65,7 +67,7 @@ class SchoolCertificateController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user || $user->role !== 'school') {
+        if (!$user || (!$user->isSchool() && !$user->canAccessAllSchoolData())) {
             abort(403, 'Unauthorized action.');
         }
 

@@ -18,7 +18,9 @@ class SchoolBadgeController extends Controller
     {
         $school = Auth::user();
         
-        $query = Badge::where('school_id', $school->id)
+        $query = Badge::when(!$school->canAccessAllSchoolData(), function($q) use ($school) {
+                return $q->where('school_id', $school->id);
+            })
             ->where('status', 'pending')
             ->with(['creator', 'approver']);
         
@@ -45,7 +47,9 @@ class SchoolBadgeController extends Controller
     {
         $school = Auth::user();
         
-        $query = Badge::where('school_id', $school->id)
+        $query = Badge::when(!$school->canAccessAllSchoolData(), function($q) use ($school) {
+                return $q->where('school_id', $school->id);
+            })
             ->with(['creator', 'approver']);
         
         if ($request->filled('status')) {
@@ -74,7 +78,7 @@ class SchoolBadgeController extends Controller
     {
         $school = Auth::user();
         
-        if ($badge->school_id !== $school->id || $badge->status !== 'pending') {
+        if (!$school->canAccessAllSchoolData() && ($badge->school_id !== $school->id || $badge->status !== 'pending')) {
             abort(403, 'غير مصرح لك بقبول هذه الشارة');
         }
         
@@ -95,7 +99,7 @@ class SchoolBadgeController extends Controller
     {
         $school = Auth::user();
         
-        if ($badge->school_id !== $school->id || $badge->status !== 'pending') {
+        if (!$school->canAccessAllSchoolData() && ($badge->school_id !== $school->id || $badge->status !== 'pending')) {
             abort(403, 'غير مصرح لك برفض هذه الشارة');
         }
         
@@ -120,7 +124,7 @@ class SchoolBadgeController extends Controller
     {
         $school = Auth::user();
         
-        if ($badge->school_id !== $school->id) {
+        if (!$school->canAccessAllSchoolData() && $badge->school_id !== $school->id) {
             abort(403, 'غير مصرح لك بعرض هذه الشارة');
         }
         

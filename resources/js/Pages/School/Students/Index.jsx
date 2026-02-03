@@ -157,7 +157,7 @@ export default function Index({ auth, students, availableBadges }) {
                         </div>
                         <button
                             onClick={() => setShowCreateModal(true)}
-                            className="bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white px-6 py-3 rounded-lg font-medium hover:shadow-lg transition flex items-center gap-2"
+                            className="bg-[#A3C042] text-white px-6 py-3 rounded-lg font-medium hover:shadow-lg transition flex items-center gap-2"
                         >
                             <FaPlus />
                             إضافة طالب جديد
@@ -322,11 +322,10 @@ export default function Index({ auth, students, availableBadges }) {
                                                 <Link
                                                     key={index}
                                                     href={link.url || '#'}
-                                                    className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                                                        link.active
-                                                            ? 'z-10 bg-[#A3C042] border-[#A3C042] text-white'
-                                                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                                                    } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                    className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${link.active
+                                                        ? 'z-10 bg-[#A3C042] border-[#A3C042] text-white'
+                                                        : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                                 />
                                             ))}

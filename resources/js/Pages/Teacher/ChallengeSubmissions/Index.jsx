@@ -76,51 +76,46 @@ export default function TeacherChallengeSubmissionsIndex({ auth, submissions, ch
                     <div className="flex flex-wrap gap-2">
                         <button
                             onClick={() => handleStatusFilter('')}
-                            className={`px-4 py-2 rounded-lg transition ${
-                                !selectedStatus
-                                    ? 'bg-blue-600 text-white'
-                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
+                            className={`px-4 py-2 rounded-lg transition ${!selectedStatus
+                                ? 'bg-[#A3C042] text-white'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                }`}
                         >
                             الكل
                         </button>
                         <button
                             onClick={() => handleStatusFilter('submitted')}
-                            className={`px-4 py-2 rounded-lg transition ${
-                                selectedStatus === 'submitted'
-                                    ? 'bg-yellow-600 text-white'
-                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
+                            className={`px-4 py-2 rounded-lg transition ${selectedStatus === 'submitted'
+                                ? 'bg-yellow-600 text-white'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                }`}
                         >
                             مُسلم
                         </button>
                         <button
                             onClick={() => handleStatusFilter('reviewed')}
-                            className={`px-4 py-2 rounded-lg transition ${
-                                selectedStatus === 'reviewed'
-                                    ? 'bg-blue-600 text-white'
-                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
+                            className={`px-4 py-2 rounded-lg transition ${selectedStatus === 'reviewed'
+                                ? 'bg-[#A3C042] text-white'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                }`}
                         >
                             تم المراجعة
                         </button>
                         <button
                             onClick={() => handleStatusFilter('approved')}
-                            className={`px-4 py-2 rounded-lg transition ${
-                                selectedStatus === 'approved'
-                                    ? 'bg-green-600 text-white'
-                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
+                            className={`px-4 py-2 rounded-lg transition ${selectedStatus === 'approved'
+                                ? 'bg-[#A3C042] text-white'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                }`}
                         >
                             مقبول
                         </button>
                         <button
                             onClick={() => handleStatusFilter('rejected')}
-                            className={`px-4 py-2 rounded-lg transition ${
-                                selectedStatus === 'rejected'
-                                    ? 'bg-red-600 text-white'
-                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
+                            className={`px-4 py-2 rounded-lg transition ${selectedStatus === 'rejected'
+                                ? 'bg-red-600 text-white'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                }`}
                         >
                             مرفوض
                         </button>
@@ -218,11 +213,10 @@ export default function TeacherChallengeSubmissionsIndex({ auth, submissions, ch
                                 <Link
                                     key={index}
                                     href={link.url || '#'}
-                                    className={`px-4 py-2 rounded-lg ${
-                                        link.active
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
-                                    } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    className={`px-4 py-2 rounded-lg ${link.active
+                                        ? 'bg-[#A3C042] text-white'
+                                        : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                 />
                             ))}

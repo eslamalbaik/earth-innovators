@@ -143,7 +143,7 @@ export default function MembershipCertificateShow({ auth, certificate, eligibili
                         {certificate ? (
                             <>
                                 {/* Certificate Card */}
-                                <div className="bg-gradient-to-br from-[#A3C042] to-[#93b03a] rounded-2xl p-6 text-white text-center shadow-lg">
+                                <div className="bg-gradient-to-br from-[#A3C042] to-[#8CA635] rounded-2xl p-6 text-white text-center shadow-lg">
                                     <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
                                         <FaCertificate className="text-4xl" />
                                     </div>
@@ -160,7 +160,7 @@ export default function MembershipCertificateShow({ auth, certificate, eligibili
                                 {/* Download Button */}
                                 <a
                                     href={certificate.download_url}
-                                    className="w-full flex items-center justify-center gap-2 bg-[#A3C042] text-white rounded-xl py-3 font-bold hover:bg-[#93b03a] transition shadow-lg"
+                                    className="w-full flex items-center justify-center gap-2 bg-[#A3C042] text-white rounded-xl py-3 font-bold hover:bg-[#8CA635] transition shadow-lg"
                                 >
                                     <FaDownload />
                                     تحميل الشهادة
@@ -171,9 +171,8 @@ export default function MembershipCertificateShow({ auth, certificate, eligibili
                                 {/* Eligibility Status */}
                                 <div className="bg-white rounded-2xl border border-gray-100 p-6">
                                     <div className="text-center mb-6">
-                                        <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
-                                            eligibility?.eligible ? 'bg-green-100' : 'bg-yellow-100'
-                                        }`}>
+                                        <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${eligibility?.eligible ? 'bg-green-100' : 'bg-yellow-100'
+                                            }`}>
                                             {eligibility?.eligible ? (
                                                 <FaCheckCircle className="text-green-500 text-2xl" />
                                             ) : (
@@ -184,7 +183,7 @@ export default function MembershipCertificateShow({ auth, certificate, eligibili
                                             {eligibility?.eligible ? 'أنت مؤهل للحصول على شهادة العضوية!' : 'أنت غير مؤهل بعد'}
                                         </h2>
                                         <p className="text-sm text-gray-600">
-                                            {eligibility?.eligible 
+                                            {eligibility?.eligible
                                                 ? 'تم منحك شهادة العضوية بناءً على إنجازاتك في المنصة'
                                                 : 'استمر في العمل لتحقيق الشروط المطلوبة'}
                                         </p>
@@ -209,9 +208,8 @@ export default function MembershipCertificateShow({ auth, certificate, eligibili
                                                 </div>
                                                 <div className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
                                                     <div
-                                                        className={`h-full rounded-full transition-all ${
-                                                            criterion.eligible ? 'bg-green-500' : 'bg-yellow-500'
-                                                        }`}
+                                                        className={`h-full rounded-full transition-all ${criterion.eligible ? 'bg-green-500' : 'bg-yellow-500'
+                                                            }`}
                                                         style={{
                                                             width: `${Math.min(100, (criterion.current / (typeof criterion.required === 'number' ? criterion.required : 1)) * 100)}%`
                                                         }}
@@ -224,7 +222,7 @@ export default function MembershipCertificateShow({ auth, certificate, eligibili
                                     {/* Check Eligibility Button */}
                                     <button
                                         onClick={handleCheckEligibility}
-                                        className="w-full mt-6 flex items-center justify-center gap-2 bg-[#A3C042] text-white rounded-xl py-3 font-bold hover:bg-[#93b03a] transition"
+                                        className="w-full mt-6 flex items-center justify-center gap-2 bg-[#A3C042] text-white rounded-xl py-3 font-bold hover:bg-[#8CA635] transition"
                                     >
                                         <FaTrophy />
                                         التحقق من الأهلية
@@ -249,7 +247,7 @@ export default function MembershipCertificateShow({ auth, certificate, eligibili
                         {certificate ? (
                             <>
                                 {/* Certificate Card */}
-                                <div className="bg-gradient-to-br from-[#A3C042] to-[#93b03a] rounded-2xl p-8 text-white text-center shadow-lg">
+                                <div className="bg-gradient-to-br from-[#A3C042] to-[#8CA635] rounded-2xl p-8 text-white text-center shadow-lg">
                                     <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
                                         <FaCertificate className="text-5xl" />
                                     </div>
@@ -270,7 +268,7 @@ export default function MembershipCertificateShow({ auth, certificate, eligibili
                                 {/* Download Button */}
                                 <a
                                     href={certificate.download_url}
-                                    className="w-full flex items-center justify-center gap-2 bg-[#A3C042] text-white rounded-xl py-4 font-bold hover:bg-[#93b03a] transition shadow-lg text-lg"
+                                    className="w-full flex items-center justify-center gap-2 bg-[#A3C042] text-white rounded-xl py-4 font-bold hover:bg-[#8CA635] transition shadow-lg text-lg"
                                 >
                                     <FaDownload />
                                     تحميل الشهادة
@@ -281,9 +279,8 @@ export default function MembershipCertificateShow({ auth, certificate, eligibili
                                 {/* Eligibility Status */}
                                 <div className="bg-white rounded-2xl border border-gray-100 p-8">
                                     <div className="text-center mb-8">
-                                        <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${
-                                            eligibility?.eligible ? 'bg-green-100' : 'bg-yellow-100'
-                                        }`}>
+                                        <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${eligibility?.eligible ? 'bg-green-100' : 'bg-yellow-100'
+                                            }`}>
                                             {eligibility?.eligible ? (
                                                 <FaCheckCircle className="text-green-500 text-3xl" />
                                             ) : (
@@ -294,7 +291,7 @@ export default function MembershipCertificateShow({ auth, certificate, eligibili
                                             {eligibility?.eligible ? 'أنت مؤهل للحصول على شهادة العضوية!' : 'أنت غير مؤهل بعد'}
                                         </h2>
                                         <p className="text-base text-gray-600">
-                                            {eligibility?.eligible 
+                                            {eligibility?.eligible
                                                 ? 'تم منحك شهادة العضوية بناءً على إنجازاتك في المنصة'
                                                 : 'استمر في العمل لتحقيق الشروط المطلوبة'}
                                         </p>
@@ -319,9 +316,8 @@ export default function MembershipCertificateShow({ auth, certificate, eligibili
                                                 </div>
                                                 <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                                                     <div
-                                                        className={`h-full rounded-full transition-all ${
-                                                            criterion.eligible ? 'bg-green-500' : 'bg-yellow-500'
-                                                        }`}
+                                                        className={`h-full rounded-full transition-all ${criterion.eligible ? 'bg-green-500' : 'bg-yellow-500'
+                                                            }`}
                                                         style={{
                                                             width: `${Math.min(100, (criterion.current / (typeof criterion.required === 'number' ? criterion.required : 1)) * 100)}%`
                                                         }}
@@ -334,7 +330,7 @@ export default function MembershipCertificateShow({ auth, certificate, eligibili
                                     {/* Check Eligibility Button */}
                                     <button
                                         onClick={handleCheckEligibility}
-                                        className="w-full flex items-center justify-center gap-2 bg-[#A3C042] text-white rounded-xl py-4 font-bold hover:bg-[#93b03a] transition text-lg"
+                                        className="w-full flex items-center justify-center gap-2 bg-[#A3C042] text-white rounded-xl py-4 font-bold hover:bg-[#8CA635] transition text-lg"
                                     >
                                         <FaTrophy />
                                         التحقق من الأهلية

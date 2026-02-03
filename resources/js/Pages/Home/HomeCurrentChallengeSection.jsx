@@ -45,7 +45,7 @@ function ChallengeCard({ onJoin }) {
                 <button
                     type="button"
                     onClick={onJoin}
-                    className="mt-4 w-full rounded-xl bg-[#A3C042] py-2 text-sm font-bold text-white hover:bg-[#93b03a] transition"
+                    className="mt-4 w-full rounded-xl bg-[#A3C042] py-2 text-sm font-bold text-white hover:bg-[#8CA635] transition"
                 >
                     شارك الآن
                 </button>
@@ -62,7 +62,7 @@ export default function HomeCurrentChallengeSection({ onViewAll, onJoin }) {
                 <button
                     type="button"
                     onClick={onViewAll}
-                    className="text-xs font-semibold text-[#A3C042] hover:text-[#93b03a]"
+                    className="text-xs font-semibold text-[#A3C042] hover:text-[#8CA635]"
                 >
                     عرض الكل
                 </button>

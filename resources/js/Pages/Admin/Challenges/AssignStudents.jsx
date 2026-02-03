@@ -40,7 +40,7 @@ export default function AdminChallengesAssignStudents({ challenge, students, ass
 
     const submit = (e) => {
         e.preventDefault();
-        
+
         // تحويل selectedStudents إلى مصفوفة
         const studentsArray = Object.entries(selectedStudents).map(([user_id, participation_type]) => ({
             user_id: parseInt(user_id),
@@ -126,11 +126,10 @@ export default function AdminChallengesAssignStudents({ challenge, students, ass
                             return (
                                 <div
                                     key={student.id}
-                                    className={`p-4 rounded-lg border-2 transition ${
-                                        isSelected
+                                    className={`p-4 rounded-lg border-2 transition ${isSelected
                                             ? 'border-blue-500 bg-blue-50'
                                             : 'border-gray-200 bg-white hover:border-gray-300'
-                                    }`}
+                                        }`}
                                 >
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-4 flex-1">
@@ -195,7 +194,7 @@ export default function AdminChallengesAssignStudents({ challenge, students, ass
                         <button
                             type="submit"
                             disabled={processing || Object.keys(selectedStudents).length === 0}
-                            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-6 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <FaSave />
                             {processing ? 'جاري الحفظ...' : 'حفظ'}

@@ -85,13 +85,12 @@ export default function AdminProjectShow({ project }) {
                                     </span>
                                 )}
                             </div>
-                            <span className={`px-4 py-2 rounded-full text-sm font-semibold ${
-                                project.status === 'approved' ? 'bg-green-100 text-green-800' :
+                            <span className={`px-4 py-2 rounded-full text-sm font-semibold ${project.status === 'approved' ? 'bg-green-100 text-green-800' :
                                 project.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                'bg-red-100 text-red-800'
-                            }`}>
+                                    'bg-red-100 text-red-800'
+                                }`}>
                                 {project.status === 'approved' ? 'معتمد' :
-                                 project.status === 'pending' ? 'قيد المراجعة' : 'مرفوض'}
+                                    project.status === 'pending' ? 'قيد المراجعة' : 'مرفوض'}
                             </span>
                         </div>
 
@@ -129,7 +128,7 @@ export default function AdminProjectShow({ project }) {
                     {(project.files && project.files.length > 0) || (project.images && project.images.length > 0) ? (
                         <div className="bg-white rounded-xl shadow-lg p-6">
                             <h2 className="text-xl font-bold text-gray-900 mb-4">الملفات والصور</h2>
-                            
+
                             {project.images && project.images.length > 0 && (
                                 <div className="mb-6">
                                     <h3 className="text-lg font-semibold text-gray-700 mb-3">الصور</h3>
@@ -197,21 +196,20 @@ export default function AdminProjectShow({ project }) {
                                                             <span>{submission.rating}/5</span>
                                                         </div>
                                                     )}
-                                                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                                                        submission.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                                    <span className={`px-2 py-1 rounded text-xs font-medium ${submission.status === 'approved' ? 'bg-green-100 text-green-800' :
                                                         submission.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                                                        submission.status === 'reviewed' ? 'bg-blue-100 text-blue-800' :
-                                                        'bg-gray-100 text-gray-800'
-                                                    }`}>
+                                                            submission.status === 'reviewed' ? 'bg-blue-100 text-blue-800' :
+                                                                'bg-gray-100 text-gray-800'
+                                                        }`}>
                                                         {submission.status === 'approved' ? 'معتمد' :
-                                                         submission.status === 'rejected' ? 'مرفوض' :
-                                                         submission.status === 'reviewed' ? 'تم المراجعة' : 'مقدم'}
+                                                            submission.status === 'rejected' ? 'مرفوض' :
+                                                                submission.status === 'reviewed' ? 'تم المراجعة' : 'مقدم'}
                                                     </span>
                                                 </div>
                                             </div>
                                             <Link
                                                 href={route('admin.submissions.show', submission.id)}
-                                                className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+                                                className="ml-4 px-4 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
                                             >
                                                 <FaEye />
                                                 {submission.status === 'submitted' ? 'تقييم' : 'عرض'}
@@ -229,7 +227,7 @@ export default function AdminProjectShow({ project }) {
                     {/* Project Details */}
                     <div className="bg-white rounded-xl shadow-lg p-6">
                         <h2 className="text-xl font-bold text-gray-900 mb-4">معلومات المشروع</h2>
-                        
+
                         <div className="space-y-4">
                             <div>
                                 <p className="text-sm text-gray-600 mb-1">تاريخ الإنشاء</p>
@@ -300,7 +298,7 @@ export default function AdminProjectShow({ project }) {
                                 {project.status === 'pending' && (
                                     <button
                                         onClick={handleApprove}
-                                        className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
+                                        className="w-full bg-[#A3C042] hover:bg-[#8CA635] text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
                                     >
                                         <FaCheckCircle />
                                         الموافقة على المشروع

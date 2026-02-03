@@ -45,7 +45,7 @@ export default function CreateBadge({ schools, auth }) {
 
             <div className="bg-white rounded-xl shadow-lg p-6">
                 <div className="mb-6 flex items-center gap-3">
-                    <div className="p-3 bg-gradient-to-r from-[#A3C042] to-legacy-blue rounded-lg">
+                    <div className="p-3 bg-[#A3C042] rounded-lg">
                         <FaMedal className="text-white text-2xl" />
                     </div>
                     <div>

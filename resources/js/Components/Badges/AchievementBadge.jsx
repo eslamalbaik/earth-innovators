@@ -73,11 +73,10 @@ export default function AchievementBadge({ badge, isEarned = false, source = nul
 
     return (
         <div
-            className={`bg-white rounded-xl shadow-lg overflow-hidden border-2 transition-all ${
-                isEarned
+            className={`bg-white rounded-xl shadow-lg overflow-hidden border-2 transition-all ${isEarned
                     ? 'border-[#A3C042] shadow-[#A3C042]/20'
                     : 'border-gray-200 hover:border-[#A3C042]/50'
-            }`}
+                }`}
         >
             <div className={`p-6 ${isEarned ? 'bg-gradient-to-br from-[#A3C042]/5 to-[#A3C042]/10' : 'bg-gray-50'}`}>
                 <div className="flex items-center justify-center mb-4">
@@ -97,7 +96,7 @@ export default function AchievementBadge({ badge, isEarned = false, source = nul
 
                 {isEarned && (
                     <div className="text-center mb-2">
-                        <span className="inline-block bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
+                        <span className="inline-block bg-[#A3C042] text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
                             ✓ مكتسبة
                         </span>
                     </div>

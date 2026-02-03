@@ -126,7 +126,7 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                 <h2 className="text-2xl font-bold text-gray-900">قائمة الشارات</h2>
                 <Link
                     href={route('admin.badges.create')}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2"
+                    className="bg-[#A3C042] hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2"
                 >
                     <FaPlus />
                     إضافة شارة جديدة
@@ -180,7 +180,7 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                     <div className="flex items-end">
                         <button
                             onClick={handleFilter}
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
+                            className="w-full bg-[#A3C042] hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
                         >
                             <FaFilter />
                             تصفية
@@ -215,9 +215,9 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                                                     const isValidImageUrl = (url) => {
                                                         if (!url) return false;
                                                         return url.startsWith('http') ||
-                                                               url.startsWith('/storage/') ||
-                                                               url.startsWith('/images/') ||
-                                                               /\.(jpg|jpeg|png|gif|svg|webp)$/i.test(url);
+                                                            url.startsWith('/storage/') ||
+                                                            url.startsWith('/images/') ||
+                                                            /\.(jpg|jpeg|png|gif|svg|webp)$/i.test(url);
                                                     };
 
                                                     // Helper function to check if icon is emoji/text (not a file path)
@@ -350,11 +350,10 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                                     <Link
                                         key={index}
                                         href={link.url || '#'}
-                                        className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                                            link.active
-                                                ? 'bg-blue-600 text-white'
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium ${link.active
+                                                ? 'bg-[#A3C042] text-white'
                                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
                                 ))}
@@ -392,9 +391,8 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                                             value={awardData.user_id}
                                             onChange={(e) => setAwardData('user_id', e.target.value)}
                                             placeholder="أدخل معرف المستخدم..."
-                                            className={`w-full pr-10 pl-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                                awardErrors.user_id ? 'border-red-500' : 'border-gray-300'
-                                            }`}
+                                            className={`w-full pr-10 pl-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${awardErrors.user_id ? 'border-red-500' : 'border-gray-300'
+                                                }`}
                                             required
                                         />
                                     </div>
@@ -416,9 +414,8 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                                         value={awardData.project_id}
                                         onChange={(e) => setAwardData('project_id', e.target.value)}
                                         placeholder="معرف المشروع"
-                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            awardErrors.project_id ? 'border-red-500' : 'border-gray-300'
-                                        }`}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${awardErrors.project_id ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                     />
                                     {awardErrors.project_id && (
                                         <p className="mt-1 text-sm text-red-600">{awardErrors.project_id}</p>
@@ -435,9 +432,8 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                                         value={awardData.challenge_id}
                                         onChange={(e) => setAwardData('challenge_id', e.target.value)}
                                         placeholder="معرف التحدي"
-                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            awardErrors.challenge_id ? 'border-red-500' : 'border-gray-300'
-                                        }`}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${awardErrors.challenge_id ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                     />
                                     {awardErrors.challenge_id && (
                                         <p className="mt-1 text-sm text-red-600">{awardErrors.challenge_id}</p>
@@ -454,9 +450,8 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                                         onChange={(e) => setAwardData('reason', e.target.value)}
                                         rows={3}
                                         placeholder="سبب منح الشارة..."
-                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            awardErrors.reason ? 'border-red-500' : 'border-gray-300'
-                                        }`}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${awardErrors.reason ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                     />
                                     {awardErrors.reason && (
                                         <p className="mt-1 text-sm text-red-600">{awardErrors.reason}</p>

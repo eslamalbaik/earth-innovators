@@ -180,8 +180,8 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                             type="button"
                             onClick={() => toggleLike(publication)}
                             className={`flex items-center gap-1 px-2 py-1.5 rounded-xl transition text-xs ${isLiked
-                                    ? 'bg-red-100 text-red-600 hover:bg-red-200'
-                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                ? 'bg-red-100 text-red-600 hover:bg-red-200'
+                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                 }`}
                             title={isLiked ? 'إزالة الإعجاب' : 'إعجاب'}
                         >
@@ -223,7 +223,7 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                     <button
                         type="button"
                         onClick={handleSearch}
-                        className="h-10 px-4 bg-[#A3C042] text-white rounded-xl hover:bg-[#93b03a] transition font-bold text-sm"
+                        className="h-10 px-4 bg-[#A3C042] text-white rounded-xl hover:bg-[#8CA635] transition font-bold text-sm"
                     >
                         بحث
                     </button>
@@ -308,8 +308,8 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                                     key={index}
                                     href={link.url || '#'}
                                     className={`px-3 py-2 rounded-xl text-sm font-semibold transition ${link.active
-                                            ? 'bg-[#A3C042] text-white'
-                                            : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                                        ? 'bg-[#A3C042] text-white'
+                                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
                                         } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                 />

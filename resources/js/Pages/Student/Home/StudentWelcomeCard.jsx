@@ -9,7 +9,7 @@ export default function StudentWelcomeCard({ userName, onUploadProject }) {
                 <button
                     type="button"
                     onClick={onUploadProject}
-                    className="mt-3 inline-flex items-center justify-center rounded-xl bg-[#A3C042] px-4 py-2 text-sm font-semibold text-white hover:bg-[#93b03a] transition w-40"
+                    className="mt-3 inline-flex items-center justify-center rounded-xl bg-[#A3C042] px-4 py-2 text-sm font-semibold text-white hover:bg-[#8CA635] transition w-40"
                 >
                     رفع مشروع جديد
                 </button>

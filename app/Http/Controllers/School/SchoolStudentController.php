@@ -24,12 +24,12 @@ class SchoolStudentController extends Controller
         $school = Auth::user();
 
         $students = $this->studentService->getStudentsBySchool(
-            $school->id,
+            $school->canAccessAllSchoolData() ? 0 : $school->id,
             $request->get('search'),
             20
         )->withQueryString();
 
-        $availableBadges = $this->studentService->getAvailableBadges($school->id);
+        $availableBadges = $this->studentService->getAvailableBadges($school->canAccessAllSchoolData() ? 0 : $school->id);
 
         return Inertia::render('School/Students/Index', [
             'students' => $students,

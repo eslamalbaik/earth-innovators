@@ -23,7 +23,7 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
         { value: 'arts', label: 'فنون' },
         { value: 'other', label: 'أخرى' },
     ];
-    
+
     const categoriesList = categories && categories.length > 0 ? categories : defaultCategories;
 
     const ageGroups = [
@@ -101,24 +101,24 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
                 <button
                     type="button"
                     onClick={() => setShowFilterModal(true)}
-                    className="h-10 w-10 rounded-xl bg-[#A3C042] flex items-center justify-center hover:bg-[#93b03a] transition flex-shrink-0"
+                    className="h-10 w-10 rounded-xl bg-[#A3C042] flex items-center justify-center hover:bg-[#8CA635] transition flex-shrink-0"
                     aria-label="فلترة"
                 >
                     <FaFilter className="text-white text-sm" />
                 </button>
                 <form onSubmit={handleSearch} className="flex-1">
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
+                    <div className="relative">
+                        <input
+                            type="text"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
                             placeholder="ابحث عن المشاريع .."
                             className="w-full h-10 pr-10 pl-4 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042] text-sm"
-                                />
+                        />
                         <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
-                            </div>
+                    </div>
                 </form>
-                        </div>
+            </div>
 
             {/* Category Filter Tabs */}
             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
@@ -133,11 +133,10 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
                                 preserveScroll: true,
                             });
                         }}
-                        className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${
-                            category === cat.value
+                        className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${category === cat.value
                                 ? 'bg-[#A3C042] text-white'
                                 : 'bg-white text-gray-700'
-                        }`}
+                            }`}
                     >
                         {cat.label}
                     </button>
@@ -147,7 +146,7 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
             {/* Projects Count */}
             <div className="text-sm text-gray-700">
                 {filteredProjects.length} مشاريع
-                </div>
+            </div>
 
             {/* Projects Grid */}
             {filteredProjects.length > 0 ? (
@@ -205,8 +204,8 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
                             </Link>
                         );
                     })}
-                    </div>
-                ) : (
+                </div>
+            ) : (
                 <div className="flex flex-col items-center justify-center py-16">
                     <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
                         <FaSearch className="text-gray-400 text-4xl" />
@@ -215,33 +214,32 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
                     <button
                         type="button"
                         onClick={handleClearFilters}
-                        className="text-[#A3C042] text-sm font-semibold hover:text-[#93b03a]"
+                        className="text-[#A3C042] text-sm font-semibold hover:text-[#8CA635]"
                     >
                         عرض كل المشاريع
                     </button>
-                    </div>
-                )}
+                </div>
+            )}
 
-                {/* Pagination */}
+            {/* Pagination */}
             {projects?.links && projects.links.length > 3 && (
                 <div className="bg-white rounded-2xl border border-gray-100 p-3">
                     <div className="flex flex-wrap gap-2 justify-center">
-                            {projects.links.map((link, index) => (
+                        {projects.links.map((link, index) => (
                             <Link
-                                    key={index}
+                                key={index}
                                 href={link.url || '#'}
-                                className={`px-3 py-2 rounded-xl text-sm font-semibold transition ${
-                                        link.active
+                                className={`px-3 py-2 rounded-xl text-sm font-semibold transition ${link.active
                                         ? 'bg-[#A3C042] text-white'
                                         : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-                                } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                    dangerouslySetInnerHTML={{ __html: link.label }}
-                                />
-                            ))}
-                        </div>
+                                    } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                dangerouslySetInnerHTML={{ __html: link.label }}
+                            />
+                        ))}
                     </div>
-                )}
-            </div>
+                </div>
+            )}
+        </div>
     );
 
     return (
@@ -308,11 +306,10 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
                                             key={age.value}
                                             type="button"
                                             onClick={() => setFilterAgeGroup(filterAgeGroup === age.value ? '' : age.value)}
-                                            className={`px-4 py-3 rounded-xl text-sm font-semibold transition ${
-                                                filterAgeGroup === age.value
+                                            className={`px-4 py-3 rounded-xl text-sm font-semibold transition ${filterAgeGroup === age.value
                                                     ? 'bg-[#eef8d6] text-[#6b7f2c] border-2 border-[#A3C042]'
                                                     : 'bg-white text-gray-700 border border-gray-200'
-                                            }`}
+                                                }`}
                                         >
                                             {age.label}
                                         </button>
@@ -329,11 +326,10 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
                                             key={school.value}
                                             type="button"
                                             onClick={() => setFilterSchool(filterSchool === school.value ? '' : school.value)}
-                                            className={`px-4 py-3 rounded-xl text-sm font-semibold transition ${
-                                                filterSchool === school.value
+                                            className={`px-4 py-3 rounded-xl text-sm font-semibold transition ${filterSchool === school.value
                                                     ? 'bg-[#eef8d6] text-[#6b7f2c] border-2 border-[#A3C042]'
                                                     : 'bg-white text-gray-700 border border-gray-200'
-                                            }`}
+                                                }`}
                                         >
                                             {school.label}
                                         </button>
@@ -354,11 +350,10 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
                                                 setCategory(newCategory);
                                                 setFilterSubject(newCategory);
                                             }}
-                                            className={`px-4 py-3 rounded-xl text-sm font-semibold transition ${
-                                                category === cat.value
+                                            className={`px-4 py-3 rounded-xl text-sm font-semibold transition ${category === cat.value
                                                     ? 'bg-[#eef8d6] text-[#6b7f2c] border-2 border-[#A3C042]'
                                                     : 'bg-white text-gray-700 border border-gray-200'
-                                            }`}
+                                                }`}
                                         >
                                             {cat.label}
                                         </button>
@@ -372,7 +367,7 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
                             <button
                                 type="button"
                                 onClick={handleApplyFilters}
-                                className="w-full rounded-xl bg-[#A3C042] py-3 text-sm font-bold text-white hover:bg-[#93b03a] transition"
+                                className="w-full rounded-xl bg-[#A3C042] py-3 text-sm font-bold text-white hover:bg-[#8CA635] transition"
                             >
                                 تطبيق الفلاتر
                             </button>

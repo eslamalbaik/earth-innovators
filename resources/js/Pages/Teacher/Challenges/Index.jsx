@@ -95,7 +95,7 @@ export default function TeacherChallengesIndex({ auth, challenges }) {
                             </div>
                             <Link
                                 href="/teacher/challenges/create"
-                                className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold shadow-md hover:shadow-lg"
+                                className="inline-flex items-center gap-2 px-6 py-3 bg-[#A3C042] text-white rounded-lg hover:bg-[#8CA635] transition-colors font-semibold shadow-md hover:shadow-lg"
                             >
                                 <FaPlus />
                                 إطلاق تحدي جديد
@@ -106,7 +106,7 @@ export default function TeacherChallengesIndex({ auth, challenges }) {
                         <div className="flex flex-wrap items-center gap-4 mb-6">
                             <button
                                 onClick={() => router.get('/teacher/challenges', { status: '' }, { preserveState: true })}
-                                className="px-4 py-2 rounded-lg font-medium transition-colors bg-blue-600 text-white"
+                                className="px-4 py-2 rounded-lg font-medium transition-colors bg-[#A3C042] text-white"
                             >
                                 الكل
                             </button>
@@ -167,7 +167,7 @@ export default function TeacherChallengesIndex({ auth, challenges }) {
                                 <p className="text-gray-500 text-lg mb-4">لا توجد تحديات</p>
                                 <Link
                                     href="/teacher/challenges/create"
-                                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white rounded-lg hover:opacity-90 transition"
+                                    className="inline-flex items-center gap-2 px-6 py-3 bg-[#A3C042] text-white rounded-lg hover:opacity-90 transition"
                                 >
                                     <FaPlus />
                                     إنشاء تحدّي جديد
@@ -183,11 +183,10 @@ export default function TeacherChallengesIndex({ auth, challenges }) {
                                         <Link
                                             key={index}
                                             href={link.url || '#'}
-                                            className={`px-4 py-2 rounded-lg ${
-                                                link.active
-                                                    ? 'bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white'
-                                                    : 'bg-white text-gray-700 hover:bg-gray-100'
-                                            } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            className={`px-4 py-2 rounded-lg ${link.active
+                                                ? 'bg-[#A3C042] text-white'
+                                                : 'bg-white text-gray-700 hover:bg-gray-100'
+                                                } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             dangerouslySetInnerHTML={{ __html: link.label }}
                                         />
                                     ))}

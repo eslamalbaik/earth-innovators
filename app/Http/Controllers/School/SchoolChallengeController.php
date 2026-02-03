@@ -32,12 +32,12 @@ class SchoolChallengeController extends Controller
         }
 
         $challenges = $this->challengeService->getSchoolChallenges(
-            $user->id,
+            $user->canAccessAllSchoolData() ? 0 : $user->id,
             $request->get('status'),
             10
         );
 
-        $stats = $this->challengeService->getSchoolChallengeStats($user->id);
+        $stats = $this->challengeService->getSchoolChallengeStats($user->canAccessAllSchoolData() ? 0 : $user->id);
 
         // Check if viewing submissions for a specific challenge
         $challengeId = $request->get('challenge_id');
@@ -45,9 +45,11 @@ class SchoolChallengeController extends Controller
         $submissions = null;
 
         if ($challengeId) {
-            $selectedChallenge = \App\Models\Challenge::where('id', $challengeId)
-                ->where('school_id', $user->id)
-                ->first();
+            $selectedChallengeQuery = \App\Models\Challenge::where('id', $challengeId);
+            if (!$user->canAccessAllSchoolData()) {
+                $selectedChallengeQuery->where('school_id', $user->id);
+            }
+            $selectedChallenge = $selectedChallengeQuery->first();
 
             if ($selectedChallenge) {
                 $submissionService = app(\App\Services\ChallengeSubmissionService::class);
@@ -147,7 +149,7 @@ class SchoolChallengeController extends Controller
         $user = Auth::user();
 
         // التحقق من أن التحدي للمدرسة الحالية
-        if ($challenge->school_id !== $user->id) {
+        if (!$user->canAccessAllSchoolData() && $challenge->school_id !== $user->id) {
             abort(403, 'غير مصرح لك بالوصول إلى هذا التحدي');
         }
 
@@ -188,7 +190,7 @@ class SchoolChallengeController extends Controller
         $user = Auth::user();
 
         // التحقق من أن التحدي للمدرسة الحالية
-        if ($challenge->school_id !== $user->id) {
+        if (!$user->canAccessAllSchoolData() && $challenge->school_id !== $user->id) {
             abort(403, 'غير مصرح لك بتعديل هذا التحدي');
         }
 
@@ -210,7 +212,7 @@ class SchoolChallengeController extends Controller
         $user = Auth::user();
 
         // التحقق من أن التحدي للمدرسة الحالية
-        if ($challenge->school_id !== $user->id) {
+        if (!$user->canAccessAllSchoolData() && $challenge->school_id !== $user->id) {
             abort(403, 'غير مصرح لك بتعديل هذا التحدي');
         }
 
@@ -251,7 +253,7 @@ class SchoolChallengeController extends Controller
         $user = Auth::user();
 
         // التحقق من أن التحدي للمدرسة الحالية
-        if ($challenge->school_id !== $user->id) {
+        if (!$user->canAccessAllSchoolData() && $challenge->school_id !== $user->id) {
             abort(403, 'غير مصرح لك بحذف هذا التحدي');
         }
 

@@ -39,14 +39,14 @@ export default function CTASection({
                     {primaryButtonLink ? (
                         <Link
                             href={primaryButtonLink}
-                            className="bg-[#A3C042] hover:bg-[#93b03a] text-white px-6 py-3 rounded-xl font-bold text-sm md:text-base transition shadow-lg text-center"
+                            className="bg-[#A3C042] hover:bg-[#8CA635] text-white px-6 py-3 rounded-xl font-bold text-sm md:text-base transition shadow-lg text-center"
                         >
                             {primaryButtonText}
                         </Link>
                     ) : (
                         <button
                             onClick={onPrimaryButtonClick}
-                            className="bg-[#A3C042] hover:bg-[#93b03a] text-white px-6 py-3 rounded-xl font-bold text-sm md:text-base transition shadow-lg"
+                            className="bg-[#A3C042] hover:bg-[#8CA635] text-white px-6 py-3 rounded-xl font-bold text-sm md:text-base transition shadow-lg"
                         >
                             {primaryButtonText}
                         </button>

@@ -203,7 +203,7 @@ export default function AdminPublicationCreate({ auth, schools }) {
                             </Link>
                             <PrimaryButton
                                 disabled={processing}
-                                className="bg-blue-600 hover:bg-blue-700"
+                                className="bg-[#A3C042] hover:bg-blue-700"
                             >
                                 {processing ? (
                                     <>

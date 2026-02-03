@@ -68,11 +68,10 @@ function ProjectCard({ project, onOpen }) {
             type="button"
             onClick={() => onOpen?.(project.id)}
             disabled={isPlaceholder || !onOpen}
-            className={`w-full bg-white rounded-2xl border border-gray-100 overflow-hidden transition ${
-                isPlaceholder || !onOpen
+            className={`w-full bg-white rounded-2xl border border-gray-100 overflow-hidden transition ${isPlaceholder || !onOpen
                     ? 'opacity-60 cursor-default'
                     : 'hover:shadow-md cursor-pointer'
-            }`}
+                }`}
         >
             <div className="relative">
                 <img
@@ -92,7 +91,7 @@ function ProjectCard({ project, onOpen }) {
             <div className="p-4">
                 <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#A3C042]/20 to-[#93b03a]/20 border border-gray-200 flex items-center justify-center">
+                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 border border-gray-200 flex items-center justify-center">
                             <FaProjectDiagram className="text-[#A3C042] text-sm" />
                         </div>
                         <div className="text-xs text-gray-600">مشروعي</div>
@@ -138,7 +137,7 @@ export default function StudentLatestProjectsSection({ projects = [], onViewAll,
                     <button
                         type="button"
                         onClick={onViewAll}
-                        className="text-xs font-semibold text-[#A3C042] hover:text-[#93b03a]"
+                        className="text-xs font-semibold text-[#A3C042] hover:text-[#8CA635]"
                     >
                         عرض الكل
                     </button>
@@ -155,7 +154,7 @@ export default function StudentLatestProjectsSection({ projects = [], onViewAll,
                     <button
                         type="button"
                         onClick={onViewAll}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-[#A3C042] text-white rounded-xl text-xs font-bold hover:bg-[#93b03a] transition"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-[#A3C042] text-white rounded-xl text-xs font-bold hover:bg-[#8CA635] transition"
                     >
                         <FaProjectDiagram className="text-xs" />
                         رفع مشروع جديد
@@ -172,7 +171,7 @@ export default function StudentLatestProjectsSection({ projects = [], onViewAll,
                 <button
                     type="button"
                     onClick={onViewAll}
-                    className="text-xs font-semibold text-[#A3C042] hover:text-[#93b03a]"
+                    className="text-xs font-semibold text-[#A3C042] hover:text-[#8CA635]"
                 >
                     عرض الكل
                 </button>

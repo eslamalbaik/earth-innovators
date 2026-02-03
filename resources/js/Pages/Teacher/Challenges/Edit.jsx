@@ -213,7 +213,7 @@ export default function TeacherChallengeEdit({ auth, challenge }) {
                                         <button
                                             type="button"
                                             onClick={() => imageInputRef.current?.click()}
-                                            className="absolute bottom-2 right-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+                                            className="absolute bottom-2 right-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-[#A3C042] transition"
                                         >
                                             تغيير الصورة
                                         </button>

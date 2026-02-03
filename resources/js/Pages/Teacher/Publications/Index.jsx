@@ -24,7 +24,7 @@ export default function TeacherPublications({ publications, auth }) {
                 <h2 className="text-2xl font-bold text-gray-900">المقالات المنشورة</h2>
                 <Link
                     href="/teacher/publications/create"
-                    className="bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white px-6 py-3 rounded-lg font-semibold transition duration-300 flex items-center gap-2 shadow-md hover:shadow-xl"
+                    className="bg-[#A3C042] text-white px-6 py-3 rounded-lg font-semibold transition duration-300 flex items-center gap-2 shadow-md hover:shadow-xl"
                 >
                     <FaPlus />
                     إنشاء مقال جديد
@@ -105,7 +105,7 @@ export default function TeacherPublications({ publications, auth }) {
                             <p className="text-gray-600 text-lg mb-4">لا توجد مقالات منشورة</p>
                             <Link
                                 href="/teacher/publications/create"
-                                className="inline-block bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white px-6 py-3 rounded-lg font-semibold transition"
+                                className="inline-block bg-[#A3C042] text-white px-6 py-3 rounded-lg font-semibold transition"
                             >
                                 <FaPlus className="inline ml-2" />
                                 إنشاء مقال جديد
@@ -120,11 +120,10 @@ export default function TeacherPublications({ publications, auth }) {
                                     <Link
                                         key={index}
                                         href={link.url || '#'}
-                                        className={`px-4 py-2 rounded-lg font-medium transition ${
-                                            link.active
-                                                ? 'bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white'
+                                        className={`px-4 py-2 rounded-lg font-medium transition ${link.active
+                                                ? 'bg-[#A3C042] text-white'
                                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
                                 ))}

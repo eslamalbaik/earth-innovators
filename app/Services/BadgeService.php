@@ -132,14 +132,23 @@ class BadgeService extends BaseService
         }, 300); // Cache for 5 minutes
     }
 
-    public function getActiveBadges(): Collection
+    public function getActiveBadges(?int $schoolId = null): Collection
     {
-        $cacheKey = 'active_badges';
+        $cacheKey = 'active_badges' . ($schoolId ? "_{$schoolId}" : '');
         $cacheTag = 'badges';
 
-        return $this->cacheTags($cacheTag, $cacheKey, function () {
-            $badges = Badge::where('is_active', true)
-                ->select('id', 'name', 'name_ar', 'description', 'description_ar', 'icon', 'image', 'type', 'badge_category', 'level', 'points_required')
+        return $this->cacheTags($cacheTag, $cacheKey, function () use ($schoolId) {
+            $query = Badge::where('is_active', true)
+                ->where('status', 'approved');
+
+            if ($schoolId) {
+                $query->where(function ($q) use ($schoolId) {
+                    $q->where('school_id', $schoolId)
+                      ->orWhereNull('school_id');
+                });
+            }
+
+            $badges = $query->select('id', 'name', 'name_ar', 'description', 'description_ar', 'icon', 'image', 'type', 'badge_category', 'level', 'points_required')
                 ->orderBy('points_required')
                 ->get();
 

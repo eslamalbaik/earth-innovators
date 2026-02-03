@@ -116,9 +116,8 @@ export default function StudentPoints({ auth, summary, points, filters }) {
                     <button
                         type="button"
                         onClick={() => applyType('')}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition border ${
-                            !currentType ? 'bg-[#A3C042] text-white border-[#A3C042]' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
-                        }`}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition border ${!currentType ? 'bg-[#A3C042] text-white border-[#A3C042]' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
+                            }`}
                     >
                         الكل
                     </button>
@@ -128,9 +127,8 @@ export default function StudentPoints({ auth, summary, points, filters }) {
                             key={t}
                             type="button"
                             onClick={() => applyType(t)}
-                            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition border ${
-                                currentType === t ? 'bg-[#A3C042] text-white border-[#A3C042]' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
-                            }`}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition border ${currentType === t ? 'bg-[#A3C042] text-white border-[#A3C042]' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
+                                }`}
                         >
                             {typeLabels[t]}
                         </button>
@@ -144,7 +142,7 @@ export default function StudentPoints({ auth, summary, points, filters }) {
                     <div className={`font-extrabold text-gray-900 ${isDesktop ? 'text-sm' : 'text-xs'}`}>سجل النقاط</div>
                     <Link
                         href="/store-membership"
-                        className={`font-bold text-[#A3C042] hover:text-[#93b03a] transition ${isDesktop ? 'text-sm' : 'text-xs'}`}
+                        className={`font-bold text-[#A3C042] hover:text-[#8CA635] transition ${isDesktop ? 'text-sm' : 'text-xs'}`}
                     >
                         بطاقة عضوية المتجر
                     </Link>
@@ -193,9 +191,8 @@ export default function StudentPoints({ auth, summary, points, filters }) {
                             <Link
                                 key={idx}
                                 href={link.url || '#'}
-                                className={`px-2 py-1.5 rounded-xl font-semibold transition ${
-                                    link.active ? 'bg-[#A3C042] text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-                                } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''} ${isDesktop ? 'text-sm' : 'text-xs'}`}
+                                className={`px-2 py-1.5 rounded-xl font-semibold transition ${link.active ? 'bg-[#A3C042] text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                                    } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''} ${isDesktop ? 'text-sm' : 'text-xs'}`}
                                 dangerouslySetInnerHTML={{ __html: link.label }}
                             />
                         ))}

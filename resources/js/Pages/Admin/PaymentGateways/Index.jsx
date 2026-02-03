@@ -36,7 +36,7 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                 },
             });
             const data = await response.json();
-            
+
             if (data.success) {
                 alert('✓ ' + data.message);
             } else {
@@ -91,9 +91,8 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                             type="text"
                             value={data.display_name}
                             onChange={(e) => setData('display_name', e.target.value)}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                errors.display_name ? 'border-red-500' : 'border-gray-300'
-                            }`}
+                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.display_name ? 'border-red-500' : 'border-gray-300'
+                                }`}
                             required
                         />
                         {errors.display_name && (
@@ -109,9 +108,8 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                             type="text"
                             value={data.display_name_ar}
                             onChange={(e) => setData('display_name_ar', e.target.value)}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                errors.display_name_ar ? 'border-red-500' : 'border-gray-300'
-                            }`}
+                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.display_name_ar ? 'border-red-500' : 'border-gray-300'
+                                }`}
                             required
                         />
                         {errors.display_name_ar && (
@@ -127,9 +125,8 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                             type="password"
                             value={data.api_key}
                             onChange={(e) => setData('api_key', e.target.value)}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                errors.api_key ? 'border-red-500' : 'border-gray-300'
-                            }`}
+                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.api_key ? 'border-red-500' : 'border-gray-300'
+                                }`}
                             placeholder="أدخل API Key"
                         />
                         {errors.api_key && (
@@ -145,9 +142,8 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                             type="password"
                             value={data.api_secret}
                             onChange={(e) => setData('api_secret', e.target.value)}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                errors.api_secret ? 'border-red-500' : 'border-gray-300'
-                            }`}
+                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.api_secret ? 'border-red-500' : 'border-gray-300'
+                                }`}
                             placeholder="أدخل API Secret"
                         />
                         {errors.api_secret && (
@@ -163,9 +159,8 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                             type="password"
                             value={data.public_key}
                             onChange={(e) => setData('public_key', e.target.value)}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                errors.public_key ? 'border-red-500' : 'border-gray-300'
-                            }`}
+                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.public_key ? 'border-red-500' : 'border-gray-300'
+                                }`}
                             placeholder="أدخل Public Key"
                         />
                         {errors.public_key && (
@@ -181,9 +176,8 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                             type="password"
                             value={data.webhook_secret}
                             onChange={(e) => setData('webhook_secret', e.target.value)}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                errors.webhook_secret ? 'border-red-500' : 'border-gray-300'
-                            }`}
+                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.webhook_secret ? 'border-red-500' : 'border-gray-300'
+                                }`}
                             placeholder="أدخل Webhook Secret"
                         />
                         {errors.webhook_secret && (
@@ -199,9 +193,8 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                             type="url"
                             value={data.base_url}
                             onChange={(e) => setData('base_url', e.target.value)}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                errors.base_url ? 'border-red-500' : 'border-gray-300'
-                            }`}
+                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.base_url ? 'border-red-500' : 'border-gray-300'
+                                }`}
                             placeholder="https://api.example.com"
                         />
                         {errors.base_url && (
@@ -217,9 +210,8 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                             type="number"
                             value={data.sort_order}
                             onChange={(e) => setData('sort_order', parseInt(e.target.value))}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                errors.sort_order ? 'border-red-500' : 'border-gray-300'
-                            }`}
+                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.sort_order ? 'border-red-500' : 'border-gray-300'
+                                }`}
                             min="0"
                         />
                         {errors.sort_order && (
@@ -235,9 +227,8 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                             value={data.description}
                             onChange={(e) => setData('description', e.target.value)}
                             rows={3}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                errors.description ? 'border-red-500' : 'border-gray-300'
-                            }`}
+                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.description ? 'border-red-500' : 'border-gray-300'
+                                }`}
                         />
                     </div>
 
@@ -249,9 +240,8 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                             value={data.description_ar}
                             onChange={(e) => setData('description_ar', e.target.value)}
                             rows={3}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                errors.description_ar ? 'border-red-500' : 'border-gray-300'
-                            }`}
+                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.description_ar ? 'border-red-500' : 'border-gray-300'
+                                }`}
                         />
                     </div>
                 </div>
@@ -294,7 +284,7 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                     <button
                         type="submit"
                         disabled={processing}
-                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50"
+                        className="px-6 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50"
                     >
                         {processing ? (
                             <>
@@ -338,12 +328,10 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                                     <>
                                         <div className="flex items-start justify-between mb-4">
                                             <div className="flex items-center gap-4">
-                                                <div className={`p-3 rounded-lg ${
-                                                    gateway.is_enabled ? 'bg-green-100' : 'bg-gray-100'
-                                                }`}>
-                                                    <FaCreditCard className={`text-2xl ${
-                                                        gateway.is_enabled ? 'text-green-600' : 'text-gray-400'
-                                                    }`} />
+                                                <div className={`p-3 rounded-lg ${gateway.is_enabled ? 'bg-green-100' : 'bg-gray-100'
+                                                    }`}>
+                                                    <FaCreditCard className={`text-2xl ${gateway.is_enabled ? 'text-green-600' : 'text-gray-400'
+                                                        }`} />
                                                 </div>
                                                 <div>
                                                     <h3 className="text-xl font-bold text-gray-900">
@@ -353,18 +341,16 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                                                         {gateway.description_ar || gateway.description}
                                                     </p>
                                                     <div className="flex items-center gap-4 mt-2">
-                                                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                                                            gateway.is_enabled
+                                                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${gateway.is_enabled
                                                                 ? 'bg-green-100 text-green-800'
                                                                 : 'bg-gray-100 text-gray-800'
-                                                        }`}>
+                                                            }`}>
                                                             {gateway.is_enabled ? 'مفعّل' : 'غير مفعّل'}
                                                         </span>
-                                                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                                                            gateway.is_test_mode
+                                                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${gateway.is_test_mode
                                                                 ? 'bg-yellow-100 text-yellow-800'
                                                                 : 'bg-blue-100 text-blue-800'
-                                                        }`}>
+                                                            }`}>
                                                             {gateway.is_test_mode ? 'وضع الاختبار' : 'وضع الإنتاج'}
                                                         </span>
                                                     </div>
@@ -374,7 +360,7 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                                                 <button
                                                     onClick={() => handleTestConnection(gateway)}
                                                     disabled={testingGateway === gateway.id}
-                                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50"
+                                                    className="px-4 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50"
                                                     title="اختبار الاتصال"
                                                 >
                                                     {testingGateway === gateway.id ? (
@@ -393,11 +379,10 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                                                 </button>
                                                 <button
                                                     onClick={() => handleToggleStatus(gateway)}
-                                                    className={`p-2 rounded-lg ${
-                                                        gateway.is_enabled
+                                                    className={`p-2 rounded-lg ${gateway.is_enabled
                                                             ? 'text-yellow-600 hover:bg-yellow-50'
                                                             : 'text-green-600 hover:bg-green-50'
-                                                    }`}
+                                                        }`}
                                                     title={gateway.is_enabled ? 'إلغاء التفعيل' : 'تفعيل'}
                                                 >
                                                     {gateway.is_enabled ? <FaToggleOn className="text-2xl" /> : <FaToggleOff className="text-2xl" />}

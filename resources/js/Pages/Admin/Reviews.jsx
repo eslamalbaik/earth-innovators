@@ -221,7 +221,7 @@ export default function Reviews({ reviews, auth }) {
                                     <div className="flex flex-col gap-2">
                                         <button
                                             onClick={() => handleReply(review.id)}
-                                            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg flex items-center gap-2 transition"
+                                            className="px-4 py-2 bg-blue-500 hover:bg-[#A3C042] text-white font-medium rounded-lg flex items-center gap-2 transition"
                                         >
                                             <FaReply />
                                             {review.teacher_response ? 'تعديل الرد' : 'رد'}
@@ -229,7 +229,7 @@ export default function Reviews({ reviews, auth }) {
                                         {!review.is_published && (
                                             <button
                                                 onClick={() => handlePublish(review.id)}
-                                                className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg flex items-center gap-2 transition"
+                                                className="px-4 py-2 bg-green-500 hover:bg-[#A3C042] text-white font-medium rounded-lg flex items-center gap-2 transition"
                                             >
                                                 <FaCheck />
                                                 نشر

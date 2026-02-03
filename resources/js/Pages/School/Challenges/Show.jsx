@@ -1,11 +1,11 @@
 import DashboardLayout from '../../../Layouts/DashboardLayout';
 import { Head, Link } from '@inertiajs/react';
-import { 
-    FaArrowLeft, 
-    FaTrophy, 
-    FaCalendar, 
-    FaUsers, 
-    FaEdit, 
+import {
+    FaArrowLeft,
+    FaTrophy,
+    FaCalendar,
+    FaUsers,
+    FaEdit,
     FaFileAlt,
     FaCheckCircle,
     FaClock,
@@ -174,7 +174,7 @@ export default function SchoolChallengeShow({ auth, challenge }) {
                         <div className="flex flex-wrap gap-3">
                             <Link
                                 href={`/school/challenge-submissions?challenge_id=${challenge?.id}`}
-                                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white rounded-lg hover:opacity-90 transition"
+                                className="inline-flex items-center gap-2 px-6 py-3 bg-[#A3C042] text-white rounded-lg hover:opacity-90 transition"
                             >
                                 <FaFileAlt />
                                 عرض التسليمات

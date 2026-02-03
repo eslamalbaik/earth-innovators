@@ -19,7 +19,7 @@ export default function TeacherDashboardLegacy({ auth, stats = {} }) {
         <DashboardLayout auth={auth} header="لوحة تحكم المعلم">
             <Head title="لوحة تحكم المعلم - إرث المبتكرين" />
 
-            <div className="bg-gradient-to-r from-[#A3C042] to-legacy-blue rounded-lg shadow-lg p-8 mb-8 text-white">
+            <div className="bg-[#A3C042] rounded-lg shadow-lg p-8 mb-8 text-white">
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-3xl font-bold mb-2">مرحباً بك، {user.name} 👨‍🏫</h1>
@@ -153,11 +153,10 @@ export default function TeacherDashboardLegacy({ auth, stats = {} }) {
                                     <div key={challenge.id} className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
                                         <div className="flex items-center justify-between mb-2">
                                             <p className="font-semibold text-gray-900">{challenge.title}</p>
-                                            <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                                                challenge.status === 'active' ? 'bg-green-100 text-green-700' :
-                                                challenge.status === 'completed' ? 'bg-blue-100 text-blue-700' :
-                                                'bg-gray-100 text-gray-700'
-                                            }`}>
+                                            <span className={`px-2 py-1 rounded text-xs font-semibold ${challenge.status === 'active' ? 'bg-green-100 text-green-700' :
+                                                    challenge.status === 'completed' ? 'bg-blue-100 text-blue-700' :
+                                                        'bg-gray-100 text-gray-700'
+                                                }`}>
                                                 {challenge.status === 'active' ? 'نشط' : challenge.status === 'completed' ? 'مكتمل' : 'مسودة'}
                                             </span>
                                         </div>

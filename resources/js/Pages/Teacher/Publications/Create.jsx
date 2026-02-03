@@ -28,7 +28,7 @@ export default function CreatePublication({ auth, school }) {
                 alert('يرجى اختيار ملف صورة صحيح');
                 return;
             }
-            
+
             // التحقق من حجم الملف (2 ميجا)
             if (file.size > 2 * 1024 * 1024) {
                 alert('حجم الصورة يجب ألا يتجاوز 2 ميجابايت');
@@ -76,8 +76,8 @@ export default function CreatePublication({ auth, school }) {
     }
 
     return (
-        <DashboardLayout 
-            auth={auth} 
+        <DashboardLayout
+            auth={auth}
             header={
                 <div className="flex items-center gap-3">
                     <Link href="/teacher/publications" className="text-gray-600 hover:text-[#A3C042]">
@@ -135,7 +135,7 @@ export default function CreatePublication({ auth, school }) {
                         {/* Cover Image */}
                         <div>
                             <InputLabel value="صورة المقال" className="text-sm font-medium text-gray-700 mb-2" />
-                            
+
                             {imagePreview ? (
                                 <div className="relative">
                                     <img
@@ -165,7 +165,7 @@ export default function CreatePublication({ auth, school }) {
                                     </p>
                                 </div>
                             )}
-                            
+
                             <input
                                 ref={imageInputRef}
                                 type="file"
@@ -218,7 +218,7 @@ export default function CreatePublication({ auth, school }) {
                             <PrimaryButton
                                 type="submit"
                                 disabled={processing || !data.title || !data.content}
-                                className="bg-[#A3C042] hover:bg-green-600 flex items-center gap-2"
+                                className="bg-[#A3C042] hover:bg-[#A3C042] flex items-center gap-2"
                             >
                                 {processing ? (
                                     <>

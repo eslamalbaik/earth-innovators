@@ -13,11 +13,10 @@ function ProjectCard({ project, onOpen }) {
             type="button"
             onClick={onOpen}
             disabled={isPlaceholder || !onOpen}
-            className={`w-full  bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition ${
-                isPlaceholder || !onOpen
+            className={`w-full  bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition ${isPlaceholder || !onOpen
                     ? 'opacity-60 cursor-default'
                     : 'hover:shadow-md cursor-pointer'
-            }`}
+                }`}
         >
             <div className="relative">
                 <img
@@ -74,7 +73,7 @@ export default function HomeLatestProjectsSection({ projects = [], onViewAll, on
                 <button
                     type="button"
                     onClick={onViewAll}
-                    className="text-xs font-semibold text-[#A3C042] hover:text-[#93b03a]"
+                    className="text-xs font-semibold text-[#A3C042] hover:text-[#8CA635]"
                 >
                     عرض الكل
                 </button>

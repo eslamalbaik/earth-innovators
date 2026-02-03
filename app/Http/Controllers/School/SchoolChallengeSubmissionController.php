@@ -33,9 +33,11 @@ class SchoolChallengeSubmissionController extends Controller
 
         if ($challengeId) {
             // Get submissions for specific challenge
-            $challenge = Challenge::where('id', $challengeId)
-                ->where('school_id', $school->id)
-                ->firstOrFail();
+            $challengeQuery = Challenge::where('id', $challengeId);
+            if (!$school->canAccessAllSchoolData()) {
+                $challengeQuery->where('school_id', $school->id);
+            }
+            $challenge = $challengeQuery->firstOrFail();
 
             $submissions = $this->submissionService->getChallengeSubmissions(
                 $challengeId,
@@ -57,7 +59,11 @@ class SchoolChallengeSubmissionController extends Controller
         }
 
         // Get all challenges with submission counts
-        $challenges = Challenge::where('school_id', $school->id)
+        $challengesQuery = Challenge::query();
+        if (!$school->canAccessAllSchoolData()) {
+            $challengesQuery->where('school_id', $school->id);
+        }
+        $challenges = $challengesQuery
             ->withCount(['submissions'])
             ->orderBy('created_at', 'desc')
             ->paginate(15)
@@ -79,7 +85,7 @@ class SchoolChallengeSubmissionController extends Controller
         $school = Auth::user();
 
         // Verify submission belongs to school's challenge
-        if ($submission->challenge->school_id !== $school->id) {
+        if (!$school->canAccessAllSchoolData() && $submission->challenge->school_id !== $school->id) {
             abort(403, 'غير مصرح لك بعرض هذا التقديم');
         }
 
@@ -107,7 +113,7 @@ class SchoolChallengeSubmissionController extends Controller
         $school = Auth::user();
 
         // Verify submission belongs to school's challenge
-        if ($submission->challenge->school_id !== $school->id) {
+        if (!$school->canAccessAllSchoolData() && $submission->challenge->school_id !== $school->id) {
             abort(403, 'غير مصرح لك بتقييم هذا التقديم');
         }
 

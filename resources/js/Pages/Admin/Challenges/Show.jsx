@@ -65,7 +65,7 @@ export default function AdminChallengesShow({ challenge }) {
                         {challenge.school_id && (
                             <Link
                                 href={route('admin.challenges.assign-students', challenge.id)}
-                                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2"
+                                className="bg-[#A3C042] hover:bg-[#8CA635] text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2"
                             >
                                 <FaUserPlus />
                                 تعيين طلاب
@@ -73,7 +73,7 @@ export default function AdminChallengesShow({ challenge }) {
                         )}
                         <Link
                             href={route('admin.challenges.edit', challenge.id)}
-                            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2"
+                            className="bg-[#A3C042] hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2"
                         >
                             <FaEdit />
                             تعديل

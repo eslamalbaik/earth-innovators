@@ -25,117 +25,28 @@ class ChallengeController extends Controller
         $challenges = null;
 
         if ($user) {
-            if ($user->isStudent()) {
-                $submissionService = app(\App\Services\ChallengeSubmissionService::class);
-                $status = $request->get('status');
-                
-                if ($user->school_id) {
-                    $query = Challenge::where('status', '!=', 'cancelled')
-                        ->where(function ($q) use ($user) {
-                            $q->where('school_id', $user->school_id)
-                              ->orWhereNull('school_id');
-                        })
-                        ->with(['creator:id,name', 'school:id,name'])
-                        ->withCount(['submissions as submissions_count', 'participants as participants_count'])
-                        ->orderBy('created_at', 'desc');
+            if ($user->isStudent() && $user->school_id) {
+                $schoolId = $user->school_id;
+            } elseif ($user->isSchool()) {
+                $schoolId = $user->id;
+            } elseif ($user->isTeacher() && $user->school_id) {
+                $schoolId = $user->school_id;
+            }
+        }
 
-                    if ($status === 'active') {
-                        $query->where('status', 'active')
-                            ->where('start_date', '<=', now())
-                            ->where('deadline', '>=', now());
-                    } elseif ($status === 'upcoming') {
-                        $query->where('status', 'active')
-                            ->where('start_date', '>', now());
-                    } elseif ($status === 'finished') {
-                        $query->where(function ($q) {
-                            $q->where('status', 'completed')
-                              ->orWhere('deadline', '<', now());
-                        });
-                    }
-
-                    if ($request->get('search')) {
-                        $search = $request->get('search');
-                        $query->where(function ($q) use ($search) {
-                            $q->where('title', 'like', "%{$search}%")
-                              ->orWhere('objective', 'like', "%{$search}%")
-                              ->orWhere('description', 'like', "%{$search}%");
-                        });
-                    }
-
-                    if ($request->get('category')) {
-                        $query->where('category', $request->get('category'));
-                    }
-
-                    $challenges = $query->paginate(12)->withQueryString();
-                } else {
-                    $query = Challenge::whereNull('school_id')
-                        ->where('status', '!=', 'cancelled')
-                        ->with(['creator:id,name', 'school:id,name'])
-                        ->withCount(['submissions as submissions_count', 'participants as participants_count'])
-                        ->orderBy('created_at', 'desc');
-
-                    if ($status === 'active') {
-                        $query->where('status', 'active')
-                            ->where('start_date', '<=', now())
-                            ->where('deadline', '>=', now());
-                    } elseif ($status === 'upcoming') {
-                        $query->where('status', 'active')
-                            ->where('start_date', '>', now());
-                    } elseif ($status === 'finished') {
-                        $query->where(function ($q) {
-                            $q->where('status', 'completed')
-                              ->orWhere('deadline', '<', now());
-                        });
-                    }
-
-                    if ($request->get('search')) {
-                        $search = $request->get('search');
-                        $query->where(function ($q) use ($search) {
-                            $q->where('title', 'like', "%{$search}%")
-                              ->orWhere('objective', 'like', "%{$search}%")
-                              ->orWhere('description', 'like', "%{$search}%");
-                        });
-                    }
-
-                    if ($request->get('category')) {
-                        $query->where('category', $request->get('category'));
-                    }
-
-                    $challenges = $query->paginate(12)->withQueryString();
-                }
-            } elseif ($user->isTeacher()) {
-                $teacherSchool = $user->school;
-                $schoolId = $teacherSchool ? $teacherSchool->id : null;
-                
+        if ($user && $user->isStudent()) {
+            $status = $request->get('status');
+            
+            if ($schoolId) {
                 $query = Challenge::where('status', '!=', 'cancelled')
-                    ->where(function ($q) use ($user, $schoolId) {
-                        $q->where('created_by', $user->id);
-                        if ($schoolId) {
-                            $q->orWhere('school_id', $schoolId);
-                        }
-                        $q->orWhereNull('school_id');
+                    ->where(function ($q) use ($schoolId) {
+                        $q->where('school_id', $schoolId)
+                          ->orWhereNull('school_id');
                     })
                     ->with(['creator:id,name', 'school:id,name'])
+                    ->withCount(['submissions as submissions_count', 'participants as participants_count'])
                     ->orderBy('created_at', 'desc');
 
-                if ($request->get('search')) {
-                    $search = $request->get('search');
-                    $query->where(function ($q) use ($search) {
-                        $q->where('title', 'like', "%{$search}%")
-                          ->orWhere('description', 'like', "%{$search}%")
-                          ->orWhere('objective', 'like', "%{$search}%");
-                    });
-                }
-
-                if ($request->get('category')) {
-                    $query->where('category', $request->get('category'));
-                }
-
-                if ($request->get('challenge_type')) {
-                    $query->where('challenge_type', $request->get('challenge_type'));
-                }
-
-                $status = $request->get('status');
                 if ($status === 'active') {
                     $query->where('status', 'active')
                         ->where('start_date', '<=', now())
@@ -150,24 +61,117 @@ class ChallengeController extends Controller
                     });
                 }
 
+                if ($request->get('search')) {
+                    $search = $request->get('search');
+                    $query->where(function ($q) use ($search) {
+                        $q->where('title', 'like', "%{$search}%")
+                          ->orWhere('objective', 'like', "%{$search}%")
+                          ->orWhere('description', 'like', "%{$search}%");
+                    });
+                }
+
+                if ($request->get('category')) {
+                    $query->where('category', $request->get('category'));
+                }
+
                 $challenges = $query->paginate(12)->withQueryString();
-                
-                $challenges->getCollection()->transform(function ($challenge) {
-                    if (!isset($challenge->image_url) && $challenge->image) {
-                        $challenge->image_url = $challenge->getImageUrlAttribute();
-                    }
-                    return $challenge;
-                });
-            } elseif ($user->isSchool()) {
-                $challenges = $this->challengeService->getSchoolChallenges(
-                    $user->id,
-                    $request->get('status'),
-                    12,
-                    $request->get('search'),
-                    $request->get('category'),
-                    $request->get('challenge_type')
-                )->withQueryString();
+            } else {
+                $query = Challenge::whereNull('school_id')
+                    ->where('status', '!=', 'cancelled')
+                    ->with(['creator:id,name', 'school:id,name'])
+                    ->withCount(['submissions as submissions_count', 'participants as participants_count'])
+                    ->orderBy('created_at', 'desc');
+
+                if ($status === 'active') {
+                    $query->where('status', 'active')
+                        ->where('start_date', '<=', now())
+                        ->where('deadline', '>=', now());
+                } elseif ($status === 'upcoming') {
+                    $query->where('status', 'active')
+                        ->where('start_date', '>', now());
+                } elseif ($status === 'finished') {
+                    $query->where(function ($q) {
+                        $q->where('status', 'completed')
+                          ->orWhere('deadline', '<', now());
+                    });
+                }
+
+                if ($request->get('search')) {
+                    $search = $request->get('search');
+                    $query->where(function ($q) use ($search) {
+                        $q->where('title', 'like', "%{$search}%")
+                          ->orWhere('objective', 'like', "%{$search}%")
+                          ->orWhere('description', 'like', "%{$search}%");
+                    });
+                }
+
+                if ($request->get('category')) {
+                    $query->where('category', $request->get('category'));
+                }
+
+                $challenges = $query->paginate(12)->withQueryString();
             }
+        } elseif ($user && $user->isTeacher()) {
+            $query = Challenge::where('status', '!=', 'cancelled')
+                ->where(function ($q) use ($user, $schoolId) {
+                    $q->where('created_by', $user->id);
+                    if ($schoolId) {
+                        $q->orWhere('school_id', $schoolId);
+                    }
+                    $q->orWhereNull('school_id');
+                })
+                ->with(['creator:id,name', 'school:id,name'])
+                ->orderBy('created_at', 'desc');
+
+            if ($request->get('search')) {
+                $search = $request->get('search');
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%")
+                      ->orWhere('objective', 'like', "%{$search}%");
+                });
+            }
+
+            if ($request->get('category')) {
+                $query->where('category', $request->get('category'));
+            }
+
+            if ($request->get('challenge_type')) {
+                $query->where('challenge_type', $request->get('challenge_type'));
+            }
+
+            $status = $request->get('status');
+            if ($status === 'active') {
+                $query->where('status', 'active')
+                    ->where('start_date', '<=', now())
+                    ->where('deadline', '>=', now());
+            } elseif ($status === 'upcoming') {
+                $query->where('status', 'active')
+                    ->where('start_date', '>', now());
+            } elseif ($status === 'finished') {
+                $query->where(function ($q) {
+                    $q->where('status', 'completed')
+                      ->orWhere('deadline', '<', now());
+                });
+            }
+
+            $challenges = $query->paginate(12)->withQueryString();
+            
+            $challenges->getCollection()->transform(function ($challenge) {
+                if (!isset($challenge->image_url) && $challenge->image) {
+                    $challenge->image_url = $challenge->getImageUrlAttribute();
+                }
+                return $challenge;
+            });
+        } elseif ($user && $user->isSchool()) {
+            $challenges = $this->challengeService->getSchoolChallenges(
+                $schoolId,
+                $request->get('status'),
+                12,
+                $request->get('search'),
+                $request->get('category'),
+                $request->get('challenge_type')
+            )->withQueryString();
         }
 
         if (!$challenges) {
@@ -175,7 +179,7 @@ class ChallengeController extends Controller
                 $request->get('search'),
                 $request->get('category'),
                 $request->get('challenge_type'),
-                null, 
+                $schoolId, 
                 12
             )->withQueryString();
         }
@@ -406,4 +410,3 @@ class ChallengeController extends Controller
         ];
     }
 }
-

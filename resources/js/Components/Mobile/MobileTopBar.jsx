@@ -17,7 +17,7 @@ export default function MobileTopBar({
     const { url } = usePage();
     const currentPath = url.split('?')[0];
     const isHomePage = currentPath === '/';
-    
+
     const LeftIcon = FaArrowRight;
     const RightIcon = FaBell;
     // Get user from auth prop or from usePage if auth is not provided
@@ -120,41 +120,41 @@ export default function MobileTopBar({
         <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-sm border-b border-gray-100 md:hidden">
             <div className="px-4 py-3">
                 <div className="flex items-center justify-between">
-                            {!isHomePage && (
-                                <button
-                                    type="button"
-                                    onClick={onBack}
-                                    className="h-10 w-10 me-2 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center hover:bg-gray-100 transition"
-                                    aria-label="رجوع"
-                                >
-                                    <LeftIcon className="text-gray-700" />
-                                </button>
-                            )}
-                            <div className="flex-shrink-0">
-                            <Link href="/" className="flex items-center space-x-3 space-x-reverse">
-                                <img
-                                    src="/images/logo-modified.png"
-                                    alt="إرث المبتكرين - Innovators Legacy"
-                                    className="h-10 w-auto object-contain"
-                                />
-                            </Link>
-                        </div>
-                            <div className="text-center flex-1 flex items-center justify-center gap-2">
-                                <div className="text-sm font-bold text-[#A3C042]">{title}</div>
-                            </div>
-                            <button
-                                type="button"
-                                onClick={onNotifications}
-                                className="relative h-10 w-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center hover:bg-gray-100 transition"
-                                aria-label="الإشعارات"
-                            >
-                                <RightIcon className="text-gray-700" />
-                                {unreadCount > 0 && (
-                                    <span className="absolute -top-1 -left-1 min-w-5 h-5 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
-                                        {unreadCount > 9 ? '9+' : unreadCount}
-                                    </span>
-                                )}
-                            </button>
+                    {!isHomePage && (
+                        <button
+                            type="button"
+                            onClick={onBack}
+                            className="h-10 w-10 me-2 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center hover:bg-gray-100 transition"
+                            aria-label="رجوع"
+                        >
+                            <LeftIcon className="text-gray-700" />
+                        </button>
+                    )}
+                    <div className="flex-shrink-0">
+                        <Link href="/" className="flex items-center space-x-3 space-x-reverse">
+                            <img
+                                src="/images/logo-modified.png"
+                                alt="إرث المبتكرين - Innovators Legacy"
+                                className="h-10 w-auto object-contain"
+                            />
+                        </Link>
+                    </div>
+                    <div className="text-center flex-1 flex items-center justify-center gap-2">
+                        <div className="text-sm font-bold text-[#A3C042]">{title}</div>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={onNotifications}
+                        className="relative h-10 w-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center hover:bg-gray-100 transition"
+                        aria-label="الإشعارات"
+                    >
+                        <RightIcon className="text-gray-700" />
+                        {unreadCount > 0 && (
+                            <span className="absolute -top-1 -left-1 min-w-5 h-5 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+                                {unreadCount > 9 ? '9+' : unreadCount}
+                            </span>
+                        )}
+                    </button>
                 </div>
             </div>
         </header>
@@ -174,7 +174,7 @@ export default function MobileTopBar({
                                 className="h-12 w-auto object-contain"
                             />
                             <div className="flex flex-col">
-                                <p className="text-xl font-bold bg-gradient-to-r from-[#A3C042] to-[#93b03a] bg-clip-text text-transparent">
+                                <p className="text-xl font-bold bg-gradient-to-r from-[#A3C042] to-[#8CA635] bg-clip-text text-transparent">
                                     إرث المبتكرين
                                 </p>
                                 <p className="text-xs text-gray-500">Innovators Legacy</p>
@@ -185,19 +185,18 @@ export default function MobileTopBar({
                     {/* Navigation Menu */}
                     <nav className="flex-1 flex items-center justify-center gap-1">
                         {navItems.map((item) => {
-                            const isActive = currentPath === item.href || 
+                            const isActive = currentPath === item.href ||
                                 (item.href !== '/' && currentPath.startsWith(item.href));
                             const Icon = item.icon;
-                            
+
                             return (
                                 <Link
                                     key={item.key}
                                     href={item.href}
-                                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                                        isActive
+                                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${isActive
                                             ? 'bg-[#A3C042]/10 text-[#A3C042] border border-[#A3C042]/20'
                                             : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-                                    }`}
+                                        }`}
                                 >
                                     <span>{item.label}</span>
                                 </Link>
@@ -246,9 +245,8 @@ export default function MobileTopBar({
                                             />
                                         ) : null}
                                         <div
-                                            className={`w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold border-2 border-gray-200 ${
-                                                userImage ? 'hidden' : 'flex'
-                                            }`}
+                                            className={`w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold border-2 border-gray-200 ${userImage ? 'hidden' : 'flex'
+                                                }`}
                                             style={{
                                                 background: `linear-gradient(135deg, ${getColorFromName(userName)})`
                                             }}
@@ -352,7 +350,7 @@ export default function MobileTopBar({
                                 </Link>
                                 <Link
                                     href="/register"
-                                    className="px-4 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-[#A3C042] to-[#93b03a] text-white hover:opacity-90 transition shadow-md"
+                                    className="px-4 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-[#A3C042] to-[#8CA635] text-white hover:opacity-90 transition shadow-md"
                                 >
                                     انضم للمنصة
                                 </Link>

@@ -268,7 +268,7 @@ export default function SchoolPublicationEdit({ auth, publication }) {
                             </Link>
                             <PrimaryButton
                                 disabled={processing}
-                                className="bg-gradient-to-r from-[#A3C042] to-legacy-blue"
+                                className="bg-[#A3C042]"
                             >
                                 {processing ? (
                                     <>

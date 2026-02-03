@@ -130,7 +130,7 @@ export default function TeacherApplications({ applications, stats, filters }) {
                             </select>
                         </div>
                         <div className="flex items-end">
-                            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 flex items-center gap-2">
+                            <button className="px-4 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-blue-700 transition duration-200 flex items-center gap-2">
                                 <FaFilter />
                                 تطبيق الفلاتر
                             </button>

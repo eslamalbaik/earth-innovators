@@ -130,7 +130,7 @@ class EvaluationService extends BaseService
         
         // Check if evaluator is the challenge owner, school admin, or system admin
         $isOwner = $challenge->created_by === $evaluatorId;
-        $isSchoolAdmin = $challenge->school_id && $evaluator->school_id === $challenge->school_id && $evaluator->role === 'school';
+        $isSchoolAdmin = $challenge->school_id && $evaluator->school_id === $challenge->school_id && $evaluator->isSchool();
         $isSystemAdmin = $evaluator->role === 'admin';
         $isTeacher = $evaluator->role === 'teacher' && $evaluator->school_id === $challenge->school_id;
 

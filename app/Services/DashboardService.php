@@ -26,10 +26,11 @@ class DashboardService extends BaseService
 
         return $this->cacheTags($cacheTag, $cacheKey, function () use ($schoolId) {
             // Get student IDs in one query
-            $studentIds = User::where('school_id', $schoolId)
-                ->where('role', 'student')
-                ->pluck('id')
-                ->toArray();
+            $studentIdsQuery = User::where('role', 'student');
+            if ($schoolId > 0) {
+                $studentIdsQuery->where('school_id', $schoolId);
+            }
+            $studentIds = $studentIdsQuery->pluck('id')->toArray();
 
             if (empty($studentIds)) {
                 return $this->getEmptySchoolStats();
@@ -67,10 +68,11 @@ class DashboardService extends BaseService
                 ->first();
 
             // Get school project IDs for submissions
-            $schoolProjectIds = Project::where('school_id', $schoolId)
-                ->where('status', 'approved')
-                ->pluck('id')
-                ->toArray();
+            $schoolProjectIdsQuery = Project::where('status', 'approved');
+            if ($schoolId > 0) {
+                $schoolProjectIdsQuery->where('school_id', $schoolId);
+            }
+            $schoolProjectIds = $schoolProjectIdsQuery->pluck('id')->toArray();
 
             $submissionStats = [];
             if (!empty($schoolProjectIds)) {
@@ -289,8 +291,10 @@ class DashboardService extends BaseService
                 ->get();
 
             $rank = 1;
+            $foundRank = false;
             foreach ($schoolsRanking as $school) {
-                if ($school->id == $schoolId) {
+                if ($schoolId > 0 && $school->id == $schoolId) {
+                    $foundRank = true;
                     return [
                         'rank' => $rank,
                         'total' => $schoolsRanking->count(),
@@ -298,6 +302,14 @@ class DashboardService extends BaseService
                     ];
                 }
                 $rank++;
+            }
+
+            if ($schoolId === 0) {
+                return [
+                    'rank' => '1',
+                    'total' => $schoolsRanking->count(),
+                    'points' => $schoolsRanking->sum('total_points'),
+                ];
             }
 
             return [
@@ -454,7 +466,7 @@ class DashboardService extends BaseService
 
     public function clearDashboardCache(int $userId, ?string $role = null): void
     {
-        if ($role === 'school') {
+        if ($role === 'school' || $role === 'educational_institution') {
             $this->forgetCacheTags(["school_dashboard_{$userId}"]);
         } elseif ($role === 'student') {
             $this->forgetCacheTags(["student_dashboard_{$userId}"]);

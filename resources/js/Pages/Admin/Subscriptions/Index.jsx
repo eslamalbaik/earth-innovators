@@ -87,11 +87,10 @@ export default function AdminSubscriptionsIndex({
                             setType('subscriptions');
                             router.get(route('admin.subscriptions.index'), { type: 'subscriptions', ...filters }, { preserveState: true });
                         }}
-                        className={`px-6 py-3 font-semibold transition-colors border-b-2 ${
-                            type === 'subscriptions'
+                        className={`px-6 py-3 font-semibold transition-colors border-b-2 ${type === 'subscriptions'
                                 ? 'text-blue-600 border-blue-600'
                                 : 'text-gray-600 border-transparent hover:text-blue-600'
-                        }`}
+                            }`}
                     >
                         <FaUsers className="inline ml-2" />
                         الاشتراكات ({subscriptionStats.total})
@@ -101,11 +100,10 @@ export default function AdminSubscriptionsIndex({
                             setType('payments');
                             router.get(route('admin.subscriptions.index'), { type: 'payments', ...filters }, { preserveState: true });
                         }}
-                        className={`px-6 py-3 font-semibold transition-colors border-b-2 ${
-                            type === 'payments'
+                        className={`px-6 py-3 font-semibold transition-colors border-b-2 ${type === 'payments'
                                 ? 'text-blue-600 border-blue-600'
                                 : 'text-gray-600 border-transparent hover:text-blue-600'
-                        }`}
+                            }`}
                     >
                         <FaCreditCard className="inline ml-2" />
                         المدفوعات ({paymentStats.total})
@@ -255,7 +253,7 @@ export default function AdminSubscriptionsIndex({
                     <div className="flex items-end">
                         <button
                             onClick={handleFilter}
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
+                            className="w-full bg-[#A3C042] hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
                         >
                             <FaFilter />
                             تصفية
@@ -376,33 +374,32 @@ export default function AdminSubscriptionsIndex({
 
                 {/* Pagination */}
                 {((type === 'subscriptions' && subscriptions.links && subscriptions.links.length > 3) ||
-                  (type === 'payments' && payments.links && payments.links.length > 3)) && (
-                    <div className="px-6 py-4 border-t border-gray-200">
-                        <div className="flex items-center justify-between">
-                            <div className="text-sm text-gray-700">
-                                {type === 'subscriptions' ? (
-                                    <>عرض {subscriptions.from} إلى {subscriptions.to} من {subscriptions.total} اشتراك</>
-                                ) : (
-                                    <>عرض {payments.from} إلى {payments.to} من {payments.total} دفعة</>
-                                )}
-                            </div>
-                            <div className="flex gap-2">
-                                {(type === 'subscriptions' ? subscriptions.links : payments.links).map((link, index) => (
-                                    <Link
-                                        key={index}
-                                        href={link.url || '#'}
-                                        className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                                            link.active
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                        dangerouslySetInnerHTML={{ __html: link.label }}
-                                    />
-                                ))}
+                    (type === 'payments' && payments.links && payments.links.length > 3)) && (
+                        <div className="px-6 py-4 border-t border-gray-200">
+                            <div className="flex items-center justify-between">
+                                <div className="text-sm text-gray-700">
+                                    {type === 'subscriptions' ? (
+                                        <>عرض {subscriptions.from} إلى {subscriptions.to} من {subscriptions.total} اشتراك</>
+                                    ) : (
+                                        <>عرض {payments.from} إلى {payments.to} من {payments.total} دفعة</>
+                                    )}
+                                </div>
+                                <div className="flex gap-2">
+                                    {(type === 'subscriptions' ? subscriptions.links : payments.links).map((link, index) => (
+                                        <Link
+                                            key={index}
+                                            href={link.url || '#'}
+                                            className={`px-4 py-2 rounded-lg text-sm font-medium ${link.active
+                                                    ? 'bg-[#A3C042] text-white'
+                                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                                } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            dangerouslySetInnerHTML={{ __html: link.label }}
+                                        />
+                                    ))}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )}
             </div>
         </DashboardLayout>
     );

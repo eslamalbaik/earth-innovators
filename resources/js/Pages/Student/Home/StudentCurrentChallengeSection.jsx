@@ -70,8 +70,8 @@ function ChallengeCard({ challenge, onJoin }) {
                                 {daysRemaining !== null && daysRemaining > 0
                                     ? `ينتهي خلال ${daysRemaining} ${daysRemaining === 1 ? 'يوم' : 'أيام'}`
                                     : deadline < new Date()
-                                    ? 'انتهى'
-                                    : formatDate(deadline)}
+                                        ? 'انتهى'
+                                        : formatDate(deadline)}
                             </span>
                         </div>
                     )}
@@ -89,7 +89,7 @@ function ChallengeCard({ challenge, onJoin }) {
                         </div>
                         <div className="mt-2 h-2 w-full rounded-full bg-gray-100 overflow-hidden">
                             <div
-                                className="h-full bg-gradient-to-l from-[#A3C042] to-[#93b03a] rounded-full transition-all"
+                                className="h-full bg-gradient-to-l from-[#A3C042] to-[#8CA635] rounded-full transition-all"
                                 style={{ width: `${progressPercent}%` }}
                             />
                         </div>
@@ -104,7 +104,7 @@ function ChallengeCard({ challenge, onJoin }) {
                             onJoin(challenge.id);
                         }
                     }}
-                    className="mt-4 w-full block text-center rounded-xl bg-[#A3C042] py-2 text-sm font-bold text-white hover:bg-[#93b03a] transition"
+                    className="mt-4 w-full block text-center rounded-xl bg-[#A3C042] py-2 text-sm font-bold text-white hover:bg-[#8CA635] transition"
                 >
                     {challenge.has_submission ? 'عرض التقديم' : 'شارك الآن'}
                 </Link>
@@ -124,7 +124,7 @@ export default function StudentCurrentChallengeSection({ challenges = [], onView
                     <button
                         type="button"
                         onClick={onViewAll}
-                        className="text-xs font-semibold text-[#A3C042] hover:text-[#93b03a]"
+                        className="text-xs font-semibold text-[#A3C042] hover:text-[#8CA635]"
                     >
                         عرض الكل
                     </button>
@@ -141,7 +141,7 @@ export default function StudentCurrentChallengeSection({ challenges = [], onView
                     <button
                         type="button"
                         onClick={onViewAll}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-[#A3C042] text-white rounded-xl text-xs font-bold hover:bg-[#93b03a] transition"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-[#A3C042] text-white rounded-xl text-xs font-bold hover:bg-[#8CA635] transition"
                     >
                         <FaTrophy className="text-xs" />
                         عرض جميع التحديات
@@ -158,7 +158,7 @@ export default function StudentCurrentChallengeSection({ challenges = [], onView
                 <button
                     type="button"
                     onClick={onViewAll}
-                    className="text-xs font-semibold text-[#A3C042] hover:text-[#93b03a]"
+                    className="text-xs font-semibold text-[#A3C042] hover:text-[#8CA635]"
                 >
                     عرض الكل
                 </button>

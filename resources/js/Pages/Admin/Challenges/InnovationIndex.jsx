@@ -64,7 +64,7 @@ export default function AdminInnovationChallengesIndex({ challenges, stats, filt
     return (
         <DashboardLayout header="التحديات الابتكارية">
             <Head title="التحديات الابتكارية" />
-            
+
             <div className="min-h-screen bg-gray-50 pb-32" dir="rtl">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     {/* Header Section */}
@@ -80,7 +80,7 @@ export default function AdminInnovationChallengesIndex({ challenges, stats, filt
                             </div>
                             <Link
                                 href={route('admin.challenges.create')}
-                                className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold shadow-md hover:shadow-lg"
+                                className="inline-flex items-center gap-2 px-6 py-3 bg-[#A3C042] text-white rounded-lg hover:bg-[#8CA635] transition-colors font-semibold shadow-md hover:shadow-lg"
                             >
                                 <FaPlus />
                                 إطلاق تحدي جديد
@@ -91,41 +91,37 @@ export default function AdminInnovationChallengesIndex({ challenges, stats, filt
                         <div className="flex flex-wrap items-center gap-4 mb-6">
                             <button
                                 onClick={() => handleStatusFilter('')}
-                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                                    !selectedStatus
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-white text-gray-700 hover:bg-gray-100'
-                                }`}
+                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${!selectedStatus
+                                    ? 'bg-[#A3C042] text-white'
+                                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                                    }`}
                             >
                                 الكل
                             </button>
                             <button
                                 onClick={() => handleStatusFilter('completed')}
-                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                                    selectedStatus === 'completed'
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-white text-gray-700 hover:bg-gray-100'
-                                }`}
+                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${selectedStatus === 'completed'
+                                    ? 'bg-[#A3C042] text-white'
+                                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                                    }`}
                             >
                                 مكتمل
                             </button>
                             <button
                                 onClick={() => handleStatusFilter('upcoming')}
-                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                                    selectedStatus === 'upcoming'
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-white text-gray-700 hover:bg-gray-100'
-                                }`}
+                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${selectedStatus === 'upcoming'
+                                    ? 'bg-[#A3C042] text-white'
+                                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                                    }`}
                             >
                                 قادم
                             </button>
                             <button
                                 onClick={() => handleStatusFilter('active')}
-                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                                    selectedStatus === 'active'
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-white text-gray-700 hover:bg-gray-100'
-                                }`}
+                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${selectedStatus === 'active'
+                                    ? 'bg-[#A3C042] text-white'
+                                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                                    }`}
                             >
                                 نشط
                             </button>
@@ -171,7 +167,7 @@ export default function AdminInnovationChallengesIndex({ challenges, stats, filt
                                 </p>
                                 <Link
                                     href={route('admin.challenges.create')}
-                                    className="inline-flex items-center gap-2 px-6 py-3.5 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all shadow-lg hover:shadow-xl font-bold"
+                                    className="inline-flex items-center gap-2 px-6 py-3.5 bg-[#A3C042] text-white rounded-xl hover:bg-[#8CA635] transition-all shadow-lg hover:shadow-xl font-bold"
                                 >
                                     <FaPlus />
                                     <span>إنشاء تحدي</span>
@@ -188,11 +184,10 @@ export default function AdminInnovationChallengesIndex({ challenges, stats, filt
                                     <Link
                                         key={index}
                                         href={link.url || '#'}
-                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                                            link.active
-                                                ? 'bg-green-600 text-white shadow-sm'
-                                                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
-                                        } ${!link.url ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${link.active
+                                            ? 'bg-[#A3C042] text-white shadow-sm'
+                                            : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+                                            } ${!link.url ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
                                 ))}

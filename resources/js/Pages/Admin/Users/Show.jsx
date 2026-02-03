@@ -1,13 +1,13 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import { 
-    FaArrowRight, 
-    FaEdit, 
-    FaTrash, 
-    FaUser, 
-    FaEnvelope, 
-    FaPhone, 
-    FaSchool, 
+import {
+    FaArrowRight,
+    FaEdit,
+    FaTrash,
+    FaUser,
+    FaEnvelope,
+    FaPhone,
+    FaSchool,
     FaStar,
     FaCalendar,
     FaCheckCircle,
@@ -158,7 +158,7 @@ export default function UsersShow({ user, contributions, auth }) {
                     {/* Contributions Section */}
                     <div className="bg-white rounded-xl shadow-lg p-6">
                         <h2 className="text-xl font-bold text-gray-900 mb-6">المساهمات والإنجازات</h2>
-                        
+
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {/* Projects */}
                             {contributions?.projects && contributions.projects.total > 0 && (
@@ -300,17 +300,17 @@ export default function UsersShow({ user, contributions, auth }) {
                         </div>
 
                         {/* Show message if no contributions */}
-                        {(!contributions || 
-                          (contributions.projects?.total === 0 && 
-                           contributions.publications?.total === 0 && 
-                           contributions.badges?.total === 0 && 
-                           contributions.teacher_projects?.total === 0 && 
-                           contributions.challenges?.total === 0)) && (
-                            <div className="text-center py-8 text-gray-500">
-                                <FaAward className="text-4xl text-gray-300 mx-auto mb-3" />
-                                <p>لا توجد مساهمات حتى الآن</p>
-                            </div>
-                        )}
+                        {(!contributions ||
+                            (contributions.projects?.total === 0 &&
+                                contributions.publications?.total === 0 &&
+                                contributions.badges?.total === 0 &&
+                                contributions.teacher_projects?.total === 0 &&
+                                contributions.challenges?.total === 0)) && (
+                                <div className="text-center py-8 text-gray-500">
+                                    <FaAward className="text-4xl text-gray-300 mx-auto mb-3" />
+                                    <p>لا توجد مساهمات حتى الآن</p>
+                                </div>
+                            )}
                     </div>
                 </div>
 
@@ -355,7 +355,7 @@ export default function UsersShow({ user, contributions, auth }) {
                         <div className="space-y-3">
                             <Link
                                 href={route('admin.users.edit', user.id)}
-                                className="block w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-center transition"
+                                className="block w-full px-4 py-2 bg-[#A3C042] hover:bg-blue-700 text-white font-semibold rounded-lg text-center transition"
                             >
                                 تعديل المستخدم
                             </Link>

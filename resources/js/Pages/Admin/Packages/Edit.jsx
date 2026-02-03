@@ -94,9 +94,8 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                 type="text"
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.name ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.name ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             />
                             {errors.name && (
@@ -113,9 +112,8 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                 type="text"
                                 value={data.name_ar}
                                 onChange={(e) => setData('name_ar', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.name_ar ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.name_ar ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                             />
                             {errors.name_ar && (
                                 <p className="mt-1 text-sm text-red-600">{errors.name_ar}</p>
@@ -131,9 +129,8 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                 value={data.description}
                                 onChange={(e) => setData('description', e.target.value)}
                                 rows={3}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.description ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.description ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                             />
                         </div>
 
@@ -146,9 +143,8 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                 value={data.description_ar}
                                 onChange={(e) => setData('description_ar', e.target.value)}
                                 rows={3}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.description_ar ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.description_ar ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                             />
                         </div>
 
@@ -163,9 +159,8 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                 step="0.01"
                                 value={data.price}
                                 onChange={(e) => setData('price', parseFloat(e.target.value) || 0)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.price ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.price ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             />
                             {errors.price && (
@@ -181,9 +176,8 @@ export default function AdminPackagesEdit({ package: pkg }) {
                             <select
                                 value={data.currency}
                                 onChange={(e) => setData('currency', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.currency ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.currency ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             >
                                 <option value="SAR">ريال سعودي (SAR)</option>
@@ -390,7 +384,7 @@ export default function AdminPackagesEdit({ package: pkg }) {
                         <button
                             type="submit"
                             disabled={processing}
-                            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50"
+                            className="px-6 py-2 bg-[#A3C042] hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50"
                         >
                             <FaSave />
                             {processing ? 'جاري الحفظ...' : 'حفظ التغييرات'}

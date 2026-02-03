@@ -65,9 +65,8 @@ export default function AdminBadgesCreate() {
                                 type="text"
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.name ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.name ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             />
                             {errors.name && (
@@ -84,9 +83,8 @@ export default function AdminBadgesCreate() {
                                 type="text"
                                 value={data.name_ar}
                                 onChange={(e) => setData('name_ar', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.name_ar ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.name_ar ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                             />
                             {errors.name_ar && (
                                 <p className="mt-1 text-sm text-red-600">{errors.name_ar}</p>
@@ -102,9 +100,8 @@ export default function AdminBadgesCreate() {
                                 value={data.description}
                                 onChange={(e) => setData('description', e.target.value)}
                                 rows={3}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.description ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.description ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                             />
                             {errors.description && (
                                 <p className="mt-1 text-sm text-red-600">{errors.description}</p>
@@ -120,9 +117,8 @@ export default function AdminBadgesCreate() {
                                 value={data.description_ar}
                                 onChange={(e) => setData('description_ar', e.target.value)}
                                 rows={3}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.description_ar ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.description_ar ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                             />
                             {errors.description_ar && (
                                 <p className="mt-1 text-sm text-red-600">{errors.description_ar}</p>
@@ -139,9 +135,8 @@ export default function AdminBadgesCreate() {
                                 value={data.icon}
                                 onChange={(e) => setData('icon', e.target.value)}
                                 placeholder="مثال: 🏆 أو 🥇"
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.icon ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.icon ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                             />
                             {errors.icon && (
                                 <p className="mt-1 text-sm text-red-600">{errors.icon}</p>
@@ -156,9 +151,8 @@ export default function AdminBadgesCreate() {
                             <select
                                 value={data.type}
                                 onChange={(e) => setData('type', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.type ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.type ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             >
                                 <option value="">اختر النوع</option>
@@ -184,9 +178,8 @@ export default function AdminBadgesCreate() {
                                 min="0"
                                 value={data.points_required}
                                 onChange={(e) => setData('points_required', parseInt(e.target.value) || 0)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.points_required ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.points_required ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             />
                             {errors.points_required && (
@@ -253,7 +246,7 @@ export default function AdminBadgesCreate() {
                         <button
                             type="submit"
                             disabled={processing}
-                            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50"
+                            className="px-6 py-2 bg-[#A3C042] hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50"
                         >
                             <FaSave />
                             {processing ? 'جاري الحفظ...' : 'حفظ'}

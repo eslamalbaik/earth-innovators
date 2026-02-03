@@ -2,12 +2,12 @@ import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { useState, useCallback, useMemo } from 'react';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
-import { 
-    FaSearch, 
-    FaFilter, 
-    FaEye, 
-    FaEdit, 
-    FaTrash, 
+import {
+    FaSearch,
+    FaFilter,
+    FaEye,
+    FaEdit,
+    FaTrash,
     FaPlus,
     FaSave,
     FaTimes
@@ -22,7 +22,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [projectToEdit, setProjectToEdit] = useState(null);
     const [isLoadingProject, setIsLoadingProject] = useState(false);
-    
+
     // PERFORMANCE: Optimistic UI state for instant feedback
     const [optimisticProjects, setOptimisticProjects] = useState(null);
     const [deletingIds, setDeletingIds] = useState(new Set());
@@ -91,7 +91,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                 setIsLoadingProject(false);
                 return;
             }
-            
+
             // Only fetch if data is missing
             const response = await fetch(route('admin.projects.edit', project.id));
             const data = await response.json();
@@ -116,7 +116,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
     const handleEditSubmit = useCallback((e) => {
         e.preventDefault();
         if (!projectToEdit) return;
-        
+
         updateProject(route('admin.projects.update', projectToEdit.id), {
             preserveState: true,
             preserveScroll: true,
@@ -264,7 +264,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                     <h2 className="text-lg font-bold text-gray-900">البحث والتصفية</h2>
                     <button
                         onClick={() => setShowCreateModal(true)}
-                        className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg flex items-center gap-2"
+                        className="px-6 py-2 bg-[#A3C042] hover:bg-[#8CA635] text-white font-semibold rounded-lg flex items-center gap-2"
                     >
                         <FaPlus />
                         إضافة مشروع جديد
@@ -310,7 +310,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                     <div className="flex items-end">
                         <button
                             onClick={handleFilter}
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
+                            className="w-full bg-[#A3C042] hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
                         >
                             <FaFilter />
                             تصفية
@@ -338,64 +338,64 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                 projectsData.map((project) => {
                                     const isDeleting = deletingIds.has(project.id);
                                     return (
-                                    <tr 
-                                        key={project.id} 
-                                        className={`hover:bg-gray-50 transition-colors ${isDeleting ? 'opacity-50 pointer-events-none' : ''}`}
-                                    >
-                                        <td className="py-4 px-6">
-                                            <div>
-                                                <Link
-                                                    href={route('admin.projects.show', project.id)}
-                                                    className="font-semibold text-blue-600 hover:text-blue-800"
-                                                >
-                                                    {project.title}
-                                                </Link>
-                                                {project.category && (
-                                                    <p className="text-sm text-gray-500 mt-1">{project.category}</p>
-                                                )}
-                                            </div>
-                                        </td>
-                                        <td className="py-4 px-6">
-                                            <div>
-                                                <p className="text-sm font-medium text-gray-900">{project.student_name}</p>
-                                                <p className="text-xs text-gray-500">{project.student_email}</p>
-                                            </div>
-                                        </td>
-                                        <td className="py-4 px-6 text-sm text-gray-700">{project.school_name}</td>
-                                        <td className="py-4 px-6">{getStatusBadge(project.status)}</td>
-                                        <td className="py-4 px-6 text-sm text-gray-700">{project.created_at}</td>
-                                        <td className="py-4 px-6">
-                                            <div className="flex items-center gap-2">
-                                                <Link
-                                                    href={route('admin.projects.show', project.id)}
-                                                    className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50 transition"
-                                                    title="عرض التفاصيل"
-                                                >
-                                                    <FaEye />
-                                                </Link>
-                                                <button
-                                                    onClick={() => handleEdit(project)}
-                                                    disabled={isLoadingProject}
-                                                    className="text-yellow-600 hover:text-yellow-800 p-2 rounded-lg hover:bg-yellow-50 transition disabled:opacity-50"
-                                                    title="تعديل"
-                                                >
-                                                    <FaEdit />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(project)}
-                                                    disabled={isDeleting}
-                                                    className={`text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50 transition ${isDeleting ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                    title={isDeleting ? 'جاري الحذف...' : 'حذف'}
-                                                >
-                                                    {isDeleting ? (
-                                                        <span className="animate-spin text-xs">⏳</span>
-                                                    ) : (
-                                                        <FaTrash />
+                                        <tr
+                                            key={project.id}
+                                            className={`hover:bg-gray-50 transition-colors ${isDeleting ? 'opacity-50 pointer-events-none' : ''}`}
+                                        >
+                                            <td className="py-4 px-6">
+                                                <div>
+                                                    <Link
+                                                        href={route('admin.projects.show', project.id)}
+                                                        className="font-semibold text-blue-600 hover:text-blue-800"
+                                                    >
+                                                        {project.title}
+                                                    </Link>
+                                                    {project.category && (
+                                                        <p className="text-sm text-gray-500 mt-1">{project.category}</p>
                                                     )}
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                                </div>
+                                            </td>
+                                            <td className="py-4 px-6">
+                                                <div>
+                                                    <p className="text-sm font-medium text-gray-900">{project.student_name}</p>
+                                                    <p className="text-xs text-gray-500">{project.student_email}</p>
+                                                </div>
+                                            </td>
+                                            <td className="py-4 px-6 text-sm text-gray-700">{project.school_name}</td>
+                                            <td className="py-4 px-6">{getStatusBadge(project.status)}</td>
+                                            <td className="py-4 px-6 text-sm text-gray-700">{project.created_at}</td>
+                                            <td className="py-4 px-6">
+                                                <div className="flex items-center gap-2">
+                                                    <Link
+                                                        href={route('admin.projects.show', project.id)}
+                                                        className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50 transition"
+                                                        title="عرض التفاصيل"
+                                                    >
+                                                        <FaEye />
+                                                    </Link>
+                                                    <button
+                                                        onClick={() => handleEdit(project)}
+                                                        disabled={isLoadingProject}
+                                                        className="text-yellow-600 hover:text-yellow-800 p-2 rounded-lg hover:bg-yellow-50 transition disabled:opacity-50"
+                                                        title="تعديل"
+                                                    >
+                                                        <FaEdit />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(project)}
+                                                        disabled={isDeleting}
+                                                        className={`text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50 transition ${isDeleting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                        title={isDeleting ? 'جاري الحذف...' : 'حذف'}
+                                                    >
+                                                        {isDeleting ? (
+                                                            <span className="animate-spin text-xs">⏳</span>
+                                                        ) : (
+                                                            <FaTrash />
+                                                        )}
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
                                     );
                                 })
                             ) : (
@@ -421,11 +421,10 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                     <Link
                                         key={index}
                                         href={link.url || '#'}
-                                        className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                                            link.active
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium ${link.active
+                                            ? 'bg-[#A3C042] text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
                                 ))}
@@ -462,9 +461,8 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                         type="text"
                                         value={editData.title}
                                         onChange={(e) => setEditData('title', e.target.value)}
-                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            editErrors.title ? 'border-red-500' : 'border-gray-300'
-                                        }`}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.title ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                         required
                                     />
                                     {editErrors.title && (
@@ -481,9 +479,8 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                         value={editData.description}
                                         onChange={(e) => setEditData('description', e.target.value)}
                                         rows="4"
-                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            editErrors.description ? 'border-red-500' : 'border-gray-300'
-                                        }`}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.description ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                         required
                                     />
                                     {editErrors.description && (
@@ -499,9 +496,8 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                     <select
                                         value={editData.category}
                                         onChange={(e) => setEditData('category', e.target.value)}
-                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            editErrors.category ? 'border-red-500' : 'border-gray-300'
-                                        }`}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.category ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                     >
                                         <option value="">اختر فئة</option>
                                         <option value="science">علوم</option>
@@ -524,9 +520,8 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                     <select
                                         value={editData.status}
                                         onChange={(e) => setEditData('status', e.target.value)}
-                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            editErrors.status ? 'border-red-500' : 'border-gray-300'
-                                        }`}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.status ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                         required
                                     >
                                         <option value="pending">قيد المراجعة</option>
@@ -562,9 +557,8 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                             <select
                                                 value={editData.school_id}
                                                 onChange={(e) => setEditData('school_id', e.target.value)}
-                                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                                    editErrors.school_id ? 'border-red-500' : 'border-gray-300'
-                                                }`}
+                                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.school_id ? 'border-red-500' : 'border-gray-300'
+                                                    }`}
                                             >
                                                 <option value="">اختر مؤسسة تعليمية</option>
                                                 {schools && schools.map((school) => (
@@ -600,7 +594,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                 <button
                                     type="submit"
                                     disabled={editProcessing}
-                                    className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50"
+                                    className="px-6 py-2 bg-[#A3C042] hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50"
                                 >
                                     <FaSave />
                                     {editProcessing ? 'جاري التحديث...' : 'تحديث'}
@@ -646,9 +640,8 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                         type="text"
                                         value={createData.title}
                                         onChange={(e) => setCreateData('title', e.target.value)}
-                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            createErrors.title ? 'border-red-500' : 'border-gray-300'
-                                        }`}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${createErrors.title ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                         required
                                     />
                                     {createErrors.title && (
@@ -665,9 +658,8 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                         value={createData.description}
                                         onChange={(e) => setCreateData('description', e.target.value)}
                                         rows="4"
-                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            createErrors.description ? 'border-red-500' : 'border-gray-300'
-                                        }`}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${createErrors.description ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                         required
                                     />
                                     {createErrors.description && (
@@ -683,9 +675,8 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                     <select
                                         value={createData.category}
                                         onChange={(e) => setCreateData('category', e.target.value)}
-                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            createErrors.category ? 'border-red-500' : 'border-gray-300'
-                                        }`}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${createErrors.category ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                     >
                                         <option value="">اختر فئة</option>
                                         <option value="science">علوم</option>
@@ -708,9 +699,8 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                     <select
                                         value={createData.status}
                                         onChange={(e) => setCreateData('status', e.target.value)}
-                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            createErrors.status ? 'border-red-500' : 'border-gray-300'
-                                        }`}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${createErrors.status ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                         required
                                     >
                                         <option value="pending">قيد المراجعة</option>
@@ -746,9 +736,8 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                             <select
                                                 value={createData.school_id}
                                                 onChange={(e) => setCreateData('school_id', e.target.value)}
-                                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                                    createErrors.school_id ? 'border-red-500' : 'border-gray-300'
-                                                }`}
+                                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${createErrors.school_id ? 'border-red-500' : 'border-gray-300'
+                                                    }`}
                                             >
                                                 <option value="">اختر مؤسسة تعليمية</option>
                                                 {schools && schools.map((school) => (
@@ -784,7 +773,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                 <button
                                     type="submit"
                                     disabled={createProcessing}
-                                    className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50"
+                                    className="px-6 py-2 bg-[#A3C042] hover:bg-[#8CA635] text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50"
                                 >
                                     <FaSave />
                                     {createProcessing ? 'جاري الحفظ...' : 'حفظ'}

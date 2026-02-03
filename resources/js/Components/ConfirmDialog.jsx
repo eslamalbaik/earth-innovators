@@ -12,8 +12,8 @@ export default function ConfirmDialog({
     message = 'هل أنت متأكد من تنفيذ هذا الإجراء؟',
     confirmText = 'تأكيد',
     cancelText = 'إلغاء',
-    onConfirm = () => {},
-    onCancel = () => {},
+    onConfirm = () => { },
+    onCancel = () => { },
     variant = 'danger', // 'danger' or 'warning' or 'info'
 }) {
     const variantStyles = {
@@ -30,7 +30,7 @@ export default function ConfirmDialog({
         info: {
             iconBg: 'bg-blue-100',
             iconColor: 'text-blue-600',
-            confirmBg: 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500',
+            confirmBg: 'bg-[#A3C042] hover:bg-blue-700 focus:ring-blue-500',
         },
     };
 

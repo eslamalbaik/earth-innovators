@@ -216,15 +216,20 @@ class SubmissionService extends BaseService
 
         return $this->cacheTags($cacheTag, $cacheKey, function () use ($schoolId, $status, $studentId, $search, $perPage) {
             // المشاريع المعتمدة للمدرسة (بما في ذلك مشاريع الإدارة المرتبطة بهذه المدرسة)
-            $schoolProjects = Project::where(function($query) use ($schoolId) {
+            $schoolProjectsQuery = Project::query();
+            
+            if ($schoolId > 0) {
+                $schoolProjectsQuery->where(function($query) use ($schoolId) {
                     $query->where('school_id', $schoolId)
                           ->orWhere(function($q) use ($schoolId) {
                               $q->whereHas('user', function($userQuery) {
                                   $userQuery->where('role', 'admin');
                               })->where('school_id', $schoolId);
                           });
-                })
-                ->where('status', 'approved')
+                });
+            }
+
+            $schoolProjects = $schoolProjectsQuery->where('status', 'approved')
                 ->pluck('id');
 
             $query = ProjectSubmission::with([
@@ -299,8 +304,11 @@ class SubmissionService extends BaseService
 
     public function evaluateSubmission(ProjectSubmission $submission, array $data, int $reviewerId, ?int $schoolId = null, ?int $teacherId = null, ?bool $isAdmin = false): ProjectSubmission
     {
-        // Admin can evaluate any submission
-        if (!$isAdmin) {
+        // Admin or users who can access all school data can evaluate any submission
+        $reviewer = \App\Models\User::find($reviewerId);
+        $canAccessAll = $isAdmin || ($reviewer && $reviewer->canAccessAllSchoolData());
+
+        if (!$canAccessAll) {
             // Verify ownership for non-admin users
             if ($schoolId && $submission->project->school_id !== $schoolId) {
                 throw new \Exception('غير مصرح لك بتقييم هذا التسليم');

@@ -191,7 +191,7 @@ export default function StudentsIndex({ students, filters, auth }) {
                                 <div className="flex items-center space-x-2 space-x-reverse">
                                     <button
                                         onClick={() => handleBulkAction('activate')}
-                                        className="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition duration-300"
+                                        className="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-[#A3C042] transition duration-300"
                                     >
                                         تفعيل
                                     </button>

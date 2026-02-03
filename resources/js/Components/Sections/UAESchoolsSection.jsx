@@ -9,7 +9,7 @@ export default function UAESchoolsSection({
     return (
         <div className="space-y-4 md:space-y-6">
             <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-[#A3C042]/20 to-[#93b03a]/20 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-xl flex items-center justify-center">
                     <FaGraduationCap className="text-[#A3C042] text-xl" />
                 </div>
                 <h2 className="text-xl md:text-2xl font-bold text-gray-900">{title}</h2>
@@ -34,7 +34,7 @@ export default function UAESchoolsSection({
                             className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm hover:shadow-md transition"
                         >
                             <div className="flex items-center justify-center mb-4">
-                                <div className="w-12 h-12 bg-gradient-to-br from-[#A3C042]/20 to-[#93b03a]/20 rounded-xl flex items-center justify-center">
+                                <div className="w-12 h-12 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-xl flex items-center justify-center">
                                     <FaSchool className="text-[#A3C042] text-xl" />
                                 </div>
                             </div>

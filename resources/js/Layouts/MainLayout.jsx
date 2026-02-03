@@ -24,7 +24,7 @@ export default function MainLayout({ children, auth }) {
 
     return (
         <div className="min-h-screen bg-white flex flex-col" dir="rtl">
-            <header className="bg-gradient-to-r from-[#A3C042] to-legacy-blue sticky top-0 z-50 shadow-md">
+            <header className="bg-[#A3C042] sticky top-0 z-50 shadow-md">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16">
                         <div className="flex-shrink-0">
@@ -34,7 +34,7 @@ export default function MainLayout({ children, auth }) {
                                     alt="إرث المبتكرين - Innovators Legacy"
                                     className="h-8 w-auto object-contain"
                                 />
-                              <p className="text-white text-2xl font-bold">إرث المبتكرين</p>
+                                <p className="text-white text-2xl font-bold">إرث المبتكرين</p>
                             </Link>
                         </div>
 
@@ -218,7 +218,7 @@ export default function MainLayout({ children, auth }) {
                 {children}
             </main>
 
-            <footer className="bg-gradient-to-r from-[#A3C042] to-legacy-blue py-6 mt-auto">
+            <footer className="bg-[#A3C042] py-6 mt-auto">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                         <div className="text-white font-semibold">

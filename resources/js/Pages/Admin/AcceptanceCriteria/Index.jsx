@@ -8,7 +8,7 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
     const { confirm } = useConfirmDialog();
     const [editingId, setEditingId] = useState(null);
     const [showAddForm, setShowAddForm] = useState(false);
-    
+
     const { data: formData, setData: setFormData, post: submitForm, put: updateForm, processing, errors, reset } = useForm({
         project_id: selectedProjectId || '',
         name_ar: '',
@@ -29,7 +29,7 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
 
     const handleAdd = (e) => {
         e.preventDefault();
-        
+
         // التحقق من أن الوزن لا يتجاوز الحد المسموح
         const maxAllowed = getMaxAllowedWeightForAdd(formData.project_id || null);
         if (parseFloat(formData.weight) > maxAllowed) {
@@ -38,11 +38,11 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
         }
 
         // التحقق من أن مجموع الأوزان لا يتجاوز 100%
-        const currentTotal = formData.project_id 
+        const currentTotal = formData.project_id
             ? getTotalWeightForProject(formData.project_id)
             : criteria.filter(c => !c.project_id).reduce((sum, c) => sum + parseFloat(c.weight || 0), 0);
         const newTotal = currentTotal + parseFloat(formData.weight);
-        
+
         if (newTotal > 100) {
             alert(`مجموع الأوزان سيكون ${newTotal.toFixed(2)}% وهو أكبر من 100%. الحد الأقصى المسموح: ${maxAllowed.toFixed(2)}%`);
             return;
@@ -79,7 +79,7 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
         // التحقق من أن مجموع الأوزان لا يتجاوز 100%
         const currentTotal = getTotalWeightExcludingCurrent(id, editData.project_id || null);
         const newTotal = currentTotal + parseFloat(editData.weight);
-        
+
         if (newTotal > 100) {
             alert(`مجموع الأوزان سيكون ${newTotal.toFixed(2)}% وهو أكبر من 100%. الحد الأقصى المسموح: ${maxAllowed.toFixed(2)}%`);
             return;
@@ -157,7 +157,7 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
     };
 
     const getMaxAllowedWeightForAdd = (projectId) => {
-        const currentTotal = projectId 
+        const currentTotal = projectId
             ? getTotalWeightForProject(projectId)
             : criteria
                 .filter(c => !c.project_id)
@@ -186,7 +186,7 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                     {!showAddForm && (
                         <button
                             onClick={() => setShowAddForm(true)}
-                            className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg flex items-center gap-2"
+                            className="bg-[#A3C042] hover:bg-[#8CA635] text-white font-semibold py-3 px-6 rounded-lg flex items-center gap-2"
                         >
                             <FaPlus />
                             إضافة معيار جديد
@@ -259,9 +259,8 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                     type="text"
                                     value={formData.name_ar}
                                     onChange={(e) => setFormData('name_ar', e.target.value)}
-                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                                        errors.name_ar ? 'border-red-500' : 'border-gray-300'
-                                    }`}
+                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${errors.name_ar ? 'border-red-500' : 'border-gray-300'
+                                        }`}
                                     required
                                 />
                                 {errors.name_ar && (
@@ -276,9 +275,8 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                     value={formData.description_ar}
                                     onChange={(e) => setFormData('description_ar', e.target.value)}
                                     rows={3}
-                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                                        errors.description_ar ? 'border-red-500' : 'border-gray-300'
-                                    }`}
+                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${errors.description_ar ? 'border-red-500' : 'border-gray-300'
+                                        }`}
                                 />
                             </div>
                             <div>
@@ -292,9 +290,8 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                     step="0.01"
                                     value={formData.weight}
                                     onChange={(e) => handleAddWeightChange(e.target.value)}
-                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                                        errors.weight ? 'border-red-500' : 'border-gray-300'
-                                    }`}
+                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${errors.weight ? 'border-red-500' : 'border-gray-300'
+                                        }`}
                                     required
                                 />
                                 {errors.weight && (
@@ -322,7 +319,7 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                 <button
                                     type="submit"
                                     disabled={processing}
-                                    className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg flex items-center gap-2 disabled:opacity-50"
+                                    className="bg-[#A3C042] hover:bg-[#8CA635] text-white font-semibold py-2 px-6 rounded-lg flex items-center gap-2 disabled:opacity-50"
                                 >
                                     <FaSave />
                                     {processing ? 'جاري الحفظ...' : 'حفظ'}
@@ -391,9 +388,8 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                                     type="text"
                                                     value={editData.name_ar}
                                                     onChange={(e) => setEditData('name_ar', e.target.value)}
-                                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                                                        editErrors.name_ar ? 'border-red-500' : 'border-gray-300'
-                                                    }`}
+                                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${editErrors.name_ar ? 'border-red-500' : 'border-gray-300'
+                                                        }`}
                                                 />
                                             </div>
                                             <div>
@@ -407,9 +403,8 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                                     step="0.01"
                                                     value={editData.weight}
                                                     onChange={(e) => handleWeightChange(criterion.id, e.target.value)}
-                                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                                                        editErrors.weight ? 'border-red-500' : 'border-gray-300'
-                                                    }`}
+                                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${editErrors.weight ? 'border-red-500' : 'border-gray-300'
+                                                        }`}
                                                 />
                                                 <p className="mt-1 text-xs text-gray-500">
                                                     المجموع الحالي (بدون هذا المعيار): {getTotalWeightExcludingCurrent(criterion.id, editData.project_id || null).toFixed(2)}%
@@ -440,7 +435,7 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                         <button
                                             onClick={() => handleUpdate(criterion.id)}
                                             disabled={editProcessing}
-                                            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg flex items-center gap-2 disabled:opacity-50"
+                                            className="bg-[#A3C042] hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg flex items-center gap-2 disabled:opacity-50"
                                         >
                                             <FaSave />
                                             {editProcessing ? 'جاري الحفظ...' : 'حفظ التعديلات'}
@@ -463,7 +458,7 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                     <div className="text-4xl font-bold text-gray-900 min-w-[100px] text-left">
                                         {parseFloat(criterion.weight || 0).toFixed(0)}%
                                     </div>
-                                    
+
                                     {/* Content */}
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2 mb-1">
@@ -484,7 +479,7 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                         <div className="flex-1">
                                             <div className="w-full bg-gray-200 rounded-full h-3 relative">
                                                 <div
-                                                    className="bg-green-600 h-3 rounded-full transition-all"
+                                                    className="bg-[#A3C042] h-3 rounded-full transition-all"
                                                     style={{ width: `${Math.min(parseFloat(criterion.weight || 0), 100)}%` }}
                                                 />
                                             </div>
@@ -518,7 +513,7 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                             <p className="text-gray-500 text-lg">لا توجد معايير قبول</p>
                             <button
                                 onClick={() => setShowAddForm(true)}
-                                className="mt-4 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg inline-flex items-center gap-2"
+                                className="mt-4 bg-[#A3C042] hover:bg-[#8CA635] text-white font-semibold py-2 px-6 rounded-lg inline-flex items-center gap-2"
                             >
                                 <FaPlus />
                                 إضافة معيار جديد

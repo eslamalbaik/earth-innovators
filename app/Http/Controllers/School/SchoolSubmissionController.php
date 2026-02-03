@@ -26,15 +26,18 @@ class SchoolSubmissionController extends Controller
         $school = Auth::user();
 
         $submissions = $this->submissionService->getSchoolSubmissions(
-            $school->id,
+            $school->canAccessAllSchoolData() ? 0 : $school->id,
             $request->get('status'),
             $request->get('student_id'),
             $request->get('search'),
             15
         )->withQueryString();
 
-        $students = User::where('school_id', $school->id)
-            ->where('role', 'student')
+        $studentsQuery = User::where('role', 'student');
+        if (!$school->canAccessAllSchoolData()) {
+            $studentsQuery->where('school_id', $school->id);
+        }
+        $students = $studentsQuery
             ->select('id', 'name')
             ->get()
             ->map(function ($student) {
@@ -63,20 +66,24 @@ class SchoolSubmissionController extends Controller
                                    $submission->project->user->role === 'admin' && 
                                    $submission->project->school_id === $school->id;
         
-        if (!$isSchoolProject && !$isAdminProjectForSchool) {
+        if (!$school->canAccessAllSchoolData() && !$isSchoolProject && !$isAdminProjectForSchool) {
             abort(403, 'غير مصرح لك بعرض هذا التسليم');
         }
 
         // المشاريع المعتمدة للمدرسة (بما في ذلك مشاريع الإدارة المرتبطة بهذه المدرسة)
-        $schoolProjects = Project::where(function($query) use ($school) {
+        $schoolProjectsQuery = Project::query();
+        if (!$school->canAccessAllSchoolData()) {
+            $schoolProjectsQuery->where(function($query) use ($school) {
                 $query->where('school_id', $school->id)
                       ->orWhere(function($q) use ($school) {
                           $q->whereHas('user', function($userQuery) {
                               $userQuery->where('role', 'admin');
                           })->where('school_id', $school->id);
                       });
-            })
-            ->where('status', 'approved')
+            });
+        }
+
+        $schoolProjects = $schoolProjectsQuery->where('status', 'approved')
             ->pluck('id');
 
         $submission->load(['project', 'student', 'reviewer']);

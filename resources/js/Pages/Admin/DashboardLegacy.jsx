@@ -25,7 +25,7 @@ export default function AdminDashboardLegacy({ auth, stats = {} }) {
         <DashboardLayout auth={auth} header="لوحة تحكم الإدارة">
             <Head title="لوحة تحكم الإدارة - إرث المبتكرين" />
 
-            <div className="bg-gradient-to-r from-[#A3C042] to-legacy-blue rounded-lg shadow-lg p-8 mb-8 text-white">
+            <div className="bg-[#A3C042] rounded-lg shadow-lg p-8 mb-8 text-white">
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-3xl font-bold mb-2">مرحباً بك، {user.name} 👨‍💼</h1>

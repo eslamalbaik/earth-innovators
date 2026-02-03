@@ -10,7 +10,7 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
         const EchoModule = await import('laravel-echo');
         const Echo = EchoModule.default || EchoModule;
 
-        if (import.meta.env.VITE_ECHO_SERVER_URL || import.meta.env.VITE_ECHO_HOST) {
+        if (import.meta.env.VITE_ECHO_ENABLED === 'true' && (import.meta.env.VITE_ECHO_SERVER_URL || import.meta.env.VITE_ECHO_HOST)) {
             try {
                 const SocketIOModule = await import('socket.io-client');
                 const io = SocketIOModule.default || SocketIOModule;
@@ -67,7 +67,7 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
                             window.Echo = null;
                         }
                     });
-                    
+
                     if (window.Echo.connector.socket.io) {
                         window.Echo.connector.socket.io.on('error', () => {
                             // Silent error

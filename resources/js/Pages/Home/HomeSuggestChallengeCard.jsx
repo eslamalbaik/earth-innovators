@@ -18,7 +18,7 @@ export default function HomeSuggestChallengeCard({ onSuggest }) {
             <button
                 type="button"
                 onClick={onSuggest}
-                className="mt-4 w-40 rounded-xl bg-[#A3C042] py-2 text-sm font-bold text-white hover:bg-[#93b03a] transition"
+                className="mt-4 w-40 rounded-xl bg-[#A3C042] py-2 text-sm font-bold text-white hover:bg-[#8CA635] transition"
             >
                 اقترح تحدي
             </button>

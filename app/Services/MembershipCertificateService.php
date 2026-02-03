@@ -308,7 +308,7 @@ class MembershipCertificateService extends BaseService
     {
         $school = User::findOrFail($schoolId);
 
-        if ($school->role !== 'school') {
+        if (!$school->isSchool()) {
             return null;
         }
 
@@ -516,7 +516,7 @@ class MembershipCertificateService extends BaseService
                 ->where('is_active', true)
                 ->latest('issue_date')
                 ->first();
-        } elseif ($role === 'school') {
+        } elseif ($role === 'school' || $role === 'educational_institution') {
             return Certificate::where('school_id', $userId)
                 ->where('type', 'membership')
                 ->where('is_active', true)
@@ -541,7 +541,7 @@ class MembershipCertificateService extends BaseService
                 return ['eligible' => false, 'error' => 'Teacher record not found'];
             }
             return $this->checkTeacherEligibility($user, $user->teacher);
-        } elseif ($role === 'school') {
+        } elseif ($role === 'school' || $role === 'educational_institution') {
             $school = User::findOrFail($userId);
             return $this->checkSchoolEligibility($school);
         }

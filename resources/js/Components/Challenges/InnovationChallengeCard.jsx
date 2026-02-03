@@ -51,7 +51,7 @@ export default function InnovationChallengeCard({ challenge, onEdit, onManagePar
         if (challenge.id === 2) {
             return 'وسام حامي البيئة + 500 نقطة';
         }
-        
+
         // منطق عام
         const rewards = [];
         if (challenge.badges_reward && Array.isArray(challenge.badges_reward) && challenge.badges_reward.length > 0) {
@@ -152,7 +152,7 @@ export default function InnovationChallengeCard({ challenge, onEdit, onManagePar
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => onManageParticipants && onManageParticipants(challenge)}
-                        className="flex-1 px-4 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium text-sm flex items-center justify-center gap-2"
+                        className="flex-1 px-4 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-[#A3C042] transition-colors font-medium text-sm flex items-center justify-center gap-2"
                     >
                         <FaUserFriends />
                         إدارة المشاركين

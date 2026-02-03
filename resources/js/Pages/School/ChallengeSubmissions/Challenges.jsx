@@ -88,11 +88,10 @@ export default function SchoolChallengeSubmissionsChallenges({ auth, challenges 
                                 <Link
                                     key={index}
                                     href={link.url || '#'}
-                                    className={`px-4 py-2 rounded-lg ${
-                                        link.active
-                                            ? 'bg-blue-600 text-white'
+                                    className={`px-4 py-2 rounded-lg ${link.active
+                                            ? 'bg-[#A3C042] text-white'
                                             : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
-                                    } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                 />
                             ))}

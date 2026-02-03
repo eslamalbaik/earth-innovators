@@ -45,17 +45,17 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                 'video/mp4', 'video/avi', 'video/mov',
                 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
             ];
-            
+
             if (file.size > maxSize) {
                 alert(`الملف ${file.name} أكبر من 10 ميجابايت`);
                 return false;
             }
-            
+
             if (!validTypes.includes(file.type)) {
                 alert(`نوع الملف ${file.name} غير مدعوم`);
                 return false;
             }
-            
+
             return true;
         });
 
@@ -85,7 +85,7 @@ export default function EditProject({ auth, project, school, schools = [] }) {
         e.preventDefault();
         e.stopPropagation();
         setDragActive(false);
-        
+
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
             handleFiles(e.dataTransfer.files);
         }
@@ -145,13 +145,13 @@ export default function EditProject({ auth, project, school, schools = [] }) {
 
         // إنشاء FormData لضمان إرسال الملفات بشكل صحيح
         const formData = new FormData();
-        
+
         // إضافة الحقول الأساسية
         formData.append('title', data.title);
         formData.append('description', data.description);
         formData.append('category', data.category || 'other');
         formData.append('_method', 'PUT');
-        
+
         if (data.school_id) {
             formData.append('school_id', data.school_id);
         }
@@ -197,8 +197,8 @@ export default function EditProject({ auth, project, school, schools = [] }) {
     };
 
     return (
-        <DashboardLayout 
-            auth={auth} 
+        <DashboardLayout
+            auth={auth}
             header={
                 <div className="flex items-center gap-3">
                     <Link href="/teacher/projects" className="text-gray-600 hover:text-[#A3C042]">
@@ -328,11 +328,10 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                                 onDragLeave={handleDrag}
                                 onDragOver={handleDrag}
                                 onDrop={handleDrop}
-                                className={`border-2 border-dashed rounded-lg p-8 text-center transition ${
-                                    dragActive
+                                className={`border-2 border-dashed rounded-lg p-8 text-center transition ${dragActive
                                         ? 'border-[#A3C042] bg-[#A3C042]/10'
                                         : 'border-gray-300 hover:border-[#A3C042]/50'
-                                }`}
+                                    }`}
                             >
                                 <input
                                     ref={fileInputRef}
@@ -352,7 +351,7 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                                 <button
                                     type="button"
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="mt-4 px-6 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-green-600 transition"
+                                    className="mt-4 px-6 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-[#A3C042] transition"
                                 >
                                     اختر ملفات
                                 </button>
@@ -407,7 +406,7 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                             <PrimaryButton
                                 type="submit"
                                 disabled={processing || !data.title || !data.description || project?.status !== 'pending'}
-                                className="bg-[#A3C042] hover:bg-green-600 flex items-center gap-2"
+                                className="bg-[#A3C042] hover:bg-[#A3C042] flex items-center gap-2"
                             >
                                 {processing ? (
                                     <>

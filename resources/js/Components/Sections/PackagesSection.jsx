@@ -21,7 +21,7 @@ export default function PackagesSection({ packages = [] }) {
     };
 
     // Filter to show only the 3 main packages (Student, Teacher, School)
-    const mainPackages = packages.filter(pkg => 
+    const mainPackages = packages.filter(pkg =>
         ['باقة الطالب', 'باقة المدرس', 'باقة المدرسة'].includes(pkg.name_ar)
     );
 
@@ -50,14 +50,13 @@ export default function PackagesSection({ packages = [] }) {
                         return (
                             <div
                                 key={pkg.id}
-                                className={`bg-white rounded-xl shadow-lg overflow-hidden border-2 transition-all relative ${
-                                    isPopular
+                                className={`bg-white rounded-xl shadow-lg overflow-hidden border-2 transition-all relative ${isPopular
                                         ? 'border-[#A3C042] shadow-[#A3C042]/20 transform scale-105'
                                         : 'border-gray-200 hover:border-[#A3C042]/50'
-                                }`}
+                                    }`}
                             >
                                 {isPopular && (
-                                    <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white text-center py-2 font-bold text-sm">
+                                    <div className="absolute top-0 left-0 right-0 bg-[#A3C042] text-white text-center py-2 font-bold text-sm">
                                         ⭐ الأكثر شعبية
                                     </div>
                                 )}
@@ -68,9 +67,8 @@ export default function PackagesSection({ packages = [] }) {
                                 )}
                                 <div className={`p-8 ${isPopular ? 'pt-12' : ''}`}>
                                     <div className="text-center mb-6">
-                                        <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${
-                                            isPopular ? 'bg-gradient-to-br from-[#A3C042] to-legacy-blue' : 'bg-gray-100'
-                                        }`}>
+                                        <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${isPopular ? 'bg-gradient-to-br from-[#A3C042] to-legacy-blue' : 'bg-gray-100'
+                                            }`}>
                                             <Icon className={`text-3xl ${isPopular ? 'text-white' : 'text-gray-600'}`} />
                                         </div>
                                         <h3 className="text-2xl font-bold text-gray-900 mb-2">
@@ -148,11 +146,10 @@ export default function PackagesSection({ packages = [] }) {
 
                                     <Link
                                         href="/packages"
-                                        className={`block w-full text-center px-6 py-3 rounded-lg font-semibold transition ${
-                                            isPopular
-                                                ? 'bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white hover:shadow-lg'
+                                        className={`block w-full text-center px-6 py-3 rounded-lg font-semibold transition ${isPopular
+                                                ? 'bg-[#A3C042] text-white hover:shadow-lg'
                                                 : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                                        }`}
+                                            }`}
                                     >
                                         {isFree ? 'احصل عليها الآن' : 'اشترك الآن'}
                                     </Link>
@@ -166,7 +163,7 @@ export default function PackagesSection({ packages = [] }) {
                 <div className="text-center">
                     <button
                         onClick={() => setShowCustomizeModal(true)}
-                        className="bg-gradient-to-r from-[#A3C042] to-legacy-blue hover:from-primary-600 hover:to-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition duration-300 transform hover:scale-105 shadow-lg"
+                        className="bg-[#A3C042] hover:from-primary-600 hover:to-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition duration-300 transform hover:scale-105 shadow-lg"
                     >
                         تخصيص باقة
                     </button>

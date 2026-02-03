@@ -1,10 +1,10 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
-import { 
-    FaSearch, 
-    FaFilter, 
-    FaEye, 
+import {
+    FaSearch,
+    FaFilter,
+    FaEye,
     FaTrash,
     FaBook,
     FaCalendar,
@@ -107,7 +107,7 @@ export default function AdminPublicationsIndex({ publications = { data: [], link
                     <h2 className="text-lg font-bold text-gray-900">البحث والتصفية</h2>
                     <Link
                         href={route('admin.publications.create')}
-                        className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg flex items-center gap-2"
+                        className="px-6 py-2 bg-[#A3C042] hover:bg-[#8CA635] text-white font-semibold rounded-lg flex items-center gap-2"
                     >
                         <FaPlus />
                         إضافة مقال جديد
@@ -157,7 +157,7 @@ export default function AdminPublicationsIndex({ publications = { data: [], link
                     <div className="flex items-end">
                         <button
                             onClick={handleFilter}
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
+                            className="w-full bg-[#A3C042] hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
                         >
                             <FaFilter />
                             تصفية
@@ -172,7 +172,7 @@ export default function AdminPublicationsIndex({ publications = { data: [], link
                     <div className="divide-y divide-gray-200">
                         {publications.data.map((publication) => {
                             const coverImage = getPublicationImageUrl(publication.cover_image);
-                            
+
                             return (
                                 <div key={publication.id} className="p-6 hover:bg-gray-50 transition">
                                     <div className="flex flex-col md:flex-row gap-6">
@@ -277,11 +277,10 @@ export default function AdminPublicationsIndex({ publications = { data: [], link
                                     <Link
                                         key={index}
                                         href={link.url || '#'}
-                                        className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                                            link.active
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium ${link.active
+                                            ? 'bg-[#A3C042] text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
                                 ))}

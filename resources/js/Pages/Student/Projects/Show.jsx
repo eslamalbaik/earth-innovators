@@ -41,19 +41,6 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
     const commentTextareaRef = useRef(null);
     const { showSuccess } = useToast();
 
-    // Maintain focus on textarea if it was focused before re-render
-    useEffect(() => {
-        if (commentTextareaRef.current && activeTab === 'comments' && document.activeElement === commentTextareaRef.current) {
-            const textarea = commentTextareaRef.current;
-            const cursorPosition = textarea.selectionStart || commentText.length;
-            setTimeout(() => {
-                if (textarea) {
-                    textarea.focus();
-                    textarea.setSelectionRange(cursorPosition, cursorPosition);
-                }
-            }, 0);
-        }
-    }, [commentText, activeTab]);
 
     const submissionForm = useForm({
         files: [],
@@ -161,7 +148,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
     const submitComment = (e) => {
         e.preventDefault();
         if (!commentText.trim() || isSubmittingComment) return;
-        
+
         setIsSubmittingComment(true);
         router.post(`/projects/${project.id}/comments`, {
             comment: commentText,
@@ -181,18 +168,9 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
         });
     };
 
-    const handleCommentChange = useCallback((e) => {
-        const newValue = e.target.value;
-        const cursorPosition = e.target.selectionStart;
-        setCommentText(newValue);
-        // Maintain cursor position after state update
-        setTimeout(() => {
-            if (commentTextareaRef.current) {
-                commentTextareaRef.current.setSelectionRange(cursorPosition, cursorPosition);
-                commentTextareaRef.current.focus();
-            }
-        }, 0);
-    }, []);
+    const handleCommentChange = (e) => {
+        setCommentText(e.target.value);
+    };
 
     const startReply = (commentId) => {
         setReplyingTo(commentId);
@@ -216,10 +194,10 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                     </span>
                     <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-full">
                         {project.category === 'science' ? 'علوم' :
-                         project.category === 'technology' ? 'تقنية' :
-                         project.category === 'engineering' ? 'هندسة' :
-                         project.category === 'mathematics' ? 'رياضيات' :
-                         project.category === 'arts' ? 'فنون' : 'أخرى'}
+                            project.category === 'technology' ? 'تقنية' :
+                                project.category === 'engineering' ? 'هندسة' :
+                                    project.category === 'mathematics' ? 'رياضيات' :
+                                        project.category === 'arts' ? 'فنون' : 'أخرى'}
                     </span>
                     <div className="flex items-center gap-1 text-gray-600 text-xs">
                         <FaEye />
@@ -232,31 +210,28 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide border-b border-gray-200">
                 <button
                     onClick={() => setActiveTab('details')}
-                    className={`whitespace-nowrap px-4 py-2 text-sm font-bold border-b-2 transition ${
-                        activeTab === 'details'
-                            ? 'border-[#A3C042] text-[#A3C042]'
-                            : 'border-transparent text-gray-600'
-                    }`}
+                    className={`whitespace-nowrap px-4 py-2 text-sm font-bold border-b-2 transition ${activeTab === 'details'
+                        ? 'border-[#A3C042] text-[#A3C042]'
+                        : 'border-transparent text-gray-600'
+                        }`}
                 >
                     التفاصيل
                 </button>
                 <button
                     onClick={() => setActiveTab('submit')}
-                    className={`whitespace-nowrap px-4 py-2 text-sm font-bold border-b-2 transition ${
-                        activeTab === 'submit'
-                            ? 'border-[#A3C042] text-[#A3C042]'
-                            : 'border-transparent text-gray-600'
-                    }`}
+                    className={`whitespace-nowrap px-4 py-2 text-sm font-bold border-b-2 transition ${activeTab === 'submit'
+                        ? 'border-[#A3C042] text-[#A3C042]'
+                        : 'border-transparent text-gray-600'
+                        }`}
                 >
                     {existingSubmission ? 'تحديث' : 'تسليم'}
                 </button>
                 <button
                     onClick={() => setActiveTab('comments')}
-                    className={`whitespace-nowrap px-4 py-2 text-sm font-bold border-b-2 transition ${
-                        activeTab === 'comments'
-                            ? 'border-[#A3C042] text-[#A3C042]'
-                            : 'border-transparent text-gray-600'
-                    }`}
+                    className={`whitespace-nowrap px-4 py-2 text-sm font-bold border-b-2 transition ${activeTab === 'comments'
+                        ? 'border-[#A3C042] text-[#A3C042]'
+                        : 'border-transparent text-gray-600'
+                        }`}
                 >
                     التعليقات ({project.comments?.length || 0})
                 </button>
@@ -324,33 +299,33 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                     {!existingSubmission.reviewed_at && existingSubmission.status === 'submitted' && (
                                         <button
                                             onClick={() => setActiveTab('submit')}
-                                            className="px-3 py-1.5 bg-green-600 text-white rounded-xl hover:bg-green-700 transition text-xs font-semibold"
+                                            className="px-3 py-1.5 bg-[#A3C042] text-white rounded-xl hover:bg-[#8CA635] transition text-xs font-semibold"
                                         >
                                             تعديل
                                         </button>
                                     )}
                                 </div>
-                                    <div className="space-y-2">
-                                        <p className="text-sm text-green-800">
-                                            الحالة: <span className="font-bold text-green-900">
-                                                {existingSubmission.status === 'submitted' ? 'مُسلم' :
-                                                 existingSubmission.status === 'reviewed' ? 'تم المراجعة' :
-                                                 existingSubmission.status === 'approved' ? 'مقبول' :
-                                                 existingSubmission.status === 'rejected' ? 'مرفوض' : existingSubmission.status}
-                                            </span>
+                                <div className="space-y-2">
+                                    <p className="text-sm text-green-800">
+                                        الحالة: <span className="font-bold text-green-900">
+                                            {existingSubmission.status === 'submitted' ? 'مُسلم' :
+                                                existingSubmission.status === 'reviewed' ? 'تم المراجعة' :
+                                                    existingSubmission.status === 'approved' ? 'مقبول' :
+                                                        existingSubmission.status === 'rejected' ? 'مرفوض' : existingSubmission.status}
+                                        </span>
+                                    </p>
+                                    {(existingSubmission.submitted_at || existingSubmission.created_at) && (
+                                        <p className="text-xs text-green-700">
+                                            تاريخ التسليم: {toGregorianDate(existingSubmission.submitted_at || existingSubmission.created_at)}
                                         </p>
-                                        {(existingSubmission.submitted_at || existingSubmission.created_at) && (
-                                            <p className="text-xs text-green-700">
-                                                تاريخ التسليم: {toGregorianDate(existingSubmission.submitted_at || existingSubmission.created_at)}
-                                            </p>
-                                        )}
-                                        {existingSubmission.comment && (
-                                            <div className="mt-2">
-                                                <p className="text-sm font-medium text-green-900 mb-1">تعليقك:</p>
-                                                <p className="text-sm text-green-800 bg-white p-2 rounded border border-green-200">{existingSubmission.comment}</p>
-                                            </div>
-                                        )}
-                                    </div>
+                                    )}
+                                    {existingSubmission.comment && (
+                                        <div className="mt-2">
+                                            <p className="text-sm font-medium text-green-900 mb-1">تعليقك:</p>
+                                            <p className="text-sm text-green-800 bg-white p-2 rounded border border-green-200">{existingSubmission.comment}</p>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
 
                             {/* Evaluation Display */}
@@ -360,66 +335,65 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                         <span>✨</span>
                                         <span>تقييم مشروعك</span>
                                     </h3>
-                                        
-                                        {/* Rating */}
-                                        {existingSubmission.rating && (
-                                            <div className="mb-4">
-                                                <p className="text-sm font-medium text-green-800 mb-2">التقييم:</p>
-                                                <div className="flex items-center gap-2" dir="ltr">
-                                                    {[1, 2, 3, 4, 5].map((star) => (
-                                                        <span
-                                                            key={star}
-                                                            className={`text-2xl ${
-                                                                star <= existingSubmission.rating
-                                                                    ? 'text-yellow-400'
-                                                                    : 'text-gray-300'
+
+                                    {/* Rating */}
+                                    {existingSubmission.rating && (
+                                        <div className="mb-4">
+                                            <p className="text-sm font-medium text-green-800 mb-2">التقييم:</p>
+                                            <div className="flex items-center gap-2" dir="ltr">
+                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                    <span
+                                                        key={star}
+                                                        className={`text-2xl ${star <= existingSubmission.rating
+                                                            ? 'text-yellow-400'
+                                                            : 'text-gray-300'
                                                             }`}
-                                                        >
-                                                            ★
-                                                        </span>
-                                                    ))}
-                                                    <span className="mr-2 text-lg font-bold text-green-900">
-                                                        ({existingSubmission.rating}/5)
+                                                    >
+                                                        ★
                                                     </span>
-                                                </div>
+                                                ))}
+                                                <span className="mr-2 text-lg font-bold text-green-900">
+                                                    ({existingSubmission.rating}/5)
+                                                </span>
                                             </div>
-                                        )}
+                                        </div>
+                                    )}
 
-                                        {/* Feedback */}
-                                        {existingSubmission.feedback && (
-                                            <div className="mb-4">
-                                                <p className="text-sm font-medium text-green-800 mb-2">ملاحظات المعلم:</p>
-                                                <div className="p-3 bg-white rounded border border-green-200">
-                                                    <p className="text-sm text-green-900 whitespace-pre-line">{existingSubmission.feedback}</p>
-                                                </div>
+                                    {/* Feedback */}
+                                    {existingSubmission.feedback && (
+                                        <div className="mb-4">
+                                            <p className="text-sm font-medium text-green-800 mb-2">ملاحظات المعلم:</p>
+                                            <div className="p-3 bg-white rounded border border-green-200">
+                                                <p className="text-sm text-green-900 whitespace-pre-line">{existingSubmission.feedback}</p>
                                             </div>
-                                        )}
+                                        </div>
+                                    )}
 
-                                        {/* Badges */}
-                                        {existingSubmission.badges && existingSubmission.badges.length > 0 && (
-                                            <div>
-                                                <p className="text-sm font-medium text-green-800 mb-2">الشارات الممنوحة:</p>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {existingSubmission.badges.map((badgeId, index) => {
-                                                        const badge = existingSubmission.badges_data?.find(b => b.id === badgeId);
-                                                        return (
-                                                            <span
-                                                                key={index}
-                                                                className="inline-flex items-center gap-1 px-3 py-1 bg-yellow-100 text-yellow-800 text-sm font-medium rounded-full border border-yellow-300"
-                                                            >
-                                                                {badge?.icon ? <span>{badge.icon}</span> : <FaAward />}
-                                                                <span>{badge?.name_ar || badge?.name || `شارة #${badgeId}`}</span>
-                                                            </span>
-                                                        );
-                                                    })}
-                                                </div>
+                                    {/* Badges */}
+                                    {existingSubmission.badges && existingSubmission.badges.length > 0 && (
+                                        <div>
+                                            <p className="text-sm font-medium text-green-800 mb-2">الشارات الممنوحة:</p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {existingSubmission.badges.map((badgeId, index) => {
+                                                    const badge = existingSubmission.badges_data?.find(b => b.id === badgeId);
+                                                    return (
+                                                        <span
+                                                            key={index}
+                                                            className="inline-flex items-center gap-1 px-3 py-1 bg-yellow-100 text-yellow-800 text-sm font-medium rounded-full border border-yellow-300"
+                                                        >
+                                                            {badge?.icon ? <span>{badge.icon}</span> : <FaAward />}
+                                                            <span>{badge?.name_ar || badge?.name || `شارة #${badgeId}`}</span>
+                                                        </span>
+                                                    );
+                                                })}
                                             </div>
-                                        )}
+                                        </div>
+                                    )}
 
-                                        {existingSubmission.reviewed_at && (
-                                            <p className="text-xs text-green-700 mt-4">
-                                                تم التقييم في: {toGregorianDate(existingSubmission.reviewed_at)}
-                                            </p>
+                                    {existingSubmission.reviewed_at && (
+                                        <p className="text-xs text-green-700 mt-4">
+                                            تم التقييم في: {toGregorianDate(existingSubmission.reviewed_at)}
+                                        </p>
                                     )}
                                 </div>
                             )}
@@ -452,11 +426,10 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                 onDragLeave={handleDrag}
                                 onDragOver={handleDrag}
                                 onDrop={handleDrop}
-                                className={`border-2 border-dashed rounded-2xl p-6 text-center transition ${
-                                    dragActive
-                                        ? 'border-[#A3C042] bg-green-50'
-                                        : 'border-gray-300'
-                                }`}
+                                className={`border-2 border-dashed rounded-2xl p-6 text-center transition ${dragActive
+                                    ? 'border-[#A3C042] bg-green-50'
+                                    : 'border-gray-300'
+                                    }`}
                             >
                                 <input
                                     ref={fileInputRef}
@@ -476,7 +449,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                 <button
                                     type="button"
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="px-4 py-2 bg-[#A3C042] text-white rounded-xl hover:bg-[#93b03a] transition text-sm font-semibold"
+                                    className="px-4 py-2 bg-[#A3C042] text-white rounded-xl hover:bg-[#8CA635] transition text-sm font-semibold"
                                 >
                                     اختر ملفات
                                 </button>
@@ -514,7 +487,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                             <PrimaryButton
                                 type="submit"
                                 disabled={submissionForm.processing}
-                                className="bg-[#A3C042] hover:bg-[#93b03a] text-sm"
+                                className="bg-[#A3C042] hover:bg-[#8CA635] text-sm"
                             >
                                 {submissionForm.processing ? (
                                     <>
@@ -570,7 +543,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                 <PrimaryButton
                                     type="submit"
                                     disabled={isSubmittingComment || !commentText.trim()}
-                                    className="bg-[#A3C042] hover:bg-[#93b03a] text-sm"
+                                    className="bg-[#A3C042] hover:bg-[#8CA635] text-sm"
                                 >
                                     {isSubmittingComment ? (
                                         <>
@@ -620,7 +593,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                     <div className="flex items-center gap-3">
                                         <button
                                             onClick={() => startReply(comment.id)}
-                                            className="text-[#A3C042] hover:text-[#93b03a] text-xs flex items-center gap-1"
+                                            className="text-[#A3C042] hover:text-[#8CA635] text-xs flex items-center gap-1"
                                         >
                                             <FaReply />
                                             رد
@@ -686,7 +659,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                     onNotifications={() => router.visit('/notifications')}
                     onBack={() => router.visit('/student/projects')}
                 >
-                    <ProjectContent />
+                    {ProjectContent()}
                 </MobileAppLayout>
             </div>
 
@@ -701,7 +674,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                 />
                 <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-4">
                     <div className="mx-auto w-full max-w-3xl">
-                        <ProjectContent />
+                        {ProjectContent()}
                     </div>
                 </main>
                 <MobileBottomNav active="projects" role={auth?.user?.role} isAuthed={!!auth?.user} user={auth?.user} />

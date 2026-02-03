@@ -55,32 +55,32 @@ export default function ChallengeCard({ challenge, user, participation = null, o
     const handleJoin = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ChallengeCard.jsx:59',message:'handleJoin called',data:{challengeId:challenge.id,userId:user?.id,userRole:user?.role},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+        fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'ChallengeCard.jsx:59', message: 'handleJoin called', data: { challengeId: challenge.id, userId: user?.id, userRole: user?.role }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'A' }) }).catch(() => { });
         if (onJoin) {
             onJoin(challenge.id);
         } else {
             if (user?.role === 'student') {
-                fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ChallengeCard.jsx:69',message:'Posting to student join route',data:{url:`/student/challenges/${challenge.id}/join`},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+                fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'ChallengeCard.jsx:69', message: 'Posting to student join route', data: { url: `/student/challenges/${challenge.id}/join` }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'B' }) }).catch(() => { });
 
                 router.post(`/student/challenges/${challenge.id}/join`, {}, {
                     preserveScroll: false,
                     preserveState: false,
                     onSuccess: (page) => {
-                        fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ChallengeCard.jsx:78',message:'Join success callback',data:{pageUrl:page?.url,challengeId:challenge.id},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'C'})}).catch(()=>{});
+                        fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'ChallengeCard.jsx:78', message: 'Join success callback', data: { pageUrl: page?.url, challengeId: challenge.id }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run2', hypothesisId: 'C' }) }).catch(() => { });
                         const targetUrl = `/student/challenges/${challenge.id}`;
                         const currentUrl = window.location.pathname;
-                        fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ChallengeCard.jsx:85',message:'Before redirect',data:{targetUrl,currentUrl,willRedirect:currentUrl !== targetUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'E'})}).catch(()=>{});
+                        fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'ChallengeCard.jsx:85', message: 'Before redirect', data: { targetUrl, currentUrl, willRedirect: currentUrl !== targetUrl }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run2', hypothesisId: 'E' }) }).catch(() => { });
 
                         if (currentUrl !== targetUrl) {
-                            fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ChallengeCard.jsx:91',message:'Calling router.visit',data:{targetUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'F'})}).catch(()=>{});
+                            fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'ChallengeCard.jsx:91', message: 'Calling router.visit', data: { targetUrl }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run2', hypothesisId: 'F' }) }).catch(() => { });
                             router.visit(targetUrl);
                         }
                     },
                     onError: (errors) => {
-                        fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ChallengeCard.jsx:95',message:'Join error callback',data:{errors:JSON.stringify(errors)},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'D'})}).catch(()=>{});
+                        fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'ChallengeCard.jsx:95', message: 'Join error callback', data: { errors: JSON.stringify(errors) }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run2', hypothesisId: 'D' }) }).catch(() => { });
                     },
                     onFinish: () => {
-                        fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ChallengeCard.jsx:101',message:'Join request finished',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'G'})}).catch(()=>{});
+                        fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'ChallengeCard.jsx:101', message: 'Join request finished', data: {}, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run2', hypothesisId: 'G' }) }).catch(() => { });
                     },
                 });
             } else {
@@ -183,7 +183,7 @@ export default function ChallengeCard({ challenge, user, participation = null, o
                             </div>
                             <div className="w-full bg-gray-200 rounded-full h-2">
                                 <div
-                                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                    className="bg-[#A3C042] h-2 rounded-full transition-all duration-300"
                                     style={{ width: `${progressPercentage}%` }}
                                 />
                             </div>

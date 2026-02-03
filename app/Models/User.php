@@ -84,6 +84,11 @@ class User extends Authenticatable
         return $this->role === 'educational_institution';
     }
 
+    public function canAccessAllSchoolData(): bool
+    {
+        return $this->isAdmin() || $this->isSystemSupervisor();
+    }
+
     public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class, 'student_email', 'email');

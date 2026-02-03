@@ -81,7 +81,7 @@ export default function StoreMembership({ auth, user, currentBalance = 1190, red
         // and update the user's points balance
         showSuccess(`تم استبدال ${item.points} نقطة بنجاح! سيتم إرسال الهدية لحسابك أو بريدك.`);
         setSelectedItem(null);
-        
+
         // Reload to update balance
         router.reload();
     };
@@ -119,76 +119,75 @@ export default function StoreMembership({ auth, user, currentBalance = 1190, red
             {/* Left Column - Desktop */}
             <div className={isDesktop ? 'space-y-4' : ''}>
                 {/* Green Banner */}
-                <div className="bg-gradient-to-r from-[#A3C042] to-[#93b03a] rounded-2xl p-4 text-white">
-                <div className="text-sm font-bold mb-1">إربح مع كل إنجاز!</div>
-                <div className="text-xs opacity-90">كلما ارتفع مستواك، زادت المزايا والهدايا</div>
-            </div>
+                <div className="bg-gradient-to-r from-[#A3C042] to-[#8CA635] rounded-2xl p-4 text-white">
+                    <div className="text-sm font-bold mb-1">إربح مع كل إنجاز!</div>
+                    <div className="text-xs opacity-90">كلما ارتفع مستواك، زادت المزايا والهدايا</div>
+                </div>
 
-            {/* Current Balance */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-4">
-                <div className="text-xs text-gray-600 mb-2">رصيدك الحالي</div>
-                <div className="bg-green-50 rounded-xl p-3 mb-2">
-                    <div className="text-base font-bold text-[#A3C042]">{balance} النقاط</div>
+                {/* Current Balance */}
+                <div className="bg-white rounded-2xl border border-gray-100 p-4">
+                    <div className="text-xs text-gray-600 mb-2">رصيدك الحالي</div>
+                    <div className="bg-green-50 rounded-xl p-3 mb-2">
+                        <div className="text-base font-bold text-[#A3C042]">{balance} النقاط</div>
+                    </div>
+                    <div className="flex items-center gap-1 text-xs text-gray-600">
+                        <FaCheckCircle className="text-green-500 text-[10px]" />
+                        <span>قابلة للتحويل</span>
+                    </div>
                 </div>
-                <div className="flex items-center gap-1 text-xs text-gray-600">
-                    <FaCheckCircle className="text-green-500 text-[10px]" />
-                    <span>قابلة للتحويل</span>
-                </div>
-            </div>
 
-            {/* Choose Your Gift */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-4">
-                <div className="flex items-center gap-2 mb-3">
-                    <FaGift className="text-[#A3C042] text-sm" />
-                    <h3 className="text-sm font-extrabold text-gray-900">اختر هديتك</h3>
-                </div>
-                <div className="space-y-3">
-                    {items.map((item) => {
-                        const canSelect = item.status === 'available' || item.status === 'ready';
-                        const isSelected = selectedItem === item.id;
-                        return (
-                            <div
-                                key={item.id}
-                                onClick={() => canSelect && setSelectedItem(item.id)}
-                                className={`flex items-center justify-between p-3 rounded-xl border-2 transition ${
-                                    isSelected
-                                        ? 'border-[#A3C042] bg-[#A3C042]/5'
-                                        : 'border-gray-200 bg-gray-50 hover:bg-gray-100'
-                                } ${canSelect ? 'cursor-pointer' : 'cursor-not-allowed opacity-75'}`}
-                            >
-                                <div className="flex items-center gap-3 flex-1">
-                                    <div className="text-2xl">{item.icon}</div>
-                                    <div className="flex-1">
-                                        <div className="text-xs font-semibold text-gray-900">{item.name}</div>
-                                        {item.statusText && (
-                                            <div className={`text-[10px] font-semibold mt-1 ${getStatusTextColor(item.status)}`}>
-                                                {item.statusText}
-                                            </div>
-                                        )}
+                {/* Choose Your Gift */}
+                <div className="bg-white rounded-2xl border border-gray-100 p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                        <FaGift className="text-[#A3C042] text-sm" />
+                        <h3 className="text-sm font-extrabold text-gray-900">اختر هديتك</h3>
+                    </div>
+                    <div className="space-y-3">
+                        {items.map((item) => {
+                            const canSelect = item.status === 'available' || item.status === 'ready';
+                            const isSelected = selectedItem === item.id;
+                            return (
+                                <div
+                                    key={item.id}
+                                    onClick={() => canSelect && setSelectedItem(item.id)}
+                                    className={`flex items-center justify-between p-3 rounded-xl border-2 transition ${isSelected
+                                            ? 'border-[#A3C042] bg-[#A3C042]/5'
+                                            : 'border-gray-200 bg-gray-50 hover:bg-gray-100'
+                                        } ${canSelect ? 'cursor-pointer' : 'cursor-not-allowed opacity-75'}`}
+                                >
+                                    <div className="flex items-center gap-3 flex-1">
+                                        <div className="text-2xl">{item.icon}</div>
+                                        <div className="flex-1">
+                                            <div className="text-xs font-semibold text-gray-900">{item.name}</div>
+                                            {item.statusText && (
+                                                <div className={`text-[10px] font-semibold mt-1 ${getStatusTextColor(item.status)}`}>
+                                                    {item.statusText}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="text-xs font-bold text-gray-700">{item.points}</div>
+                                        {getStatusIcon(item.status)}
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="text-xs font-bold text-gray-700">{item.points}</div>
-                                    {getStatusIcon(item.status)}
-                                </div>
-                            </div>
-                        );
-                    })}
+                            );
+                        })}
+                    </div>
                 </div>
-            </div>
 
-            {/* Redeem Button */}
-            <button
-                type="button"
-                onClick={handleRedeem}
-                className="w-full bg-[#A3C042] text-white rounded-xl py-3 font-bold text-sm flex items-center justify-center gap-2 hover:bg-[#93b03a] transition"
-            >
-                <FaGift />
-                استبدل النقاط
-            </button>
-            <p className="text-[10px] text-gray-500 text-center">
-                يتم خصم النقاط تلقائيا وإرسال الهدية لحسابك أو بريدك.
-            </p>
+                {/* Redeem Button */}
+                <button
+                    type="button"
+                    onClick={handleRedeem}
+                    className="w-full bg-[#A3C042] text-white rounded-xl py-3 font-bold text-sm flex items-center justify-center gap-2 hover:bg-[#8CA635] transition"
+                >
+                    <FaGift />
+                    استبدل النقاط
+                </button>
+                <p className="text-[10px] text-gray-500 text-center">
+                    يتم خصم النقاط تلقائيا وإرسال الهدية لحسابك أو بريدك.
+                </p>
             </div>
 
             {/* Right Column - Desktop */}
@@ -204,30 +203,30 @@ export default function StoreMembership({ auth, user, currentBalance = 1190, red
                 </div>
 
                 {/* Digital Win Card */}
-                <div className="bg-gradient-to-r from-[#A3C042] to-[#93b03a] rounded-2xl p-4 text-white">
-                <div className="text-sm font-bold mb-3">بطاقة فوز رقمية</div>
-                <div className="flex items-center gap-2 mb-3">
-                    <div className="bg-white/20 rounded-xl px-2 py-1">
-                        <div className="text-xs font-bold">نقطة 25</div>
+                <div className="bg-gradient-to-r from-[#A3C042] to-[#8CA635] rounded-2xl p-4 text-white">
+                    <div className="text-sm font-bold mb-3">بطاقة فوز رقمية</div>
+                    <div className="flex items-center gap-2 mb-3">
+                        <div className="bg-white/20 rounded-xl px-2 py-1">
+                            <div className="text-xs font-bold">نقطة 25</div>
+                        </div>
                     </div>
-                </div>
-                <div className="bg-white/20 rounded-xl p-3 mb-2">
-                    <div className="text-xs font-mono font-bold">FVZ9-62YP-LK21</div>
-                </div>
-                <div className="flex items-center justify-between text-xs mb-2">
-                    <span>كود البطاقة:</span>
-                    <div className="flex items-center gap-1">
-                        <FaCalendar className="text-[10px]" />
-                        <span>31 ديسمبر 2025</span>
+                    <div className="bg-white/20 rounded-xl p-3 mb-2">
+                        <div className="text-xs font-mono font-bold">FVZ9-62YP-LK21</div>
                     </div>
+                    <div className="flex items-center justify-between text-xs mb-2">
+                        <span>كود البطاقة:</span>
+                        <div className="flex items-center gap-1">
+                            <FaCalendar className="text-[10px]" />
+                            <span>31 ديسمبر 2025</span>
+                        </div>
+                    </div>
+                    <div className="flex items-center justify-between text-xs mb-3">
+                        <span>صالح حتى:</span>
+                    </div>
+                    <p className="text-[10px] opacity-90">
+                        استخدم الكود في صفحة الشحن لشحن رصيدك بالنقاط!
+                    </p>
                 </div>
-                <div className="flex items-center justify-between text-xs mb-3">
-                    <span>صالح حتى:</span>
-                </div>
-                <p className="text-[10px] opacity-90">
-                    استخدم الكود في صفحة الشحن لشحن رصيدك بالنقاط!
-                </p>
-            </div>
             </div>
         </div>
     );

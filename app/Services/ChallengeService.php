@@ -24,7 +24,9 @@ class ChallengeService extends BaseService
     ): LengthAwarePaginator {
         // Don't cache - always get fresh data to ensure new challenges appear immediately
         // Cache was causing issues where new challenges didn't appear
-        $query = Challenge::where('school_id', $schoolId)
+        $query = Challenge::when($schoolId > 0, function($q) use ($schoolId) {
+                return $q->where('school_id', $schoolId);
+            })
             ->where('status', '!=', 'cancelled')
             ->with(['creator', 'school'])
             ->orderBy('created_at', 'desc');
@@ -371,11 +373,16 @@ class ChallengeService extends BaseService
     public function getSchoolChallengeStats(int $schoolId): array
     {
         return Cache::remember("school_challenge_stats_{$schoolId}", 3600, function () use ($schoolId) {
+            $query = Challenge::query();
+            if ($schoolId > 0) {
+                $query->where('school_id', $schoolId);
+            }
+            
             return [
-                'total' => Challenge::where('school_id', $schoolId)->count(),
-                'active' => Challenge::where('school_id', $schoolId)->where('status', 'active')->count(),
-                'draft' => Challenge::where('school_id', $schoolId)->where('status', 'draft')->count(),
-                'completed' => Challenge::where('school_id', $schoolId)->where('status', 'completed')->count(),
+                'total' => (clone $query)->count(),
+                'active' => (clone $query)->where('status', 'active')->count(),
+                'draft' => (clone $query)->where('status', 'draft')->count(),
+                'completed' => (clone $query)->where('status', 'completed')->count(),
             ];
         });
     }

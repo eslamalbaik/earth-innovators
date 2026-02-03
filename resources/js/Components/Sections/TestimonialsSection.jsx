@@ -106,7 +106,7 @@ export default function TestimonialsSection({
     return (
         <div className="space-y-4 md:space-y-6">
             <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-[#A3C042]/20 to-[#93b03a]/20 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-xl flex items-center justify-center">
                     <FaComments className="text-[#A3C042] text-xl" />
                 </div>
                 <h2 className="text-xl md:text-2xl font-bold text-gray-900">{title}</h2>
@@ -138,11 +138,10 @@ export default function TestimonialsSection({
                                         {[...Array(5)].map((_, i) => (
                                             <FaStar
                                                 key={i}
-                                                className={`text-lg ${
-                                                    i < Math.floor(testimonial.rating)
+                                                className={`text-lg ${i < Math.floor(testimonial.rating)
                                                         ? 'text-yellow-400'
                                                         : 'text-gray-300'
-                                                }`}
+                                                    }`}
                                             />
                                         ))}
                                     </div>
@@ -193,14 +192,14 @@ export default function TestimonialsSection({
                     <>
                         <button
                             onClick={prevSlide}
-                            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 md:-translate-x-4 bg-[#A3C042] text-white rounded-full p-2 md:p-3 shadow-lg hover:bg-[#93b03a] transition-colors z-10"
+                            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 md:-translate-x-4 bg-[#A3C042] text-white rounded-full p-2 md:p-3 shadow-lg hover:bg-[#8CA635] transition-colors z-10"
                             aria-label="Previous"
                         >
                             <FaChevronLeft className="text-sm md:text-base" />
                         </button>
                         <button
                             onClick={nextSlide}
-                            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 md:translate-x-4 bg-[#A3C042] text-white rounded-full p-2 md:p-3 shadow-lg hover:bg-[#93b03a] transition-colors z-10"
+                            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 md:translate-x-4 bg-[#A3C042] text-white rounded-full p-2 md:p-3 shadow-lg hover:bg-[#8CA635] transition-colors z-10"
                             aria-label="Next"
                         >
                             <FaChevronRight className="text-sm md:text-base" />
@@ -215,11 +214,10 @@ export default function TestimonialsSection({
                             <button
                                 key={index}
                                 onClick={() => setCurrentIndex(index)}
-                                className={`h-2 rounded-full transition-all ${
-                                    currentIndex === index
+                                className={`h-2 rounded-full transition-all ${currentIndex === index
                                         ? 'bg-[#A3C042] w-6'
                                         : 'bg-gray-300 w-2'
-                                }`}
+                                    }`}
                                 aria-label={`Go to slide ${index + 1}`}
                             />
                         ))}

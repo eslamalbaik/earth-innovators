@@ -99,7 +99,7 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
                                 تنتهي في: {toHijriDate(userPackage.end_date)}
                             </p>
                         </div>
-                        <span className={`px-3 py-1 bg-green-600 text-white ${isDesktop ? 'text-sm' : 'text-xs'} font-semibold rounded-full`}>
+                        <span className={`px-3 py-1 bg-[#A3C042] text-white ${isDesktop ? 'text-sm' : 'text-xs'} font-semibold rounded-full`}>
                             نشطة
                         </span>
                     </div>
@@ -125,30 +125,28 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
                         return (
                             <div
                                 key={pkg.id}
-                                className={`bg-white rounded-2xl border-2 overflow-hidden transition-all relative ${
-                                    isPopular
-                                        ? 'border-[#A3C042] shadow-lg'
-                                        : isCurrentPackage
+                                className={`bg-white rounded-2xl border-2 overflow-hidden transition-all relative ${isPopular
+                                    ? 'border-[#A3C042] shadow-lg'
+                                    : isCurrentPackage
                                         ? 'border-green-300 bg-green-50'
                                         : 'border-gray-200'
-                                }`}
+                                    }`}
                             >
                                 {isPopular && (
-                                    <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-[#A3C042] to-[#93b03a] text-white text-center py-1.5 font-bold text-xs">
+                                    <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-[#A3C042] to-[#8CA635] text-white text-center py-1.5 font-bold text-xs">
                                         ⭐ الأكثر شعبية
                                     </div>
                                 )}
                                 {isCurrentPackage && (
-                                    <div className="absolute top-0 left-0 right-0 bg-green-600 text-white text-center py-1.5 font-bold text-xs">
+                                    <div className="absolute top-0 left-0 right-0 bg-[#A3C042] text-white text-center py-1.5 font-bold text-xs">
                                         ✓ باقتك الحالية
                                     </div>
                                 )}
                                 <div className={`${isDesktop ? 'p-6' : 'p-4'} ${isPopular || isCurrentPackage ? isDesktop ? 'pt-16' : 'pt-12' : ''}`}>
                                     {/* Package Header */}
                                     <div className="text-center mb-4">
-                                        <div className={`inline-flex items-center justify-center ${isDesktop ? 'w-20 h-20' : 'w-14 h-14'} rounded-full mb-3 ${
-                                            isPopular ? 'bg-gradient-to-br from-[#A3C042] to-[#93b03a]' : 'bg-gray-100'
-                                        }`}>
+                                        <div className={`inline-flex items-center justify-center ${isDesktop ? 'w-20 h-20' : 'w-14 h-14'} rounded-full mb-3 ${isPopular ? 'bg-gradient-to-br from-[#A3C042] to-[#8CA635]' : 'bg-gray-100'
+                                            }`}>
                                             <Icon className={`${isDesktop ? 'text-4xl' : 'text-2xl'} ${isPopular ? 'text-white' : 'text-gray-600'}`} />
                                         </div>
                                         <h3 className={`${isDesktop ? 'text-xl' : 'text-base'} font-extrabold text-gray-900 mb-2`}>
@@ -226,13 +224,12 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
                                         <button
                                             onClick={() => handleSubscribe(pkg.id)}
                                             disabled={isSubscribing || isCurrentPackage}
-                                            className={`w-full text-center ${isDesktop ? 'px-6 py-4' : 'px-4 py-3'} rounded-xl font-semibold ${isDesktop ? 'text-base' : 'text-sm'} transition ${
-                                                isCurrentPackage
-                                                    ? 'bg-green-100 text-green-700 cursor-not-allowed'
-                                                    : isPopular
-                                                    ? 'bg-gradient-to-r from-[#A3C042] to-[#93b03a] text-white hover:shadow-lg'
-                                                    : 'bg-[#A3C042] text-white hover:bg-[#93b03a]'
-                                            } ${isSubscribing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            className={`w-full text-center ${isDesktop ? 'px-6 py-4' : 'px-4 py-3'} rounded-xl font-semibold ${isDesktop ? 'text-base' : 'text-sm'} transition ${isCurrentPackage
+                                                ? 'bg-green-100 text-green-700 cursor-not-allowed'
+                                                : isPopular
+                                                    ? 'bg-gradient-to-r from-[#A3C042] to-[#8CA635] text-white hover:shadow-lg'
+                                                    : 'bg-[#A3C042] text-white hover:bg-[#8CA635]'
+                                                } ${isSubscribing ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         >
                                             {isSubscribing ? (
                                                 <>
@@ -251,11 +248,10 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
                                     ) : (
                                         <Link
                                             href="/register"
-                                            className={`block w-full text-center ${isDesktop ? 'px-6 py-4' : 'px-4 py-3'} rounded-xl font-semibold ${isDesktop ? 'text-base' : 'text-sm'} transition ${
-                                                isPopular
-                                                    ? 'bg-gradient-to-r from-[#A3C042] to-[#93b03a] text-white hover:shadow-lg'
-                                                    : 'bg-[#A3C042] text-white hover:bg-[#93b03a]'
-                                            }`}
+                                            className={`block w-full text-center ${isDesktop ? 'px-6 py-4' : 'px-4 py-3'} rounded-xl font-semibold ${isDesktop ? 'text-base' : 'text-sm'} transition ${isPopular
+                                                ? 'bg-gradient-to-r from-[#A3C042] to-[#8CA635] text-white hover:shadow-lg'
+                                                : 'bg-[#A3C042] text-white hover:bg-[#8CA635]'
+                                                }`}
                                         >
                                             سجل للاشتراك
                                         </Link>

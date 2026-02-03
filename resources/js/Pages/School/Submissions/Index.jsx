@@ -83,7 +83,7 @@ export default function SchoolSubmissionsIndex({ auth, submissions, students = [
                         )}
                         <button
                             type="submit"
-                            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                            className="px-6 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-blue-700 transition"
                         >
                             بحث
                         </button>
@@ -193,13 +193,12 @@ export default function SchoolSubmissionsIndex({ auth, submissions, students = [
                                     key={index}
                                     onClick={() => link.url && router.get(link.url)}
                                     disabled={!link.url}
-                                    className={`px-4 py-2 rounded-lg ${
-                                        link.active
-                                            ? 'bg-blue-600 text-white'
+                                    className={`px-4 py-2 rounded-lg ${link.active
+                                            ? 'bg-[#A3C042] text-white'
                                             : link.url
-                                            ? 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-                                            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                    }`}
+                                                ? 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                                                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                        }`}
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                 />
                             ))}

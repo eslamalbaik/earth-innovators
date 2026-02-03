@@ -16,12 +16,12 @@ class BadgeRepository extends BaseRepository
     {
         $query = $this->model->where('is_active', true);
 
-        if ($schoolId) {
+        if ($schoolId !== null && $schoolId > 0) {
             $query->where(function ($q) use ($schoolId) {
                 $q->whereNull('school_id')
                   ->orWhere('school_id', $schoolId);
             });
-        } else {
+        } elseif ($schoolId === null) {
             $query->whereNull('school_id');
         }
 

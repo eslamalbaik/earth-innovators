@@ -94,9 +94,8 @@ export default function AdminPackagesCreate() {
                                 type="text"
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.name ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.name ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             />
                             {errors.name && (
@@ -113,9 +112,8 @@ export default function AdminPackagesCreate() {
                                 type="text"
                                 value={data.name_ar}
                                 onChange={(e) => setData('name_ar', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.name_ar ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.name_ar ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                             />
                             {errors.name_ar && (
                                 <p className="mt-1 text-sm text-red-600">{errors.name_ar}</p>
@@ -131,9 +129,8 @@ export default function AdminPackagesCreate() {
                                 value={data.description}
                                 onChange={(e) => setData('description', e.target.value)}
                                 rows={3}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.description ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.description ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                             />
                             {errors.description && (
                                 <p className="mt-1 text-sm text-red-600">{errors.description}</p>
@@ -149,9 +146,8 @@ export default function AdminPackagesCreate() {
                                 value={data.description_ar}
                                 onChange={(e) => setData('description_ar', e.target.value)}
                                 rows={3}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.description_ar ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.description_ar ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                             />
                             {errors.description_ar && (
                                 <p className="mt-1 text-sm text-red-600">{errors.description_ar}</p>
@@ -169,9 +165,8 @@ export default function AdminPackagesCreate() {
                                 step="0.01"
                                 value={data.price}
                                 onChange={(e) => setData('price', parseFloat(e.target.value) || 0)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.price ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.price ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             />
                             {errors.price && (
@@ -187,9 +182,8 @@ export default function AdminPackagesCreate() {
                             <select
                                 value={data.currency}
                                 onChange={(e) => setData('currency', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.currency ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.currency ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             >
                                 <option value="SAR">ريال سعودي (SAR)</option>
@@ -209,9 +203,8 @@ export default function AdminPackagesCreate() {
                             <select
                                 value={data.duration_type}
                                 onChange={(e) => setData('duration_type', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.duration_type ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.duration_type ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             >
                                 <option value="monthly">شهري</option>
@@ -234,9 +227,8 @@ export default function AdminPackagesCreate() {
                                 min="1"
                                 value={data.duration_months}
                                 onChange={(e) => setData('duration_months', parseInt(e.target.value) || 1)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.duration_months ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.duration_months ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                             />
                             {errors.duration_months && (
                                 <p className="mt-1 text-sm text-red-600">{errors.duration_months}</p>
@@ -253,9 +245,8 @@ export default function AdminPackagesCreate() {
                                 min="0"
                                 value={data.points_bonus}
                                 onChange={(e) => setData('points_bonus', parseInt(e.target.value) || 0)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.points_bonus ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.points_bonus ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                             />
                             {errors.points_bonus && (
                                 <p className="mt-1 text-sm text-red-600">{errors.points_bonus}</p>
@@ -272,9 +263,8 @@ export default function AdminPackagesCreate() {
                                 min="0"
                                 value={data.projects_limit || ''}
                                 onChange={(e) => setData('projects_limit', e.target.value ? parseInt(e.target.value) : null)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.projects_limit ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.projects_limit ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 placeholder="غير محدود"
                             />
                             {errors.projects_limit && (
@@ -292,9 +282,8 @@ export default function AdminPackagesCreate() {
                                 min="0"
                                 value={data.challenges_limit || ''}
                                 onChange={(e) => setData('challenges_limit', e.target.value ? parseInt(e.target.value) : null)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.challenges_limit ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.challenges_limit ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 placeholder="غير محدود"
                             />
                             {errors.challenges_limit && (
@@ -424,7 +413,7 @@ export default function AdminPackagesCreate() {
                         <button
                             type="submit"
                             disabled={processing}
-                            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50"
+                            className="px-6 py-2 bg-[#A3C042] hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50"
                         >
                             <FaSave />
                             {processing ? 'جاري الحفظ...' : 'حفظ'}

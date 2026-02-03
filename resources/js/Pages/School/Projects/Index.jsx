@@ -52,7 +52,7 @@ export default function SchoolProjects({ projects, auth }) {
             e.preventDefault();
             e.stopPropagation();
         }
-        
+
         const confirmed = await confirm({
             title: 'تأكيد الحذف',
             message: 'هل أنت متأكد من حذف هذا المشروع؟ هذا الإجراء لا يمكن التراجع عنه.',
@@ -88,7 +88,7 @@ export default function SchoolProjects({ projects, auth }) {
                 <h2 className="text-2xl font-bold text-gray-900">مشاريع المدرسة</h2>
                 <Link
                     href="/school/projects/create"
-                    className="bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white px-6 py-3 rounded-lg font-semibold transition duration-300 flex items-center gap-2 shadow-md hover:shadow-xl"
+                    className="bg-[#A3C042] text-white px-6 py-3 rounded-lg font-semibold transition duration-300 flex items-center gap-2 shadow-md hover:shadow-xl"
                 >
                     <FaPlus />
                     إنشاء مشروع جديد
@@ -221,11 +221,10 @@ export default function SchoolProjects({ projects, auth }) {
                                     <Link
                                         key={index}
                                         href={link.url || '#'}
-                                        className={`px-4 py-2 rounded-lg font-medium transition ${
-                                            link.active
-                                                ? 'bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        className={`px-4 py-2 rounded-lg font-medium transition ${link.active
+                                            ? 'bg-[#A3C042] text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
                                 ))}

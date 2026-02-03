@@ -18,9 +18,12 @@ class ProjectController extends Controller
     {
         $user = Auth::user();
         
-        $schoolId = null;
-        if ($user && $user->isStudent() && $user->school_id) {
-            $schoolId = $user->school_id;
+        if ($user) {
+            if ($user->isStudent() && $user->school_id) {
+                $schoolId = $user->school_id;
+            } elseif ($user->isSchool()) {
+                $schoolId = $user->id;
+            }
         }
 
         $projects = $this->projectService->getApprovedProjects(

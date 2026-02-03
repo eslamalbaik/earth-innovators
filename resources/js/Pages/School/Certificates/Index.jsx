@@ -91,14 +91,14 @@ export default function Index({ auth, students, description }) {
                 showSuccess('تم إنشاء الشهادة بنجاح');
                 setShowGenerateModal(false);
                 setSelectedStudent(null);
-                
+
                 // Download the certificate
                 if (response.data.certificate.storage_url) {
                     window.open(response.data.certificate.storage_url, '_blank');
                 } else if (response.data.certificate.download_url) {
                     window.open(response.data.certificate.download_url, '_blank');
                 }
-                
+
                 // Refresh the page to update student list
                 router.reload();
             } else {
@@ -424,7 +424,7 @@ export default function Index({ auth, students, description }) {
                     <div className="mt-6 flex justify-end">
                         <button
                             onClick={() => setShowPreviewModal(false)}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                            className="px-4 py-2 bg-[#A3C042] text-white rounded-md hover:bg-blue-700"
                         >
                             إغلاق
                         </button>

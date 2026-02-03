@@ -13,10 +13,10 @@ import FAQSection from '@/Components/Sections/FAQSection';
 import PublicationsSection from '@/Components/Sections/PublicationsSection';
 import CTASection from '@/Components/Sections/CTASection';
 
-export default function Landing({ 
-    auth, 
-    stats = [], 
-    featuredProjects = [], 
+export default function Landing({
+    auth,
+    stats = [],
+    featuredProjects = [],
     featuredPublications = [],
     uaeSchools = [],
     testimonials = [],
@@ -35,7 +35,7 @@ export default function Landing({
 
     const getCertificateLink = () => {
         if (!user) return '/membership-certificate';
-        
+
         switch (user.role) {
             case 'student':
                 return '/student/certificate';
@@ -94,8 +94,8 @@ export default function Landing({
                     onBack={() => router.visit('/')}
                 >
                     <div className="space-y-6">
-                                                {/* Membership Certificate Banner - Only for authenticated users */}
-                                                {isAuthed && membershipCertificate && (
+                        {/* Membership Certificate Banner - Only for authenticated users */}
+                        {isAuthed && membershipCertificate && (
                             <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-2xl p-4">
                                 <div className="flex items-center gap-3">
                                     <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -111,14 +111,14 @@ export default function Landing({
                                         <div className="flex items-center gap-2">
                                             <Link
                                                 href={getCertificateLink()}
-                                                className="text-xs font-bold text-[#A3C042] hover:text-[#93b03a]"
+                                                className="text-xs font-bold text-[#A3C042] hover:text-[#8CA635]"
                                             >
                                                 عرض الشهادة
                                             </Link>
                                             <span className="text-gray-300">|</span>
                                             <a
                                                 href={membershipCertificate.download_url}
-                                                className="text-xs font-bold text-[#A3C042] hover:text-[#93b03a] flex items-center gap-1"
+                                                className="text-xs font-bold text-[#A3C042] hover:text-[#8CA635] flex items-center gap-1"
                                             >
                                                 <FaDownload className="text-xs" />
                                                 تحميل
@@ -129,7 +129,7 @@ export default function Landing({
                             </div>
                         )}
                         {/* Hero Section */}
-                        <div className="bg-gradient-to-br from-[#A3C042] to-[#93b03a] rounded-3xl p-6 text-white relative overflow-hidden">
+                        <div className="bg-gradient-to-br from-[#A3C042] to-[#8CA635] rounded-3xl p-6 text-white relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
                             <div className="relative z-10">
                                 <h1 className="text-2xl font-extrabold mb-3 leading-tight">
@@ -187,7 +187,7 @@ export default function Landing({
                                             className="block bg-gray-50 rounded-xl p-3 border border-gray-100 hover:shadow-md transition"
                                         >
                                             <div className="flex items-start gap-3">
-                                                <div className="w-12 h-12 bg-gradient-to-br from-[#A3C042]/20 to-[#93b03a]/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                                                <div className="w-12 h-12 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-xl flex items-center justify-center flex-shrink-0">
                                                     <FaProjectDiagram className="text-[#A3C042] text-xl" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
@@ -283,7 +283,7 @@ export default function Landing({
                         </div>
 
                         {/* Platform Features Section */}
-                        <div className="bg-gradient-to-br from-[#A3C042]/5 to-[#93b03a]/5 rounded-2xl border border-gray-100 p-4 md:p-6">
+                        <div className="bg-gradient-to-br from-[#A3C042]/5 to-[#8CA635]/5 rounded-2xl border border-gray-100 p-4 md:p-6">
                             <PlatformFeaturesSection
                                 title="منصة متكاملة للإبداع والابتكار"
                                 subtitle="جميع الأدوات والميزات التي تحتاجها لتكون جزءاً من مجتمع المبتكرين والموهوبين."
@@ -305,7 +305,7 @@ export default function Landing({
 
                         {/* Teacher Recruitment Section - Only show to non-authenticated users or non-teachers */}
                         {(!isAuthed || (user?.role !== 'teacher' && user?.role !== 'school')) && (
-                            <div className="bg-gradient-to-br from-[#A3C042] to-[#93b03a] rounded-2xl p-4 md:p-6 text-white">
+                            <div className="bg-gradient-to-br from-[#A3C042] to-[#8CA635] rounded-2xl p-4 md:p-6 text-white">
                                 <TeacherRecruitmentSection
                                     title="هل أنت معلم أو مشرف؟"
                                     callToAction="انضم إلى إرث المبتكرين!"
@@ -332,7 +332,7 @@ export default function Landing({
                         )}
 
                         {/* FAQ Section */}
-                        <div className="bg-gradient-to-br from-[#A3C042]/10 to-[#93b03a]/10 rounded-2xl border border-gray-100 p-4 md:p-6">
+                        <div className="bg-gradient-to-br from-[#A3C042]/10 to-[#8CA635]/10 rounded-2xl border border-gray-100 p-4 md:p-6">
                             <FAQSection
                                 title="الأسئلة الشائعة"
                                 subtitle="أجوبة على أهم الأسئلة المتعلقة بمنصة إرث المبتكرين والمشاريع والتحديات والشارات."
@@ -382,7 +382,7 @@ export default function Landing({
                 />
                 <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-4">
                     <div className="space-y-6">
-                        
+
                         {/* Membership Certificate Banner - Desktop */}
                         {isAuthed && membershipCertificate && (
                             <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-2xl p-6">
@@ -400,14 +400,14 @@ export default function Landing({
                                         <div className="flex items-center gap-3">
                                             <Link
                                                 href={getCertificateLink()}
-                                                className="text-sm font-bold text-[#A3C042] hover:text-[#93b03a]"
+                                                className="text-sm font-bold text-[#A3C042] hover:text-[#8CA635]"
                                             >
                                                 عرض الشهادة
                                             </Link>
                                             <span className="text-gray-300">|</span>
                                             <a
                                                 href={membershipCertificate.download_url}
-                                                className="text-sm font-bold text-[#A3C042] hover:text-[#93b03a] flex items-center gap-1"
+                                                className="text-sm font-bold text-[#A3C042] hover:text-[#8CA635] flex items-center gap-1"
                                             >
                                                 <FaDownload />
                                                 تحميل
@@ -417,9 +417,9 @@ export default function Landing({
                                 </div>
                             </div>
                         )}
-                        
+
                         {/* Hero Section */}
-                        <div className="bg-gradient-to-br from-[#A3C042] to-[#93b03a] rounded-3xl p-8 text-white relative overflow-hidden">
+                        <div className="bg-gradient-to-br from-[#A3C042] to-[#8CA635] rounded-3xl p-8 text-white relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
                             <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                                 <div>
@@ -472,7 +472,7 @@ export default function Landing({
                                     <h2 className="text-2xl font-bold text-gray-900">أبرز المشاريع الإبداعية</h2>
                                     <Link
                                         href="/projects"
-                                        className="text-[#A3C042] text-sm font-semibold flex items-center gap-2 hover:text-[#93b03a] transition"
+                                        className="text-[#A3C042] text-sm font-semibold flex items-center gap-2 hover:text-[#8CA635] transition"
                                     >
                                         عرض جميع المشاريع
                                         <FaArrowLeft />
@@ -571,7 +571,7 @@ export default function Landing({
                         </section>
 
                         {/* Platform Features Section */}
-                        <section className="bg-gradient-to-br from-[#A3C042]/5 to-[#93b03a]/5 rounded-2xl border border-gray-100 p-6 md:p-8">
+                        <section className="bg-gradient-to-br from-[#A3C042]/5 to-[#8CA635]/5 rounded-2xl border border-gray-100 p-6 md:p-8">
                             <PlatformFeaturesSection
                                 title="منصة متكاملة للإبداع والابتكار"
                                 subtitle="جميع الأدوات والميزات التي تحتاجها لتكون جزءاً من مجتمع المبتكرين والموهوبين."
@@ -593,7 +593,7 @@ export default function Landing({
 
                         {/* Teacher Recruitment Section - Only show to non-authenticated users or non-teachers */}
                         {(!isAuthed || (user?.role !== 'teacher' && user?.role !== 'school')) && (
-                            <section className="bg-gradient-to-br from-[#A3C042] to-[#93b03a] rounded-2xl p-6 md:p-8 text-white">
+                            <section className="bg-gradient-to-br from-[#A3C042] to-[#8CA635] rounded-2xl p-6 md:p-8 text-white">
                                 <TeacherRecruitmentSection
                                     title="هل أنت معلم أو مشرف؟"
                                     callToAction="انضم إلى إرث المبتكرين!"
@@ -620,7 +620,7 @@ export default function Landing({
                         )}
 
                         {/* FAQ Section */}
-                        <section className="bg-gradient-to-br from-[#A3C042]/10 to-[#93b03a]/10 rounded-2xl border border-gray-100 p-6 md:p-8">
+                        <section className="bg-gradient-to-br from-[#A3C042]/10 to-[#8CA635]/10 rounded-2xl border border-gray-100 p-6 md:p-8">
                             <FAQSection
                                 title="الأسئلة الشائعة"
                                 subtitle="أجوبة على أهم الأسئلة المتعلقة بمنصة إرث المبتكرين والمشاريع والتحديات والشارات."

@@ -224,11 +224,11 @@ export default function TeacherApplicationDetails({ application }) {
                             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                                 <h3 className="text-lg font-semibold text-gray-900 mb-4">الإجراءات</h3>
                                 <div className="space-y-3">
-                                    <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200">
+                                    <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-[#8CA635] transition duration-200">
                                         <FaCheck />
                                         الموافقة على الطلب
                                     </button>
-                                    <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200">
+                                    <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-blue-700 transition duration-200">
                                         <FaClock />
                                         وضع قيد المراجعة
                                     </button>

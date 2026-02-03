@@ -85,9 +85,8 @@ export default function MySubscriptions({ auth, subscriptions = [] }) {
                         return (
                             <div
                                 key={subscription.id}
-                                className={`bg-white rounded-2xl border-2 p-4 ${
-                                    isActive ? 'border-green-300 bg-green-50' : 'border-gray-200'
-                                }`}
+                                className={`bg-white rounded-2xl border-2 p-4 ${isActive ? 'border-green-300 bg-green-50' : 'border-gray-200'
+                                    }`}
                             >
                                 {/* Package Info */}
                                 <div className="flex items-start justify-between mb-3">
@@ -158,7 +157,7 @@ export default function MySubscriptions({ auth, subscriptions = [] }) {
                     <p className="text-sm text-gray-500 mb-4">لا توجد اشتراكات حالياً</p>
                     <button
                         onClick={() => router.visit('/packages')}
-                        className="px-4 py-2 bg-[#A3C042] text-white rounded-xl hover:bg-[#93b03a] transition text-sm font-semibold"
+                        className="px-4 py-2 bg-[#A3C042] text-white rounded-xl hover:bg-[#8CA635] transition text-sm font-semibold"
                     >
                         تصفح الباقات
                     </button>

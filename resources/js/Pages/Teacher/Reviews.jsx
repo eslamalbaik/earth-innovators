@@ -202,7 +202,7 @@ export default function TeacherReviews({ reviews, stats, teacher }) {
                                                     <button
                                                         type="submit"
                                                         disabled={isReplying}
-                                                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition disabled:opacity-50"
+                                                        className="bg-blue-500 hover:bg-[#A3C042] text-white px-4 py-2 rounded-lg text-sm font-medium transition disabled:opacity-50"
                                                     >
                                                         {isReplying ? 'جاري الإرسال...' : 'إرسال'}
                                                     </button>
@@ -231,7 +231,7 @@ export default function TeacherReviews({ reviews, stats, teacher }) {
                                         {replyingTo?.id !== review.id && (
                                             <button
                                                 onClick={() => handleReply(review)}
-                                                className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg flex items-center gap-2 transition"
+                                                className="px-4 py-2 bg-blue-500 hover:bg-[#A3C042] text-white font-medium rounded-lg flex items-center gap-2 transition"
                                             >
                                                 <FaReply />
                                                 {review.teacher_response ? 'تعديل الرد' : 'رد'}

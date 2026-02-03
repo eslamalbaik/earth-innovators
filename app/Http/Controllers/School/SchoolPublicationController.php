@@ -25,13 +25,13 @@ class SchoolPublicationController extends Controller
         $user = Auth::user();
 
         $publications = $this->publicationService->getSchoolPublications(
-            $user->id,
+            $user->canAccessAllSchoolData() ? 0 : $user->id,
             $request->get('status'),
             10
         );
 
         // Accessor in Model handles image path normalization automatically
-        $stats = $this->publicationService->getSchoolPublicationStats($user->id);
+        $stats = $this->publicationService->getSchoolPublicationStats($user->canAccessAllSchoolData() ? 0 : $user->id);
 
         return Inertia::render('School/Publications/Index', [
             'publications' => $publications,
@@ -49,7 +49,7 @@ class SchoolPublicationController extends Controller
     {
         $user = Auth::user();
 
-        $publications = $this->publicationService->getSchoolPendingPublications($user->id, 10);
+        $publications = $this->publicationService->getSchoolPendingPublications($user->canAccessAllSchoolData() ? 0 : $user->id, 10);
 
         // Accessor in Model handles image path normalization automatically
         return Inertia::render('School/Publications/Pending', [
@@ -155,7 +155,7 @@ class SchoolPublicationController extends Controller
         $user = Auth::user();
 
         // التحقق من أن المقال يتبع هذه المدرسة
-        if ($publication->school_id !== $user->id) {
+        if (!$user->canAccessAllSchoolData() && $publication->school_id !== $user->id) {
             abort(403);
         }
 
@@ -181,7 +181,7 @@ class SchoolPublicationController extends Controller
         $user = Auth::user();
 
         // التحقق من أن المقال يتبع هذه المدرسة
-        if ($publication->school_id !== $user->id) {
+        if (!$user->canAccessAllSchoolData() && $publication->school_id !== $user->id) {
             abort(403);
         }
 
@@ -204,7 +204,7 @@ class SchoolPublicationController extends Controller
         $user = Auth::user();
 
         // التحقق من أن المقال يتبع هذه المدرسة
-        if ($publication->school_id !== $user->id) {
+        if (!$user->canAccessAllSchoolData() && $publication->school_id !== $user->id) {
             abort(403);
         }
 
@@ -224,7 +224,7 @@ class SchoolPublicationController extends Controller
         $user = Auth::user();
 
         // التحقق من أن المقال يتبع هذه المدرسة
-        if ($publication->school_id !== $user->id) {
+        if (!$user->canAccessAllSchoolData() && $publication->school_id !== $user->id) {
             abort(403);
         }
 
@@ -242,7 +242,7 @@ class SchoolPublicationController extends Controller
         $user = Auth::user();
 
         // التحقق من أن المقال يتبع هذه المدرسة
-        if ($publication->school_id !== $user->id) {
+        if (!$user->canAccessAllSchoolData() && $publication->school_id !== $user->id) {
             abort(403);
         }
 
@@ -303,7 +303,7 @@ class SchoolPublicationController extends Controller
         $user = Auth::user();
 
         // التحقق من أن المقال يتبع هذه المدرسة
-        if ($publication->school_id !== $user->id) {
+        if (!$user->canAccessAllSchoolData() && $publication->school_id !== $user->id) {
             abort(403);
         }
 

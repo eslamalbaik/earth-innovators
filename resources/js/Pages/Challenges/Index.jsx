@@ -52,12 +52,12 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
             category,
             challenge_type: challengeType,
         };
-        
+
         // Add status filter if user is authenticated (students, teachers, schools can filter by status)
         if (auth?.user && filterStatus) {
             params.status = filterStatus;
         }
-        
+
         router.get('/challenges', params, {
             preserveState: true,
             preserveScroll: true,
@@ -119,7 +119,7 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                 <button
                     type="button"
                     onClick={() => setShowFilterModal(true)}
-                    className="h-10 w-10 rounded-xl bg-[#A3C042] flex items-center justify-center hover:bg-[#93b03a] transition flex-shrink-0"
+                    className="h-10 w-10 rounded-xl bg-[#A3C042] flex items-center justify-center hover:bg-[#8CA635] transition flex-shrink-0"
                     aria-label="فلترة"
                 >
                     <FaFilter className="text-white text-sm" />
@@ -151,11 +151,10 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                                 preserveScroll: true,
                             });
                         }}
-                        className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${
-                            category === cat.value
+                        className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${category === cat.value
                                 ? 'bg-[#A3C042] text-white'
                                 : 'bg-white text-gray-700'
-                        }`}
+                            }`}
                     >
                         {cat.label}
                     </button>
@@ -229,19 +228,19 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                         <FaTrophy className="text-gray-400 text-4xl" />
                     </div>
                     <p className="text-gray-400 text-sm mb-2">
-                        {auth?.user?.role === 'student' 
+                        {auth?.user?.role === 'student'
                             ? 'لا توجد تحديات متاحة لمدرستك حالياً'
                             : auth?.user?.role === 'teacher'
-                            ? 'لا توجد تحديات متاحة لمدرستك أو التي أنشأتها'
-                            : auth?.user?.role === 'school'
-                            ? 'لا توجد تحديات متاحة لمدرستك حالياً'
-                            : 'لا توجد تحديات تطابق معايير البحث'}
+                                ? 'لا توجد تحديات متاحة لمدرستك أو التي أنشأتها'
+                                : auth?.user?.role === 'school'
+                                    ? 'لا توجد تحديات متاحة لمدرستك حالياً'
+                                    : 'لا توجد تحديات تطابق معايير البحث'}
                     </p>
                     {(search || category || challengeType || filterStatus) && (
                         <button
                             type="button"
                             onClick={handleClearFilters}
-                            className="text-[#A3C042] text-sm font-semibold hover:text-[#93b03a] mt-2"
+                            className="text-[#A3C042] text-sm font-semibold hover:text-[#8CA635] mt-2"
                         >
                             عرض كل التحديات
                         </button>
@@ -335,7 +334,7 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                     <button
                         type="button"
                         onClick={() => router.visit('/challenges/winners')}
-                        className="mt-4 w-full text-center text-xs font-semibold text-[#A3C042] hover:text-[#93b03a] transition"
+                        className="mt-4 w-full text-center text-xs font-semibold text-[#A3C042] hover:text-[#8CA635] transition"
                     >
                         عرض جميع الفائزين
                     </button>
@@ -350,11 +349,10 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                             <Link
                                 key={index}
                                 href={link.url || '#'}
-                                className={`px-3 py-2 rounded-xl text-sm font-semibold transition ${
-                                    link.active
+                                className={`px-3 py-2 rounded-xl text-sm font-semibold transition ${link.active
                                         ? 'bg-[#A3C042] text-white'
                                         : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-                                } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 dangerouslySetInnerHTML={{ __html: link.label }}
                             />
                         ))}
@@ -427,11 +425,10 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                                             key={status.value}
                                             type="button"
                                             onClick={() => setFilterStatus(filterStatus === status.value ? '' : status.value)}
-                                            className={`px-4 py-3 rounded-xl text-sm font-semibold transition ${
-                                                filterStatus === status.value
+                                            className={`px-4 py-3 rounded-xl text-sm font-semibold transition ${filterStatus === status.value
                                                     ? 'bg-[#eef8d6] text-[#6b7f2c] border-2 border-[#A3C042]'
                                                     : 'bg-white text-gray-700 border border-gray-200'
-                                            }`}
+                                                }`}
                                         >
                                             {status.label}
                                         </button>
@@ -448,11 +445,10 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                                             key={type.value}
                                             type="button"
                                             onClick={() => setChallengeType(challengeType === type.value ? '' : type.value)}
-                                            className={`px-4 py-3 rounded-xl text-sm font-semibold transition ${
-                                                challengeType === type.value
+                                            className={`px-4 py-3 rounded-xl text-sm font-semibold transition ${challengeType === type.value
                                                     ? 'bg-[#eef8d6] text-[#6b7f2c] border-2 border-[#A3C042]'
                                                     : 'bg-white text-gray-700 border border-gray-200'
-                                            }`}
+                                                }`}
                                         >
                                             {type.label}
                                         </button>
@@ -466,7 +462,7 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                             <button
                                 type="button"
                                 onClick={handleApplyFilters}
-                                className="w-full rounded-xl bg-[#A3C042] py-3 text-sm font-bold text-white hover:bg-[#93b03a] transition"
+                                className="w-full rounded-xl bg-[#A3C042] py-3 text-sm font-bold text-white hover:bg-[#8CA635] transition"
                             >
                                 تطبيق الفلاتر
                             </button>

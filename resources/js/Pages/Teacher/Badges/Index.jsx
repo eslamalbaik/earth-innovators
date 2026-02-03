@@ -17,7 +17,7 @@ export default function TeacherBadges({ badges, auth }) {
                 <h2 className="text-2xl font-bold text-gray-900">الشارات المرسلة</h2>
                 <Link
                     href="/teacher/badges/create"
-                    className="bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white px-6 py-3 rounded-lg font-semibold transition duration-300 flex items-center gap-2 shadow-md hover:shadow-xl"
+                    className="bg-[#A3C042] text-white px-6 py-3 rounded-lg font-semibold transition duration-300 flex items-center gap-2 shadow-md hover:shadow-xl"
                 >
                     <FaPlus />
                     إرسال شارة جديدة
@@ -51,7 +51,7 @@ export default function TeacherBadges({ badges, auth }) {
                                                 />
                                             )}
                                         </div>
-                                        
+
                                         <div className="flex items-center justify-between mb-4">
                                             <span className={`px-3 py-1 rounded-full text-xs font-semibold border flex items-center gap-1 ${statusLabels[badge.status]?.color || statusLabels.pending.color}`}>
                                                 <StatusIcon className="text-xs" />
@@ -91,7 +91,7 @@ export default function TeacherBadges({ badges, auth }) {
                             <p className="text-gray-600 text-lg mb-4">لا توجد شارات مرسلة</p>
                             <Link
                                 href="/teacher/badges/create"
-                                className="inline-block bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white px-6 py-3 rounded-lg font-semibold transition"
+                                className="inline-block bg-[#A3C042] text-white px-6 py-3 rounded-lg font-semibold transition"
                             >
                                 <FaPlus className="inline ml-2" />
                                 إرسال شارة جديدة
@@ -106,11 +106,10 @@ export default function TeacherBadges({ badges, auth }) {
                                     <Link
                                         key={index}
                                         href={link.url || '#'}
-                                        className={`px-4 py-2 rounded-lg font-medium transition ${
-                                            link.active
-                                                ? 'bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white'
+                                        className={`px-4 py-2 rounded-lg font-medium transition ${link.active
+                                                ? 'bg-[#A3C042] text-white'
                                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
                                 ))}

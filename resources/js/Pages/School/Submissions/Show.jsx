@@ -145,9 +145,8 @@ export default function SchoolSubmissionShow({ auth, submission, availableBadges
                             className="focus:outline-none"
                         >
                             <FaStar
-                                className={`text-2xl transition ${
-                                    star <= (hoveredRating || rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'
-                                }`}
+                                className={`text-2xl transition ${star <= (hoveredRating || rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'
+                                    }`}
                             />
                         </button>
                     ))}
@@ -161,7 +160,7 @@ export default function SchoolSubmissionShow({ auth, submission, availableBadges
                     {submission.feedback ? submission.feedback : 'لا توجد تعليقات بعد'}
                 </div>
                 <div className="flex items-center gap-2">
-                    <button type="button" className="h-10 w-10 rounded-lg bg-blue-600 text-white flex items-center justify-center" aria-label="إرسال">
+                    <button type="button" className="h-10 w-10 rounded-lg bg-[#A3C042] text-white flex items-center justify-center" aria-label="إرسال">
                         <FaPaperPlane />
                     </button>
                     <input
@@ -192,7 +191,7 @@ export default function SchoolSubmissionShow({ auth, submission, availableBadges
                 <button
                     type="submit"
                     disabled={processing}
-                    className="w-full rounded-xl bg-[#A3C042] py-3 text-sm font-extrabold text-white hover:bg-[#93b03a] transition disabled:opacity-60"
+                    className="w-full rounded-xl bg-[#A3C042] py-3 text-sm font-extrabold text-white hover:bg-[#8CA635] transition disabled:opacity-60"
                 >
                     {processing ? 'جاري الحفظ...' : 'حفظ التقييم'}
                 </button>
@@ -207,11 +206,10 @@ export default function SchoolSubmissionShow({ auth, submission, availableBadges
                             <Link
                                 key={sub.id}
                                 href={`/school/submissions/${sub.id}`}
-                                className={`block p-3 rounded-xl border transition ${
-                                    sub.id === submission.id
-                                        ? 'border-blue-500 bg-blue-50'
-                                        : 'border-gray-100 bg-white hover:bg-gray-50'
-                                }`}
+                                className={`block p-3 rounded-xl border transition ${sub.id === submission.id
+                                    ? 'border-blue-500 bg-blue-50'
+                                    : 'border-gray-100 bg-white hover:bg-gray-50'
+                                    }`}
                             >
                                 <div className="text-sm font-semibold text-gray-900 line-clamp-1">
                                     {sub.project_title || sub.project?.title || 'مشروع غير محدد'}
@@ -271,11 +269,10 @@ export default function SchoolSubmissionShow({ auth, submission, availableBadges
                                             <Link
                                                 key={sub.id}
                                                 href={`/school/submissions/${sub.id}`}
-                                                className={`block p-3 rounded-xl border transition ${
-                                                    sub.id === submission.id
-                                                        ? 'border-blue-500 bg-blue-50'
-                                                        : 'border-gray-100 bg-white hover:bg-gray-50'
-                                                }`}
+                                                className={`block p-3 rounded-xl border transition ${sub.id === submission.id
+                                                    ? 'border-blue-500 bg-blue-50'
+                                                    : 'border-gray-100 bg-white hover:bg-gray-50'
+                                                    }`}
                                             >
                                                 <div className="text-sm font-semibold text-gray-900 line-clamp-1">
                                                     {sub.project_title || sub.project?.title || 'مشروع غير محدد'}

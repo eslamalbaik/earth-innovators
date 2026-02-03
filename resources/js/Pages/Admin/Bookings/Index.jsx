@@ -152,10 +152,10 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                                         if (teacherFilter) params.append('teacher_id', teacherFilter);
                                         if (dateFrom) params.append('date_from', dateFrom);
                                         if (dateTo) params.append('date_to', dateTo);
-                                        
+
                                         window.location.href = `/admin/bookings-export?${params.toString()}`;
                                     }}
-                                    className="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300"
+                                    className="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-[#A3C042] transition duration-300"
                                 >
                                     <FaDownload className="ml-2" />
                                     تصدير CSV
@@ -279,7 +279,7 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                                 <div className="flex items-center space-x-2 space-x-reverse">
                                     <button
                                         onClick={() => handleBulkAction('approve')}
-                                        className="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition duration-300"
+                                        className="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-[#A3C042] transition duration-300"
                                     >
                                         موافقة
                                     </button>

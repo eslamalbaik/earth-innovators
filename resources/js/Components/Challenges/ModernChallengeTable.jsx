@@ -65,9 +65,8 @@ const ModernChallengeTableRow = memo(function ModernChallengeTableRow({
 
     return (
         <tr
-            className={`hover:bg-gray-50 transition-colors duration-150 border-b border-gray-100 ${
-                isDeleting ? 'opacity-50 pointer-events-none' : ''
-            } ${isUpdating ? 'bg-blue-50' : ''}`}
+            className={`hover:bg-gray-50 transition-colors duration-150 border-b border-gray-100 ${isDeleting ? 'opacity-50 pointer-events-none' : ''
+                } ${isUpdating ? 'bg-blue-50' : ''}`}
         >
             {/* Challenge Info with Points */}
             <td className="px-4 sm:px-6 py-5">
@@ -168,7 +167,7 @@ const ModernChallengeTableRow = memo(function ModernChallengeTableRow({
                     {challenge.max_participants && (
                         <div className="w-full bg-gray-200 rounded-full h-2">
                             <div
-                                className="bg-gradient-to-r from-primary-500 to-secondary-500 h-2 rounded-full transition-all duration-300"
+                                className="bg-[#A3C042] h-2 rounded-full transition-all duration-300"
                                 style={{ width: `${participantPercentage}%` }}
                             />
                         </div>

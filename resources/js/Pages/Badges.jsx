@@ -58,7 +58,7 @@ export default function Badges({
                 >
                     <div className="space-y-6">
                         {/* Hero Section */}
-                        <div className="bg-gradient-to-r from-[#A3C042] to-[#93b03a] rounded-2xl p-6 text-white text-center">
+                        <div className="bg-gradient-to-r from-[#A3C042] to-[#8CA635] rounded-2xl p-6 text-white text-center">
                             <FaMedal className="mx-auto text-4xl mb-3 opacity-90" />
                             <h1 className="text-xl font-bold mb-2">الشارات والإنجازات</h1>
                             <p className="text-white/90 text-sm">
@@ -68,7 +68,7 @@ export default function Badges({
 
                         {/* User Badges Summary */}
                         {auth?.user && (
-                            <div className="bg-gradient-to-r from-[#A3C042]/10 to-[#93b03a]/10 rounded-2xl p-4 border-2 border-[#A3C042]/20">
+                            <div className="bg-gradient-to-r from-[#A3C042]/10 to-[#8CA635]/10 rounded-2xl p-4 border-2 border-[#A3C042]/20">
                                 <h2 className="text-lg font-bold text-gray-900 mb-2">شاراتي</h2>
                                 <p className="text-sm text-gray-600">
                                     {userBadges.length} شارة إنجاز • {userCommunityBadgeProgress.length} شارة مجتمعية
@@ -78,7 +78,7 @@ export default function Badges({
 
                         {/* School Ranking */}
                         {currentSchoolRank && (
-                            <div className="bg-gradient-to-r from-[#A3C042] to-[#93b03a] rounded-2xl p-4 text-white shadow-lg">
+                            <div className="bg-gradient-to-r from-[#A3C042] to-[#8CA635] rounded-2xl p-4 text-white shadow-lg">
                                 <div className="flex items-center gap-2 mb-4">
                                     <FaTrophy className="text-yellow-300 text-xl" />
                                     <h3 className="text-base font-bold">ترتيب مدرستك</h3>
@@ -129,11 +129,10 @@ export default function Badges({
                                     {schoolsRanking.slice(0, 10).map((school, index) => (
                                         <div
                                             key={school.id}
-                                            className={`px-4 py-3 flex items-center gap-3 ${
-                                                school.is_current_school
-                                                    ? 'bg-gradient-to-r from-[#A3C042]/10 to-[#93b03a]/10 border-r-4 border-[#A3C042]'
+                                            className={`px-4 py-3 flex items-center gap-3 ${school.is_current_school
+                                                    ? 'bg-gradient-to-r from-[#A3C042]/10 to-[#8CA635]/10 border-r-4 border-[#A3C042]'
                                                     : 'hover:bg-gray-50'
-                                            }`}
+                                                }`}
                                         >
                                             <div className="flex-shrink-0 w-10 flex items-center justify-center">
                                                 {getRankIcon(school.rank)}
@@ -239,7 +238,7 @@ export default function Badges({
                 <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-4">
                     <div className="space-y-6">
                         {/* Hero Section */}
-                        <div className="bg-gradient-to-r from-[#A3C042] to-[#93b03a] rounded-2xl p-8 text-white text-center">
+                        <div className="bg-gradient-to-r from-[#A3C042] to-[#8CA635] rounded-2xl p-8 text-white text-center">
                             <FaMedal className="mx-auto text-6xl mb-4 opacity-90" />
                             <h1 className="text-3xl font-bold mb-4">الشارات والإنجازات</h1>
                             <p className="text-white/90 text-lg max-w-2xl mx-auto">
@@ -249,14 +248,14 @@ export default function Badges({
 
                         {/* User Badges Summary */}
                         {auth?.user && (
-                            <div className="bg-gradient-to-r from-[#A3C042]/10 to-[#93b03a]/10 rounded-2xl p-6 border-2 border-[#A3C042]/20">
+                            <div className="bg-gradient-to-r from-[#A3C042]/10 to-[#8CA635]/10 rounded-2xl p-6 border-2 border-[#A3C042]/20">
                                 <h2 className="text-2xl font-bold text-gray-900 mb-2">شاراتي</h2>
                                 <p className="text-gray-600">
                                     {userBadges.length} شارة إنجاز • {userCommunityBadgeProgress.length} شارة مجتمعية
                                 </p>
                             </div>
                         )}
-                        
+
                         {/* School Ranking */}
                         {currentSchoolRank && (
                             <div className="bg-yellow-500 rounded-2xl p-6 text-white shadow-lg">
@@ -312,11 +311,10 @@ export default function Badges({
                                     {schoolsRanking.slice(0, 10).map((school, index) => (
                                         <div
                                             key={school.id}
-                                            className={`px-6 py-4 flex items-center gap-4 transition ${
-                                                school.is_current_school
-                                                    ? 'bg-gradient-to-r from-[#A3C042]/10 to-[#93b03a]/10 border-r-4 border-[#A3C042]'
+                                            className={`px-6 py-4 flex items-center gap-4 transition ${school.is_current_school
+                                                    ? 'bg-gradient-to-r from-[#A3C042]/10 to-[#8CA635]/10 border-r-4 border-[#A3C042]'
                                                     : 'hover:bg-gray-50'
-                                            }`}
+                                                }`}
                                         >
                                             <div className="flex-shrink-0 w-12 flex items-center justify-center">
                                                 {getRankIcon(school.rank)}

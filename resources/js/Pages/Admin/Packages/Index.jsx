@@ -83,7 +83,7 @@ export default function AdminPackagesIndex({ packages, stats }) {
                 <h2 className="text-2xl font-bold text-gray-900">قائمة الباقات</h2>
                 <Link
                     href={route('admin.packages.create')}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2"
+                    className="bg-[#A3C042] hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2"
                 >
                     <FaPlus />
                     إضافة باقة جديدة
@@ -107,7 +107,7 @@ export default function AdminPackagesIndex({ packages, stats }) {
                     </div>
                     <button
                         onClick={handleSearch}
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2"
+                        className="bg-[#A3C042] hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2"
                     >
                         <FaFilter />
                         بحث
@@ -202,7 +202,7 @@ export default function AdminPackagesIndex({ packages, stats }) {
                                         </Link>
                                         <Link
                                             href={route('admin.packages.edit', pkg.id)}
-                                            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+                                            className="px-4 py-2 bg-[#A3C042] hover:bg-blue-700 text-white rounded-lg"
                                             title="تعديل"
                                         >
                                             <FaEdit />

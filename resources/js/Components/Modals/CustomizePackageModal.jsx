@@ -30,9 +30,9 @@ export default function CustomizePackageModal({ onClose }) {
 
         try {
             const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-            const axios = window.axios || (await import('axios')).default;  
+            const axios = window.axios || (await import('axios')).default;
             const url = '/api/customize-package-request';
-            
+
             const response = await axios.post(url, formData, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -41,7 +41,7 @@ export default function CustomizePackageModal({ onClose }) {
                     'X-Requested-With': 'XMLHttpRequest',
                 }
             });
-            
+
             if (response.data.success) {
                 alert('تم إرسال طلبك بنجاح! سنتواصل معك قريباً.');
                 setFormData({
@@ -188,7 +188,7 @@ export default function CustomizePackageModal({ onClose }) {
                         <PrimaryButton
                             type="submit"
                             disabled={processing}
-                            className="px-6 py-3 bg-gradient-to-r from-[#A3C042] to-legacy-blue text-white rounded-lg font-semibold hover:shadow-lg transition"
+                            className="px-6 py-3 bg-[#A3C042] text-white rounded-lg font-semibold hover:shadow-lg transition"
                         >
                             {processing ? 'جاري الإرسال...' : 'تأكيد طلب عرض السعر'}
                         </PrimaryButton>

@@ -15,7 +15,7 @@ export default function SchoolRanking({ schoolsRanking = [], currentSchoolRank, 
             <Head title="الترتيب والشارات - إرث المبتكرين" />
 
             {currentSchoolRank && (
-                <div className="bg-gradient-to-r from-[#A3C042] to-legacy-blue rounded-xl shadow-lg p-8 mb-8 text-white">
+                <div className="bg-[#A3C042] rounded-xl shadow-lg p-8 mb-8 text-white">
                     <div className="flex items-center justify-between">
                         <div>
                             <h2 className="text-2xl font-bold mb-2">ترتيب مدرستك</h2>
@@ -76,11 +76,10 @@ export default function SchoolRanking({ schoolsRanking = [], currentSchoolRank, 
                             {schoolsRanking.map((school, index) => (
                                 <div
                                     key={school.id}
-                                    className={`border rounded-lg p-4 transition ${
-                                        school.is_current_school
+                                    className={`border rounded-lg p-4 transition ${school.is_current_school
                                             ? 'border-[#A3C042] bg-gradient-to-r from-[#A3C042]/10 to-legacy-blue/10 shadow-md'
                                             : 'border-gray-200 hover:shadow-md'
-                                    }`}
+                                        }`}
                                 >
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-4 flex-1">

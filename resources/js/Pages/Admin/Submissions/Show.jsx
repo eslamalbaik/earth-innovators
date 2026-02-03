@@ -99,7 +99,7 @@ export default function AdminSubmissionShow({ submission, availableBadges }) {
                         {/* Project Details */}
                         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                             <h2 className="text-2xl font-bold text-gray-900 mb-4">{submission.project?.title}</h2>
-                            
+
                             <div className="flex items-center justify-between mb-6">
                                 <div className="flex items-center gap-2 text-gray-600">
                                     <FaUser className="text-gray-400" />
@@ -156,11 +156,10 @@ export default function AdminSubmissionShow({ submission, availableBadges }) {
                                         className="focus:outline-none"
                                     >
                                         <FaStar
-                                            className={`text-4xl transition ${
-                                                star <= (hoveredRating || rating)
-                                                    ? 'text-yellow-400 fill-current'
-                                                    : 'text-gray-300'
-                                            }`}
+                                            className={`text-4xl transition ${star <= (hoveredRating || rating)
+                                                ? 'text-yellow-400 fill-current'
+                                                : 'text-gray-300'
+                                                }`}
                                         />
                                     </button>
                                 ))}
@@ -233,7 +232,7 @@ export default function AdminSubmissionShow({ submission, availableBadges }) {
                             <PrimaryButton
                                 type="submit"
                                 disabled={processing}
-                                className="w-full bg-green-600 hover:bg-green-700 text-lg py-3"
+                                className="w-full bg-[#A3C042] hover:bg-[#8CA635] text-lg py-3"
                             >
                                 {processing ? (
                                     <>
@@ -284,15 +283,14 @@ export default function AdminSubmissionShow({ submission, availableBadges }) {
                                 )}
                                 <div>
                                     <p className="text-sm text-gray-600 mb-1">الحالة</p>
-                                    <span className={`inline-block px-3 py-1 rounded text-sm font-medium ${
-                                        submission.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                    <span className={`inline-block px-3 py-1 rounded text-sm font-medium ${submission.status === 'approved' ? 'bg-green-100 text-green-800' :
                                         submission.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                                        submission.status === 'reviewed' ? 'bg-blue-100 text-blue-800' :
-                                        'bg-gray-100 text-gray-800'
-                                    }`}>
+                                            submission.status === 'reviewed' ? 'bg-blue-100 text-blue-800' :
+                                                'bg-gray-100 text-gray-800'
+                                        }`}>
                                         {submission.status === 'approved' ? 'معتمد' :
-                                         submission.status === 'rejected' ? 'مرفوض' :
-                                         submission.status === 'reviewed' ? 'تم المراجعة' : 'مقدم'}
+                                            submission.status === 'rejected' ? 'مرفوض' :
+                                                submission.status === 'reviewed' ? 'تم المراجعة' : 'مقدم'}
                                     </span>
                                 </div>
                             </div>

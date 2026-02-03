@@ -53,9 +53,8 @@ export default function AdminCertificatesEdit({ certificate, users }) {
                             <select
                                 value={data.user_id}
                                 onChange={(e) => setData('user_id', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.user_id ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.user_id ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             >
                                 <option value="">اختر المستخدم</option>
@@ -78,9 +77,8 @@ export default function AdminCertificatesEdit({ certificate, users }) {
                             <select
                                 value={data.type}
                                 onChange={(e) => setData('type', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.type ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.type ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             >
                                 <option value="student">طالب</option>
@@ -103,9 +101,8 @@ export default function AdminCertificatesEdit({ certificate, users }) {
                                 type="text"
                                 value={data.title}
                                 onChange={(e) => setData('title', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.title ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.title ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             />
                             {errors.title && (
@@ -122,9 +119,8 @@ export default function AdminCertificatesEdit({ certificate, users }) {
                                 type="text"
                                 value={data.title_ar}
                                 onChange={(e) => setData('title_ar', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.title_ar ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.title_ar ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             />
                             {errors.title_ar && (
@@ -141,9 +137,8 @@ export default function AdminCertificatesEdit({ certificate, users }) {
                                 value={data.description}
                                 onChange={(e) => setData('description', e.target.value)}
                                 rows={3}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.description ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.description ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                             />
                             {errors.description && (
                                 <p className="mt-1 text-sm text-red-600">{errors.description}</p>
@@ -159,9 +154,8 @@ export default function AdminCertificatesEdit({ certificate, users }) {
                                 value={data.description_ar}
                                 onChange={(e) => setData('description_ar', e.target.value)}
                                 rows={3}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.description_ar ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.description_ar ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                             />
                             {errors.description_ar && (
                                 <p className="mt-1 text-sm text-red-600">{errors.description_ar}</p>
@@ -177,9 +171,8 @@ export default function AdminCertificatesEdit({ certificate, users }) {
                                 type="date"
                                 value={data.issue_date}
                                 onChange={(e) => setData('issue_date', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.issue_date ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.issue_date ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 required
                             />
                             {errors.issue_date && (
@@ -196,9 +189,8 @@ export default function AdminCertificatesEdit({ certificate, users }) {
                                 type="date"
                                 value={data.expiry_date}
                                 onChange={(e) => setData('expiry_date', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.expiry_date ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.expiry_date ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                             />
                             {errors.expiry_date && (
                                 <p className="mt-1 text-sm text-red-600">{errors.expiry_date}</p>
@@ -215,9 +207,8 @@ export default function AdminCertificatesEdit({ certificate, users }) {
                                 value={data.template}
                                 onChange={(e) => setData('template', e.target.value)}
                                 placeholder="مسار القالب"
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.template ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.template ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                             />
                             {errors.template && (
                                 <p className="mt-1 text-sm text-red-600">{errors.template}</p>
@@ -274,7 +265,7 @@ export default function AdminCertificatesEdit({ certificate, users }) {
                         <button
                             type="submit"
                             disabled={processing}
-                            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50"
+                            className="px-6 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50"
                         >
                             <FaSave />
                             {processing ? 'جاري الحفظ...' : 'حفظ التغييرات'}

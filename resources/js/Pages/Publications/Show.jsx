@@ -37,108 +37,107 @@ export default function PublicationShow({ auth, publication, isLiked: initialIsL
     const coverImage = getPublicationImageUrl(publication?.cover_image);
 
     const PublicationContent = () => {
-    if (!publication) {
-        return (
+        if (!publication) {
+            return (
                 <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
                     <p className="text-sm text-gray-500">الإصدار غير موجود</p>
                 </div>
-        );
-    }
+            );
+        }
 
-    return (
+        return (
             <div className="space-y-4">
-                    {/* Cover Image */}
-                    {publication.cover_image && (
+                {/* Cover Image */}
+                {publication.cover_image && (
                     <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-                            <img
-                                src={coverImage}
-                                alt={publication.title}
+                        <img
+                            src={coverImage}
+                            alt={publication.title}
                             className="w-full h-auto"
-                                onError={(e) => {
-                                    e.target.src = '/images/default-publication.jpg';
-                                }}
-                                loading="lazy"
-                            />
-                        </div>
-                    )}
+                            onError={(e) => {
+                                e.target.src = '/images/default-publication.jpg';
+                            }}
+                            loading="lazy"
+                        />
+                    </div>
+                )}
 
                 <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
                     <h1 className="text-lg font-extrabold text-gray-900">
-                            {publication.title}
-                            {publication.issue_number && (
-                                <span className="text-gray-600"> - العدد {publication.issue_number}</span>
-                            )}
-                        </h1>
+                        {publication.title}
+                        {publication.issue_number && (
+                            <span className="text-gray-600"> - العدد {publication.issue_number}</span>
+                        )}
+                    </h1>
 
                     <div className="flex flex-wrap items-center gap-3 text-xs text-gray-600">
-                            {publication.publish_date && (
+                        {publication.publish_date && (
                             <div className="flex items-center gap-1">
                                 <FaCalendar className="text-[10px]" />
-                                    {formatDate(publication.publish_date)}
-                                </div>
-                            )}
-                            {(publication.publisher_name || publication.school?.name) && (
+                                {formatDate(publication.publish_date)}
+                            </div>
+                        )}
+                        {(publication.publisher_name || publication.school?.name) && (
                             <div className="flex items-center gap-1">
                                 <FaBuilding className="text-[10px]" />
-                                    {publication.publisher_name || publication.school?.name}
-                                </div>
-                            )}
-                            {publication.views !== undefined && (
+                                {publication.publisher_name || publication.school?.name}
+                            </div>
+                        )}
+                        {publication.views !== undefined && (
                             <div className="flex items-center gap-1">
                                 <FaEye className="text-[10px]" />
                                 {publication.views}
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Actions */}
-                    <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
-                            {publication.file && (
-                                <a
-                                    href={getPublicationFileUrl(publication.file) || '#'}
-                                    download
-                                className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#A3C042] text-white rounded-xl hover:bg-[#93b03a] transition font-bold text-sm"
-                                >
-                                    <FaFileAlt />
-                                    تحميل PDF
-                                </a>
-                            )}
-                            <button
-                            type="button"
-                                onClick={toggleLike}
-                            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition text-sm font-semibold ${
-                                    isLiked
-                                        ? 'bg-red-100 text-red-600 hover:bg-red-200'
-                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                }`}
-                            >
-                                <FaHeart className={isLiked ? 'fill-current' : ''} />
-                            <span>({likesCount})</span>
-                            </button>
-                        </div>
+                            </div>
+                        )}
                     </div>
 
-                    {/* Description */}
-                    {publication.description && (
+                    {/* Actions */}
+                    <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
+                        {publication.file && (
+                            <a
+                                href={getPublicationFileUrl(publication.file) || '#'}
+                                download
+                                className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#A3C042] text-white rounded-xl hover:bg-[#8CA635] transition font-bold text-sm"
+                            >
+                                <FaFileAlt />
+                                تحميل PDF
+                            </a>
+                        )}
+                        <button
+                            type="button"
+                            onClick={toggleLike}
+                            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition text-sm font-semibold ${isLiked
+                                ? 'bg-red-100 text-red-600 hover:bg-red-200'
+                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                }`}
+                        >
+                            <FaHeart className={isLiked ? 'fill-current' : ''} />
+                            <span>({likesCount})</span>
+                        </button>
+                    </div>
+                </div>
+
+                {/* Description */}
+                {publication.description && (
                     <div className="bg-white rounded-2xl border border-gray-100 p-4">
                         <h2 className="text-sm font-bold text-gray-900 mb-2">الوصف</h2>
                         <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
-                                {publication.description}
-                            </p>
-                        </div>
-                    )}
+                            {publication.description}
+                        </p>
+                    </div>
+                )}
 
-                    {/* Content */}
-                    {publication.content && (
+                {/* Content */}
+                {publication.content && (
                     <div className="bg-white rounded-2xl border border-gray-100 p-4">
                         <h2 className="text-sm font-bold text-gray-900 mb-3">المحتوى</h2>
-                            <div
+                        <div
                             className="prose prose-sm max-w-none text-gray-700 leading-relaxed"
-                                dangerouslySetInnerHTML={{ __html: publication.content }}
-                            />
-                        </div>
-                    )}
-                </div>
+                            dangerouslySetInnerHTML={{ __html: publication.content }}
+                        />
+                    </div>
+                )}
+            </div>
         );
     };
 
@@ -155,7 +154,7 @@ export default function PublicationShow({ auth, publication, isLiked: initialIsL
                         onNotifications={() => router.visit('/notifications')}
                         onBack={() => router.visit('/publications')}
                     >
-                        <PublicationContent />
+                        {PublicationContent()}
                     </MobileAppLayout>
                 </div>
                 <div className="hidden md:block">
@@ -168,7 +167,7 @@ export default function PublicationShow({ auth, publication, isLiked: initialIsL
                     />
                     <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-4">
                         <div className="mx-auto w-full max-w-3xl">
-                            <PublicationContent />
+                            {PublicationContent()}
                         </div>
                     </main>
                     <MobileBottomNav active="explore" role={auth?.user?.role} isAuthed={!!auth?.user} user={auth?.user} />
@@ -191,7 +190,7 @@ export default function PublicationShow({ auth, publication, isLiked: initialIsL
                     onNotifications={() => router.visit('/notifications')}
                     onBack={() => router.visit('/publications')}
                 >
-                    <PublicationContent />
+                    {PublicationContent()}
                 </MobileAppLayout>
             </div>
 
@@ -204,11 +203,11 @@ export default function PublicationShow({ auth, publication, isLiked: initialIsL
                     onBack={() => router.visit('/publications')}
                     reverseOrder={false}
                 />
-                    <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-4">
-                        <div className="mx-auto w-full max-w-3xl">
-                            <PublicationContent />
-                        </div>
-                    </main>
+                <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-4">
+                    <div className="mx-auto w-full max-w-3xl">
+                        <PublicationContent />
+                    </div>
+                </main>
                 <MobileBottomNav active="explore" role={auth?.user?.role} isAuthed={!!auth?.user} user={auth?.user} />
             </div>
         </div>

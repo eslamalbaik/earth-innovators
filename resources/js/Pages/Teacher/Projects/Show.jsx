@@ -135,7 +135,7 @@ export default function TeacherProjectShow({ project, auth }) {
                             {project.status === 'pending' && (
                                 <Link
                                     href={route('teacher.projects.edit', project.id)}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                                    className="px-4 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
                                 >
                                     <FaEdit />
                                     تعديل
@@ -254,13 +254,12 @@ export default function TeacherProjectShow({ project, auth }) {
                                                     {submission.student?.name || 'طالب'}
                                                 </span>
                                             </div>
-                                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                                                submission.status === 'evaluated' ? 'bg-green-100 text-green-800' :
-                                                submission.status === 'submitted' ? 'bg-blue-100 text-blue-800' :
-                                                'bg-gray-100 text-gray-800'
-                                            }`}>
+                                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${submission.status === 'evaluated' ? 'bg-green-100 text-green-800' :
+                                                    submission.status === 'submitted' ? 'bg-blue-100 text-blue-800' :
+                                                        'bg-gray-100 text-gray-800'
+                                                }`}>
                                                 {submission.status === 'evaluated' ? 'تم التقييم' :
-                                                 submission.status === 'submitted' ? 'تم التسليم' : 'قيد المراجعة'}
+                                                    submission.status === 'submitted' ? 'تم التسليم' : 'قيد المراجعة'}
                                             </span>
                                         </div>
                                         {submission.comment && (
@@ -284,7 +283,7 @@ export default function TeacherProjectShow({ project, auth }) {
                     {/* Project Details */}
                     <div className="bg-white rounded-xl shadow-lg p-6">
                         <h2 className="text-xl font-bold text-gray-900 mb-4">معلومات المشروع</h2>
-                        
+
                         <div className="space-y-4">
                             <div>
                                 <p className="text-sm text-gray-600 mb-1 flex items-center gap-2">
@@ -348,7 +347,7 @@ export default function TeacherProjectShow({ project, auth }) {
                             {project.status === 'pending' && (
                                 <Link
                                     href={route('teacher.projects.edit', project.id)}
-                                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
+                                    className="w-full px-4 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
                                 >
                                     <FaEdit />
                                     تعديل المشروع

@@ -167,7 +167,7 @@ export default function AdminPackagesSubscribers({ package: pkg, subscribers, fi
                     <div className="md:col-span-3 flex justify-end">
                         <button
                             onClick={handleSearch}
-                            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center gap-2"
+                            className="px-6 py-2 bg-[#A3C042] hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center gap-2"
                         >
                             <FaSearch />
                             بحث
@@ -224,7 +224,7 @@ export default function AdminPackagesSubscribers({ package: pkg, subscribers, fi
                                                     <>
                                                         <button
                                                             onClick={() => handleRenewSubscription(subscriber.id)}
-                                                            className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-semibold flex items-center gap-1"
+                                                            className="px-3 py-1 bg-[#A3C042] hover:bg-[#8CA635] text-white rounded text-xs font-semibold flex items-center gap-1"
                                                             title="تجديد"
                                                         >
                                                             <FaSync />
@@ -277,11 +277,10 @@ export default function AdminPackagesSubscribers({ package: pkg, subscribers, fi
                                     <Link
                                         key={index}
                                         href={link.url || '#'}
-                                        className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                                            link.active
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium ${link.active
+                                            ? 'bg-[#A3C042] text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
                                 ))}

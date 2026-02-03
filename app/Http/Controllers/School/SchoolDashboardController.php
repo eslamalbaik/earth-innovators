@@ -21,12 +21,14 @@ class SchoolDashboardController extends Controller
         $school = Auth::user();
 
         // Get optimized dashboard stats from service
-        $stats = $this->dashboardService->getSchoolDashboardStats($school->id);
+        $stats = $this->dashboardService->getSchoolDashboardStats($school->canAccessAllSchoolData() ? 0 : $school->id);
 
         // Get pending projects for review
-        $studentIds = User::where('school_id', $school->id)
-            ->where('role', 'student')
-            ->pluck('id');
+        $studentIdsQuery = User::where('role', 'student');
+        if (!$school->canAccessAllSchoolData()) {
+            $studentIdsQuery->where('school_id', $school->id);
+        }
+        $studentIds = $studentIdsQuery->pluck('id');
 
         $pendingProjectsList = Project::whereIn('user_id', $studentIds)
             ->where('status', 'pending')

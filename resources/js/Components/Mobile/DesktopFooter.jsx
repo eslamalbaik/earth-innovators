@@ -40,7 +40,7 @@ export default function DesktopFooter({ auth }) {
                                 className="h-12 w-auto object-contain"
                             />
                             <div>
-                                <div className="text-xl font-extrabold bg-gradient-to-r from-[#A3C042] to-[#93b03a] bg-clip-text text-transparent">
+                                <div className="text-xl font-extrabold bg-gradient-to-r from-[#A3C042] to-[#8CA635] bg-clip-text text-transparent">
                                     إرث المبتكرين
                                 </div>
                                 <div className="text-xs text-gray-400">Innovators Legacy</div>
@@ -102,7 +102,7 @@ export default function DesktopFooter({ auth }) {
                                             href={contact.href}
                                             className="flex items-center gap-3 text-gray-300 hover:text-[#A3C042] transition group"
                                         >
-                                            <div className="w-8 h-8 bg-gradient-to-br from-[#A3C042]/20 to-[#93b03a]/20 rounded-lg flex items-center justify-center group-hover:from-[#A3C042] group-hover:to-[#93b03a] transition">
+                                            <div className="w-8 h-8 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-lg flex items-center justify-center group-hover:from-[#A3C042] group-hover:to-[#8CA635] transition">
                                                 <Icon className="text-sm text-white" />
                                             </div>
                                             <span className="text-sm">{contact.text}</span>
@@ -123,7 +123,7 @@ export default function DesktopFooter({ auth }) {
                             <div className="space-y-3">
                                 <Link
                                     href="/register"
-                                    className="block w-full bg-gradient-to-r from-[#A3C042] to-[#93b03a] text-white text-center py-3 rounded-xl font-bold hover:opacity-90 transition shadow-lg"
+                                    className="block w-full bg-gradient-to-r from-[#A3C042] to-[#8CA635] text-white text-center py-3 rounded-xl font-bold hover:opacity-90 transition shadow-lg"
                                 >
                                     إنشاء حساب
                                 </Link>
@@ -135,7 +135,7 @@ export default function DesktopFooter({ auth }) {
                                 </Link>
                             </div>
                         ) : (
-                            <div className="bg-gradient-to-br from-[#A3C042]/10 to-[#93b03a]/10 border border-[#A3C042]/20 rounded-xl p-4">
+                            <div className="bg-gradient-to-br from-[#A3C042]/10 to-[#8CA635]/10 border border-[#A3C042]/20 rounded-xl p-4">
                                 <p className="text-sm text-gray-300 mb-2">مرحباً بك، {user?.name?.split(' ')[0]}!</p>
                                 <Link
                                     href={user?.role === 'student' ? '/student/dashboard' : user?.role === 'teacher' ? '/teacher/dashboard' : '/school/dashboard'}

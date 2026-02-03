@@ -22,7 +22,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
 
     const handleStatusFilter = (status) => {
         setSelectedStatus(status);
-        const url = typeof route !== 'undefined' 
+        const url = typeof route !== 'undefined'
             ? route('school.challenges.index')
             : '/school/challenges';
         router.get(url, {
@@ -181,7 +181,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
         >
             <Head title="التحديات الابتكارية - لوحة المدرسة" />
 
-            <div className="min-h-screen bg-gray-50 pb-32" dir="rtl">
+            <div className="min-h-screen bg-gray-50 pb-12" dir="rtl">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     {/* Stats */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -227,22 +227,20 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                         preserveScroll: false,
                                     });
                                 }}
-                                className={`px-4 py-2 font-medium transition-colors border-b-2 ${
-                                    activeTab === 'challenges'
-                                        ? 'border-green-600 text-green-600'
-                                        : 'border-transparent text-gray-600 hover:text-gray-900'
-                                }`}
+                                className={`px-4 py-2 font-medium transition-colors border-b-2 ${activeTab === 'challenges'
+                                    ? 'border-green-600 text-green-600'
+                                    : 'border-transparent text-gray-600 hover:text-gray-900'
+                                    }`}
                             >
                                 التحديات
                             </button>
                             {selectedChallenge && (
                                 <button
                                     onClick={() => setActiveTab('submissions')}
-                                    className={`px-4 py-2 font-medium transition-colors border-b-2 ${
-                                        activeTab === 'submissions'
-                                            ? 'border-green-600 text-green-600'
-                                            : 'border-transparent text-gray-600 hover:text-gray-900'
-                                    }`}
+                                    className={`px-4 py-2 font-medium transition-colors border-b-2 ${activeTab === 'submissions'
+                                        ? 'border-green-600 text-green-600'
+                                        : 'border-transparent text-gray-600 hover:text-gray-900'
+                                        }`}
                                 >
                                     تسليمات: {selectedChallenge.title}
                                 </button>
@@ -261,7 +259,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                             {activeTab === 'challenges' && (
                                 <Link
                                     href={typeof route !== 'undefined' ? route('school.challenges.create') : '/school/challenges/create'}
-                                    className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold shadow-md hover:shadow-lg"
+                                    className="inline-flex items-center gap-2 px-6 py-3 bg-[#A3C042] text-white rounded-lg hover:bg-[#8CA635] transition-colors font-semibold shadow-md hover:shadow-lg"
                                 >
                                     <FaPlus />
                                     إطلاق تحدي جديد
@@ -290,41 +288,37 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                 <div className="flex flex-wrap items-center gap-4 mb-6">
                                     <button
                                         onClick={() => handleStatusFilter('')}
-                                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                                            !selectedStatus
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-white text-gray-700 hover:bg-gray-100'
-                                        }`}
+                                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${!selectedStatus
+                                            ? 'bg-[#A3C042] text-white'
+                                            : 'bg-white text-gray-700 hover:bg-gray-100'
+                                            }`}
                                     >
                                         الكل
                                     </button>
                                     <button
                                         onClick={() => handleStatusFilter('completed')}
-                                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                                            selectedStatus === 'completed'
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-white text-gray-700 hover:bg-gray-100'
-                                        }`}
+                                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${selectedStatus === 'completed'
+                                            ? 'bg-[#A3C042] text-white'
+                                            : 'bg-white text-gray-700 hover:bg-gray-100'
+                                            }`}
                                     >
                                         مكتمل
                                     </button>
                                     <button
                                         onClick={() => handleStatusFilter('upcoming')}
-                                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                                            selectedStatus === 'upcoming'
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-white text-gray-700 hover:bg-gray-100'
-                                        }`}
+                                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${selectedStatus === 'upcoming'
+                                            ? 'bg-[#A3C042] text-white'
+                                            : 'bg-white text-gray-700 hover:bg-gray-100'
+                                            }`}
                                     >
                                         قادم
                                     </button>
                                     <button
                                         onClick={() => handleStatusFilter('active')}
-                                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                                            selectedStatus === 'active'
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-white text-gray-700 hover:bg-gray-100'
-                                        }`}
+                                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${selectedStatus === 'active'
+                                            ? 'bg-[#A3C042] text-white'
+                                            : 'bg-white text-gray-700 hover:bg-gray-100'
+                                            }`}
                                     >
                                         نشط
                                     </button>
@@ -350,66 +344,65 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                         <>
                             {/* Challenges Grid - بطاقات التحديات */}
                             {hasChallenges ? (
-                        <>
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                {challengesData.map((challenge) => (
-                                    <InnovationChallengeCard
-                                        key={challenge.id}
-                                        challenge={{
-                                            ...challenge,
-                                            school_name: challenge.school?.name || 'مدرستك',
-                                            creator_name: challenge.creator?.name || '',
-                                            challenge_type_label: getChallengeTypeLabel(challenge.challenge_type),
-                                        }}
-                                        onEdit={handleEdit}
-                                    onManageParticipants={(challenge) => {
-                                        handleViewSubmissions(challenge);
-                                    }}
-                                        routePrefix="challenges"
-                                    />
-                                ))}
-                            </div>
-                            
-                            {/* Pagination */}
-                            {challenges?.links && challenges.links.length > 3 && (
-                                <div className="mt-8 flex items-center justify-center">
-                                    <div className="flex gap-2">
-                                        {challenges.links.map((link, index) => (
-                                            <Link
-                                                key={index}
-                                                href={link.url || '#'}
-                                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                                                    link.active
-                                                        ? 'bg-green-600 text-white shadow-sm'
-                                                        : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
-                                                } ${!link.url ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
-                                                dangerouslySetInnerHTML={{ __html: link.label }}
+                                <>
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                        {challengesData.map((challenge) => (
+                                            <InnovationChallengeCard
+                                                key={challenge.id}
+                                                challenge={{
+                                                    ...challenge,
+                                                    school_name: challenge.school?.name || 'مدرستك',
+                                                    creator_name: challenge.creator?.name || '',
+                                                    challenge_type_label: getChallengeTypeLabel(challenge.challenge_type),
+                                                }}
+                                                onEdit={handleEdit}
+                                                onManageParticipants={(challenge) => {
+                                                    handleViewSubmissions(challenge);
+                                                }}
+                                                routePrefix="challenges"
                                             />
                                         ))}
                                     </div>
+
+                                    {/* Pagination */}
+                                    {challenges?.links && challenges.links.length > 3 && (
+                                        <div className="mt-8 flex items-center justify-center">
+                                            <div className="flex gap-2">
+                                                {challenges.links.map((link, index) => (
+                                                    <Link
+                                                        key={index}
+                                                        href={link.url || '#'}
+                                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${link.active
+                                                            ? 'bg-[#A3C042] text-white shadow-sm'
+                                                            : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+                                                            } ${!link.url ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
+                                                        dangerouslySetInnerHTML={{ __html: link.label }}
+                                                    />
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+                                    <div className="max-w-md mx-auto">
+                                        <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                                            <FaTrophy className="text-4xl text-gray-400" />
+                                        </div>
+                                        <h3 className="text-xl font-bold text-gray-900 mb-2">لا توجد تحديات</h3>
+                                        <p className="text-gray-500 mb-6">
+                                            ابدأ بإنشاء تحدٍ جديد لإشراك طلابك في أنشطة تعليمية ممتعة ومبتكرة
+                                        </p>
+                                        <Link
+                                            href={typeof route !== 'undefined' ? route('school.challenges.create') : '/school/challenges/create'}
+                                            className="inline-flex items-center gap-2 px-6 py-3.5 bg-[#A3C042] text-white rounded-xl hover:from-primary-600 hover:to-secondary-600 transition-all shadow-lg hover:shadow-xl font-bold text-base transform hover:scale-105"
+                                        >
+                                            <FaPlus className="text-lg" />
+                                            <span>إنشاء تحدي</span>
+                                        </Link>
+                                    </div>
                                 </div>
                             )}
-                        </>
-                    ) : (
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-                            <div className="max-w-md mx-auto">
-                                <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                                    <FaTrophy className="text-4xl text-gray-400" />
-                                </div>
-                                <h3 className="text-xl font-bold text-gray-900 mb-2">لا توجد تحديات</h3>
-                                <p className="text-gray-500 mb-6">
-                                    ابدأ بإنشاء تحدٍ جديد لإشراك طلابك في أنشطة تعليمية ممتعة ومبتكرة
-                                </p>
-                                <Link
-                                    href={typeof route !== 'undefined' ? route('school.challenges.create') : '/school/challenges/create'}
-                                    className="inline-flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-xl hover:from-primary-600 hover:to-secondary-600 transition-all shadow-lg hover:shadow-xl font-bold text-base transform hover:scale-105"
-                                >
-                                    <FaPlus className="text-lg" />
-                                    <span>إنشاء تحدي</span>
-                                </Link>
-                            </div>
-                        </div>
-                    )}
                         </>
                     ) : activeTab === 'submissions' && selectedChallenge ? (
                         <>
@@ -419,51 +412,46 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                 <div className="flex flex-wrap gap-2">
                                     <button
                                         onClick={() => handleSubmissionStatusFilter('')}
-                                        className={`px-4 py-2 rounded-lg transition ${
-                                            !submissionStatusFilter
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        }`}
+                                        className={`px-4 py-2 rounded-lg transition ${!submissionStatusFilter
+                                            ? 'bg-[#A3C042] text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            }`}
                                     >
                                         الكل
                                     </button>
                                     <button
                                         onClick={() => handleSubmissionStatusFilter('submitted')}
-                                        className={`px-4 py-2 rounded-lg transition ${
-                                            submissionStatusFilter === 'submitted'
-                                                ? 'bg-yellow-600 text-white'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        }`}
+                                        className={`px-4 py-2 rounded-lg transition ${submissionStatusFilter === 'submitted'
+                                            ? 'bg-yellow-600 text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            }`}
                                     >
                                         مُسلم
                                     </button>
                                     <button
                                         onClick={() => handleSubmissionStatusFilter('reviewed')}
-                                        className={`px-4 py-2 rounded-lg transition ${
-                                            submissionStatusFilter === 'reviewed'
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        }`}
+                                        className={`px-4 py-2 rounded-lg transition ${submissionStatusFilter === 'reviewed'
+                                            ? 'bg-[#A3C042] text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            }`}
                                     >
                                         تم المراجعة
                                     </button>
                                     <button
                                         onClick={() => handleSubmissionStatusFilter('approved')}
-                                        className={`px-4 py-2 rounded-lg transition ${
-                                            submissionStatusFilter === 'approved'
-                                                ? 'bg-green-600 text-white'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        }`}
+                                        className={`px-4 py-2 rounded-lg transition ${submissionStatusFilter === 'approved'
+                                            ? 'bg-[#A3C042] text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            }`}
                                     >
                                         مقبول
                                     </button>
                                     <button
                                         onClick={() => handleSubmissionStatusFilter('rejected')}
-                                        className={`px-4 py-2 rounded-lg transition ${
-                                            submissionStatusFilter === 'rejected'
-                                                ? 'bg-red-600 text-white'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        }`}
+                                        className={`px-4 py-2 rounded-lg transition ${submissionStatusFilter === 'rejected'
+                                            ? 'bg-red-600 text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            }`}
                                     >
                                         مرفوض
                                     </button>
@@ -561,11 +549,10 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                             <Link
                                                 key={index}
                                                 href={link.url || '#'}
-                                                className={`px-4 py-2 rounded-lg ${
-                                                    link.active
-                                                        ? 'bg-blue-600 text-white'
-                                                        : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
-                                                } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                className={`px-4 py-2 rounded-lg ${link.active
+                                                    ? 'bg-[#A3C042] text-white'
+                                                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+                                                    } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
                                             />
                                         ))}
@@ -578,7 +565,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
             </div>
 
             {/* Bottom Banner - Banner سفلي */}
-            <div className="mt-8 bg-purple-900 text-white p-6 rounded-xl shadow-2xl" dir="rtl">
+            <div className="bg-purple-900 text-white p-6 rounded-xl shadow-2xl" dir="rtl">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                     {/* Right Side - أيقونة كأس */}
                     <div className="hidden md:flex items-center justify-center">
@@ -597,13 +584,13 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
 
                     {/* Left Side - زر إنشاء تحدي */}
                     <div className="flex-shrink-0">
-                            <Link
-                                href={typeof route !== 'undefined' ? route('school.challenges.create') : '/school/challenges/create'}
-                                className="inline-flex items-center gap-2 px-6 py-3 bg-white text-purple-900 rounded-lg hover:bg-purple-50 transition-colors font-bold shadow-lg hover:shadow-xl"
-                            >
-                                <FaPlus />
-                                إنشاء تحدي مخصص
-                            </Link>
+                        <Link
+                            href={typeof route !== 'undefined' ? route('school.challenges.create') : '/school/challenges/create'}
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-purple-900 rounded-lg hover:bg-purple-50 transition-colors font-bold shadow-lg hover:shadow-xl"
+                        >
+                            <FaPlus />
+                            إنشاء تحدي مخصص
+                        </Link>
                     </div>
                 </div>
             </div>

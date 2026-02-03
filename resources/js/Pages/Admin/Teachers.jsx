@@ -227,7 +227,7 @@ export default function Teachers({ teachers, auth, cities = [], filters = {} }) 
                 <div className="flex items-center gap-3">
                     <button
                         onClick={handleExportCSV}
-                        className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-4 py-3 rounded-lg flex items-center gap-2 transition"
+                        className="bg-blue-500 hover:bg-[#A3C042] text-white font-bold px-4 py-3 rounded-lg flex items-center gap-2 transition"
                     >
                         <FaDownload />
                         تصدير EXCEL

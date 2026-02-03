@@ -38,7 +38,7 @@ export default function PublicationsSection({
         <div className="space-y-4 md:space-y-6">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-[#A3C042]/20 to-[#93b03a]/20 rounded-xl flex items-center justify-center">
+                    <div className="w-10 h-10 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-xl flex items-center justify-center">
                         <FaNewspaper className="text-[#A3C042] text-xl" />
                     </div>
                     <h2 className="text-xl md:text-2xl font-bold text-gray-900">{title}</h2>
@@ -154,7 +154,7 @@ export default function PublicationsSection({
             <div className="text-center mt-6">
                 <Link
                     href={viewAllLink}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#A3C042] to-[#93b03a] text-white rounded-xl hover:opacity-90 transition shadow-lg font-bold text-sm md:text-base"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#A3C042] to-[#8CA635] text-white rounded-xl hover:opacity-90 transition shadow-lg font-bold text-sm md:text-base"
                 >
                     عرض جميع الإصدارات
                     <FaArrowLeft className="text-xs" />

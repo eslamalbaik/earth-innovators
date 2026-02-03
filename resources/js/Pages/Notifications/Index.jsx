@@ -37,7 +37,7 @@ export default function Index({ auth, notifications, unread_count }) {
         try {
             notificationChannel = window.Echo.private(channelName);
 
-            notificationChannel.listen('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', (e) => {                
+            notificationChannel.listen('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', (e) => {
                 if (e.notification) {
                     const newNotification = {
                         id: e.notification.id,
@@ -47,7 +47,7 @@ export default function Index({ auth, notifications, unread_count }) {
                         created_at: new Date().toISOString(),
                         created_at_human: 'الآن',
                     };
-                    
+
                     setNotificationsList(prev => [newNotification, ...prev]);
                     setUnreadCount(prev => prev + 1);
                 }
@@ -96,9 +96,9 @@ export default function Index({ auth, notifications, unread_count }) {
         router.post(`/notifications/${notificationId}/read`, {}, {
             preserveScroll: true,
             onSuccess: (page) => {
-                setNotificationsList(prev => 
-                    prev.map(n => 
-                        n.id === notificationId 
+                setNotificationsList(prev =>
+                    prev.map(n =>
+                        n.id === notificationId
                             ? { ...n, read_at: new Date().toISOString() }
                             : n
                     )
@@ -117,7 +117,7 @@ export default function Index({ auth, notifications, unread_count }) {
         router.post('/notifications/mark-all-read', {}, {
             preserveScroll: true,
             onSuccess: () => {
-                setNotificationsList(prev => 
+                setNotificationsList(prev =>
                     prev.map(n => ({ ...n, read_at: n.read_at || new Date().toISOString() }))
                 );
                 setUnreadCount(0);
@@ -154,7 +154,7 @@ export default function Index({ auth, notifications, unread_count }) {
         if (isRead) {
             return 'bg-white border-gray-100';
         }
-        
+
         switch (type) {
             case 'badge_awarded':
             case 'App\\Notifications\\BadgeAwardedNotification':
@@ -176,7 +176,7 @@ export default function Index({ auth, notifications, unread_count }) {
 
     const getNotificationLink = (notification) => {
         const data = notification.data || {};
-        
+
         if (data.project_id) {
             return `/projects/${data.project_id}`;
         }
@@ -189,7 +189,7 @@ export default function Index({ auth, notifications, unread_count }) {
         if (data.badge_id) {
             return '/badges';
         }
-        
+
         return null;
     };
 
@@ -208,7 +208,7 @@ export default function Index({ auth, notifications, unread_count }) {
                     </p>
                     <Link
                         href="/"
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#A3C042] to-[#93b03a] text-white rounded-xl font-bold text-sm md:text-base hover:opacity-90 transition shadow-lg"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#A3C042] to-[#8CA635] text-white rounded-xl font-bold text-sm md:text-base hover:opacity-90 transition shadow-lg"
                     >
                         العودة للرئيسية
                         <FaRocket className="text-sm" />
@@ -234,7 +234,7 @@ export default function Index({ auth, notifications, unread_count }) {
                             type="button"
                             onClick={handleMarkAllAsRead}
                             disabled={isLoading}
-                            className="flex items-center gap-2 px-4 py-2 bg-[#A3C042] text-white rounded-xl text-sm font-bold hover:bg-[#93b03a] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex items-center gap-2 px-4 py-2 bg-[#A3C042] text-white rounded-xl text-sm font-bold hover:bg-[#8CA635] transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <FaCheckCircle className="text-xs" />
                             تحديد الكل كمقروء
@@ -326,11 +326,10 @@ export default function Index({ auth, notifications, unread_count }) {
                                 <Link
                                     key={index}
                                     href={link.url || '#'}
-                                    className={`px-3 py-2 rounded-xl text-xs md:text-sm font-semibold transition ${
-                                        link.active
+                                    className={`px-3 py-2 rounded-xl text-xs md:text-sm font-semibold transition ${link.active
                                             ? 'bg-[#A3C042] text-white'
                                             : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-                                    } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                 />
                             ))}

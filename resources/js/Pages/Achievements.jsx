@@ -96,51 +96,51 @@ export default function Achievements({ auth, user, badges = [], points = 0, rece
                 <div>
                     <h3 className="text-sm font-extrabold text-gray-900 mb-3">مستويات رحلة المتعلم</h3>
                     <div className="grid grid-cols-2 gap-3">
-                    {learnerLevels.map((level, index) => {
-                        const LeftIcon = level.leftIcon;
-                        return (
-                            <div
-                                key={index}
-                                className={`bg-gradient-to-br ${level.gradient} rounded-2xl p-4 text-white relative overflow-hidden`}
-                            >
-                                <div className="flex items-center justify-between">
-                                    <span className="text-2xl">{level.rightIcon}</span>
+                        {learnerLevels.map((level, index) => {
+                            const LeftIcon = level.leftIcon;
+                            return (
+                                <div
+                                    key={index}
+                                    className={`bg-gradient-to-br ${level.gradient} rounded-2xl p-4 text-white relative overflow-hidden`}
+                                >
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-2xl">{level.rightIcon}</span>
+                                    </div>
+                                    <div className="mt-3">
+                                        <div className="text-xs font-bold mb-1">{level.title}</div>
+                                        <div className="text-[10px] opacity-90">{level.points}</div>
+                                    </div>
                                 </div>
-                                <div className="mt-3">
-                                    <div className="text-xs font-bold mb-1">{level.title}</div>
-                                    <div className="text-[10px] opacity-90">{level.points}</div>
-                                </div>
-                            </div>
-                        );
-                    })}
+                            );
+                        })}
+                    </div>
                 </div>
-            </div>
 
-            {/* Points Distribution */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-4">
-                <div className="flex items-center gap-2 mb-3">
-                    <FaCheckCircle className="text-[#A3C042] text-lg" />
-                    <h3 className="text-sm font-extrabold text-gray-900">توزيع النقاط</h3>
-                </div>
-                <div className="text-xs text-gray-600 mb-4">الحد الاقصى : 100 نقطة</div>
-                <div className="space-y-3">
-                    {pointsDistribution.map((item, index) => (
-                        <div key={index} className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <div className={`w-6 h-6 rounded-full ${item.iconBg} flex items-center justify-center`}>
-                                    <span className="text-xs">{item.icon}</span>
+                {/* Points Distribution */}
+                <div className="bg-white rounded-2xl border border-gray-100 p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                        <FaCheckCircle className="text-[#A3C042] text-lg" />
+                        <h3 className="text-sm font-extrabold text-gray-900">توزيع النقاط</h3>
+                    </div>
+                    <div className="text-xs text-gray-600 mb-4">الحد الاقصى : 100 نقطة</div>
+                    <div className="space-y-3">
+                        {pointsDistribution.map((item, index) => (
+                            <div key={index} className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <div className={`w-6 h-6 rounded-full ${item.iconBg} flex items-center justify-center`}>
+                                        <span className="text-xs">{item.icon}</span>
+                                    </div>
+                                    <span className="text-xs text-gray-700">{item.type}</span>
                                 </div>
-                                <span className="text-xs text-gray-700">{item.type}</span>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs font-semibold text-gray-700">{item.points}</span>
+                                    <span className="text-xs text-gray-500">{item.multiplier}</span>
+                                    <span className="text-xs font-bold text-gray-900">{item.total}</span>
+                                </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <span className="text-xs font-semibold text-gray-700">{item.points}</span>
-                                <span className="text-xs text-gray-500">{item.multiplier}</span>
-                                <span className="text-xs font-bold text-gray-900">{item.total}</span>
-                            </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
-            </div>
             </div>
 
             {/* Right Column - Desktop */}
@@ -154,9 +154,8 @@ export default function Achievements({ auth, user, badges = [], points = 0, rece
                             return (
                                 <div
                                     key={badge.id}
-                                    className={`${badge.color} rounded-2xl p-4 text-white text-center ${
-                                        !badge.earned ? 'opacity-50' : ''
-                                    }`}
+                                    className={`${badge.color} rounded-2xl p-4 text-white text-center ${!badge.earned ? 'opacity-50' : ''
+                                        }`}
                                 >
                                     <Icon className="mx-auto text-2xl mb-2" />
                                     <div className="text-[10px] font-bold">{badge.name}</div>
@@ -166,42 +165,42 @@ export default function Achievements({ auth, user, badges = [], points = 0, rece
                     </div>
                 </div>
 
-            {/* Link to Store Membership */}
-            <button
-                type="button"
-                onClick={() => router.visit('/store-membership')}
-                className="w-full bg-gradient-to-r from-[#A3C042] to-[#93b03a] text-white rounded-2xl p-4 font-bold text-sm flex items-center justify-center gap-2 hover:opacity-90 transition"
-            >
-                <FaChartLine />
-                بطاقة عضوية المتجر
-            </button>
+                {/* Link to Store Membership */}
+                <button
+                    type="button"
+                    onClick={() => router.visit('/store-membership')}
+                    className="w-full bg-gradient-to-r from-[#A3C042] to-[#8CA635] text-white rounded-2xl p-4 font-bold text-sm flex items-center justify-center gap-2 hover:opacity-90 transition"
+                >
+                    <FaChartLine />
+                    بطاقة عضوية المتجر
+                </button>
 
-            {/* Recent Achievements */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-4">
-                <h3 className="text-sm font-extrabold text-gray-900 mb-3">إنجازات حديثة</h3>
-                <div className="space-y-3">
-                    {achievements.map((achievement) => {
-                        const Icon = achievement.icon;
-                        return (
-                            <div
-                                key={achievement.id}
-                                className="bg-[#eef8d6] rounded-2xl p-3 flex items-start justify-between gap-3"
-                            >
-                                <div className="flex-1">
-                                    <div className="text-xs font-bold text-gray-900 mb-1">{achievement.title}</div>
-                                    <div className="text-[10px] text-gray-600">{achievement.description}</div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="px-2 py-1 rounded-full bg-[#A3C042] text-white text-[10px] font-bold">
-                                        +{achievement.points} نقطة
-                                    </span>
-                                    <div className={`${achievement.iconColor} w-8 h-8 rounded-full flex items-center justify-center`}>
-                                        <Icon className="text-white text-xs" />
+                {/* Recent Achievements */}
+                <div className="bg-white rounded-2xl border border-gray-100 p-4">
+                    <h3 className="text-sm font-extrabold text-gray-900 mb-3">إنجازات حديثة</h3>
+                    <div className="space-y-3">
+                        {achievements.map((achievement) => {
+                            const Icon = achievement.icon;
+                            return (
+                                <div
+                                    key={achievement.id}
+                                    className="bg-[#eef8d6] rounded-2xl p-3 flex items-start justify-between gap-3"
+                                >
+                                    <div className="flex-1">
+                                        <div className="text-xs font-bold text-gray-900 mb-1">{achievement.title}</div>
+                                        <div className="text-[10px] text-gray-600">{achievement.description}</div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="px-2 py-1 rounded-full bg-[#A3C042] text-white text-[10px] font-bold">
+                                            +{achievement.points} نقطة
+                                        </span>
+                                        <div className={`${achievement.iconColor} w-8 h-8 rounded-full flex items-center justify-center`}>
+                                            <Icon className="text-white text-xs" />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        );
-                    })}
+                            );
+                        })}
                     </div>
                 </div>
             </div>

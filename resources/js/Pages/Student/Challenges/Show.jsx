@@ -127,19 +127,19 @@ export default function StudentChallengeShow({ auth, challenge }) {
 
     const submitChallenge = (e) => {
         e.preventDefault();
-        
+
         // Validate that at least answer or files are provided
         if (!submissionForm.data.answer?.trim() && fileList.length === 0) {
             alert('يجب تقديم إجابة أو رفع ملف واحد على الأقل');
             return;
         }
-        
-        const route = existingSubmission 
+
+        const route = existingSubmission
             ? `/student/challenges/${challenge.id}/submissions/${existingSubmission.id}`
             : `/student/challenges/${challenge.id}/submit`;
-        
+
         const method = existingSubmission ? 'put' : 'post';
-        
+
         submissionForm[method](route, {
             forceFormData: true,
             onSuccess: () => {
@@ -158,9 +158,9 @@ export default function StudentChallengeShow({ auth, challenge }) {
 
     const statusBadge = getStatusBadge();
     const StatusIcon = statusBadge.icon;
-    const isActive = challenge.status === 'active' && 
-                     new Date(challenge.start_date) <= new Date() && 
-                     new Date(challenge.deadline) >= new Date();
+    const isActive = challenge.status === 'active' &&
+        new Date(challenge.start_date) <= new Date() &&
+        new Date(challenge.deadline) >= new Date();
 
     const ChallengeContent = () => (
         <div className="space-y-4">
@@ -210,22 +210,20 @@ export default function StudentChallengeShow({ auth, challenge }) {
             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide border-b border-gray-200">
                 <button
                     onClick={() => setActiveTab('details')}
-                    className={`whitespace-nowrap px-4 py-2 text-sm font-bold border-b-2 transition ${
-                        activeTab === 'details'
+                    className={`whitespace-nowrap px-4 py-2 text-sm font-bold border-b-2 transition ${activeTab === 'details'
                             ? 'border-[#A3C042] text-[#A3C042]'
                             : 'border-transparent text-gray-600'
-                    }`}
+                        }`}
                 >
                     التفاصيل
                 </button>
                 {isActive && (
                     <button
                         onClick={() => setActiveTab('submit')}
-                        className={`whitespace-nowrap px-4 py-2 text-sm font-bold border-b-2 transition ${
-                            activeTab === 'submit'
+                        className={`whitespace-nowrap px-4 py-2 text-sm font-bold border-b-2 transition ${activeTab === 'submit'
                                 ? 'border-[#A3C042] text-[#A3C042]'
                                 : 'border-transparent text-gray-600'
-                        }`}
+                            }`}
                     >
                         {existingSubmission ? 'تحديث التقديم' : 'تقديم الحل'}
                     </button>
@@ -262,9 +260,9 @@ export default function StudentChallengeShow({ auth, challenge }) {
                             <div className="space-y-2 text-sm">
                                 <p><strong>الحالة:</strong> {
                                     existingSubmission.status === 'submitted' ? 'تم التقديم' :
-                                    existingSubmission.status === 'reviewed' ? 'قيد المراجعة' :
-                                    existingSubmission.status === 'approved' ? 'مقبول' :
-                                    existingSubmission.status === 'rejected' ? 'مرفوض' : existingSubmission.status
+                                        existingSubmission.status === 'reviewed' ? 'قيد المراجعة' :
+                                            existingSubmission.status === 'approved' ? 'مقبول' :
+                                                existingSubmission.status === 'rejected' ? 'مرفوض' : existingSubmission.status
                                 }</p>
                                 {existingSubmission.rating && (
                                     <p><strong>التقييم:</strong> {existingSubmission.rating} / 10</p>
@@ -321,9 +319,8 @@ export default function StudentChallengeShow({ auth, challenge }) {
                         <div className="mb-4">
                             <InputLabel value="الملفات (اختياري)" className="text-sm" />
                             <div
-                                className={`mt-2 border-2 border-dashed rounded-2xl p-6 text-center transition ${
-                                    dragActive ? 'border-[#A3C042] bg-green-50' : 'border-gray-300'
-                                }`}
+                                className={`mt-2 border-2 border-dashed rounded-2xl p-6 text-center transition ${dragActive ? 'border-[#A3C042] bg-green-50' : 'border-gray-300'
+                                    }`}
                                 onDragEnter={handleDrag}
                                 onDragLeave={handleDrag}
                                 onDragOver={handleDrag}
@@ -337,7 +334,7 @@ export default function StudentChallengeShow({ auth, challenge }) {
                                 <button
                                     type="button"
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="px-4 py-2 bg-[#A3C042] text-white rounded-xl hover:bg-[#93b03a] transition text-sm font-semibold"
+                                    className="px-4 py-2 bg-[#A3C042] text-white rounded-xl hover:bg-[#8CA635] transition text-sm font-semibold"
                                 >
                                     اختر ملفات
                                 </button>
@@ -375,9 +372,9 @@ export default function StudentChallengeShow({ auth, challenge }) {
                         </div>
 
                         <div className="flex justify-end">
-                            <PrimaryButton 
+                            <PrimaryButton
                                 disabled={submissionForm.processing}
-                                className="bg-[#A3C042] hover:bg-[#93b03a] text-sm"
+                                className="bg-[#A3C042] hover:bg-[#8CA635] text-sm"
                             >
                                 {submissionForm.processing ? (
                                     <>
