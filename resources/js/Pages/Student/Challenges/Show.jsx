@@ -162,7 +162,7 @@ export default function StudentChallengeShow({ auth, challenge }) {
         new Date(challenge.start_date) <= new Date() &&
         new Date(challenge.deadline) >= new Date();
 
-    const ChallengeContent = () => (
+    const renderChallengeContent = (
         <div className="space-y-4">
             {/* Challenge Header */}
             <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-4">
@@ -211,8 +211,8 @@ export default function StudentChallengeShow({ auth, challenge }) {
                 <button
                     onClick={() => setActiveTab('details')}
                     className={`whitespace-nowrap px-4 py-2 text-sm font-bold border-b-2 transition ${activeTab === 'details'
-                            ? 'border-[#A3C042] text-[#A3C042]'
-                            : 'border-transparent text-gray-600'
+                        ? 'border-[#A3C042] text-[#A3C042]'
+                        : 'border-transparent text-gray-600'
                         }`}
                 >
                     التفاصيل
@@ -221,8 +221,8 @@ export default function StudentChallengeShow({ auth, challenge }) {
                     <button
                         onClick={() => setActiveTab('submit')}
                         className={`whitespace-nowrap px-4 py-2 text-sm font-bold border-b-2 transition ${activeTab === 'submit'
-                                ? 'border-[#A3C042] text-[#A3C042]'
-                                : 'border-transparent text-gray-600'
+                            ? 'border-[#A3C042] text-[#A3C042]'
+                            : 'border-transparent text-gray-600'
                             }`}
                     >
                         {existingSubmission ? 'تحديث التقديم' : 'تقديم الحل'}
@@ -409,7 +409,7 @@ export default function StudentChallengeShow({ auth, challenge }) {
                     onNotifications={() => router.visit('/notifications')}
                     onBack={() => router.visit('/student/challenges')}
                 >
-                    <ChallengeContent />
+                    {renderChallengeContent}
                 </MobileAppLayout>
             </div>
 
@@ -424,7 +424,7 @@ export default function StudentChallengeShow({ auth, challenge }) {
                     onBack={() => router.visit('/student/challenges')}
                 >
                     <div className="mx-auto w-full max-w-3xl">
-                        <ChallengeContent />
+                        {renderChallengeContent}
                     </div>
                 </MobileAppLayout>
             </div>

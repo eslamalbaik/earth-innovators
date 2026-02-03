@@ -74,9 +74,8 @@ export default function TeacherSubmissionShow({ auth, submission, availableBadge
         return `${year}/${month}/${day}`;
     };
 
-    const SubmissionContent = () => (
+    const renderSubmissionContent = (
         <>
-
             {/* Tabs */}
             <div className="bg-white rounded-2xl border border-gray-100 p-3">
                 <div className="grid grid-cols-2 gap-3">
@@ -121,7 +120,7 @@ export default function TeacherSubmissionShow({ auth, submission, availableBadge
                         <div className="text-sm font-bold text-gray-900 mb-2">الملفات المرفقة:</div>
                         <div className="space-y-2">
                             {submission.files.map((file, index) => (
-                                <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200">
                                     {getFileIcon(file.split('/').pop())}
                                     <span className="flex-1 text-sm text-gray-900">{file.split('/').pop()}</span>
                                     <a
@@ -251,7 +250,7 @@ export default function TeacherSubmissionShow({ auth, submission, availableBadge
                     onNotifications={() => router.visit('/notifications')}
                     onBack={() => router.visit('/teacher/submissions')}
                 >
-                    <SubmissionContent />
+                    {renderSubmissionContent}
                 </MobileAppLayout>
             </div>
 
@@ -268,7 +267,7 @@ export default function TeacherSubmissionShow({ auth, submission, availableBadge
                     <div className="space-y-4 lg:grid lg:grid-cols-12 lg:gap-6 lg:space-y-0">
                         {/* Left Column - Main Content */}
                         <div className="lg:col-span-8 space-y-4">
-                            <SubmissionContent />
+                            {renderSubmissionContent}
                         </div>
 
                         {/* Right Column - Submissions List */}
