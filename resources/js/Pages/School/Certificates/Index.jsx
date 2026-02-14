@@ -33,6 +33,8 @@ export default function Index({ auth, students, description }) {
         signature: '',
         issued_by: auth.user?.name || '',
         join_date: '',
+        description: '',
+        therapeutic_plan: '',
     });
 
     const handleSelectStudent = (student) => {
@@ -47,6 +49,8 @@ export default function Index({ auth, students, description }) {
             signature: '',
             issued_by: auth.user?.name || '',
             join_date: student.created_at ? new Date(student.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+            description: '',
+            therapeutic_plan: '',
         });
         setShowGenerateModal(true);
     };
@@ -78,6 +82,19 @@ export default function Index({ auth, students, description }) {
             if (certificateType === 'membership') {
                 overrides.join_date = formData.join_date;
                 overrides.course_name = 'شهادة عضوية';
+            }
+
+            // Add custom description if provided
+            if (formData.description) {
+                overrides.description = formData.description;
+            } else {
+                // Use default description based on certificate type
+                overrides.description = getDefaultDescription(certificateType);
+            }
+
+            // Add therapeutic plan if provided
+            if (formData.therapeutic_plan) {
+                overrides.therapeutic_plan = formData.therapeutic_plan;
             }
 
             const response = await axios.post('/api/certificates/generate', {
@@ -278,6 +295,14 @@ export default function Index({ auth, students, description }) {
                                     setCertificateType(e.target.value);
                                     if (e.target.value === 'membership') {
                                         setFormData({ ...formData, course_name: 'شهادة عضوية' });
+                                    } else if (e.target.value === 'general_completion') {
+                                        setFormData({ ...formData, course_name: 'شهادة إتمام عامة' });
+                                    } else if (e.target.value === 'academic_excellence') {
+                                        setFormData({ ...formData, course_name: 'شهادة تميز أكاديمي' });
+                                    } else if (e.target.value === 'motivation') {
+                                        setFormData({ ...formData, course_name: 'شهادة تحفيز وتشجيع' });
+                                    } else if (e.target.value === 'innovation') {
+                                        setFormData({ ...formData, course_name: 'شهادة إبداع أو ابتكار' });
                                     } else {
                                         setFormData({ ...formData, course_name: 'شهادة إتمام' });
                                     }
@@ -285,6 +310,10 @@ export default function Index({ auth, students, description }) {
                                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
                             >
                                 <option value="student">شهادة إتمام</option>
+                                <option value="general_completion">شهادة إتمام عامة</option>
+                                <option value="academic_excellence">شهادة تميز أكاديمي</option>
+                                <option value="motivation">شهادة تحفيز وتشجيع</option>
+                                <option value="innovation">شهادة إبداع أو ابتكار</option>
                                 <option value="membership">شهادة عضوية</option>
                                 <option value="achievement">شهادة إنجاز</option>
                             </select>
@@ -356,6 +385,49 @@ export default function Index({ auth, students, description }) {
                                 <option value="short">09/12/2025</option>
                                 <option value="long">9 ديسمبر 2025</option>
                             </select>
+                        </div>
+
+                        {/* Description Field - Optional */}
+                        <div>
+                            <InputLabel htmlFor="description" value="نص الشهادة (اختياري)" />
+                            <textarea
+                                id="description"
+                                value={formData.description}
+                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                rows={3}
+                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                placeholder="أدخل نص الشهادة المخصص..."
+                            />
+                            <p className="text-xs text-gray-500 mt-1">
+                                {!formData.description && certificateType === 'general_completion' && 
+                                    'تُمنح هذه الشهادة للطالب تقديرًا لإتمامه الدورة بنجاح، وإشادةً بجدّه واجتهاده وتميّزه الأكاديمي.'}
+                                {!formData.description && certificateType === 'academic_excellence' && 
+                                    'تُمنح هذه الشهادة للطالب تقديرًا لإتمامه الدورة بنجاح، وإشادةً بجدّه واجتهاده وتميّزه الأكاديمي.'}
+                                {!formData.description && certificateType === 'motivation' && 
+                                    'تُمنح هذه الشهادة للطالب تحفيزًا وتشجيعًا على مزيد من التفوق والنجاح.'}
+                                {!formData.description && certificateType === 'innovation' && 
+                                    'تُمنح هذه الشهادة للطالب تقديرًا لإبداعه وابتكاره المتميز.'}
+                            </p>
+                        </div>
+
+                        {/* Therapeutic Support Plan - Optional */}
+                        <div>
+                            <InputLabel htmlFor="therapeutic_plan" value="خطة الدعم العلاجية الفردية (اختياري)" />
+                            <textarea
+                                id="therapeutic_plan"
+                                value={formData.therapeutic_plan}
+                                onChange={(e) => setFormData({ ...formData, therapeutic_plan: e.target.value })}
+                                rows={4}
+                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                placeholder="أدخل معلومات خطة الدعم العلاجية...
+- تحديد نقاط القوة والضعف
+- أهداف قصيرة وطويلة المدى
+- أنشطة أسبوعية
+- متابعة دورية"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">
+                                يُمكن إضافة معلومات خطة الدعم العلاجية الفردية هنا
+                            </p>
                         </div>
 
                         <div className="flex justify-end space-x-3 space-x-reverse mt-6">

@@ -288,6 +288,7 @@ class CertificateService
             'file_path' => $filePath,
             'issued_by' => $issuer->id,
             'is_active' => true,
+            'therapeutic_plan' => $data['therapeutic_plan'] ?? null,
         ]);
 
         return $certificate;

@@ -90,6 +90,14 @@ export default function SchoolChallengeEdit({ auth, challenge }) {
     };
 
     const challengeTypes = [
+        { value: 'cognitive', label: 'تحدّي معرفي' },
+        { value: 'applied', label: 'تحدّي تطبيقي/مهاري' },
+        { value: 'creative', label: 'تحدّي إبداعي' },
+        { value: 'artistic_creative', label: 'تحدّي إبداعي فني' },
+        { value: 'collaborative', label: 'تحدّي تعاوني' },
+        { value: 'analytical', label: 'تحدّي تحليلي/استقصائي' },
+        { value: 'technological', label: 'تحدّي تكنولوجي' },
+        { value: 'behavioral', label: 'تحدّي سلوكي/قيمي' },
         { value: '60_seconds', label: 'تحدّي 60 ثانية' },
         { value: 'mental_math', label: 'حلها بدون قلم' },
         { value: 'conversions', label: 'تحدّي التحويلات' },

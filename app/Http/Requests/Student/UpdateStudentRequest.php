@@ -19,8 +19,9 @@ class UpdateStudentRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($studentId)],
-            'phone' => 'nullable|string|max:20',
+            'phone' => ['nullable', 'string', 'max:20', Rule::unique('users')->ignore($studentId)],
             'password' => 'nullable|string|min:8',
+            'year' => 'nullable|integer|min:1900|max:2100',
         ];
     }
 }

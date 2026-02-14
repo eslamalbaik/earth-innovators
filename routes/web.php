@@ -665,6 +665,11 @@ Route::middleware(['auth', 'school'])->prefix('school')->name('school.')->group(
 
     // إدارة الشهادات
     Route::get('/certificates', [\App\Http\Controllers\School\SchoolCertificateController::class, 'index'])->name('certificates.index');
+
+    // التقارير
+    Route::get('/reports', [\App\Http\Controllers\School\SchoolReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/create', [\App\Http\Controllers\School\SchoolReportController::class, 'create'])->name('reports.create');
+    Route::post('/reports', [\App\Http\Controllers\School\SchoolReportController::class, 'store'])->name('reports.store');
 });
 
 Route::middleware(['auth', 'teacher'])->group(function () {

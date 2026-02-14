@@ -111,6 +111,14 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
 
     const getChallengeTypeLabel = (type) => {
         const labels = {
+            'cognitive': 'تحدّي معرفي',
+            'applied': 'تحدّي تطبيقي/مهاري',
+            'creative': 'تحدّي إبداعي',
+            'artistic_creative': 'تحدّي إبداعي فني',
+            'collaborative': 'تحدّي تعاوني',
+            'analytical': 'تحدّي تحليلي/استقصائي',
+            'technological': 'تحدّي تكنولوجي',
+            'behavioral': 'تحدّي سلوكي/قيمي',
             '60_seconds': 'تحدّي 60 ثانية',
             'mental_math': 'حلها بدون قلم',
             'conversions': 'تحدّي التحويلات',

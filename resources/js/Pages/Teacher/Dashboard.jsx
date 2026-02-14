@@ -419,6 +419,9 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
                                                 <p className="text-sm text-gray-600 mt-1">
                                                     {publication.type === 'magazine' ? 'مجلة' :
                                                      publication.type === 'booklet' ? 'كتيب' :
+                                                     publication.type === 'article' ? 'مقال' :
+                                                     publication.type === 'study' ? 'دراسة' :
+                                                     publication.type === 'news' ? 'اخبار' :
                                                      'تقرير'}
                                                 </p>
                                                 <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">

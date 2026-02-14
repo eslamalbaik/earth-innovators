@@ -29,6 +29,9 @@ class Project extends Model
         'rating',
         'points_earned',
         'self_evaluation',
+        'instructional_approach',
+        'grade',
+        'subject',
     ];
 
     protected $casts = [

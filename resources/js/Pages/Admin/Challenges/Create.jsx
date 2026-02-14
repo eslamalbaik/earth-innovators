@@ -207,6 +207,14 @@ export default function AdminChallengesCreate({ schools }) {
                                 required
                             >
                                 <option value="">اختر نوع التحدي</option>
+                                <option value="cognitive">تحدّي معرفي</option>
+                                <option value="applied">تحدّي تطبيقي/مهاري</option>
+                                <option value="creative">تحدّي إبداعي</option>
+                                <option value="artistic_creative">تحدّي إبداعي فني</option>
+                                <option value="collaborative">تحدّي تعاوني</option>
+                                <option value="analytical">تحدّي تحليلي/استقصائي</option>
+                                <option value="technological">تحدّي تكنولوجي</option>
+                                <option value="behavioral">تحدّي سلوكي/قيمي</option>
                                 <option value="60_seconds">تحدّي 60 ثانية</option>
                                 <option value="mental_math">حلها بدون قلم</option>
                                 <option value="conversions">تحدّي التحويلات</option>

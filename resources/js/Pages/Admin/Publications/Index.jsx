@@ -66,6 +66,8 @@ export default function AdminPublicationsIndex({ publications = { data: [], link
             booklet: 'كتيب',
             report: 'تقرير',
             article: 'مقال',
+            study: 'دراسة',
+            news: 'اخبار',
         };
         return labels[type] || type;
     };

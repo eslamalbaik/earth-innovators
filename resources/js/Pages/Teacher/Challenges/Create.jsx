@@ -17,9 +17,10 @@ export default function TeacherChallengeCreate({ auth, school }) {
         description: '',
         image: null,
         instructions: '',
-        challenge_type: '60_seconds',
+        challenge_type: 'cognitive',
         category: 'mathematics',
         age_group: '10-13',
+        difficulty: 'medium',
         start_date: '',
         deadline: '',
         status: 'draft',
@@ -80,12 +81,26 @@ export default function TeacherChallengeCreate({ auth, school }) {
     };
 
     const challengeTypes = [
+        { value: 'cognitive', label: 'تحدّي معرفي' },
+        { value: 'applied', label: 'تحدّي تطبيقي/مهاري' },
+        { value: 'creative', label: 'تحدّي إبداعي' },
+        { value: 'artistic_creative', label: 'تحدّي إبداعي فني' },
+        { value: 'collaborative', label: 'تحدّي تعاوني' },
+        { value: 'analytical', label: 'تحدّي تحليلي/استقصائي' },
+        { value: 'technological', label: 'تحدّي تكنولوجي' },
+        { value: 'behavioral', label: 'تحدّي سلوكي/قيمي' },
         { value: '60_seconds', label: 'تحدّي 60 ثانية' },
         { value: 'mental_math', label: 'حلها بدون قلم' },
         { value: 'conversions', label: 'تحدّي التحويلات' },
         { value: 'team_fastest', label: 'تحدّي الفريق الأسرع' },
         { value: 'build_problem', label: 'ابنِ مسألة' },
         { value: 'custom', label: 'تحدّي مخصص' },
+    ];
+
+    const difficultyLevels = [
+        { value: 'easy', label: 'سهل' },
+        { value: 'medium', label: 'متوسط' },
+        { value: 'hard', label: 'صعب' },
     ];
 
     const categories = [
@@ -301,6 +316,43 @@ export default function TeacherChallengeCreate({ auth, school }) {
                                 ))}
                             </select>
                             <InputError message={errors.age_group} className="mt-2" />
+                        </div>
+
+                        {/* Difficulty Level */}
+                        <div>
+                            <InputLabel htmlFor="difficulty" value="مستوى الصعوبة" />
+                            <select
+                                id="difficulty"
+                                value={data.difficulty}
+                                onChange={(e) => setData('difficulty', e.target.value)}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
+                            >
+                                {difficultyLevels.map((level) => (
+                                    <option key={level.value} value={level.value}>
+                                        {level.label}
+                                    </option>
+                                ))}
+                            </select>
+                            <InputError message={errors.difficulty} className="mt-2" />
+                        </div>
+
+                        {/* Points Reward */}
+                        <div>
+                            <InputLabel htmlFor="points_reward" value="نقاط المكافأة" />
+                            <select
+                                id="points_reward"
+                                value={data.points_reward}
+                                onChange={(e) => setData('points_reward', parseInt(e.target.value))}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
+                            >
+                                <option value={0}>0 نقطة</option>
+                                <option value={10}>10 نقاط</option>
+                                <option value={20}>20 نقطة</option>
+                                <option value={30}>30 نقطة</option>
+                                <option value={50}>50 نقطة</option>
+                                <option value={100}>100 نقطة</option>
+                            </select>
+                            <InputError message={errors.points_reward} className="mt-2" />
                         </div>
 
                         {/* Date Range */}

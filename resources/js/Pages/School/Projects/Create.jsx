@@ -12,6 +12,9 @@ export default function CreateSchoolProject({ auth }) {
         title: '',
         description: '',
         category: 'other',
+        instructional_approach: '',
+        grade: '',
+        subject: '',
         files: [],
         images: [],
         report: '',
@@ -126,6 +129,46 @@ export default function CreateSchoolProject({ auth }) {
         { value: 'other', label: 'أخرى' },
     ];
 
+    // فئات النهج التعليمي
+    const instructionalApproachOptions = [
+        { value: 'play_based', label: 'النهج القائم على اللعب' },
+        { value: 'problem_based', label: 'النهج القائم على حل المشكلات' },
+        { value: 'pbl', label: 'مشاريع التعلم القائم على المشاريع (PBL)' },
+        { value: 'transformative', label: 'التعليم التحويلي' },
+        { value: 'accelerated', label: 'التعليم المسرّع (AEP)' },
+        { value: 'improvement', label: 'منهج التحسين' },
+    ];
+
+    // المواد
+    const subjectOptions = [
+        { value: 'math', label: 'الرياضيات' },
+        { value: 'arabic', label: 'اللغة العربية' },
+        { value: 'english', label: 'اللغة الإنجليزية' },
+        { value: 'social_studies', label: 'الدراسات الاجتماعية' },
+        { value: 'arts_subject', label: 'الفنون' },
+        { value: 'sports', label: 'الرياضة' },
+        { value: 'engineering_subject', label: 'الهندسة' },
+        { value: 'science_subject', label: 'العلوم' },
+        { value: 'technology_subject', label: 'التقنية' },
+        { value: 'physics_chem_bio', label: 'الفيزياء والكيمياء والأحياء' },
+    ];
+
+    // الصفوف
+    const gradeOptions = [
+        { value: 'grade_1', label: 'الصف الأول' },
+        { value: 'grade_2', label: 'الصف الثاني' },
+        { value: 'grade_3', label: 'الصف الثالث' },
+        { value: 'grade_4', label: 'الصف الرابع' },
+        { value: 'grade_5', label: 'الصف الخامس' },
+        { value: 'grade_6', label: 'الصف السادس' },
+        { value: 'grade_7', label: 'الصف السابع' },
+        { value: 'grade_8', label: 'الصف الثامن' },
+        { value: 'grade_9', label: 'الصف التاسع' },
+        { value: 'grade_10', label: 'الصف العاشر' },
+        { value: 'grade_11', label: 'الصف الحادي عشر' },
+        { value: 'grade_12', label: 'الصف الثاني عشر' },
+    ];
+
     return (
         <DashboardLayout header="إنشاء مشروع جديد">
             <Head title="إنشاء مشروع جديد - إرث المبتكرين" />
@@ -186,6 +229,64 @@ export default function CreateSchoolProject({ auth }) {
                                 ))}
                             </select>
                             <InputError message={errors.category} className="mt-2" />
+                        </div>
+
+                        {/* الصف (بديل الفئة العمرية) */}
+                        <div>
+                            <InputLabel htmlFor="grade" value="الصف *" />
+                            <select
+                                id="grade"
+                                value={data.grade}
+                                onChange={(e) => setData('grade', e.target.value)}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring focus:ring-[#A3C042] focus:ring-opacity-50"
+                                required
+                            >
+                                <option value="">اختر الصف</option>
+                                {gradeOptions.map(option => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </select>
+                            <InputError message={errors.grade} className="mt-2" />
+                        </div>
+
+                        {/* المادة */}
+                        <div>
+                            <InputLabel htmlFor="subject" value="المادة" />
+                            <select
+                                id="subject"
+                                value={data.subject}
+                                onChange={(e) => setData('subject', e.target.value)}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring focus:ring-[#A3C042] focus:ring-opacity-50"
+                            >
+                                <option value="">اختر المادة</option>
+                                {subjectOptions.map(option => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </select>
+                            <InputError message={errors.subject} className="mt-2" />
+                        </div>
+
+                        {/* النهج التعليمي */}
+                        <div>
+                            <InputLabel htmlFor="instructional_approach" value="فئة النهج التعليمي" />
+                            <select
+                                id="instructional_approach"
+                                value={data.instructional_approach}
+                                onChange={(e) => setData('instructional_approach', e.target.value)}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring focus:ring-[#A3C042] focus:ring-opacity-50"
+                            >
+                                <option value="">اختر النهج التعليمي</option>
+                                {instructionalApproachOptions.map(option => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </select>
+                            <InputError message={errors.instructional_approach} className="mt-2" />
                         </div>
 
                         {/* رفع الصور */}

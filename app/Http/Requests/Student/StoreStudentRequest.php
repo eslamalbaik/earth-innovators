@@ -16,8 +16,9 @@ class StoreStudentRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'nullable|string|max:20|unique:users',
             'password' => 'required|string|min:8',
+            'year' => 'nullable|integer|min:1900|max:2100',
         ];
     }
 }

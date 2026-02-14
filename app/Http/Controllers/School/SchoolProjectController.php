@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 class SchoolProjectController extends Controller
@@ -107,9 +106,6 @@ class SchoolProjectController extends Controller
 
         $project->save();
 
-        // مسح الكاش لضمان ظهور المشروع في القوائم
-        $this->projectService->clearProjectCache($project->id, $project->user_id, $project->teacher_id, $school->id);
-
         // إرسال إشعار لجميع الطلاب في المدرسة
         \App\Jobs\SendNewProjectNotification::dispatch($project);
 
@@ -195,21 +191,6 @@ class SchoolProjectController extends Controller
             'school_id' => $project->school_id,
             'approved_by' => $project->approved_by,
         ]);
-
-        // مسح الكاش لضمان ظهور المشروع في القوائم
-        $this->projectService->clearProjectCache($project->id, $project->user_id, $project->teacher_id, $school->id);
-
-        // مسح كاش المشاريع المعتمدة
-        $cacheDriver = config('cache.default');
-        if (in_array($cacheDriver, ['redis', 'memcached'])) {
-            Cache::tags(['approved_projects'])->flush();
-        } else {
-            // مسح جميع مفاتيح الكاش المتعلقة بالمشاريع المعتمدة
-            for ($page = 1; $page <= 20; $page++) {
-                Cache::forget("approved_projects_" . md5(json_encode([null, null, $school->id, 12])));
-                Cache::forget("approved_projects_" . md5(json_encode([null, null, null, 12])));
-            }
-        }
 
         // إرسال حدث قبول المشروع
         \App\Events\ProjectApproved::dispatch($project);
@@ -409,38 +390,6 @@ class SchoolProjectController extends Controller
         $project->images = $allImages;
 
         $project->save();
-
-        // مسح الكاش بشكل شامل
-        $this->projectService->clearProjectCache($project->id, $project->user_id, $project->teacher_id, $school->id);
-        
-        // مسح كاش إضافي للتأكد من ظهور التحديثات
-        // مسح جميع مفاتيح الكاش المتعلقة بالمدرسة
-        $cacheDriver = config('cache.default');
-        if (in_array($cacheDriver, ['redis', 'memcached'])) {
-            Cache::tags(['school_projects_' . $school->id, 'approved_projects'])->flush();
-        } else {
-            // مسح جميع التوليفات المحتملة
-            $searchOptions = [null, ''];
-            $statusOptions = [null, '', 'pending', 'approved', 'rejected'];
-            $categoryOptions = [null, '', 'science', 'technology', 'engineering', 'mathematics', 'arts', 'other'];
-            
-            foreach ($searchOptions as $search) {
-                foreach ($statusOptions as $status) {
-                    foreach ($categoryOptions as $category) {
-                        $cacheKey = "school_projects_{$school->id}_" . md5(json_encode([$search, $status, $category, 15]));
-                        Cache::forget($cacheKey);
-                    }
-                }
-            }
-            
-            // مسح pending projects
-            foreach ($searchOptions as $search) {
-                foreach ($categoryOptions as $category) {
-                    $cacheKey = "school_pending_projects_{$school->id}_" . md5(json_encode([$search, $category, 15]));
-                    Cache::forget($cacheKey);
-                }
-            }
-        }
 
         return redirect()->route('school.projects.index')
             ->with('success', 'تم تحديث المشروع بنجاح');

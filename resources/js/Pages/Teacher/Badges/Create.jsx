@@ -10,7 +10,6 @@ export default function CreateBadge({ schools, auth }) {
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         name_ar: '',
-        description: '',
         description_ar: '',
         icon: '',
         image: null,
@@ -87,28 +86,16 @@ export default function CreateBadge({ schools, auth }) {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            وصف الشارة (عربي)
+                            وصف الشارة (عربي) <span className="text-gray-500">(اختياري)</span>
                         </label>
                         <textarea
                             value={data.description_ar}
                             onChange={(e) => setData('description_ar', e.target.value)}
                             className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#A3C042] focus:border-transparent"
                             rows="3"
+                            placeholder="أدخل وصف الشارة باللغة العربية..."
                         />
                         {errors.description_ar && <p className="text-red-500 text-sm mt-1">{errors.description_ar}</p>}
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            وصف الشارة (إنجليزي)
-                        </label>
-                        <textarea
-                            value={data.description}
-                            onChange={(e) => setData('description', e.target.value)}
-                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#A3C042] focus:border-transparent"
-                            rows="3"
-                        />
-                        {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -168,15 +155,21 @@ export default function CreateBadge({ schools, auth }) {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            أيقونة الشارة
+                            الأيقونة <span className="text-gray-500">(اختياري)</span>
                         </label>
-                        <TextInput
-                            type="text"
-                            value={data.icon}
-                            onChange={(e) => setData('icon', e.target.value)}
-                            className="w-full"
-                            placeholder="مثال: star, medal, trophy"
-                        />
+                        <div className="flex gap-2 items-center">
+                            <TextInput
+                                type="text"
+                                value={data.icon}
+                                onChange={(e) => setData('icon', e.target.value)}
+                                className="flex-1"
+                                placeholder="مثال: 🏆 🥇 🌟 ⭐ 💎"
+                            />
+                            <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-lg border border-gray-300 text-2xl">
+                                {data.icon || '🎨'}
+                            </div>
+                        </div>
+                        <p className="mt-1 text-xs text-gray-500">يمكنك استخدام رموز Emoji أو ترك الحقل فارغًا</p>
                         {errors.icon && <p className="text-red-500 text-sm mt-1">{errors.icon}</p>}
                     </div>
 

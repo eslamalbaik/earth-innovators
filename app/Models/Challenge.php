@@ -22,6 +22,7 @@ class Challenge extends Model
         'challenge_type',
         'category',
         'age_group',
+        'difficulty',
         'start_date',
         'deadline',
         'status',

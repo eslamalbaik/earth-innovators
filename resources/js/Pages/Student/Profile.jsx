@@ -188,6 +188,99 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                 </div>
             </div>
 
+            {/* Student Classification */}
+            {(() => {
+                const points = displayStats.points;
+                let classification = null;
+                
+                if (points >= 98 && points <= 100) {
+                    classification = {
+                        level: 'outstanding',
+                        label: 'المتفوقون',
+                        range: '100-98',
+                        description: 'إتقان تام + ابتكار',
+                        skill: 'حل المشكلات المعقدة، ربط معرفي شامل',
+                        action: 'تحفيز قيادي (مساعد معلم)',
+                        color: 'from-yellow-400 to-orange-500',
+                        bgColor: 'bg-yellow-50',
+                        borderColor: 'border-yellow-400',
+                        textColor: 'text-yellow-700',
+                        icon: '👑'
+                    };
+                } else if (points >= 90 && points <= 97) {
+                    classification = {
+                        level: 'distinguished',
+                        label: 'المتميزون',
+                        range: '97-90',
+                        description: 'استيعاب مرتفع',
+                        skill: 'تنفيذ دقيق للمهام، أخطاء هامشية',
+                        action: 'تغذية راجعة لتجويد التفاصيل',
+                        color: 'from-blue-400 to-blue-600',
+                        bgColor: 'bg-blue-50',
+                        borderColor: 'border-blue-400',
+                        textColor: 'text-blue-700',
+                        icon: '⭐'
+                    };
+                } else if (points >= 70 && points <= 89) {
+                    classification = {
+                        level: 'average',
+                        label: 'المتوسطون',
+                        range: '89-70',
+                        description: 'تطبيق أساسي',
+                        skill: 'فهم المفاهيم الكبرى، صعوبة في التحليل',
+                        action: 'تدريبات لتعزيز مهارات الاستنتاج',
+                        color: 'from-amber-400 to-yellow-500',
+                        bgColor: 'bg-amber-50',
+                        borderColor: 'border-amber-400',
+                        textColor: 'text-amber-700',
+                        icon: '📚'
+                    };
+                } else {
+                    classification = {
+                        level: 'needs_followup',
+                        label: 'المتابعة',
+                        range: 'أقل من 70',
+                        description: 'إلمام محدود',
+                        skill: 'ضعف في ربط المعلومات والمهام المركبة',
+                        action: 'خطة علاجية (تبسيط المهارة + إعادة شرح)',
+                        color: 'from-red-400 to-red-600',
+                        bgColor: 'bg-red-50',
+                        borderColor: 'border-red-400',
+                        textColor: 'text-red-700',
+                        icon: '📋'
+                    };
+                }
+                
+                return (
+                    <div className={`${classification.bgColor} rounded-3xl shadow-sm p-4 border-2 ${classification.borderColor}`}>
+                        <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                                <span className="text-2xl">{classification.icon}</span>
+                                <div className="font-bold text-lg text-gray-900">{classification.label}</div>
+                            </div>
+                            <div className="px-3 py-1 bg-white rounded-full text-sm font-bold text-gray-600">
+                                {classification.range} نقطة
+                            </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                            <div className="flex items-start gap-2">
+                                <span className="text-xs font-bold text-gray-500 w-16">الوصف:</span>
+                                <span className={`text-sm font-medium ${classification.textColor}`}>{classification.description}</span>
+                            </div>
+                            <div className="flex items-start gap-2">
+                                <span className="text-xs font-bold text-gray-500 w-16">المهارة:</span>
+                                <span className="text-sm text-gray-700">{classification.skill}</span>
+                            </div>
+                            <div className="flex items-start gap-2">
+                                <span className="text-xs font-bold text-gray-500 w-16">الإجراء:</span>
+                                <span className={`text-sm font-medium ${classification.textColor}`}>{classification.action}</span>
+                            </div>
+                        </div>
+                    </div>
+                );
+            })()}
+
             {/* Quick Access Buttons */}
             <div className="grid grid-cols-2 gap-3">
                 {/* الإنجازات */}

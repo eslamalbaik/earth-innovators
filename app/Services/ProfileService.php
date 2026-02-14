@@ -74,6 +74,9 @@ class ProfileService extends BaseService
                 'image' => $teacher->image ? (str_starts_with($teacher->image, 'http') ? $teacher->image : Storage::url($teacher->image)) : null,
                 'is_verified' => $teacher->is_verified,
                 'is_active' => $teacher->is_active,
+                'education_type' => $teacher->education_type ?? '',
+                'curriculum_type' => is_array($teacher->curriculum_type) ? $teacher->curriculum_type : json_decode($teacher->curriculum_type ?? '[]', true),
+                'teaching_language' => is_array($teacher->teaching_language) ? $teacher->teaching_language : json_decode($teacher->teaching_language ?? '[]', true),
             ];
             $data['subjects'] = $subjects;
             $data['cities'] = $cities;
@@ -292,21 +295,16 @@ class ProfileService extends BaseService
     private function getSaudiCities(): array
     {
         return [
-            'الرياض',
-            'جدة',
-            'مكة المكرمة',
-            'المدينة المنورة',
-            'الدمام',
-            'الخبر',
-            'الظهران',
-            'الطائف',
-            'بريدة',
-            'تبوك',
-            'خميس مشيط',
-            'الهفوف',
-            'حائل',
-            'نجران',
-            'الجبيل'
+            'دبي',
+            'أبوظبي',
+            'الشارقة',
+            'عجمان',
+            'رأس الخيمة',
+            'أم القيوين',
+            'الفجيرة',
+            'العين',
+            'الظفرة',
+            'الغربية'
         ];
     }
 

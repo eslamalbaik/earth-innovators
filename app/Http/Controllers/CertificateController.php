@@ -30,7 +30,7 @@ class CertificateController extends Controller
             'overrides' => 'sometimes|array',
             'template_path' => 'sometimes|string',
             'date_format' => 'sometimes|string|in:Y-m-d,d-m-Y,long,short',
-            'certificate_type' => 'sometimes|string|in:student,school,achievement,membership',
+            'certificate_type' => 'sometimes|string|in:student,school,achievement,membership,general_completion,academic_excellence,motivation,innovation',
         ]);
 
         if ($validator->fails()) {
@@ -70,7 +70,9 @@ class CertificateController extends Controller
                 $user,
                 $filePath,
                 array_merge($overrides, [
-                    'course_name' => $overrides['course_name'] ?? ($certificateType === 'membership' ? 'شهادة عضوية' : 'شهادة إتمام'),
+                    'course_name' => $overrides['course_name'] ?? $this->getCertificateCourseName($certificateType),
+                    'description' => $overrides['description'] ?? $this->getDefaultDescription($certificateType),
+                    'description_ar' => $overrides['description'] ?? $this->getDefaultDescription($certificateType),
                 ]),
                 $certificateType
             );
@@ -158,6 +160,32 @@ class CertificateController extends Controller
         }
 
         return false;
+    }
+
+    protected function getCertificateCourseName(string $certificateType): string
+    {
+        return match($certificateType) {
+            'membership' => 'شهادة عضوية',
+            'general_completion' => 'شهادة إتمام عامة',
+            'academic_excellence' => 'شهادة تميز أكاديمي',
+            'motivation' => 'شهادة تحفيز وتشجيع',
+            'innovation' => 'شهادة إبداع أو ابتكار',
+            'achievement' => 'شهادة إنجاز',
+            default => 'شهادة إتمام',
+        };
+    }
+
+    protected function getDefaultDescription(string $certificateType): string
+    {
+        return match($certificateType) {
+            'general_completion' => 'تُمنح هذه الشهادة للطالب تقديرًا لإتمامه الدورة بنجاح، وإشادةً بجدّه واجتهاده وتميّزه الأكاديمي.',
+            'academic_excellence' => 'تُمنح هذه الشهادة للطالب تقديرًا لإتمامه الدورة بنجاح، وإشادةً بجدّه واجتهاده وتميّزه الأكاديمي.',
+            'motivation' => 'تُمنح هذه الشهادة للطالب تحفيزًا وتشجيعًا على مزيد من التفوق والنجاح.',
+            'innovation' => 'تُمنح هذه الشهادة للطالب تقديرًا لإبداعه وابتكاره المتميز.',
+            'achievement' => 'تُمنح هذه الشهادة للطالب تقديرًا لإنجازه المتميز.',
+            'membership' => 'تُمنح هذه الشهادة تقديرًا لعضوية الطالب في منصة إرث المبتكرين.',
+            default => 'تُمنح هذه الشهادة للطالب تقديرًا لإتمامه الدورة بنجاح.',
+        };
     }
 }
 

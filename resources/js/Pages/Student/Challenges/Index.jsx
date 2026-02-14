@@ -82,6 +82,14 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
 
     const getChallengeTypeLabel = (type) => {
         const labels = {
+            'cognitive': 'تحدّي معرفي',
+            'applied': 'تحدّي تطبيقي',
+            'creative': 'تحدّي إبداعي',
+            'artistic_creative': 'إبداعي فني',
+            'collaborative': 'تحدّي تعاوني',
+            'analytical': 'تحليلي',
+            'technological': 'تكنولوجي',
+            'behavioral': 'سلوكي',
             '60_seconds': '60 ثانية',
             'mental_math': 'بدون قلم',
             'conversions': 'التحويلات',

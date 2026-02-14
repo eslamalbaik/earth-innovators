@@ -33,6 +33,10 @@ class User extends Authenticatable
         'notification_preferences',
         'institution',
         'bio',
+        'contract_start_date',
+        'contract_end_date',
+        'contract_status',
+        'year',
     ];
 
     protected $hidden = [
@@ -46,6 +50,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'notification_preferences' => 'array',
+            'contract_start_date' => 'date',
+            'contract_end_date' => 'date',
         ];
     }
 
@@ -77,6 +83,101 @@ class User extends Authenticatable
     public function isSchool(): bool
     {
         return $this->role === 'school' || $this->role === 'educational_institution';
+    }
+
+    /**
+     * Get student classification based on points
+     * 
+     * المتفوقون (100-98): إتقان تام + ابتكار
+     * المتميزون (97-90): استيعاب مرتفع
+     * المتوسطون (89-70): تطبيق أساسي
+     * المتابعة (أقل من 70): إلمام محدود
+     */
+    public function getStudentClassification(): array
+    {
+        $points = $this->points ?? 0;
+        
+        if ($points >= 98 && $points <= 100) {
+            return [
+                'level' => 'outstanding',
+                'label' => 'المتفوقون',
+                'range' => '100-98',
+                'description' => 'إتقان تام + ابتكار',
+                'skill' => 'حل المشكلات المعقدة، ربط معرفي شامل',
+                'action' => 'تحفيز قيادي (مساعد معلم)',
+                'color' => 'gold',
+                'icon' => '👑',
+            ];
+        } elseif ($points >= 90 && $points <= 97) {
+            return [
+                'level' => 'distinguished',
+                'label' => 'المتميزون',
+                'range' => '97-90',
+                'description' => 'استيعاب مرتفع',
+                'skill' => 'تنفيذ دقيق للمهام، أخطاء هامشية',
+                'action' => 'تغذية راجعة لتجويد التفاصيل',
+                'color' => 'blue',
+                'icon' => '⭐',
+            ];
+        } elseif ($points >= 70 && $points <= 89) {
+            return [
+                'level' => 'average',
+                'label' => 'المتوسطون',
+                'range' => '89-70',
+                'description' => 'تطبيق أساسي',
+                'skill' => 'فهم المفاهيم الكبرى، صعوبة في التحليل',
+                'action' => 'تدريبات لتعزيز مهارات الاستنتاج',
+                'color' => 'yellow',
+                'icon' => '📚',
+            ];
+        } else {
+            return [
+                'level' => 'needs_followup',
+                'label' => 'المتابعة',
+                'range' => 'أقل من 70',
+                'description' => 'إلمام محدود',
+                'skill' => 'ضعف في ربط المعلومات والمهام المركبة',
+                'action' => 'خطة علاجية (تبسيط المهارة + إعادة شرح)',
+                'color' => 'red',
+                'icon' => '📋',
+            ];
+        }
+    }
+
+    /**
+     * Check if contract is valid
+     */
+    public function isContractValid(): bool
+    {
+        if (!$this->contract_end_date) {
+            return true; // No expiration date means always valid
+        }
+        return now()->lessThanOrEqualTo($this->contract_end_date);
+    }
+
+    /**
+     * Get days remaining until contract expires
+     */
+    public function getContractDaysRemaining(): ?int
+    {
+        if (!$this->contract_end_date) {
+            return null;
+        }
+        return now()->diffInDays($this->contract_end_date, false);
+    }
+
+    /**
+     * Check if teacher contract is valid
+     */
+    public function isTeacherContractValid(): bool
+    {
+        if (!$this->teacher) {
+            return false;
+        }
+        if (!$this->teacher->contract_end_date) {
+            return true;
+        }
+        return now()->lessThanOrEqualTo($this->teacher->contract_end_date);
     }
 
     public function isEducationalInstitution(): bool

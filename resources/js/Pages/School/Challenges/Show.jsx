@@ -23,6 +23,14 @@ export default function SchoolChallengeShow({ auth, challenge }) {
 
     const getChallengeTypeLabel = (type) => {
         const labels = {
+            'cognitive': 'تحدّي معرفي',
+            'applied': 'تحدّي تطبيقي/مهاري',
+            'creative': 'تحدّي إبداعي',
+            'artistic_creative': 'تحدّي إبداعي فني',
+            'collaborative': 'تحدّي تعاوني',
+            'analytical': 'تحدّي تحليلي/استقصائي',
+            'technological': 'تحدّي تكنولوجي',
+            'behavioral': 'تحدّي سلوكي/قيمي',
             '60_seconds': 'تحدّي 60 ثانية',
             'mental_math': 'حلها بدون قلم',
             'conversions': 'تحدّي التحويلات',
@@ -43,6 +51,24 @@ export default function SchoolChallengeShow({ auth, challenge }) {
             other: 'أخرى',
         };
         return labels[category] || category;
+    };
+
+    const getDifficultyLabel = (difficulty) => {
+        const labels = {
+            easy: 'سهل',
+            medium: 'متوسط',
+            hard: 'صعب',
+        };
+        return labels[difficulty] || difficulty;
+    };
+
+    const getDifficultyColor = (difficulty) => {
+        const colors = {
+            easy: 'bg-green-100 text-green-800',
+            medium: 'bg-yellow-100 text-yellow-800',
+            hard: 'bg-red-100 text-red-800',
+        };
+        return colors[difficulty] || 'bg-gray-100 text-gray-800';
     };
 
     const getStatusBadge = (status) => {
@@ -139,6 +165,14 @@ export default function SchoolChallengeShow({ auth, challenge }) {
                                     <FaAward className="text-sm" />
                                     <span className="font-semibold">نقاط المكافأة:</span>
                                     <span className="text-[#A3C042] font-bold">{challenge?.points_reward}</span>
+                                </div>
+                            )}
+                            {challenge?.difficulty && (
+                                <div className="flex items-center gap-2 text-gray-600">
+                                    <span className="font-semibold">مستوى الصعوبة:</span>
+                                    <span className={`px-2 py-1 rounded ${getDifficultyColor(challenge.difficulty)}`}>
+                                        {getDifficultyLabel(challenge.difficulty)}
+                                    </span>
                                 </div>
                             )}
                         </div>

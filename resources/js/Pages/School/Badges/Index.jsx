@@ -85,8 +85,15 @@ export default function SchoolBadges({ badges, auth }) {
                                     <div key={badge.id} className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition">
                                         <div className="flex items-start justify-between mb-4">
                                             <div className="flex-1">
-                                                <h4 className="text-lg font-bold text-gray-900 mb-2">{badge.name_ar || badge.name}</h4>
-                                                <p className="text-sm text-gray-600 line-clamp-2">{badge.description_ar || badge.description}</p>
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    {badge.icon && (
+                                                        <span className="text-2xl">{badge.icon}</span>
+                                                    )}
+                                                    <h4 className="text-lg font-bold text-gray-900">{badge.name_ar || badge.name}</h4>
+                                                </div>
+                                                {badge.description_ar && (
+                                                    <p className="text-sm text-gray-600 line-clamp-2">{badge.description_ar}</p>
+                                                )}
                                             </div>
                                             {badge.image && (
                                                 <img

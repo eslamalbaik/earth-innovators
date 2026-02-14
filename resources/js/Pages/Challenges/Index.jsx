@@ -24,6 +24,14 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
 
     const challengeTypes = [
         { value: '', label: 'الكل' },
+        { value: 'cognitive', label: 'تحدّي معرفي' },
+        { value: 'applied', label: 'تحدّي تطبيقي' },
+        { value: 'creative', label: 'تحدّي إبداعي' },
+        { value: 'artistic_creative', label: 'إبداعي فني' },
+        { value: 'collaborative', label: 'تحدّي تعاوني' },
+        { value: 'analytical', label: 'تحليلي' },
+        { value: 'technological', label: 'تكنولوجي' },
+        { value: 'behavioral', label: 'سلوكي' },
         { value: '60_seconds', label: '60 ثانية' },
         { value: 'mental_math', label: 'بدون قلم' },
         { value: 'conversions', label: 'التحويلات' },

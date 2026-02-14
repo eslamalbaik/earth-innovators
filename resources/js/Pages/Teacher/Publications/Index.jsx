@@ -14,6 +14,8 @@ export default function TeacherPublications({ publications, auth }) {
         booklet: 'كتيب',
         report: 'تقرير',
         article: 'مقال',
+        study: 'دراسة',
+        news: 'اخبار',
     };
 
     return (

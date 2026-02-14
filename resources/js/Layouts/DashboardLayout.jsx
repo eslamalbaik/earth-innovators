@@ -380,7 +380,7 @@ export default function DashboardLayout({ children, header }) {
     const navigation = {
         admin: [
             { name: 'لوحة التحكم', href: '/admin/dashboard', icon: FaTachometerAlt },
-            { name: 'المشاريع', href: '/admin/projects', icon: FaBook },
+            { name: 'صندوق المشاريع', href: '/admin/projects', icon: FaBook },
             {
                 name: 'مقالات',
                 href: '/admin/publications',
@@ -403,7 +403,7 @@ export default function DashboardLayout({ children, header }) {
         teacher: [
             { name: 'لوحة التحكم', href: '/teacher/dashboard', icon: FaTachometerAlt },
             {
-                name: 'المشاريع',
+                name: 'صندوق المشاريع',
                 href: '/teacher/projects',
                 icon: FaProjectDiagram,
                 subItems: [
@@ -443,7 +443,7 @@ export default function DashboardLayout({ children, header }) {
         school: [
             { name: 'لوحة التحكم', href: '/school/dashboard', icon: FaTachometerAlt },
             {
-                name: 'المشاريع',
+                name: 'صندوق المشاريع',
                 href: '/school/projects',
                 icon: FaProjectDiagram,
                 subItems: [
@@ -482,6 +482,7 @@ export default function DashboardLayout({ children, header }) {
                     // { name: 'إنشاء تحدّي', href: '/school/challenges/create', icon: FaCalendar },
                 ]
             },
+            { name: 'إضافة تقارير', href: '/school/reports', icon: FaFile },
             { name: 'الطلاب', href: '/school/students', icon: FaGraduationCap },
             { name: 'الشهادات', href: '/school/certificates', icon: FaFile },
             { name: 'الملف الشخصي', href: '/profile', icon: FaUser },
@@ -489,11 +490,11 @@ export default function DashboardLayout({ children, header }) {
         educational_institution: [
             { name: 'لوحة التحكم', href: '/school/dashboard', icon: FaTachometerAlt },
             {
-                name: 'المشاريع',
+                name: 'صندوق المشاريع',
                 href: '/school/projects',
                 icon: FaProjectDiagram,
                 subItems: [
-                    { name: 'تسليمات المشاريع', href: '/school/submissions', icon: FaFile },
+                    { name: 'تسليمات صندوق المشاريع', href: '/school/submissions', icon: FaFile },
                     { name: 'مراجعة المشاريع', href: '/school/projects/pending', icon: FaBookOpen },
                     { name: 'مشاريع المدرسة', href: '/school/projects', icon: FaProjectDiagram },
                     // { name: 'إنشاء مشروع', href: '/school/projects/create', icon: FaProjectDiagram },
@@ -528,6 +529,7 @@ export default function DashboardLayout({ children, header }) {
                     // { name: 'إنشاء تحدّي', href: '/school/challenges/create', icon: FaCalendar },
                 ]
             },
+            { name: 'إضافة تقارير', href: '/school/reports', icon: FaFile },
             { name: 'الطلاب', href: '/school/students', icon: FaGraduationCap },
             { name: 'الشهادات', href: '/school/certificates', icon: FaFile },
             { name: 'الملف الشخصي', href: '/profile', icon: FaUser },

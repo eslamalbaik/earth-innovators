@@ -22,6 +22,7 @@ class Certificate extends Model
         'file_path',
         'issued_by',
         'is_active',
+        'therapeutic_plan',
     ];
 
     protected $casts = [

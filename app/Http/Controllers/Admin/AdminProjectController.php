@@ -440,7 +440,34 @@ class AdminProjectController extends Controller
      */
     public function destroy(Project $project)
     {
+        // حذف الملفات المرتبطة
+        if ($project->files && is_array($project->files)) {
+            foreach ($project->files as $file) {
+                if ($file) {
+                    \Storage::disk('public')->delete($file);
+                }
+            }
+        }
+        
+        if ($project->images && is_array($project->images)) {
+            foreach ($project->images as $image) {
+                if ($image) {
+                    \Storage::disk('public')->delete($image);
+                }
+            }
+        }
+
+        $projectId = $project->id;
+        $userId = $project->user_id;
+        $teacherId = $project->teacher_id;
+        $schoolId = $project->school_id;
+
         $project->delete();
+
+        // مسح الكاش بشكل شامل
+        if (isset($this->projectService)) {
+            $this->projectService->clearProjectCache($projectId, $userId, $teacherId, $schoolId);
+        }
 
         return redirect()
             ->route('admin.projects.index')

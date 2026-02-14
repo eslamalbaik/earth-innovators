@@ -50,6 +50,9 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
         neighborhoods: teacher?.neighborhoods || [],
         price_per_hour: teacher?.price_per_hour || 0,
         teacher_image: null,
+        education_type: teacher?.education_type || '',
+        curriculum_type: teacher?.curriculum_type || [],
+        teaching_language: teacher?.teaching_language || [],
     });
 
     const passwordForm = useForm({
@@ -211,6 +214,24 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
             teacherForm.setData('neighborhoods', currentNeighborhoods.filter(n => n !== neighborhood));
         } else {
             teacherForm.setData('neighborhoods', [...currentNeighborhoods, neighborhood]);
+        }
+    };
+
+    const handleCurriculumChange = (curriculum) => {
+        const currentCurriculum = teacherForm.data.curriculum_type;
+        if (currentCurriculum.includes(curriculum)) {
+            teacherForm.setData('curriculum_type', currentCurriculum.filter(c => c !== curriculum));
+        } else {
+            teacherForm.setData('curriculum_type', [...currentCurriculum, curriculum]);
+        }
+    };
+
+    const handleTeachingLanguageChange = (language) => {
+        const currentLanguages = teacherForm.data.teaching_language;
+        if (currentLanguages.includes(language)) {
+            teacherForm.setData('teaching_language', currentLanguages.filter(l => l !== language));
+        } else {
+            teacherForm.setData('teaching_language', [...currentLanguages, language]);
         }
     };
 
@@ -499,10 +520,16 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                                                 required
                                             >
                                                 <option value="">اختر الجنسية</option>
+                                                <option value="إماراتي">إماراتي</option>
                                                 <option value="سعودي">سعودي</option>
                                                 <option value="مصري">مصري</option>
                                                 <option value="سوري">سوري</option>
                                                 <option value="أردني">أردني</option>
+                                                <option value="لبناني">لبناني</option>
+                                                <option value="كويتي">كويتي</option>
+                                                <option value="قطري">قطري</option>
+                                                <option value="بحريني">بحريني</option>
+                                                <option value="عماني">عماني</option>
                                                 <option value="أخرى">أخرى</option>
                                             </select>
                                         </div>
@@ -557,17 +584,6 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                                                     required
                                                 />
                                             </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-2">السعر في الساعة (ريال) *</label>
-                                                <input
-                                                    type="number"
-                                                    value={teacherForm.data.price_per_hour}
-                                                    onChange={(e) => teacherForm.setData('price_per_hour', e.target.value)}
-                                                    min="0"
-                                                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400"
-                                                    required
-                                                />
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -593,8 +609,8 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
 
                                 <div className="border-t border-gray-200 pt-6">
                                     <h3 className="text-lg font-semibold text-gray-900 mb-4">المراحل الدراسية *</h3>
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                        {['الابتدائية', 'المتوسطة', 'الثانوية', 'الجامعية'].map((stage) => (
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                        {['رياض الأطفال', 'الابتدائية (الحلقة الأولى)', 'المتوسطة (الحلقة الثانية)', 'الثانوية (الحلقة الثالثة)', 'المؤسسات التعليمية'].map((stage) => (
                                             <label key={stage} className="flex items-center gap-2 cursor-pointer">
                                                 <input
                                                     type="checkbox"
@@ -609,20 +625,89 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                                 </div>
 
                                 <div className="border-t border-gray-200 pt-6">
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-4">معلومات إضافية</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">نوع التعليم</label>
+                                            <select
+                                                value={teacherForm.data.education_type}
+                                                onChange={(e) => teacherForm.setData('education_type', e.target.value)}
+                                                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400"
+                                            >
+                                                <option value="">اختر نوع التعليم</option>
+                                                <option value="حكومي">حكومي</option>
+                                                <option value="خاص">خاص</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">السعر في الساعة (درهم إماراتي)</label>
+                                            <input
+                                                type="number"
+                                                value={teacherForm.data.price_per_hour}
+                                                onChange={(e) => teacherForm.setData('price_per_hour', e.target.value)}
+                                                min="0"
+                                                step="0.01"
+                                                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="mt-4">
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">نوع المنهاج</label>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            {[
+                                                { value: 'بريطانية', label: 'بريطانية' },
+                                                { value: 'أمريكية', label: 'أمريكية' },
+                                                { value: 'IB', label: 'IB' },
+                                                { value: 'التربية والتعليم', label: 'التربية والتعليم (اماراتي)' }
+                                            ].map((curriculum) => (
+                                                <label key={curriculum.value} className="flex items-center gap-2 cursor-pointer">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={teacherForm.data.curriculum_type.includes(curriculum.value)}
+                                                        onChange={() => handleCurriculumChange(curriculum.value)}
+                                                        className="rounded border-gray-300 text-yellow-400 focus:ring-yellow-400"
+                                                    />
+                                                    <span className="text-sm text-gray-700">{curriculum.label}</span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="mt-4">
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">لغة التدريس</label>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            {[
+                                                { value: 'عربية', label: 'عربية' },
+                                                { value: 'إنجليزية', label: 'إنجليزية' }
+                                            ].map((language) => (
+                                                <label key={language.value} className="flex items-center gap-2 cursor-pointer">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={teacherForm.data.teaching_language.includes(language.value)}
+                                                        onChange={() => handleTeachingLanguageChange(language.value)}
+                                                        className="rounded border-gray-300 text-yellow-400 focus:ring-yellow-400"
+                                                    />
+                                                    <span className="text-sm text-gray-700">{language.label}</span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="border-t border-gray-200 pt-6">
                                     <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                                         <FaMapMarkerAlt />
                                         الموقع
                                     </h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">المدينة *</label>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">الإمارة *</label>
                                             <select
                                                 value={teacherForm.data.city}
                                                 onChange={(e) => teacherForm.setData('city', e.target.value)}
                                                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400"
                                                 required
                                             >
-                                                <option value="">اختر المدينة</option>
+                                                <option value="">اختر الإمارة</option>
                                                 {cities?.map((city) => (
                                                     <option key={city} value={city}>{city}</option>
                                                 ))}

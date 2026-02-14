@@ -33,6 +33,13 @@ class Teacher extends Model
         'students_count',
         'is_verified',
         'is_active',
+        'education_type',
+        'curriculum_type',
+        'teaching_language',
+        'contract_start_date',
+        'contract_end_date',
+        'contract_status',
+        'membership_type',
     ];
 
     protected $casts = [
@@ -43,6 +50,10 @@ class Teacher extends Model
         'rating' => 'decimal:2',
         'is_verified' => 'boolean',
         'is_active' => 'boolean',
+        'curriculum_type' => 'array',
+        'teaching_language' => 'array',
+        'contract_start_date' => 'date',
+        'contract_end_date' => 'date',
     ];
 
     public function user(): BelongsTo

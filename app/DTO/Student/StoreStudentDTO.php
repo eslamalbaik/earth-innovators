@@ -12,6 +12,7 @@ class StoreStudentDTO extends BaseDTO
     public string $password;
     public int $schoolId;
     public int $points = 0;
+    public ?int $year = null;
 
     public static function fromRequest(array $data, int $schoolId): self
     {
@@ -22,6 +23,7 @@ class StoreStudentDTO extends BaseDTO
         $dto->password = $data['password'];
         $dto->schoolId = $schoolId;
         $dto->points = 0;
+        $dto->year = isset($data['year']) && $data['year'] ? (int) $data['year'] : null;
 
         return $dto;
     }

@@ -11,6 +11,7 @@ import { getPublicationImageUrl } from '../../../utils/imageUtils';
 export default function SchoolPublicationEdit({ auth, publication }) {
     const { data, setData, post, processing, errors } = useForm({
         type: publication?.type || 'magazine',
+        category: publication?.category || '',
         title: publication?.title || '',
         description: publication?.description || '',
         content: publication?.content || '',
@@ -117,10 +118,34 @@ export default function SchoolPublicationEdit({ auth, publication }) {
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                             >
                                 <option value="magazine">مجلة</option>
-                                <option value="booklet">كتيب</option>
+                                <option value="article">مقال</option>
+                                <option value="study">دراسة</option>
                                 <option value="report">تقرير</option>
+                                <option value="news">اخبار</option>
+                                <option value="booklet">كتيب</option>
                             </select>
                             <InputError message={errors.type} className="mt-2" />
+                        </div>
+
+                        {/* Category */}
+                        <div>
+                            <InputLabel htmlFor="category" value="فئة المجلة" />
+                            <select
+                                id="category"
+                                value={data.category}
+                                onChange={(e) => setData('category', e.target.value)}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
+                            >
+                                <option value="">اختر الفئة</option>
+                                <option value="educational">تربوية</option>
+                                <option value="instructional">تعليمية</option>
+                                <option value="research">بحثية</option>
+                                <option value="guidance">إرشادية</option>
+                                <option value="project_based">متخصصة بالمشاريع</option>
+                                <option value="assessment">جلسات التقييم</option>
+                                <option value="academic_guidance">التوجيه الأكاديمي</option>
+                            </select>
+                            <InputError message={errors.category} className="mt-2" />
                         </div>
 
                         {/* Title */}

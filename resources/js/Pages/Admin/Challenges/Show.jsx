@@ -30,6 +30,26 @@ export default function AdminChallengesShow({ challenge }) {
         return categoryMap[category] || category;
     };
 
+    const getChallengeTypeLabel = (type) => {
+        const typeMap = {
+            'cognitive': 'تحدّي معرفي',
+            'applied': 'تحدّي تطبيقي/مهاري',
+            'creative': 'تحدّي إبداعي',
+            'artistic_creative': 'تحدّي إبداعي فني',
+            'collaborative': 'تحدّي تعاوني',
+            'analytical': 'تحدّي تحليلي/استقصائي',
+            'technological': 'تحدّي تكنولوجي',
+            'behavioral': 'تحدّي سلوكي/قيمي',
+            '60_seconds': 'تحدّي 60 ثانية',
+            'mental_math': 'حلها بدون قلم',
+            'conversions': 'تحدّي التحويلات',
+            'team_fastest': 'تحدّي الفريق الأسرع',
+            'build_problem': 'ابنِ مسألة',
+            'custom': 'تحدّي مخصص',
+        };
+        return typeMap[type] || type;
+    };
+
     const getAgeGroupLabel = (ageGroup) => {
         const ageGroupMap = {
             '6-9': '6-9 سنوات',
@@ -38,6 +58,24 @@ export default function AdminChallengesShow({ challenge }) {
             '18+': '18+ سنة',
         };
         return ageGroupMap[ageGroup] || ageGroup;
+    };
+
+    const getDifficultyLabel = (difficulty) => {
+        const difficultyMap = {
+            'easy': 'سهل',
+            'medium': 'متوسط',
+            'hard': 'صعب',
+        };
+        return difficultyMap[difficulty] || difficulty;
+    };
+
+    const getDifficultyColor = (difficulty) => {
+        const colorMap = {
+            'easy': { bg: 'bg-green-100', text: 'text-green-800', icon: 'text-green-500' },
+            'medium': { bg: 'bg-yellow-100', text: 'text-yellow-800', icon: 'text-yellow-500' },
+            'hard': { bg: 'bg-red-100', text: 'text-red-800', icon: 'text-red-500' },
+        };
+        return colorMap[difficulty] || { bg: 'bg-gray-100', text: 'text-gray-800', icon: 'text-gray-500' };
     };
 
     return (
@@ -144,6 +182,18 @@ export default function AdminChallengesShow({ challenge }) {
                                     <p className="font-semibold text-gray-900">{getAgeGroupLabel(challenge.age_group)}</p>
                                 </div>
                             </div>
+
+                            {challenge.difficulty && (
+                                <div className="flex items-center gap-3">
+                                    <FaStar className={getDifficultyColor(challenge.difficulty).icon} />
+                                    <div>
+                                        <p className="text-sm text-gray-600">مستوى الصعوبة</p>
+                                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getDifficultyColor(challenge.difficulty).bg} ${getDifficultyColor(challenge.difficulty).text}`}>
+                                            {getDifficultyLabel(challenge.difficulty)}
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
 
                             {challenge.school && (
                                 <div className="flex items-center gap-3">

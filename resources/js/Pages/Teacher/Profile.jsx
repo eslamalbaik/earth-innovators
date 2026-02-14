@@ -38,6 +38,10 @@ export default function Profile({ teacher, subjects, cities }) {
         price_per_hour: teacher?.price_per_hour || 0,
         email: teacher?.email || teacher?.user?.email || '',
         phone: teacher?.phone || teacher?.user?.phone || '',
+        contract_start_date: teacher?.contract_start_date || '',
+        contract_end_date: teacher?.contract_end_date || '',
+        contract_status: teacher?.contract_status || 'active',
+        membership_type: teacher?.membership_type || 'standard',
     });
 
     const handleImageChange = (e) => {
@@ -247,6 +251,43 @@ export default function Profile({ teacher, subjects, cities }) {
                                 <FaEdit />
                                 {isEditing ? 'إلغاء التعديل' : 'تعديل الملف'}
                             </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Membership Card */}
+                <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl shadow-lg p-6 mb-6 text-white">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <div className="flex items-center gap-2 mb-2">
+                                <span className="text-2xl">🎓</span>
+                                <h2 className="text-xl font-bold">بطاقة عضوية المعلم</h2>
+                            </div>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                                <div>
+                                    <div className="text-sm opacity-80">نوع العضوية</div>
+                                    <div className="font-bold text-lg">{data.membership_type === 'premium' ? 'مميزة' : 'عادية'}</div>
+                                </div>
+                                <div>
+                                    <div className="text-sm opacity-80">حالة العقد</div>
+                                    <div className={`font-bold text-lg ${data.contract_status === 'active' ? 'text-green-300' : 'text-red-300'}`}>
+                                        {data.contract_status === 'active' ? 'نشط' : 'غير نشط'}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="text-sm opacity-80">تاريخ البداية</div>
+                                    <div className="font-bold">{data.contract_start_date || 'غير محدد'}</div>
+                                </div>
+                                <div>
+                                    <div className="text-sm opacity-80">تاريخ الانتهاء</div>
+                                    <div className="font-bold">{data.contract_end_date || 'غير محدد'}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="hidden md:block">
+                            <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center">
+                                <span className="text-4xl">🏆</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -486,6 +527,60 @@ export default function Profile({ teacher, subjects, cities }) {
                             </div>
                         </div>
                     </div>
+
+                    {/* Contract & Membership Section */}
+                    {isEditing && (
+                        <div className="bg-white rounded-xl shadow-lg p-6">
+                            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                <FaUser />
+                                معلومات العقد والعضوية
+                            </h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">نوع العضوية</label>
+                                    <select
+                                        value={data.membership_type}
+                                        onChange={(e) => setData('membership_type', e.target.value)}
+                                        className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                                    >
+                                        <option value="standard">عادية</option>
+                                        <option value="premium">مميزة</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">حالة العقد</label>
+                                    <select
+                                        value={data.contract_status}
+                                        onChange={(e) => setData('contract_status', e.target.value)}
+                                        className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                                    >
+                                        <option value="active">نشط</option>
+                                        <option value="inactive">غير نشط</option>
+                                        <option value="expired">منتهي</option>
+                                        <option value="pending">قيد الانتظار</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">تاريخ بداية العقد</label>
+                                    <input
+                                        type="date"
+                                        value={data.contract_start_date}
+                                        onChange={(e) => setData('contract_start_date', e.target.value)}
+                                        className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">تاريخ نهاية العقد</label>
+                                    <input
+                                        type="date"
+                                        value={data.contract_end_date}
+                                        onChange={(e) => setData('contract_end_date', e.target.value)}
+                                        className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {isEditing && (
                         <div className="flex justify-end">

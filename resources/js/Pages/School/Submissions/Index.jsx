@@ -125,7 +125,6 @@ export default function SchoolSubmissionsIndex({ auth, submissions, students = [
                                             <tr key={submission.id} className="hover:bg-gray-50">
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="flex items-center">
-                                                        <FaUser className="text-gray-400 mr-2" />
                                                         <span className="text-sm font-medium text-gray-900">
                                                             {submission.student?.name || 'غير محدد'}
                                                         </span>
@@ -138,7 +137,6 @@ export default function SchoolSubmissionsIndex({ auth, submissions, students = [
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="flex items-center text-sm text-gray-500">
-                                                        <FaCalendar className="mr-2" />
                                                         {submission.submitted_at
                                                             ? toHijriDate(submission.submitted_at)
                                                             : '-'}
@@ -147,7 +145,7 @@ export default function SchoolSubmissionsIndex({ auth, submissions, students = [
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     {submission.rating ? (
                                                         <div className="flex items-center">
-                                                            <FaStar className="text-yellow-400 mr-1" />
+                                                            <FaStar className="text-yellow-400 me-1" />
                                                             <span className="text-sm font-medium text-gray-900">
                                                                 {submission.rating}/5
                                                             </span>

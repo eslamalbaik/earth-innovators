@@ -26,6 +26,7 @@ export default function Index({ auth, students, availableBadges }) {
         email: '',
         phone: '',
         password: '',
+        year: '',
     });
 
     const editForm = useForm({
@@ -33,6 +34,7 @@ export default function Index({ auth, students, availableBadges }) {
         email: '',
         phone: '',
         password: '',
+        year: '',
     });
 
     const badgeForm = useForm({
@@ -58,6 +60,7 @@ export default function Index({ auth, students, availableBadges }) {
             email: student.email,
             phone: student.phone || '',
             password: '',
+            year: student.year || '',
         });
         setShowEditModal(true);
     };
@@ -187,6 +190,9 @@ export default function Index({ auth, students, availableBadges }) {
                                         رقم العضوية
                                     </th>
                                     <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                        السنة
+                                    </th>
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
                                         الاسم
                                     </th>
                                     <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
@@ -222,6 +228,11 @@ export default function Index({ auth, students, availableBadges }) {
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="text-sm font-semibold text-[#A3C042]">
                                                     {student.membership_number || '-'}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm font-semibold text-gray-700">
+                                                    {student.year || '-'}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
@@ -403,6 +414,19 @@ export default function Index({ auth, students, availableBadges }) {
                             />
                             <InputError message={createForm.errors.password} className="mt-2" />
                         </div>
+
+                        <div>
+                            <InputLabel htmlFor="year" value="السنة الدراسية" />
+                            <TextInput
+                                id="year"
+                                type="number"
+                                className="mt-1 block w-full"
+                                value={createForm.data.year}
+                                onChange={(e) => createForm.setData('year', e.target.value)}
+                                placeholder="مثال: 2026"
+                            />
+                            <InputError message={createForm.errors.year} className="mt-2" />
+                        </div>
                     </div>
 
                     <div className="flex items-center justify-end gap-3 mt-6">
@@ -471,6 +495,19 @@ export default function Index({ auth, students, availableBadges }) {
                                 onChange={(e) => editForm.setData('phone', e.target.value)}
                             />
                             <InputError message={editForm.errors.phone} className="mt-2" />
+                        </div>
+
+                        <div>
+                            <InputLabel htmlFor="edit_year" value="السنة الدراسية" />
+                            <TextInput
+                                id="edit_year"
+                                type="number"
+                                className="mt-1 block w-full"
+                                value={editForm.data.year}
+                                onChange={(e) => editForm.setData('year', e.target.value)}
+                                placeholder="مثال: 2026"
+                            />
+                            <InputError message={editForm.errors.year} className="mt-2" />
                         </div>
 
                         <div>

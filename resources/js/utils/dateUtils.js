@@ -1,13 +1,21 @@
 /**
- * Date Utilities for Hijri Calendar Conversion
- * Converts Gregorian dates to Hijri (Islamic) calendar
+ * Date Utilities for Date Formatting
+ * Formats dates in Arabic format (Gregorian)
+ *
+ * Note: The original toHijriDate function has been modified to return
+ * Gregorian dates in Arabic format instead of Hijri calendar.
  */
 
 /**
- * Convert Gregorian date to Hijri date
- * @param {Date|string} date - The date to convert
+ * Date Utilities for Date Formatting
+ * Formats dates in Arabic format (Gregorian)
+ */
+
+/**
+ * Format date in Arabic Gregorian format
+ * @param {Date|string} date - The date to format
  * @param {boolean} includeTime - Whether to include time in the output
- * @returns {string} - Formatted Hijri date string
+ * @returns {string} - Formatted date string
  */
 export function toHijriDate(date, includeTime = false) {
     if (!date) return 'غير محدد';
@@ -15,17 +23,14 @@ export function toHijriDate(date, includeTime = false) {
     const gregorianDate = new Date(date);
     if (isNaN(gregorianDate.getTime())) return 'تاريخ غير صحيح';
 
-    // Convert to Hijri using the algorithm
-    const hijri = gregorianToHijri(gregorianDate);
-    
-    const hijriMonths = [
-        'محرم', 'صفر', 'ربيع الأول', 'ربيع الآخر', 'جمادى الأولى', 'جمادى الآخرة',
-        'رجب', 'شعبان', 'رمضان', 'شوال', 'ذو القعدة', 'ذو الحجة'
+    const gregorianMonths = [
+        'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+        'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
     ];
 
-    const day = hijri.day;
-    const month = hijriMonths[hijri.month - 1];
-    const year = hijri.year;
+    const day = gregorianDate.getDate();
+    const month = gregorianMonths[gregorianDate.getMonth()];
+    const year = gregorianDate.getFullYear();
 
     let result = `${day} ${month} ${year}`;
     
@@ -40,9 +45,9 @@ export function toHijriDate(date, includeTime = false) {
 }
 
 /**
- * Convert Gregorian date to Hijri date (simple format: DD/MM/YYYY)
- * @param {Date|string} date - The date to convert
- * @returns {string} - Formatted Hijri date string (DD/MM/YYYY)
+ * Format date in short format (DD/MM/YYYY)
+ * @param {Date|string} date - The date to format
+ * @returns {string} - Formatted date string (DD/MM/YYYY)
  */
 export function toHijriDateShort(date) {
     if (!date) return 'غير محدد';
@@ -50,9 +55,11 @@ export function toHijriDateShort(date) {
     const gregorianDate = new Date(date);
     if (isNaN(gregorianDate.getTime())) return 'تاريخ غير صحيح';
 
-    const hijri = gregorianToHijri(gregorianDate);
+    const day = gregorianDate.getDate();
+    const month = gregorianDate.getMonth() + 1;
+    const year = gregorianDate.getFullYear();
     
-    return `${hijri.day}/${hijri.month}/${hijri.year}`;
+    return `${day}/${month}/${year}`;
 }
 
 /**
