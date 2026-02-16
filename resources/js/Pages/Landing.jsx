@@ -420,9 +420,8 @@ export default function Landing({
 
                         {/* Hero Section */}
                         <div className="bg-gradient-to-br from-[#A3C042] to-[#8CA635] rounded-3xl p-8 text-white relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
                             <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                                <div>
+                                <div className='z-10'>
                                     <h1 className="text-4xl font-extrabold mb-4 leading-tight">
                                         نحن معا نحو التقدم والتطور
                                     </h1>
@@ -436,11 +435,12 @@ export default function Landing({
                                         {isAuthed ? 'اذهب إلى لوحة التحكم' : 'ابدأ رحلتك معنا'}
                                     </button>
                                 </div>
-                                <div className="flex justify-center">
+                                <div className="flex justify-center items-center">
+                                    <div className="absolute bg-[#C1DA6C] md:w-[298px] md:h-[1500px] rotate-45"></div>
                                     <img
                                         src="/images/hero.png"
                                         alt="Hero"
-                                        className="w-full max-w-md h-auto"
+                                        className="z-10 w-full max-w-md"
                                     />
                                 </div>
                             </div>
