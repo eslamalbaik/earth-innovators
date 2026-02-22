@@ -100,7 +100,7 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                         </div>
 
                         {/* Online dot */}
-                        <div className="absolute bottom-0 left-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full" />
+                        <div className="absolute bottom-0 end-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full" />
 
                         {/* Edit Image Button */}
                         <button
@@ -288,7 +288,7 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                     href="/achievements"
                     className="group relative bg-gradient-to-br from-yellow-400 via-orange-500 to-pink-500 rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all transform hover:scale-105 overflow-hidden"
                 >
-                    <div className="absolute top-0 right-0 w-20 h-20 bg-white/20 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+                    <div className="absolute top-0 start-0 w-20 h-20 bg-white/20 rounded-full -ms-10 -mt-10 blur-2xl"></div>
                     <div className="relative flex items-center gap-3">
                         <div className="w-12 h-12 rounded-xl bg-white/30 backdrop-blur-sm flex items-center justify-center shadow-lg">
                             <FaTrophy className="text-white text-xl" />
@@ -306,7 +306,7 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                     href="/student/points"
                     className="group relative bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all transform hover:scale-105 overflow-hidden"
                 >
-                    <div className="absolute top-0 left-0 w-20 h-20 bg-white/20 rounded-full -ml-10 -mt-10 blur-2xl"></div>
+                    <div className="absolute top-0 end-0 w-20 h-20 bg-white/20 rounded-full -me-10 -mt-10 blur-2xl"></div>
                     <div className="relative flex items-center gap-3">
                         <div className="w-12 h-12 rounded-xl bg-white/30 backdrop-blur-sm flex items-center justify-center shadow-lg">
                             <FaChartLine className="text-white text-xl" />
@@ -324,7 +324,7 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                     href="/packages"
                     className="group relative bg-gradient-to-br from-[#A3C042] via-[#8CA635] to-[#7a9a2f] rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all transform hover:scale-105 overflow-hidden"
                 >
-                    <div className="absolute top-0 right-0 w-20 h-20 bg-white/20 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+                    <div className="absolute top-0 start-0 w-20 h-20 bg-white/20 rounded-full -ms-10 -mt-10 blur-2xl"></div>
                     <div className="relative flex items-center gap-3">
                         <div className="w-12 h-12 rounded-xl bg-white/30 backdrop-blur-sm flex items-center justify-center shadow-lg">
                             <FaCreditCard className="text-white text-xl" />
@@ -342,8 +342,8 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                     href="/store-membership"
                     className="group relative bg-gradient-to-br from-green-500 via-emerald-500 to-teal-600 rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all transform hover:scale-105 overflow-hidden col-span-2"
                 >
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/15 rounded-full -mr-16 -mt-16 blur-3xl"></div>
-                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/15 rounded-full -ml-12 -mb-12 blur-2xl"></div>
+                    <div className="absolute top-0 start-0 w-32 h-32 bg-white/15 rounded-full -ms-16 -mt-16 blur-3xl"></div>
+                    <div className="absolute bottom-0 end-0 w-24 h-24 bg-white/15 rounded-full -me-12 -mb-12 blur-2xl"></div>
                     <div className="relative flex items-center gap-4">
                         <div className="w-14 h-14 rounded-xl bg-white/30 backdrop-blur-sm flex items-center justify-center shadow-lg">
                             <FaGift className="text-white text-2xl" />

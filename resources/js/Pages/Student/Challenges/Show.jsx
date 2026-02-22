@@ -386,12 +386,12 @@ export default function StudentChallengeShow({ auth, challenge }) {
                             >
                                 {submissionForm.processing ? (
                                     <>
-                                        <FaSpinner className="animate-spin ml-2" />
+                                        <FaSpinner className="animate-spin me-2" />
                                         جاري الإرسال...
                                     </>
                                 ) : (
                                     <>
-                                        <FaUpload className="ml-2" />
+                                        <FaUpload className="me-2" />
                                         {existingSubmission ? 'تحديث التقديم' : 'تقديم الحل'}
                                     </>
                                 )}

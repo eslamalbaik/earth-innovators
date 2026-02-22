@@ -2,6 +2,7 @@ import { Link } from '@inertiajs/react';
 import { memo, useMemo } from 'react';
 import { FaTrophy, FaCalendar, FaUsers, FaSchool, FaUser, FaChartLine } from 'react-icons/fa';
 import ActionsMenu from './ActionsMenu';
+import { useTranslation } from '@/i18n';
 
 /**
  * Modern Challenge Table Row - Card-like row design
@@ -22,6 +23,7 @@ const ModernChallengeTableRow = memo(function ModernChallengeTableRow({
     deletingIds,
     updatingId,
 }) {
+    const { t } = useTranslation();
     const isDeleting = deletingIds?.has(challenge.id) || false;
     const isUpdating = updatingId === challenge.id;
 
@@ -81,7 +83,7 @@ const ModernChallengeTableRow = memo(function ModernChallengeTableRow({
                                 <div className="text-sm font-bold text-gray-900">
                                     {challenge.points_reward}
                                 </div>
-                                <div className="text-xs text-gray-600">نقطة</div>
+                                <div className="text-xs text-gray-600">{t('common.points')}</div>
                             </div>
                         </div>
                     )}
@@ -136,13 +138,13 @@ const ModernChallengeTableRow = memo(function ModernChallengeTableRow({
                     <div className="flex items-center gap-2 text-xs text-gray-700">
                         <FaCalendar className="text-gray-400 flex-shrink-0" />
                         <div>
-                            <span className="font-medium">بدء:</span> {formattedStartDate}
+                            <span className="font-medium">{t('challenges.start')}:</span> {formattedStartDate}
                         </div>
                     </div>
                     <div className="flex items-center gap-2 text-xs text-gray-600">
                         <FaCalendar className="text-gray-400 flex-shrink-0" />
                         <div>
-                            <span className="font-medium">انتهاء:</span> {formattedDeadline}
+                            <span className="font-medium">{t('challenges.end')}:</span> {formattedDeadline}
                         </div>
                     </div>
                 </div>
@@ -159,7 +161,7 @@ const ModernChallengeTableRow = memo(function ModernChallengeTableRow({
                             </div>
                             {challenge.max_participants && (
                                 <div className="text-xs text-gray-500">
-                                    من {challenge.max_participants}
+                                    {t('common.of')} {challenge.max_participants}
                                 </div>
                             )}
                         </div>
@@ -188,7 +190,7 @@ const ModernChallengeTableRow = memo(function ModernChallengeTableRow({
                         className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors text-xs font-medium"
                     >
                         <FaChartLine className="text-xs" />
-                        تحليل
+                        {t('challenges.analytics')}
                     </Link>
                 </td>
             )}
@@ -234,6 +236,8 @@ function ModernChallengeTable({
     deletingIds = new Set(),
     updatingId = null,
 }) {
+    const { t } = useTranslation();
+    
     if (!challenges || challenges.length === 0) {
         return null;
     }
@@ -244,29 +248,29 @@ function ModernChallengeTable({
                 <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
                     <tr>
                         <th className="px-4 sm:px-6 py-4  text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                            التحدي
+                            {t('challenges.challenge')}
                         </th>
                         {showSchool && (
                             <th className="px-4 sm:px-6 py-4  text-xs font-semibold text-gray-700 uppercase tracking-wider hidden md:table-cell">
-                                المدرسة
+                                {t('common.school')}
                             </th>
                         )}
                         <th className="px-4 sm:px-6 py-4  text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                            التواريخ
+                            {t('challenges.dates')}
                         </th>
                         <th className="px-4 sm:px-6 py-4  text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                            المشاركون
+                            {t('challenges.participants')}
                         </th>
                         <th className="px-4 sm:px-6 py-4  text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                            الحالة
+                            {t('common.status')}
                         </th>
                         {showAnalytics && (
                             <th className="px-4 sm:px-6 py-4  text-xs font-semibold text-gray-700 uppercase tracking-wider hidden lg:table-cell">
-                                الأداء
+                                {t('challenges.performance')}
                             </th>
                         )}
                         <th className="px-4 sm:px-6 py-4  text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                            الإجراءات
+                            {t('common.actions')}
                         </th>
                     </tr>
                 </thead>

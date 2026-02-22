@@ -1,28 +1,33 @@
 import { Link } from '@inertiajs/react';
 import SectionTitle from '../SectionTitle';
 import { FaArrowDown } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function SubjectsSection({
-    title = "استكشف المشاريع بحسب المجالات",
-    subtitle = "تصفح المشاريع الإبداعية في مختلف المجالات: العلوم، التكنولوجيا، الهندسة، الرياضيات، والفنون.",
+    title,
+    subtitle,
     subjects = [],
     browseAllLink = "/projects",
     onSubjectClick
 }) {
+    const { t } = useTranslation();
+    
+    const displayTitle = title || t('sections.subjects.title');
+    const displaySubtitle = subtitle || t('sections.subjects.subtitle');
     return (
         <section className="py-16 bg-gradient-to-r from-[#A3C042]/5 to-legacy-blue/5">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center space-y-8">
                     <div className="text-center">
                         <SectionTitle
-                            text={title}
+                            text={displayTitle}
                             size="2xl"
                             align="center"
                             className="pb-2"
                         />
 
                         <p className="text-lg text-gray-800 max-w-3xl mx-auto leading-relaxed">
-                            {subtitle}
+                            {displaySubtitle}
                         </p>
                     </div>
 
@@ -31,8 +36,8 @@ export default function SubjectsSection({
                             subjects.map((subject) => {
                                 const subjectName = subject.name_ar || subject.name || subject.name_en;
                                 const teacherCount = subject.teacher_count !== undefined && subject.teacher_count !== null
-                                    ? `${subject.teacher_count} معلم`
-                                    : '0 معلم';
+                                    ? `${subject.teacher_count} ${t('common.teacher')}`
+                                    : `0 ${t('common.teacher')}`;
                                 const subjectImage = subject.image || '/images/subjects/default.png';
 
                                 return (
@@ -60,7 +65,7 @@ export default function SubjectsSection({
                             })
                         ) : (
                             <div className="col-span-full text-center py-8">
-                                <p className="text-gray-500">لا توجد مواد متاحة حالياً</p>
+                                <p className="text-gray-500">{t('sections.subjects.noSubjects')}</p>
                             </div>
                         )}
                     </div>
@@ -70,7 +75,7 @@ export default function SubjectsSection({
                             href={browseAllLink}
                             className="inline-flex items-center gap-2 bg-[#A3C042] hover:bg-primary-600 text-white px-4 py-2 md:px-8 md:py-4 rounded-lg font-bold text-md md:text-lg transition duration-300 transform hover:scale-105 shadow-md"
                         >
-                            تصفح كل المواد
+                            {t('sections.subjects.browseAllSubjects')}
                             <FaArrowDown className="text-sm" />
                         </Link>
                     </div>

@@ -185,7 +185,7 @@ export default function SchoolSubmissionShow({ auth, submission, availableBadges
                                                 />
                                             </button>
                                         ))}
-                                        <span className="mr-3 text-gray-600">
+                                        <span className="ms-3 text-gray-600">
                                             {rating > 0 ? `${rating}/5` : 'اختر التقييم'}
                                         </span>
                                     </div>

@@ -62,7 +62,7 @@ export default function Packages({ auth, packages = [], userPackage = null }) {
                                     }`}
                             >
                                 {isPopular && (
-                                    <div className="absolute top-0 left-0 right-0 bg-[#A3C042] text-white text-center py-2 font-bold text-sm">
+                                    <div className="absolute top-0 end-0 start-0 bg-[#A3C042] text-white text-center py-2 font-bold text-sm">
                                         ⭐ الأكثر شعبية
                                     </div>
                                 )}

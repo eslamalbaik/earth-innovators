@@ -255,7 +255,7 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                             onChange={(e) => setData('is_enabled', e.target.checked)}
                             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                         />
-                        <label htmlFor={`enabled_${gateway.id}`} className="mr-2 block text-sm text-gray-900">
+                        <label htmlFor={`enabled_${gateway.id}`} className="ms-2 block text-sm text-gray-900">
                             مفعّل
                         </label>
                     </div>
@@ -267,7 +267,7 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                             onChange={(e) => setData('is_test_mode', e.target.checked)}
                             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                         />
-                        <label htmlFor={`test_mode_${gateway.id}`} className="mr-2 block text-sm text-gray-900">
+                        <label htmlFor={`test_mode_${gateway.id}`} className="ms-2 block text-sm text-gray-900">
                             وضع الاختبار
                         </label>
                     </div>

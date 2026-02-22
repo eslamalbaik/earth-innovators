@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FaMedal, FaTrophy, FaAward, FaStar, FaCheckCircle, FaSchool, FaUserTie } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 /**
  * AchievementBadge Component
@@ -7,6 +8,7 @@ import { FaMedal, FaTrophy, FaAward, FaStar, FaCheckCircle, FaSchool, FaUserTie 
  * Shows source (Teacher/School) and earned state
  */
 export default function AchievementBadge({ badge, isEarned = false, source = null }) {
+    const { t } = useTranslation();
     const [imageError, setImageError] = useState(false);
     const imageUrl = badge.image || badge.icon;
 
@@ -97,7 +99,7 @@ export default function AchievementBadge({ badge, isEarned = false, source = nul
                 {isEarned && (
                     <div className="text-center mb-2">
                         <span className="inline-block bg-[#A3C042] text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
-                            ✓ مكتسبة
+                            {t('badges.earned')}
                         </span>
                     </div>
                 )}
@@ -119,7 +121,7 @@ export default function AchievementBadge({ badge, isEarned = false, source = nul
                             <FaSchool className="text-green-500 text-sm" />
                         )}
                         <span className="text-xs text-gray-600">
-                            {source === 'teacher' || source === 'Teacher' ? 'معلم' : 'مدرسة'}
+                            {source === 'teacher' || source === 'Teacher' ? t('common.teacher') : t('common.school')}
                         </span>
                     </div>
                 )}
@@ -127,8 +129,8 @@ export default function AchievementBadge({ badge, isEarned = false, source = nul
                 <div className="flex items-center justify-center gap-4 text-sm">
                     {badge.points_required > 0 && (
                         <div className="text-gray-500">
-                            <FaStar className="inline ml-1 text-yellow-500" />
-                            {badge.points_required} نقطة
+                            <FaStar className="inline me-1 text-yellow-500" />
+                            {badge.points_required} {t('badges.points')}
                         </div>
                     )}
                 </div>

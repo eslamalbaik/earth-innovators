@@ -1,17 +1,19 @@
 import { Link, router } from '@inertiajs/react';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaTwitter, FaInstagram, FaFacebook, FaLinkedin, FaRocket, FaUsers, FaTrophy, FaBook, FaCompass } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function DesktopFooter({ auth }) {
+    const { t } = useTranslation();
     const user = auth?.user;
     const isAuthed = !!user;
 
     const quickLinks = [
-        { name: 'الرئيسية', href: '/', icon: FaRocket },
-        { name: 'المشاريع', href: '/projects', icon: FaBook },
-        { name: 'التحديات', href: '/challenges', icon: FaTrophy },
-        { name: 'الإصدارات', href: '/publications', icon: FaCompass },
-        { name: 'الشارات', href: '/badges', icon: FaTrophy },
-        { name: 'من نحن', href: '/about', icon: FaUsers },
+        { name: t('common.home'), href: '/', icon: FaRocket },
+        { name: t('common.projects'), href: '/projects', icon: FaBook },
+        { name: t('common.challenges'), href: '/challenges', icon: FaTrophy },
+        { name: t('common.publications'), href: '/publications', icon: FaCompass },
+        { name: t('common.badges'), href: '/badges', icon: FaTrophy },
+        { name: t('common.about'), href: '/about', icon: FaUsers },
     ];
 
     const socialLinks = [
@@ -24,7 +26,7 @@ export default function DesktopFooter({ auth }) {
     const contactInfo = [
         { icon: FaEnvelope, text: 'info@innovatorslegacy.ae', href: 'mailto:info@innovatorslegacy.ae' },
         { icon: FaPhone, text: '+971 4 XXX XXXX', href: 'tel:+9714XXXXXXX' },
-        { icon: FaMapMarkerAlt, text: 'دبي، الإمارات العربية المتحدة', href: '#' },
+        { icon: FaMapMarkerAlt, text: t('countries.uae'), href: '#' },
     ];
 
     return (
@@ -36,18 +38,18 @@ export default function DesktopFooter({ auth }) {
                         <Link href="/" className="flex items-center gap-3 mb-4">
                             <img
                                 src="/images/logo-modified.png"
-                                alt="إرث المبتكرين"
+                                alt={t('header.appName')}
                                 className="h-12 w-auto object-contain"
                             />
                             <div>
                                 <div className="text-xl font-extrabold bg-gradient-to-r from-[#A3C042] to-[#8CA635] bg-clip-text text-transparent">
-                                    إرث المبتكرين
+                                    {t('header.appName')}
                                 </div>
                                 <div className="text-xs text-gray-400">Innovators Legacy</div>
                             </div>
                         </Link>
                         <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                            منصة تعليمية تهدف إلى بناء مجتمع من المبتكرين والموهوبين في المؤسسات تعليمية من خلال توفير بيئة محفزة للإبداع والابتكار.
+                            {t('sections.whyChooseSubtitle')}
                         </p>
                         {/* Social Media */}
                         <div className="flex items-center gap-3">
@@ -71,7 +73,7 @@ export default function DesktopFooter({ auth }) {
 
                     {/* Quick Links */}
                     <div className="lg:col-span-1">
-                        <h3 className="text-lg font-bold mb-4 text-[#A3C042]">روابط سريعة</h3>
+                        <h3 className="text-lg font-bold mb-4 text-[#A3C042]">{t('sections.quickLinks')}</h3>
                         <ul className="space-y-2">
                             {quickLinks.map((link) => {
                                 const Icon = link.icon;
@@ -92,7 +94,7 @@ export default function DesktopFooter({ auth }) {
 
                     {/* Contact Info */}
                     <div className="lg:col-span-1">
-                        <h3 className="text-lg font-bold mb-4 text-[#A3C042]">تواصل معنا</h3>
+                        <h3 className="text-lg font-bold mb-4 text-[#A3C042]">{t('footer.contact')}</h3>
                         <ul className="space-y-3">
                             {contactInfo.map((contact, index) => {
                                 const Icon = contact.icon;
@@ -115,9 +117,9 @@ export default function DesktopFooter({ auth }) {
 
                     {/* Newsletter / CTA */}
                     <div className="lg:col-span-1">
-                        <h3 className="text-lg font-bold mb-4 text-[#A3C042]">انضم إلينا</h3>
+                        <h3 className="text-lg font-bold mb-4 text-[#A3C042]">{t('common.join')}</h3>
                         <p className="text-gray-400 text-sm mb-4">
-                            اشترك في نشرتنا الإخبارية للحصول على آخر الأخبار والتحديثات
+                            {t('sections.ctaSubtitle')}
                         </p>
                         {!isAuthed ? (
                             <div className="space-y-3">
@@ -125,23 +127,23 @@ export default function DesktopFooter({ auth }) {
                                     href="/register"
                                     className="block w-full bg-gradient-to-r from-[#A3C042] to-[#8CA635] text-white text-center py-3 rounded-xl font-bold hover:opacity-90 transition shadow-lg"
                                 >
-                                    إنشاء حساب
+                                    {t('common.register')}
                                 </Link>
                                 <Link
                                     href="/login"
                                     className="block w-full bg-gray-800 border border-gray-700 text-white text-center py-3 rounded-xl font-semibold hover:bg-gray-700 transition"
                                 >
-                                    تسجيل الدخول
+                                    {t('common.login')}
                                 </Link>
                             </div>
                         ) : (
                             <div className="bg-gradient-to-br from-[#A3C042]/10 to-[#8CA635]/10 border border-[#A3C042]/20 rounded-xl p-4">
-                                <p className="text-sm text-gray-300 mb-2">مرحباً بك، {user?.name?.split(' ')[0]}!</p>
+                                <p className="text-sm text-gray-300 mb-2">{t('dashboard.welcomeMessage')}، {user?.name?.split(' ')[0]}!</p>
                                 <Link
                                     href={user?.role === 'student' ? '/student/dashboard' : user?.role === 'teacher' ? '/teacher/dashboard' : '/school/dashboard'}
                                     className="text-[#A3C042] text-sm font-semibold hover:underline"
                                 >
-                                    اذهب إلى لوحة التحكم
+                                    {t('hero.goToDashboard')}
                                 </Link>
                             </div>
                         )}
@@ -152,17 +154,17 @@ export default function DesktopFooter({ auth }) {
                 <div className="border-t border-gray-700 pt-4">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                         <div className="text-gray-400 text-sm">
-                            جميع الحقوق محفوظة لإرث المبتكرين © {new Date().getFullYear()}
+                            {t('footer.copyright')} © {new Date().getFullYear()}
                         </div>
                         <div className="flex items-center gap-6">
                             <Link href="/privacy" className="text-gray-400 hover:text-[#A3C042] transition text-sm">
-                                سياسة الخصوصية
+                                {t('common.privacy')}
                             </Link>
                             <Link href="/terms" className="text-gray-400 hover:text-[#A3C042] transition text-sm">
-                                الشروط والأحكام
+                                {t('common.terms')}
                             </Link>
                             <Link href="/about" className="text-gray-400 hover:text-[#A3C042] transition text-sm">
-                                من نحن
+                                {t('common.about')}
                             </Link>
                         </div>
                     </div>

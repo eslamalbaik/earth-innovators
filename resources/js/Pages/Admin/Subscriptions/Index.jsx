@@ -92,7 +92,7 @@ export default function AdminSubscriptionsIndex({
                                 : 'text-gray-600 border-transparent hover:text-blue-600'
                             }`}
                     >
-                        <FaUsers className="inline ml-2" />
+                        <FaUsers className="inline me-2" />
                         الاشتراكات ({subscriptionStats.total})
                     </button>
                     <button
@@ -105,7 +105,7 @@ export default function AdminSubscriptionsIndex({
                                 : 'text-gray-600 border-transparent hover:text-blue-600'
                             }`}
                     >
-                        <FaCreditCard className="inline ml-2" />
+                        <FaCreditCard className="inline me-2" />
                         المدفوعات ({paymentStats.total})
                     </button>
                 </div>
@@ -180,7 +180,7 @@ export default function AdminSubscriptionsIndex({
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 placeholder="ابحث..."
-                                className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
                         </div>
                     </div>

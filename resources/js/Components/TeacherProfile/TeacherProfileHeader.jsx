@@ -1,5 +1,6 @@
 import { FaStar, FaCheck, FaUser, FaBook, FaGraduationCap } from 'react-icons/fa';
 import { getInitials, getColorFromName } from '../../utils/imageUtils';
+import { useTranslation } from '@/i18n';
 
 const getImageUrl = (image) => {
     if (!image) return null;
@@ -78,6 +79,8 @@ const formatSubject = (subject) => {
 };
 
 export default function TeacherProfileHeader({ teacher, onBookClick }) {
+    const { t } = useTranslation();
+    
     return (
         <div className="flex flex-col items-start gap-8">
             <div className="w-full flex items-center justify-between gap-4">
@@ -144,14 +147,14 @@ export default function TeacherProfileHeader({ teacher, onBookClick }) {
                             <div className="text-sm font-bold text-gray-900 flex items-center ">
                                 <span>{teacher?.price || '0'}</span>
                                 <img src="/images/aed-currency(black).svg" alt="currency" className="w-5 h-5" />
-                                <span> / ساعة</span>
+                                <span> {t('teachers.perHour')}</span>
                             </div>
 
                             <button
                                 onClick={onBookClick}
                                 className="bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-lg font-bold text-md transition duration-300 transform hover:scale-105"
                             >
-                                احجز الآن
+                                {t('teachers.bookNow')}
                             </button>
                         </div>
                     </div>
@@ -168,20 +171,20 @@ export default function TeacherProfileHeader({ teacher, onBookClick }) {
                             <FaStar className="text-sm text-yellow-400" />
                         </div>
                         <span className="text-gray-700 font-medium">
-                            {teacher?.rating ? Number(teacher.rating).toFixed(1) : '0.0'} ({teacher?.reviewsCount || 0} تقييم)
+                            {teacher?.rating ? Number(teacher.rating).toFixed(1) : '0.0'} ({teacher?.reviewsCount || 0} {t('teachers.reviews')})
                         </span>
                     </div>
                     <div className="flex items-center gap-2 border border-gray-200 rounded-lg py-1 px-2">
                         <FaGraduationCap className="text-green-500 text-sm" />
-                        <span className="text-gray-700">خبرة {teacher?.experience || 0} سنوات</span>
+                        <span className="text-gray-700">{t('teachers.experience')} {teacher?.experience || 0} {t('teachers.years')}</span>
                     </div>
                     <div className="flex items-center gap-2 border border-gray-200 rounded-lg py-1 px-2">
                         <FaBook className="text-blue-500 text-sm" />
-                        <span className="text-gray-700">{teacher?.sessionsCount || 0} حصة</span>
+                        <span className="text-gray-700">{teacher?.sessionsCount || 0} {t('teachers.session')}</span>
                     </div>
                     <div className="flex items-center gap-2 border border-gray-200 rounded-lg py-1 px-2">
                         <FaUser className="text-purple-900 text-sm" />
-                        <span className="text-gray-700">{teacher?.studentsCount || 0} طالب استفاد منه</span>
+                        <span className="text-gray-700">{teacher?.studentsCount || 0} {t('teachers.studentBenefited')}</span>
                     </div>
                 </div>
             </div>

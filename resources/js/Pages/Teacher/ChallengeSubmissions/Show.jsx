@@ -219,7 +219,7 @@ export default function TeacherChallengeSubmissionShow({ auth, submission, avail
                                                 <FaStar />
                                             </button>
                                         ))}
-                                        <span className="mr-2 text-gray-600">({rating} / 10)</span>
+                                        <span className="ms-2 text-gray-600">({rating} / 10)</span>
                                     </div>
                                     <InputError message={errors.rating} className="mt-2" />
                                 </div>
@@ -290,7 +290,7 @@ export default function TeacherChallengeSubmissionShow({ auth, submission, avail
                                 <PrimaryButton disabled={processing}>
                                     {processing ? (
                                         <>
-                                            <FaSpinner className="animate-spin mr-2" />
+                                            <FaSpinner className="animate-spin ms-2" />
                                             جاري الحفظ...
                                         </>
                                     ) : (
@@ -361,7 +361,7 @@ export default function TeacherChallengeSubmissionShow({ auth, submission, avail
                         </div>
                         <button
                             onClick={() => setShowToast(false)}
-                            className="ml-4 text-white hover:text-gray-200 transition"
+                            className="me-4 text-white hover:text-gray-200 transition"
                         >
                             <FaTimes />
                         </button>

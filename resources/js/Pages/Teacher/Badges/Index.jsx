@@ -78,7 +78,7 @@ export default function TeacherBadges({ badges, auth }) {
                                             href={`/teacher/badges/${badge.id}`}
                                             className="block w-full text-center bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition"
                                         >
-                                            <FaEye className="inline ml-2" />
+                                            <FaEye className="inline me-2" />
                                             عرض التفاصيل
                                         </Link>
                                     </div>
@@ -93,7 +93,7 @@ export default function TeacherBadges({ badges, auth }) {
                                 href="/teacher/badges/create"
                                 className="inline-block bg-[#A3C042] text-white px-6 py-3 rounded-lg font-semibold transition"
                             >
-                                <FaPlus className="inline ml-2" />
+                                <FaPlus className="inline me-2" />
                                 إرسال شارة جديدة
                             </Link>
                         </div>

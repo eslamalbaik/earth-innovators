@@ -224,8 +224,8 @@ export default function VerifyOtp() {
             <div className="flex items-center justify-center sm:px-4">
                 <div className="w-full sm:space-y-8">
                     <div className="relative min-h-screen overflow-hidden bg-white shadow-lg sm:rounded-2xl px-4 py-10 w-[100vw] sm:w-[400px] md:w-[450px] max-w-5xl sm:mx-auto">
-                        <img src="/images/avatar.svg" alt="avatar" className="absolute -top-24 -left-24 w-48 h-48" />
-                        <img src="/images/avatar1.svg" alt="avatar" className="absolute -bottom-8 right-0 w-28 h-28" />
+                        <img src="/images/avatar.svg" alt="avatar" className="absolute -top-24 -start-24 w-48 h-48" />
+                        <img src="/images/avatar1.svg" alt="avatar" className="absolute -bottom-8 end-0 w-28 h-28" />
                         <div className="flex flex-col items-center">
                             <div>
                                 <img
@@ -269,7 +269,7 @@ export default function VerifyOtp() {
                             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
                                 <div className="flex items-start justify-between">
                                     <div className="flex items-start">
-                                        <FaExclamationTriangle className="text-red-500 text-xl mt-0.5 ml-3 flex-shrink-0" />
+                                        <FaExclamationTriangle className="text-red-500 text-xl mt-0.5 me-3 flex-shrink-0" />
                                         <div className="flex-1">
                                             <h3 className="text-sm font-semibold text-red-800 mb-2">
                                                 يرجى تصحيح الأخطاء التالية:

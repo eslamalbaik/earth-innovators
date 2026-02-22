@@ -50,7 +50,7 @@ export default function TeacherApplications({ applications, stats, filters }) {
                             <div className="p-2 bg-blue-100 rounded-lg">
                                 <FaClock className="w-6 h-6 text-blue-600" />
                             </div>
-                            <div className="mr-4">
+                            <div className="ms-4">
                                 <p className="text-sm font-medium text-gray-600">إجمالي الطلبات</p>
                                 <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
                             </div>
@@ -62,7 +62,7 @@ export default function TeacherApplications({ applications, stats, filters }) {
                             <div className="p-2 bg-yellow-100 rounded-lg">
                                 <FaClock className="w-6 h-6 text-yellow-600" />
                             </div>
-                            <div className="mr-4">
+                            <div className="ms-4">
                                 <p className="text-sm font-medium text-gray-600">في الانتظار</p>
                                 <p className="text-2xl font-bold text-gray-900">{stats.pending}</p>
                             </div>
@@ -74,7 +74,7 @@ export default function TeacherApplications({ applications, stats, filters }) {
                             <div className="p-2 bg-blue-100 rounded-lg">
                                 <FaEye className="w-6 h-6 text-blue-600" />
                             </div>
-                            <div className="mr-4">
+                            <div className="ms-4">
                                 <p className="text-sm font-medium text-gray-600">قيد المراجعة</p>
                                 <p className="text-2xl font-bold text-gray-900">{stats.under_review}</p>
                             </div>
@@ -86,7 +86,7 @@ export default function TeacherApplications({ applications, stats, filters }) {
                             <div className="p-2 bg-green-100 rounded-lg">
                                 <FaCheck className="w-6 h-6 text-green-600" />
                             </div>
-                            <div className="mr-4">
+                            <div className="ms-4">
                                 <p className="text-sm font-medium text-gray-600">موافق عليه</p>
                                 <p className="text-2xl font-bold text-gray-900">{stats.approved}</p>
                             </div>
@@ -98,7 +98,7 @@ export default function TeacherApplications({ applications, stats, filters }) {
                             <div className="p-2 bg-red-100 rounded-lg">
                                 <FaTimes className="w-6 h-6 text-red-600" />
                             </div>
-                            <div className="mr-4">
+                            <div className="ms-4">
                                 <p className="text-sm font-medium text-gray-600">مرفوض</p>
                                 <p className="text-2xl font-bold text-gray-900">{stats.rejected}</p>
                             </div>
@@ -115,7 +115,7 @@ export default function TeacherApplications({ applications, stats, filters }) {
                                 <input
                                     type="text"
                                     placeholder="ابحث بالاسم أو البريد الإلكتروني..."
-                                    className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
                             </div>
                         </div>
@@ -186,7 +186,7 @@ export default function TeacherApplications({ applications, stats, filters }) {
                                                         </div>
                                                     )}
                                                 </div>
-                                                <div className="mr-4">
+                                                <div className="ms-4">
                                                     <div className="text-sm font-medium text-gray-900">
                                                         {application.teacher?.name}
                                                     </div>
@@ -263,7 +263,7 @@ export default function TeacherApplications({ applications, stats, filters }) {
                                     </a>
                                     <a
                                         href={applications.next_page_url}
-                                        className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                        className="me-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                     >
                                         التالي
                                     </a>

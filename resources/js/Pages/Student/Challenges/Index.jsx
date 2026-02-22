@@ -167,7 +167,7 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="ابحث عن التحديات .."
-                            className="w-full h-10 pr-10 pl-4 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042] text-sm"
+                            className="w-full h-10 ps-10 pe-4 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042] text-sm"
                         />
                         <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
                     </div>

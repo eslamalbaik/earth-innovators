@@ -134,7 +134,7 @@ export default function Bookings({ bookings, auth }) {
                             placeholder="البحث في الطلبات..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pr-12 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                            className="w-full ps-12 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
                         />
                     </div>
                     <select
@@ -208,7 +208,7 @@ export default function Bookings({ bookings, auth }) {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span className={`px-3 py-1 inline-flex items-center text-xs font-semibold rounded-full ${statusColors[booking.status]}`}>
-                                                    <StatusIcon className="ml-1" />
+                                                    <StatusIcon className="me-1" />
                                                     {statusLabels[booking.status]}
                                                 </span>
                                             </td>

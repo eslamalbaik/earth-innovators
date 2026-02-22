@@ -35,8 +35,8 @@ export default function About({ auth }) {
         <div className={`space-y-6 ${isDesktop ? 'lg:space-y-8' : ''}`}>
             {/* Hero Section */}
             <div className="relative bg-gradient-to-br from-[#A3C042] via-[#8CA635] to-[#7a9a2f] rounded-3xl p-6 md:p-12 text-white overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
-                <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full -ml-24 -mb-24 blur-2xl"></div>
+                <div className="absolute top-0 start-0 w-64 h-64 bg-white/10 rounded-full -ms-32 -mt-32 blur-3xl"></div>
+                <div className="absolute bottom-0 end-0 w-48 h-48 bg-white/10 rounded-full -me-24 -mb-24 blur-2xl"></div>
                 <div className="relative z-10">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-12 h-12 md:w-16 md:h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">

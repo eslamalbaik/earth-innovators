@@ -1,6 +1,7 @@
 import { memo, useMemo, lazy, Suspense } from 'react';
 import { FaBolt } from 'react-icons/fa';
 import { FaArrowUp } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 // Lazy load the chart component for better performance
 const EngagementChart = lazy(() => import('./EngagementChart'));
@@ -21,52 +22,53 @@ function UserEngagementCard({
     chartData = [],
     trendPercentage = "+12%"
 }) {
+    const { t } = useTranslation();
     // Memoize default data to prevent unnecessary recalculations
     const defaultListItems = useMemo(() => [
         {
             id: 1,
-            name: 'سارة خالد',
+            name: t('dashboard.defaultStudent1'),
             nameEn: 'Sara Khalid',
             activity: 98,
-            project: 'مشروع 315 أوسمة',
+            project: t('dashboard.defaultProject1'),
             projectEn: 'Project 315 badges',
-            date: 'منشور في 15 | 3 | 2025',
+            date: t('dashboard.defaultDate1'),
             image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face',
             badge: 1
         },
         {
             id: 2,
-            name: 'لينا عمر',
+            name: t('dashboard.defaultStudent2'),
             nameEn: 'Lina Omar',
             activity: 91,
-            project: 'مشروع 114 أوسمة',
+            project: t('dashboard.defaultProject2'),
             projectEn: 'Project 114 badges',
-            date: 'منشور في 12 | 3 | 2025',
+            date: t('dashboard.defaultDate2'),
             image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
             badge: 2
         },
         {
             id: 3,
-            name: 'أحمد محمود',
+            name: t('dashboard.defaultStudent3'),
             nameEn: 'Ahmed Mahmoud',
             activity: 85,
-            project: 'مشروع 213 أوسمة',
+            project: t('dashboard.defaultProject3'),
             projectEn: 'Project 213 badges',
-            date: 'منشور في 10 | 3 | 2025',
+            date: t('dashboard.defaultDate3'),
             image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
             badge: 3
         }
-    ], []);
+    ], [t]);
 
     const defaultChartData = useMemo(() => [
-        { month: 'يناير', value: 75 },
-        { month: 'فبراير', value: 70 },
-        { month: 'مارس', value: 65 },
-        { month: 'أبريل', value: 68 },
-        { month: 'مايو', value: 75 },
-        { month: 'يونيو', value: 78 },
-        { month: 'يوليو', value: 80 }
-    ], []);
+        { month: t('common.months.january'), value: 75 },
+        { month: t('common.months.february'), value: 70 },
+        { month: t('common.months.march'), value: 65 },
+        { month: t('common.months.april'), value: 68 },
+        { month: t('common.months.may'), value: 75 },
+        { month: t('common.months.june'), value: 78 },
+        { month: t('common.months.july'), value: 80 }
+    ], [t]);
 
     // Use provided data or fallback to defaults
     const displayListItems = useMemo(() => 
@@ -84,7 +86,7 @@ function UserEngagementCard({
             dir="rtl" 
             className="w-full bg-white rounded-2xl shadow-lg border border-gray-100 p-6 md:p-8"
             role="region"
-            aria-label="تحليلات تفاعل الطلاب"
+            aria-label={t('dashboard.studentEngagementAnalytics')}
         >
             {/* Header Section */}
             <div className="mb-6">
@@ -94,14 +96,14 @@ function UserEngagementCard({
                         aria-hidden="true"
                     />
                     <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-                        تفاعل الطلاب
-                        <span className="text-lg md:text-xl font-normal text-gray-600 mr-2">
+                        {t('dashboard.studentEngagement')}
+                        <span className="text-lg md:text-xl font-normal text-gray-600 ms-2">
                             (User Engagement)
                         </span>
                     </h2>
                 </div>
-                <p className="text-sm md:text-base text-gray-600 mr-10">
-                    قياس مدى تفاعل الطلاب ونشاطهم داخل المنصة
+                <p className="text-sm md:text-base text-gray-600 ms-10">
+                    {t('dashboard.engagementDescription')}
                 </p>
             </div>
 
@@ -109,7 +111,7 @@ function UserEngagementCard({
             <div className="flex items-center justify-center md:justify-start mb-6">
                 <div className="inline-flex items-center gap-2 bg-green-50 border border-green-200 rounded-full px-4 py-2">
                     <span className="text-sm font-semibold text-gray-700">
-                        أفضل التفاعلات الإيجابية
+                        {t('dashboard.bestPositiveEngagement')}
                     </span>
                     <div className="flex items-center gap-1 bg-green-100 rounded-full px-3 py-1">
                         <FaArrowUp className="text-green-600 text-xs" aria-hidden="true" />
@@ -126,12 +128,12 @@ function UserEngagementCard({
                 {/* Left Section: Top Engaged Innovators List */}
                 <div className="flex-1 lg:max-w-md space-y-4">
                     <h3 className="text-lg font-bold text-gray-900 mb-4">
-                        أبرز المبتكرين المتفاعلين
+                        {t('dashboard.topEngagedInnovators')}
                     </h3>
                     <div 
                         className="space-y-4"
                         role="list"
-                        aria-label="قائمة أبرز المبتكرين المتفاعلين"
+                        aria-label={t('dashboard.topInnovatorsList')}
                     >
                         {displayListItems.map((item, index) => (
                             <EngagementListItem
@@ -147,17 +149,17 @@ function UserEngagementCard({
                 <div className="flex-1 lg:flex-[1.5]">
                     <div className="bg-white rounded-xl p-4 md:p-6 border border-gray-100">
                         <h3 className="text-lg font-bold text-green-700 mb-4 flex items-center gap-2">
-                            <span>متوسط نقاط التفاعل الشهري</span>
+                            <span>{t('dashboard.monthlyAvgEngagementPoints')}</span>
                         </h3>
                         <Suspense 
                             fallback={
                                 <div 
                                     className="w-full h-64 flex items-center justify-center bg-gray-50 rounded-lg"
                                     role="status"
-                                    aria-label="جاري تحميل الرسم البياني"
+                                    aria-label={t('common.loading')}
                                 >
                                     <div className="animate-pulse text-gray-400">
-                                        جاري التحميل...
+                                        {t('common.loading')}
                                     </div>
                                 </div>
                             }
@@ -226,7 +228,7 @@ const EngagementListItem = memo(({ item, index }) => {
                     {item.activity}%
                 </div>
                 <div className="text-xs text-gray-500 mt-1">
-                    متوسط
+                    {t('dashboard.average')}
                 </div>
             </div>
         </div>

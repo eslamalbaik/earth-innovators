@@ -63,7 +63,7 @@ export default function SchoolBadges({ badges, auth }) {
                         </SelectInput>
                     </div>
                     <PrimaryButton type="submit">
-                        <FaSearch className="inline ml-2" />
+                        <FaSearch className="inline me-2" />
                         بحث
                     </PrimaryButton>
                 </form>
@@ -130,7 +130,7 @@ export default function SchoolBadges({ badges, auth }) {
                                             href={`/school/badges/${badge.id}`}
                                             className="block w-full text-center bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition"
                                         >
-                                            <FaEye className="inline ml-2" />
+                                            <FaEye className="inline me-2" />
                                             عرض التفاصيل
                                         </Link>
                                     </div>

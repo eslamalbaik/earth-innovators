@@ -209,7 +209,7 @@ export default function AdminProjectShow({ project }) {
                                             </div>
                                             <Link
                                                 href={route('admin.submissions.show', submission.id)}
-                                                className="ml-4 px-4 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+                                                className="me-4 px-4 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
                                             >
                                                 <FaEye />
                                                 {submission.status === 'submitted' ? 'تقييم' : 'عرض'}

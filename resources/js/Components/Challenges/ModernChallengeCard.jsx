@@ -158,7 +158,7 @@ const ModernChallengeCard = memo(function ModernChallengeCard({
                         <FaCalendar className="text-gray-400 flex-shrink-0" />
                         <span className="font-medium">التواريخ</span>
                     </div>
-                    <div className="space-y-1 text-xs text-gray-600 pr-6">
+                    <div className="space-y-1 text-xs text-gray-600 ps-6">
                         <div>
                             <span className="font-medium">بدء:</span> {formattedStartDate}
                         </div>

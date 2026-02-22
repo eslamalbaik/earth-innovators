@@ -1,23 +1,28 @@
 import SectionTitle from '../SectionTitle';
+import { useTranslation } from '@/i18n';
 
 export default function StatsSection({
-    title = "أرقام تثبت نجاحنا!",
-    subtitle = "مجتمع المبتكرين والموهوبين ينمو يومياً على منصة إرث المبتكرين.",
+    title,
+    subtitle,
     stats = []
 }) {
+    const { t } = useTranslation();
+    
+    const displayTitle = title || t('sections.stats.title');
+    const displaySubtitle = subtitle || t('sections.stats.subtitle');
     return (
         <section className="py-12 bg-gradient-to-r from-[#A3C042]/10 to-legacy-blue/10">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center space-y-6">
                     <div className="space-y-2">
                         <SectionTitle
-                            text={title}
+                            text={displayTitle}
                             size="2xl"
                             align="center"
                             className="pb-2 md:pb-6"
                         />
                         <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                            {subtitle}
+                            {displaySubtitle}
                         </p>
                     </div>
 
@@ -35,7 +40,7 @@ export default function StatsSection({
                             ))
                         ) : (
                             <div className="col-span-4 text-center text-gray-500 py-8">
-                                <p>جاري تحميل الإحصائيات...</p>
+                                <p>{t('sections.stats.loading')}</p>
                             </div>
                         )}
                     </div>

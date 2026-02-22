@@ -218,7 +218,7 @@ export default function AdminChallengeSubmissionShow({ auth, submission, availab
                                                 <FaStar />
                                             </button>
                                         ))}
-                                        <span className="mr-2 text-gray-600">({rating} / 10)</span>
+                                        <span className="ms-2 text-gray-600">({rating} / 10)</span>
                                     </div>
                                     <InputError message={errors.rating} className="mt-2" />
                                 </div>
@@ -288,7 +288,7 @@ export default function AdminChallengeSubmissionShow({ auth, submission, availab
                                 <PrimaryButton disabled={processing}>
                                     {processing ? (
                                         <>
-                                            <FaSpinner className="animate-spin mr-2" />
+                                            <FaSpinner className="animate-spin ms-2" />
                                             جاري الحفظ...
                                         </>
                                     ) : (
@@ -359,7 +359,7 @@ export default function AdminChallengeSubmissionShow({ auth, submission, availab
                         </div>
                         <button
                             onClick={() => setShowToast(false)}
-                            className="ml-4 text-white hover:text-gray-200 transition"
+                            className="me-4 text-white hover:text-gray-200 transition"
                         >
                             <FaTimes />
                         </button>

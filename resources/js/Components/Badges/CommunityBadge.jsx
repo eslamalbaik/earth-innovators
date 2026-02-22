@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaBug, FaHeart, FaBrain, FaRocket } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 /**
  * CommunityBadge Component
@@ -23,6 +24,7 @@ function getRangeFromScore(score) {
 }
 
 export default function CommunityBadge({ badge, progress = null }) {
+    const { t } = useTranslation();
     const [imageError, setImageError] = useState(false);
     const imageUrl = badge.image || badge.icon;
 
@@ -91,7 +93,7 @@ export default function CommunityBadge({ badge, progress = null }) {
                             {badge.name_ar || badge.name}
                         </h3>
                         <p className="text-sm text-gray-600">
-                            {score} من 100 نقطة
+                            {score} {t('badges.of100')}
                         </p>
                     </div>
 
@@ -116,7 +118,7 @@ export default function CommunityBadge({ badge, progress = null }) {
                 {activeRange && (
                     <div className="flex items-center gap-2 mb-4">
                         <activeRange.icon className={`text-lg ${activeRange.iconColor}`} />
-                        <span className="text-xs text-gray-600">المستوى الحالي</span>
+                        <span className="text-xs text-gray-600">{t('badges.currentLevel')}</span>
                     </div>
                 )}
 

@@ -157,14 +157,14 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                                     }}
                                     className="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-[#A3C042] transition duration-300"
                                 >
-                                    <FaDownload className="ml-2" />
+                                    <FaDownload className="me-2" />
                                     تصدير CSV
                                 </button>
                                 <button
                                     onClick={() => setShowFilters(!showFilters)}
                                     className="flex items-center px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-300"
                                 >
-                                    <FaFilter className="ml-2" />
+                                    <FaFilter className="me-2" />
                                     فلترة
                                 </button>
                             </div>
@@ -183,7 +183,7 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
                                             placeholder="رقم الطلب، اسم الطالب، اسم المعلم..."
-                                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                                            className="w-full pe-10 ps-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                                         />
                                         <FaSearch className="absolute left-3 top-3 text-gray-400" />
                                     </div>
@@ -374,7 +374,7 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                                                             <FaUser className="h-5 w-5 text-gray-600" />
                                                         </div>
                                                     </div>
-                                                    <div className="mr-4">
+                                                    <div className="ms-4">
                                                         <div className="text-sm font-medium text-gray-900">
                                                             {booking.student?.name || booking.student_name || 'غير محدد'}
                                                         </div>
@@ -391,7 +391,7 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                                                             <FaUser className="h-5 w-5 text-gray-600" />
                                                         </div>
                                                     </div>
-                                                    <div className="mr-4">
+                                                    <div className="ms-4">
                                                         <div className="text-sm font-medium text-gray-900">
                                                             {booking.teacher?.user?.name || booking.teacher?.name_ar || 'غير محدد'}
                                                         </div>
@@ -403,7 +403,7 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                 <div className="flex items-center">
-                                                    <FaCalendar className="ml-2 text-gray-400" />
+                                                    <FaCalendar className="me-2 text-gray-400" />
                                                     {(() => {
                                                         const d = booking?.availability?.date
                                                             ? new Date(booking.availability.date)
@@ -414,7 +414,7 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                 <div className="flex items-center">
-                                                    <FaClock className="ml-2 text-gray-400" />
+                                                    <FaClock className="me-2 text-gray-400" />
                                                     {(() => {
                                                         const t = booking?.availability?.start_time
                                                             ? new Date(booking.availability.start_time)
@@ -498,7 +498,7 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                                     {bookings.next_page_url && (
                                         <button
                                             onClick={() => router.get(bookings.next_page_url)}
-                                            className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                            className="me-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                         >
                                             التالي
                                         </button>

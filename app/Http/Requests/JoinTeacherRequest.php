@@ -17,7 +17,7 @@ class JoinTeacherRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255', 'min:2'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'phone' => ['required', 'string', 'regex:/^(\+966|\+971|\+973|\+974|\+965|\+968|\+964|\+967|\+970|\+963|\+962|\+20)[0-9]{8,10}$/', 'unique:users,phone'],
+            'phone' => ['required', 'string', 'regex:/^(\+971)[0-9]{9}$/', 'unique:users,phone'],
             'city' => ['required', 'string', 'max:100'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'password_confirmation' => ['required', 'string', 'min:8'],
@@ -195,16 +195,20 @@ class JoinTeacherRequest extends FormRequest
             return $phone;
         }
         
-        // إذا كان الرقم 9 أرقام ويبدأ بـ 5، أضف +966
+        // إذا كان الرقم 9 أرقام ويبدأ بـ 5، أضف +971
         if (strlen($phone) == 9 && substr($phone, 0, 1) == '5') {
-            $phone = '+966' . $phone;
+            $phone = '+971' . $phone;
         } 
-        // إذا كان الرقم 10 أرقام ويبدأ بـ 05، أضف +966
+        // إذا كان الرقم 10 أرقام ويبدأ بـ 0، أضف +971
         elseif (strlen($phone) == 10 && substr($phone, 0, 2) == '05') {
-            $phone = '+966' . substr($phone, 1);
+            $phone = '+971' . substr($phone, 1);
+        }
+        // إذا كان الرقم 10 أرقام ويبدأ بـ 5، أضف +971
+        elseif (strlen($phone) == 10 && substr($phone, 0, 1) == '5') {
+            $phone = '+971' . $phone;
         } 
-        // إذا كان الرقم 12 رقم ويبدأ بـ 966، أضف +
-        elseif (strlen($phone) == 12 && substr($phone, 0, 3) == '966') {
+        // إذا كان الرقم 12 رقم ويبدأ بـ 971، أضف +
+        elseif (strlen($phone) == 12 && substr($phone, 0, 3) == '971') {
             $phone = '+' . $phone;
         }
 

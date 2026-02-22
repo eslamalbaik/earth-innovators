@@ -1,5 +1,6 @@
 import { FaProjectDiagram, FaUsers, FaTrophy } from 'react-icons/fa';
 import { router } from '@inertiajs/react';
+import { useSelector } from 'react-redux';
 
 export default function HeroSection({
     title = "نحن معا نحو التقدم والتطور",
@@ -7,12 +8,14 @@ export default function HeroSection({
     cities = [],
     subjects = []
 }) {
+    const { dir } = useSelector((state) => state.language);
+    
     const handleStartJourney = () => {
         router.visit('/register');
     };
 
     return (
-        <section className="relative min-h-screen px-24 flex items-center overflow-hidden bg-gradient-to-br from-[#A3C042]/10 via-white to-legacy-blue/10">
+        <section dir={dir} className="relative min-h-screen px-24 flex items-center overflow-hidden bg-gradient-to-br from-[#A3C042]/10 via-white to-legacy-blue/10">
             {/* Background decorative elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 {/* Dotted lines and arrows */}
@@ -48,8 +51,8 @@ export default function HeroSection({
 
             <div className="container mx-auto px-4 lg:px-12 py-24 relative z-10">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-                    {/* Left side - Text and CTA Button */}
-                    <div className="space-y-8 order-1 lg:order-1">
+                    {/* Text and CTA Button */}
+                    <div className="space-y-8 order-1">
                         {/* Top small text */}
                         <div className="text-[#A3C042] text-lg font-medium">
                             كل ما عليك هو التعلم
@@ -76,8 +79,8 @@ export default function HeroSection({
                         </div>
                     </div>
 
-                    {/* Right side - Hero Image */}
-                    <div className="relative order-2 lg:order-2">
+                    {/* Hero Image */}
+                    <div className="relative order-2">
                         <div className="relative w-full h-full flex items-center justify-center">
                             <img
                                 src="/images/hero.png"

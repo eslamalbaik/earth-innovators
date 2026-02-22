@@ -403,7 +403,7 @@ export default function AdminDashboard({
                         </div>
                     </div>
                     <div className="flex items-center text-sm pt-3 border-t border-gray-100">
-                        <FaChartLine className="ml-1 text-gray-400" />
+                        <FaChartLine className="me-1 text-gray-400" />
                         <span className="text-gray-600">من الاشتراكات: <span className="font-semibold text-gray-900">{formatCurrency(kpis.subscription_revenue || 0)}</span></span>
                     </div>
                 </div>

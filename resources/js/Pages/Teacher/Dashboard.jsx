@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import DashboardLayout from '../../Layouts/DashboardLayout';
+import { useTranslation } from '@/i18n';
 import {
     FaProjectDiagram,
     FaBook,
@@ -15,6 +16,7 @@ import {
 } from 'react-icons/fa';
 
 export default function TeacherDashboard({ auth, teacher, stats, activationBanner }) {
+    const { t } = useTranslation();
     const {
         projects = {},
         publications = {},
@@ -31,16 +33,16 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* ترحيب */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-8">
-                    <div className="flex items-center justify-between">
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 mb-8">
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                                مرحباً بك، {teacher?.name || 'المعلم'}
+                            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                                {t('common.welcomeBack') || 'مرحباً بك،'} {teacher?.name || t('common.teacher') || 'المعلم'}
                             </h1>
-                            <p className="text-gray-600 text-lg">نظام ارث - إدارة مشاريعك ومقالاتك وإنجازاتك</p>
+                            <p className="text-gray-600 text-base md:text-lg">{t('common.appName')} - {t('dashboard.manageProjects') || 'إدارة مشاريعك ومقالاتك وإنجازاتك'}</p>
                         </div>
-                        <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
-                            <FaGraduationCap className="text-6xl text-gray-400" />
+                        <div className="bg-gray-50 rounded-2xl p-4 md:p-6 border border-gray-100 self-center md:self-auto">
+                            <FaGraduationCap className="text-4xl md:text-6xl text-gray-400" />
                         </div>
                     </div>
                 </div>

@@ -50,8 +50,8 @@ class PaymentController extends Controller
             return redirect()->route('bookings.student')->with('error', 'لا يمكن البدء بعملية الدفع لعدم توفر رقم جوال في حسابك. يرجى إضافة رقم جوال من إعدادات الحساب.');
         }
 
-        if (!preg_match('/^\+966/', $phone)) {
-            return redirect()->route('bookings.student')->with('error', 'لا يمكن الدفع لأن رقم الجوال يجب أن يكون بمقدمة سعودية (+966). يرجى تحديث رقم الجوال في إعدادات الحساب.');
+        if (!preg_match('/^\+971/', $phone)) {
+            return redirect()->route('bookings.student')->with('error', 'لا يمكن الدفع لأن رقم الجوال يجب أن يكون بمقدمة إماراتية (+971). يرجى تحديث رقم الجوال في إعدادات الحساب.');
         }
 
         try {
@@ -110,8 +110,8 @@ class PaymentController extends Controller
                 return redirect()->route('bookings.student')->with('error', 'رقم الجوال غير صالح.');
             }
 
-            if (!preg_match('/^\+966/', $phone)) {
-                return redirect()->route('bookings.student')->with('error', 'لا يمكن الدفع لأن رقم الجوال يجب أن يكون بمقدمة سعودية (+966). يرجى تحديث رقم الجوال في إعدادات الحساب.');
+            if (!preg_match('/^\+971/', $phone)) {
+                return redirect()->route('bookings.student')->with('error', 'لا يمكن الدفع لأن رقم الجوال يجب أن يكون بمقدمة إماراتية (+971). يرجى تحديث رقم الجوال في إعدادات الحساب.');
             }
 
             $payment = $this->paymentService->preparePayment($booking, $user, $amount);

@@ -81,14 +81,14 @@ export default function EditStudent({ student, auth }) {
                             onClick={() => router.visit(route('admin.students.index'))}
                             className="px-4 py-2 border rounded text-gray-700"
                         >
-                            <FaTimes className="inline ml-2" /> إلغاء
+                            <FaTimes className="inline me-2" /> إلغاء
                         </button>
                         <button
                             type="submit"
                             disabled={processing}
                             className="px-4 py-2 rounded text-white bg-yellow-600 hover:bg-yellow-700 disabled:opacity-75"
                         >
-                            {processing ? <FaSpinner className="inline animate-spin ml-2" /> : <FaSave className="inline ml-2" />} حفظ
+                            {processing ? <FaSpinner className="inline animate-spin me-2" /> : <FaSave className="inline me-2" />} حفظ
                         </button>
                     </div>
                 </form>

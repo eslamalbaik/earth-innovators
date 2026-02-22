@@ -1,227 +1,185 @@
 import { FaStar, FaChevronLeft, FaChevronRight, FaComments } from 'react-icons/fa';
 import { getInitials, getColorFromName } from '../../utils/imageUtils';
 import { useState, useEffect } from 'react';
+import { useTranslation } from '@/i18n';
 
 export default function TestimonialsSection({
-    title = "آراء العملاء",
-    subtitle = "",
+    title,
+    subtitle,
     testimonials = [],
     compact = false
 }) {
+    const { t } = useTranslation();
     const [currentIndex, setCurrentIndex] = useState(0);
-    // Default testimonials if none provided
+    
+    const displayTitle = title || t('sections.testimonials.title');
+    const displaySubtitle = subtitle || t('sections.testimonials.subtitle');
+    
     const defaultTestimonials = [
         {
             id: 1,
-            title: "منصة رائعة للإبداع والتعلم",
-            text: "منصة إرث المبتكرين ساعدتني كثيراً في عرض مشاريعي الإبداعية والحصول على تقييمات من المعلمين. التحديات والمسابقات شجعتني على الابتكار أكثر. أنصح جميع الطلاب بتجربة هذه المنصة المميزة.",
-            name: "سارة أحمد",
-            location: "الرياض",
+            text: t('sections.testimonials.testimonial1.text'),
+            name: t('sections.testimonials.testimonial1.name'),
+            location: t('sections.testimonials.testimonial1.location'),
+            role: t('sections.testimonials.roles.student'),
             rating: 5.0,
-            initials: "سأ",
-            role: "طالبة"
         },
         {
             id: 2,
-            title: "تجربة ممتازة للمؤسسات تعليمية",
-            text: "كمديرة مدرسة، منصة إرث المبتكرين ساعدتنا في تنظيم مشاريع الطلاب وتشجيعهم على الإبداع. النظام سهل الاستخدام والنتائج واضحة. الطلاب أصبحوا أكثر حماساً للمشاركة في التحديات والمسابقات.",
-            name: "فاطمة محمد",
-            location: "جدة",
+            text: t('sections.testimonials.testimonial2.text'),
+            name: t('sections.testimonials.testimonial2.name'),
+            location: t('sections.testimonials.testimonial2.location'),
+            role: t('sections.testimonials.roles.schoolPrincipal'),
             rating: 5.0,
-            initials: "فم",
-            role: "مديرة مدرسة"
         },
         {
             id: 3,
-            title: "أفضل منصة تعليمية",
-            text: "منصة إرث المبتكرين منصة رائعة لطلابنا. ابنتي شاركت في عدة تحديات وحصلت على شارات ونقاط. النظام واضح وسهل الاستخدام. شكراً لكم على هذه المبادرة الرائعة.",
-            name: "أم خالد",
-            location: "الدمام",
-            rating: 4.9,
-            initials: "أخ",
-            role: "ولي أمر"
+            text: t('sections.testimonials.testimonial3.text'),
+            name: t('sections.testimonials.testimonial3.name'),
+            location: t('sections.testimonials.testimonial3.location'),
+            role: t('sections.testimonials.roles.teacher'),
+            rating: 5.0,
         },
         {
             id: 4,
-            title: "منصة محترفة ومبتكرة",
-            text: "كمعلم، استخدمت منصة إرث المبتكرين لتقييم مشاريع الطلاب وتشجيعهم. النظام سهل الاستخدام والواجهة جميلة. الطلاب يستمتعون بالمشاركة في التحديات والحصول على الشارات.",
-            name: "أحمد علي",
-            location: "الرياض",
-            rating: 4.8,
-            initials: "أع",
-            role: "معلم"
-        },
-        {
-            id: 5,
-            title: "تجربة إيجابية جداً",
-            text: "ابني شارك في عدة مشاريع على منصة إرث المبتكرين وحصل على تقييمات إيجابية. التحديات شجعته على الابتكار والإبداع. المنصة سهلة الاستخدام والنتائج واضحة.",
-            name: "أبو ناصر",
-            location: "مكة المكرمة",
-            rating: 4.7,
-            initials: "أن",
-            role: "ولي أمر"
-        },
-        {
-            id: 6,
-            title: "منصة متميزة للطلاب",
-            text: "منصة إرث المبتكرين ساعدتني في تطوير مهاراتي الإبداعية. التحديات متنوعة والشارات تشجعني على المشاركة أكثر. أنصح جميع الطلاب بتجربة هذه المنصة الرائعة.",
-            name: "محمد خالد",
-            location: "الرياض",
+            text: t('sections.testimonials.testimonial4.text'),
+            name: t('sections.testimonials.testimonial4.name'),
+            location: t('sections.testimonials.testimonial4.location'),
+            role: t('sections.testimonials.roles.parent'),
             rating: 5.0,
-            initials: "مخ",
-            role: "طالب"
-        }
+        },
     ];
 
     const displayTestimonials = testimonials.length > 0 ? testimonials : defaultTestimonials;
-    const itemsPerView = 3; // Number of items to show at once
-    const maxIndex = Math.max(0, displayTestimonials.length - itemsPerView);
 
-    const nextSlide = () => {
-        setCurrentIndex((prev) =>
-            prev >= maxIndex ? 0 : prev + 1
-        );
-    };
-
-    const prevSlide = () => {
-        setCurrentIndex((prev) =>
-            prev === 0 ? maxIndex : prev - 1
-        );
-    };
-
-    // Auto-play carousel
     useEffect(() => {
-        if (displayTestimonials.length <= itemsPerView) return;
-
+        if (displayTestimonials.length <= 1) return;
+        
         const interval = setInterval(() => {
-            setCurrentIndex((prev) => {
-                const newMaxIndex = Math.max(0, displayTestimonials.length - itemsPerView);
-                return prev >= newMaxIndex ? 0 : prev + 1;
-            });
-        }, 5000); // Change slide every 5 seconds
+            setCurrentIndex((prevIndex) => 
+                prevIndex === displayTestimonials.length - 1 ? 0 : prevIndex + 1
+            );
+        }, 5000);
 
         return () => clearInterval(interval);
     }, [displayTestimonials.length]);
 
-    return (
-        <div className="space-y-4 md:space-y-6">
-            <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-xl flex items-center justify-center">
-                    <FaComments className="text-[#A3C042] text-xl" />
+    const goToPrevious = () => {
+        setCurrentIndex(currentIndex === 0 ? displayTestimonials.length - 1 : currentIndex - 1);
+    };
+
+    const goToNext = () => {
+        setCurrentIndex(currentIndex === displayTestimonials.length - 1 ? 0 : currentIndex + 1);
+    };
+
+    const currentTestimonial = displayTestimonials[currentIndex];
+
+    if (compact) {
+        return (
+            <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-xl flex items-center justify-center">
+                        <FaComments className="text-[#A3C042] text-xl" />
+                    </div>
+                    <h2 className="text-xl font-bold text-gray-900">{displayTitle}</h2>
                 </div>
-                <h2 className="text-xl md:text-2xl font-bold text-gray-900">{title}</h2>
+                <p className="text-sm text-gray-600">{displaySubtitle}</p>
+                
+                <div className="bg-gradient-to-br from-[#A3C042]/5 to-[#8CA635]/5 rounded-xl p-4">
+                    <p className="text-gray-700 text-sm mb-3 line-clamp-3">"{currentTestimonial.text}"</p>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <div 
+                                className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                                style={{ background: getColorFromName(currentTestimonial.name) }}
+                            >
+                                {getInitials(currentTestimonial.name)}
+                            </div>
+                            <div>
+                                <p className="text-xs font-semibold text-gray-900">{currentTestimonial.name}</p>
+                                <p className="text-[10px] text-gray-500">{currentTestimonial.role}</p>
+                            </div>
+                        </div>
+                        <div className="flex">
+                            {[...Array(5)].map((_, i) => (
+                                <FaStar key={i} className="text-yellow-400 text-xs" />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-6">
+            <div className="text-center mb-8">
+                <div className="flex items-center justify-center gap-3 mb-2">
+                    <div className="w-12 h-12 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-xl flex items-center justify-center">
+                        <FaComments className="text-[#A3C042] text-2xl" />
+                    </div>
+                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900">{displayTitle}</h2>
+                </div>
+                <p className="text-gray-600 text-sm md:text-base">{displaySubtitle}</p>
             </div>
 
-            {subtitle && (
-                <p className="text-sm md:text-base text-gray-700 leading-relaxed mb-6">
-                    {subtitle}
-                </p>
-            )}
-
-            <div className="relative">
-                {/* Carousel Container */}
-                <div className="overflow-hidden">
-                    <div
-                        className="flex transition-transform duration-500 ease-in-out"
-                        style={{
-                            transform: `translateX(${currentIndex * (100 / itemsPerView)}%)`
-                        }}
-                    >
-                        {displayTestimonials.map((testimonial) => (
-                            <div
-                                key={testimonial.id}
-                                className="flex-shrink-0 w-full md:w-1/2 lg:w-1/3 px-2"
-                            >
-                                <div className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm hover:shadow-md transition flex flex-col h-full">
-                                    {/* Star Rating */}
-                                    <div className="flex items-center gap-1 mb-4">
-                                        {[...Array(5)].map((_, i) => (
-                                            <FaStar
-                                                key={i}
-                                                className={`text-lg ${i < Math.floor(testimonial.rating)
-                                                        ? 'text-yellow-400'
-                                                        : 'text-gray-300'
-                                                    }`}
-                                            />
-                                        ))}
-                                    </div>
-
-                                    {/* Title */}
-                                    {testimonial.title && (
-                                        <h3 className="text-base md:text-lg font-bold text-[#A3C042] mb-3">
-                                            {testimonial.title}
-                                        </h3>
-                                    )}
-
-                                    {/* Review Text */}
-                                    <p className="text-sm md:text-base text-gray-700 leading-relaxed mb-4 flex-grow">
-                                        {testimonial.text || testimonial.comment}
-                                    </p>
-
-                                    {/* Reviewer Info */}
-                                    <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
-                                        <div
-                                            className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-xs shadow-sm"
-                                            style={{
-                                                background: `linear-gradient(135deg, ${getColorFromName(testimonial.name || 'User')})`
-                                            }}
-                                        >
-                                            {testimonial.initials || getInitials(testimonial.name || 'User')}
-                                        </div>
-                                        <div className="flex flex-col flex-grow">
-                                            <span className="text-sm md:text-base font-bold text-[#A3C042]">{testimonial.name}</span>
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-xs md:text-sm text-gray-600">{testimonial.location}</span>
-                                                {testimonial.role && (
-                                                    <>
-                                                        <span className="text-gray-400">•</span>
-                                                        <span className="text-xs md:text-sm text-gray-500">{testimonial.role}</span>
-                                                    </>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
+            <div className="relative max-w-4xl mx-auto">
+                <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 md:p-8 min-h-[200px] flex items-center">
+                    <div className="w-full">
+                        <div className="flex flex-col md:flex-row gap-6 items-start">
+                            <div className="flex-shrink-0 mx-auto md:mx-0">
+                                <div 
+                                    className="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center text-white text-2xl font-bold"
+                                    style={{ background: `linear-gradient(135deg, ${getColorFromName(currentTestimonial.name).split(', ')[0]}, ${getColorFromName(currentTestimonial.name).split(', ')[1]})` }}
+                                >
+                                    {getInitials(currentTestimonial.name)}
                                 </div>
                             </div>
-                        ))}
+                            <div className="flex-1 text-center md:text-start">
+                                <div className="flex justify-center md:justify-start mb-2">
+                                    {[...Array(5)].map((_, i) => (
+                                        <FaStar key={i} className="text-yellow-400 text-lg" />
+                                    ))}
+                                </div>
+                                <p className="text-gray-700 text-base md:text-lg leading-relaxed mb-4">"{currentTestimonial.text}"</p>
+                                <div>
+                                    <p className="font-bold text-gray-900">{currentTestimonial.name}</p>
+                                    <p className="text-sm text-gray-500">{currentTestimonial.role} - {currentTestimonial.location}</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                {/* Navigation Buttons */}
-                {displayTestimonials.length > itemsPerView && (
+                {displayTestimonials.length > 1 && (
                     <>
                         <button
-                            onClick={prevSlide}
-                            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 md:-translate-x-4 bg-[#A3C042] text-white rounded-full p-2 md:p-3 shadow-lg hover:bg-[#8CA635] transition-colors z-10"
-                            aria-label="Previous"
+                            onClick={goToPrevious}
+                            className="absolute top-1/2 -translate-y-1/2 start-0 md:right-4 -translate-x-1/2 md:translate-x-0 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition"
                         >
-                            <FaChevronLeft className="text-sm md:text-base" />
+                            <FaChevronLeft className="text-gray-700" />
                         </button>
                         <button
-                            onClick={nextSlide}
-                            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 md:translate-x-4 bg-[#A3C042] text-white rounded-full p-2 md:p-3 shadow-lg hover:bg-[#8CA635] transition-colors z-10"
-                            aria-label="Next"
+                            onClick={goToNext}
+                            className="absolute top-1/2 -translate-y-1/2 end-0 md:left-4 translate-x-1/2 md:translate-x-0 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition"
                         >
-                            <FaChevronRight className="text-sm md:text-base" />
+                            <FaChevronRight className="text-gray-700" />
                         </button>
-                    </>
-                )}
 
-                {/* Dots Indicator */}
-                {displayTestimonials.length > itemsPerView && (
-                    <div className="flex justify-center gap-2 mt-6">
-                        {Array.from({ length: maxIndex + 1 }).map((_, index) => (
-                            <button
-                                key={index}
-                                onClick={() => setCurrentIndex(index)}
-                                className={`h-2 rounded-full transition-all ${currentIndex === index
-                                        ? 'bg-[#A3C042] w-6'
-                                        : 'bg-gray-300 w-2'
+                        <div className="flex justify-center gap-2 mt-4">
+                            {displayTestimonials.map((_, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => setCurrentIndex(index)}
+                                    className={`w-2 h-2 rounded-full transition ${
+                                        index === currentIndex 
+                                            ? 'bg-[#A3C042] w-6' 
+                                            : 'bg-gray-300 hover:bg-gray-400'
                                     }`}
-                                aria-label={`Go to slide ${index + 1}`}
-                            />
-                        ))}
-                    </div>
+                                />
+                            ))}
+                        </div>
+                    </>
                 )}
             </div>
         </div>

@@ -182,7 +182,7 @@ export default function CreateBadge({ schools, auth }) {
                                 type="file"
                                 accept="image/*"
                                 onChange={handleImageChange}
-                                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#A3C042] file:text-white hover:file:bg-primary-600"
+                                className="block w-full text-sm text-gray-500 file:ms-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#A3C042] file:text-white hover:file:bg-primary-600"
                             />
                             {imagePreview && (
                                 <img

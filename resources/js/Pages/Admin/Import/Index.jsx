@@ -26,7 +26,7 @@ export default function ImportIndex({ auth }) {
                 {props.import_errors && props.import_errors.length > 0 && (
                     <div className="mb-4 p-3 rounded bg-yellow-50 text-yellow-900">
                         <div className="font-semibold mb-2">تحذيرات الاستيراد:</div>
-                        <ul className="list-disc pr-6">
+                        <ul className="list-disc ps-6">
                             {props.import_errors.map((e, i) => (<li key={i}>{e}</li>))}
                         </ul>
                     </div>
@@ -39,7 +39,7 @@ export default function ImportIndex({ auth }) {
                             <button
                                 onClick={() => submit(item.key)}
                                 disabled={!files[item.key]}
-                                className="ml-3 px-4 py-2 rounded bg-yellow-600 text-white disabled:opacity-50"
+                                className="me-3 px-4 py-2 rounded bg-yellow-600 text-white disabled:opacity-50"
                             >
                                 Import
                             </button>

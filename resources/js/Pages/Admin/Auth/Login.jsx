@@ -45,7 +45,7 @@ export default function AdminLogin({ status }) {
                     {status && (
                         <div className="rounded-md bg-green-50 p-4">
                             <div className="flex">
-                                <div className="ml-3">
+                                <div className="me-3">
                                     <p className="text-sm font-medium text-green-800">
                                         {status}
                                     </p>
@@ -59,7 +59,7 @@ export default function AdminLogin({ status }) {
                             <div>
                                 <InputLabel htmlFor="email" value="البريد الإلكتروني" className="text-sm font-medium text-gray-700 mb-2" />
                                 <div className="relative">
-                                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                         <FaEnvelope className="h-5 w-5 text-gray-400" />
                                     </div>
                                     <TextInput
@@ -67,7 +67,7 @@ export default function AdminLogin({ status }) {
                                         type="email"
                                         name="email"
                                         value={data.email}
-                                        className="block w-full pr-10 pl-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
+                                        className="block w-full ps-10 pe-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
                                         autoComplete="username"
                                         isFocused
                                         onChange={(e) => setData('email', e.target.value)}
@@ -80,7 +80,7 @@ export default function AdminLogin({ status }) {
                             <div>
                                 <InputLabel htmlFor="password" value="كلمة المرور" className="text-sm font-medium text-gray-700 mb-2" />
                                 <div className="relative">
-                                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                         <FaLock className="h-5 w-5 text-gray-400" />
                                     </div>
                                     <TextInput
@@ -88,14 +88,14 @@ export default function AdminLogin({ status }) {
                                         type={showPassword ? 'text' : 'password'}
                                         name="password"
                                         value={data.password}
-                                        className="block w-full pr-10 pl-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
+                                        className="block w-full ps-10 pe-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
                                         autoComplete="current-password"
                                         onChange={(e) => setData('password', e.target.value)}
                                         placeholder="••••••••"
                                     />
                                     <button
                                         type="button"
-                                        className="absolute inset-y-0 left-0 pl-3 flex items-center"
+                                        className="absolute inset-y-0 end-0 pe-3 flex items-center"
                                         onClick={() => setShowPassword(!showPassword)}
                                     >
                                         {showPassword ? (

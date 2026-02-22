@@ -58,7 +58,7 @@ class SchoolDemoSeeder extends Seeder
                     'neighborhoods' => json_encode([]),
                     'experience_years' => 5,
                     'price_per_hour' => 100,
-                    'nationality' => 'سعودي',
+                    'nationality' => 'إماراتي',
                     'is_verified' => true,
                     'is_active' => true,
                 ]

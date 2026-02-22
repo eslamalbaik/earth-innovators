@@ -171,7 +171,7 @@ export default function TeacherBookings({ bookings }) {
                                                 <option value="completed">مكتمل</option>
                                             </select>
                                             {updating === booking.id && (
-                                                <span className="mr-2 text-xs text-gray-500">جاري التحديث...</span>
+                                                <span className="ms-2 text-xs text-gray-500">جاري التحديث...</span>
                                             )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">{new Date(booking.created_at).toLocaleDateString('en-US')}</td>

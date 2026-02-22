@@ -2,8 +2,10 @@ import { useState } from 'react';
 import Modal from '../Modal';
 import { FaTimes } from 'react-icons/fa';
 import PrimaryButton from '../PrimaryButton';
+import { useTranslation } from '@/i18n';
 
 export default function CustomizePackageModal({ onClose }) {
+    const { t } = useTranslation();
     const [formData, setFormData] = useState({
         school_name: '',
         responsible_name: '',
@@ -43,7 +45,7 @@ export default function CustomizePackageModal({ onClose }) {
             });
 
             if (response.data.success) {
-                alert('تم إرسال طلبك بنجاح! سنتواصل معك قريباً.');
+                alert(t('packages.requestSuccess'));
                 setFormData({
                     school_name: '',
                     responsible_name: '',
@@ -59,7 +61,7 @@ export default function CustomizePackageModal({ onClose }) {
             } else if (error.response && error.response.data && error.response.data.message) {
                 alert(error.response.data.message);
             } else {
-                alert('حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.');
+                alert(t('packages.requestError'));
             }
         } finally {
             setProcessing(false);
@@ -78,7 +80,7 @@ export default function CustomizePackageModal({ onClose }) {
                             <FaTimes className="text-2xl" />
                         </button>
                         <h2 className="text-2xl font-bold text-gray-900">
-                            طلب عرض سعر لـ باقة مخصصة
+                            {t('packages.customQuoteRequest')}
                         </h2>
                     </div>
                 </div>
@@ -87,7 +89,7 @@ export default function CustomizePackageModal({ onClose }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                اسم المدرسة / الجهة
+                                {t('packages.schoolName')}
                             </label>
                             <input
                                 type="text"
@@ -96,7 +98,7 @@ export default function CustomizePackageModal({ onClose }) {
                                 onChange={handleChange}
                                 dir="rtl"
                                 className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#A3C042] focus:border-transparent "
-                                placeholder="أدخل اسم المدرسة أو الجهة"
+                                placeholder={t('packages.enterSchoolName')}
                             />
                             {errors.school_name && (
                                 <p className="mt-1 text-sm text-red-600">{Array.isArray(errors.school_name) ? errors.school_name[0] : errors.school_name}</p>
@@ -105,7 +107,7 @@ export default function CustomizePackageModal({ onClose }) {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                اسم المسؤول
+                                {t('packages.responsibleName')}
                             </label>
                             <input
                                 type="text"
@@ -114,7 +116,7 @@ export default function CustomizePackageModal({ onClose }) {
                                 onChange={handleChange}
                                 dir="rtl"
                                 className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#A3C042] focus:border-transparent "
-                                placeholder="أدخل اسم المسؤول"
+                                placeholder={t('packages.enterResponsibleName')}
                             />
                             {errors.responsible_name && (
                                 <p className="mt-1 text-sm text-red-600">{Array.isArray(errors.responsible_name) ? errors.responsible_name[0] : errors.responsible_name}</p>
@@ -123,7 +125,7 @@ export default function CustomizePackageModal({ onClose }) {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                رقم الجوال
+                                {t('packages.phoneNumber')}
                             </label>
                             <input
                                 type="tel"
@@ -132,7 +134,7 @@ export default function CustomizePackageModal({ onClose }) {
                                 onChange={handleChange}
                                 dir="rtl"
                                 className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#A3C042] focus:border-transparent "
-                                placeholder="+966 5x xxxx xxxx"
+                                placeholder="+971 5x xxxx xxxx"
                             />
                             {errors.mobile_number && (
                                 <p className="mt-1 text-sm text-red-600">{Array.isArray(errors.mobile_number) ? errors.mobile_number[0] : errors.mobile_number}</p>
@@ -141,7 +143,7 @@ export default function CustomizePackageModal({ onClose }) {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                العدد المتوقع للطلاب
+                                {t('packages.expectedStudents')}
                             </label>
                             <input
                                 type="number"
@@ -150,7 +152,7 @@ export default function CustomizePackageModal({ onClose }) {
                                 onChange={handleChange}
                                 dir="rtl"
                                 className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#A3C042] focus:border-transparent "
-                                placeholder="أدخل العدد المتوقع"
+                                placeholder={t('packages.enterExpectedNumber')}
                                 min="1"
                             />
                             {errors.expected_students && (
@@ -161,7 +163,7 @@ export default function CustomizePackageModal({ onClose }) {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            ملاحظات إضافية
+                            {t('packages.additionalNotes')}
                         </label>
                         <textarea
                             name="additional_notes"
@@ -170,7 +172,7 @@ export default function CustomizePackageModal({ onClose }) {
                             dir="rtl"
                             rows={4}
                             className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#A3C042] focus:border-transparent "
-                            placeholder="أدخل أي ملاحظات أو متطلبات إضافية..."
+                            placeholder={t('packages.enterAdditionalNotes')}
                         />
                         {errors.additional_notes && (
                             <p className="mt-1 text-sm text-red-600">{Array.isArray(errors.additional_notes) ? errors.additional_notes[0] : errors.additional_notes}</p>
@@ -183,14 +185,14 @@ export default function CustomizePackageModal({ onClose }) {
                             onClick={onClose}
                             className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-50 transition"
                         >
-                            إلغاء
+                            {t('common.cancel')}
                         </button>
                         <PrimaryButton
                             type="submit"
                             disabled={processing}
                             className="px-6 py-3 bg-[#A3C042] text-white rounded-lg font-semibold hover:shadow-lg transition"
                         >
-                            {processing ? 'جاري الإرسال...' : 'تأكيد طلب عرض السعر'}
+                            {processing ? t('common.sending') : t('packages.confirmQuoteRequest')}
                         </PrimaryButton>
                     </div>
                 </form>

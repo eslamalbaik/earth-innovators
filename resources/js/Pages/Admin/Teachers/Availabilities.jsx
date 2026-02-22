@@ -117,7 +117,7 @@ export default function Availabilities({ teacher, availabilities, subjects = [],
                     onClick={() => router.get('/admin/teachers')}
                     className="flex items-center text-gray-600 hover:text-gray-900 transition mb-4"
                 >
-                    <FaArrowRight className="ml-2" />
+                    <FaArrowRight className="me-2" />
                     العودة إلى قائمة المعلمين
                 </button>
             </div>
@@ -142,7 +142,7 @@ export default function Availabilities({ teacher, availabilities, subjects = [],
                     }}
                     className="flex items-center px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition"
                 >
-                    <FaPlus className="ml-2" />
+                    <FaPlus className="me-2" />
                     إضافة وقت
                 </button>
             </div>

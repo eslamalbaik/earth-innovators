@@ -52,7 +52,7 @@ export default function TeacherPublications({ publications, auth }) {
                                                 <div className="flex items-center gap-3 mb-3">
                                                     <h4 className="text-xl font-bold text-gray-900">{publication.title}</h4>
                                                     <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${statusLabels[publication.status]?.color || statusLabels.pending.color}`}>
-                                                        <StatusIcon className="inline text-xs mr-1" />
+                                                        <StatusIcon className="inline text-xs ms-1" />
                                                         {statusLabels[publication.status]?.label || 'قيد المراجعة'}
                                                     </span>
                                                     <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 border border-blue-300">
@@ -78,7 +78,7 @@ export default function TeacherPublications({ publications, auth }) {
                                                     )}
                                                 </div>
                                             </div>
-                                            <div className="flex items-center gap-2 mr-6">
+                                            <div className="flex items-center gap-2 ms-6">
                                                 <Link
                                                     href={`/teacher/publications/${publication.id}`}
                                                     className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition flex items-center gap-2"
@@ -109,7 +109,7 @@ export default function TeacherPublications({ publications, auth }) {
                                 href="/teacher/publications/create"
                                 className="inline-block bg-[#A3C042] text-white px-6 py-3 rounded-lg font-semibold transition"
                             >
-                                <FaPlus className="inline ml-2" />
+                                <FaPlus className="inline me-2" />
                                 إنشاء مقال جديد
                             </Link>
                         </div>

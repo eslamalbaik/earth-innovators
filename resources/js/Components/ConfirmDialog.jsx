@@ -5,17 +5,24 @@ import {
     TransitionChild,
 } from '@headlessui/react';
 import { FaExclamationTriangle } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function ConfirmDialog({
     show = false,
-    title = 'تأكيد الإجراء',
-    message = 'هل أنت متأكد من تنفيذ هذا الإجراء؟',
-    confirmText = 'تأكيد',
-    cancelText = 'إلغاء',
+    title,
+    message,
+    confirmText,
+    cancelText,
     onConfirm = () => { },
     onCancel = () => { },
     variant = 'danger', // 'danger' or 'warning' or 'info'
 }) {
+    const { t } = useTranslation();
+    
+    const defaultTitle = t('common.confirm') || 'تأكيد الإجراء';
+    const defaultMessage = t('errors.required') || 'هل أنت متأكد من تنفيذ هذا الإجراء؟';
+    const defaultConfirmText = t('common.yes') || 'تأكيد';
+    const defaultCancelText = t('common.cancel') || 'إلغاء';
     const variantStyles = {
         danger: {
             iconBg: 'bg-red-100',
@@ -35,6 +42,11 @@ export default function ConfirmDialog({
     };
 
     const styles = variantStyles[variant] || variantStyles.danger;
+
+    const displayTitle = title || defaultTitle;
+    const displayMessage = message || defaultMessage;
+    const displayConfirmText = confirmText || defaultConfirmText;
+    const displayCancelText = cancelText || defaultCancelText;
 
     return (
         <Transition show={show}>
@@ -75,12 +87,12 @@ export default function ConfirmDialog({
 
                                     {/* Title */}
                                     <h3 className="text-xl font-bold text-gray-900 text-center mb-3">
-                                        {title}
+                                        {displayTitle}
                                     </h3>
 
                                     {/* Message */}
                                     <p className="text-gray-600 text-center mb-6 leading-relaxed">
-                                        {message}
+                                        {displayMessage}
                                     </p>
 
                                     {/* Actions */}
@@ -89,13 +101,13 @@ export default function ConfirmDialog({
                                             onClick={onCancel}
                                             className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2"
                                         >
-                                            {cancelText}
+                                            {displayCancelText}
                                         </button>
                                         <button
                                             onClick={onConfirm}
                                             className={`flex-1 px-4 py-3 text-white font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${styles.confirmBg}`}
                                         >
-                                            {confirmText}
+                                            {displayConfirmText}
                                         </button>
                                     </div>
                                 </div>

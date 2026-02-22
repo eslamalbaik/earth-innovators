@@ -32,17 +32,10 @@ const parseJsonArray = (value) => {
     return [];
 };
 
-const DEFAULT_DIAL_CODE = '+966';
+const DEFAULT_DIAL_CODE = '+971';
 
 const dialCodeOptions = [
-    { value: '+966', label: '+966' },
     { value: '+971', label: '+971' },
-    { value: '+973', label: '+973' },
-    { value: '+974', label: '+974' },
-    { value: '+965', label: '+965' },
-    { value: '+968', label: '+968' },
-    { value: '+964', label: '+964' },
-    { value: '+967', label: '+967' },
 ];
 
 const detectDialCode = (phone) => {
@@ -183,7 +176,7 @@ export default function EditTeacher({ teacher, subjects, cities, auth }) {
         dial_code: initialDialCode,
         city: teacher.city || '',
         bio: teacher.bio || '',
-        nationality: teacher.nationality || 'سعودي',
+        nationality: teacher.nationality || 'إماراتي',
         gender: teacher.gender || '',
         qualifications: teacher.qualifications || '',
         price_per_hour: teacher.price_per_hour || 0,
@@ -273,7 +266,7 @@ export default function EditTeacher({ teacher, subjects, cities, auth }) {
                                     onClick={() => window.history.back()}
                                     className="flex items-center text-gray-600 hover:text-gray-900 transition duration-300"
                                 >
-                                    <FaArrowRight className="ml-2" />
+                                    <FaArrowRight className="me-2" />
                                     العودة
                                 </button>
                                 <h1 className="text-2xl font-bold text-gray-900">تعديل المعلم</h1>
@@ -304,7 +297,7 @@ export default function EditTeacher({ teacher, subjects, cities, auth }) {
                                                     <FaUser className="text-gray-400 text-4xl" />
                                                 )}
                                             </div>
-                                            <label className="absolute bottom-0 right-0 bg-yellow-500 text-white p-2 rounded-full cursor-pointer hover:bg-yellow-600 transition duration-300">
+                                            <label className="absolute bottom-0 start-0 bg-yellow-500 text-white p-2 rounded-full cursor-pointer hover:bg-yellow-600 transition duration-300">
                                                 <FaImage />
                                                 <input
                                                     type="file"
@@ -322,7 +315,7 @@ export default function EditTeacher({ teacher, subjects, cities, auth }) {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                <FaUser className="inline ml-2" />
+                                                <FaUser className="inline me-2" />
                                                 الاسم بالعربية *
                                             </label>
                                             <input
@@ -338,7 +331,7 @@ export default function EditTeacher({ teacher, subjects, cities, auth }) {
 
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                <FaUser className="inline ml-2" />
+                                                <FaUser className="inline me-2" />
                                                 الاسم بالإنجليزية
                                             </label>
                                             <input
@@ -353,7 +346,7 @@ export default function EditTeacher({ teacher, subjects, cities, auth }) {
 
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                <FaEnvelope className="inline ml-2" />
+                                                <FaEnvelope className="inline me-2" />
                                                 البريد الإلكتروني *
                                             </label>
                                             <input
@@ -369,7 +362,7 @@ export default function EditTeacher({ teacher, subjects, cities, auth }) {
 
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                <FaPhone className="inline ml-2" />
+                                                <FaPhone className="inline me-2" />
                                                 رقم الجوال *
                                             </label>
                                             <div className="flex gap-2">
@@ -400,7 +393,7 @@ export default function EditTeacher({ teacher, subjects, cities, auth }) {
 
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                <FaMapMarkerAlt className="inline ml-2" />
+                                                <FaMapMarkerAlt className="inline me-2" />
                                                 المدينة *
                                             </label>
                                             <select
@@ -419,7 +412,7 @@ export default function EditTeacher({ teacher, subjects, cities, auth }) {
 
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                <FaGraduationCap className="inline ml-2" />
+                                                <FaGraduationCap className="inline me-2" />
                                                 الجنسية
                                             </label>
                                             <input
@@ -427,7 +420,7 @@ export default function EditTeacher({ teacher, subjects, cities, auth }) {
                                                 value={data.nationality}
                                                 onChange={(e) => setData('nationality', e.target.value)}
                                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                                                placeholder="سعودي"
+                                                placeholder="إماراتي"
                                             />
                                             {errors.nationality && <p className="text-red-500 text-sm mt-1">{errors.nationality}</p>}
                                         </div>
@@ -450,7 +443,7 @@ export default function EditTeacher({ teacher, subjects, cities, auth }) {
 
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                <FaDollarSign className="inline ml-2" />
+                                                <FaDollarSign className="inline me-2" />
                                                 سعر الحصة (ساعة) *
                                             </label>
                                             <input
@@ -506,7 +499,7 @@ export default function EditTeacher({ teacher, subjects, cities, auth }) {
                                                         onChange={() => handleSubjectChange(subject.id)}
                                                         className="w-4 h-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500"
                                                     />
-                                                    <span className="mr-3 text-sm font-medium text-gray-700">{subject.label}</span>
+                                                    <span className="ms-3 text-sm font-medium text-gray-700">{subject.label}</span>
                                                 </label>
                                             ))}
                                         </div>
@@ -526,7 +519,7 @@ export default function EditTeacher({ teacher, subjects, cities, auth }) {
                                                         onChange={() => handleStageChange(stage)}
                                                         className="w-4 h-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500"
                                                     />
-                                                    <span className="mr-3 text-sm font-medium text-gray-700">{stage}</span>
+                                                    <span className="ms-3 text-sm font-medium text-gray-700">{stage}</span>
                                                 </label>
                                             ))}
                                         </div>
@@ -542,7 +535,7 @@ export default function EditTeacher({ teacher, subjects, cities, auth }) {
                                                     onChange={(e) => setData('is_verified', e.target.checked)}
                                                     className="w-4 h-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500"
                                                 />
-                                                <span className="mr-2 text-sm font-medium text-gray-700">معلم موثق</span>
+                                                <span className="ms-2 text-sm font-medium text-gray-700">معلم موثق</span>
                                             </label>
                                             <label className="flex items-center">
                                                 <input
@@ -551,7 +544,7 @@ export default function EditTeacher({ teacher, subjects, cities, auth }) {
                                                     onChange={(e) => setData('is_active', e.target.checked)}
                                                     className="w-4 h-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500"
                                                 />
-                                                <span className="mr-2 text-sm font-medium text-gray-700">نشط</span>
+                                                <span className="ms-2 text-sm font-medium text-gray-700">نشط</span>
                                             </label>
                                         </div>
                                     </div>
@@ -571,7 +564,7 @@ export default function EditTeacher({ teacher, subjects, cities, auth }) {
                                     disabled={processing}
                                     className="px-6 py-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 disabled:opacity-50 transition duration-300 flex items-center"
                                 >
-                                    <FaSave className="ml-2" />
+                                    <FaSave className="me-2" />
                                     {processing ? 'جاري الحفظ...' : 'حفظ التغييرات'}
                                 </button>
                             </div>

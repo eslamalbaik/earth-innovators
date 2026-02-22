@@ -4,6 +4,7 @@ import { FaStar, FaEdit, FaChevronDown } from 'react-icons/fa';
 import { getInitials, getColorFromName } from '../../utils/imageUtils';
 import ReviewModal from './ReviewModal';
 import { usePage } from '@inertiajs/react';
+import { useTranslation } from '@/i18n';
 
 const getImageUrl = (image) => {
     if (!image) return null;
@@ -17,6 +18,7 @@ const getImageUrl = (image) => {
 };
 
 export default function ReviewsSection({ reviews = [], teacherId, reviewsTotal = 0, reviewsPage = 1, hasMoreReviews = false }) {
+    const { t } = useTranslation();
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     const { auth } = usePage().props;
 
@@ -30,19 +32,19 @@ export default function ReviewsSection({ reviews = [], teacherId, reviewsTotal =
     return (
         <div>
             <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-gray-900">تقييمات أولياء الأمور</h2>
+                <h2 className="text-xl font-bold text-gray-900">{t('teachers.parentReviews')}</h2>
                 <button
                     onClick={() => setIsReviewModalOpen(true)}
                     className="bg-yellow-50 text-yellow-500 border border-yellow-500 hover:bg-yellow-500 hover:text-black px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition duration-300"
                 >
                     <FaEdit className="text-sm" />
-                    اكتب تقييمك
+                    {t('teachers.writeReview')}
                 </button>
             </div>
 
             {!reviews || reviews.length === 0 ? (
                 <div className="text-center py-12">
-                    <p className="text-gray-500">لا توجد تقييمات متاحة حالياً</p>
+                    <p className="text-gray-500">{t('teachers.noReviews')}</p>
                 </div>
             ) : (
                 <>
@@ -100,7 +102,7 @@ export default function ReviewsSection({ reviews = [], teacherId, reviewsTotal =
                                 onClick={handleLoadMore}
                                 className="border border-gray-300 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium flex items-center gap-2 mx-auto transition duration-300"
                             >
-                                اطلع على المزيد من التقييمات
+                                {t('teachers.loadMoreReviews')}
                                 <FaChevronDown className="text-sm" />
                             </button>
                         </div>

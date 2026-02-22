@@ -26,7 +26,7 @@ export default function Profile({ teacher, subjects, cities }) {
     const { data, setData, put, processing, errors, reset } = useForm({
         name_ar: teacher?.name_ar || '',
         name_en: teacher?.name_en || '',
-        nationality: teacher?.nationality || '',
+        nationality: teacher?.nationality || 'إماراتي',
         gender: teacher?.gender || '',
         bio: teacher?.bio || '',
         qualifications: teacher?.qualifications || '',
@@ -205,7 +205,7 @@ export default function Profile({ teacher, subjects, cities }) {
                                     <button
                                         type="button"
                                         onClick={() => fileInputRef.current?.click()}
-                                        className="absolute bottom-0 right-0 bg-yellow-500 hover:bg-yellow-600 text-white rounded-full p-2 shadow-lg transition"
+                                        className="absolute bottom-0 start-0 bg-yellow-500 hover:bg-yellow-600 text-white rounded-full p-2 shadow-lg transition"
                                         title="تغيير الصورة"
                                     >
                                         <FaUpload className="text-sm" />
@@ -333,6 +333,7 @@ export default function Profile({ teacher, subjects, cities }) {
                                     required
                                 >
                                     <option value="">اختر الجنسية</option>
+                                    <option value="إماراتي">إماراتي</option>
                                     <option value="سعودي">سعودي</option>
                                     <option value="مصري">مصري</option>
                                     <option value="سوري">سوري</option>

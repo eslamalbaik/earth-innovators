@@ -206,7 +206,7 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                             onChange={(e) => setSearchTerm(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                             placeholder="البحث عن الإصدارات..."
-                            className="w-full h-10 pr-10 pl-4 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042]"
+                            className="w-full h-10 ps-10 pe-4 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042]"
                         />
                         <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
                     </div>

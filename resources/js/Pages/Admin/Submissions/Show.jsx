@@ -236,7 +236,7 @@ export default function AdminSubmissionShow({ submission, availableBadges }) {
                             >
                                 {processing ? (
                                     <>
-                                        <FaSpinner className="animate-spin mr-2" />
+                                        <FaSpinner className="animate-spin ms-2" />
                                         جاري الحفظ...
                                     </>
                                 ) : (

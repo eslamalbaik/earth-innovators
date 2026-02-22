@@ -1,8 +1,10 @@
 import { Head, Link } from '@inertiajs/react';
 import DashboardLayout from '../../Layouts/DashboardLayout';
+import { useTranslation } from '@/i18n';
 import { FaUsers, FaProjectDiagram, FaTrophy, FaMedal, FaCertificate, FaBox, FaChartLine, FaCheckCircle, FaClock, FaSchool, FaGraduationCap } from 'react-icons/fa';
 
 export default function AdminDashboardLegacy({ auth, stats = {} }) {
+    const { t } = useTranslation();
     const user = auth.user;
 
     const displayStats = {
@@ -25,14 +27,14 @@ export default function AdminDashboardLegacy({ auth, stats = {} }) {
         <DashboardLayout auth={auth} header="لوحة تحكم الإدارة">
             <Head title="لوحة تحكم الإدارة - إرث المبتكرين" />
 
-            <div className="bg-[#A3C042] rounded-lg shadow-lg p-8 mb-8 text-white">
-                <div className="flex items-center justify-between">
+            <div className="bg-[#A3C042] rounded-lg shadow-lg p-6 md:p-8 mb-8 text-white">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold mb-2">مرحباً بك، {user.name} 👨‍💼</h1>
-                        <p className="text-white/90 text-lg">إدارة شاملة لمنصة إرث المبتكرين</p>
+                        <h1 className="text-2xl md:text-3xl font-bold mb-2">{t('common.welcomeBack')} {user.name}</h1>
+                        <p className="text-white/90 text-base md:text-lg">{t('common.appName')} - {t('dashboard.platformManagement') || 'إدارة شاملة للمنصة'}</p>
                     </div>
-                    <div className="bg-white/20 rounded-full p-6 backdrop-blur-sm">
-                        <FaChartLine className="text-6xl text-white" />
+                    <div className="bg-white/20 rounded-full p-4 md:p-6 backdrop-blur-sm self-center md:self-auto">
+                        <FaChartLine className="text-4xl md:text-6xl text-white" />
                     </div>
                 </div>
             </div>
@@ -171,7 +173,7 @@ export default function AdminDashboardLegacy({ auth, stats = {} }) {
                                             <p className="text-sm text-gray-600">بواسطة {project.user?.name}</p>
                                             <p className="text-xs text-gray-500">{new Date(project.created_at).toLocaleDateString('en-US')}</p>
                                         </div>
-                                        <Link href={`/admin/projects/${project.id}`} className="ml-4 bg-[#A3C042] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary-600 transition">
+                                        <Link href={`/admin/projects/${project.id}`} className="me-4 bg-[#A3C042] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary-600 transition">
                                             مراجعة
                                         </Link>
                                     </div>

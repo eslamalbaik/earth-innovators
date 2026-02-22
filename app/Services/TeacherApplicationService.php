@@ -166,7 +166,7 @@ class TeacherApplicationService extends BaseService
                 'is_verified' => true,
                 'subjects' => $subjects,
                 'stages' => $stages,
-                'nationality' => $data['nationality'] ?? 'سعودي',
+                'nationality' => $data['nationality'] ?? 'إماراتي',
                 'neighborhoods' => [],
             ]);
 

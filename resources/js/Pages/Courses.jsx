@@ -60,7 +60,7 @@ export default function Courses({ auth, courses = [] }) {
                         <input
                             type="text"
                             placeholder="ابحث عن دورة..."
-                            className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -92,20 +92,20 @@ export default function Courses({ auth, courses = [] }) {
                             <p className="text-gray-600 mb-4 line-clamp-2">{course.description}</p>
 
                             <div className="flex items-center text-sm text-gray-500 mb-2">
-                                <FaUser className="ml-2" />
+                                <FaUser className="me-2" />
                                 <span>{course.instructor}</span>
                             </div>
 
                             <div className="flex items-center text-sm text-gray-500 mb-4">
-                                <FaClock className="ml-2" />
+                                <FaClock className="me-2" />
                                 <span>{course.duration}</span>
                             </div>
 
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center">
-                                    <FaStar className="text-yellow-400 ml-1" />
+                                    <FaStar className="text-yellow-400 me-1" />
                                     <span className="font-semibold">{course.rating}</span>
-                                    <span className="text-gray-500 text-sm mr-2">({course.students} طالب)</span>
+                                    <span className="text-gray-500 text-sm ms-2">({course.students} طالب)</span>
                                 </div>
                                 <span className="text-lg font-bold text-blue-600">{course.price}</span>
                             </div>

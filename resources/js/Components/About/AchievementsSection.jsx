@@ -1,12 +1,15 @@
 import SectionTitle from '../SectionTitle';
 import { FaCheck } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function AchievementsSection() {
+    const { t } = useTranslation();
+    
     const achievements = [
-        "أكثر من 500 مشروع إبداعي منشور",
-        "أكثر من 50 تحدٍ تعليمي نشط",
-        "أكثر من 200 شارة ممنوحة للطلاب المبتكرين",
-        "تغطية أكثر من 30 مدرسة في الإمارات"
+        t('about.achievements.achievement1'),
+        t('about.achievements.achievement2'),
+        t('about.achievements.achievement3'),
+        t('about.achievements.achievement4')
     ];
 
     return (
@@ -23,7 +26,7 @@ export default function AchievementsSection() {
                 </div>
                 <div className="space-y-6">
                     <SectionTitle
-                        text="انجازاتنا"
+                        text={t('about.achievementsTitle')}
                         size="2xl"
                         align="start"
                         className="pb-0"

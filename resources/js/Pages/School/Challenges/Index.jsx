@@ -339,7 +339,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                         <input
                                             type="text"
                                             placeholder="ابحث عن تحدي..."
-                                            className="w-full pr-10 pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                            className="w-full ps-10 pe-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                         />
                                     </div>
                                 </form>
@@ -498,7 +498,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                                         <tr key={submission.id} className="hover:bg-gray-50">
                                                             <td className="px-6 py-4 whitespace-nowrap">
                                                                 <div className="flex items-center">
-                                                                    <FaUser className="text-gray-400 mr-2" />
+                                                                    <FaUser className="text-gray-400 ms-2" />
                                                                     <span className="text-sm font-medium text-gray-900">
                                                                         {submission.student?.name || 'غير معروف'}
                                                                     </span>
@@ -613,7 +613,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                         </div>
                         <button
                             onClick={() => setShowToast(false)}
-                            className="ml-4 text-white hover:text-gray-200 transition"
+                            className="me-4 text-white hover:text-gray-200 transition"
                         >
                             <FaTimes />
                         </button>

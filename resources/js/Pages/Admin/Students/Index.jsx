@@ -100,7 +100,7 @@ export default function StudentsIndex({ students, filters, auth }) {
                                     onClick={() => setShowFilters(!showFilters)}
                                     className="flex items-center px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-300"
                                 >
-                                    <FaFilter className="ml-2" />
+                                    <FaFilter className="me-2" />
                                     فلترة
                                 </button>
                             </div>
@@ -119,7 +119,7 @@ export default function StudentsIndex({ students, filters, auth }) {
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
                                             placeholder="اسم الطالب، البريد الإلكتروني..."
-                                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                                            className="w-full pe-10 ps-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                                         />
                                         <FaSearch className="absolute left-3 top-3 text-gray-400" />
                                     </div>
@@ -274,7 +274,7 @@ export default function StudentsIndex({ students, filters, auth }) {
                                                             <FaUser className="h-5 w-5 text-gray-600" />
                                                         </div>
                                                     </div>
-                                                    <div className="mr-4">
+                                                    <div className="ms-4">
                                                         <div className="text-sm font-medium text-gray-900">
                                                             {student.name || 'غير محدد'}
                                                         </div>
@@ -286,19 +286,19 @@ export default function StudentsIndex({ students, filters, auth }) {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center">
-                                                    <FaEnvelope className="ml-2 text-gray-400" />
+                                                    <FaEnvelope className="me-2 text-gray-400" />
                                                     <span className="text-sm text-gray-900">{student.email || 'غير محدد'}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center">
-                                                    <FaPhone className="ml-2 text-gray-400" />
+                                                    <FaPhone className="me-2 text-gray-400" />
                                                     <span className="text-sm text-gray-900">{student.phone || 'غير محدد'}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                 <div className="flex items-center">
-                                                    <FaCalendar className="ml-2 text-gray-400" />
+                                                    <FaCalendar className="me-2 text-gray-400" />
                                                     {student.created_at ? new Date(student.created_at).toLocaleDateString('en-US') : 'غير محدد'}
                                                 </div>
                                             </td>
@@ -352,7 +352,7 @@ export default function StudentsIndex({ students, filters, auth }) {
                                     {students.next_page_url && (
                                         <button
                                             onClick={() => router.get(students.next_page_url)}
-                                            className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                            className="me-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                         >
                                             التالي
                                         </button>

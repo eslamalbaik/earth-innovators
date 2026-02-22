@@ -4,6 +4,7 @@ import {
     Transition,
     TransitionChild,
 } from '@headlessui/react';
+import { useSelector } from 'react-redux';
 
 export default function Modal({
     children,
@@ -12,6 +13,8 @@ export default function Modal({
     closeable = true,
     onClose = () => { },
 }) {
+    const { dir } = useSelector((state) => state.language);
+    
     const close = () => {
         if (closeable) {
             onClose();
@@ -33,7 +36,7 @@ export default function Modal({
                 id="modal"
                 className="fixed inset-0 z-50 flex transform items-center overflow-y-auto px-4 py-6 transition-all sm:px-0"
                 onClose={close}
-                dir="rtl"
+                dir={dir}
             >
                 <TransitionChild
                     enter="ease-out duration-300"

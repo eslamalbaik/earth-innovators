@@ -60,8 +60,8 @@ export default function Home({ auth, cities = [], subjects = [], featuredTeacher
                                     href="/packages"
                                     className="group relative bg-gradient-to-br from-[#A3C042] via-[#8CA635] to-[#7a9a2f] rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02] overflow-hidden block"
                                 >
-                                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/15 rounded-full -mr-16 -mt-16 blur-3xl"></div>
-                                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/15 rounded-full -ml-12 -mb-12 blur-2xl"></div>
+                                    <div className="absolute top-0 start-0 w-32 h-32 bg-white/15 rounded-full -ms-16 -mt-16 blur-3xl"></div>
+                                    <div className="absolute bottom-0 end-0 w-24 h-24 bg-white/15 rounded-full -me-12 -mb-12 blur-2xl"></div>
                                     <div className="relative flex items-center gap-4">
                                         <div className="w-14 h-14 rounded-xl bg-white/30 backdrop-blur-sm flex items-center justify-center shadow-lg">
                                             <FaCreditCard className="text-white text-2xl" />
@@ -131,8 +131,8 @@ export default function Home({ auth, cities = [], subjects = [], featuredTeacher
                                         href="/packages"
                                         className="group relative bg-gradient-to-br from-[#A3C042] via-[#8CA635] to-[#7a9a2f] rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02] overflow-hidden block"
                                     >
-                                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/15 rounded-full -mr-16 -mt-16 blur-3xl"></div>
-                                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/15 rounded-full -ml-12 -mb-12 blur-2xl"></div>
+                                        <div className="absolute top-0 start-0 w-32 h-32 bg-white/15 rounded-full -ms-16 -mt-16 blur-3xl"></div>
+                                        <div className="absolute bottom-0 end-0 w-24 h-24 bg-white/15 rounded-full -me-12 -mb-12 blur-2xl"></div>
                                         <div className="relative flex items-center gap-4">
                                             <div className="w-14 h-14 rounded-xl bg-white/30 backdrop-blur-sm flex items-center justify-center shadow-lg">
                                                 <FaCreditCard className="text-white text-2xl" />

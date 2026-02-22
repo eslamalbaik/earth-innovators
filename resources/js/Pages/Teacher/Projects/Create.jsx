@@ -904,14 +904,14 @@ export default function CreateProject({ auth, school, schools = [] }) {
                                                         <p className="text-sm text-gray-500">{criterion.description}</p>
                                                     </div>
                                                 </div>
-                                                <div className="text-right">
+                                                <div className="">
                                                     <span className="text-2xl font-black text-gray-900">{data.evaluation[criterion.id]}</span>
-                                                    <span className="text-sm text-gray-400 font-bold ml-1">%</span>
+                                                    <span className="text-sm text-gray-400 font-bold me-1">%</span>
                                                 </div>
                                             </div>
                                             <div className="relative h-2 bg-gray-100 rounded-full overflow-hidden">
                                                 <div
-                                                    className="absolute top-0 right-0 h-full bg-[#A3C042] transition-all duration-300"
+                                                    className="absolute top-0 start-0 h-full bg-[#A3C042] transition-all duration-300"
                                                     style={{ width: `${data.evaluation[criterion.id]}%` }}
                                                 />
                                                 <input
@@ -920,7 +920,7 @@ export default function CreateProject({ auth, school, schools = [] }) {
                                                     max="100"
                                                     value={data.evaluation[criterion.id]}
                                                     onChange={(e) => handleEvaluationChange(criterion.id, e.target.value)}
-                                                    className="absolute top-0 right-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                                    className="absolute top-0 start-0 w-full h-full opacity-0 cursor-pointer z-10"
                                                 />
                                             </div>
                                             <div className="flex justify-between text-[11px] text-gray-400 mt-2 font-bold px-1 uppercase tracking-tighter">

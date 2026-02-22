@@ -514,7 +514,7 @@ export default function EditSchoolProject({ auth, project }) {
                             <PrimaryButton type="submit" disabled={processing}>
                                 {processing ? (
                                     <>
-                                        <FaSpinner className="animate-spin mr-2" />
+                                        <FaSpinner className="animate-spin ms-2" />
                                         جاري الحفظ...
                                     </>
                                 ) : (

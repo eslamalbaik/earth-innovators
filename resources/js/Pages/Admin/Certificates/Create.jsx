@@ -222,7 +222,7 @@ export default function AdminCertificatesCreate({ users }) {
                                 onChange={(e) => setData('is_active', e.target.checked)}
                                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                             />
-                            <label htmlFor="is_active" className="mr-2 block text-sm text-gray-900">
+                            <label htmlFor="is_active" className="ms-2 block text-sm text-gray-900">
                                 تفعيل الشهادة
                             </label>
                         </div>
@@ -234,7 +234,7 @@ export default function AdminCertificatesCreate({ users }) {
                                 onChange={(e) => setData('generate_pdf', e.target.checked)}
                                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                             />
-                            <label htmlFor="generate_pdf" className="mr-2 block text-sm text-gray-900">
+                            <label htmlFor="generate_pdf" className="ms-2 block text-sm text-gray-900">
                                 إنشاء ملف PDF تلقائياً
                             </label>
                         </div>

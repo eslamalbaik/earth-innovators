@@ -43,7 +43,7 @@ export default function Index({ auth, students }) {
                             placeholder="ابحث عن طالب..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#A3C042] focus:border-transparent"
+                            className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#A3C042] focus:border-transparent"
                         />
                     </div>
                 </div>
@@ -160,7 +160,7 @@ export default function Index({ auth, students }) {
                                     {students.links[students.links.length - 1].url && (
                                         <Link
                                             href={students.links[students.links.length - 1].url}
-                                            className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                            className="me-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                         >
                                             التالي
                                         </Link>

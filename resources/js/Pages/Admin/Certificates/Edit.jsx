@@ -235,7 +235,7 @@ export default function AdminCertificatesEdit({ certificate, users }) {
                                 onChange={(e) => setData('is_active', e.target.checked)}
                                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                             />
-                            <label htmlFor="is_active" className="mr-2 block text-sm text-gray-900">
+                            <label htmlFor="is_active" className="ms-2 block text-sm text-gray-900">
                                 تفعيل الشهادة
                             </label>
                         </div>
@@ -247,7 +247,7 @@ export default function AdminCertificatesEdit({ certificate, users }) {
                                 onChange={(e) => setData('regenerate_pdf', e.target.checked)}
                                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                             />
-                            <label htmlFor="regenerate_pdf" className="mr-2 block text-sm text-gray-900">
+                            <label htmlFor="regenerate_pdf" className="ms-2 block text-sm text-gray-900">
                                 إعادة إنشاء ملف PDF
                             </label>
                         </div>

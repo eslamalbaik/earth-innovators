@@ -101,7 +101,7 @@ function ProjectCard({ project, onOpen }) {
                     )}
                 </div>
 
-                <h3 className="text-sm font-bold text-gray-900 line-clamp-2 mb-1 text-right">
+                <h3 className="text-sm font-bold text-gray-900 line-clamp-2 mb-1 ">
                     {title}
                 </h3>
 

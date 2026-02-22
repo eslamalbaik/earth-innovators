@@ -1,13 +1,16 @@
 import { FaLightbulb, FaBullseye } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function VisionGoalsSection() {
+    const { t } = useTranslation();
+    
     const goals = [
-        "توفير بيئة محفزة للطلاب لعرض مشاريعهم الإبداعية",
-        "تمكين المعلمين من متابعة وتقييم مشاريع الطلاب",
-        "تنظيم تحديبات ومسابقات تعليمية في مجالات متنوعة",
-        "بناء نظام تحفيزي بالشارات والنقاط والمكافآت",
-        "إصدار الشهادات للمؤسسات تعليمية والطلاب المتميزين",
-        "المساهمة في بناء جيل من المبتكرين والموهوبين"
+        t('about.goals.goal1'),
+        t('about.goals.goal2'),
+        t('about.goals.goal3'),
+        t('about.goals.goal4'),
+        t('about.goals.goal5'),
+        t('about.goals.goal6')
     ];
 
     return (
@@ -17,10 +20,10 @@ export default function VisionGoalsSection() {
                     <div className="w-12 h-12 bg-gradient-to-br from-[#A3C042] to-legacy-blue rounded-lg flex items-center justify-center">
                         <FaLightbulb className="text-white text-xl" />
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-900">رؤيتنا</h2>
+                    <h2 className="text-2xl font-bold text-gray-900">{t('about.vision')}</h2>
                 </div>
                 <p className="text-lg text-gray-800 leading-relaxed">
-                    أن نكون المنصة التعليمية الرائدة في المنطقة التي تبني مجتمعاً من المبتكرين والموهوبين في المؤسسات تعليمية، من خلال توفير بيئة محفزة للإبداع والابتكار، وربط الطلاب المبتكرين مع المعلمين والمشرفين، وتنظيم التحديات والمسابقات التعليمية المثيرة.
+                    {t('about.visionDescription')}
                 </p>
             </div>
 
@@ -29,7 +32,7 @@ export default function VisionGoalsSection() {
                     <div className="w-12 h-12 bg-gradient-to-br from-[#A3C042] to-legacy-blue rounded-lg flex items-center justify-center">
                         <FaBullseye className="text-white text-xl" />
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-900">أهدافنا</h2>
+                    <h2 className="text-2xl font-bold text-gray-900">{t('about.goalsTitle')}</h2>
                 </div>
                 <div className="space-y-3 text-gray-800">
                     {goals.map((goal, index) => (

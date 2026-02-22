@@ -154,7 +154,7 @@ export default function Index({ auth, students, description }) {
                                 placeholder="ابحث عن طالب..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
                         </div>
                     </div>
@@ -194,7 +194,7 @@ export default function Index({ auth, students, description }) {
                                             <tr key={student.id} className="hover:bg-gray-50">
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="flex items-center">
-                                                        <FaUser className="ml-2 text-gray-400" />
+                                                        <FaUser className="me-2 text-gray-400" />
                                                         <span className="text-sm font-medium text-gray-900">
                                                             {student.name}
                                                         </span>
@@ -214,7 +214,7 @@ export default function Index({ auth, students, description }) {
                                                         onClick={() => handleSelectStudent(student)}
                                                         className="text-blue-600 hover:text-blue-900 flex items-center"
                                                     >
-                                                        <FaFilePdf className="ml-1" />
+                                                        <FaFilePdf className="me-1" />
                                                         إنشاء شهادة
                                                     </button>
                                                 </td>
@@ -241,7 +241,7 @@ export default function Index({ auth, students, description }) {
                                         {students.links.next && (
                                             <button
                                                 onClick={() => router.visit(students.links.next.url)}
-                                                className="mr-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                                className="ms-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                             >
                                                 التالي
                                             </button>

@@ -51,6 +51,8 @@ class CategorySeeder extends Seeder
 
         // Grade Levels (الصفوف)
         $grades = [
+            ['name' => 'KG1', 'slug' => 'kg1', 'description' => 'رياض الأطفال KG1', 'type' => 'grade'],
+            ['name' => 'KG2', 'slug' => 'kg2', 'description' => 'رياض الأطفال KG2', 'type' => 'grade'],
             ['name' => 'الصف الأول', 'slug' => 'grade_1', 'description' => 'الصف الأول الابتدائي', 'type' => 'grade'],
             ['name' => 'الصف الثاني', 'slug' => 'grade_2', 'description' => 'الصف الثاني الابتدائي', 'type' => 'grade'],
             ['name' => 'الصف الثالث', 'slug' => 'grade_3', 'description' => 'صف الثالث الابتدائي', 'type' => 'grade'],

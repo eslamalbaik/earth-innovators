@@ -4,8 +4,11 @@ import { FaFilter, FaChevronDown, FaImage, FaEye, FaStar, FaTrophy, FaTrash } fr
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import { useToast } from '@/Contexts/ToastContext';
+import { useDirection, getDropdownPosition } from '@/utils/directionUtils';
 
 export default function StudentProjectsIndex({ auth, projects, message }) {
+    const { dir } = useDirection();
+    const isRtl = dir === 'rtl';
     const [filter, setFilter] = useState('all'); // all | pending | evaluated | winners
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
 
@@ -84,7 +87,7 @@ export default function StudentProjectsIndex({ auth, projects, message }) {
                         <FaChevronDown className="text-xs" />
                     </button>
                     {showFilterDropdown && (
-                        <div className="absolute top-full right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-200 p-2 z-10 min-w-[150px]">
+                        <div className={`absolute ${getDropdownPosition(isRtl)} top-full mt-2 bg-white rounded-xl shadow-lg border border-gray-200 p-2 z-10 min-w-[150px]`}>
                             <button
                                 type="button"
                                 onClick={() => {

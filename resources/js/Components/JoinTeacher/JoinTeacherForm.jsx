@@ -3,21 +3,10 @@ import { FaPlus, FaTrash, FaEye, FaEyeSlash, FaSpinner, FaCheck, FaExclamationTr
 import axios from 'axios';
 import { router } from '@inertiajs/react';
 
-const DEFAULT_DIAL_CODE = '+966';
+const DEFAULT_DIAL_CODE = '+971';
 
 const dialCodeOptions = [
-    // الدول الخليجية
-    { value: '+966', label: '+966 (السعودية)' },
-    // { value: '+971', label: '+971 (الإمارات)' },
-    // { value: '+973', label: '+973 (البحرين)' },
-    // { value: '+974', label: '+974 (قطر)' },
-    // { value: '+965', label: '+965 (الكويت)' },
-    // { value: '+968', label: '+968 (عمان)' },
-    // // بلاد الشام
-    // { value: '+970', label: '+970 (فلسطين)' },
-    // { value: '+963', label: '+963 (سوريا)' },
-    // { value: '+964', label: '+964 (العراق)' },
-    // { value: '+967', label: '+967 (اليمن)' },
+    { value: '+971', label: '+971 (الإمارات)' },
     // // مصر والأردن
     // { value: '+20', label: '+20 (مصر)' },
     // { value: '+962', label: '+962 (الأردن)' },

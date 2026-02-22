@@ -127,7 +127,7 @@ export default function AdminCertificatesIndex({ certificates, stats, users, fil
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     placeholder="البحث برقم الشهادة، العنوان، أو اسم المستخدم..."
-                                    className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
                             </div>
                         </div>
@@ -192,25 +192,25 @@ export default function AdminCertificatesIndex({ certificates, stats, users, fil
                         <table className="w-full">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         رقم الشهادة
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         المستخدم
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         العنوان
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         النوع
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         تاريخ الإصدار
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         الحالة
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         الإجراءات
                                     </th>
                                 </tr>
@@ -226,7 +226,7 @@ export default function AdminCertificatesIndex({ certificates, stats, users, fil
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center">
-                                                    <FaUser className="text-gray-400 mr-2" />
+                                                    <FaUser className="text-gray-400 ms-2" />
                                                     <div>
                                                         <div className="text-sm font-medium text-gray-900">
                                                             {certificate.user?.name || 'غير معروف'}

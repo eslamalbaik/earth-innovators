@@ -2,8 +2,10 @@ import { Link, router } from '@inertiajs/react';
 import { FaTrophy, FaUsers, FaClock, FaGraduationCap, FaCheckCircle } from 'react-icons/fa';
 import PrimaryButton from '../PrimaryButton';
 import { useState } from 'react';
+import { useTranslation } from '@/i18n';
 
 export default function ChallengeCard({ challenge, user, participation = null, onJoin = null }) {
+    const { t } = useTranslation();
     const isParticipating = participation !== null;
     const isCompleted = participation?.status === 'completed';
     const canJoin = user?.role === 'student' && !isParticipating && challenge.status === 'active';
@@ -30,17 +32,17 @@ export default function ChallengeCard({ challenge, user, participation = null, o
         const now = new Date();
         const diff = deadline - now;
 
-        if (diff <= 0) return 'انتهى';
+        if (diff <= 0) return t('common.completed');
 
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
 
         if (days > 0) {
-            return `${days} يوم${days > 1 ? '' : ''}`;
+            return `${days} ${t('common.days')}`;
         } else if (hours > 0) {
-            return `${hours} ساعة`;
+            return `${hours} ${t('common.hours')}`;
         } else {
-            return 'أقل من ساعة';
+            return t('challenges.lessThanHour');
         }
     };
 
@@ -101,7 +103,7 @@ export default function ChallengeCard({ challenge, user, participation = null, o
             return (
                 <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded flex items-center gap-1">
                     <FaCheckCircle className="text-xs" />
-                    مكتمل
+                    {t('challenges.completed')}
                 </span>
             );
         }
@@ -109,7 +111,7 @@ export default function ChallengeCard({ challenge, user, participation = null, o
         if (isParticipating) {
             return (
                 <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
-                    مشارك
+                    {t('challenges.joined')}
                 </span>
             );
         }
@@ -117,14 +119,14 @@ export default function ChallengeCard({ challenge, user, participation = null, o
         if (challenge.status === 'active') {
             return (
                 <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
-                    نشط
+                    {t('challenges.active')}
                 </span>
             );
         }
 
         return (
             <span className="px-2 py-1 bg-gray-100 text-gray-800 text-xs font-medium rounded">
-                {challenge.status === 'upcoming' ? 'قادم' : 'منتهي'}
+                {challenge.status === 'upcoming' ? t('challenges.upcoming') : t('challenges.ended')}
             </span>
         );
     };
@@ -167,7 +169,7 @@ export default function ChallengeCard({ challenge, user, participation = null, o
 
                     {challenge.objective && (
                         <p className="text-gray-600 text-sm mb-2">
-                            <span className="font-semibold">الهدف:</span> {challenge.objective}
+                            <span className="font-semibold">{t('challenges.goal')}:</span> {challenge.objective}
                         </p>
                     )}
 
@@ -178,7 +180,7 @@ export default function ChallengeCard({ challenge, user, participation = null, o
                     {challenge.max_participants && (
                         <div className="mb-4">
                             <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
-                                <span>المشاركون</span>
+                                <span>{t('challenges.participants')}</span>
                                 <span>{challenge.current_participants || 0} / {challenge.max_participants}</span>
                             </div>
                             <div className="w-full bg-gray-200 rounded-full h-2">
@@ -193,7 +195,7 @@ export default function ChallengeCard({ challenge, user, participation = null, o
                     <div className="flex items-center justify-between text-sm text-gray-500 pt-4 border-t border-gray-200 mb-4">
                         <div className="flex items-center gap-2">
                             <FaGraduationCap className="text-gray-400" />
-                            <span>{challenge.creator?.name || challenge.school?.name || 'مستخدم'}</span>
+                            <span>{challenge.creator?.name || challenge.school?.name || t('common.user')}</span>
                         </div>
                         {remainingTime && (
                             <div className="flex items-center gap-2">
@@ -208,7 +210,7 @@ export default function ChallengeCard({ challenge, user, participation = null, o
                             <div className="inline-flex items-center gap-2 px-3 py-1 bg-yellow-50 border border-yellow-200 rounded-full">
                                 <FaTrophy className="text-yellow-600 text-sm" />
                                 <span className="text-sm font-semibold text-yellow-800">
-                                    {challenge.points_reward} نقطة
+                                    {challenge.points_reward} {t('common.points')}
                                 </span>
                             </div>
                         </div>
@@ -222,7 +224,7 @@ export default function ChallengeCard({ challenge, user, participation = null, o
                         onClick={handleJoin}
                         className="w-full"
                     >
-                        انضم الآن
+                        {t('challenges.joinNow')}
                     </PrimaryButton>
                 </div>
             )}
@@ -233,7 +235,7 @@ export default function ChallengeCard({ challenge, user, participation = null, o
                         href={`/challenges/${challenge.id}`}
                         className="block w-full text-center px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition"
                     >
-                        استمر في التحدي
+                        {t('challenges.continue')}
                     </Link>
                 </div>
             )}
@@ -244,12 +246,12 @@ export default function ChallengeCard({ challenge, user, participation = null, o
                         <div className="text-sm text-gray-600">
                             {participation.points_earned > 0 && (
                                 <span className="font-semibold text-green-600">
-                                    +{participation.points_earned} نقطة
+                                    +{participation.points_earned} {t('common.points')}
                                 </span>
                             )}
                             {participation.rank && (
-                                <span className="ml-2">
-                                    الترتيب: #{participation.rank}
+                                <span className="me-2">
+                                    {t('challenges.rank')}: #{participation.rank}
                                 </span>
                             )}
                         </div>
@@ -257,7 +259,7 @@ export default function ChallengeCard({ challenge, user, participation = null, o
                             href={`/challenges/${challenge.id}`}
                             className="text-sm text-blue-600 hover:text-blue-800"
                         >
-                            عرض التفاصيل
+                            {t('challenges.viewDetails')}
                         </Link>
                     </div>
                 </div>

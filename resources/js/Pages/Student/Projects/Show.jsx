@@ -352,7 +352,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                                         ★
                                                     </span>
                                                 ))}
-                                                <span className="mr-2 text-lg font-bold text-green-900">
+                                                <span className="ms-2 text-lg font-bold text-green-900">
                                                     ({existingSubmission.rating}/5)
                                                 </span>
                                             </div>
@@ -491,12 +491,12 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                             >
                                 {submissionForm.processing ? (
                                     <>
-                                        <FaSpinner className="animate-spin ml-2" />
+                                        <FaSpinner className="animate-spin me-2" />
                                         جاري التسليم...
                                     </>
                                 ) : (
                                     <>
-                                        <FaUpload className="ml-2" />
+                                        <FaUpload className="me-2" />
                                         {existingSubmission ? 'تحديث التسليم' : 'تسليم المشروع'}
                                     </>
                                 )}
@@ -547,12 +547,12 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                 >
                                     {isSubmittingComment ? (
                                         <>
-                                            <FaSpinner className="animate-spin ml-2" />
+                                            <FaSpinner className="animate-spin me-2" />
                                             جاري الإرسال...
                                         </>
                                     ) : (
                                         <>
-                                            <FaComment className="ml-2" />
+                                            <FaComment className="me-2" />
                                             {replyingTo ? 'إرسال الرد' : 'إرسال التعليق'}
                                         </>
                                     )}
@@ -602,7 +602,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
 
                                     {/* Replies */}
                                     {comment.replies && comment.replies.length > 0 && (
-                                        <div className="mt-3 pr-4 border-r-2 border-gray-200 space-y-3">
+                                        <div className="mt-3 ps-4 border-r-2 border-gray-200 space-y-3">
                                             {comment.replies.map((reply) => (
                                                 <div key={reply.id} className="flex items-start gap-2">
                                                     <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">

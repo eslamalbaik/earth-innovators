@@ -146,7 +146,7 @@ export default function AdminPublicationCreate({ auth, schools }) {
                                     type="file"
                                     accept="image/*"
                                     onChange={handleCoverImageChange}
-                                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
+                                    className="block w-full text-sm text-gray-500 file:ms-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
                                 />
                                 {coverPreview && (
                                     <img
@@ -168,7 +168,7 @@ export default function AdminPublicationCreate({ auth, schools }) {
                                     type="file"
                                     accept=".pdf"
                                     onChange={handleFileChange}
-                                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
+                                    className="block w-full text-sm text-gray-500 file:ms-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
                                 />
                                 {fileName && (
                                     <p className="mt-2 text-sm text-gray-600">
@@ -207,12 +207,12 @@ export default function AdminPublicationCreate({ auth, schools }) {
                             >
                                 {processing ? (
                                     <>
-                                        <FaSpinner className="animate-spin inline-block ml-2" />
+                                        <FaSpinner className="animate-spin inline-block me-2" />
                                         جاري الحفظ...
                                     </>
                                 ) : (
                                     <>
-                                        <FaUpload className="inline-block ml-2" />
+                                        <FaUpload className="inline-block me-2" />
                                         نشر المقال
                                     </>
                                 )}

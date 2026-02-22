@@ -1,23 +1,30 @@
 import SectionTitle from '../SectionTitle';
 import { FaProjectDiagram, FaEye, FaUser, FaGraduationCap, FaArrowLeft } from 'react-icons/fa';
 import { Link } from '@inertiajs/react';
+import { useTranslation, useForwardIcon } from '@/i18n';
 
 export default function ProjectsSection({
-    title = "أبرز المشاريع الإبداعية",
-    subtitle = "استكشف مشاريع الطلاب المبتكرين في مختلف المجالات والفئات العمرية.",
+    title,
+    subtitle,
     projects = [],
     onViewAllProjects
 }) {
+    const { t } = useTranslation();
+    const ForwardIcon = useForwardIcon();
+    
+    const displayTitle = title || t('sections.projects.title');
+    const displaySubtitle = subtitle || t('sections.projects.subtitle');
+    
     const getCategoryLabel = (category) => {
         const categories = {
-            'science': 'علوم',
-            'technology': 'تقنية',
-            'engineering': 'هندسة',
-            'mathematics': 'رياضيات',
-            'arts': 'فنون',
-            'other': 'أخرى'
+            'science': t('common.categories.science'),
+            'technology': t('common.categories.technology'),
+            'engineering': t('common.categories.engineering'),
+            'mathematics': t('common.categories.mathematics'),
+            'arts': t('common.categories.arts'),
+            'other': t('common.categories.other')
         };
-        return categories[category] || 'أخرى';
+        return categories[category] || t('common.categories.other');
     };
 
     return (
@@ -25,14 +32,14 @@ export default function ProjectsSection({
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center">
                     <SectionTitle
-                        text={title}
+                        text={displayTitle}
                         size="2xl"
                         align="center"
                         className="pb-2"
                     />
 
                     <p className="mb-8 text-lg text-gray-800 max-w-3xl mx-auto leading-relaxed">
-                        {subtitle}
+                        {displaySubtitle}
                     </p>
                 </div>
 
@@ -40,7 +47,7 @@ export default function ProjectsSection({
                     {projects.length === 0 ? (
                         <div className="text-center py-12">
                             <FaProjectDiagram className="mx-auto text-6xl text-gray-300 mb-4" />
-                            <p className="text-gray-600">لا توجد مشاريع متاحة حالياً</p>
+                            <p className="text-gray-600">{t('sections.projects.noProjects')}</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -54,7 +61,7 @@ export default function ProjectsSection({
                                         <div className="flex items-center gap-2">
                                             <FaProjectDiagram className="text-blue-600 text-xl" />
                                             <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
-                                                معتمد
+                                                {t('common.approved')}
                                             </span>
                                         </div>
                                         <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded">
@@ -76,14 +83,14 @@ export default function ProjectsSection({
                                                 <>
                                                     <FaGraduationCap className="text-gray-400" />
                                                     <span className="text-xs">
-                                                        {project.teacher.name_ar || project.teacher.user?.name || 'معلم'}
+                                                        {project.teacher.name_ar || project.teacher.user?.name || t('common.teacher')}
                                                     </span>
                                                 </>
                                             ) : (
                                                 <>
                                                     <FaUser className="text-gray-400" />
                                                     <span className="text-xs">
-                                                        {project.user?.name || 'طالب'}
+                                                        {project.user?.name || t('common.student')}
                                                     </span>
                                                 </>
                                             )}
@@ -96,7 +103,7 @@ export default function ProjectsSection({
 
                                     {project.school && (
                                         <div className="mt-2 text-xs text-gray-500">
-                                            مدرسة: {project.school.name}
+                                            {t('common.school')}: {project.school.name}
                                         </div>
                                     )}
                                 </Link>
@@ -109,8 +116,8 @@ export default function ProjectsSection({
                             onClick={onViewAllProjects}
                             className="bg-[#A3C042] hover:bg-primary-600 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg font-bold text-xs md:text-sm transition duration-300 flex items-center gap-3 shadow-lg"
                         >
-                            عرض جميع المشاريع
-                            <FaArrowLeft className="text-md" />
+                            {t('sections.projects.viewAllProjects')}
+                            <ForwardIcon className="text-md" />
                         </button>
                     </div>
                 </div>

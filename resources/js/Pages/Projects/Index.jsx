@@ -4,8 +4,10 @@ import { FaSearch, FaFilter, FaHeart, FaComment, FaTimes } from 'react-icons/fa'
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import DesktopFooter from '@/Components/Mobile/DesktopFooter';
+import { useTranslation } from '@/i18n';
 
 export default function ProjectsIndex({ auth, projects, userRole, categories = [] }) {
+    const { t, language } = useTranslation();
     const [search, setSearch] = useState('');
     const [category, setCategory] = useState('');
     const [showFilterModal, setShowFilterModal] = useState(false);
@@ -15,29 +17,29 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
 
     // استخدام الفئات من قاعدة البيانات أو الفئات الافتراضية
     const defaultCategories = [
-        { value: '', label: 'الكل' },
-        { value: 'science', label: 'علوم' },
-        { value: 'technology', label: 'تقنية' },
-        { value: 'engineering', label: 'هندسة' },
-        { value: 'mathematics', label: 'رياضيات' },
-        { value: 'arts', label: 'فنون' },
-        { value: 'other', label: 'أخرى' },
+        { value: '', label: t('common.all') || 'الكل' },
+        { value: 'science', label: t('categories.science') || 'علوم' },
+        { value: 'technology', label: t('categories.technology') || 'تقنية' },
+        { value: 'engineering', label: t('categories.engineering') || 'هندسة' },
+        { value: 'mathematics', label: t('categories.mathematics') || 'رياضيات' },
+        { value: 'arts', label: t('categories.arts') || 'فنون' },
+        { value: 'other', label: t('categories.other') || 'أخرى' },
     ];
 
     const categoriesList = categories && categories.length > 0 ? categories : defaultCategories;
 
     const ageGroups = [
-        { value: '6-9', label: '6-9 سنوات' },
-        { value: '10-13', label: '10-13 سنة' },
-        { value: '14-17', label: '14-17 سنة' },
-        { value: '18+', label: '18+ سنة' },
+        { value: '6-9', label: t('projects.age6_9') || '6-9 سنوات' },
+        { value: '10-13', label: t('projects.age10_13') || '10-13 سنة' },
+        { value: '14-17', label: t('projects.age14_17') || '14-17 سنة' },
+        { value: '18+', label: t('projects.age18plus') || '18+ سنة' },
     ];
 
     const schools = [
-        { value: 'primary', label: 'المدرسة الابتدائية' },
-        { value: 'middle', label: 'المدرسة المتوسطة' },
-        { value: 'high', label: 'المدرسة الثانوية' },
-        { value: 'university', label: 'الجامعة' },
+        { value: 'primary', label: t('projects.primarySchool') || 'المدرسة الابتدائية' },
+        { value: 'middle', label: t('projects.middleSchool') || 'المدرسة المتوسطة' },
+        { value: 'high', label: t('projects.highSchool') || 'المدرسة الثانوية' },
+        { value: 'university', label: t('projects.university') || 'الجامعة' },
     ];
 
     // استخدام الفئات من قاعدة البيانات للفلترة أيضاً
@@ -80,13 +82,26 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
 
     const getCategoryLabel = (cat) => {
         const found = categoriesList.find((c) => c.value === cat);
-        return found ? found.label : 'أخرى';
+        return found ? found.label : t('categories.other') || 'أخرى';
     };
 
     const formatDate = (date) => {
         if (!date) return '';
         const d = new Date(date);
-        const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+        const months = [
+            t('common.january') || 'يناير',
+            t('common.february') || 'فبراير',
+            t('common.march') || 'مارس',
+            t('common.april') || 'أبريل',
+            t('common.may') || 'مايو',
+            t('common.june') || 'يونيو',
+            t('common.july') || 'يوليو',
+            t('common.august') || 'أغسطس',
+            t('common.september') || 'سبتمبر',
+            t('common.october') || 'أكتوبر',
+            t('common.november') || 'نوفمبر',
+            t('common.december') || 'ديسمبر'
+        ];
         return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
     };
 
@@ -102,7 +117,7 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
                     type="button"
                     onClick={() => setShowFilterModal(true)}
                     className="h-10 w-10 rounded-xl bg-[#A3C042] flex items-center justify-center hover:bg-[#8CA635] transition flex-shrink-0"
-                    aria-label="فلترة"
+                    aria-label={t('projects.filter')}
                 >
                     <FaFilter className="text-white text-sm" />
                 </button>
@@ -112,8 +127,8 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder="ابحث عن المشاريع .."
-                            className="w-full h-10 pr-10 pl-4 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042] text-sm"
+                            placeholder={t('projects.searchPlaceholder') || 'ابحث عن المشاريع ..'}
+                            className="w-full h-10 ps-10 pe-4 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042] text-sm"
                         />
                         <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
                     </div>
@@ -145,7 +160,7 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
 
             {/* Projects Count */}
             <div className="text-sm text-gray-700">
-                {filteredProjects.length} مشاريع
+                {filteredProjects.length} {t('projects.projects')}
             </div>
 
             {/* Projects Grid */}
@@ -156,8 +171,8 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
                         const categoryLabel = getCategoryLabel(project.category);
                         const projectImage = project.image || project.thumbnail || '/images/hero.png';
                         const ageRange = project.age_range || '13-10 سنة';
-                        const schoolName = project.school?.name || 'المدرسة المتوسطة';
-                        const teacherName = project.teacher?.name_ar || project.user?.name || 'أحمد محمد';
+                        const schoolName = project.school?.name || t('projects.middleSchoolDefault');
+                        const teacherName = project.teacher?.name_ar || project.user?.name || t('projects.teacherNameDefault');
                         const likes = project.likes || 24;
                         const comments = project.comments_count || 8;
                         const isLiked = project.is_liked || false;
@@ -176,7 +191,7 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
                                     />
                                     {isWinner && (
                                         <div className="absolute top-2 left-2 px-2 py-1 rounded-full bg-orange-500 text-white text-[10px] font-bold">
-                                            مشروع فائز
+                                            {t('projects.winnerProject')}
                                         </div>
                                     )}
                                     <div className="absolute top-2 right-2 px-2 py-1 rounded-full bg-gray-100 text-gray-700 text-[10px] font-semibold border border-gray-200">
@@ -185,7 +200,7 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
                                 </div>
                                 <div className="p-3">
                                     <h3 className="text-sm font-bold text-gray-900 mb-2 line-clamp-2 min-h-[2.5rem]">
-                                        {project.title || 'روبوت مساعد للمنزل'}
+                                        {project.title || t('projects.innovationChallenge')}
                                     </h3>
                                     <div className="text-xs text-gray-600 mb-2">
                                         {ageRange} • {schoolName} • {teacherName}
@@ -210,13 +225,13 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
                     <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
                         <FaSearch className="text-gray-400 text-4xl" />
                     </div>
-                    <p className="text-gray-400 text-sm mb-2">لا توجد مشاريع تطابق معايير البحث</p>
+                    <p className="text-gray-400 text-sm mb-2">{t('projects.noProjects')}</p>
                     <button
                         type="button"
                         onClick={handleClearFilters}
                         className="text-[#A3C042] text-sm font-semibold hover:text-[#8CA635]"
                     >
-                        عرض كل المشاريع
+                        {t('projects.viewAll')}
                     </button>
                 </div>
             )}
@@ -243,13 +258,13 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
     );
 
     return (
-        <div dir="rtl" className="min-h-screen bg-gray-50">
-            <Head title="استكشف المشاريع - إرث المبتكرين" />
+        <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
+            <Head title={t('projects.exploreProjects') + ' - ' + t('common.appName')} />
 
             {/* Mobile View */}
             <div className="block md:hidden">
                 <MobileTopBar
-                    title="إرث المبتكرين"
+                    title={t('common.appName')}
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
                     onBack={() => router.visit('/')}
@@ -263,7 +278,7 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
             {/* Desktop View */}
             <div className="hidden md:block">
                 <MobileTopBar
-                    title="إرث المبتكرين"
+                    title={t('common.appName')}
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
                     onBack={() => router.visit('/')}
@@ -287,11 +302,11 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
                                 type="button"
                                 onClick={() => setShowFilterModal(false)}
                                 className="text-gray-700 text-xl leading-none"
-                                aria-label="إغلاق"
+                                aria-label={t('common.close')}
                             >
                                 <FaTimes />
                             </button>
-                            <div className="text-sm font-extrabold text-gray-900">خيارات الفلترة</div>
+                            <div className="text-sm font-extrabold text-gray-900">{t('projects.filterOptions')}</div>
                             <div className="w-6" />
                         </div>
 
@@ -299,7 +314,7 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
                         <div className="p-4 space-y-6 max-h-[70vh] overflow-y-auto">
                             {/* Age Group */}
                             <div>
-                                <div className="text-sm font-bold text-gray-900 mb-3">الفئة العمرية</div>
+                                <div className="text-sm font-bold text-gray-900 mb-3">{t('projects.ageGroup')}</div>
                                 <div className="grid grid-cols-2 gap-2">
                                     {ageGroups.map((age) => (
                                         <button
@@ -319,7 +334,7 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
 
                             {/* School */}
                             <div>
-                                <div className="text-sm font-bold text-gray-900 mb-3">المدرسة</div>
+                                <div className="text-sm font-bold text-gray-900 mb-3">{t('projects.school')}</div>
                                 <div className="grid grid-cols-2 gap-2">
                                     {schools.map((school) => (
                                         <button
@@ -339,7 +354,7 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
 
                             {/* Subject/Category */}
                             <div>
-                                <div className="text-sm font-bold text-gray-900 mb-3">الفئة</div>
+                                <div className="text-sm font-bold text-gray-900 mb-3">{t('projects.category')}</div>
                                 <div className="grid grid-cols-2 gap-2">
                                     {categoriesList.filter(c => c.value !== '').map((cat) => (
                                         <button
@@ -369,7 +384,7 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
                                 onClick={handleApplyFilters}
                                 className="w-full rounded-xl bg-[#A3C042] py-3 text-sm font-bold text-white hover:bg-[#8CA635] transition"
                             >
-                                تطبيق الفلاتر
+                                {t('projects.applyFilters')}
                             </button>
                         </div>
                     </div>

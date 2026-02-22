@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from '@inertiajs/react';
 import { FaStar, FaCheck, FaUser, FaBook, FaGraduationCap } from 'react-icons/fa';
 import BookingModal from '../Booking/BookingModal';
+import { useTranslation } from '@/i18n';
 
 const getInitials = (name) => {
     if (!name) return '?';
@@ -76,6 +77,7 @@ const formatLocation = (location) => {
 };
 
 export default function TeacherCard({ teacher }) {
+    const { t } = useTranslation();
     const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
     const [imageError, setImageError] = useState(false);
 
@@ -132,15 +134,15 @@ export default function TeacherCard({ teacher }) {
                     <div className="mb-4 flex items-center justify-start gap-2">
                         <div className="flex items-center gap-2 border border-gray-200 rounded-lg p-2">
                             <FaGraduationCap className="text-green-500 text-xs" />
-                            <span className="text-xs text-gray-700">خبرة {teacher.experience || 0} سنوات</span>
+                            <span className="text-xs text-gray-700">{t('teachers.experience')} {teacher.experience || 0} {t('teachers.years')}</span>
                         </div>
                         <div className="flex items-center gap-2 border border-gray-200 rounded-lg p-2">
                             <FaBook className="text-blue-500 text-xs" />
-                            <span className="text-xs text-gray-700">{teacher.sessionsCount || 0} حصة</span>
+                            <span className="text-xs text-gray-700">{teacher.sessionsCount || 0} {t('teachers.session')}</span>
                         </div>
                         <div className="flex items-center gap-2 border border-gray-200 rounded-lg p-2">
                             <FaUser className="text-purple-900 text-xs" />
-                            <span className="text-xs text-gray-700">{teacher.studentsCount || 0} طالب استفاد منه</span>
+                            <span className="text-xs text-gray-700">{teacher.studentsCount || 0} {t('teachers.studentBenefited')}</span>
                         </div>
                     </div>
 
@@ -148,20 +150,20 @@ export default function TeacherCard({ teacher }) {
                         <div className="text-sm font-bold text-gray-900 flex items-center ">
                             <span>{teacher.price}</span>
                             <img src="/images/aed-currency(black).svg" alt="currency" className="w-5 h-5" />
-                            <span> / ساعة</span>
+                            <span> {t('teachers.perHour')}</span>
                         </div>
                         <div className="col-span-2 grid grid-cols-2 w-full gap-3">
                             <Link
                                 href={`/teachers/${teacher.id}`}
                                 className="font-meduim flex-1 border border-gray-200 hover:bg-gray-300 text-gray-800 px-2 py-2 rounded-lg text-[14px] transition duration-300 text-center"
                             >
-                                تفاصيل المعلم
+                                {t('teachers.teacherDetails')}
                             </Link>
                             <button
                                 onClick={() => setIsBookingModalOpen(true)}
                                 className="font-meduim flex-1 bg-yellow-400 hover:bg-yellow-500 text-black px-2 py-2 rounded-lg text-[14px] transition duration-300"
                             >
-                                احجز الآن
+                                {t('teachers.bookNow')}
                             </button>
                         </div>
                     </div>

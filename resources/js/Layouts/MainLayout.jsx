@@ -1,12 +1,17 @@
 import { Link, router } from '@inertiajs/react';
 import { FaUser, FaSignInAlt, FaSignOutAlt, FaBars, FaTimes, FaChevronLeft, FaTwitter, FaInstagram, FaEnvelope } from 'react-icons/fa';
 import { useState, useRef, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { getUserImageUrl, getInitials, getColorFromName } from '../utils/imageUtils';
+import LanguageSwitcher from '../Components/LanguageSwitcher';
+import { useTranslation } from '../i18n';
 
 export default function MainLayout({ children, auth }) {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const userMenuRef = useRef(null);
+    const { currentLanguage, dir } = useSelector((state) => state.language);
+    const { t } = useTranslation();
 
     const handleLogout = () => {
         router.post(route('logout'));
@@ -23,7 +28,7 @@ export default function MainLayout({ children, auth }) {
     }, []);
 
     return (
-        <div className="min-h-screen bg-white flex flex-col" dir="rtl">
+        <div className="min-h-screen bg-white flex flex-col" dir={dir}>
             <header className="bg-[#A3C042] sticky top-0 z-50 shadow-md">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16">
@@ -31,33 +36,37 @@ export default function MainLayout({ children, auth }) {
                             <Link href="/" className="flex items-center space-x-3 space-x-reverse">
                                 <img
                                     src="/images/logo-modified.png"
-                                    alt="إرث المبتكرين - Innovators Legacy"
+                                    alt={t('header.appName')}
                                     className="h-8 w-auto object-contain"
                                 />
-                                <p className="text-white text-2xl font-bold">إرث المبتكرين</p>
+                                <p className="text-white text-2xl font-bold">{t('header.appName')}</p>
                             </Link>
                         </div>
 
                         <nav className="hidden md:flex items-center space-x-8 space-x-reverse">
                             <Link href="/" className="text-white hover:text-gray-100 font-medium transition">
-                                الرئيسية
+                                {t('common.home')}
                             </Link>
                             <Link href="/projects" className="text-white hover:text-gray-100 font-medium transition">
-                                المشاريع
+                                {t('common.projects')}
                             </Link>
                             <Link href="/challenges" className="text-white hover:text-gray-100 font-medium transition">
-                                التحديات
+                                {t('common.challenges')}
                             </Link>
                             <Link href="/publications" className="text-white hover:text-gray-100 font-medium transition">
-                                الإصدارات
+                                {t('common.publications')}
                             </Link>
                             <Link href="/badges" className="text-white hover:text-gray-100 font-medium transition">
-                                الشارات
+                                {t('common.badges')}
                             </Link>
                             <Link href="/about" className="text-white hover:text-gray-100 font-medium transition">
-                                عن إرث المبتكرين
+                                {t('common.about')}
                             </Link>
                         </nav>
+
+                        <div className="hidden md:flex items-center gap-3">
+                            <LanguageSwitcher />
+                        </div>
 
                         {!auth?.user && (
                             <div className="hidden md:flex justify-end items-center gap-2">
@@ -65,14 +74,14 @@ export default function MainLayout({ children, auth }) {
                                     href="/register"
                                     className="text-sm bg-white hover:bg-gray-100 text-[#A3C042] px-4 py-2 rounded-lg font-semibold transition duration-300 flex items-center space-x-1 space-x-reverse shadow-md"
                                 >
-                                    <span>انضم للمنصة</span>
+                                    <span>{t('common.joinPlatform')}</span>
                                 </Link>
                                 <Link
                                     href="/login"
                                     className="text-sm bg-legacy-blue hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition duration-300 flex items-center space-x-1 space-x-reverse shadow-md"
                                     onClick={() => setIsMobileMenuOpen(false)}
                                 >
-                                    <span>تسجيل الدخول</span>
+                                    <span>{t('common.login')}</span>
                                 </Link>
                             </div>
                         )}
@@ -102,19 +111,15 @@ export default function MainLayout({ children, auth }) {
                                         <div className="">
                                             <div className="text-sm font-semibold text-white">{auth.user.name}</div>
                                             <div className="text-xs text-white/80">
-                                                {auth.user.role === 'admin' && 'إدارة'}
-                                                {auth.user.role === 'teacher' && 'معلم'}
-                                                {auth.user.role === 'student' && 'طالب'}
-                                                {auth.user.role === 'school' && 'مدرسة'}
-                                                {auth.user.role === 'educational_institution' && 'مؤسسة تعليمية'}
+                                                {t('roles.' + auth.user.role)}
                                             </div>
                                         </div>
                                     </button>
                                     {userMenuOpen && (
-                                        <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50">
-                                            <Link href={route('dashboard')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">لوحة التحكم</Link>
+                                        <div className="absolute end-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50">
+                                            <Link href={route('dashboard')} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{t('common.dashboard')}</Link>
                                             <button onClick={handleLogout} className="w-full  px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2">
-                                                <FaSignOutAlt /> خروج
+                                                <FaSignOutAlt /> {t('common.logout')}
                                             </button>
                                         </div>
                                     )}
@@ -138,43 +143,49 @@ export default function MainLayout({ children, auth }) {
                                     className="text-white hover:text-gray-100 font-medium py-2"
                                     onClick={() => setIsMobileMenuOpen(false)}
                                 >
-                                    الرئيسية
+                                    {t('common.home')}
                                 </Link>
                                 <Link
                                     href="/projects"
                                     className="text-white hover:text-gray-100 font-medium py-2"
                                     onClick={() => setIsMobileMenuOpen(false)}
                                 >
-                                    المشاريع
+                                    {t('common.projects')}
                                 </Link>
                                 <Link
                                     href="/challenges"
                                     className="text-white hover:text-gray-100 font-medium py-2"
                                     onClick={() => setIsMobileMenuOpen(false)}
                                 >
-                                    التحديات
+                                    {t('common.challenges')}
                                 </Link>
                                 <Link
                                     href="/publications"
                                     className="text-white hover:text-gray-100 font-medium py-2"
                                     onClick={() => setIsMobileMenuOpen(false)}
                                 >
-                                    الإصدارات
+                                    {t('common.publications')}
                                 </Link>
                                 <Link
                                     href="/badges"
                                     className="text-white hover:text-gray-100 font-medium py-2"
                                     onClick={() => setIsMobileMenuOpen(false)}
                                 >
-                                    الشارات
+                                    {t('common.badges')}
                                 </Link>
                                 <Link
                                     href="/about"
                                     className="text-white hover:text-gray-100 font-medium py-2"
                                     onClick={() => setIsMobileMenuOpen(false)}
                                 >
-                                    عن إرث المبتكرين
+                                    {t('common.about')}
                                 </Link>
+
+                                <div className="border-t border-white/20 pt-2">
+                                    <div className="flex justify-center py-2">
+                                        <LanguageSwitcher />
+                                    </div>
+                                </div>
 
                                 <div className="border-t border-white/20 pt-2">
                                     <Link
@@ -182,7 +193,7 @@ export default function MainLayout({ children, auth }) {
                                         className="block bg-white hover:bg-gray-100 text-[#A3C042] px-6 py-3 rounded-lg font-semibold text-center transition duration-300 shadow-md"
                                         onClick={() => setIsMobileMenuOpen(false)}
                                     >
-                                        انضم للمنصة
+                                        {t('common.joinPlatform')}
                                     </Link>
                                 </div>
 
@@ -194,7 +205,7 @@ export default function MainLayout({ children, auth }) {
                                             onClick={() => setIsMobileMenuOpen(false)}
                                         >
                                             <FaUser className="text-lg" />
-                                            <span>لوحة التحكم</span>
+                                            <span>{t('common.dashboard')}</span>
                                         </Link>
                                     </div>
                                 ) : (
@@ -204,7 +215,7 @@ export default function MainLayout({ children, auth }) {
                                             className="block bg-legacy-blue hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold text-center transition duration-300 shadow-md"
                                             onClick={() => setIsMobileMenuOpen(false)}
                                         >
-                                            <span>تسجيل الدخول</span>
+                                            <span>{t('common.login')}</span>
                                         </Link>
                                     </div>
                                 )}
@@ -222,15 +233,15 @@ export default function MainLayout({ children, auth }) {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                         <div className="text-white font-semibold">
-                            جميع الحقوق محفوظة لإرث المبتكرين © 2025
+                            {t('footer.copyright')} © 2025
                         </div>
 
                         <div className="flex items-center gap-8">
                             <Link href="/privacy" className="text-white hover:text-gray-100 transition duration-300 underline">
-                                سياسة الخصوصية
+                                {t('common.privacy')}
                             </Link>
                             <Link href="/terms" className="text-white hover:text-gray-100 transition duration-300 underline">
-                                الشروط والأحكام
+                                {t('common.terms')}
                             </Link>
                         </div>
 

@@ -39,7 +39,7 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
     const teacherForm = useForm({
         name_ar: teacher?.name_ar || '',
         name_en: teacher?.name_en || '',
-        nationality: teacher?.nationality || '',
+        nationality: teacher?.nationality || 'إماراتي',
         gender: teacher?.gender || '',
         bio: teacher?.bio || '',
         qualifications: teacher?.qualifications || '',
@@ -326,7 +326,7 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                                         imageInputRef.current?.click();
                                     }
                                 }}
-                                className="absolute bottom-0 right-0 bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded-full shadow-lg transition"
+                                className="absolute bottom-0 start-0 bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded-full shadow-lg transition"
                             >
                                 <FaCamera className="text-sm" />
                             </button>
@@ -370,7 +370,7 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                                     : 'text-gray-600 hover:text-gray-900'
                                 }`}
                         >
-                            <FaUser className="inline ml-2" />
+                            <FaUser className="inline me-2" />
                             المعلومات الأساسية
                         </button>
                         {user.role === 'teacher' && (
@@ -381,7 +381,7 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                                         : 'text-gray-600 hover:text-gray-900'
                                     }`}
                             >
-                                <FaGraduationCap className="inline ml-2" />
+                                <FaGraduationCap className="inline me-2" />
                                 بيانات المعلم
                             </button>
                         )}
@@ -393,7 +393,7 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                                         : 'text-gray-600 hover:text-gray-900'
                                     }`}
                             >
-                                <FaMedal className="inline ml-2" />
+                                <FaMedal className="inline me-2" />
                                 الشارات
                             </button>
                         )}
@@ -404,7 +404,7 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                                     : 'text-gray-600 hover:text-gray-900'
                                 }`}
                         >
-                            <FaLock className="inline ml-2" />
+                            <FaLock className="inline me-2" />
                             كلمة المرور
                         </button>
                         <button
@@ -414,7 +414,7 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                                     : 'text-gray-600 hover:text-gray-900'
                                 }`}
                         >
-                            <FaTrash className="inline ml-2" />
+                            <FaTrash className="inline me-2" />
                             حذف الحساب
                         </button>
                     </div>

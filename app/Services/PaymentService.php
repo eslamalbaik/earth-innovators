@@ -92,12 +92,16 @@ class PaymentService extends BaseService
             return '+' . $digits;
         }
 
+        if (strlen($digits) === 12 && str_starts_with($digits, '971')) {
+            return '+' . $digits;
+        }
+
         if (strlen($digits) === 10 && str_starts_with($digits, '05')) {
-            return '+966' . substr($digits, 1);
+            return '+971' . substr($digits, 1);
         }
 
         if (strlen($digits) === 9 && str_starts_with($digits, '5')) {
-            return '+966' . $digits;
+            return '+971' . $digits;
         }
 
         return null;

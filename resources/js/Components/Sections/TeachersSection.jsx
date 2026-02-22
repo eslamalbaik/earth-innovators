@@ -2,6 +2,7 @@ import SectionTitle from '../SectionTitle';
 import { FaStar, FaCheck, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { getInitials, getColorFromName } from '../../utils/imageUtils';
 import { useState } from 'react';
+import { useTranslation, useBackIcon, useForwardIcon } from '@/i18n';
 
 const TeacherImage = ({ teacher }) => {
     const [imageError, setImageError] = useState(false);
@@ -30,27 +31,33 @@ const TeacherImage = ({ teacher }) => {
 };
 
 export default function TeachersSection({
-    title = "أبرز المشاريع الإبداعية",
-    subtitle = "استكشف مشاريع الطلاب المبتكرين في مختلف المجالات والفئات العمرية.",
+    title,
+    subtitle,
     teachers = [],
     onViewAllTeachers,
     onTeacherClick,
     onPreviousClick,
     onNextClick
 }) {
+    const { t } = useTranslation();
+    const BackIcon = useBackIcon();
+    const ForwardIcon = useForwardIcon();
+    
+    const displayTitle = title || t('sections.teachers.title');
+    const displaySubtitle = subtitle || t('sections.teachers.subtitle');
     return (
         <section className="py-16 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center">
                     <SectionTitle
-                        text={title}
+                        text={displayTitle}
                         size="2xl"
                         align="center"
                         className="pb-2"
                     />
 
                     <p className="mb-8 text-lg text-gray-800 max-w-3xl mx-auto leading-relaxed">
-                        {subtitle}
+                        {displaySubtitle}
                     </p>
                 </div>
 
@@ -59,7 +66,7 @@ export default function TeachersSection({
                         <div className="flex gap-6 pb-4 min-w-max lg:min-w-0 lg:grid lg:grid-cols-4 lg:gap-6">
                             {teachers.length === 0 ? (
                                 <div className="col-span-4 text-center py-12">
-                                    <p className="text-gray-600">لا يوجد معلمين متاحين حالياً</p>
+                                    <p className="text-gray-600">{t('sections.teachers.noTeachers')}</p>
                                 </div>
                             ) : (
                                 teachers.map((teacher) => (
@@ -95,7 +102,7 @@ export default function TeachersSection({
                                             <div className="text-sm font-bold text-gray-900 flex items-center ">
                                                 <p className="text-md font-bold text-gray-900 mt-1">{teacher.price}</p>
                                                 <img src="/images/aed-currency(black).svg" alt="currency" className="w-5 h-5" />
-                                                <p className="text-md font-bold text-gray-900">/ ساعة</p>
+                                                <p className="text-md font-bold text-gray-900">{t('common.perHour')}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -110,13 +117,13 @@ export default function TeachersSection({
                                 onClick={onPreviousClick}
                                 className="w-8 h-8 md:w-10 md:h-10 bg-gray-600 hover:bg-gray-700 text-white rounded-lg flex items-center justify-center transition duration-300 shadow-lg"
                             >
-                                <FaArrowRight className="text-sm" />
+                                <BackIcon className="text-sm" />
                             </button>
                             <button
                                 onClick={onNextClick}
                                 className="w-8 h-8 md:w-10 md:h-10 bg-[#A3C042] hover:bg-primary-600 text-white rounded-lg flex items-center justify-center transition duration-300 shadow-lg"
                             >
-                                <FaArrowLeft className="text-sm" />
+                                <ForwardIcon className="text-sm" />
                             </button>
                         </div>
                         <div>
@@ -124,8 +131,8 @@ export default function TeachersSection({
                                 onClick={onViewAllTeachers}
                                 className="bg-[#A3C042] hover:bg-primary-600 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg font-bold text-xs md:text-sm transition duration-300 flex items-center gap-3 shadow-lg"
                             >
-                                عرض جميع المشاريع
-                                <FaArrowLeft className="text-md" />
+                                {t('sections.teachers.viewAllTeachers')}
+                                <ForwardIcon className="text-md" />
                             </button>
                         </div>
                     </div>

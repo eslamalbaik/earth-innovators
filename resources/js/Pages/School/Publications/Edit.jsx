@@ -198,7 +198,7 @@ export default function SchoolPublicationEdit({ auth, publication }) {
                                     type="file"
                                     accept="image/*"
                                     onChange={handleCoverImageChange}
-                                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#A3C042]/10 file:text-[#A3C042] hover:file:bg-[#A3C042]/20"
+                                    className="block w-full text-sm text-gray-500 file:ms-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#A3C042]/10 file:text-[#A3C042] hover:file:bg-[#A3C042]/20"
                                 />
                                 {coverPreview ? (
                                     <div className="mt-4">
@@ -231,7 +231,7 @@ export default function SchoolPublicationEdit({ auth, publication }) {
                                     type="file"
                                     accept=".pdf"
                                     onChange={handleFileChange}
-                                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-legacy-blue/10 file:text-legacy-blue hover:file:bg-legacy-blue/20"
+                                    className="block w-full text-sm text-gray-500 file:ms-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-legacy-blue/10 file:text-legacy-blue hover:file:bg-legacy-blue/20"
                                 />
                                 {fileName && (
                                     <p className="mt-2 text-sm text-gray-600">
@@ -297,12 +297,12 @@ export default function SchoolPublicationEdit({ auth, publication }) {
                             >
                                 {processing ? (
                                     <>
-                                        <FaSpinner className="animate-spin inline-block ml-2" />
+                                        <FaSpinner className="animate-spin inline-block me-2" />
                                         جاري الحفظ...
                                     </>
                                 ) : (
                                     <>
-                                        <FaUpload className="inline-block ml-2" />
+                                        <FaUpload className="inline-block me-2" />
                                         حفظ التغييرات
                                     </>
                                 )}

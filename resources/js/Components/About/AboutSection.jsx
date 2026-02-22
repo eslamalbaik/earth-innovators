@@ -1,10 +1,13 @@
 import SectionTitle from '../SectionTitle';
+import { useTranslation } from '@/i18n';
 
 export default function AboutSection() {
+    const { t } = useTranslation();
+    
     return (
         <div className="text-center">
             <SectionTitle
-                text="من نحن"
+                text={t('about.aboutUs')}
                 size="2xl"
                 align="right"
                 className="pb-6"
@@ -12,13 +15,13 @@ export default function AboutSection() {
 
             <div className="space-y-4 text-gray-800 leading-relaxed">
                 <p className="text-lg">
-                    منصة إرث المبتكرين هي منصة إلكترونية تعليمية تهدف إلى بناء مجتمع من المبتكرين والموهوبين في المؤسسات تعليمية. تعمل على ربط الطلاب المبتكرين مع المعلمين والمشرفين، وتتيح مشاركة المشاريع الإبداعية والمشاركة في التحديات والمسابقات التعليمية.
+                    {t('about.description1')}
                 </p>
                 <p className="text-lg">
-                    توفر المنصة بيئة محفزة للطلاب لعرض مشاريعهم الإبداعية، وتمكن المعلمين من متابعة وتقييم مشاريع الطلاب، وتنظيم تحديبات ومسابقات تعليمية في مجالات متنوعة (علوم، بيني، تراثي، تقني).
+                    {t('about.description2')}
                 </p>
                 <p className="text-lg">
-                    اليوم، نعمل على بناء نظام تحفيزي بالشارات والنقاط والمكافآت، وإصدار الشهادات للمؤسسات تعليمية والطلاب المتميزين، لتحفيز الإبداع والابتكار في المجتمع التعليمي.
+                    {t('about.description3')}
                 </p>
             </div>
         </div>

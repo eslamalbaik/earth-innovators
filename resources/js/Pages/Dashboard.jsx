@@ -1,9 +1,11 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link } from '@inertiajs/react';
+import { useTranslation } from '@/i18n';
 import { FaUsers, FaBookOpen, FaStar, FaDollarSign, FaChartLine, FaCheckCircle, FaClock, FaCreditCard } from 'react-icons/fa';
 import { FaGraduationCap } from 'react-icons/fa6';
 
 export default function Dashboard({ auth, stats, recentBookings, upcomingSessions }) {
+    const { t } = useTranslation();
     const user = auth.user;
 
     // استخدام الإحصائيات من قاعدة البيانات فقط
@@ -43,8 +45,8 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
 
         return (
             <span className={`px-3 py-1 inline-flex items-center text-xs font-semibold rounded-full ${colorClass}`}>
-                {status === 'confirmed' || status === 'approved' ? <FaCheckCircle className="ml-1" /> :
-                    status === 'pending' ? <FaClock className="ml-1" /> : null}
+                {status === 'confirmed' || status === 'approved' ? <FaCheckCircle className="me-1" /> :
+                    status === 'pending' ? <FaClock className="me-1" /> : null}
                 {label}
             </span>
         );
@@ -58,16 +60,16 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
 
             {isStudent && (
                 <>
-                    <div className="bg-gradient-to-r from-blue-400 to-blue-500 rounded-lg shadow-lg p-8 mb-8">
-                        <div className="flex items-center justify-between">
+                    <div className="bg-gradient-to-r from-blue-400 to-blue-500 rounded-lg shadow-lg p-6 md:p-8 mb-8">
+                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                             <div>
-                                <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                                    مرحباً بك، {user.name}
+                                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                                    {t('common.welcomeBack')} {user.name}
                                 </h1>
-                                <p className="text-gray-800 text-lg">تابع حجوزاتك وجلساتك التعليمية</p>
+                                <p className="text-white text-base md:text-lg">{t('dashboard.trackBookings') || 'تابع حجوزاتك وجلساتك التعليمية'}</p>
                             </div>
-                            <div className="bg-white bg-opacity-20 rounded-full p-4">
-                                <FaGraduationCap className="text-6xl text-white" />
+                            <div className="bg-white bg-opacity-20 rounded-full p-4 self-center md:self-auto">
+                                <FaGraduationCap className="text-4xl md:text-6xl text-white" />
                             </div>
                         </div>
                     </div>
@@ -232,7 +234,7 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                                 </div>
                             </div>
                             <div className="flex items-center text-sm text-gray-500">
-                                <FaChartLine className="ml-1" />
+                                <FaChartLine className="me-1" />
                                 <span>المعلمون النشطون</span>
                             </div>
                         </div>
@@ -249,7 +251,7 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                             </div>
                         </div>
                         <div className="flex items-center text-sm text-gray-500">
-                            <FaChartLine className="ml-1" />
+                            <FaChartLine className="me-1" />
                             <span>إجمالي الحجوزات</span>
                         </div>
                     </div>
@@ -268,7 +270,7 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                                 </div>
                             </div>
                             <div className="flex items-center text-sm text-gray-500">
-                                <FaChartLine className="ml-1" />
+                                <FaChartLine className="me-1" />
                                 <span>إجمالي الإيرادات</span>
                             </div>
                         </div>
@@ -285,7 +287,7 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                             </div>
                         </div>
                         <div className="flex items-center text-sm text-gray-500">
-                            <FaChartLine className="ml-1" />
+                            <FaChartLine className="me-1" />
                             <span>متوسط تقييم المعلمين</span>
                         </div>
                     </div>

@@ -9,12 +9,14 @@ import {
     ResponsiveContainer,
     Dot
 } from 'recharts';
+import { useTranslation } from '@/i18n';
 
 /**
  * Custom Dot Component for data points
  */
 const CustomDot = (props) => {
     const { cx, cy, payload } = props;
+    const { t } = useTranslation();
     return (
         <circle
             cx={cx}
@@ -24,7 +26,7 @@ const CustomDot = (props) => {
             stroke="#fff"
             strokeWidth={2}
             className="hover:r-6 transition-all duration-200"
-            aria-label={`${payload.month}: ${payload.value} نقطة`}
+            aria-label={`${payload.month}: ${payload.value} ${t('common.points')}`}
         />
     );
 };
@@ -33,6 +35,7 @@ const CustomDot = (props) => {
  * Custom Tooltip Component
  */
 const CustomTooltip = ({ active, payload, label }) => {
+    const { t } = useTranslation();
     if (active && payload && payload.length) {
         return (
             <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3">
@@ -40,7 +43,7 @@ const CustomTooltip = ({ active, payload, label }) => {
                     {label}
                 </p>
                 <p className="text-sm text-blue-600 font-bold">
-                    {payload[0].value} نقطة
+                    {payload[0].value} {t('common.points')}
                 </p>
             </div>
         );
@@ -55,6 +58,7 @@ const CustomTooltip = ({ active, payload, label }) => {
  * Optimized with memoization and responsive design
  */
 function EngagementChart({ data = [] }) {
+    const { t } = useTranslation();
     // Memoize chart configuration
     const chartConfig = useMemo(() => ({
         lineColor: '#1E3A8A',
@@ -67,23 +71,23 @@ function EngagementChart({ data = [] }) {
     const validData = useMemo(() => {
         if (!Array.isArray(data) || data.length === 0) {
             return [
-                { month: 'يناير', value: 75 },
-                { month: 'فبراير', value: 70 },
-                { month: 'مارس', value: 65 },
-                { month: 'أبريل', value: 68 },
-                { month: 'مايو', value: 75 },
-                { month: 'يونيو', value: 78 },
-                { month: 'يوليو', value: 80 }
+                { month: t('common.months.january'), value: 75 },
+                { month: t('common.months.february'), value: 70 },
+                { month: t('common.months.march'), value: 65 },
+                { month: t('common.months.april'), value: 68 },
+                { month: t('common.months.may'), value: 75 },
+                { month: t('common.months.june'), value: 78 },
+                { month: t('common.months.july'), value: 80 }
             ];
         }
         return data;
-    }, [data]);
+    }, [data, t]);
 
     return (
         <div 
             className="w-full"
             role="img"
-            aria-label="رسم بياني يوضح متوسط نقاط التفاعل الشهري"
+            aria-label={t('dashboard.engagementChartAria')}
         >
             <ResponsiveContainer width="100%" height={300}>
                 <LineChart
@@ -115,7 +119,7 @@ function EngagementChart({ data = [] }) {
                         tickLine={{ stroke: chartConfig.axisColor }}
                         axisLine={{ stroke: chartConfig.axisColor }}
                         label={{ 
-                            value: 'نقاط التفاعل', 
+                            value: t('dashboard.engagementPoints'), 
                             angle: -90, 
                             position: 'insideLeft',
                             style: { textAnchor: 'middle', fill: chartConfig.textColor }

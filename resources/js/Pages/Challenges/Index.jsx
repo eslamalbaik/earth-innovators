@@ -4,8 +4,10 @@ import { FaSearch, FaFilter, FaTrophy, FaTimes, FaUsers, FaCalendar, FaClock, Fa
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import DesktopFooter from '@/Components/Mobile/DesktopFooter';
+import { useTranslation } from '@/i18n';
 
 export default function ChallengesIndex({ auth, challenges, userRole, previousWinners = [], participationConditions = [], categories = [] }) {
+    const { t, language } = useTranslation();
     const [search, setSearch] = useState('');
     const [category, setCategory] = useState('');
     const [challengeType, setChallengeType] = useState('');
@@ -14,36 +16,36 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
 
     // Use categories from database, fallback to default if empty
     const categoriesList = categories && categories.length > 0 ? categories : [
-        { value: '', label: 'الكل' },
-        { value: 'science', label: 'علمي' },
-        { value: 'arts', label: 'فني' },
-        { value: 'technology', label: 'تقني' },
-        { value: 'heritage', label: 'تراثي' },
-        { value: 'environmental', label: 'بيئي' },
+        { value: '', label: t('common.all') || 'الكل' },
+        { value: 'science', label: t('challenges.scientific') || 'علمي' },
+        { value: 'arts', label: t('challenges.technical') || 'فني' },
+        { value: 'technology', label: t('categories.technology') || 'تقني' },
+        { value: 'heritage', label: t('challenges.heritage') || 'تراثي' },
+        { value: 'environmental', label: t('challenges.environmental') || 'بيئي' },
     ];
 
     const challengeTypes = [
-        { value: '', label: 'الكل' },
-        { value: 'cognitive', label: 'تحدّي معرفي' },
-        { value: 'applied', label: 'تحدّي تطبيقي' },
-        { value: 'creative', label: 'تحدّي إبداعي' },
-        { value: 'artistic_creative', label: 'إبداعي فني' },
-        { value: 'collaborative', label: 'تحدّي تعاوني' },
-        { value: 'analytical', label: 'تحليلي' },
-        { value: 'technological', label: 'تكنولوجي' },
-        { value: 'behavioral', label: 'سلوكي' },
-        { value: '60_seconds', label: '60 ثانية' },
-        { value: 'mental_math', label: 'بدون قلم' },
-        { value: 'conversions', label: 'التحويلات' },
-        { value: 'team_fastest', label: 'الفريق الأسرع' },
-        { value: 'build_problem', label: 'ابنِ مسألة' },
+        { value: '', label: t('common.all') || 'الكل' },
+        { value: 'cognitive', label: t('challenges.cognitive') || 'تحدّي معرفي' },
+        { value: 'applied', label: t('challenges.applied') || 'تحدّي تطبيقي' },
+        { value: 'creative', label: t('challenges.creative') || 'تحدّي إبداعي' },
+        { value: 'artistic_creative', label: t('challenges.artisticCreative') || 'إبداعي فني' },
+        { value: 'collaborative', label: t('challenges.collaborative') || 'تحدّي تعاوني' },
+        { value: 'analytical', label: t('challenges.analytical') || 'تحليلي' },
+        { value: 'technological', label: t('challenges.technological') || 'تكنولوجي' },
+        { value: 'behavioral', label: t('challenges.behavioral') || 'سلوكي' },
+        { value: '60_seconds', label: t('challenges.minseconds') || '60 ثانية' },
+        { value: 'mental_math', label: t('challenges.mentalMath') || 'بدون قلم' },
+        { value: 'conversions', label: t('challenges.conversions') || 'التحويلات' },
+        { value: 'team_fastest', label: t('challenges.teamFastest') || 'الفريق الأسرع' },
+        { value: 'build_problem', label: t('challenges.buildProblem') || 'ابنِ مسألة' },
     ];
 
     const statusOptions = [
-        { value: '', label: 'الكل' },
-        { value: 'active', label: 'نشط' },
-        { value: 'upcoming', label: 'قادم' },
-        { value: 'finished', label: 'منتهي' },
+        { value: '', label: t('common.all') || 'الكل' },
+        { value: 'active', label: t('challenges.active') || 'نشط' },
+        { value: 'upcoming', label: t('challenges.upcoming') || 'قادم' },
+        { value: 'finished', label: t('challenges.finished') || 'منتهي' },
     ];
 
     const handleSearch = (e) => {
@@ -86,7 +88,7 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
 
     const getCategoryLabel = (cat) => {
         const found = categoriesList.find((c) => c.value === cat);
-        return found ? found.label : 'أخرى';
+        return found ? found.label : t('categories.other') || 'أخرى';
     };
 
     const getChallengeTypeLabel = (type) => {
@@ -97,7 +99,20 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
     const formatDate = (date) => {
         if (!date) return '';
         const d = new Date(date);
-        const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+        const months = [
+            t('common.january') || 'يناير',
+            t('common.february') || 'فبراير',
+            t('common.march') || 'مارس',
+            t('common.april') || 'أبريل',
+            t('common.may') || 'مايو',
+            t('common.june') || 'يونيو',
+            t('common.july') || 'يوليو',
+            t('common.august') || 'أغسطس',
+            t('common.september') || 'سبتمبر',
+            t('common.october') || 'أكتوبر',
+            t('common.november') || 'نوفمبر',
+            t('common.december') || 'ديسمبر'
+        ];
         return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
     };
 
@@ -106,9 +121,9 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
         const startDate = new Date(challenge.start_date);
         const endDate = new Date(challenge.end_date);
 
-        if (now < startDate) return { label: 'قادم', color: 'bg-blue-100 text-blue-700 border-blue-300', icon: FaClock };
-        if (now > endDate) return { label: 'منتهي', color: 'bg-gray-100 text-gray-700 border-gray-300', icon: FaCalendar };
-        return { label: 'نشط', color: 'bg-green-100 text-green-700 border-green-300', icon: FaTrophy };
+        if (now < startDate) return { label: t('challenges.upcoming') || 'قادم', color: 'bg-blue-100 text-blue-700 border-blue-300', icon: FaClock };
+        if (now > endDate) return { label: t('challenges.finished') || 'منتهي', color: 'bg-gray-100 text-gray-700 border-gray-300', icon: FaCalendar };
+        return { label: t('challenges.active') || 'نشط', color: 'bg-green-100 text-green-700 border-green-300', icon: FaTrophy };
     };
 
     const filteredChallenges = useMemo(() => {
@@ -128,7 +143,7 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                     type="button"
                     onClick={() => setShowFilterModal(true)}
                     className="h-10 w-10 rounded-xl bg-[#A3C042] flex items-center justify-center hover:bg-[#8CA635] transition flex-shrink-0"
-                    aria-label="فلترة"
+                    aria-label={t('challenges.filter')}
                 >
                     <FaFilter className="text-white text-sm" />
                 </button>
@@ -138,8 +153,8 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder="ابحث عن التحديات .."
-                            className="w-full h-10 pr-10 pl-4 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042] text-sm"
+                            placeholder={t('challenges.searchPlaceholder') || 'ابحث عن التحديات ..'}
+                            className="w-full h-10 ps-10 pe-4 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042] text-sm"
                         />
                         <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
                     </div>
@@ -171,7 +186,7 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
 
             {/* Challenges Count */}
             <div className="text-sm text-gray-700">
-                {filteredChallenges.length} تحديات
+                {filteredChallenges.length} {t('challenges.challenges')}
             </div>
 
             {/* Challenges Grid */}
@@ -211,8 +226,8 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                                         {challenge.title || 'تحدي الابتكار'}
                                     </h3>
                                     <div className="text-xs text-gray-600 mb-2 space-y-1">
-                                        {startDate && <div>بداية: {startDate}</div>}
-                                        {endDate && <div>نهاية: {endDate}</div>}
+                                        {startDate && <div>{t('challenges.start')}: {startDate}</div>}
+                                        {endDate && <div>{t('challenges.end')}: {endDate}</div>}
                                     </div>
                                     <div className="flex items-center gap-3 text-xs text-gray-500">
                                         <div className="flex items-center gap-1">
@@ -237,12 +252,12 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                     </div>
                     <p className="text-gray-400 text-sm mb-2">
                         {auth?.user?.role === 'student'
-                            ? 'لا توجد تحديات متاحة لمدرستك حالياً'
+                            ? t('challenges.noChallengesStudent')
                             : auth?.user?.role === 'teacher'
-                                ? 'لا توجد تحديات متاحة لمدرستك أو التي أنشأتها'
+                                ? t('challenges.noChallengesTeacher')
                                 : auth?.user?.role === 'school'
-                                    ? 'لا توجد تحديات متاحة لمدرستك حالياً'
-                                    : 'لا توجد تحديات تطابق معايير البحث'}
+                                    ? t('challenges.noChallengesSchool')
+                                    : t('challenges.noChallenges')}
                     </p>
                     {(search || category || challengeType || filterStatus) && (
                         <button
@@ -250,7 +265,7 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                             onClick={handleClearFilters}
                             className="text-[#A3C042] text-sm font-semibold hover:text-[#8CA635] mt-2"
                         >
-                            عرض كل التحديات
+                            {t('challenges.viewAll')}
                         </button>
                     )}
                 </div>
@@ -262,7 +277,7 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                 <div className="bg-white rounded-2xl border border-gray-100 p-4">
                     <div className="flex items-center gap-2 mb-4">
                         <FaCheckCircle className="text-[#A3C042] text-lg" />
-                        <h3 className="text-sm font-extrabold text-gray-900">شروط المشاركة في التحديات</h3>
+                        <h3 className="text-sm font-extrabold text-gray-900">{t('challenges.participationConditions')}</h3>
                     </div>
                     <div className="space-y-3">
                         {participationConditions.length > 0 ? (
@@ -281,7 +296,7 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                                 );
                             })
                         ) : (
-                            <p className="text-xs text-gray-500 text-center py-2">لا توجد شروط متاحة حالياً</p>
+                            <p className="text-xs text-gray-500 text-center py-2">{t('challenges.noConditions')}</p>
                         )}
                     </div>
                 </div>
@@ -290,7 +305,7 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                 <div className="bg-white rounded-2xl border border-gray-100 p-4">
                     <div className="flex items-center gap-2 mb-4">
                         <FaTrophy className="text-yellow-500 text-lg" />
-                        <h3 className="text-sm font-extrabold text-gray-900">الفائزون السابقون</h3>
+                        <h3 className="text-sm font-extrabold text-gray-900">{t('challenges.previousWinners')}</h3>
                     </div>
                     <div className="space-y-4">
                         {previousWinners.length > 0 ? (
@@ -327,7 +342,7 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                                                 )}
                                                 {winner.points > 0 && (
                                                     <span className="px-2 py-1 rounded-full text-[10px] font-semibold border bg-blue-100 text-blue-700 border-blue-300">
-                                                        {winner.points} نقطة
+                                                        {winner.points} {t('challenges.points')}
                                                     </span>
                                                 )}
                                             </div>
@@ -336,7 +351,7 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                                 );
                             })
                         ) : (
-                            <p className="text-xs text-gray-500 text-center py-4">لا توجد فائزين سابقين حالياً</p>
+                            <p className="text-xs text-gray-500 text-center py-4">{t('challenges.noWinners')}</p>
                         )}
                     </div>
                     <button
@@ -344,7 +359,7 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                         onClick={() => router.visit('/challenges/winners')}
                         className="mt-4 w-full text-center text-xs font-semibold text-[#A3C042] hover:text-[#8CA635] transition"
                     >
-                        عرض جميع الفائزين
+                        {t('challenges.viewAllWinners')}
                     </button>
                 </div>
             </div>
@@ -371,13 +386,13 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
     );
 
     return (
-        <div dir="rtl" className="min-h-screen bg-gray-50">
-            <Head title="التحديات - إرث المبتكرين" />
+        <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
+            <Head title={t('challenges.allChallenges') + ' - ' + t('common.appName')} />
 
             {/* Mobile View */}
             <div className="block md:hidden">
                 <MobileTopBar
-                    title="إرث المبتكرين"
+                    title={t('common.appName')}
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
                     onBack={() => router.visit('/')}
@@ -391,7 +406,7 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
             {/* Desktop View */}
             <div className="hidden md:block">
                 <MobileTopBar
-                    title="إرث المبتكرين"
+                    title={t('common.appName')}
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
                     onBack={() => router.visit('/')}
@@ -414,11 +429,11 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                                 type="button"
                                 onClick={() => setShowFilterModal(false)}
                                 className="text-gray-700 text-xl leading-none"
-                                aria-label="إغلاق"
+                                aria-label={t('common.close')}
                             >
                                 <FaTimes />
                             </button>
-                            <div className="text-sm font-extrabold text-gray-900">خيارات الفلترة</div>
+                            <div className="text-sm font-extrabold text-gray-900">{t('challenges.filterOptions')}</div>
                             <div className="w-6" />
                         </div>
 
@@ -426,7 +441,7 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                         <div className="p-4 space-y-6 max-h-[70vh] overflow-y-auto">
                             {/* Status Filter */}
                             <div>
-                                <div className="text-sm font-bold text-gray-900 mb-3">الحالة</div>
+                                <div className="text-sm font-bold text-gray-900 mb-3">{t('challenges.status')}</div>
                                 <div className="grid grid-cols-2 gap-2">
                                     {statusOptions.map((status) => (
                                         <button
@@ -446,7 +461,7 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
 
                             {/* Challenge Type Filter */}
                             <div>
-                                <div className="text-sm font-bold text-gray-900 mb-3">نوع التحدي</div>
+                                <div className="text-sm font-bold text-gray-900 mb-3">{t('challenges.challengeType')}</div>
                                 <div className="grid grid-cols-2 gap-2">
                                     {challengeTypes.map((type) => (
                                         <button
@@ -472,7 +487,7 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                                 onClick={handleApplyFilters}
                                 className="w-full rounded-xl bg-[#A3C042] py-3 text-sm font-bold text-white hover:bg-[#8CA635] transition"
                             >
-                                تطبيق الفلاتر
+                                {t('challenges.applyFilters')}
                             </button>
                         </div>
                     </div>

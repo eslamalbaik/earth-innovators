@@ -235,7 +235,7 @@ export default function UsersShow({ user, contributions, auth }) {
                                     </div>
                                     <div className="mb-3">
                                         <span className="text-2xl font-bold text-gray-900">{contributions.badges.total}</span>
-                                        <span className="text-sm text-gray-600 mr-2">شارة</span>
+                                        <span className="text-sm text-gray-600 ms-2">شارة</span>
                                     </div>
                                     {contributions.badges.list && contributions.badges.list.length > 0 && (
                                         <div className="space-y-2 max-h-32 overflow-y-auto">

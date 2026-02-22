@@ -56,12 +56,12 @@ export default function PackagesSection({ packages = [] }) {
                                     }`}
                             >
                                 {isPopular && (
-                                    <div className="absolute top-0 left-0 right-0 bg-[#A3C042] text-white text-center py-2 font-bold text-sm">
+                                    <div className="absolute top-0 end-0 start-0 bg-[#A3C042] text-white text-center py-2 font-bold text-sm">
                                         ⭐ الأكثر شعبية
                                     </div>
                                 )}
                                 {isFree && (
-                                    <div className="absolute top-0 right-0 bg-green-500 text-white px-3 py-1 rounded-bl-lg font-bold text-xs">
+                                    <div className="absolute top-0 start-0 bg-green-500 text-white px-3 py-1 rounded-bl-lg font-bold text-xs">
                                         مجاني
                                     </div>
                                 )}

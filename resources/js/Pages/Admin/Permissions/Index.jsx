@@ -121,7 +121,7 @@ export default function PermissionsIndex({ adminUsers, stats, filters, auth }) {
                                     onChange={(e) => setSearch(e.target.value)}
                                     onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                                     placeholder="ابحث بالاسم أو البريد الإلكتروني..."
-                                    className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
                             </div>
                         </div>
@@ -246,7 +246,7 @@ export default function PermissionsIndex({ adminUsers, stats, filters, auth }) {
                             {adminUsers.links[adminUsers.links.length - 1].url && (
                                 <Link
                                     href={adminUsers.links[adminUsers.links.length - 1].url}
-                                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                    className="me-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                 >
                                     التالي
                                 </Link>

@@ -124,7 +124,7 @@ export default function Reviews({ reviews, auth }) {
                             placeholder="البحث في التقييمات..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pr-12 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                            className="w-full ps-12 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
                         />
                     </div>
                     <select
@@ -199,7 +199,7 @@ export default function Reviews({ reviews, auth }) {
                                                 </p>
                                                 <div className="flex items-center gap-1 mb-3">
                                                     {renderStars(Math.round(review.rating))}
-                                                    <span className="text-sm font-medium text-gray-900 mr-2">{review.rating}/5</span>
+                                                    <span className="text-sm font-medium text-gray-900 ms-2">{review.rating}/5</span>
                                                 </div>
                                                 <p className="text-gray-700 leading-relaxed mb-3">{review.comment}</p>
                                                 {review.teacher_response && (

@@ -1,10 +1,13 @@
 import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { FaBars, FaUser, FaCog, FaSignOutAlt, FaHome, FaUsers, FaBook, FaCalendar, FaChartBar, FaFileAlt, FaTrophy, FaCreditCard, FaShieldAlt } from 'react-icons/fa';
+import { useSelector } from 'react-redux';
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import LanguageSwitcher from '@/Components/LanguageSwitcher';
 
 export default function AdminLayout({ children, title = 'لوحة الإدارة' }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const { dir } = useSelector((state) => state.language);
 
     const navigation = [
         { name: 'لوحة التحكم', href: '/admin/dashboard', icon: FaHome },
@@ -21,9 +24,9 @@ export default function AdminLayout({ children, title = 'لوحة الإدارة
     ];
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50" dir={dir}>
             <Head title={title} />
-            <div className={`fixed inset-y-0 right-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : 'translate-x-full'
+            <div className={`fixed inset-y-0 start-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : 'translate-x-full'
                 } lg:translate-x-0 lg:static lg:inset-0`}>
                 <div className="flex flex-col items-center justify-center h-20 px-6 border-b border-gray-200 relative">
                     <button
@@ -51,7 +54,7 @@ export default function AdminLayout({ children, title = 'لوحة الإدارة
                                     href={item.href}
                                     className="group flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 hover:text-gray-900 transition duration-200"
                                 >
-                                    <Icon className="ml-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" />
+                                    <Icon className="me-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" />
                                     {item.name}
                                 </a>
                             );
@@ -60,7 +63,7 @@ export default function AdminLayout({ children, title = 'لوحة الإدارة
                 </nav>
             </div>
 
-            <div className="lg:pr-64">
+            <div className="lg:ps-64">
                 <div className="bg-white shadow-sm border-b border-gray-200">
                     <div className="flex items-center justify-between h-16 px-6">
                         <button
@@ -71,6 +74,7 @@ export default function AdminLayout({ children, title = 'لوحة الإدارة
                         </button>
 
                         <div className="flex items-center space-x-4">
+                            <LanguageSwitcher />
                             <div className="relative">
                                 <button className="flex items-center space-x-2 text-gray-700 hover:text-gray-900">
                                     <FaUser className="h-5 w-5" />

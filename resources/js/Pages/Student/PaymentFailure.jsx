@@ -23,7 +23,7 @@ export default function PaymentFailure({ payment }) {
                         <p>فشل الدفع والحجز</p>
                         <button
                             onClick={() => setShowToast(false)}
-                            className="ml-4 text-white hover:text-gray-200"
+                            className="me-4 text-white hover:text-gray-200"
                         >
                             <FaTimes />
                         </button>

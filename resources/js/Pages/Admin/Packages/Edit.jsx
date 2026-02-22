@@ -271,7 +271,7 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                     onChange={(e) => setData('certificate_access', e.target.checked)}
                                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                                 />
-                                <label className="mr-2 text-sm font-medium text-gray-700">
+                                <label className="ms-2 text-sm font-medium text-gray-700">
                                     الوصول إلى الشهادات
                                 </label>
                             </div>
@@ -283,7 +283,7 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                     onChange={(e) => setData('badge_access', e.target.checked)}
                                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                                 />
-                                <label className="mr-2 text-sm font-medium text-gray-700">
+                                <label className="ms-2 text-sm font-medium text-gray-700">
                                     الوصول إلى الشارات
                                 </label>
                             </div>
@@ -295,7 +295,7 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                     onChange={(e) => setData('is_active', e.target.checked)}
                                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                                 />
-                                <label className="mr-2 text-sm font-medium text-gray-700">
+                                <label className="ms-2 text-sm font-medium text-gray-700">
                                     نشط
                                 </label>
                             </div>
@@ -307,7 +307,7 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                     onChange={(e) => setData('is_popular', e.target.checked)}
                                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                                 />
-                                <label className="mr-2 text-sm font-medium text-gray-700">
+                                <label className="ms-2 text-sm font-medium text-gray-700">
                                     شائع
                                 </label>
                             </div>

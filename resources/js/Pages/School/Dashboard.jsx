@@ -1,6 +1,7 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 import { Head, Link, router } from '@inertiajs/react';
+import { useTranslation } from '@/i18n';
 import {
     FaProjectDiagram, FaTrophy, FaMedal, FaChartLine, FaUsers,
     FaCheckCircle, FaTimesCircle, FaClock, FaFlask, FaRocket,
@@ -9,6 +10,7 @@ import {
 import { toHijriDate } from '@/utils/dateUtils';
 
 export default function SchoolDashboard({ auth, stats = {}, pendingProjects = [], recentApprovedProjects = [] }) {
+    const { t } = useTranslation();
     const user = auth.user;
     const { confirm } = useConfirmDialog();
 
@@ -67,30 +69,30 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
             <Head title="لوحة تحكم المدرسة - إرث المبتكرين" />
 
             {/* Welcome Card */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-8">
-                <div className="flex items-center justify-between">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 mb-8">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold mb-2 text-gray-900">مرحباً بك، {user.name} 👋</h1>
-                        <p className="text-gray-600 text-lg">إدارة مشاريع طلابك ومتابعة إنجازاتهم</p>
+                        <h1 className="text-2xl md:text-3xl font-bold mb-2 text-gray-900">{t('common.welcomeBack')} {user.name}</h1>
+                        <p className="text-gray-600 text-base md:text-lg">{t('dashboard.manageStudentProjects') || 'إدارة مشاريع طلابك ومتابعة إنجازاتهم'}</p>
                         {stats.rank && (
-                            <div className="mt-4 flex items-center gap-4">
+                            <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
                                 <div className="bg-blue-50 rounded-xl px-4 py-2 border border-blue-100">
                                     <div className="flex items-center gap-2">
                                         <FaTrophy className="text-yellow-500" />
-                                        <span className="font-semibold text-gray-900">الترتيب: {stats.rank} من {stats.totalSchools}</span>
+                                        <span className="font-semibold text-gray-900">{t('dashboard.rank') || 'الترتيب'}: {stats.rank} {t('dashboard.from') || 'من'} {stats.totalSchools}</span>
                                     </div>
                                 </div>
                                 <div className="bg-green-50 rounded-xl px-4 py-2 border border-green-100">
                                     <div className="flex items-center gap-2">
                                         <FaStar className="text-yellow-500" />
-                                        <span className="font-semibold text-gray-900">إجمالي النقاط: {stats.totalPoints || 0}</span>
+                                        <span className="font-semibold text-gray-900">{t('dashboard.totalPoints') || 'إجمالي النقاط'}: {stats.totalPoints || 0}</span>
                                     </div>
                                 </div>
                             </div>
                         )}
                     </div>
-                    <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
-                        <FaUsers className="text-6xl text-gray-400" />
+                    <div className="bg-gray-50 rounded-2xl p-4 md:p-6 border border-gray-100 self-center md:self-auto">
+                        <FaUsers className="text-4xl md:text-6xl text-gray-400" />
                     </div>
                 </div>
             </div>
@@ -213,7 +215,7 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                                             <p className="text-sm text-gray-600 mb-2">الطالب: {project.student_name}</p>
                                             <p className="text-xs text-gray-500">تاريخ الإرسال: {toHijriDate(project.created_at)}</p>
                                         </div>
-                                        <div className="flex items-center gap-2 mr-4">
+                                        <div className="flex items-center gap-2 ms-4">
                                             <button
                                                 onClick={() => handleApprove(project.id, project.title)}
                                                 className="bg-[#A3C042] hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center gap-2 shadow-md"

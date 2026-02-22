@@ -8,28 +8,17 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Head, Link, useForm, usePage, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaPhone, FaChevronDown, FaExclamationTriangle, FaTimes, FaSchool, FaUserGraduate, FaChalkboardTeacher, FaUniversity } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
-const DEFAULT_DIAL_CODE = '+966';
+const DEFAULT_DIAL_CODE = '+971';
 
 // قائمة مقدمات الدول
 const dialCodeOptions = [
-    // الدول الخليجية
-    { value: '+966', label: '+966 (السعودية)', flag: '🇸🇦' },
-    // { value: '+971', label: '+971 (الإمارات)', flag: '🇦🇪' },
-    // { value: '+973', label: '+973 (البحرين)', flag: '🇧🇭' },
-    // { value: '+974', label: '+974 (قطر)', flag: '🇶🇦' },
-    // { value: '+965', label: '+965 (الكويت)', flag: '🇰🇼' },
-    // { value: '+968', label: '+968 (عمان)', flag: '🇴🇲' },
-    // // بلاد الشام
-    // { value: '+970', label: '+970 (فلسطين)', flag: '🇵🇸' },
-    // { value: '+963', label: '+963 (سوريا)', flag: '🇸🇾' },
-    // { value: '+964', label: '+964 (العراق)', flag: '🇮🇶' },
-    // // مصر والأردن
-    // { value: '+20', label: '+20 (مصر)', flag: '🇪🇬' },
-    // { value: '+962', label: '+962 (الأردن)', flag: '🇯🇴' },
+    { value: '+971', label: '+971 (الإمارات)', flag: '🇦🇪' },
 ];
 
 export default function Register({ schools = [] }) {
+    const { t, language } = useTranslation();
     const { props } = usePage();
 
     const [showPassword, setShowPassword] = useState(false);
@@ -50,10 +39,10 @@ export default function Register({ schools = [] }) {
     });
 
     const roleOptions = [
-        { key: 'student', label: 'طالب', description: 'إنشاء حساب كطالب', icon: FaUserGraduate },
-        { key: 'teacher', label: 'معلم', description: 'إنشاء حساب كمعلم', icon: FaChalkboardTeacher },
-        { key: 'school', label: 'مدرسة', description: 'إنشاء حساب كمدرسة', icon: FaSchool },
-        { key: 'educational_institution', label: 'مؤسسة تعليمية', description: 'إنشاء حساب كمؤسسة تعليمية', icon: FaUniversity },
+        { key: 'student', label: t('roles.student'), description: t('auth.createAsStudent') || 'إنشاء حساب كطالب', icon: FaUserGraduate },
+        { key: 'teacher', label: t('roles.teacher'), description: t('auth.createAsTeacher') || 'إنشاء حساب كمعلم', icon: FaChalkboardTeacher },
+        { key: 'school', label: t('roles.school'), description: t('auth.createAsSchool') || 'إنشاء حساب كمدرسة', icon: FaSchool },
+        { key: 'educational_institution', label: t('roles.educationalInstitution'), description: t('auth.createAsInstitution') || 'إنشاء حساب كمؤسسة تعليمية', icon: FaUniversity },
     ];
 
     // الحصول على الأخطاء من Inertia (من usePage) أو من state المحلي أو من useForm
@@ -121,13 +110,13 @@ export default function Register({ schools = [] }) {
 
     return (
         <GuestLayout>
-            <Head title="إنشاء حساب" />
-            <div className="flex items-center justify-center sm:px-4">
+            <Head title={t('auth.register')} />
+            <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="flex items-center justify-center sm:px-4">
                 <div className="w-full sm:space-y-8">
                 <div className="relative min-h-screen overflow-hidden bg-white shadow-lg sm:rounded-2xl px-4 py-10 w-[100vw] sm:w-[400px] md:w-[450px] max-w-5xl sm:mx-auto">
                 <form onSubmit={submit} className="space-y-6">
-                            <img src="/images/avatar.svg" alt="avatar" className="absolute -top-24 -left-24 w-48 h-48" />
-                            <img src="/images/avatar1.svg" alt="avatar" className="absolute -bottom-8 right-0 w-28 h-28" />
+                            <img src="/images/avatar.svg" alt="avatar" className="absolute -top-24 -start-24 w-48 h-48" />
+                            <img src="/images/avatar1.svg" alt="avatar" className="absolute -bottom-8 end-0 w-28 h-28" />
                             <div className="flex flex-col items-center">
                                 <div>
                                     <img
@@ -138,7 +127,7 @@ export default function Register({ schools = [] }) {
                                 </div>
                             </div>
                             <div>
-                                <div className='text-xs mb-1 opacity-75'>إنشاء حساب كـ</div>
+                                <div className='text-xs mb-1 opacity-75'>{t('auth.createAccountAs') || 'إنشاء حساب كـ'}</div>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5 md:gap-3">
                                     {roleOptions.map((roleOption) => {
                                         const isActive = data.role === roleOption.key;
@@ -171,7 +160,7 @@ export default function Register({ schools = [] }) {
                             {(data.role === 'student' || data.role === 'teacher') && (
                                 <div>
                                     <div className="relative">
-                                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                             <FaSchool className="h-5 w-5 text-gray-400" />
                                         </div>
                                         {schools && schools.length > 0 ? (
@@ -183,7 +172,7 @@ export default function Register({ schools = [] }) {
                                                 className="block w-full ps-10 pe-3 py-3 border-2 border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-1 sm:text-sm transition-all"
                                                 required
                                             >
-                                                <option value="">اختر مدرستك</option>
+                                                <option value="">{t('auth.selectSchool') || 'اختر مدرستك'}</option>
                                                 {schools.map((school) => (
                                                     <option key={school.id} value={school.id}>
                                                         {school.name}
@@ -192,15 +181,15 @@ export default function Register({ schools = [] }) {
                                             </SelectInput>
                                         ) : (
                                             <div className="block w-full ps-10 pe-3 py-2 border border-red-300 rounded-md shadow-sm bg-red-50 text-red-700 text-sm">
-                                                <p className="font-semibold">تحذير: لا توجد مؤسسات تعليمية مسجلة في النظام</p>
-                                                <p className="text-xs mt-1">يرجى التواصل مع الإدارة لإنشاء حساب مدرسة أولاً</p>
+                                                <p className="font-semibold">{t('auth.noInstitutions') || 'تحذير: لا توجد مؤسسات تعليمية مسجلة في النظام'}</p>
+                                                <p className="text-xs mt-1">{t('auth.contactAdmin') || 'يرجى التواصل مع الإدارة لإنشاء حساب مدرسة أولاً'}</p>
                                             </div>
                                         )}
                                     </div>
                                     <InputError message={errors.school_id} className="mt-2" />
                                     {schools && schools.length === 0 && (
                                         <p className="mt-2 text-sm text-red-600">
-                                            يجب أن تكون هناك مدرسة مسجلة في النظام أولاً. يرجى التواصل مع الإدارة.
+                                            {t('auth.schoolRequired') || 'يجب أن تكون هناك مدرسة مسجلة في النظام أولاً. يرجى التواصل مع الإدارة.'}
                                         </p>
                                     )}
                                 </div>
@@ -210,11 +199,11 @@ export default function Register({ schools = [] }) {
                             {showErrorsAlert && Object.keys(errors).length > 0 && (
                                 <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
                                     <div className="flex items-start justify-between">
-                                        <div className="flex items-start">
-                                            <FaExclamationTriangle className="text-red-500 text-xl mt-0.5 ml-3 flex-shrink-0" />
+                                            <div className="flex items-start">
+                                            <FaExclamationTriangle className="text-red-500 text-xl mt-0.5 me-3 flex-shrink-0" />
                                             <div className="flex-1">
                                                 <h3 className="text-sm font-semibold text-red-800 mb-2">
-                                                    يرجى تصحيح الأخطاء التالية:
+                                                    {t('auth.fixErrors') || 'يرجى تصحيح الأخطاء التالية:'}
                                                 </h3>
                                                 <ul className="list-disc list-inside space-y-1 text-sm text-red-700">
                                                     {Object.entries(errors).map(([key, value]) => {
@@ -246,7 +235,7 @@ export default function Register({ schools = [] }) {
 
                             <div>
                                 <div className="relative">
-                                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                         <FaUser className="h-5 w-5 text-gray-400" />
                                     </div>
                                     <TextInput
@@ -257,7 +246,7 @@ export default function Register({ schools = [] }) {
                                         autoComplete="name"
                                         isFocused={true}
                                         onChange={(e) => setData('name', e.target.value)}
-                                        placeholder="أدخل اسمك الكامل"
+                                        placeholder={t('auth.fullName')}
                                         required
                                     />
                                 </div>
@@ -266,7 +255,7 @@ export default function Register({ schools = [] }) {
 
                             <div>
                                 <div className="relative">
-                                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                         <FaEnvelope className="h-5 w-5 text-gray-400" />
                                     </div>
                                     <TextInput
@@ -277,7 +266,7 @@ export default function Register({ schools = [] }) {
                                         className="block w-full ps-10 pe-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
                                         autoComplete="username"
                                         onChange={(e) => setData('email', e.target.value)}
-                                        placeholder="البريد الإلكتروني"
+                                        placeholder={t('auth.email')}
                                         required
                                     />
                                 </div>
@@ -286,10 +275,10 @@ export default function Register({ schools = [] }) {
 
                             <div>
                                 <div className="relative">
-                                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                         <FaPhone className="h-5 w-5 text-gray-400" />
                                     </div>
-                                    <div className="absolute inset-y-0 left-0 pe-3 flex items-center z-10">
+                                    <div className="absolute inset-y-0 end-0 pe-3 flex items-center z-10">
                                         <div className="relative">
                                             <button
                                                 type="button"
@@ -307,7 +296,7 @@ export default function Register({ schools = [] }) {
                                                         className="fixed inset-0 z-10"
                                                         onClick={() => setShowDialCodeDropdown(false)}
                                                     ></div>
-                                                    <div className="absolute left-0 mt-1 w-56 bg-white border border-gray-300 rounded-md shadow-lg z-20 max-h-60 overflow-y-auto">
+                                                    <div className="absolute end-0 mt-1 w-56 bg-white border border-gray-300 rounded-md shadow-lg z-20 max-h-60 overflow-y-auto">
                                                         {dialCodeOptions.map((option) => (
                                                             <button
                                                                 key={option.value}
@@ -320,7 +309,7 @@ export default function Register({ schools = [] }) {
                                                                     }`}
                                                             >
                                                                 <span className="text-gray-700">{option.label}</span>
-                                                                <span className="text-lg ml-2">{option.flag}</span>
+                                                                <span className="text-lg me-2">{option.flag}</span>
                                                             </button>
                                                         ))}
                                                     </div>
@@ -336,7 +325,7 @@ export default function Register({ schools = [] }) {
                                         className="block w-full ps-20 pe-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
                                         autoComplete="tel"
                                         onChange={handlePhoneInputChange}
-                                        placeholder="رقم الجوال"
+                                        placeholder={t('auth.phoneNumber')}
                                     />
                                 </div>
                                 <InputError
@@ -347,7 +336,7 @@ export default function Register({ schools = [] }) {
 
                             <div>
                                 <div className="relative">
-                                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                         <FaLock className="h-5 w-5 text-gray-400" />
                                     </div>
                                     <TextInput
@@ -358,12 +347,12 @@ export default function Register({ schools = [] }) {
                                         className="block w-full ps-10 pe-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
                                         autoComplete="new-password"
                                         onChange={(e) => setData('password', e.target.value)}
-                                        placeholder="كلمة المرور"
+                                        placeholder={t('auth.password')}
                                         required
                                     />
                                     <button
                                         type="button"
-                                        className="absolute inset-y-0 left-0 pe-3 flex items-center"
+                                        className="absolute inset-y-0 end-0 pe-3 flex items-center"
                                         onClick={() => setShowPassword(!showPassword)}
                                     >
                                         {showPassword ? (
@@ -378,7 +367,7 @@ export default function Register({ schools = [] }) {
 
                             <div>
                                 <div className="relative">
-                                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                         <FaLock className="h-5 w-5 text-gray-400" />
                                     </div>
                                     <TextInput
@@ -389,12 +378,12 @@ export default function Register({ schools = [] }) {
                                         className="block w-full ps-10 pe-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
                                         autoComplete="new-password"
                                         onChange={(e) => setData('password_confirmation', e.target.value)}
-                                        placeholder="تأكيد كلمة المرور"
+                                        placeholder={t('auth.confirmPassword')}
                                         required
                                     />
                                     <button
                                         type="button"
-                                        className="absolute inset-y-0 left-0 pe-3 flex items-center"
+                                        className="absolute inset-y-0 end-0 pe-3 flex items-center"
                                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                                     >
                                         {showConfirmPassword ? (
@@ -417,23 +406,23 @@ export default function Register({ schools = [] }) {
                                 >
                                     {processing ? (
                                         <div className="flex items-center">
-                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                                            جاري إنشاء الحساب...
+                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white ms-2"></div>
+                                            {t('auth.creating') || 'جاري إنشاء الحساب...'}
                                         </div>
                                     ) : (
-                                        'إنشاء حساب'
+                                        t('auth.register')
                                     )}
                                 </PrimaryButton>
                             </div>
 
                             <div className="text-center">
                                 <p className="text-sm text-gray-600">
-                                    لديك حساب بالفعل؟{' '}
+                                    {t('auth.hasAccount') || 'لديك حساب بالفعل؟'}{' '}
                                     <Link
                                         href={route('login')}
                                         className="font-medium text-[#A3C042] hover:text-[#F9D536]"
                                     >
-                                        سجل الدخول
+                                        {t('auth.login')}
                                     </Link>
                                 </p>
                             </div>

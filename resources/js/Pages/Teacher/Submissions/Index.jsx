@@ -47,7 +47,7 @@ export default function TeacherSubmissionsIndex({ auth, submissions }) {
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     placeholder="ابحث عن طالب أو مشروع..."
-                                    className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                             </div>
                         </div>
@@ -108,7 +108,7 @@ export default function TeacherSubmissionsIndex({ auth, submissions }) {
                                             <tr key={submission.id} className="hover:bg-gray-50">
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="flex items-center">
-                                                        <FaUser className="text-gray-400 mr-2" />
+                                                        <FaUser className="text-gray-400 ms-2" />
                                                         <span className="text-sm font-medium text-gray-900">
                                                             {submission.student?.name || 'غير محدد'}
                                                         </span>
@@ -121,7 +121,7 @@ export default function TeacherSubmissionsIndex({ auth, submissions }) {
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="flex items-center text-sm text-gray-500">
-                                                        <FaCalendar className="mr-2" />
+                                                        <FaCalendar className="ms-2" />
                                                         {submission.submitted_at
                                                             ? toHijriDate(submission.submitted_at)
                                                             : '-'}
@@ -130,7 +130,7 @@ export default function TeacherSubmissionsIndex({ auth, submissions }) {
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     {submission.rating ? (
                                                         <div className="flex items-center">
-                                                            <FaStar className="text-yellow-400 mr-1" />
+                                                            <FaStar className="text-yellow-400 ms-1" />
                                                             <span className="text-sm font-medium text-gray-900">
                                                                 {submission.rating}/5
                                                             </span>

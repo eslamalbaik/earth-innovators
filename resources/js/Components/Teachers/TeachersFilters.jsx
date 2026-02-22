@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { FaSearch, FaPlus, FaMinus } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function TeachersFilters({
     filters,
     onFilterChange,
     filterOptions = {}
 }) {
+    const { t } = useTranslation();
     const [expandedSections, setExpandedSections] = useState({
         city: true,
         subject: false,
@@ -104,7 +106,7 @@ export default function TeachersFilters({
                                     );
                                 })
                             ) : (
-                                <p className="text-sm text-gray-500 text-center py-2">لا توجد خيارات متاحة</p>
+                                <p className="text-sm text-gray-500 text-center py-2">{t('teachers.noOptions')}</p>
                             )}
                         </div>
                     </div>
@@ -116,12 +118,12 @@ export default function TeachersFilters({
     return (
         <div className="space-y-4">
             <div>
-                <h2 className="text-md font-bold text-gray-900 mb-2 ">فلترة المعلمين</h2>
+                <h2 className="text-md font-bold text-gray-900 mb-2 ">{t('teachers.filterTeachers')}</h2>
                 <div className="mb-4">
                     <div className="relative border border-gray-300 rounded-lg">
                         <input
                             type="text"
-                            placeholder="ابحث باسم المعلم ..."
+                            placeholder={t('teachers.searchByName')}
                             value={filters.search}
                             onChange={(e) => onFilterChange('search', e.target.value, e.target.value)}
                             className="w-full  text-gray-900 px-3 py-2 pe-10 rounded-lg border-0 focus:ring-2 focus:ring-yellow-400 focus:outline-none "
@@ -131,44 +133,44 @@ export default function TeachersFilters({
                 </div>
             </div>
             <FilterSection
-                title="المدينة"
+                title={t('teachers.city')}
                 sectionKey="city"
                 items={cities}
-                searchPlaceholder="ابحث باسم المدينة ..."
+                searchPlaceholder={t('teachers.searchByCity')}
             />
 
             <FilterSection
-                title="المادة الدراسية"
+                title={t('teachers.subject')}
                 sectionKey="subject"
                 items={subjects}
             />
 
             <FilterSection
-                title="المراحل الدراسية"
+                title={t('teachers.educationalStage')}
                 sectionKey="stage"
                 items={stages}
             />
 
             <FilterSection
-                title="سنوات الخبرة"
+                title={t('teachers.yearsExperience')}
                 sectionKey="experience"
                 items={experienceRanges}
             />
 
             <FilterSection
-                title="السعر لكل ساعة"
+                title={t('teachers.pricePerHour')}
                 sectionKey="price"
                 items={priceRanges}
             />
 
             <FilterSection
-                title="التقييم"
+                title={t('teachers.rating')}
                 sectionKey="rating"
                 items={ratings}
             />
 
             <FilterSection
-                title="عدد الحصص"
+                title={t('teachers.sessionsCount')}
                 sectionKey="sessions"
                 items={sessionRanges}
             />

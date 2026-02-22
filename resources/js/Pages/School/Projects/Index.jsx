@@ -132,7 +132,7 @@ export default function SchoolProjects({ projects, auth }) {
                         </SelectInput>
                     </div>
                     <PrimaryButton type="submit">
-                        <FaSearch className="inline ml-2" />
+                        <FaSearch className="inline me-2" />
                         بحث
                     </PrimaryButton>
                 </form>
@@ -176,7 +176,7 @@ export default function SchoolProjects({ projects, auth }) {
                                                 )}
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2 mr-6">
+                                        <div className="flex items-center gap-2 ms-6">
                                             <Link
                                                 href={`/school/projects/${project.id}`}
                                                 className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center gap-2"

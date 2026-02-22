@@ -316,7 +316,7 @@ export default function StudentReviews({ reviews, reviewableBookings, stats }) {
                                         )}
                                         <div className="flex items-center gap-1 mb-3">
                                             {renderStars(Math.round(review.rating))}
-                                            <span className="text-sm font-medium text-gray-900 mr-2">
+                                            <span className="text-sm font-medium text-gray-900 ms-2">
                                                 {review.rating}/5
                                             </span>
                                         </div>
@@ -444,7 +444,7 @@ export default function StudentReviews({ reviews, reviewableBookings, stats }) {
                                 </label>
                                 <div className="flex items-center gap-2">
                                     {renderStars(data.rating, true, (rating) => setData('rating', rating))}
-                                    <span className="text-sm font-medium text-gray-900 mr-2">
+                                    <span className="text-sm font-medium text-gray-900 ms-2">
                                         {data.rating}/5
                                     </span>
                                 </div>
@@ -526,7 +526,7 @@ export default function StudentReviews({ reviews, reviewableBookings, stats }) {
                                 </label>
                                 <div className="flex items-center gap-2">
                                     {renderStars(editData.rating, true, (rating) => setEditData('rating', rating))}
-                                    <span className="text-sm font-medium text-gray-900 mr-2">
+                                    <span className="text-sm font-medium text-gray-900 ms-2">
                                         {editData.rating}/5
                                     </span>
                                 </div>
@@ -617,7 +617,7 @@ export default function StudentReviews({ reviews, reviewableBookings, stats }) {
                         <p>{toastMessage}</p>
                         <button
                             onClick={() => setShowToast(false)}
-                            className="ml-4 text-white hover:text-gray-200"
+                            className="me-4 text-white hover:text-gray-200"
                         >
                             <FaTimes />
                         </button>

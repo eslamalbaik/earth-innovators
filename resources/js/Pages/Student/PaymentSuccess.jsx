@@ -23,7 +23,7 @@ export default function PaymentSuccess({ payment }) {
                         <p>تم الدفع والحجز بنجاح!</p>
                         <button
                             onClick={() => setShowToast(false)}
-                            className="ml-4 text-white hover:text-gray-200"
+                            className="me-4 text-white hover:text-gray-200"
                         >
                             <FaTimes />
                         </button>

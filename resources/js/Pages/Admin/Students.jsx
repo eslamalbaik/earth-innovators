@@ -58,7 +58,7 @@ export default function Students({ auth, students, bookings }) {
                             <input
                                 type="text"
                                 placeholder="البحث عن طالب..."
-                                className="w-full pr-12 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                                className="w-full ps-12 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
                             />
                         </div>
                         <select className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400">

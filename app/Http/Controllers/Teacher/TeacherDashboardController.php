@@ -37,7 +37,7 @@ class TeacherDashboardController extends Controller
                     'stages' => json_encode([]),
                     'experience_years' => 0,
                     'price_per_hour' => 0,
-                    'nationality' => 'سعودي',
+                    'nationality' => 'إماراتي',
                     'gender' => null,
                     'neighborhoods' => json_encode([]),
                     'is_verified' => true,

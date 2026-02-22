@@ -99,7 +99,7 @@ export default function ShowSchoolProject({ project, auth }) {
                                 <h1 className="text-3xl font-bold text-gray-900 mb-3">{project.title}</h1>
                                 <div className="flex items-center gap-3 flex-wrap">
                                     <span className={`px-3 py-1 rounded-full text-sm font-semibold ${categoryColors[project.category] || categoryColors.other}`}>
-                                        <FaTag className="inline ml-1" />
+                                        <FaTag className="inline me-1" />
                                         {categoryLabels[project.category] || 'أخرى'}
                                     </span>
                                     {statusLabels[project.status] && (

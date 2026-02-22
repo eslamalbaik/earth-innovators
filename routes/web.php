@@ -14,6 +14,7 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 // Serve storage files directly (MUST be first to catch storage requests before other routes)
@@ -101,8 +102,8 @@ $landingLogic = function () {
     });
 
     $membershipCertificate = null;
-    if (auth()->check()) {
-        $user = auth()->user();
+    if (Auth::check()) {
+        $user = Auth::user();
         $membershipCertificateService = app(\App\Services\MembershipCertificateService::class);
         $certificate = $membershipCertificateService->getUserMembershipCertificate($user->id, $user->role);
         if ($certificate) {
@@ -477,7 +478,7 @@ Route::get('/contact', function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
-        $user = auth()->user();
+        $user = Auth::user();
 
         // إعادة توجيه الأدمن مباشرة إلى لوحة التحكم الخاصة بهم
         if ($user->isAdmin()) {
@@ -500,7 +501,7 @@ Route::middleware(['auth'])->group(function () {
                         'stages' => json_encode([]),
                         'experience_years' => 0,
                         'price_per_hour' => 0,
-                        'nationality' => 'سعودي',
+                        'nationality' => 'إماراتي',
                         'gender' => null,
                         'neighborhoods' => json_encode([]),
                         'is_verified' => true, // معتمد تلقائياً

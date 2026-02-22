@@ -1,19 +1,26 @@
 import { Link } from '@inertiajs/react';
 import { FaBook, FaFileAlt, FaHeart, FaArrowLeft, FaNewspaper } from 'react-icons/fa';
 import { getPublicationImageUrl } from '../../utils/imageUtils';
+import { useTranslation, useForwardIcon } from '@/i18n';
 
 export default function PublicationsSection({
-    title = "الإصدارات",
-    subtitle = "اكتشف محتوى مبتكر من الطلاب والمعلمين: مجلات، كتيبات وتقارير تعرض إبداع مؤسسات تعليميةنا.",
+    title,
+    subtitle,
     publications = [],
     viewAllLink = "/publications",
     compact = false
 }) {
+    const { t } = useTranslation();
+    const ForwardIcon = useForwardIcon();
+    
+    const displayTitle = title || t('sections.publications.title');
+    const displaySubtitle = subtitle || t('sections.publications.subtitle');
+    
     const getTypeLabel = (type) => {
         const labels = {
-            magazine: 'مجلة',
-            booklet: 'كتيب',
-            report: 'تقرير',
+            magazine: t('sections.publications.types.magazine'),
+            booklet: t('sections.publications.types.booklet'),
+            report: t('sections.publications.types.report'),
         };
         return labels[type] || type;
     };
@@ -26,7 +33,20 @@ export default function PublicationsSection({
     const formatDate = (date) => {
         if (!date) return '';
         const d = new Date(date);
-        const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+        const months = [
+            t('common.months.january'), 
+            t('common.months.february'), 
+            t('common.months.march'), 
+            t('common.months.april'), 
+            t('common.months.may'), 
+            t('common.months.june'), 
+            t('common.months.july'), 
+            t('common.months.august'), 
+            t('common.months.september'), 
+            t('common.months.october'), 
+            t('common.months.november'), 
+            t('common.months.december')
+        ];
         return `${d.getFullYear()} ${months[d.getMonth()]}`;
     };
 
@@ -41,19 +61,19 @@ export default function PublicationsSection({
                     <div className="w-10 h-10 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-xl flex items-center justify-center">
                         <FaNewspaper className="text-[#A3C042] text-xl" />
                     </div>
-                    <h2 className="text-xl md:text-2xl font-bold text-gray-900">{title}</h2>
+                    <h2 className="text-xl md:text-2xl font-bold text-gray-900">{displayTitle}</h2>
                 </div>
                 <Link
                     href={viewAllLink}
                     className="flex items-center gap-2 text-sm md:text-base text-gray-600 hover:text-[#A3C042] transition font-semibold"
                 >
-                    <span className="hidden md:inline">عرض الكل</span>
-                    <FaArrowLeft className="text-xs" />
+                    <span className="hidden md:inline">{t('common.viewAll')}</span>
+                    <ForwardIcon className="text-xs" />
                 </Link>
             </div>
 
             <p className="text-sm md:text-base text-gray-700 leading-relaxed mb-6">
-                {subtitle}
+                {displaySubtitle}
             </p>
 
             {/* Publications Grid */}
@@ -72,7 +92,7 @@ export default function PublicationsSection({
                                     className="w-full h-48 md:h-64 object-cover"
                                 />
                                 <div className="absolute top-3 right-3 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
-                                    جديد
+                                    {t('common.new')}
                                 </div>
                                 <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm text-gray-800 px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5">
                                     <TypeIcon className="text-xs" />
@@ -86,7 +106,7 @@ export default function PublicationsSection({
                                 <h3 className="text-base md:text-lg font-bold text-gray-900 mb-2 line-clamp-2">
                                     {publication.title}
                                     {publication.issue_number && (
-                                        <span className="text-gray-600 font-normal"> - العدد {publication.issue_number}</span>
+                                        <span className="text-gray-600 font-normal"> - {t('sections.publications.issue')} {publication.issue_number}</span>
                                     )}
                                 </h3>
 
@@ -124,7 +144,7 @@ export default function PublicationsSection({
                                                 className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition text-xs md:text-sm font-semibold"
                                             >
                                                 <FaFileAlt className="text-xs" />
-                                                تحميل
+                                                {t('common.download')}
                                             </a>
                                         )}
                                         {publication.content && (
@@ -133,7 +153,7 @@ export default function PublicationsSection({
                                                 className="flex items-center gap-1.5 px-3 py-1.5 bg-[#A3C042]/10 text-[#A3C042] rounded-lg hover:bg-[#A3C042]/20 transition text-xs md:text-sm font-semibold"
                                             >
                                                 <FaBook className="text-xs" />
-                                                قراءة
+                                                {t('common.read')}
                                             </Link>
                                         )}
                                     </div>
@@ -156,8 +176,8 @@ export default function PublicationsSection({
                     href={viewAllLink}
                     className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#A3C042] to-[#8CA635] text-white rounded-xl hover:opacity-90 transition shadow-lg font-bold text-sm md:text-base"
                 >
-                    عرض جميع الإصدارات
-                    <FaArrowLeft className="text-xs" />
+                    {t('sections.publications.viewAllPublications')}
+                    <ForwardIcon className="text-xs" />
                 </Link>
             </div>
         </div>

@@ -1,6 +1,7 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
+import { useTranslation } from '@/i18n';
 import {
     FaStar,
     FaCheckCircle,
@@ -14,6 +15,7 @@ import {
 import { getUserImageUrl, getInitials, getColorFromName } from '@/utils/imageUtils';
 
 export default function TeacherReviews({ reviews, stats, teacher }) {
+    const { t } = useTranslation();
     const [replyingTo, setReplyingTo] = useState(null);
     const { data: replyData, setData: setReplyData, post: postReply, processing: isReplying, reset: resetReply } = useForm({
         teacher_response: ''
@@ -49,15 +51,15 @@ export default function TeacherReviews({ reviews, stats, teacher }) {
             <Head title="التقييمات" />
 
             <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-lg shadow-lg p-6 mb-6">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <div>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                            مرحباً بك، {teacher.name}
+                        <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">
+                            {t('common.welcomeBack')} {teacher.name}
                         </h2>
-                        <p className="text-gray-800">إدارة تقييمات الطلاب</p>
+                        <p className="text-gray-800 text-base">{t('dashboard.manageReviews') || 'إدارة تقييمات الطلاب'}</p>
                     </div>
-                    <div className="bg-white bg-opacity-20 rounded-full p-4">
-                        <FaStar className="text-5xl text-white" />
+                    <div className="bg-white bg-opacity-20 rounded-full p-3 md:p-4 self-center md:self-auto">
+                        <FaStar className="text-4xl md:text-5xl text-white" />
                     </div>
                 </div>
             </div>
@@ -174,7 +176,7 @@ export default function TeacherReviews({ reviews, stats, teacher }) {
                                         )}
                                         <div className="flex items-center gap-1 mb-3">
                                             {renderStars(Math.round(review.rating))}
-                                            <span className="text-sm font-medium text-gray-900 mr-2">
+                                            <span className="text-sm font-medium text-gray-900 ms-2">
                                                 {review.rating}/5
                                             </span>
                                         </div>

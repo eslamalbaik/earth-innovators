@@ -1,5 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { FaProjectDiagram, FaUsers, FaTrophy, FaRocket, FaArrowLeft, FaCheckCircle, FaBook, FaMedal, FaChartLine, FaCertificate, FaDownload } from 'react-icons/fa';
+import { FaProjectDiagram, FaUsers, FaTrophy, FaRocket, FaArrowLeft, FaCheckCircle, FaBook, FaMedal, FaChartLine, FaCertificate, FaDownload, FaArrowRight } from 'react-icons/fa';
+import { useSelector } from 'react-redux';
+import { useTranslation, useForwardIcon } from '@/i18n';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import MobileAppLayout from '@/Layouts/MobileAppLayout';
@@ -24,6 +26,24 @@ export default function Landing({
 }) {
     const user = auth?.user || null;
     const isAuthed = !!user;
+    const { dir } = useSelector((state) => state.language);
+    const { t, language } = useTranslation();
+    const ForwardIcon = useForwardIcon();
+
+    // Translate stat labels from backend
+    const getStatLabel = (label) => {
+        const labelMap = {
+            'طالب': t('about.stats.student'),
+            'معلم': t('about.stats.teacher'),
+            'جلسة ناجحة': t('about.stats.session'),
+            'التقييم المتوسط': t('about.stats.rating'),
+            'Student': t('about.stats.student'),
+            'Teacher': t('about.stats.teacher'),
+            'Successful Session': t('about.stats.session'),
+            'Average Rating': t('about.stats.rating'),
+        };
+        return labelMap[label] || label;
+    };
 
     const handleStartJourney = () => {
         if (isAuthed) {
@@ -50,44 +70,44 @@ export default function Landing({
 
     const getCategoryLabel = (category) => {
         const categories = {
-            'science': 'علوم',
-            'technology': 'تقنية',
-            'engineering': 'هندسة',
-            'mathematics': 'رياضيات',
-            'arts': 'فنون',
-            'other': 'أخرى'
+            'science': t('categories.science'),
+            'technology': t('categories.technology'),
+            'engineering': t('categories.engineering'),
+            'mathematics': t('categories.mathematics'),
+            'arts': t('categories.arts'),
+            'other': t('categories.other')
         };
-        return categories[category] || 'أخرى';
+        return categories[category] || t('categories.other');
     };
 
     const whyChooseBenefits = [
         {
-            title: 'بيئة محفزة للإبداع',
-            description: 'منصة شاملة توفر جميع الأدوات والموارد اللازمة للطلاب لعرض مشاريعهم الإبداعية والمشاركة في التحديات التعليمية.'
+            title: t('features.creativeEnvironment'),
+            description: t('features.creativeEnvironmentDesc')
         },
         {
-            title: 'نظام تحفيزي متكامل',
-            description: 'احصل على الشارات والنقاط والمكافآت عند تحقيق الإنجازات والمشاركة في التحديات والمسابقات التعليمية.'
+            title: t('features.incentiveSystem'),
+            description: t('features.incentiveSystemDesc')
         },
         {
-            title: 'متابعة من المعلمين',
-            description: 'تقييم ومتابعة من قبل المعلمين والمشرفين للمساعدة في تطوير المشاريع وتحسين الأداء.'
+            title: t('features.teacherFollowUp'),
+            description: t('features.teacherFollowUpDesc')
         },
         {
-            title: 'شهادات تقدير',
-            description: 'احصل على شهادات تقدير للمؤسسات تعليمية والطلاب المتميزين في الابتكار والإبداع.'
+            title: t('features.certificates'),
+            description: t('features.certificatesDesc')
         }
     ];
 
     return (
-        <div dir="rtl" className="min-h-screen bg-gray-50">
-            <Head title="إرث المبتكرين - منصة الإبداع والابتكار" />
+        <div dir={dir} className="min-h-screen bg-gray-50">
+            <Head title={t('header.appName') + ' - ' + t('hero.subtitle')} />
 
             {/* Mobile View */}
             <div className="block md:hidden">
                 <MobileAppLayout
                     auth={auth}
-                    title="إرث المبتكرين"
+                    title={t('header.appName')}
                     activeNav="home"
                     unreadCount={isAuthed ? (auth?.unreadCount || 0) : 0}
                     onNotifications={() => router.visit(isAuthed ? '/notifications' : '/login')}
@@ -129,20 +149,20 @@ export default function Landing({
                             </div>
                         )}
                         {/* Hero Section */}
-                        <div className="bg-gradient-to-br from-[#A3C042] to-[#8CA635] rounded-3xl p-6 text-white relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+                        <div dir={dir} className="bg-gradient-to-br from-[#A3C042] to-[#8CA635] rounded-3xl p-6 text-white relative overflow-hidden">
+                            <div className={`absolute top-0 ${dir === 'rtl' ? 'start-0' : 'end-0'} w-32 h-32 bg-white/10 rounded-full ${dir === 'rtl' ? '-ms-16 -mt-16' : '-me-16 -mt-16'} blur-2xl`}></div>
                             <div className="relative z-10">
                                 <h1 className="text-2xl font-extrabold mb-3 leading-tight">
-                                    نحن معا نحو التقدم والتطور
+                                    {t('hero.title')}
                                 </h1>
                                 <p className="text-white/90 text-sm mb-4">
-                                    مشاريع إبداعية في كل المجالات
+                                    {t('hero.subtitle')}
                                 </p>
                                 <button
                                     onClick={handleStartJourney}
                                     className="bg-white text-[#A3C042] px-6 py-3 rounded-xl font-bold text-sm hover:bg-gray-100 transition shadow-lg"
                                 >
-                                    {isAuthed ? 'اذهب إلى لوحة التحكم' : 'ابدأ رحلتك معنا'}
+                                    {isAuthed ? t('hero.goToDashboard') : t('hero.startJourney')}
                                 </button>
                             </div>
                         </div>
@@ -150,7 +170,7 @@ export default function Landing({
                         {/* Stats Section */}
                         {stats && stats.length > 0 && (
                             <div className="bg-white rounded-2xl border border-gray-100 p-4">
-                                <h2 className="text-lg font-bold text-gray-900 mb-4 text-center">أرقام تثبت نجاحنا!</h2>
+                                <h2 className="text-lg font-bold text-gray-900 mb-4 text-center">{t('stats.successNumbers')}</h2>
                                 <div className="grid grid-cols-2 gap-4">
                                     {stats.map((stat, index) => (
                                         <div key={index} className="text-center">
@@ -158,7 +178,7 @@ export default function Landing({
                                                 {stat.value || '0'}
                                             </div>
                                             <div className="text-xs text-gray-600 font-semibold">
-                                                {stat.label || ''}
+                                                {getStatLabel(stat.label)}
                                             </div>
                                         </div>
                                     ))}
@@ -170,13 +190,13 @@ export default function Landing({
                         {featuredProjects && featuredProjects.length > 0 && (
                             <div className="bg-white rounded-2xl border border-gray-100 p-4">
                                 <div className="flex items-center justify-between mb-4">
-                                    <h2 className="text-lg font-bold text-gray-900">أبرز المشاريع</h2>
+                                    <h2 className="text-lg font-bold text-gray-900">{t('sections.featuredProjects')}</h2>
                                     <Link
                                         href="/projects"
                                         className="text-[#A3C042] text-sm font-semibold flex items-center gap-1"
                                     >
-                                        عرض الكل
-                                        <FaArrowLeft className="text-xs" />
+                                        {t('common.viewAll')}
+                                        <ForwardIcon className="text-xs" />
                                     </Link>
                                 </div>
                                 <div className="space-y-3">
@@ -203,20 +223,20 @@ export default function Landing({
                                                         </span>
                                                         {project.views > 0 && (
                                                             <span className="text-[10px] text-gray-500">
-                                                                {project.views} مشاهدة
+                                                                {project.views} {t('project.views')}
                                                             </span>
                                                         )}
                                                     </div>
                                                 </div>
                                             </div>
                                         </Link>
-                                    ))}
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
 
-                        {/* Quick Links */}
-                        <div className="grid grid-cols-2 gap-3">
+                            {/* Quick Links */}
+                            <div className="grid grid-cols-2 gap-3">
                             <Link
                                 href="/challenges"
                                 className="bg-white rounded-2xl border border-gray-100 p-4 hover:shadow-md transition"
@@ -225,9 +245,9 @@ export default function Landing({
                                     <div className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">
                                         <FaTrophy className="text-yellow-600 text-lg" />
                                     </div>
-                                    <div className="text-sm font-bold text-gray-900">التحديات</div>
+                                    <div className="text-sm font-bold text-gray-900">{t('quickLinks.challenges')}</div>
                                 </div>
-                                <p className="text-xs text-gray-600">شارك في التحديات التعليمية</p>
+                                <p className="text-xs text-gray-600">{t('quickLinks.challengesDesc')}</p>
                             </Link>
 
                             <Link
@@ -238,9 +258,9 @@ export default function Landing({
                                     <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
                                         <FaBook className="text-blue-600 text-lg" />
                                     </div>
-                                    <div className="text-sm font-bold text-gray-900">الإصدارات</div>
+                                    <div className="text-sm font-bold text-gray-900">{t('quickLinks.publications')}</div>
                                 </div>
-                                <p className="text-xs text-gray-600">اقرأ المجلات والكتيبات</p>
+                                <p className="text-xs text-gray-600">{t('quickLinks.publicationsDesc')}</p>
                             </Link>
 
                             <Link
@@ -251,9 +271,9 @@ export default function Landing({
                                     <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
                                         <FaMedal className="text-purple-600 text-lg" />
                                     </div>
-                                    <div className="text-sm font-bold text-gray-900">الشارات</div>
+                                    <div className="text-sm font-bold text-gray-900">{t('quickLinks.badges')}</div>
                                 </div>
-                                <p className="text-xs text-gray-600">احصل على الشارات والإنجازات</p>
+                                <p className="text-xs text-gray-600">{t('quickLinks.badgesDesc')}</p>
                             </Link>
 
                             <Link
@@ -264,20 +284,20 @@ export default function Landing({
                                     <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
                                         <FaRocket className="text-green-600 text-lg" />
                                     </div>
-                                    <div className="text-sm font-bold text-gray-900">من نحن</div>
+                                    <div className="text-sm font-bold text-gray-900">{t('quickLinks.about')}</div>
                                 </div>
-                                <p className="text-xs text-gray-600">تعرف على منصة إرث المبتكرين</p>
+                                <p className="text-xs text-gray-600">{t('quickLinks.aboutDesc')}</p>
                             </Link>
                         </div>
 
                         {/* Why Choose Section */}
                         <div className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6">
                             <WhyChooseSection
-                                title="لماذا منصة إرث المبتكرين؟"
-                                subtitle="منصة تعليمية شاملة تهدف إلى بناء مجتمع من المبتكرين والموهوبين في المؤسسات تعليمية. نوفر بيئة محفزة للإبداع والابتكار."
+                                title={t('sections.whyChoose')}
+                                subtitle={t('sections.whyChooseSubtitle')}
                                 benefits={whyChooseBenefits}
                                 imageSrc="/images/erth-img.jpg"
-                                imageAlt="منصة إرث المبتكرين"
+                                imageAlt={t('header.appName')}
                                 compact={true}
                             />
                         </div>
@@ -285,8 +305,8 @@ export default function Landing({
                         {/* Platform Features Section */}
                         <div className="bg-gradient-to-br from-[#A3C042]/5 to-[#8CA635]/5 rounded-2xl border border-gray-100 p-4 md:p-6">
                             <PlatformFeaturesSection
-                                title="منصة متكاملة للإبداع والابتكار"
-                                subtitle="جميع الأدوات والميزات التي تحتاجها لتكون جزءاً من مجتمع المبتكرين والموهوبين."
+                                title={t('sections.platformFeatures')}
+                                subtitle={t('sections.platformFeaturesSubtitle')}
                                 compact={true}
                             />
                         </div>
@@ -295,8 +315,8 @@ export default function Landing({
                         {uaeSchools && uaeSchools.length > 0 && (
                             <div className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6">
                                 <UAESchoolsSection
-                                    title="مدارس مشاركة من الإمارات"
-                                    subtitle="نفتخر بشراكتنا مع مؤسسات تعليمية متميزة من دولة الإمارات العربية المتحدة"
+                                    title={t('sections.uaeSchools')}
+                                    subtitle={t('sections.uaeSchoolsSubtitle')}
                                     schools={uaeSchools}
                                     compact={true}
                                 />
@@ -307,10 +327,10 @@ export default function Landing({
                         {(!isAuthed || (user?.role !== 'teacher' && user?.role !== 'school')) && (
                             <div className="bg-gradient-to-br from-[#A3C042] to-[#8CA635] rounded-2xl p-4 md:p-6 text-white">
                                 <TeacherRecruitmentSection
-                                    title="هل أنت معلم أو مشرف؟"
+                                    title={t('sections.teacherRecruitment.title')}
                                     callToAction="انضم إلى إرث المبتكرين!"
                                     description="شارك في بناء مجتمع المبتكرين. قيّم مشاريع الطلاب، شارك في التحديات، ونشر المقالات التعليمية لتكون جزءاً من حركة الإبداع."
-                                    buttonText={isAuthed ? 'عرض لوحة التحكم' : 'انضم كمعلم/مشرف'}
+                                    buttonText={isAuthed ? t('hero.goToDashboard') : t('sections.join')}
                                     imageSrc="/images/avatar2.svg"
                                     imageAlt="معلم خصوصي"
                                     onJoinClick={() => router.visit(isAuthed ? '/dashboard' : '/register')}
@@ -323,8 +343,8 @@ export default function Landing({
                         {testimonials && testimonials.length > 0 && (
                             <div className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6">
                                 <TestimonialsSection
-                                    title="آراء العملاء"
-                                    subtitle="ماذا يقول مستخدمونا عن منصة إرث المبتكرين"
+                                    title={t('sections.testimonials.title')}
+                                    subtitle={t('sections.testimonials.subtitle')}
                                     testimonials={testimonials}
                                     compact={true}
                                 />
@@ -334,8 +354,8 @@ export default function Landing({
                         {/* FAQ Section */}
                         <div className="bg-gradient-to-br from-[#A3C042]/10 to-[#8CA635]/10 rounded-2xl border border-gray-100 p-4 md:p-6">
                             <FAQSection
-                                title="الأسئلة الشائعة"
-                                subtitle="أجوبة على أهم الأسئلة المتعلقة بمنصة إرث المبتكرين والمشاريع والتحديات والشارات."
+                                title={t('sections.faq.title')}
+                                subtitle={t('sections.faq.subtitle')}
                                 compact={true}
                             />
                         </div>
@@ -344,7 +364,7 @@ export default function Landing({
                         {featuredPublications && featuredPublications.length > 0 && (
                             <div className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6">
                                 <PublicationsSection
-                                    title="الإصدارات"
+                                    title={t('sections.publications')}
                                     subtitle="اكتشف محتوى مبتكر من الطلاب والمعلمين: مجلات، كتيبات وتقارير تعرض إبداع مؤسسات تعليميةنا."
                                     publications={featuredPublications}
                                     viewAllLink="/publications"
@@ -356,10 +376,10 @@ export default function Landing({
                         {/* CTA Section */}
                         <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-4 md:p-6 text-white">
                             <CTASection
-                                title="ابدأ رحلتك مع إرث المبتكرين!"
-                                description="انضم إلى مجتمع المبتكرين والموهوبين، شارك مشاريعك الإبداعية، وكن جزءاً من التحديات التعليمية المثيرة."
-                                primaryButtonText={isAuthed ? 'اذهب إلى لوحة التحكم' : 'سجل الآن'}
-                                secondaryButtonText="تواصل معنا"
+                                title={t('sections.cta.title')}
+                                description={t('sections.cta.description')}
+                                primaryButtonText={isAuthed ? t('hero.goToDashboard') : t('sections.cta.registerNow')}
+                                secondaryButtonText={t('sections.cta.contactUs')}
                                 primaryButtonLink={isAuthed ? '/dashboard' : '/register'}
                                 onPrimaryButtonClick={handleStartJourney}
                                 onSecondaryButtonClick={() => router.visit('/about')}
@@ -373,7 +393,7 @@ export default function Landing({
             {/* Desktop View */}
             <div className="hidden md:block">
                 <MobileTopBar
-                    title="إرث المبتكرين"
+                    title={t('header.appName')}
                     unreadCount={isAuthed ? (auth?.unreadCount || 0) : 0}
                     onNotifications={() => router.visit(isAuthed ? '/notifications' : '/login')}
                     onBack={() => router.visit('/')}
@@ -419,24 +439,24 @@ export default function Landing({
                         )}
 
                         {/* Hero Section */}
-                        <div className="bg-gradient-to-br from-[#A3C042] to-[#8CA635] rounded-3xl p-8 text-white relative overflow-hidden">
+                        <div dir={dir} className="bg-gradient-to-br from-[#A3C042] to-[#8CA635] rounded-3xl p-8 text-white relative overflow-hidden">
                             <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                                 <div className='z-10'>
                                     <h1 className="text-4xl font-extrabold mb-4 leading-tight">
-                                        نحن معا نحو التقدم والتطور
+                                        {t('hero.title')}
                                     </h1>
                                     <p className="text-white/90 text-lg mb-6">
-                                        مشاريع إبداعية في كل المجالات
+                                        {t('hero.subtitle')}
                                     </p>
                                     <button
                                         onClick={handleStartJourney}
                                         className="bg-white text-[#A3C042] px-8 py-4 rounded-xl font-bold text-base hover:bg-gray-100 transition shadow-lg"
                                     >
-                                        {isAuthed ? 'اذهب إلى لوحة التحكم' : 'ابدأ رحلتك معنا'}
+                                        {isAuthed ? t('hero.goToDashboard') : t('hero.startJourney')}
                                     </button>
                                 </div>
-                                <div className="flex justify-center items-center">
-                                    <div className="absolute bg-[#C1DA6C] md:w-[298px] md:h-[1500px] rotate-45"></div>
+                                <div className={`flex justify-center items-center ${dir === 'rtl' ? '' : 'lg:order-last'}`}>
+                                    <div className={`absolute bg-[#C1DA6C] md:w-[298px] md:h-[1500px] rotate-45 ${dir === 'rtl' ? '' : 'lg:-scale-x-100'}`}></div>
                                     <img
                                         src="/images/hero.png"
                                         alt="Hero"
@@ -449,7 +469,7 @@ export default function Landing({
                         {/* Stats Section */}
                         {stats && stats.length > 0 && (
                             <div className="bg-white rounded-2xl border border-gray-100 p-6">
-                                <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">أرقام تثبت نجاحنا!</h2>
+                                <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">{t('stats.successNumbers')}</h2>
                                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                                     {stats.map((stat, index) => (
                                         <div key={index} className="text-center">
@@ -457,7 +477,7 @@ export default function Landing({
                                                 {stat.value || '0'}
                                             </div>
                                             <div className="text-sm text-gray-600 font-semibold">
-                                                {stat.label || ''}
+                                                {getStatLabel(stat.label)}
                                             </div>
                                         </div>
                                     ))}
@@ -469,13 +489,13 @@ export default function Landing({
                         {featuredProjects && featuredProjects.length > 0 && (
                             <div className="bg-white rounded-2xl border border-gray-100 p-6">
                                 <div className="flex items-center justify-between mb-6">
-                                    <h2 className="text-2xl font-bold text-gray-900">أبرز المشاريع الإبداعية</h2>
+                                    <h2 className="text-2xl font-bold text-gray-900">{t('sections.featuredProjects')}</h2>
                                     <Link
                                         href="/projects"
                                         className="text-[#A3C042] text-sm font-semibold flex items-center gap-2 hover:text-[#8CA635] transition"
                                     >
-                                        عرض جميع المشاريع
-                                        <FaArrowLeft />
+                                        {t('sections.allProjects')}
+                                        <ForwardIcon />
                                     </Link>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -502,7 +522,7 @@ export default function Landing({
                                                     {getCategoryLabel(project.category)}
                                                 </span>
                                                 {project.views > 0 && (
-                                                    <span>{project.views} مشاهدة</span>
+                                                    <span>{project.views} {t('project.views')}</span>
                                                 )}
                                             </div>
                                         </Link>
@@ -520,8 +540,8 @@ export default function Landing({
                                 <div className="w-16 h-16 bg-yellow-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                                     <FaTrophy className="text-yellow-600 text-2xl" />
                                 </div>
-                                <div className="text-base font-bold text-gray-900 mb-2">التحديات</div>
-                                <p className="text-sm text-gray-600">شارك في التحديات التعليمية</p>
+                                <div className="text-base font-bold text-gray-900 mb-2">{t('quickLinks.challenges')}</div>
+                                <p className="text-sm text-gray-600">{t('quickLinks.challengesDesc')}</p>
                             </Link>
 
                             <Link
@@ -531,8 +551,8 @@ export default function Landing({
                                 <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                                     <FaBook className="text-blue-600 text-2xl" />
                                 </div>
-                                <div className="text-base font-bold text-gray-900 mb-2">الإصدارات</div>
-                                <p className="text-sm text-gray-600">اقرأ المجلات والكتيبات</p>
+                                <div className="text-base font-bold text-gray-900 mb-2">{t('quickLinks.publications')}</div>
+                                <p className="text-sm text-gray-600">{t('quickLinks.publicationsDesc')}</p>
                             </Link>
 
                             <Link
@@ -542,8 +562,8 @@ export default function Landing({
                                 <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                                     <FaMedal className="text-purple-600 text-2xl" />
                                 </div>
-                                <div className="text-base font-bold text-gray-900 mb-2">الشارات</div>
-                                <p className="text-sm text-gray-600">احصل على الشارات والإنجازات</p>
+                                <div className="text-base font-bold text-gray-900 mb-2">{t('quickLinks.badges')}</div>
+                                <p className="text-sm text-gray-600">{t('quickLinks.badgesDesc')}</p>
                             </Link>
 
                             <Link
@@ -553,19 +573,19 @@ export default function Landing({
                                 <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                                     <FaRocket className="text-green-600 text-2xl" />
                                 </div>
-                                <div className="text-base font-bold text-gray-900 mb-2">من نحن</div>
-                                <p className="text-sm text-gray-600">تعرف على منصة إرث المبتكرين</p>
+                                <div className="text-base font-bold text-gray-900 mb-2">{t('quickLinks.about')}</div>
+                                <p className="text-sm text-gray-600">{t('quickLinks.aboutDesc')}</p>
                             </Link>
                         </div>
 
                         {/* Why Choose Section */}
                         <section className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8">
                             <WhyChooseSection
-                                title="لماذا منصة إرث المبتكرين؟"
-                                subtitle="منصة تعليمية شاملة تهدف إلى بناء مجتمع من المبتكرين والموهوبين في المؤسسات تعليمية. نوفر بيئة محفزة للإبداع والابتكار."
+                                title={t('sections.whyChoose')}
+                                subtitle={t('sections.whyChooseSubtitle')}
                                 benefits={whyChooseBenefits}
                                 imageSrc="/images/erth-img.jpg"
-                                imageAlt="منصة إرث المبتكرين"
+                                imageAlt={t('header.appName')}
                                 compact={true}
                             />
                         </section>
@@ -573,8 +593,8 @@ export default function Landing({
                         {/* Platform Features Section */}
                         <section className="bg-gradient-to-br from-[#A3C042]/5 to-[#8CA635]/5 rounded-2xl border border-gray-100 p-6 md:p-8">
                             <PlatformFeaturesSection
-                                title="منصة متكاملة للإبداع والابتكار"
-                                subtitle="جميع الأدوات والميزات التي تحتاجها لتكون جزءاً من مجتمع المبتكرين والموهوبين."
+                                title={t('sections.platformFeatures')}
+                                subtitle={t('sections.platformFeaturesSubtitle')}
                                 compact={true}
                             />
                         </section>
@@ -583,8 +603,8 @@ export default function Landing({
                         {uaeSchools && uaeSchools.length > 0 && (
                             <section className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8">
                                 <UAESchoolsSection
-                                    title="مدارس مشاركة من الإمارات"
-                                    subtitle="نفتخر بشراكتنا مع مؤسسات تعليمية متميزة من دولة الإمارات العربية المتحدة"
+                                    title={t('sections.uaeSchools')}
+                                    subtitle={t('sections.uaeSchoolsSubtitle')}
                                     schools={uaeSchools}
                                     compact={true}
                                 />
@@ -595,10 +615,10 @@ export default function Landing({
                         {(!isAuthed || (user?.role !== 'teacher' && user?.role !== 'school')) && (
                             <section className="bg-gradient-to-br from-[#A3C042] to-[#8CA635] rounded-2xl p-6 md:p-8 text-white">
                                 <TeacherRecruitmentSection
-                                    title="هل أنت معلم أو مشرف؟"
+                                    title={t('sections.teacherRecruitment.title')}
                                     callToAction="انضم إلى إرث المبتكرين!"
                                     description="شارك في بناء مجتمع المبتكرين. قيّم مشاريع الطلاب، شارك في التحديات، ونشر المقالات التعليمية لتكون جزءاً من حركة الإبداع."
-                                    buttonText={isAuthed ? 'عرض لوحة التحكم' : 'انضم كمعلم/مشرف'}
+                                    buttonText={isAuthed ? t('hero.goToDashboard') : t('sections.join')}
                                     imageSrc="/images/avatar2.svg"
                                     imageAlt="معلم خصوصي"
                                     onJoinClick={() => router.visit(isAuthed ? '/dashboard' : '/register')}
@@ -611,7 +631,7 @@ export default function Landing({
                         {testimonials && testimonials.length > 0 && (
                             <section className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8">
                                 <TestimonialsSection
-                                    title="آراء العملاء"
+                                    title={t('sections.testimonials.title')}
                                     subtitle="ماذا يقول مستخدمونا عن منصة إرث المبتكرين"
                                     testimonials={testimonials}
                                     compact={true}
@@ -622,8 +642,8 @@ export default function Landing({
                         {/* FAQ Section */}
                         <section className="bg-gradient-to-br from-[#A3C042]/10 to-[#8CA635]/10 rounded-2xl border border-gray-100 p-6 md:p-8">
                             <FAQSection
-                                title="الأسئلة الشائعة"
-                                subtitle="أجوبة على أهم الأسئلة المتعلقة بمنصة إرث المبتكرين والمشاريع والتحديات والشارات."
+                                title={t('sections.faq.title')}
+                                subtitle={t('sections.faq.subtitle')}
                                 compact={true}
                             />
                         </section>
@@ -632,7 +652,7 @@ export default function Landing({
                         {featuredPublications && featuredPublications.length > 0 && (
                             <section className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8">
                                 <PublicationsSection
-                                    title="الإصدارات"
+                                    title={t('sections.publications')}
                                     subtitle="اكتشف محتوى مبتكر من الطلاب والمعلمين: مجلات، كتيبات وتقارير تعرض إبداع مؤسسات تعليميةنا."
                                     publications={featuredPublications}
                                     viewAllLink="/publications"
@@ -644,10 +664,10 @@ export default function Landing({
                         {/* CTA Section */}
                         <section className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 md:p-8 text-white">
                             <CTASection
-                                title="ابدأ رحلتك مع إرث المبتكرين!"
-                                description="انضم إلى مجتمع المبتكرين والموهوبين، شارك مشاريعك الإبداعية، وكن جزءاً من التحديات التعليمية المثيرة."
-                                primaryButtonText={isAuthed ? 'اذهب إلى لوحة التحكم' : 'سجل الآن'}
-                                secondaryButtonText="تواصل معنا"
+                                title={t('sections.cta.title')}
+                                description={t('sections.cta.description')}
+                                primaryButtonText={isAuthed ? t('hero.goToDashboard') : t('sections.cta.registerNow')}
+                                secondaryButtonText={t('sections.cta.contactUs')}
                                 primaryButtonLink={isAuthed ? '/dashboard' : '/register'}
                                 onPrimaryButtonClick={handleStartJourney}
                                 onSecondaryButtonClick={() => router.visit('/about')}

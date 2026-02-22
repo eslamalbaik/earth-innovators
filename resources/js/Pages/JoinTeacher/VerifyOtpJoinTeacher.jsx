@@ -24,7 +24,7 @@ export default function VerifyOtpJoinTeacher() {
         name: userData?.name || '',
         email: userData?.email || '',
         phone: userData?.phone || '',
-        dial_code: userData?.dial_code || '+966',
+        dial_code: userData?.dial_code || '+971',
         city: userData?.city || '',
         password: userData?.password || '',
         password_confirmation: userData?.password_confirmation || '',
@@ -168,7 +168,7 @@ export default function VerifyOtpJoinTeacher() {
         if (cleanedPhone.startsWith('0')) {
             cleanedPhone = cleanedPhone.substring(1);
         }
-        const fullPhone = `${userData?.dial_code || data.dial_code || '+966'}${cleanedPhone}`;
+        const fullPhone = `${userData?.dial_code || data.dial_code || '+971'}${cleanedPhone}`;
 
         // إضافة جميع البيانات من userData
         if (userData) {
@@ -284,7 +284,7 @@ export default function VerifyOtpJoinTeacher() {
                                 <div className="flex items-center gap-3 text-sm text-gray-700">
                                     <FaPhone className="text-gray-400" />
                                     <span className="font-medium">رقم الجوال:</span>
-                                    <span>{userData.dial_code || '+966'} {userData.phone}</span>
+                                    <span>{userData.dial_code || '+971'} {userData.phone}</span>
                                 </div>
                             )}
                         </div>
@@ -294,7 +294,7 @@ export default function VerifyOtpJoinTeacher() {
                             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
                                 <div className="flex items-start justify-between">
                                     <div className="flex items-start">
-                                        <FaExclamationTriangle className="text-red-500 text-xl mt-0.5 ml-3 flex-shrink-0" />
+                                        <FaExclamationTriangle className="text-red-500 text-xl mt-0.5 me-3 flex-shrink-0" />
                                         <div className="flex-1">
                                             <h3 className="text-sm font-semibold text-red-800 mb-2">
                                                 يرجى تصحيح الأخطاء التالية:
@@ -369,7 +369,7 @@ export default function VerifyOtpJoinTeacher() {
                                 >
                                     {processing ? (
                                         <div className="flex items-center">
-                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white ms-2"></div>
                                             جاري التحقق...
                                         </div>
                                     ) : (

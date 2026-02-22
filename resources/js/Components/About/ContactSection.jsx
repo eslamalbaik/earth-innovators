@@ -1,26 +1,29 @@
 import SectionTitle from '../SectionTitle';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function ContactSection() {
+    const { t } = useTranslation();
+    
     const contactInfo = [
         {
             icon: FaEnvelope,
-            text: "info@innovatorslegacy.ae"
+            text: t('about.email')
         },
         {
             icon: FaPhone,
-            text: "+971 4 XXX XXXX"
+            text: t('about.phone')
         },
         {
             icon: FaMapMarkerAlt,
-            text: "دبي، الإمارات العربية المتحدة"
+            text: t('about.dubai')
         }
     ];
 
     return (
         <div>
             <SectionTitle
-                text="تواصل معنا"
+                text={t('about.contactUs')}
                 size="2xl"
                 align="right"
                 className="pt-0"

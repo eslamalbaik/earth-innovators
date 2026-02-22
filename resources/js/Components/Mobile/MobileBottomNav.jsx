@@ -2,6 +2,7 @@ import { router } from '@inertiajs/react';
 import { useState, useRef, useEffect } from 'react';
 import { FaHome, FaFolderOpen, FaCompass, FaTrophy, FaUser, FaSignOutAlt, FaBook, FaMedal, FaTachometerAlt, FaCreditCard } from 'react-icons/fa';
 import { getUserImageUrl, getInitials, getColorFromName } from '@/utils/imageUtils';
+import { useTranslation } from '@/i18n';
 
 const getRoleLinks = (role) => {
     if (role === 'teacher') {
@@ -50,6 +51,7 @@ const getRoleLinks = (role) => {
 };
 
 export default function MobileBottomNav({ active = 'home', role, isAuthed = false, user = null }) {
+    const { t } = useTranslation();
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [userDropdownOpen, setUserDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
@@ -81,10 +83,10 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
     };
 
     const items = [
-        { key: 'home', label: 'الرئيسية', icon: FaHome, href: links.home },
-        { key: 'projects', label: 'مشاريعي', icon: FaFolderOpen, href: links.projects },
-        { key: 'explore', label: 'استكشاف', icon: FaCompass, href: '/projects' },
-        { key: 'challenges', label: 'التحديات', icon: FaTrophy, href: links.challenges },
+        { key: 'home', label: t('common.home'), icon: FaHome, href: links.home },
+        { key: 'projects', label: t('dashboard.myProjects'), icon: FaFolderOpen, href: links.projects },
+        { key: 'explore', label: t('common.projects'), icon: FaCompass, href: '/projects' },
+        { key: 'challenges', label: t('common.challenges'), icon: FaTrophy, href: links.challenges },
     ];
 
     // If user is not authenticated or doesn't have a role, hide "مشاريعي" and show only "استكشاف"
@@ -96,20 +98,20 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
     // Desktop Sidebar
     const DesktopSidebar = () => {
         const sidebarItems = [
-            { key: 'home', label: 'الرئيسية', icon: FaHome, href: links.home },
-            { key: 'projects', label: 'مشاريعي', icon: FaFolderOpen, href: links.projects },
-            { key: 'explore', label: 'استكشاف', icon: FaCompass, href: '/projects' },
-            { key: 'challenges', label: 'التحديات', icon: FaTrophy, href: links.challenges },
+            { key: 'home', label: t('common.home'), icon: FaHome, href: links.home },
+            { key: 'projects', label: t('dashboard.myProjects'), icon: FaFolderOpen, href: links.projects },
+            { key: 'explore', label: t('common.projects'), icon: FaCompass, href: '/projects' },
+            { key: 'challenges', label: t('common.challenges'), icon: FaTrophy, href: links.challenges },
         ];
 
         const filteredSidebarItems = isAuthed && role ? sidebarItems : sidebarItems.filter(item => item.key !== 'projects');
 
         return (
-            <aside className="hidden lg:block fixed right-0 top-20 bottom-0 w-72 bg-white border-l border-gray-200 z-30">
+            <aside className="hidden lg:block fixed start-0 top-20 bottom-0 w-72 bg-white border-l border-gray-200 z-30">
                 <div className="h-full overflow-y-auto">
                     <div className="p-6 space-y-2">
                         <div className="mb-6">
-                            <h3 className="text-xs font-bold text-gray-500 uppercase mb-4 px-3">القائمة الرئيسية</h3>
+                            <h3 className="text-xs font-bold text-gray-500 uppercase mb-4 px-3">{t('sections.quickLinks')}</h3>
                             {filteredSidebarItems.map((item) => {
                                 const isActive = item.key === active;
                                 const Icon = item.icon;
@@ -132,7 +134,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
 
                         {/* Quick Links Section */}
                         <div className="pt-6 border-t border-gray-200">
-                            <h3 className="text-xs font-bold text-gray-500 uppercase mb-4 px-3">روابط سريعة</h3>
+                            <h3 className="text-xs font-bold text-gray-500 uppercase mb-4 px-3">{t('sections.quickLinks')}</h3>
                             <div className="space-y-1">
                                 <button
                                     type="button"
@@ -225,7 +227,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
     return (
         <>
             {/* Mobile Bottom Navigation */}
-            <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-100 md:hidden">
+            <nav className="fixed bottom-0 end-0 start-0 z-40 bg-white border-t border-gray-100 md:hidden">
                 <div className="px-2">
                     <div className={`grid py-2 ${isAuthed && role ? 'grid-cols-5' : 'grid-cols-4'}`}>
                         {filteredItems.map((item) => {
@@ -286,7 +288,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
 
                                 {/* User Dropdown Menu */}
                                 {userDropdownOpen && (
-                                    <div className="absolute bottom-full left-0 mb-2 w-40 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden z-50">
+                                    <div className="absolute bottom-full end-0 mb-2 w-40 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden z-50">
                                         {/* لوحة التحكم - تظهر لجميع الأدوار */}
                                         {(role === 'admin' || role === 'teacher' || role === 'school' || role === 'student') && (
                                             <>
@@ -360,7 +362,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
 
                                 {/* Dropdown Menu */}
                                 {dropdownOpen && (
-                                    <div className="absolute bottom-full left-0 mb-2 w-40 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden z-50">
+                                    <div className="absolute bottom-full end-0 mb-2 w-40 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden z-50">
                                         <button
                                             type="button"
                                             onClick={() => {

@@ -258,7 +258,7 @@ export default function Teachers({ teachers, auth, cities = [], filters = {} }) 
                             placeholder="البحث عن معلم..."
                             value={search}
                             onChange={handleSearchChange}
-                            className="w-full pr-12 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                            className="w-full ps-12 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
                         />
                     </div>
                     <select
@@ -367,12 +367,12 @@ export default function Teachers({ teachers, auth, cities = [], filters = {} }) 
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         {teacher.is_active ? (
                                             <span className="px-3 py-1 inline-flex items-center text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                                                <FaCheck className="ml-1" />
+                                                <FaCheck className="me-1" />
                                                 نشط
                                             </span>
                                         ) : (
                                             <span className="px-3 py-1 inline-flex items-center text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
-                                                <FaTimes className="ml-1" />
+                                                <FaTimes className="me-1" />
                                                 غير نشط
                                             </span>
                                         )}

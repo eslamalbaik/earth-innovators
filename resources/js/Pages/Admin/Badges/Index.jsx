@@ -145,7 +145,7 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 placeholder="ابحث عن شارة..."
-                                className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
                         </div>
                     </div>
@@ -391,7 +391,7 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                                             value={awardData.user_id}
                                             onChange={(e) => setAwardData('user_id', e.target.value)}
                                             placeholder="أدخل معرف المستخدم..."
-                                            className={`w-full pr-10 pl-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${awardErrors.user_id ? 'border-red-500' : 'border-gray-300'
+                                            className={`w-full ps-10 pe-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${awardErrors.user_id ? 'border-red-500' : 'border-gray-300'
                                                 }`}
                                             required
                                         />

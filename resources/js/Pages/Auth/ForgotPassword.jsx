@@ -6,11 +6,15 @@ import TextInput from '@/Components/TextInput';
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
 import { Head } from '@inertiajs/react';
+import { useForwardIcon } from '@/i18n';
+import { useTranslation } from '@/i18n';
 
 export default function ForgotPassword({ status }) {
     const { data, setData, post, processing, errors } = useForm({
         email: '',
     });
+    const ForwardIcon = useForwardIcon();
+    const { t } = useTranslation();
 
     const submit = (e) => {
         e.preventDefault();
@@ -19,7 +23,7 @@ export default function ForgotPassword({ status }) {
 
     return (
         <GuestLayout>
-            <Head title="نسيان كلمة المرور" />
+            <Head title={t('auth.forgotPasswordTitle')} />
             <div className="flex items-center justify-center sm:px-4">
                 <div className="w-full sm:space-y-8">
                     {status && (
@@ -30,7 +34,7 @@ export default function ForgotPassword({ status }) {
                                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                     </svg>
                                 </div>
-                                <div className="mr-3">
+                                <div className="ms-3">
                                     <p className="text-sm font-medium text-green-800">{status}</p>
                                 </div>
                             </div>
@@ -39,8 +43,8 @@ export default function ForgotPassword({ status }) {
 
                     <div className="relative min-h-screen overflow-hidden bg-white shadow-lg sm:rounded-2xl px-4 py-10 w-[100vw] sm:w-[400px] md:w-[450px] max-w-5xl sm:mx-auto">
                         <form onSubmit={submit} className="space-y-6">
-                            <img src="/images/avatar.svg" alt="avatar" className="absolute -top-24 -left-24 w-48 h-48" />
-                            <img src="/images/avatar1.svg" alt="avatar" className="absolute -bottom-8 right-0 w-28 h-28" />
+                            <img src="/images/avatar.svg" alt="avatar" className="absolute -top-24 -start-24 w-48 h-48" />
+                            <img src="/images/avatar1.svg" alt="avatar" className="absolute -bottom-8 end-0 w-28 h-28" />
                             <div className="flex flex-col items-center">
                                 <div>
                                     <img
@@ -53,16 +57,16 @@ export default function ForgotPassword({ status }) {
 
                             <div className="text-center">
                                 <h2 className="text-2xl font-extrabold text-gray-900 mb-2">
-                                    نسيان كلمة المرور
+                                    {t('auth.forgotPasswordTitle')}
                                 </h2>
                                 <p className="text-sm text-gray-600">
-                                    أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة تعيين كلمة المرور
+                                    {t('auth.forgotPasswordDescription')}
                                 </p>
                             </div>
 
                             <div>
                                 <div className="relative">
-                                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                         <FaEnvelope className="h-5 w-5 text-gray-400" />
                                     </div>
                                     <TextInput
@@ -74,7 +78,7 @@ export default function ForgotPassword({ status }) {
                                         autoComplete="email"
                                         isFocused={true}
                                         onChange={(e) => setData('email', e.target.value)}
-                                        placeholder="البريد الإلكتروني"
+                                        placeholder={t('auth.enterEmail')}
                                     />
                                 </div>
                                 <InputError message={errors.email} className="mt-2" />
@@ -88,10 +92,10 @@ export default function ForgotPassword({ status }) {
                                     {processing ? (
                                         <div className="flex items-center">
                                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white me-2"></div>
-                                            جاري الإرسال...
+                                            {t('auth.sending')}
                                         </div>
                                     ) : (
-                                        'إرسال رابط إعادة التعيين'
+                                        t('auth.resetPasswordLink')
                                     )}
                                 </PrimaryButton>
                             </div>
@@ -101,8 +105,8 @@ export default function ForgotPassword({ status }) {
                                     href={route('login')}
                                     className="font-medium text-[#A3C042] hover:text-[#F9D536] flex items-center justify-center gap-2"
                                 >
-                                    <FaArrowRight />
-                                    العودة لتسجيل الدخول
+                                    <ForwardIcon className="text-md" />
+                                    {t('auth.backToLogin')}
                                 </Link>
                             </div>
                         </form>

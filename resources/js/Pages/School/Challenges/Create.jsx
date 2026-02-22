@@ -400,12 +400,12 @@ export default function SchoolChallengeCreate({ auth }) {
                             <PrimaryButton disabled={processing}>
                                 {processing ? (
                                     <>
-                                        <FaSpinner className="animate-spin mr-2" />
+                                        <FaSpinner className="animate-spin ms-2" />
                                         جاري الحفظ...
                                     </>
                                 ) : (
                                     <>
-                                        <FaTrophy className="mr-2" />
+                                        <FaTrophy className="ms-2" />
                                         إنشاء التحدي
                                     </>
                                 )}

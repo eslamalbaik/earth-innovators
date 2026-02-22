@@ -8,8 +8,10 @@ import { Head, Link, useForm, router } from '@inertiajs/react';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaUserGraduate, FaChalkboardTeacher, FaSchool, FaUniversity } from 'react-icons/fa';
 import { useState } from 'react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import { useTranslation } from '@/i18n';
 
 export default function Login({ status, canResetPassword }) {
+    const { t, language } = useTranslation();
     const [showPassword, setShowPassword] = useState(false);
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
@@ -45,9 +47,9 @@ export default function Login({ status, canResetPassword }) {
 
     return (
         <GuestLayout>
-            <Head title="تسجيل الدخول" />
+            <Head title={t('auth.login')} />
 
-            <div className="flex items-center justify-center sm:px-4">
+            <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="flex items-center justify-center sm:px-4">
                 <div className="w-full sm:space-y-8">
                     {status && (
                         <div className="bg-green-50 border border-green-200 rounded-lg p-4 animate-fadeInUp">
@@ -57,7 +59,7 @@ export default function Login({ status, canResetPassword }) {
                                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                     </svg>
                                 </div>
-                                <div className="mr-3">
+                                <div className="ms-3">
                                     <p className="text-sm font-medium text-green-800">
                                         {status}
                                     </p>
@@ -68,26 +70,26 @@ export default function Login({ status, canResetPassword }) {
 
 <div className="relative min-h-screen overflow-hidden bg-white shadow-lg sm:rounded-2xl px-4 py-10 w-[100vw] sm:w-[400px] md:w-[450px] max-w-5xl sm:mx-auto">
 <form onSubmit={submit} className="space-y-6">
-                            <img src="/images/avatar.svg" alt="avatar" className="absolute -top-24 -left-24 w-48 h-48" />
-                            <img src="/images/avatar1.svg" alt="avatar" className="absolute -bottom-8 right-0 w-28 h-28" />
+                            <img src="/images/avatar.svg" alt="avatar" className="absolute -top-24 -start-24 w-48 h-48" />
+                            <img src="/images/avatar1.svg" alt="avatar" className="absolute -bottom-8 end-0 w-28 h-28" />
                             <div className="flex flex-col items-center">
                                 <div>
                                     <img
                                         src="/images/logo-modified.png"
-                                        alt="إرث المبتكرين - Innovators Legacy"
+                                        alt={t('header.appName')}
                                         className="h-24 w-auto object-contain"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                            <div className='text-xs mb-1 opacity-75'>الدخول كـ</div>
+                            <div className='text-xs mb-1 opacity-75'>{t('auth.loginAs') || 'تسجيل الدخول كـ'}</div>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5 md:gap-3">
                                     {[
-                                        { key: 'student', label: 'طالب', description: 'للوصول إلى لوحة الطالب', icon: FaUserGraduate },
-                                        { key: 'teacher', label: 'معلم', description: 'للوصول إلى لوحة المعلم', icon: FaChalkboardTeacher },
-                                        { key: 'school', label: 'مدرسة', description: 'للوصول إلى لوحة المدرسة', icon: FaSchool },
-                                        { key: 'educational_institution', label: 'مؤسسة تعليمية', description: 'للوصول إلى لوحة المؤسسة التعليمية', icon: FaUniversity },
+                                        { key: 'student', label: t('roles.student'), description: t('auth.studentAccess') || 'للوصول إلى لوحة الطالب', icon: FaUserGraduate },
+                                        { key: 'teacher', label: t('roles.teacher'), description: t('auth.teacherAccess') || 'للوصول إلى لوحة المعلم', icon: FaChalkboardTeacher },
+                                        { key: 'school', label: t('roles.school'), description: t('auth.schoolAccess') || 'للوصول إلى لوحة المدرسة', icon: FaSchool },
+                                        { key: 'educational_institution', label: t('roles.educationalInstitution'), description: t('auth.institutionAccess') || 'للوصول إلى لوحة المؤسسة التعليمية', icon: FaUniversity },
                                     ].map((roleOption) => {
                                         const isActive = data.role === roleOption.key;
                                         const IconComponent = roleOption.icon;
@@ -118,7 +120,7 @@ export default function Login({ status, canResetPassword }) {
 
                             <div>
                                 <div className="relative">
-                                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                         <FaEnvelope className="h-5 w-5 text-gray-400" />
                                     </div>
                                     <TextInput
@@ -130,7 +132,7 @@ export default function Login({ status, canResetPassword }) {
                                         autoComplete="username"
                                         isFocused={true}
                                         onChange={(e) => setData('email', e.target.value)}
-                                        placeholder="البريد الإلكتروني"
+                                        placeholder={t('auth.email')}
                                     />
                                 </div>
                                 <InputError message={errors.email} className="mt-2" />
@@ -138,7 +140,7 @@ export default function Login({ status, canResetPassword }) {
 
                             <div>
                                 <div className="relative">
-                                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                         <FaLock className="h-5 w-5 text-gray-400" />
                                     </div>
                                     <TextInput
@@ -149,11 +151,11 @@ export default function Login({ status, canResetPassword }) {
                                         className="block w-full ps-10 pe-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
                                         autoComplete="current-password"
                                         onChange={(e) => setData('password', e.target.value)}
-                                        placeholder="كلمة المرور"
+                                        placeholder={t('auth.password')}
                                     />
                                     <button
                                         type="button"
-                                        className="absolute inset-y-0 left-0 pl-3 flex items-center"
+                                        className="absolute inset-y-0 end-0 pe-3 flex items-center"
                                         onClick={() => setShowPassword(!showPassword)}
                                     >
                                         {showPassword ? (
@@ -174,7 +176,7 @@ export default function Login({ status, canResetPassword }) {
                                         onChange={(e) => setData('remember', e.target.checked)}
                                     />
                                     <label className="ms-2 block text-sm text-gray-900">
-                                        تذكرني
+                                        {t('auth.rememberMe') || 'تذكرني'}
                                     </label>
                                 </div>
 
@@ -184,7 +186,7 @@ export default function Login({ status, canResetPassword }) {
                                             href={route('password.request')}
                                             className="font-medium text-[#A3C042] hover:text-[#F9D536]"
                                         >
-                                            نسيت كلمة المرور؟
+                                            {t('auth.forgotPassword') || 'نسيت كلمة المرور؟'}
                                         </Link>
                                     </div>
                                 )}
@@ -198,10 +200,10 @@ export default function Login({ status, canResetPassword }) {
                                     {processing ? (
                                         <div className="flex items-center">
                                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white me-2"></div>
-                                            جاري تسجيل الدخول...
+                                            {t('auth.loggingIn') || 'جاري تسجيل الدخول...'}
                                         </div>
                                     ) : (
-                                        'تسجيل الدخول'
+                                        t('auth.login')
                                     )}
                                 </PrimaryButton>
                             </div>
@@ -209,12 +211,12 @@ export default function Login({ status, canResetPassword }) {
                             <div className="text-center space-y-2"> 
                                 <div className="text-sm text-gray-600">
                                     <p>
-                                        ليس لديك حساب؟{' '}
+                                        {t('auth.noAccount') || 'ليس لديك حساب؟'}{' '}
                                         <Link
                                             href={route('register')}
                                             className="font-medium text-[#A3C042] hover:text-[#F9D536]"
                                             >
-                                            إنشاء حساب جديد
+                                            {t('auth.register')}
                                         </Link>
                                     </p>
                                 </div>

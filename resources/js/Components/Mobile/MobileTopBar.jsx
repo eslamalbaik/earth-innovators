@@ -1,7 +1,11 @@
-import { FaBell, FaArrowRight, FaHome, FaFolderOpen, FaCompass, FaTrophy, FaBook, FaMedal, FaUser, FaSignOutAlt, FaChevronDown, FaTachometerAlt } from 'react-icons/fa';
+import { FaBell, FaArrowRight, FaHome, FaFolderOpen, FaCompass, FaTrophy, FaBook, FaMedal, FaUser, FaSignOutAlt, FaChevronDown, FaTachometerAlt, FaArrowLeft } from 'react-icons/fa';
 import { Link, usePage, router } from '@inertiajs/react';
 import { useState, useRef, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { getUserImageUrl, getInitials, getColorFromName } from '@/utils/imageUtils';
+import LanguageSwitcher from '@/Components/LanguageSwitcher';
+import { useTranslation, useBackIcon } from '@/i18n';
+import { getDropdownPosition } from '@/utils/directionUtils';
 
 export default function MobileTopBar({
     title,
@@ -14,11 +18,15 @@ export default function MobileTopBar({
     showLogo = true,
     auth,
 }) {
+    const { t } = useTranslation();
+    const BackIcon = useBackIcon();
     const { url } = usePage();
+    const { dir } = useSelector((state) => state.language);
+    const isRtl = dir === 'rtl';
     const currentPath = url.split('?')[0];
     const isHomePage = currentPath === '/';
 
-    const LeftIcon = FaArrowRight;
+    const LeftIcon = BackIcon;
     const RightIcon = FaBell;
     // Get user from auth prop or from usePage if auth is not provided
     const page = usePage();
@@ -107,12 +115,12 @@ export default function MobileTopBar({
     const userName = user?.name || '';
 
     const navItems = [
-        { key: 'home', label: 'الرئيسية', icon: FaHome, href: links.home },
-        { key: 'projects', label: 'المشاريع', icon: FaFolderOpen, href: '/projects' },
-        { key: 'challenges', label: 'التحديات', icon: FaTrophy, href: '/challenges' },
-        { key: 'publications', label: 'الإصدارات', icon: FaBook, href: '/publications' },
-        { key: 'badges', label: 'الشارات', icon: FaMedal, href: '/badges' },
-        { key: 'about', label: 'من نحن', icon: FaCompass, href: '/about' },
+        { key: 'home', label: t('common.home'), icon: FaHome, href: links.home },
+        { key: 'projects', label: t('common.projects'), icon: FaFolderOpen, href: '/projects' },
+        { key: 'challenges', label: t('common.challenges'), icon: FaTrophy, href: '/challenges' },
+        { key: 'publications', label: t('common.publications'), icon: FaBook, href: '/publications' },
+        { key: 'badges', label: t('common.badges'), icon: FaMedal, href: '/badges' },
+        { key: 'about', label: t('common.about'), icon: FaCompass, href: '/about' },
     ];
 
     // Mobile View
@@ -125,7 +133,7 @@ export default function MobileTopBar({
                             type="button"
                             onClick={onBack}
                             className="h-10 w-10 me-2 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center hover:bg-gray-100 transition"
-                            aria-label="رجوع"
+                            aria-label={t('common.back')}
                         >
                             <LeftIcon className="text-gray-700" />
                         </button>
@@ -134,7 +142,7 @@ export default function MobileTopBar({
                         <Link href="/" className="flex items-center space-x-3 space-x-reverse">
                             <img
                                 src="/images/logo-modified.png"
-                                alt="إرث المبتكرين - Innovators Legacy"
+                                alt={t('common.appName')}
                                 className="h-10 w-auto object-contain"
                             />
                         </Link>
@@ -146,7 +154,7 @@ export default function MobileTopBar({
                         type="button"
                         onClick={onNotifications}
                         className="relative h-10 w-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center hover:bg-gray-100 transition"
-                        aria-label="الإشعارات"
+                        aria-label={t('common.notifications')}
                     >
                         <RightIcon className="text-gray-700" />
                         {unreadCount > 0 && (
@@ -155,6 +163,9 @@ export default function MobileTopBar({
                             </span>
                         )}
                     </button>
+                    <div className="ms-1">
+                        <LanguageSwitcher />
+                    </div>
                 </div>
             </div>
         </header>
@@ -170,12 +181,12 @@ export default function MobileTopBar({
                         <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
                             <img
                                 src="/images/logo-modified.png"
-                                alt="إرث المبتكرين - Innovators Legacy"
+                                alt={t('common.appName')}
                                 className="h-12 w-auto object-contain"
                             />
                             <div className="flex flex-col">
                                 <p className="text-xl font-bold bg-gradient-to-r from-[#A3C042] to-[#8CA635] bg-clip-text text-transparent">
-                                    إرث المبتكرين
+                                    {t('common.appName')}
                                 </p>
                                 <p className="text-xs text-gray-500">Innovators Legacy</p>
                             </div>
@@ -205,14 +216,17 @@ export default function MobileTopBar({
                     </nav>
 
                     {/* Right Side - Notifications & User */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1.5">
+                        {/* Language Switcher */}
+                        <LanguageSwitcher />
+
                         {/* Notifications */}
                         {isAuthed && (
                             <button
                                 type="button"
                                 onClick={onNotifications}
-                                className="relative h-11 w-11 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center hover:bg-gray-100 hover:border-gray-300 transition group"
-                                aria-label="الإشعارات"
+                                className="relative h-10 w-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center hover:bg-gray-100 hover:border-gray-300 transition group"
+                        aria-label={t('common.notifications')}
                             >
                                 <RightIcon className="text-gray-600 group-hover:text-[#A3C042] transition" />
                                 {unreadCount > 0 && (
@@ -255,12 +269,12 @@ export default function MobileTopBar({
                                         </div>
                                     </div>
                                     <div className=" hidden lg:block">
-                                        <div className="text-sm font-bold text-gray-900">{userName?.split(' ')[0] || 'المستخدم'}</div>
+                                        <div className="text-sm font-bold text-gray-900">{userName?.split(' ')[0] || t('common.user')}</div>
                                         <div className="text-xs text-gray-500">
-                                            {user?.role === 'student' && 'طالب'}
-                                            {user?.role === 'teacher' && 'معلم'}
-                                            {user?.role === 'school' && 'مدرسة'}
-                                            {user?.role === 'admin' && 'مدير'}
+                                            {user?.role === 'student' && t('common.student')}
+                                            {user?.role === 'teacher' && t('common.teacher')}
+                                            {user?.role === 'school' && t('common.school')}
+                                            {user?.role === 'admin' && t('common.admin')}
                                         </div>
                                     </div>
                                     <FaChevronDown className={`text-xs text-gray-400 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
@@ -268,13 +282,13 @@ export default function MobileTopBar({
 
                                 {/* User Dropdown */}
                                 {userMenuOpen && (
-                                    <div className="absolute left-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden z-50">
+                                    <div className="absolute end-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden z-50">
                                         <div className="p-4 border-b border-gray-100">
-                                            <div className="font-bold text-gray-900">{userName || 'المستخدم'}</div>
+                                            <div className="font-bold text-gray-900">{userName || t('common.user')}</div>
                                             <div className="text-xs text-gray-500 mt-1">{user?.email || ''}</div>
                                         </div>
                                         <div className="py-2">
-                                            {/* لوحة التحكم - تظهر لجميع الأدوار */}
+                                            {/* Dashboard - shown for all roles */}
                                             {(user?.role === 'admin' || user?.role === 'teacher' || user?.role === 'school' || user?.role === 'student') && (
                                                 <button
                                                     type="button"
@@ -284,7 +298,7 @@ export default function MobileTopBar({
                                                     }}
                                                     className="w-full px-4 py-3 text-sm font-semibold text-[#A3C042] hover:bg-[#A3C042]/10 transition flex items-center justify-between gap-2 border-b border-gray-100"
                                                 >
-                                                    <span>لوحة التحكم</span>
+                                                    <span>{t('dashboard.dashboard')}</span>
                                                     <FaTachometerAlt className="text-[#A3C042]" />
                                                 </button>
                                             )}
@@ -296,7 +310,7 @@ export default function MobileTopBar({
                                                 }}
                                                 className="w-full  px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition flex items-center justify-between gap-2"
                                             >
-                                                <span>الملف الشخصي</span>
+                                                <span>{t('dashboard.myProfile')}</span>
                                                 <FaUser className="text-gray-400" />
                                             </button>
                                             {user?.role === 'student' && (
@@ -309,7 +323,7 @@ export default function MobileTopBar({
                                                         }}
                                                         className="w-full  px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition flex items-center justify-between gap-2"
                                                     >
-                                                        <span>النقاط</span>
+                                                        <span>{t('dashboard.points')}</span>
                                                     </button>
                                                     <button
                                                         type="button"
@@ -319,7 +333,7 @@ export default function MobileTopBar({
                                                         }}
                                                         className="w-full  px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition flex items-center justify-between gap-2"
                                                     >
-                                                        <span>الإنجازات</span>
+                                                        <span>{t('dashboard.achievements')}</span>
                                                     </button>
                                                 </>
                                             )}
@@ -333,7 +347,7 @@ export default function MobileTopBar({
                                                 }}
                                                 className="w-full px-4 py-3 text-sm font-semibold text-red-600 hover:bg-red-50 transition flex items-center justify-between gap-2"
                                             >
-                                                <span>تسجيل الخروج</span>
+                                                <span>{t('common.logout')}</span>
                                                 <FaSignOutAlt className="text-xs" />
                                             </button>
                                         </div>
@@ -346,13 +360,13 @@ export default function MobileTopBar({
                                     href="/login"
                                     className="px-4 py-2 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-100 transition"
                                 >
-                                    تسجيل الدخول
+                                    {t('common.login')}
                                 </Link>
                                 <Link
                                     href="/register"
                                     className="px-4 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-[#A3C042] to-[#8CA635] text-white hover:opacity-90 transition shadow-md"
                                 >
-                                    انضم للمنصة
+                                    {t('common.joinPlatform')}
                                 </Link>
                             </div>
                         )}
@@ -363,10 +377,10 @@ export default function MobileTopBar({
     );
 
     return (
-        <>
+        <div dir={dir}>
             <MobileHeader />
             <DesktopHeader />
-        </>
+        </div>
     );
 }
 

@@ -26,8 +26,8 @@ export default function ConfirmPassword() {
                 <div className="w-full sm:space-y-8">
                     <div className="relative overflow-hidden bg-white shadow-lg sm:rounded-2xl px-4 py-10 w-[100vw] sm:w-[400px] md:w-[450px] max-w-5xl sm:mx-auto">
                         <form onSubmit={submit} className="space-y-6">
-                            <img src="/images/avatar.svg" alt="avatar" className="absolute -top-24 -left-24 w-48 h-48" />
-                            <img src="/images/avatar1.svg" alt="avatar" className="absolute -bottom-8 right-0 w-28 h-28" />
+                            <img src="/images/avatar.svg" alt="avatar" className="absolute -top-24 -start-24 w-48 h-48" />
+                            <img src="/images/avatar1.svg" alt="avatar" className="absolute -bottom-8 end-0 w-28 h-28" />
                             <div className="flex flex-col items-center">
                                 <div>
                                     <img
@@ -49,7 +49,7 @@ export default function ConfirmPassword() {
 
                             <div>
                                 <div className="relative">
-                                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                         <FaLock className="h-5 w-5 text-gray-400" />
                                     </div>
                                     <TextInput
@@ -65,7 +65,7 @@ export default function ConfirmPassword() {
                                     />
                                     <button
                                         type="button"
-                                        className="absolute inset-y-0 left-0 pl-3 flex items-center"
+                                        className="absolute inset-y-0 end-0 pe-3 flex items-center"
                                         onClick={() => setShowPassword(!showPassword)}
                                     >
                                         {showPassword ? (

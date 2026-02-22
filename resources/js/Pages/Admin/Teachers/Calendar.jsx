@@ -121,7 +121,7 @@ export default function TeacherCalendar({ teacher, availabilities, auth }) {
                                     onClick={() => window.history.back()}
                                     className="flex items-center text-gray-600 hover:text-gray-900 transition duration-300"
                                 >
-                                    <FaCalendar className="ml-2" />
+                                    <FaCalendar className="me-2" />
                                     العودة
                                 </button>
                                 <h1 className="text-2xl font-bold text-gray-900">
@@ -141,7 +141,7 @@ export default function TeacherCalendar({ teacher, availabilities, auth }) {
                                 }}
                                 className="flex items-center px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition duration-300"
                             >
-                                <FaPlus className="ml-2" />
+                                <FaPlus className="me-2" />
                                 إضافة وقت
                             </button>
                         </div>

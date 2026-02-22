@@ -136,7 +136,7 @@ export default function StudentChallengeSubmissionShow({ auth, challenge, submis
                                             className={star <= submission.rating ? 'text-yellow-500' : 'text-gray-300'}
                                         />
                                     ))}
-                                    <span className="mr-2">({submission.rating}/5)</span>
+                                    <span className="ms-2">({submission.rating}/5)</span>
                                 </div>
                             </div>
                         )}

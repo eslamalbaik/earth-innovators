@@ -133,12 +133,12 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
                                     }`}
                             >
                                 {isPopular && (
-                                    <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-[#A3C042] to-[#8CA635] text-white text-center py-1.5 font-bold text-xs">
+                                    <div className="absolute top-0 end-0 start-0 bg-gradient-to-r from-[#A3C042] to-[#8CA635] text-white text-center py-1.5 font-bold text-xs">
                                         ⭐ الأكثر شعبية
                                     </div>
                                 )}
                                 {isCurrentPackage && (
-                                    <div className="absolute top-0 left-0 right-0 bg-[#A3C042] text-white text-center py-1.5 font-bold text-xs">
+                                    <div className="absolute top-0 end-0 start-0 bg-[#A3C042] text-white text-center py-1.5 font-bold text-xs">
                                         ✓ باقتك الحالية
                                     </div>
                                 )}
@@ -233,14 +233,14 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
                                         >
                                             {isSubscribing ? (
                                                 <>
-                                                    <FaSpinner className="animate-spin inline ml-2" />
+                                                    <FaSpinner className="animate-spin inline me-2" />
                                                     جاري المعالجة...
                                                 </>
                                             ) : isCurrentPackage ? (
                                                 'باقتك الحالية'
                                             ) : (
                                                 <>
-                                                    <FaCreditCard className="inline ml-2" />
+                                                    <FaCreditCard className="inline me-2" />
                                                     {userPackage?.package_id === pkg.id ? 'تجديد الاشتراك' : 'اشترك الآن'}
                                                 </>
                                             )}

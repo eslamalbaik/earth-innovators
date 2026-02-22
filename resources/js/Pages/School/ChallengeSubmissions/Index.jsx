@@ -154,7 +154,7 @@ export default function SchoolChallengeSubmissionsIndex({ auth, submissions, cha
                                             <tr key={submission.id} className="hover:bg-gray-50">
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="flex items-center">
-                                                        <FaUser className="text-gray-400 mr-2" />
+                                                        <FaUser className="text-gray-400 ms-2" />
                                                         <span className="text-sm font-medium text-gray-900">
                                                             {submission.student?.name || 'غير معروف'}
                                                         </span>
@@ -235,7 +235,7 @@ export default function SchoolChallengeSubmissionsIndex({ auth, submissions, cha
                         </div>
                         <button
                             onClick={() => setShowToast(false)}
-                            className="ml-4 text-white hover:text-gray-200 transition"
+                            className="me-4 text-white hover:text-gray-200 transition"
                         >
                             <FaTimes />
                         </button>

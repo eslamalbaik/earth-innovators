@@ -176,7 +176,7 @@ export default function ResetPasswordOtp({ token, email, status }) {
                                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                     </svg>
                                 </div>
-                                <div className="mr-3">
+                                <div className="ms-3">
                                     <p className="text-sm font-medium text-green-800">{status}</p>
                                 </div>
                             </div>
@@ -184,8 +184,8 @@ export default function ResetPasswordOtp({ token, email, status }) {
                     )}
 
                     <div className="relative min-h-screen overflow-hidden bg-white shadow-lg sm:rounded-2xl px-4 py-10 w-[100vw] sm:w-[400px] md:w-[450px] max-w-5xl sm:mx-auto">
-                        <img src="/images/avatar.svg" alt="avatar" className="absolute -top-24 -left-24 w-48 h-48" />
-                        <img src="/images/avatar1.svg" alt="avatar" className="absolute -bottom-8 right-0 w-28 h-28" />
+                        <img src="/images/avatar.svg" alt="avatar" className="absolute -top-24 -start-24 w-48 h-48" />
+                        <img src="/images/avatar1.svg" alt="avatar" className="absolute -bottom-8 end-0 w-28 h-28" />
                         <div className="flex flex-col items-center">
                             <div>
                                 <img
@@ -214,7 +214,7 @@ export default function ResetPasswordOtp({ token, email, status }) {
                             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
                                 <div className="flex items-start justify-between">
                                     <div className="flex items-start">
-                                        <FaExclamationTriangle className="text-red-500 text-xl mt-0.5 ml-3 flex-shrink-0" />
+                                        <FaExclamationTriangle className="text-red-500 text-xl mt-0.5 me-3 flex-shrink-0" />
                                         <div className="flex-1">
                                             <h3 className="text-sm font-semibold text-red-800 mb-2">
                                                 يرجى تصحيح الأخطاء التالية:

@@ -16,7 +16,7 @@ class TeacherFactory extends Factory
             'user_id' => User::factory()->create(['role' => 'teacher'])->id,
             'name_ar' => $this->faker->name(),
             'name_en' => $this->faker->name(),
-            'nationality' => 'SA',
+            'nationality' => 'إماراتي',
             'gender' => $this->faker->randomElement(['male', 'female']),
             'bio' => $this->faker->paragraph(),
             'qualifications' => $this->faker->sentence(),

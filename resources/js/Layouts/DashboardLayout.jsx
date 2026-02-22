@@ -8,16 +8,21 @@ import {
     FaChevronDown, FaCreditCard, FaTrophy, FaProjectDiagram, FaMedal, FaFile,
     FaCheckCircle
 } from 'react-icons/fa';
+import { useSelector } from 'react-redux';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import SidebarItem from '@/Components/SidebarItem';
 import SidebarSubMenu from '@/Components/SidebarSubMenu';
 import { getInitials, getColorFromName } from '@/utils/imageUtils';
 import { useToast } from '@/Contexts/ToastContext';
 import { useFlashNotifications } from '@/Hooks/useFlashNotifications';
+import LanguageSwitcher from '@/Components/LanguageSwitcher';
+import { useTranslation } from '@/i18n';
 
 export default function DashboardLayout({ children, header }) {
+    const { t } = useTranslation();
     const { auth } = usePage().props;
     const { showInfo } = useToast();
+    const { dir } = useSelector((state) => state.language);
 
     useFlashNotifications();
     const [sidebarOpen, setSidebarOpen] = useState(() => {
@@ -50,15 +55,15 @@ export default function DashboardLayout({ children, header }) {
         const role = auth?.user?.role;
         switch (role) {
             case 'student':
-                return 'لوحة تحكم الطالب';
+                return t('dashboard.studentDashboard');
             case 'teacher':
-                return 'لوحة تحكم المعلم';
+                return t('dashboard.teacherDashboard');
             case 'school':
-                return 'لوحة تحكم المدرسة';
+                return t('dashboard.schoolDashboard');
             case 'admin':
-                return 'لوحة الإدارة';
+                return t('dashboard.adminDashboard');
             default:
-                return 'لوحة التحكم';
+                return t('dashboard.dashboard');
         }
     };
 
@@ -268,13 +273,13 @@ export default function DashboardLayout({ children, header }) {
 
         const previousData = previousDashboardDataRef.current;
 
-        let dashboardType = 'لوحة التحكم';
+        let dashboardType = t('dashboard.dashboard');
         if (currentUrl.includes('/teacher')) {
-            dashboardType = 'لوحة تحكم المعلم';
+            dashboardType = t('dashboard.teacherDashboard');
         } else if (currentUrl.includes('/student')) {
-            dashboardType = 'لوحة تحكم الطالب';
+            dashboardType = t('dashboard.studentDashboard');
         } else if (currentUrl.includes('/school')) {
-            dashboardType = 'لوحة تحكم المدرسة';
+            dashboardType = t('dashboard.schoolDashboard');
         }
 
         if (!previousData) {
@@ -283,9 +288,9 @@ export default function DashboardLayout({ children, header }) {
         }
 
         if (previousData.url !== currentData.url) {
-            showInfo('تم تحميل البيانات', {
+            showInfo(t('dashboard.dataLoaded'), {
                 title: `${dashboardType}`,
-                message: 'تم تحميل معلومات لوحة التحكم بنجاح',
+                message: t('dashboard.dataLoadedMessage'),
                 autoDismiss: 5000,
             });
             previousDashboardDataRef.current = currentData;
@@ -297,9 +302,9 @@ export default function DashboardLayout({ children, header }) {
             const teacherChanged = JSON.stringify(previousData.teacher) !== JSON.stringify(currentData.teacher);
 
             if (statsChanged || teacherChanged) {
-                showInfo('تم تحديث البيانات', {
-                    title: `تحديث ${dashboardType}`,
-                    message: 'تم تحديث معلومات لوحة التحكم بنجاح',
+                showInfo(t('dashboard.dataUpdated'), {
+                    title: `${dashboardType}`,
+                    message: t('dashboard.dataUpdatedMessage'),
                     autoDismiss: 5000,
                 });
             }
@@ -379,185 +384,177 @@ export default function DashboardLayout({ children, header }) {
 
     const navigation = {
         admin: [
-            { name: 'لوحة التحكم', href: '/admin/dashboard', icon: FaTachometerAlt },
-            { name: 'صندوق المشاريع', href: '/admin/projects', icon: FaBook },
+            { name: t('sidebar.dashboard'), href: '/admin/dashboard', icon: FaTachometerAlt },
+            { name: t('sidebar.projectBox'), href: '/admin/projects', icon: FaBook },
             {
-                name: 'مقالات',
+                name: t('sidebar.publications'),
                 href: '/admin/publications',
                 icon: FaBook,
                 subItems: [
-                    // { name: 'مراجعة مقالات المجلة', href: '/admin/publications?status=pending', icon: FaBookOpen },
-                    { name: 'مقالات المدرسة', href: '/admin/publications', icon: FaBook },
+                    { name: t('sidebar.schoolPublications'), href: '/admin/publications', icon: FaBook },
                 ]
             },
-            { name: 'التحديات', href: '/admin/challenges', icon: FaCalendar },
-            { name: 'المستخدمون', href: '/admin/users', icon: FaUsers },
-            { name: 'الشارات', href: '/admin/badges', icon: FaCommentDots },
-            { name: 'الباقات', href: '/admin/packages', icon: FaCreditCard },
-            { name: 'الاشتراكات والمدفوعات', href: '/admin/subscriptions', icon: FaCreditCard },
-            { name: 'الشهادات', href: '/admin/certificates', icon: FaGraduationCap },
-            { name: 'بوابات الدفع', href: '/admin/payment-gateways', icon: FaCreditCard },
-            { name: 'معايير القبول', href: '/admin/acceptance-criteria', icon: FaCheckCircle },
-            { name: 'الملف الشخصي', href: '/profile', icon: FaUser },
+            { name: t('sidebar.challenges'), href: '/admin/challenges', icon: FaCalendar },
+            { name: t('sidebar.users'), href: '/admin/users', icon: FaUsers },
+            { name: t('sidebar.badges'), href: '/admin/badges', icon: FaCommentDots },
+            { name: t('sidebar.packages'), href: '/admin/packages', icon: FaCreditCard },
+            { name: t('sidebar.subscriptions'), href: '/admin/subscriptions', icon: FaCreditCard },
+            { name: t('sidebar.certificates'), href: '/admin/certificates', icon: FaGraduationCap },
+            { name: t('sidebar.paymentGateways'), href: '/admin/payment-gateways', icon: FaCreditCard },
+            { name: t('sidebar.acceptanceCriteria'), href: '/admin/acceptance-criteria', icon: FaCheckCircle },
+            { name: t('sidebar.profile'), href: '/profile', icon: FaUser },
         ],
         teacher: [
-            { name: 'لوحة التحكم', href: '/teacher/dashboard', icon: FaTachometerAlt },
+            { name: t('sidebar.dashboard'), href: '/teacher/dashboard', icon: FaTachometerAlt },
             {
-                name: 'صندوق المشاريع',
+                name: t('sidebar.projectBox'),
                 href: '/teacher/projects',
                 icon: FaProjectDiagram,
                 subItems: [
-                    { name: 'تسليمات المشاريع', href: '/teacher/submissions', icon: FaFile },
-                    { name: 'مراجعة المشاريع', href: '/teacher/projects', icon: FaBookOpen },
-                    { name: 'مشاريعي', href: '/teacher/projects', icon: FaProjectDiagram },
-                    // { name: 'إنشاء مشروع', href: '/teacher/projects/create', icon: FaProjectDiagram },
+                    { name: t('sidebar.submissions'), href: '/teacher/submissions', icon: FaFile },
+                    { name: t('sidebar.reviewProjects'), href: '/teacher/projects', icon: FaBookOpen },
+                    { name: t('sidebar.myProjects'), href: '/teacher/projects', icon: FaProjectDiagram },
                 ]
             },
             {
-                name: 'مقالات',
+                name: t('sidebar.publications'),
                 href: '/teacher/publications',
                 icon: FaBook,
                 subItems: [
-                    // { name: 'مراجعة مقالات المجلة', href: '/school/publications/pending', icon: FaBookOpen },
-                    { name: 'مقالات المدرسة', href: '/teacher/publications', icon: FaBook },
-                    // { name: 'إنشاء مقال', href: '/teacher/publications/create', icon: FaBook },
+                    { name: t('sidebar.schoolPublications'), href: '/teacher/publications', icon: FaBook },
                 ]
             },
             {
-                name: 'التحديات',
+                name: t('sidebar.challenges'),
                 href: '/teacher/challenges',
                 icon: FaCalendar,
                 subItems: [
-                    { name: 'تسليمات التحديات', href: '/teacher/challenge-submissions', icon: FaFile },
-                    // { name: 'مراجعة التحديات', href: '/teacher/challenge-submissions?status=submitted', icon: FaBookOpen },
-                    { name: 'تحدياتي', href: '/teacher/challenges', icon: FaCalendar },
-                    // { name: 'إنشاء تحدّي', href: '/teacher/challenges/create', icon: FaCalendar },
+                    { name: t('sidebar.challengeSubmissions'), href: '/teacher/challenge-submissions', icon: FaFile },
+                    { name: t('sidebar.myChallenges'), href: '/teacher/challenges', icon: FaCalendar },
                 ]
             },
-            { name: 'الطلاب المتابعون', href: '/teacher/students', icon: FaGraduationCap },
-            { name: 'شاراتي', href: '/teacher/badges', icon: FaMedal },
-            // { name: 'إرسال شارة', href: '/teacher/badges/create', icon: FaCommentDots },
-            { name: 'الشهادات', href: '/teacher/certificates', icon: FaFile },
-            { name: 'الملف الشخصي', href: '/teacher/profile', icon: FaUser },
+            { name: t('sidebar.followedStudents'), href: '/teacher/students', icon: FaGraduationCap },
+            { name: t('sidebar.myBadges'), href: '/teacher/badges', icon: FaMedal },
+            { name: t('sidebar.certificates'), href: '/teacher/certificates', icon: FaFile },
+            { name: t('sidebar.profile'), href: '/teacher/profile', icon: FaUser },
         ],
         school: [
-            { name: 'لوحة التحكم', href: '/school/dashboard', icon: FaTachometerAlt },
+            { name: t('sidebar.dashboard'), href: '/school/dashboard', icon: FaTachometerAlt },
             {
-                name: 'صندوق المشاريع',
+                name: t('sidebar.projectBox'),
                 href: '/school/projects',
                 icon: FaProjectDiagram,
                 subItems: [
-                    { name: 'تسليمات المشاريع', href: '/school/submissions', icon: FaFile },
-                    { name: 'مراجعة المشاريع', href: '/school/projects/pending', icon: FaBookOpen },
-                    { name: 'مشاريع المدرسة', href: '/school/projects', icon: FaProjectDiagram },
-                    // { name: 'إنشاء مشروع', href: '/school/projects/create', icon: FaProjectDiagram },
+                    { name: t('sidebar.submissions'), href: '/school/submissions', icon: FaFile },
+                    { name: t('sidebar.reviewProjects'), href: '/school/projects/pending', icon: FaBookOpen },
+                    { name: t('sidebar.projects'), href: '/school/projects', icon: FaProjectDiagram },
                 ]
             },
             {
-                name: 'الشارات',
+                name: t('sidebar.badges'),
                 href: '/school/badges',
                 icon: FaMedal,
                 subItems: [
-                    { name: 'مراجعة الشارات', href: '/school/badges/pending', icon: FaMedal },
-                    { name: 'الشارات المرسلة', href: '/school/badges', icon: FaCommentDots },
-                    { name: 'الترتيب والشارات', href: '/school/ranking', icon: FaTrophy },
+                    { name: t('sidebar.reviewProjects'), href: '/school/badges/pending', icon: FaMedal },
+                    { name: t('sidebar.badges'), href: '/school/badges', icon: FaCommentDots },
+                    { name: t('sidebar.ranking'), href: '/school/ranking', icon: FaTrophy },
                 ]
             },
             {
-                name: 'المقالات',
+                name: t('sidebar.publications'),
                 href: '/school/publications',
                 icon: FaBook,
                 subItems: [
-                    { name: 'مقالات المدرسة', href: '/school/publications', icon: FaBook },
-                    // { name: 'إنشاء مقال', href: '/school/publications/create', icon: FaBook },
+                    { name: t('sidebar.schoolPublications'), href: '/school/publications', icon: FaBook },
                 ]
             },
             {
-                name: 'التحديات',
+                name: t('sidebar.challenges'),
                 href: '/school/challenges',
                 icon: FaCalendar,
                 subItems: [
-                    { name: 'تسليمات التحديات', href: '/school/challenge-submissions', icon: FaFile },
-                    { name: 'تحديات المدرسة', href: '/school/challenges', icon: FaCalendar },
-                    // { name: 'إنشاء تحدّي', href: '/school/challenges/create', icon: FaCalendar },
+                    { name: t('sidebar.challengeSubmissions'), href: '/school/challenge-submissions', icon: FaFile },
+                    { name: t('sidebar.challenges'), href: '/school/challenges', icon: FaCalendar },
                 ]
             },
-            { name: 'إضافة تقارير', href: '/school/reports', icon: FaFile },
-            { name: 'الطلاب', href: '/school/students', icon: FaGraduationCap },
-            { name: 'الشهادات', href: '/school/certificates', icon: FaFile },
-            { name: 'الملف الشخصي', href: '/profile', icon: FaUser },
+            { name: t('sidebar.addReports'), href: '/school/reports', icon: FaFile },
+            { name: t('sidebar.students'), href: '/school/students', icon: FaGraduationCap },
+            { name: t('sidebar.certificates'), href: '/school/certificates', icon: FaFile },
+            { name: t('sidebar.profile'), href: '/profile', icon: FaUser },
         ],
         educational_institution: [
-            { name: 'لوحة التحكم', href: '/school/dashboard', icon: FaTachometerAlt },
+            { name: t('sidebar.dashboard'), href: '/school/dashboard', icon: FaTachometerAlt },
             {
-                name: 'صندوق المشاريع',
+                name: t('sidebar.projectBox'),
                 href: '/school/projects',
                 icon: FaProjectDiagram,
                 subItems: [
-                    { name: 'تسليمات صندوق المشاريع', href: '/school/submissions', icon: FaFile },
-                    { name: 'مراجعة المشاريع', href: '/school/projects/pending', icon: FaBookOpen },
-                    { name: 'مشاريع المدرسة', href: '/school/projects', icon: FaProjectDiagram },
-                    // { name: 'إنشاء مشروع', href: '/school/projects/create', icon: FaProjectDiagram },
+                    { name: t('sidebar.submissions'), href: '/school/submissions', icon: FaFile },
+                    { name: t('sidebar.reviewProjects'), href: '/school/projects/pending', icon: FaBookOpen },
+                    { name: t('sidebar.projects'), href: '/school/projects', icon: FaProjectDiagram },
                 ]
             },
             {
-                name: 'الشارات',
+                name: t('sidebar.badges'),
                 href: '/school/badges',
                 icon: FaMedal,
                 subItems: [
-                    { name: 'مراجعة الشارات', href: '/school/badges/pending', icon: FaMedal },
-                    { name: 'الشارات المرسلة', href: '/school/badges', icon: FaCommentDots },
-                    { name: 'الترتيب والشارات', href: '/school/ranking', icon: FaTrophy },
+                    { name: t('sidebar.reviewProjects'), href: '/school/badges/pending', icon: FaMedal },
+                    { name: t('sidebar.badges'), href: '/school/badges', icon: FaCommentDots },
+                    { name: t('sidebar.ranking'), href: '/school/ranking', icon: FaTrophy },
                 ]
             },
             {
-                name: 'المقالات',
+                name: t('sidebar.publications'),
                 href: '/school/publications',
                 icon: FaBook,
                 subItems: [
-                    { name: 'مقالات المدرسة', href: '/school/publications', icon: FaBook },
-                    // { name: 'إنشاء مقال', href: '/school/publications/create', icon: FaBook },
+                    { name: t('sidebar.schoolPublications'), href: '/school/publications', icon: FaBook },
                 ]
             },
             {
-                name: 'التحديات',
+                name: t('sidebar.challenges'),
                 href: '/school/challenges',
                 icon: FaCalendar,
                 subItems: [
-                    { name: 'تسليمات التحديات', href: '/school/challenge-submissions', icon: FaFile },
-                    { name: 'تحديات المدرسة', href: '/school/challenges', icon: FaCalendar },
-                    // { name: 'إنشاء تحدّي', href: '/school/challenges/create', icon: FaCalendar },
+                    { name: t('sidebar.challengeSubmissions'), href: '/school/challenge-submissions', icon: FaFile },
+                    { name: t('sidebar.challenges'), href: '/school/challenges', icon: FaCalendar },
                 ]
             },
-            { name: 'إضافة تقارير', href: '/school/reports', icon: FaFile },
-            { name: 'الطلاب', href: '/school/students', icon: FaGraduationCap },
-            { name: 'الشهادات', href: '/school/certificates', icon: FaFile },
-            { name: 'الملف الشخصي', href: '/profile', icon: FaUser },
+            { name: t('sidebar.addReports'), href: '/school/reports', icon: FaFile },
+            { name: t('sidebar.students'), href: '/school/students', icon: FaGraduationCap },
+            { name: t('sidebar.certificates'), href: '/school/certificates', icon: FaFile },
+            { name: t('sidebar.profile'), href: '/profile', icon: FaUser },
         ],
         student: [
-            { name: 'لوحة التحكم', href: '/student/dashboard', icon: FaTachometerAlt },
-            { name: 'مشاريعي', href: '/student/projects', icon: FaBook },
-            { name: 'التحديات', href: '/student/challenges', icon: FaCalendar },
-            { name: 'الشارات', href: '/student/badges', icon: FaCommentDots },
-            { name: 'النقاط', href: '/student/points', icon: FaChartLine },
-            { name: 'الباقات', href: '/packages', icon: FaCreditCard },
-            { name: 'الملف الشخصي', href: '/student/profile', icon: FaUser },
+            { name: t('sidebar.dashboard'), href: '/student/dashboard', icon: FaTachometerAlt },
+            { name: t('sidebar.myProjects'), href: '/student/projects', icon: FaBook },
+            { name: t('sidebar.challenges'), href: '/student/challenges', icon: FaCalendar },
+            { name: t('sidebar.badges'), href: '/student/badges', icon: FaCommentDots },
+            { name: t('sidebar.points'), href: '/student/points', icon: FaChartLine },
+            { name: t('sidebar.packages'), href: '/packages', icon: FaCreditCard },
+            { name: t('sidebar.profile'), href: '/student/profile', icon: FaUser },
         ]
     };
 
     const currentNavigation = navigation[auth.user?.role];
 
+    const sidebarPosition = dir === 'rtl' ? 'right-4' : 'left-4';
+    const sidebarClosePosition = dir === 'rtl' ? 'left-4' : 'right-4';
+    const sidebarHiddenClass = dir === 'rtl' 
+        ? (sidebarOpen ? 'translate-x-0 opacity-100' : 'translate-x-[120%] opacity-0 pointer-events-none')
+        : (sidebarOpen ? 'translate-x-0 opacity-100' : '-translate-x-[120%] opacity-0 pointer-events-none');
+
     return (
-        <div dir="rtl" className="min-h-screen bg-gray-50">
+        <div dir={dir} className="min-h-screen bg-gray-50">
             <aside
-                className={`fixed top-2 right-4 bottom-2 z-40 transition-all duration-300 ${sidebarOpen ? 'translate-x-0 opacity-100' : 'translate-x-[120%] opacity-0 pointer-events-none'
-                    } w-72 bg-white rounded-2xl shadow-2xl border border-gray-100`}
+                className={`fixed top-2 ${sidebarPosition} bottom-2 z-40 transition-all duration-300 ${sidebarHiddenClass} w-72 bg-white rounded-2xl shadow-2xl border border-gray-100`}
             >
                 <div className="relative flex flex-col items-center justify-center h-24 px-6 border-b border-gray-100">
                     {sidebarOpen && (
                         <button
                             onClick={toggleSidebar}
-                            className="absolute left-4 top-4 lg:hidden p-2 rounded-xl hover:bg-gray-50 transition"
+                            className={`absolute ${sidebarClosePosition} top-4 lg:hidden p-2 rounded-xl hover:bg-gray-50 transition`}
                         >
                             <FaTimes className="text-gray-500" />
                         </button>
@@ -565,7 +562,7 @@ export default function DashboardLayout({ children, header }) {
                     <div className="w-full flex justify-center items-center gap-3">
                         <Link href="/" className="flex items-center gap-3">
                             <ApplicationLogo />
-                            <span className="text-lg font-bold bg-[#A3C042] bg-clip-text text-transparent">إرث المبتكرين</span>
+                            <span className="text-lg font-bold bg-[#A3C042] bg-clip-text text-transparent">{t('common.appName')}</span>
                         </Link>
                     </div>
                     {auth?.user && (
@@ -641,11 +638,11 @@ export default function DashboardLayout({ children, header }) {
                                     <div className="flex-1">
                                         <p className="text-sm font-semibold text-gray-900">{auth.user?.name}</p>
                                         <p className="text-xs text-gray-500">
-                                            {auth.user?.role === 'admin' && 'أدمن'}
-                                            {auth.user?.role === 'teacher' && 'معلم'}
-                                            {auth.user?.role === 'student' && 'طالب'}
-                                            {auth.user?.role === 'school' && 'مدرسة'}
-                                            {auth.user?.role === 'educational_institution' && 'مؤسسة تعليمية'}
+                                            {auth.user?.role === 'admin' && t('roles.admin')}
+                                            {auth.user?.role === 'teacher' && t('roles.teacher')}
+                                            {auth.user?.role === 'student' && t('roles.student')}
+                                            {auth.user?.role === 'school' && t('roles.school')}
+                                            {auth.user?.role === 'educational_institution' && t('roles.educationalInstitution')}
                                         </p>
                                     </div>
                                 </div>
@@ -674,6 +671,8 @@ export default function DashboardLayout({ children, header }) {
                             </div>
 
                             <div className="flex items-center gap-3">
+                                <LanguageSwitcher />
+                                
                                 {(auth?.user?.role === 'student' || auth?.user?.role === 'teacher' || auth?.user?.role === 'school' || auth?.user?.role === 'educational_institution' || auth?.user?.role === 'admin') && (
                                     <div className="relative" ref={notificationsRef}>
                                         <button
@@ -692,9 +691,9 @@ export default function DashboardLayout({ children, header }) {
                                         </button>
 
                                         {notificationsOpen && (
-                                            <div className="absolute left-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 max-h-96 overflow-hidden flex flex-col">
+                                            <div className="absolute end-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 max-h-96 overflow-hidden flex flex-col">
                                                 <div className="px-4 py-3 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between rounded-t-2xl">
-                                                    <h3 className="font-bold text-gray-900">الإشعارات</h3>
+                                                    <h3 className="font-bold text-gray-900">{t('notifications.title')}</h3>
                                                     {unreadCount > 0 && (
                                                         <button
                                                             onClick={(e) => {
@@ -703,7 +702,7 @@ export default function DashboardLayout({ children, header }) {
                                                             }}
                                                             className="text-xs text-blue-600 hover:text-blue-700 font-medium"
                                                         >
-                                                            تحديد الكل كمقروء
+                                                            {t('notifications.markAllRead')}
                                                         </button>
                                                     )}
                                                 </div>
@@ -792,7 +791,7 @@ export default function DashboardLayout({ children, header }) {
                                                                                     notification.data?.message_ar ||
                                                                                     notification.data?.message ||
                                                                                     notification.data?.body ||
-                                                                                    'إشعار جديد'}
+                                                                                    t('notifications.newNotification')}
                                                                             </p>
                                                                             {(notification.data?.message || notification.data?.body) &&
                                                                                 notification.data?.title && (
@@ -828,7 +827,7 @@ export default function DashboardLayout({ children, header }) {
                                                                                             ★
                                                                                         </span>
                                                                                     ))}
-                                                                                    <span className="text-xs text-gray-600 mr-1">
+                                                                                    <span className="text-xs text-gray-600 ms-1">
                                                                                         ({notification.data.rating}/5)
                                                                                     </span>
                                                                                 </div>
@@ -850,7 +849,7 @@ export default function DashboardLayout({ children, header }) {
                                                         </div>
                                                     ) : (
                                                         <div className="px-4 py-8 text-center text-gray-500">
-                                                            لا توجد إشعارات
+                                                            {t('notifications.noNotifications')}
                                                         </div>
                                                     )}
                                                 </div>
@@ -861,7 +860,7 @@ export default function DashboardLayout({ children, header }) {
                                                             className="text-sm text-blue-600 hover:text-blue-700 font-medium block text-center"
                                                             onClick={() => setNotificationsOpen(false)}
                                                         >
-                                                            عرض جميع الإشعارات
+                                                            {t('notifications.viewAll')}
                                                         </Link>
                                                     </div>
                                                 )}
@@ -900,22 +899,21 @@ export default function DashboardLayout({ children, header }) {
                                             {getInitials(auth.user?.name || 'User')}
                                         </div>
                                         <div className="hidden sm:block ">
-                                            <div className="text-sm font-semibold text-gray-900">{auth.user?.name?.split(' ')[0] || 'المستخدم'}</div>
+                                            <div className="text-sm font-semibold text-gray-900">{auth.user?.name?.split(' ')[0] || t('roles.user')}</div>
                                             <div className="text-xs text-gray-500">
-                                                {auth.user?.role === 'admin' && 'أدمن'}
-                                                {auth.user?.role === 'teacher' && 'معلم'}
-                                                {auth.user?.role === 'student' && 'طالب'}
-                                                {auth.user?.role === 'school' && 'مدرسة'}
-                                                {auth.user?.role === 'educational_institution' && 'مؤسسة تعليمية'}
+                                                {auth.user?.role === 'admin' && t('roles.admin')}
+                                                {auth.user?.role === 'teacher' && t('roles.teacher')}
+                                                {auth.user?.role === 'student' && t('roles.student')}
+                                                {auth.user?.role === 'school' && t('roles.school')}
+                                                {auth.user?.role === 'educational_institution' && t('roles.educationalInstitution')}
                                             </div>
                                         </div>
                                         <FaChevronDown className={`text-gray-400 text-xs transition-transform duration-200 ${userDropdownOpen ? 'rotate-180' : ''}`} />
                                     </button>
 
                                     {userDropdownOpen && (
-                                        <div className="absolute left-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
+                                        <div className="absolute end-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
                                             <div className="py-2">
-                                                {/* لوحة التحكم */}
                                                 {(auth?.user?.role === 'admin' || auth?.user?.role === 'teacher' || auth?.user?.role === 'school' || auth?.user?.role === 'student') && (
                                                     <>
                                                         <Link
@@ -932,7 +930,7 @@ export default function DashboardLayout({ children, header }) {
                                                             onClick={() => setUserDropdownOpen(false)}
                                                         >
                                                             <FaTachometerAlt className="text-[#A3C042]" />
-                                                            لوحة التحكم
+                                                            {t('sidebar.dashboard')}
                                                         </Link>
                                                         <div className="border-t border-gray-100 my-1" />
                                                     </>
@@ -949,7 +947,7 @@ export default function DashboardLayout({ children, header }) {
                                                     onClick={() => setUserDropdownOpen(false)}
                                                 >
                                                     <FaUser className="text-gray-400" />
-                                                    الملف الشخصي
+                                                    {t('profile.profile')}
                                                 </Link>
                                                 <div className="border-t border-gray-100 my-1" />
                                                 <Link
@@ -960,7 +958,7 @@ export default function DashboardLayout({ children, header }) {
                                                     onClick={() => setUserDropdownOpen(false)}
                                                 >
                                                     <FaSignOutAlt className="text-red-500" />
-                                                    تسجيل الخروج
+                                                    {t('profile.logout')}
                                                 </Link>
                                             </div>
                                         </div>

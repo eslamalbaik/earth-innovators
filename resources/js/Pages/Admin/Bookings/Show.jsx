@@ -134,7 +134,7 @@ export default function BookingShow({ booking, auth }) {
                                     onClick={() => router.get('/admin/bookings')}
                                     className="flex items-center text-gray-600 hover:text-gray-900 transition duration-300"
                                 >
-                                    <FaArrowRight className="ml-2" />
+                                    <FaArrowRight className="me-2" />
                                     العودة
                                 </button>
                                 <div>
@@ -147,14 +147,14 @@ export default function BookingShow({ booking, auth }) {
                                     onClick={handleSendEmail}
                                     className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-[#A3C042] transition duration-300"
                                 >
-                                    <FaEnvelope className="ml-2" />
+                                    <FaEnvelope className="me-2" />
                                     إرسال إيميل
                                 </button>
                                 <button
                                     onClick={() => setIsEditing(!isEditing)}
                                     className="flex items-center px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition duration-300"
                                 >
-                                    <FaEdit className="ml-2" />
+                                    <FaEdit className="me-2" />
                                     {isEditing ? 'إلغاء التعديل' : 'تعديل'}
                                 </button>
                             </div>
@@ -213,7 +213,7 @@ export default function BookingShow({ booking, auth }) {
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">الاسم</label>
                                         <div className="flex items-center">
-                                            <FaUser className="ml-2 text-gray-400" />
+                                            <FaUser className="me-2 text-gray-400" />
                                             <span className="text-gray-900">
                                                 {(booking.student && booking.student.name) ? booking.student.name : (booking.student_name || 'غير محدد')}
                                             </span>
@@ -222,7 +222,7 @@ export default function BookingShow({ booking, auth }) {
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">البريد الإلكتروني</label>
                                         <div className="flex items-center">
-                                            <FaEnvelope className="ml-2 text-gray-400" />
+                                            <FaEnvelope className="me-2 text-gray-400" />
                                             <span className="text-gray-900">
                                                 {(booking.student && booking.student.email) ? booking.student.email : (booking.student_email || 'غير محدد')}
                                             </span>
@@ -231,7 +231,7 @@ export default function BookingShow({ booking, auth }) {
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">رقم الجوال</label>
                                         <div className="flex items-center">
-                                            <FaPhone className="ml-2 text-gray-400" />
+                                            <FaPhone className="me-2 text-gray-400" />
                                             <span className="text-gray-900">
                                                 {(booking.student && booking.student.phone) ? booking.student.phone : (booking.student_phone || 'غير محدد')}
                                             </span>
@@ -247,28 +247,28 @@ export default function BookingShow({ booking, auth }) {
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">الاسم</label>
                                         <div className="flex items-center">
-                                            <FaUser className="ml-2 text-gray-400" />
+                                            <FaUser className="me-2 text-gray-400" />
                                             <span className="text-gray-900">{booking.teacher?.user?.name || 'غير محدد'}</span>
                                         </div>
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">البريد الإلكتروني</label>
                                         <div className="flex items-center">
-                                            <FaEnvelope className="ml-2 text-gray-400" />
+                                            <FaEnvelope className="me-2 text-gray-400" />
                                             <span className="text-gray-900">{booking.teacher?.user?.email || 'غير محدد'}</span>
                                         </div>
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">المدينة</label>
                                         <div className="flex items-center">
-                                            <FaMapMarkerAlt className="ml-2 text-gray-400" />
+                                            <FaMapMarkerAlt className="me-2 text-gray-400" />
                                             <span className="text-gray-900">{booking.teacher?.city || 'غير محدد'}</span>
                                         </div>
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">المواد</label>
                                         <div className="flex items-center">
-                                            <FaGraduationCap className="ml-2 text-gray-400" />
+                                            <FaGraduationCap className="me-2 text-gray-400" />
                                             <span className="text-gray-900">
                                                 {booking.teacher?.subjects ? booking.teacher.subjects.join(', ') : 'غير محدد'}
                                             </span>
@@ -283,7 +283,7 @@ export default function BookingShow({ booking, auth }) {
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">التاريخ</label>
                                         <div className="flex items-center">
-                                            <FaCalendar className="ml-2 text-gray-400" />
+                                            <FaCalendar className="me-2 text-gray-400" />
                                             <span className="text-gray-900">
                                                 {booking.availability?.date ? new Date(booking.availability.date).toLocaleDateString('en-US') : 'غير محدد'}
                                             </span>
@@ -292,7 +292,7 @@ export default function BookingShow({ booking, auth }) {
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">الوقت</label>
                                         <div className="flex items-center">
-                                            <FaClock className="ml-2 text-gray-400" />
+                                            <FaClock className="me-2 text-gray-400" />
                                             <span className="text-gray-900">
                                                 {booking.availability?.start_time ? new Date(booking.availability.start_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : 'غير محدد'}
                                             </span>
@@ -301,7 +301,7 @@ export default function BookingShow({ booking, auth }) {
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">السعر</label>
                                         <div className="flex items-center">
-                                            <FaDollarSign className="ml-2 text-gray-400" />
+                                            <FaDollarSign className="me-2 text-gray-400" />
                                             <span className="text-gray-900">{booking.price ? `${booking.price} ريال` : 'غير محدد'}</span>
                                         </div>
                                     </div>
@@ -353,21 +353,21 @@ export default function BookingShow({ booking, auth }) {
                                         onClick={() => handleStatusUpdate('approved')}
                                         className="w-full flex items-center justify-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-[#A3C042] transition duration-300"
                                     >
-                                        <FaCheck className="ml-2" />
+                                        <FaCheck className="me-2" />
                                         موافقة
                                     </button>
                                     <button
                                         onClick={() => handleStatusUpdate('rejected')}
                                         className="w-full flex items-center justify-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300"
                                     >
-                                        <FaTimes className="ml-2" />
+                                        <FaTimes className="me-2" />
                                         رفض
                                     </button>
                                     <button
                                         onClick={() => handleStatusUpdate('completed')}
                                         className="w-full flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-[#A3C042] transition duration-300"
                                     >
-                                        <FaCheck className="ml-2" />
+                                        <FaCheck className="me-2" />
                                         إكمال
                                     </button>
                                 </div>
@@ -452,7 +452,7 @@ export default function BookingShow({ booking, auth }) {
                                 disabled={processing}
                                 className="flex items-center px-6 py-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 disabled:opacity-50 transition duration-300"
                             >
-                                {processing ? <FaSpinner className="animate-spin ml-2" /> : <FaSave className="ml-2" />}
+                                {processing ? <FaSpinner className="animate-spin me-2" /> : <FaSave className="me-2" />}
                                 {processing ? 'جاري الحفظ...' : 'حفظ التغييرات'}
                             </button>
                         </div>

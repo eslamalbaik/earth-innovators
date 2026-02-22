@@ -107,7 +107,7 @@ export default function StudentBookings({ bookings, auth }) {
             {showError && errorMessage && (
                 <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
                     <div className="flex items-start">
-                        <FaExclamationTriangle className="text-red-500 text-xl mt-0.5 ml-3 flex-shrink-0" />
+                        <FaExclamationTriangle className="text-red-500 text-xl mt-0.5 me-3 flex-shrink-0" />
                         <div className="flex-1">
                             <h3 className="text-sm font-semibold text-red-800 mb-1">
                                 تنبيه
