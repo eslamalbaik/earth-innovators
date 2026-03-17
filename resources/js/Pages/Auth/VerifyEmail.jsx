@@ -72,7 +72,7 @@ export default function VerifyEmail({ status }) {
                                             {t('auth.sending')}
                                         </div>
                                     ) : (
-                                        {t('auth.resendVerification')}
+                                        t('auth.resendVerification')
                                     )}
                                 </PrimaryButton>
 
