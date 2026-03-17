@@ -91,7 +91,7 @@ export default function ConfirmPassword() {
                                             {t('auth.confirming')}
                                         </div>
                                     ) : (
-                                        {t('common.confirm')}
+                                        t('common.confirm')
                                     )}
                                 </PrimaryButton>
                             </div>
