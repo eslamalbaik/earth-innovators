@@ -1,6 +1,7 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
+import { useTranslation } from '@/i18n';
 import {
     FaBook,
     FaPlus,
@@ -12,6 +13,7 @@ import {
 } from 'react-icons/fa';
 
 export default function StudentSubjects({ studentSubjects, allSubjects }) {
+    const { t } = useTranslation();
     const [showAddModal, setShowAddModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -52,19 +54,19 @@ export default function StudentSubjects({ studentSubjects, allSubjects }) {
     };
 
     return (
-        <DashboardLayout header="موادي">
-            <Head title="موادي" />
+        <DashboardLayout header={t('studentSubjectsPage.title')}>
+            <Head title={t('studentSubjectsPage.pageTitle', { appName: t('common.appName') })} />
             <div className="mb-6 flex items-center justify-between flex-wrap gap-4">
                 <div>
-                    <h2 className="text-2xl font-bold text-gray-900">موادي الدراسية</h2>
-                    <p className="text-gray-600 mt-1">إدارة المواد التي تدرسها</p>
+                    <h2 className="text-2xl font-bold text-gray-900">{t('studentSubjectsPage.heading')}</h2>
+                    <p className="text-gray-600 mt-1">{t('studentSubjectsPage.subheading')}</p>
                 </div>
                 <button
                     onClick={() => setShowAddModal(true)}
                     className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition shadow-lg hover:shadow-xl"
                 >
                     <FaPlus />
-                    إضافة مادة جديدة
+                    {t('studentSubjectsPage.addSubject')}
                 </button>
             </div>
 
@@ -72,7 +74,7 @@ export default function StudentSubjects({ studentSubjects, allSubjects }) {
                 <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-blue-500">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">عدد المواد</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('studentSubjectsPage.stats.subjectsCount')}</p>
                             <p className="text-3xl font-bold text-gray-900">{studentSubjects.length}</p>
                         </div>
                         <div className="p-3 bg-blue-100 rounded-full">
@@ -84,7 +86,7 @@ export default function StudentSubjects({ studentSubjects, allSubjects }) {
                 <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-green-500">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">إجمالي المعلمين</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('studentSubjectsPage.stats.totalTeachers')}</p>
                             <p className="text-3xl font-bold text-green-600">
                                 {studentSubjects.reduce((sum, subject) => sum + (subject.teacher_count || 0), 0)}
                             </p>
@@ -98,7 +100,7 @@ export default function StudentSubjects({ studentSubjects, allSubjects }) {
                 <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-purple-500">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">المواد المتاحة</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('studentSubjectsPage.stats.availableSubjects')}</p>
                             <p className="text-3xl font-bold text-purple-600">{availableSubjects.length}</p>
                         </div>
                         <div className="p-3 bg-purple-100 rounded-full">
@@ -111,14 +113,14 @@ export default function StudentSubjects({ studentSubjects, allSubjects }) {
             {studentSubjects.length === 0 ? (
                 <div className="bg-white rounded-xl shadow-lg p-12 text-center">
                     <FaBook className="mx-auto text-6xl mb-4 text-gray-300" />
-                    <p className="text-xl text-gray-500 mb-2">لا توجد مواد حالياً</p>
-                    <p className="text-sm text-gray-400 mb-6">ابدأ بإضافة المواد التي تدرسها</p>
+                    <p className="text-xl text-gray-500 mb-2">{t('studentSubjectsPage.empty.title')}</p>
+                    <p className="text-sm text-gray-400 mb-6">{t('studentSubjectsPage.empty.description')}</p>
                     <button
                         onClick={() => setShowAddModal(true)}
                         className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-medium inline-flex items-center gap-2 transition"
                     >
                         <FaPlus />
-                        إضافة أول مادة
+                        {t('studentSubjectsPage.empty.action')}
                     </button>
                 </div>
             ) : (
@@ -141,7 +143,7 @@ export default function StudentSubjects({ studentSubjects, allSubjects }) {
                                     <button
                                         onClick={() => handleRemoveSubject(subject)}
                                         className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-lg transition"
-                                        title="حذف المادة"
+                                        title={t('studentSubjectsPage.deleteSubject')}
                                     >
                                         <FaTrash className="text-sm" />
                                     </button>
@@ -164,14 +166,14 @@ export default function StudentSubjects({ studentSubjects, allSubjects }) {
                                     <div className="flex items-center gap-2 text-gray-600">
                                         <FaUsers className="text-sm" />
                                         <span className="text-sm font-medium">
-                                            {subject.teacher_count || 0} معلم
+                                            {t('studentSubjectsPage.teacherCount', { count: subject.teacher_count || 0 })}
                                         </span>
                                     </div>
                                     <Link
                                         href={`/teachers?subject=${encodeURIComponent(subject.name_ar)}`}
                                         className="text-blue-600 hover:text-blue-700 text-sm font-medium"
                                     >
-                                        عرض المعلمين
+                                        {t('studentSubjectsPage.viewTeachers')}
                                     </Link>
                                 </div>
                             </div>
@@ -185,7 +187,7 @@ export default function StudentSubjects({ studentSubjects, allSubjects }) {
                     <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
                         {/* Modal Header */}
                         <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 p-6 flex items-center justify-between">
-                            <h3 className="text-2xl font-bold text-white">إضافة مادة جديدة</h3>
+                            <h3 className="text-2xl font-bold text-white">{t('studentSubjectsPage.addModal.title')}</h3>
                             <button
                                 onClick={() => {
                                     setShowAddModal(false);
@@ -202,7 +204,7 @@ export default function StudentSubjects({ studentSubjects, allSubjects }) {
                                 <FaSearch className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
                                 <input
                                     type="text"
-                                    placeholder="ابحث عن مادة..."
+                                    placeholder={t('studentSubjectsPage.addModal.searchPlaceholder')}
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     className="w-full ps-12 pe-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
@@ -215,7 +217,7 @@ export default function StudentSubjects({ studentSubjects, allSubjects }) {
                                 <div className="text-center py-12">
                                     <FaBook className="mx-auto text-4xl mb-4 text-gray-300" />
                                     <p className="text-gray-500">
-                                        {searchTerm ? 'لا توجد نتائج' : 'لا توجد مواد متاحة'}
+                                        {searchTerm ? t('common.noResults') : t('studentSubjectsPage.addModal.noAvailableSubjects')}
                                     </p>
                                 </div>
                             ) : (
@@ -246,7 +248,7 @@ export default function StudentSubjects({ studentSubjects, allSubjects }) {
                                                     <div className="flex items-center gap-4 text-xs text-gray-500">
                                                         <span className="flex items-center gap-1">
                                                             <FaUsers />
-                                                            {subject.teacher_count || 0} معلم
+                                                            {t('studentSubjectsPage.teacherCount', { count: subject.teacher_count || 0 })}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -256,7 +258,7 @@ export default function StudentSubjects({ studentSubjects, allSubjects }) {
                                                         handleAddSubject(subject.id);
                                                     }}
                                                     className="bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded-full transition"
-                                                    title="إضافة"
+                                                    title={t('common.add')}
                                                 >
                                                     <FaPlus />
                                                 </button>
@@ -277,16 +279,16 @@ export default function StudentSubjects({ studentSubjects, allSubjects }) {
                             <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full">
                                 <FaTrash className="text-2xl text-red-600" />
                             </div>
-                            <h2 className="text-xl font-bold text-gray-900 text-center mb-2">تأكيد الحذف</h2>
+                            <h2 className="text-xl font-bold text-gray-900 text-center mb-2">{t('studentSubjectsPage.deleteConfirm.title')}</h2>
                             <p className="text-gray-600 text-center mb-6">
-                                هل أنت متأكد من حذف مادة <strong>{subjectToDelete.name_ar}</strong> من قائمتك؟ لا يمكن التراجع عن هذه العملية.
+                                {t('studentSubjectsPage.deleteConfirm.message', { name: subjectToDelete.name_ar })}
                             </p>
                             <div className="flex items-center gap-4">
                                 <button
                                     onClick={handleDeleteConfirm}
                                     className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-lg transition"
                                 >
-                                    حذف
+                                    {t('common.delete')}
                                 </button>
                                 <button
                                     onClick={() => {
@@ -295,7 +297,7 @@ export default function StudentSubjects({ studentSubjects, allSubjects }) {
                                     }}
                                     className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 rounded-lg transition"
                                 >
-                                    إلغاء
+                                    {t('common.cancel')}
                                 </button>
                             </div>
                         </div>

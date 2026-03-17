@@ -7,8 +7,10 @@ import { FaBook, FaFileAlt, FaCalendar, FaBuilding, FaHeart, FaArrowLeft, FaSear
 import { useState } from 'react';
 import axios from 'axios';
 import { getPublicationImageUrl } from '../../utils/imageUtils';
+import { useTranslation } from '@/i18n';
 
 export default function PublicationsIndex({ auth, publications, filters }) {
+    const { t, language } = useTranslation();
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
     const [selectedType, setSelectedType] = useState(filters?.type || '');
     const [likedPublications, setLikedPublications] = useState(new Set());
@@ -51,10 +53,10 @@ export default function PublicationsIndex({ auth, publications, filters }) {
 
     const getTypeLabel = (type) => {
         const labels = {
-            magazine: 'مجلة',
-            booklet: 'كتيب',
-            report: 'تقرير',
-            article: 'مقال',
+            magazine: t('sections.publications.types.magazine'),
+            booklet: t('sections.publications.types.booklet'),
+            report: t('sections.publications.types.report'),
+            article: t('publicationsPage.types.article'),
         };
         return labels[type] || type;
     };
@@ -69,7 +71,20 @@ export default function PublicationsIndex({ auth, publications, filters }) {
     const formatDate = (date) => {
         if (!date) return '';
         const d = new Date(date);
-        const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+        const months = [
+            t('common.months.january'),
+            t('common.months.february'),
+            t('common.months.march'),
+            t('common.months.april'),
+            t('common.months.may'),
+            t('common.months.june'),
+            t('common.months.july'),
+            t('common.months.august'),
+            t('common.months.september'),
+            t('common.months.october'),
+            t('common.months.november'),
+            t('common.months.december'),
+        ];
         return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
     };
 
@@ -109,7 +124,7 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                     />
                     {/* New tag */}
                     <div className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                        جديد
+                        {t('common.new')}
                     </div>
                     {/* Type badge */}
                     <div className={`absolute top-3 left-3 ${getBadgeColor(publication.type)} px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-2 border`}>
@@ -124,7 +139,10 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                     <h3 className="text-base font-bold text-gray-900 mb-2 line-clamp-2">
                         {publication.title}
                         {publication.issue_number && (
-                            <span className="text-gray-600"> - العدد {publication.issue_number}</span>
+                            <span className="text-gray-600">
+                                {' '}
+                                - {t('publicationsPage.issueLabel', { number: publication.issue_number })}
+                            </span>
                         )}
                     </h3>
 
@@ -163,7 +181,7 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                                     className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition border border-blue-200 text-xs font-semibold"
                                 >
                                     <FaDownload className="text-xs" />
-                                    <span>تحميل</span>
+                                    <span>{t('common.download')}</span>
                                 </a>
                             )}
                             {publication.content && (
@@ -172,7 +190,7 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                                     className="flex items-center gap-1 px-3 py-1.5 bg-[#A3C042]/10 text-[#A3C042] rounded-xl hover:bg-[#A3C042]/20 transition border border-[#A3C042]/20 text-xs font-semibold"
                                 >
                                     <FaBook className="text-xs" />
-                                    <span>قراءة</span>
+                                    <span>{t('common.read')}</span>
                                 </Link>
                             )}
                         </div>
@@ -183,7 +201,7 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                                 ? 'bg-red-100 text-red-600 hover:bg-red-200'
                                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                 }`}
-                            title={isLiked ? 'إزالة الإعجاب' : 'إعجاب'}
+                            title={isLiked ? t('publicationsPage.unlike') : t('publicationsPage.like')}
                         >
                             <FaHeart className={isLiked ? 'fill-current' : ''} />
                             <span>{publication.likes_count || 0}</span>
@@ -205,7 +223,7 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                            placeholder="البحث عن الإصدارات..."
+                            placeholder={t('publicationsPage.searchPlaceholder')}
                             className="w-full h-10 ps-10 pe-4 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042]"
                         />
                         <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
@@ -215,17 +233,17 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                         onChange={(e) => setSelectedType(e.target.value)}
                         className="h-10 px-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042]"
                     >
-                        <option value="">جميع الأنواع</option>
-                        <option value="magazine">مجلة</option>
-                        <option value="booklet">كتيب</option>
-                        <option value="report">تقرير</option>
+                        <option value="">{t('publicationsPage.allTypes')}</option>
+                        <option value="magazine">{t('sections.publications.types.magazine')}</option>
+                        <option value="booklet">{t('sections.publications.types.booklet')}</option>
+                        <option value="report">{t('sections.publications.types.report')}</option>
                     </select>
                     <button
                         type="button"
                         onClick={handleSearch}
                         className="h-10 px-4 bg-[#A3C042] text-white rounded-xl hover:bg-[#8CA635] transition font-bold text-sm"
                     >
-                        بحث
+                        {t('common.search')}
                     </button>
                 </div>
             </div>
@@ -239,7 +257,7 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                             <div className="mb-6">
                                 <div className="flex items-center gap-2 mb-4">
                                     <FaNewspaper className="text-lg text-gray-700" />
-                                    <h2 className="text-lg font-bold text-gray-900">مجلة إرث المبتكرين</h2>
+                                    <h2 className="text-lg font-bold text-gray-900">{t('publicationsPage.sections.magazineTitle')}</h2>
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                                     {magazines.map(renderPublicationCard)}
@@ -252,7 +270,7 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                             <div className="mb-6">
                                 <div className="flex items-center gap-2 mb-4">
                                     <FaBook className="text-lg text-gray-700" />
-                                    <h2 className="text-lg font-bold text-gray-900">كتيبات إبداعية</h2>
+                                    <h2 className="text-lg font-bold text-gray-900">{t('publicationsPage.sections.bookletTitle')}</h2>
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                                     {booklets.map(renderPublicationCard)}
@@ -265,7 +283,7 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                             <div className="mb-6">
                                 <div className="flex items-center gap-2 mb-4">
                                     <FaFileAlt className="text-lg text-gray-700" />
-                                    <h2 className="text-lg font-bold text-gray-900">تقارير</h2>
+                                    <h2 className="text-lg font-bold text-gray-900">{t('publicationsPage.sections.reportTitle')}</h2>
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                                     {reports.map(renderPublicationCard)}
@@ -278,7 +296,7 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                             <div className="mb-6">
                                 <div className="flex items-center gap-2 mb-4">
                                     <FaFileAlt className="text-lg text-gray-700" />
-                                    <h2 className="text-lg font-bold text-gray-900">مقالات</h2>
+                                    <h2 className="text-lg font-bold text-gray-900">{t('publicationsPage.sections.articleTitle')}</h2>
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                                     {articles.map(renderPublicationCard)}
@@ -295,7 +313,7 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                     </>
                 ) : (
                     <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-                        <p className="text-sm text-gray-500">لا توجد إصدارات متاحة حالياً</p>
+                        <p className="text-sm text-gray-500">{t('publicationsPage.empty')}</p>
                     </div>
                 )}
 
@@ -322,14 +340,14 @@ export default function PublicationsIndex({ auth, publications, filters }) {
     );
 
     return (
-        <div dir="rtl" className="min-h-screen bg-gray-50">
-            <Head title="الإصدارات - إرث المبتكرين" />
+        <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
+            <Head title={t('publicationsPage.pageTitle', { appName: t('common.appName') })} />
 
             {/* Mobile View */}
             <div className="block md:hidden">
                 <MobileAppLayout
                     auth={auth}
-                    title="إرث المبتكرين"
+                    title={t('sections.publications.title')}
                     activeNav="explore"
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
@@ -342,7 +360,7 @@ export default function PublicationsIndex({ auth, publications, filters }) {
             {/* Desktop View */}
             <div className="hidden md:block">
                 <MobileTopBar
-                    title="إرث المبتكرين"
+                    title={t('sections.publications.title')}
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
                     onBack={() => router.visit('/')}

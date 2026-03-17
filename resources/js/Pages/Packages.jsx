@@ -1,8 +1,10 @@
 import { Head, Link } from '@inertiajs/react';
 import MainLayout from '../Layouts/MainLayout';
 import { FaCheck, FaStar, FaRocket, FaCrown, FaBox } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function Packages({ auth, packages = [], userPackage = null }) {
+    const { t } = useTranslation();
     const IconMap = {
         monthly: FaBox,
         quarterly: FaRocket,
@@ -12,15 +14,15 @@ export default function Packages({ auth, packages = [], userPackage = null }) {
 
     return (
         <MainLayout auth={auth}>
-            <Head title="الباقات - إرث المبتكرين" />
+            <Head title={t('packagesIndexPage.pageTitle', { appName: t('common.appName') })} />
 
             <div className="bg-[#A3C042] py-16 text-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center">
                         <FaBox className="mx-auto text-6xl mb-4 opacity-90" />
-                        <h1 className="text-4xl font-bold mb-4">باقات الاشتراك</h1>
+                        <h1 className="text-4xl font-bold mb-4">{t('packagesIndexPage.title')}</h1>
                         <p className="text-xl text-white/90 max-w-2xl mx-auto">
-                            اختر الباقة المناسبة لك واحصل على ميزات حصرية وإمكانيات متقدمة
+                            {t('packagesIndexPage.subtitle')}
                         </p>
                     </div>
                 </div>
@@ -31,17 +33,21 @@ export default function Packages({ auth, packages = [], userPackage = null }) {
                     <div className="mb-8 bg-gradient-to-r from-[#A3C042]/10 to-legacy-blue/10 rounded-xl p-6 border-2 border-[#A3C042]/20">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h2 className="text-2xl font-bold text-gray-900 mb-2">باقتي الحالية</h2>
+                                <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('packagesIndexPage.currentPackage.title')}</h2>
                                 <p className="text-gray-600">
                                     {userPackage.package?.name_ar || userPackage.package?.name} -
-                                    تنتهي في {new Date(userPackage.end_date).toLocaleDateString('en-US')}
+                                    {t('packagesIndexPage.currentPackage.endsAt')} {new Date(userPackage.end_date).toLocaleDateString('en-US')}
                                 </p>
                             </div>
                             <div className={`px-4 py-2 rounded-lg font-semibold ${userPackage.status === 'active' ? 'bg-green-100 text-green-700' :
                                     userPackage.status === 'expired' ? 'bg-red-100 text-red-700' :
                                         'bg-gray-100 text-gray-700'
                                 }`}>
-                                {userPackage.status === 'active' ? 'نشطة' : userPackage.status === 'expired' ? 'منتهية' : 'ملغاة'}
+                                {userPackage.status === 'active'
+                                    ? t('packagesPage.status.active')
+                                    : userPackage.status === 'expired'
+                                        ? t('packagesPage.status.expired')
+                                        : t('packagesPage.status.cancelled')}
                             </div>
                         </div>
                     </div>
@@ -63,7 +69,7 @@ export default function Packages({ auth, packages = [], userPackage = null }) {
                             >
                                 {isPopular && (
                                     <div className="absolute top-0 end-0 start-0 bg-[#A3C042] text-white text-center py-2 font-bold text-sm">
-                                        ⭐ الأكثر شعبية
+                                        {t('packagesIndexPage.badges.mostPopular')}
                                     </div>
                                 )}
                                 <div className={`p-8 ${isPopular ? 'pt-12' : ''}`}>
@@ -79,7 +85,7 @@ export default function Packages({ auth, packages = [], userPackage = null }) {
                                             <span className="text-4xl font-bold text-gray-900">{pkg.price}</span>
                                             <span className="text-gray-600"> {pkg.currency}</span>
                                             {pkg.duration_type !== 'lifetime' && (
-                                                <span className="text-gray-500 text-sm"> / {pkg.duration_type === 'monthly' ? 'شهر' : pkg.duration_type === 'quarterly' ? 'ربع سنوي' : 'سنة'}</span>
+                                                <span className="text-gray-500 text-sm"> / {t(`packagesPage.duration.${pkg.duration_type}`)}</span>
                                             )}
                                         </div>
                                         <p className="text-gray-600 text-sm">
@@ -88,46 +94,46 @@ export default function Packages({ auth, packages = [], userPackage = null }) {
                                     </div>
 
                                     <div className="border-t border-gray-200 pt-6 mb-6">
-                                        <h4 className="font-semibold text-gray-900 mb-4">الميزات:</h4>
+                                        <h4 className="font-semibold text-gray-900 mb-4">{t('packagesIndexPage.features.title')}:</h4>
                                         <ul className="space-y-3">
                                             {pkg.projects_limit !== null ? (
                                                 <li className="flex items-center gap-2">
                                                     <FaCheck className="text-[#A3C042] flex-shrink-0" />
-                                                    <span className="text-gray-700">حتى {pkg.projects_limit} مشروع</span>
+                                                    <span className="text-gray-700">{t('packagesIndexPage.features.projectsLimit', { count: pkg.projects_limit })}</span>
                                                 </li>
                                             ) : (
                                                 <li className="flex items-center gap-2">
                                                     <FaCheck className="text-[#A3C042] flex-shrink-0" />
-                                                    <span className="text-gray-700">مشاريع غير محدودة</span>
+                                                    <span className="text-gray-700">{t('packagesIndexPage.features.unlimitedProjects')}</span>
                                                 </li>
                                             )}
                                             {pkg.challenges_limit !== null ? (
                                                 <li className="flex items-center gap-2">
                                                     <FaCheck className="text-[#A3C042] flex-shrink-0" />
-                                                    <span className="text-gray-700">حتى {pkg.challenges_limit} تحدٍ</span>
+                                                    <span className="text-gray-700">{t('packagesIndexPage.features.challengesLimit', { count: pkg.challenges_limit })}</span>
                                                 </li>
                                             ) : (
                                                 <li className="flex items-center gap-2">
                                                     <FaCheck className="text-[#A3C042] flex-shrink-0" />
-                                                    <span className="text-gray-700">تحديات غير محدودة</span>
+                                                    <span className="text-gray-700">{t('packagesIndexPage.features.unlimitedChallenges')}</span>
                                                 </li>
                                             )}
                                             {pkg.points_bonus > 0 && (
                                                 <li className="flex items-center gap-2">
                                                     <FaCheck className="text-[#A3C042] flex-shrink-0" />
-                                                    <span className="text-gray-700">{pkg.points_bonus} نقطة إضافية</span>
+                                                    <span className="text-gray-700">{t('packagesIndexPage.features.pointsBonus', { count: pkg.points_bonus })}</span>
                                                 </li>
                                             )}
                                             {pkg.badge_access && (
                                                 <li className="flex items-center gap-2">
                                                     <FaCheck className="text-[#A3C042] flex-shrink-0" />
-                                                    <span className="text-gray-700">إمكانية الحصول على شارات</span>
+                                                    <span className="text-gray-700">{t('packagesIndexPage.features.badgesAccess')}</span>
                                                 </li>
                                             )}
                                             {pkg.certificate_access && (
                                                 <li className="flex items-center gap-2">
                                                     <FaCheck className="text-[#A3C042] flex-shrink-0" />
-                                                    <span className="text-gray-700">إمكانية الحصول على شهادات</span>
+                                                    <span className="text-gray-700">{t('packagesIndexPage.features.certificatesAccess')}</span>
                                                 </li>
                                             )}
                                             {features.map((feature, index) => (
@@ -147,7 +153,7 @@ export default function Packages({ auth, packages = [], userPackage = null }) {
                                                     : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
                                                 }`}
                                         >
-                                            {userPackage?.package_id === pkg.id ? 'تجديد الاشتراك' : 'اشترك الآن'}
+                                            {userPackage?.package_id === pkg.id ? t('packagesIndexPage.actions.renew') : t('packagesIndexPage.actions.subscribeNow')}
                                         </Link>
                                     ) : (
                                         <Link
@@ -157,7 +163,7 @@ export default function Packages({ auth, packages = [], userPackage = null }) {
                                                     : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
                                                 }`}
                                         >
-                                            سجل للاشتراك
+                                            {t('packagesIndexPage.actions.registerToSubscribe')}
                                         </Link>
                                     )}
                                 </div>
@@ -169,7 +175,7 @@ export default function Packages({ auth, packages = [], userPackage = null }) {
                 {packages.length === 0 && (
                     <div className="text-center py-12">
                         <FaBox className="mx-auto text-6xl text-gray-300 mb-4" />
-                        <p className="text-gray-500 text-lg">لا توجد باقات متاحة حالياً</p>
+                        <p className="text-gray-500 text-lg">{t('packagesIndexPage.empty')}</p>
                     </div>
                 )}
             </div>

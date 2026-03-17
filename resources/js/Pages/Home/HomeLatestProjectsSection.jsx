@@ -1,11 +1,13 @@
 import { FaEye, FaHeart, FaStar } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 function ProjectCard({ project, onOpen }) {
-    const title = project?.title || 'تصميم واجهة مستخدم لتطبيق تعليمي';
+    const { t } = useTranslation();
+    const title = project?.title || t('homePage.projectPlaceholderTitle');
     const views = project?.views ?? 156;
     const likes = project?.likes ?? 24;
     const rating = project?.rating ?? 0;
-    const createdAt = project?.created_at || 'منذ يومين';
+    const createdAt = project?.created_at || t('homePage.projectPlaceholderTime');
     const isPlaceholder = !project?.id || project.id.toString().startsWith('placeholder-');
 
     return (
@@ -26,7 +28,7 @@ function ProjectCard({ project, onOpen }) {
                     loading="lazy"
                 />
                 <div className="absolute top-3 right-3 rounded-full bg-white/90 border border-gray-100 px-3 py-1 text-[11px] font-semibold text-gray-700">
-                    ملف إبداعي
+                    {t('homePage.projectPlaceholderBadge')}
                 </div>
             </div>
 
@@ -34,14 +36,14 @@ function ProjectCard({ project, onOpen }) {
                 <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                         <div className="h-8 w-8 rounded-full bg-gray-200 border border-white" />
-                        <div className="text-xs text-gray-600">أحمد محمد</div>
+                        <div className="text-xs text-gray-600">{t('homePage.projectPlaceholderAuthor')}</div>
                     </div>
                     <div className="text-xs text-gray-400">{createdAt}</div>
                 </div>
 
                 <div className="text-sm font-bold text-gray-900 line-clamp-2">{title}</div>
                 <div className="mt-1 text-xs text-gray-500 line-clamp-2">
-                    مشروع تصميم واجهة مستخدم سهلة الاستخدام لتطبيق تعليمي يستهدف طلاب المرحلة الثانوية
+                    {t('homePage.projectPlaceholderDescription')}
                 </div>
 
                 <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
@@ -64,18 +66,19 @@ function ProjectCard({ project, onOpen }) {
 }
 
 export default function HomeLatestProjectsSection({ projects = [], onViewAll, onOpenProject }) {
+    const { t } = useTranslation();
     const list = Array.isArray(projects) ? projects.slice(0, 2) : [];
 
     return (
         <section>
             <div className="flex items-center justify-between px-1">
-                <div className="text-sm font-bold text-gray-900">أحدث المشاريع</div>
+                <div className="text-sm font-bold text-gray-900">{t('homePage.latestProjectsTitle')}</div>
                 <button
                     type="button"
                     onClick={onViewAll}
                     className="text-xs font-semibold text-[#A3C042] hover:text-[#8CA635]"
                 >
-                    عرض الكل
+                    {t('common.viewAll')}
                 </button>
             </div>
 
@@ -94,5 +97,3 @@ export default function HomeLatestProjectsSection({ projects = [], onViewAll, on
         </section>
     );
 }
-
-

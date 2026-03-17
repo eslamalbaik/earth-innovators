@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import { memo, useMemo } from 'react';
 import { FaTrophy, FaCalendar, FaUsers, FaEye, FaEdit, FaTrash, FaChartLine } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 /**
  * PERFORMANCE: Memoized card component to prevent unnecessary re-renders
@@ -20,6 +21,7 @@ const ChallengeCard = memo(function ChallengeCard({
     deletingIds,
     updatingId
 }) {
+    const { t } = useTranslation();
     const isDeleting = deletingIds.has(challenge.id);
     const isUpdating = updatingId === challenge.id;
     
@@ -106,7 +108,7 @@ const ChallengeCard = memo(function ChallengeCard({
                     {challenge.points_reward > 0 && (
                         <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-yellow-50 text-yellow-700 rounded-md text-xs font-medium">
                             <FaTrophy className="text-xs" />
-                            {challenge.points_reward} نقطة
+                            {challenge.points_reward} {t('common.point')}
                         </span>
                     )}
                 </div>
@@ -118,7 +120,7 @@ const ChallengeCard = memo(function ChallengeCard({
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                     <FaCalendar className="text-gray-400 flex-shrink-0" />
                     <div className="flex-1">
-                        <div className="font-medium text-gray-700">تاريخ البدء</div>
+                        <div className="font-medium text-gray-700">{t('adminChallengesIndexPage.table.startDate')}</div>
                         <div className="text-xs text-gray-500">
                             {formattedStartDate}
                         </div>
@@ -127,7 +129,7 @@ const ChallengeCard = memo(function ChallengeCard({
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                     <FaCalendar className="text-gray-400 flex-shrink-0" />
                     <div className="flex-1">
-                        <div className="font-medium text-gray-700">تاريخ الانتهاء</div>
+                        <div className="font-medium text-gray-700">{t('adminChallengesIndexPage.table.endDate')}</div>
                         <div className="text-xs text-gray-500">
                             {formattedDeadline}
                         </div>
@@ -139,7 +141,7 @@ const ChallengeCard = memo(function ChallengeCard({
                     <FaUsers className="text-gray-400 flex-shrink-0" />
                     <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
-                            <span className="font-medium text-gray-700">المشاركون</span>
+                            <span className="font-medium text-gray-700">{t('challenges.participants')}</span>
                             <span className="text-sm font-semibold text-gray-900">
                                 {challenge.current_participants || 0}
                                 {challenge.max_participants && ` / ${challenge.max_participants}`}
@@ -165,7 +167,7 @@ const ChallengeCard = memo(function ChallengeCard({
                             <button
                                 onClick={() => onView(challenge)}
                                 className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
-                                title="عرض"
+                                title={t('common.view')}
                             >
                                 <FaEye className="text-sm" />
                             </button>
@@ -174,7 +176,7 @@ const ChallengeCard = memo(function ChallengeCard({
                             <button
                                 onClick={() => onEdit(challenge)}
                                 className="p-2 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors"
-                                title="تعديل"
+                                title={t('common.edit')}
                             >
                                 <FaEdit className="text-sm" />
                             </button>
@@ -184,7 +186,7 @@ const ChallengeCard = memo(function ChallengeCard({
                                 onClick={() => onDelete(challenge.id)}
                                 disabled={isDeleting || isUpdating}
                                 className={`p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors ${isDeleting || isUpdating ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                title={isDeleting ? 'جاري الحذف...' : 'حذف'}
+                                title={isDeleting ? t('adminUsersIndexPage.deleting') : t('common.delete')}
                             >
                                 {isDeleting ? (
                                     <span className="animate-spin text-xs">⏳</span>
@@ -200,7 +202,7 @@ const ChallengeCard = memo(function ChallengeCard({
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors text-xs font-medium"
                         >
                             <FaChartLine className="text-xs" />
-                            تحليل
+                            {t('challenges.analytics')}
                         </Link>
                     )}
                 </div>
@@ -228,12 +230,13 @@ function ChallengeCardGrid({
     deletingIds = new Set(),
     updatingId = null
 }) {
+    const { language } = useTranslation();
     if (!challenges || challenges.length === 0) {
         return null;
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             {challenges.map((challenge) => (
                 <ChallengeCard
                     key={challenge.id}

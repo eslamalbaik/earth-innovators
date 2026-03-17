@@ -3,9 +3,11 @@ import { Head, Link, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { FaSearch, FaFilter, FaEye, FaEdit, FaTrash, FaPlus, FaTrophy, FaSave, FaTimes, FaAward, FaUser } from 'react-icons/fa';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
+import { useTranslation } from '@/i18n';
 
 export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
     const { confirm } = useConfirmDialog();
+    const { t } = useTranslation();
     const [search, setSearch] = useState(filters?.search || '');
     const [status, setStatus] = useState(filters?.status || '');
     const [type, setType] = useState(filters?.type || '');
@@ -32,10 +34,10 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
 
     const handleDelete = async (badgeId, badgeName) => {
         const confirmed = await confirm({
-            title: 'تأكيد الحذف',
-            message: `هل أنت متأكد من حذف الشارة "${badgeName}"؟ هذا الإجراء لا يمكن التراجع عنه.`,
-            confirmText: 'حذف',
-            cancelText: 'إلغاء',
+            title: t('adminBadgesPage.deleteConfirm.title'),
+            message: t('adminBadgesPage.deleteConfirm.message', { name: badgeName }),
+            confirmText: t('common.delete'),
+            cancelText: t('common.cancel'),
             variant: 'danger',
         });
 
@@ -78,58 +80,58 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
         if (isActive) {
             return (
                 <span className="px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
-                    نشط
+                    {t('common.active')}
                 </span>
             );
         }
         return (
             <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">
-                غير نشط
+                {t('common.inactive')}
             </span>
         );
     };
 
     const getTypeLabel = (type) => {
         const typeMap = {
-            'rank_first': 'المركز الأول',
-            'rank_second': 'المركز الثاني',
-            'rank_third': 'المركز الثالث',
-            'excellent_innovator': 'مبتكر ممتاز',
-            'active_participant': 'مشارك نشط',
-            'custom': 'مخصص',
+            rank_first: t('adminBadgesPage.types.rankFirst'),
+            rank_second: t('adminBadgesPage.types.rankSecond'),
+            rank_third: t('adminBadgesPage.types.rankThird'),
+            excellent_innovator: t('adminBadgesPage.types.excellentInnovator'),
+            active_participant: t('adminBadgesPage.types.activeParticipant'),
+            custom: t('adminBadgesPage.types.custom'),
         };
         return typeMap[type] || type;
     };
 
     return (
-        <DashboardLayout header="إدارة الشارات">
-            <Head title="إدارة الشارات" />
+        <DashboardLayout header={t('adminBadgesPage.title')}>
+            <Head title={t('adminBadgesPage.pageTitle', { appName: t('common.appName') })} />
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div className="bg-white rounded-xl shadow-lg p-6">
-                    <p className="text-sm text-gray-600 mb-2">إجمالي الشارات</p>
+                    <p className="text-sm text-gray-600 mb-2">{t('adminBadgesPage.stats.total')}</p>
                     <p className="text-3xl font-bold text-gray-900">{stats.total || 0}</p>
                 </div>
                 <div className="bg-white rounded-xl shadow-lg p-6">
-                    <p className="text-sm text-gray-600 mb-2">الشارات النشطة</p>
+                    <p className="text-sm text-gray-600 mb-2">{t('adminBadgesPage.stats.active')}</p>
                     <p className="text-3xl font-bold text-green-600">{stats.active || 0}</p>
                 </div>
                 <div className="bg-white rounded-xl shadow-lg p-6">
-                    <p className="text-sm text-gray-600 mb-2">إجمالي الشارات الممنوحة</p>
+                    <p className="text-sm text-gray-600 mb-2">{t('adminBadgesPage.stats.totalAwarded')}</p>
                     <p className="text-3xl font-bold text-blue-600">{stats.totalAwarded || 0}</p>
                 </div>
             </div>
 
             {/* Header with Create Button */}
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">قائمة الشارات</h2>
+                <h2 className="text-2xl font-bold text-gray-900">{t('adminBadgesPage.badgesList')}</h2>
                 <Link
                     href={route('admin.badges.create')}
                     className="bg-[#A3C042] hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2"
                 >
                     <FaPlus />
-                    إضافة شارة جديدة
+                    {t('adminBadgesPage.addNew')}
                 </Link>
             </div>
 
@@ -137,44 +139,44 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
             <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">البحث</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.search')}</label>
                         <div className="relative">
                             <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                             <input
                                 type="text"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                placeholder="ابحث عن شارة..."
+                                placeholder={t('adminBadgesPage.searchPlaceholder')}
                                 className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
                         </div>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">الحالة</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.status')}</label>
                         <select
                             value={status}
                             onChange={(e) => setStatus(e.target.value)}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         >
-                            <option value="">الكل</option>
-                            <option value="active">نشط</option>
-                            <option value="inactive">غير نشط</option>
+                            <option value="">{t('common.all')}</option>
+                            <option value="active">{t('common.active')}</option>
+                            <option value="inactive">{t('common.inactive')}</option>
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">النوع</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminBadgesPage.table.type')}</label>
                         <select
                             value={type}
                             onChange={(e) => setType(e.target.value)}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         >
-                            <option value="">الكل</option>
-                            <option value="rank_first">المركز الأول</option>
-                            <option value="rank_second">المركز الثاني</option>
-                            <option value="rank_third">المركز الثالث</option>
-                            <option value="excellent_innovator">مبتكر ممتاز</option>
-                            <option value="active_participant">مشارك نشط</option>
-                            <option value="custom">مخصص</option>
+                            <option value="">{t('common.all')}</option>
+                            <option value="rank_first">{t('adminBadgesPage.types.rankFirst')}</option>
+                            <option value="rank_second">{t('adminBadgesPage.types.rankSecond')}</option>
+                            <option value="rank_third">{t('adminBadgesPage.types.rankThird')}</option>
+                            <option value="excellent_innovator">{t('adminBadgesPage.types.excellentInnovator')}</option>
+                            <option value="active_participant">{t('adminBadgesPage.types.activeParticipant')}</option>
+                            <option value="custom">{t('adminBadgesPage.types.custom')}</option>
                         </select>
                     </div>
                     <div className="flex items-end">
@@ -183,7 +185,7 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                             className="w-full bg-[#A3C042] hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
                         >
                             <FaFilter />
-                            تصفية
+                            {t('common.filter')}
                         </button>
                     </div>
                 </div>
@@ -195,13 +197,13 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                     <table className="w-full">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الشارة</th>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الاسم</th>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">النوع</th>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">النقاط المطلوبة</th>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الحالة</th>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">تاريخ الإنشاء</th>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الإجراءات</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminBadgesPage.table.badge')}</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('common.name')}</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminBadgesPage.table.type')}</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminBadgesPage.table.pointsRequired')}</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('common.status')}</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminBadgesPage.table.createdAt')}</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('common.actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
@@ -305,21 +307,21 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                                                 <button
                                                     onClick={() => handleAward(badge)}
                                                     className="text-purple-600 hover:text-purple-800 p-2 rounded-lg hover:bg-purple-50"
-                                                    title="منح الشارة"
+                                                    title={t('adminBadgesPage.actions.award')}
                                                 >
                                                     <FaAward />
                                                 </button>
                                                 <Link
                                                     href={route('admin.badges.edit', badge.id)}
                                                     className="text-yellow-600 hover:text-yellow-800 p-2 rounded-lg hover:bg-yellow-50"
-                                                    title="تعديل"
+                                                    title={t('common.edit')}
                                                 >
                                                     <FaEdit />
                                                 </Link>
                                                 <button
                                                     onClick={() => handleDelete(badge.id, badge.name_ar || badge.name)}
                                                     className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50"
-                                                    title="حذف"
+                                                    title={t('common.delete')}
                                                 >
                                                     <FaTrash />
                                                 </button>
@@ -330,7 +332,7 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                             ) : (
                                 <tr>
                                     <td colSpan="7" className="py-12 text-center text-gray-500">
-                                        لا توجد شارات
+                                        {t('adminBadgesPage.empty')}
                                     </td>
                                 </tr>
                             )}
@@ -343,7 +345,9 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                     <div className="px-6 py-4 border-t border-gray-200">
                         <div className="flex items-center justify-between">
                             <div className="text-sm text-gray-700">
-                                عرض {badges.from} إلى {badges.to} من {badges.total} شارة
+                                {t('pagination.showing')}{' '}
+                                {badges.from} {t('pagination.to')} {badges.to} {t('pagination.of')} {badges.total}{' '}
+                                {t('adminBadgesPage.badgeUnit')}
                             </div>
                             <div className="flex gap-2">
                                 {badges.links.map((link, index) => (
@@ -368,7 +372,9 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
                     <div className="bg-white rounded-xl shadow-xl p-6 max-w-2xl w-full my-8 max-h-[90vh] overflow-y-auto">
                         <div className="flex items-center justify-between mb-6 sticky top-0 bg-white pb-4 border-b">
-                            <h3 className="text-2xl font-bold text-gray-900">منح الشارة: {badgeToAward.name_ar || badgeToAward.name}</h3>
+                            <h3 className="text-2xl font-bold text-gray-900">
+                                {t('adminBadgesPage.awardModal.title', { name: badgeToAward.name_ar || badgeToAward.name })}
+                            </h3>
                             <button
                                 onClick={closeAwardModal}
                                 className="text-gray-400 hover:text-gray-600 transition"
@@ -382,7 +388,7 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                                 {/* معرف المستخدم */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        معرف المستخدم (User ID) <span className="text-red-500">*</span>
+                                        {t('adminBadgesPage.awardModal.userIdLabel')} <span className="text-red-500">*</span>
                                     </label>
                                     <div className="relative">
                                         <FaUser className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -390,14 +396,14 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                                             type="number"
                                             value={awardData.user_id}
                                             onChange={(e) => setAwardData('user_id', e.target.value)}
-                                            placeholder="أدخل معرف المستخدم..."
+                                            placeholder={t('adminBadgesPage.awardModal.userIdPlaceholder')}
                                             className={`w-full ps-10 pe-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${awardErrors.user_id ? 'border-red-500' : 'border-gray-300'
                                                 }`}
                                             required
                                         />
                                     </div>
                                     <p className="mt-1 text-xs text-gray-500">
-                                        يمكنك العثور على معرف المستخدم من صفحة إدارة المستخدمين
+                                        {t('adminBadgesPage.awardModal.userIdHint')}
                                     </p>
                                     {awardErrors.user_id && (
                                         <p className="mt-1 text-sm text-red-600">{awardErrors.user_id}</p>
@@ -407,13 +413,13 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                                 {/* المشروع (اختياري) */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        المشروع (اختياري)
+                                        {t('adminBadgesPage.awardModal.projectLabel')}
                                     </label>
                                     <input
                                         type="number"
                                         value={awardData.project_id}
                                         onChange={(e) => setAwardData('project_id', e.target.value)}
-                                        placeholder="معرف المشروع"
+                                        placeholder={t('adminBadgesPage.awardModal.projectPlaceholder')}
                                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${awardErrors.project_id ? 'border-red-500' : 'border-gray-300'
                                             }`}
                                     />
@@ -425,13 +431,13 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                                 {/* التحدي (اختياري) */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        التحدي (اختياري)
+                                        {t('adminBadgesPage.awardModal.challengeLabel')}
                                     </label>
                                     <input
                                         type="number"
                                         value={awardData.challenge_id}
                                         onChange={(e) => setAwardData('challenge_id', e.target.value)}
-                                        placeholder="معرف التحدي"
+                                        placeholder={t('adminBadgesPage.awardModal.challengePlaceholder')}
                                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${awardErrors.challenge_id ? 'border-red-500' : 'border-gray-300'
                                             }`}
                                     />
@@ -443,13 +449,13 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                                 {/* السبب */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        السبب (اختياري)
+                                        {t('adminBadgesPage.awardModal.reasonLabel')}
                                     </label>
                                     <textarea
                                         value={awardData.reason}
                                         onChange={(e) => setAwardData('reason', e.target.value)}
                                         rows={3}
-                                        placeholder="سبب منح الشارة..."
+                                        placeholder={t('adminBadgesPage.awardModal.reasonPlaceholder')}
                                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${awardErrors.reason ? 'border-red-500' : 'border-gray-300'
                                             }`}
                                     />
@@ -467,7 +473,7 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                                     className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50"
                                 >
                                     <FaAward />
-                                    {awardProcessing ? 'جاري المنح...' : 'منح الشارة'}
+                                    {awardProcessing ? t('adminBadgesPage.awardModal.awarding') : t('adminBadgesPage.actions.award')}
                                 </button>
                                 <button
                                     type="button"
@@ -475,7 +481,7 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                                     className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg flex items-center gap-2"
                                 >
                                     <FaTimes />
-                                    إلغاء
+                                    {t('common.cancel')}
                                 </button>
                             </div>
                         </form>

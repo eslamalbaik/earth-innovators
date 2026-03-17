@@ -15,34 +15,34 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
     const [filterSchool, setFilterSchool] = useState('');
     const [filterSubject, setFilterSubject] = useState('');
 
-    // استخدام الفئات من قاعدة البيانات أو الفئات الافتراضية
+    // Use DB categories when provided, otherwise fall back to defaults
     const defaultCategories = [
-        { value: '', label: t('common.all') || 'الكل' },
-        { value: 'science', label: t('categories.science') || 'علوم' },
-        { value: 'technology', label: t('categories.technology') || 'تقنية' },
-        { value: 'engineering', label: t('categories.engineering') || 'هندسة' },
-        { value: 'mathematics', label: t('categories.mathematics') || 'رياضيات' },
-        { value: 'arts', label: t('categories.arts') || 'فنون' },
-        { value: 'other', label: t('categories.other') || 'أخرى' },
+        { value: '', label: t('common.all') },
+        { value: 'science', label: t('categories.science') },
+        { value: 'technology', label: t('categories.technology') },
+        { value: 'engineering', label: t('categories.engineering') },
+        { value: 'mathematics', label: t('categories.mathematics') },
+        { value: 'arts', label: t('categories.arts') },
+        { value: 'other', label: t('categories.other') },
     ];
 
     const categoriesList = categories && categories.length > 0 ? categories : defaultCategories;
 
     const ageGroups = [
-        { value: '6-9', label: t('projects.age6_9') || '6-9 سنوات' },
-        { value: '10-13', label: t('projects.age10_13') || '10-13 سنة' },
-        { value: '14-17', label: t('projects.age14_17') || '14-17 سنة' },
-        { value: '18+', label: t('projects.age18plus') || '18+ سنة' },
+        { value: '6-9', label: t('projects.age6_9') },
+        { value: '10-13', label: t('projects.age10_13') },
+        { value: '14-17', label: t('projects.age14_17') },
+        { value: '18+', label: t('projects.age18plus') },
     ];
 
     const schools = [
-        { value: 'primary', label: t('projects.primarySchool') || 'المدرسة الابتدائية' },
-        { value: 'middle', label: t('projects.middleSchool') || 'المدرسة المتوسطة' },
-        { value: 'high', label: t('projects.highSchool') || 'المدرسة الثانوية' },
-        { value: 'university', label: t('projects.university') || 'الجامعة' },
+        { value: 'primary', label: t('projects.primarySchool') },
+        { value: 'middle', label: t('projects.middleSchool') },
+        { value: 'high', label: t('projects.highSchool') },
+        { value: 'university', label: t('projects.university') },
     ];
 
-    // استخدام الفئات من قاعدة البيانات للفلترة أيضاً
+    // Build subjects list from the same categories list
     const subjects = categoriesList.filter(c => c.value !== '').map(cat => ({
         value: cat.value,
         label: cat.label,
@@ -82,25 +82,25 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
 
     const getCategoryLabel = (cat) => {
         const found = categoriesList.find((c) => c.value === cat);
-        return found ? found.label : t('categories.other') || 'أخرى';
+        return found ? found.label : t('categories.other');
     };
 
     const formatDate = (date) => {
         if (!date) return '';
         const d = new Date(date);
         const months = [
-            t('common.january') || 'يناير',
-            t('common.february') || 'فبراير',
-            t('common.march') || 'مارس',
-            t('common.april') || 'أبريل',
-            t('common.may') || 'مايو',
-            t('common.june') || 'يونيو',
-            t('common.july') || 'يوليو',
-            t('common.august') || 'أغسطس',
-            t('common.september') || 'سبتمبر',
-            t('common.october') || 'أكتوبر',
-            t('common.november') || 'نوفمبر',
-            t('common.december') || 'ديسمبر'
+            t('common.january'),
+            t('common.february'),
+            t('common.march'),
+            t('common.april'),
+            t('common.may'),
+            t('common.june'),
+            t('common.july'),
+            t('common.august'),
+            t('common.september'),
+            t('common.october'),
+            t('common.november'),
+            t('common.december'),
         ];
         return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
     };
@@ -127,7 +127,7 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder={t('projects.searchPlaceholder') || 'ابحث عن المشاريع ..'}
+                            placeholder={t('projects.searchPlaceholder')}
                             className="w-full h-10 ps-10 pe-4 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042] text-sm"
                         />
                         <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
@@ -170,7 +170,7 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
                         const isWinner = project.rating >= 4.5 || project.is_winner;
                         const categoryLabel = getCategoryLabel(project.category);
                         const projectImage = project.image || project.thumbnail || '/images/hero.png';
-                        const ageRange = project.age_range || '13-10 سنة';
+                        const ageRange = project.age_range || t('projects.ageUnknown');
                         const schoolName = project.school?.name || t('projects.middleSchoolDefault');
                         const teacherName = project.teacher?.name_ar || project.user?.name || t('projects.teacherNameDefault');
                         const likes = project.likes || 24;

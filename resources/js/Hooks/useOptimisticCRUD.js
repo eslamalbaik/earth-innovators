@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { router, usePage } from '@inertiajs/react';
 import { useToast } from '@/Contexts/ToastContext';
+import { useTranslation } from '@/i18n';
 
 /**
  * PERFORMANCE HOOK: Optimistic CRUD operations with instant UI feedback
@@ -20,6 +21,7 @@ export function useOptimisticCRUD(items = [], resourceName, additionalProps = []
     // Get toast functions for non-intrusive notifications
     const { showSuccess, showError } = useToast();
     const { flash } = usePage().props;
+    const { t } = useTranslation();
     
     // Optimistic state: stores local changes before server confirmation
     const [optimisticItems, setOptimisticItems] = useState(null);
@@ -41,7 +43,7 @@ export function useOptimisticCRUD(items = [], resourceName, additionalProps = []
      */
     const handleDelete = useCallback((itemId, deleteRoute, options = {}) => {
         const {
-            confirmMessage = 'هل أنت متأكد من الحذف؟',
+            confirmMessage = t('crud.deleteConfirm'),
             onSuccess,
             onError,
             ...routerOptions
@@ -77,7 +79,7 @@ export function useOptimisticCRUD(items = [], resourceName, additionalProps = []
                 setOptimisticItems(null); // Clear optimistic state, use server data
                 
                 // Show non-intrusive success notification (short duration for delete)
-                const successMessage = flash?.success || 'تم الحذف بنجاح';
+                const successMessage = flash?.success || t('crud.deleteSuccess');
                 showSuccess(successMessage, {
                     autoDismiss: 2500, // Shorter duration for delete operations
                     title: null, // No title for simple operations
@@ -95,7 +97,7 @@ export function useOptimisticCRUD(items = [], resourceName, additionalProps = []
                 });
                 
                 // Show error notification
-                const errorMessage = flash?.error || errors?.message || 'حدث خطأ أثناء الحذف';
+                const errorMessage = flash?.error || errors?.message || t('crud.deleteError');
                 showError(errorMessage, {
                     autoDismiss: 3000,
                     title: null,
@@ -104,7 +106,7 @@ export function useOptimisticCRUD(items = [], resourceName, additionalProps = []
                 onError?.(errors);
             },
         });
-    }, [items, resourceName, additionalProps]);
+    }, [items, resourceName, additionalProps, flash, showError, showSuccess, t]);
 
     /**
      * Optimistic update with instant UI feedback
@@ -130,7 +132,7 @@ export function useOptimisticCRUD(items = [], resourceName, additionalProps = []
                 setOptimisticItems(null); // Clear optimistic state
                 
                 // Show success notification
-                const successMessage = flash?.success || 'تم التحديث بنجاح';
+                const successMessage = flash?.success || t('crud.updateSuccess');
                 showSuccess(successMessage, {
                     autoDismiss: 2500,
                     title: null,
@@ -143,7 +145,7 @@ export function useOptimisticCRUD(items = [], resourceName, additionalProps = []
                 setOptimisticItems(null);
                 
                 // Show error notification
-                const errorMessage = flash?.error || errors?.message || 'حدث خطأ أثناء التحديث';
+                const errorMessage = flash?.error || errors?.message || t('crud.updateError');
                 showError(errorMessage, {
                     autoDismiss: 3000,
                     title: null,
@@ -152,7 +154,7 @@ export function useOptimisticCRUD(items = [], resourceName, additionalProps = []
                 onError?.(errors);
             },
         });
-    }, [resourceName, additionalProps]);
+    }, [resourceName, additionalProps, flash, showError, showSuccess, t]);
 
     /**
      * Optimistic create with instant UI feedback
@@ -174,7 +176,7 @@ export function useOptimisticCRUD(items = [], resourceName, additionalProps = []
                 setOptimisticItems(null);
                 
                 // Show success notification
-                const successMessage = flash?.success || 'تم الإنشاء بنجاح';
+                const successMessage = flash?.success || t('crud.createSuccess');
                 showSuccess(successMessage, {
                     autoDismiss: 2500,
                     title: null,
@@ -186,7 +188,7 @@ export function useOptimisticCRUD(items = [], resourceName, additionalProps = []
                 setOptimisticItems(null);
                 
                 // Show error notification
-                const errorMessage = flash?.error || errors?.message || 'حدث خطأ أثناء الإنشاء';
+                const errorMessage = flash?.error || errors?.message || t('crud.createError');
                 showError(errorMessage, {
                     autoDismiss: 3000,
                     title: null,
@@ -195,7 +197,7 @@ export function useOptimisticCRUD(items = [], resourceName, additionalProps = []
                 onError?.(errors);
             },
         });
-    }, [resourceName, additionalProps]);
+    }, [resourceName, additionalProps, flash, showError, showSuccess, t]);
 
     /**
      * Clear optimistic state manually
@@ -226,4 +228,3 @@ export function useOptimisticCRUD(items = [], resourceName, additionalProps = []
         setOptimisticItems,
     };
 }
-

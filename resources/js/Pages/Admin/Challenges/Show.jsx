@@ -1,14 +1,16 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link } from '@inertiajs/react';
 import { FaArrowRight, FaEdit, FaTrophy, FaUser, FaCalendar, FaFlag, FaClock, FaUsers, FaCoins, FaUserPlus, FaExclamationCircle, FaStar, FaCheckCircle, FaFile } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function AdminChallengesShow({ challenge }) {
+    const { t } = useTranslation();
     const getStatusBadge = (status) => {
         const statusMap = {
-            'active': { bg: 'bg-green-100', text: 'text-green-800', label: 'نشط' },
-            'draft': { bg: 'bg-gray-100', text: 'text-gray-800', label: 'مسودة' },
-            'completed': { bg: 'bg-blue-100', text: 'text-blue-800', label: 'مكتمل' },
-            'cancelled': { bg: 'bg-red-100', text: 'text-red-800', label: 'ملغي' },
+            active: { bg: 'bg-green-100', text: 'text-green-800', label: t('common.challengeStatuses.active') },
+            draft: { bg: 'bg-gray-100', text: 'text-gray-800', label: t('common.challengeStatuses.draft') },
+            completed: { bg: 'bg-blue-100', text: 'text-blue-800', label: t('common.challengeStatuses.completed') },
+            cancelled: { bg: 'bg-red-100', text: 'text-red-800', label: t('common.challengeStatuses.cancelled') },
         };
         const statusConfig = statusMap[status] || { bg: 'bg-gray-100', text: 'text-gray-800', label: status };
         return (
@@ -19,54 +21,19 @@ export default function AdminChallengesShow({ challenge }) {
     };
 
     const getCategoryLabel = (category) => {
-        const categoryMap = {
-            'science': 'علوم',
-            'technology': 'تقنية',
-            'engineering': 'هندسة',
-            'mathematics': 'رياضيات',
-            'arts': 'فنون',
-            'other': 'أخرى',
-        };
-        return categoryMap[category] || category;
+        return t(`common.categories.${category || 'other'}`);
     };
 
     const getChallengeTypeLabel = (type) => {
-        const typeMap = {
-            'cognitive': 'تحدّي معرفي',
-            'applied': 'تحدّي تطبيقي/مهاري',
-            'creative': 'تحدّي إبداعي',
-            'artistic_creative': 'تحدّي إبداعي فني',
-            'collaborative': 'تحدّي تعاوني',
-            'analytical': 'تحدّي تحليلي/استقصائي',
-            'technological': 'تحدّي تكنولوجي',
-            'behavioral': 'تحدّي سلوكي/قيمي',
-            '60_seconds': 'تحدّي 60 ثانية',
-            'mental_math': 'حلها بدون قلم',
-            'conversions': 'تحدّي التحويلات',
-            'team_fastest': 'تحدّي الفريق الأسرع',
-            'build_problem': 'ابنِ مسألة',
-            'custom': 'تحدّي مخصص',
-        };
-        return typeMap[type] || type;
+        return t(`common.challengeTypes.${type || 'custom'}`);
     };
 
     const getAgeGroupLabel = (ageGroup) => {
-        const ageGroupMap = {
-            '6-9': '6-9 سنوات',
-            '10-13': '10-13 سنة',
-            '14-17': '14-17 سنة',
-            '18+': '18+ سنة',
-        };
-        return ageGroupMap[ageGroup] || ageGroup;
+        return t(`common.ageGroups.${ageGroup || '10-13'}`);
     };
 
     const getDifficultyLabel = (difficulty) => {
-        const difficultyMap = {
-            'easy': 'سهل',
-            'medium': 'متوسط',
-            'hard': 'صعب',
-        };
-        return difficultyMap[difficulty] || difficulty;
+        return t(`common.difficultyLevels.${difficulty || 'medium'}`);
     };
 
     const getDifficultyColor = (difficulty) => {
@@ -79,7 +46,7 @@ export default function AdminChallengesShow({ challenge }) {
     };
 
     return (
-        <DashboardLayout header="تفاصيل التحدي">
+        <DashboardLayout header={t('adminChallengesShowPage.title')}>
             <Head title={challenge.title} />
 
             <div className="mb-6">
@@ -88,7 +55,7 @@ export default function AdminChallengesShow({ challenge }) {
                     className="text-blue-600 hover:text-blue-800 flex items-center gap-2"
                 >
                     <FaArrowRight className="transform rotate-180" />
-                    العودة إلى قائمة التحديات
+                    {t('adminChallengesShowPage.actions.backToChallenges')}
                 </Link>
             </div>
 
@@ -106,7 +73,7 @@ export default function AdminChallengesShow({ challenge }) {
                                 className="bg-[#A3C042] hover:bg-[#8CA635] text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2"
                             >
                                 <FaUserPlus />
-                                تعيين طلاب
+                                {t('adminChallengesShowPage.actions.assignStudents')}
                             </Link>
                         )}
                         <Link
@@ -114,21 +81,21 @@ export default function AdminChallengesShow({ challenge }) {
                             className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2"
                         >
                             <FaFile />
-                            التسليمات
+                            {t('adminChallengesShowPage.actions.submissions')}
                         </Link>
                         <Link
                             href={route('admin.challenges.edit', challenge.id)}
                             className="bg-[#A3C042] hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2"
                         >
                             <FaEdit />
-                            تعديل
+                            {t('common.edit')}
                         </Link>
                     </div>
                 </div>
 
                 {challenge.objective && (
                     <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-                        <p className="text-gray-700"><strong>الهدف:</strong> {challenge.objective}</p>
+                        <p className="text-gray-700"><strong>{t('adminChallengesShowPage.labels.objective')}:</strong> {challenge.objective}</p>
                     </div>
                 )}
             </div>
@@ -138,7 +105,7 @@ export default function AdminChallengesShow({ challenge }) {
                 <div className="lg:col-span-2 space-y-6">
                     {/* Description */}
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                        <h2 className="text-xl font-bold text-gray-900 mb-4">وصف التحدي</h2>
+                        <h2 className="text-xl font-bold text-gray-900 mb-4">{t('adminChallengesShowPage.sections.description')}</h2>
                         <div className="prose max-w-none">
                             <p className="text-gray-700 whitespace-pre-wrap">{challenge.description}</p>
                         </div>
@@ -146,7 +113,7 @@ export default function AdminChallengesShow({ challenge }) {
 
                     {/* Instructions */}
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                        <h2 className="text-xl font-bold text-gray-900 mb-4">كيفية التنفيذ</h2>
+                        <h2 className="text-xl font-bold text-gray-900 mb-4">{t('adminChallengesShowPage.sections.instructions')}</h2>
                         <div className="prose max-w-none">
                             <p className="text-gray-700 whitespace-pre-wrap">{challenge.instructions}</p>
                         </div>
@@ -157,13 +124,13 @@ export default function AdminChallengesShow({ challenge }) {
                 <div className="space-y-6">
                     {/* Challenge Info */}
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                        <h2 className="text-xl font-bold text-gray-900 mb-4">معلومات التحدي</h2>
+                        <h2 className="text-xl font-bold text-gray-900 mb-4">{t('adminChallengesShowPage.sections.challengeInfo')}</h2>
                         <div className="space-y-4">
                             <div className="flex items-center gap-3">
                                 <FaFlag className="text-blue-500" />
                                 <div>
-                                    <p className="text-sm text-gray-600">نوع التحدي</p>
-                                    <p className="font-semibold text-gray-900">{challenge.challenge_type_label}</p>
+                                    <p className="text-sm text-gray-600">{t('adminChallengesShowPage.labels.challengeType')}</p>
+                                    <p className="font-semibold text-gray-900">{getChallengeTypeLabel(challenge.challenge_type)}</p>
                                 </div>
                             </div>
 
@@ -178,7 +145,7 @@ export default function AdminChallengesShow({ challenge }) {
                             <div className="flex items-center gap-3">
                                 <FaUser className="text-purple-500" />
                                 <div>
-                                    <p className="text-sm text-gray-600">الفئة العمرية</p>
+                                    <p className="text-sm text-gray-600">{t('adminChallengesShowPage.labels.ageGroup')}</p>
                                     <p className="font-semibold text-gray-900">{getAgeGroupLabel(challenge.age_group)}</p>
                                 </div>
                             </div>
@@ -187,7 +154,7 @@ export default function AdminChallengesShow({ challenge }) {
                                 <div className="flex items-center gap-3">
                                     <FaStar className={getDifficultyColor(challenge.difficulty).icon} />
                                     <div>
-                                        <p className="text-sm text-gray-600">مستوى الصعوبة</p>
+                                        <p className="text-sm text-gray-600">{t('adminChallengesShowPage.labels.difficulty')}</p>
                                         <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getDifficultyColor(challenge.difficulty).bg} ${getDifficultyColor(challenge.difficulty).text}`}>
                                             {getDifficultyLabel(challenge.difficulty)}
                                         </span>
@@ -199,7 +166,7 @@ export default function AdminChallengesShow({ challenge }) {
                                 <div className="flex items-center gap-3">
                                     <FaTrophy className="text-yellow-500" />
                                     <div>
-                                        <p className="text-sm text-gray-600">المدرسة</p>
+                                        <p className="text-sm text-gray-600">{t('adminChallengesShowPage.labels.school')}</p>
                                         <p className="font-semibold text-gray-900">{challenge.school.name}</p>
                                         {challenge.school.email && (
                                             <p className="text-xs text-gray-500">{challenge.school.email}</p>
@@ -212,7 +179,7 @@ export default function AdminChallengesShow({ challenge }) {
                                 <div className="flex items-center gap-3">
                                     <FaUser className="text-indigo-500" />
                                     <div>
-                                        <p className="text-sm text-gray-600">المنشئ</p>
+                                        <p className="text-sm text-gray-600">{t('adminChallengesShowPage.labels.creator')}</p>
                                         <p className="font-semibold text-gray-900">{challenge.creator.name}</p>
                                         {challenge.creator.email && (
                                             <p className="text-xs text-gray-500">{challenge.creator.email}</p>
@@ -225,12 +192,12 @@ export default function AdminChallengesShow({ challenge }) {
 
                     {/* Dates */}
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                        <h2 className="text-xl font-bold text-gray-900 mb-4">التواريخ</h2>
+                        <h2 className="text-xl font-bold text-gray-900 mb-4">{t('adminChallengesShowPage.sections.dates')}</h2>
                         <div className="space-y-4">
                             <div className="flex items-center gap-3">
                                 <FaCalendar className="text-green-500" />
                                 <div>
-                                    <p className="text-sm text-gray-600">تاريخ البدء</p>
+                                    <p className="text-sm text-gray-600">{t('adminChallengesShowPage.labels.startDate')}</p>
                                     <p className="font-semibold text-gray-900">{new Date(challenge.start_date).toLocaleString('en-US')}</p>
                                 </div>
                             </div>
@@ -238,7 +205,7 @@ export default function AdminChallengesShow({ challenge }) {
                             <div className="flex items-center gap-3">
                                 <FaClock className="text-red-500" />
                                 <div>
-                                    <p className="text-sm text-gray-600">تاريخ الانتهاء</p>
+                                    <p className="text-sm text-gray-600">{t('adminChallengesShowPage.labels.deadline')}</p>
                                     <p className="font-semibold text-gray-900">{new Date(challenge.deadline).toLocaleString('en-US')}</p>
                                 </div>
                             </div>
@@ -247,14 +214,14 @@ export default function AdminChallengesShow({ challenge }) {
 
                     {/* Stats */}
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                        <h2 className="text-xl font-bold text-gray-900 mb-4">الإحصائيات</h2>
+                        <h2 className="text-xl font-bold text-gray-900 mb-4">{t('adminChallengesShowPage.sections.stats')}</h2>
                         <div className="space-y-4">
                             {challenge.points_reward > 0 && (
                                 <div className="flex items-center gap-3">
                                     <FaCoins className="text-yellow-500" />
                                     <div>
-                                        <p className="text-sm text-gray-600">نقاط المكافأة</p>
-                                        <p className="font-semibold text-gray-900">{challenge.points_reward} نقطة</p>
+                                        <p className="text-sm text-gray-600">{t('adminChallengesShowPage.labels.pointsReward')}</p>
+                                        <p className="font-semibold text-gray-900">{t('adminChallengesShowPage.points', { count: challenge.points_reward })}</p>
                                     </div>
                                 </div>
                             )}
@@ -262,10 +229,10 @@ export default function AdminChallengesShow({ challenge }) {
                             <div className="flex items-center gap-3">
                                 <FaUsers className="text-blue-500" />
                                 <div>
-                                    <p className="text-sm text-gray-600">المشاركون</p>
+                                    <p className="text-sm text-gray-600">{t('adminChallengesShowPage.labels.participants')}</p>
                                     <p className="font-semibold text-gray-900">
                                         {challenge.current_participants || 0}
-                                        {challenge.max_participants ? ` / ${challenge.max_participants}` : ' / غير محدود'}
+                                        {challenge.max_participants ? ` / ${challenge.max_participants}` : ` / ${t('adminChallengesShowPage.unlimited')}`}
                                     </p>
                                 </div>
                             </div>
@@ -276,12 +243,12 @@ export default function AdminChallengesShow({ challenge }) {
                     {challenge.school_id && challenge.assigned_students && challenge.assigned_students.length > 0 && (
                         <div className="bg-white rounded-xl shadow-lg p-6">
                             <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-xl font-bold text-gray-900">الطلاب المعينون</h2>
+                                <h2 className="text-xl font-bold text-gray-900">{t('adminChallengesShowPage.sections.assignedStudents')}</h2>
                                 <Link
                                     href={route('admin.challenges.assign-students', challenge.id)}
                                     className="text-blue-600 hover:text-blue-800 text-sm font-semibold"
                                 >
-                                    تعديل
+                                    {t('common.edit')}
                                 </Link>
                             </div>
                             <div className="space-y-2">
@@ -299,11 +266,11 @@ export default function AdminChallengesShow({ challenge }) {
                                     const getTypeLabel = (type) => {
                                         switch (type) {
                                             case 'mandatory':
-                                                return 'إلزامي';
+                                                return t('adminChallengesShowPage.participationTypes.mandatory');
                                             case 'favorite':
-                                                return 'مفضل';
+                                                return t('adminChallengesShowPage.participationTypes.favorite');
                                             default:
-                                                return 'اختياري';
+                                                return t('adminChallengesShowPage.participationTypes.optional');
                                         }
                                     };
                                     const getTypeColor = (type) => {
@@ -336,10 +303,10 @@ export default function AdminChallengesShow({ challenge }) {
 
                     {/* Timestamps */}
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                        <h2 className="text-xl font-bold text-gray-900 mb-4">معلومات إضافية</h2>
+                        <h2 className="text-xl font-bold text-gray-900 mb-4">{t('adminChallengesShowPage.sections.moreInfo')}</h2>
                         <div className="space-y-2 text-sm text-gray-600">
-                            <p><strong>تاريخ الإنشاء:</strong> {challenge.created_at}</p>
-                            <p><strong>آخر تحديث:</strong> {challenge.updated_at}</p>
+                            <p><strong>{t('adminChallengesShowPage.labels.createdAt')}:</strong> {challenge.created_at}</p>
+                            <p><strong>{t('adminChallengesShowPage.labels.updatedAt')}:</strong> {challenge.updated_at}</p>
                         </div>
                     </div>
                 </div>

@@ -11,8 +11,10 @@ import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
+import { useTranslation } from '@/i18n';
 
 export default function Index({ auth, students, availableBadges }) {
+    const { t, language } = useTranslation();
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showBadgeModal, setShowBadgeModal] = useState(false);
@@ -79,10 +81,10 @@ export default function Index({ auth, students, availableBadges }) {
 
     const handleDelete = async (studentId, studentName) => {
         const confirmed = await confirm({
-            title: 'تأكيد الحذف',
-            message: `هل أنت متأكد من حذف الطالب "${studentName}"؟ هذا الإجراء لا يمكن التراجع عنه.`,
-            confirmText: 'حذف',
-            cancelText: 'إلغاء',
+            title: t('schoolStudentsIndexPage.deleteConfirm.title'),
+            message: t('schoolStudentsIndexPage.deleteConfirm.message', { name: studentName }),
+            confirmText: t('common.delete'),
+            cancelText: t('common.cancel'),
             variant: 'danger',
         });
 
@@ -118,10 +120,10 @@ export default function Index({ auth, students, availableBadges }) {
 
     const handleRemoveBadge = async (badgeId, badgeName) => {
         const confirmed = await confirm({
-            title: 'تأكيد الإزالة',
-            message: `هل أنت متأكد من إزالة الشارة "${badgeName}"؟`,
-            confirmText: 'إزالة',
-            cancelText: 'إلغاء',
+            title: t('schoolStudentsIndexPage.removeBadgeConfirm.title'),
+            message: t('schoolStudentsIndexPage.removeBadgeConfirm.message', { name: badgeName }),
+            confirmText: t('schoolStudentsIndexPage.actions.remove'),
+            cancelText: t('common.cancel'),
             variant: 'warning',
         });
 
@@ -144,26 +146,26 @@ export default function Index({ auth, students, availableBadges }) {
     });
 
     return (
-        <DashboardLayout header="إدارة الطلاب">
-            <Head title="إدارة الطلاب - إرث المبتكرين" />
+        <DashboardLayout header={t('schoolStudentsIndexPage.title')}>
+            <Head title={t('schoolStudentsIndexPage.pageTitle', { appName: t('common.appName') })} />
 
-            <div className="space-y-6">
+            <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="space-y-6">
                 {/* رأس الصفحة */}
                 <div className="bg-white rounded-xl shadow-lg p-6">
                     <div className="flex items-center justify-between mb-6">
                         <div>
                             <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
                                 <FaUsers className="text-[#A3C042]" />
-                                إدارة الطلاب
+                                {t('schoolStudentsIndexPage.title')}
                             </h2>
-                            <p className="text-gray-600 mt-1">إجمالي الطلاب: {students.total}</p>
+                            <p className="text-gray-600 mt-1">{t('schoolStudentsIndexPage.totalStudents', { count: students.total })}</p>
                         </div>
                         <button
                             onClick={() => setShowCreateModal(true)}
                             className="bg-[#A3C042] text-white px-6 py-3 rounded-lg font-medium hover:shadow-lg transition flex items-center gap-2"
                         >
                             <FaPlus />
-                            إضافة طالب جديد
+                            {t('schoolStudentsIndexPage.actions.addNew')}
                         </button>
                     </div>
 
@@ -172,7 +174,7 @@ export default function Index({ auth, students, availableBadges }) {
                         <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                         <input
                             type="text"
-                            placeholder="ابحث عن طالب (الاسم، البريد، الهاتف، رقم العضوية)..."
+                            placeholder={t('schoolStudentsIndexPage.searchPlaceholder')}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#A3C042] focus:border-transparent"
@@ -187,31 +189,31 @@ export default function Index({ auth, students, availableBadges }) {
                             <thead className="bg-gradient-to-r from-[#A3C042]/10 to-legacy-blue/10">
                                 <tr>
                                     <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                        رقم العضوية
+                                        {t('schoolStudentsIndexPage.table.membershipNumber')}
                                     </th>
                                     <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                        السنة
+                                        {t('schoolStudentsIndexPage.table.year')}
                                     </th>
                                     <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                        الاسم
+                                        {t('common.name')}
                                     </th>
                                     <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                        البريد الإلكتروني
+                                        {t('common.email')}
                                     </th>
                                     <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                        الهاتف
+                                        {t('schoolStudentsIndexPage.table.phone')}
                                     </th>
                                     <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                        النقاط
+                                        {t('common.points')}
                                     </th>
                                     <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                        المشاريع
+                                        {t('common.projects')}
                                     </th>
                                     <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                        الشارات
+                                        {t('common.badges')}
                                     </th>
                                     <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                        الإجراءات
+                                        {t('common.actions')}
                                     </th>
                                 </tr>
                             </thead>
@@ -219,7 +221,7 @@ export default function Index({ auth, students, availableBadges }) {
                                 {filteredStudents.length === 0 ? (
                                     <tr>
                                         <td colSpan="8" className="px-6 py-12 text-center text-gray-500">
-                                            {searchTerm ? 'لا توجد نتائج للبحث' : 'لا يوجد طلاب مسجلين'}
+                                            {searchTerm ? t('schoolStudentsIndexPage.empty.search') : t('schoolStudentsIndexPage.empty.default')}
                                         </td>
                                     </tr>
                                 ) : (
@@ -253,7 +255,7 @@ export default function Index({ auth, students, availableBadges }) {
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-1 text-sm text-gray-600">
                                                     <FaProjectDiagram />
-                                                    {student.projects_count} ({student.approved_projects} معتمد)
+                                                    {t('schoolStudentsIndexPage.projectsCount', { total: student.projects_count, approved: student.approved_projects })}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
@@ -270,21 +272,21 @@ export default function Index({ auth, students, availableBadges }) {
                                                     <button
                                                         onClick={() => handleAwardBadge(student)}
                                                         className="text-orange-600 hover:text-orange-900 p-2 rounded hover:bg-orange-50"
-                                                        title="منح شارة"
+                                                        title={t('schoolStudentsIndexPage.actions.awardBadge')}
                                                     >
                                                         <FaAward />
                                                     </button>
                                                     <button
                                                         onClick={() => handleEdit(student)}
                                                         className="text-blue-600 hover:text-blue-900 p-2 rounded hover:bg-blue-50"
-                                                        title="تعديل"
+                                                        title={t('common.edit')}
                                                     >
                                                         <FaEdit />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(student.id, student.name)}
                                                         className="text-red-600 hover:text-red-900 p-2 rounded hover:bg-red-50"
-                                                        title="حذف"
+                                                        title={t('common.delete')}
                                                     >
                                                         <FaTrash />
                                                     </button>
@@ -307,7 +309,7 @@ export default function Index({ auth, students, availableBadges }) {
                                             href={students.links[0].url}
                                             className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                         >
-                                            السابق
+                                            {t('common.previous')}
                                         </Link>
                                     )}
                                     {students.links[students.links.length - 1].url && (
@@ -315,16 +317,14 @@ export default function Index({ auth, students, availableBadges }) {
                                             href={students.links[students.links.length - 1].url}
                                             className="me-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                         >
-                                            التالي
+                                            {t('common.next')}
                                         </Link>
                                     )}
                                 </div>
                                 <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                                     <div>
                                         <p className="text-sm text-gray-700">
-                                            عرض <span className="font-medium">{students.from}</span> إلى{' '}
-                                            <span className="font-medium">{students.to}</span> من{' '}
-                                            <span className="font-medium">{students.total}</span> نتيجة
+                                            {t('schoolStudentsIndexPage.pagination.showing', { from: students.from, to: students.to, total: students.total })}
                                         </p>
                                     </div>
                                     <div>
@@ -353,7 +353,7 @@ export default function Index({ auth, students, availableBadges }) {
             <Modal show={showCreateModal} onClose={() => setShowCreateModal(false)}>
                 <form onSubmit={handleCreate} className="p-6">
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-bold text-gray-900">إضافة طالب جديد</h3>
+                        <h3 className="text-lg font-bold text-gray-900">{t('schoolStudentsIndexPage.modals.create.title')}</h3>
                         <button
                             type="button"
                             onClick={() => setShowCreateModal(false)}
@@ -365,7 +365,7 @@ export default function Index({ auth, students, availableBadges }) {
 
                     <div className="space-y-4">
                         <div>
-                            <InputLabel htmlFor="name" value="الاسم" />
+                            <InputLabel htmlFor="name" value={t('common.name')} />
                             <TextInput
                                 id="name"
                                 type="text"
@@ -378,7 +378,7 @@ export default function Index({ auth, students, availableBadges }) {
                         </div>
 
                         <div>
-                            <InputLabel htmlFor="email" value="البريد الإلكتروني" />
+                            <InputLabel htmlFor="email" value={t('common.email')} />
                             <TextInput
                                 id="email"
                                 type="email"
@@ -391,7 +391,7 @@ export default function Index({ auth, students, availableBadges }) {
                         </div>
 
                         <div>
-                            <InputLabel htmlFor="phone" value="الهاتف (اختياري)" />
+                            <InputLabel htmlFor="phone" value={t('schoolStudentsIndexPage.form.phoneOptional')} />
                             <TextInput
                                 id="phone"
                                 type="text"
@@ -403,7 +403,7 @@ export default function Index({ auth, students, availableBadges }) {
                         </div>
 
                         <div>
-                            <InputLabel htmlFor="password" value="كلمة المرور" />
+                            <InputLabel htmlFor="password" value={t('common.password')} />
                             <TextInput
                                 id="password"
                                 type="password"
@@ -416,14 +416,14 @@ export default function Index({ auth, students, availableBadges }) {
                         </div>
 
                         <div>
-                            <InputLabel htmlFor="year" value="السنة الدراسية" />
+                            <InputLabel htmlFor="year" value={t('schoolStudentsIndexPage.form.year')} />
                             <TextInput
                                 id="year"
                                 type="number"
                                 className="mt-1 block w-full"
                                 value={createForm.data.year}
                                 onChange={(e) => createForm.setData('year', e.target.value)}
-                                placeholder="مثال: 2026"
+                                placeholder={t('schoolStudentsIndexPage.form.yearPlaceholder')}
                             />
                             <InputError message={createForm.errors.year} className="mt-2" />
                         </div>
@@ -435,10 +435,10 @@ export default function Index({ auth, students, availableBadges }) {
                             onClick={() => setShowCreateModal(false)}
                             className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
                         >
-                            إلغاء
+                            {t('common.cancel')}
                         </button>
                         <PrimaryButton type="submit" disabled={createForm.processing}>
-                            إضافة
+                            {t('common.add')}
                         </PrimaryButton>
                     </div>
                 </form>
@@ -448,7 +448,7 @@ export default function Index({ auth, students, availableBadges }) {
             <Modal show={showEditModal} onClose={() => setShowEditModal(false)}>
                 <form onSubmit={handleUpdate} className="p-6">
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-bold text-gray-900">تعديل بيانات الطالب</h3>
+                        <h3 className="text-lg font-bold text-gray-900">{t('schoolStudentsIndexPage.modals.edit.title')}</h3>
                         <button
                             type="button"
                             onClick={() => setShowEditModal(false)}
@@ -460,7 +460,7 @@ export default function Index({ auth, students, availableBadges }) {
 
                     <div className="space-y-4">
                         <div>
-                            <InputLabel htmlFor="edit_name" value="الاسم" />
+                            <InputLabel htmlFor="edit_name" value={t('common.name')} />
                             <TextInput
                                 id="edit_name"
                                 type="text"
@@ -473,7 +473,7 @@ export default function Index({ auth, students, availableBadges }) {
                         </div>
 
                         <div>
-                            <InputLabel htmlFor="edit_email" value="البريد الإلكتروني" />
+                            <InputLabel htmlFor="edit_email" value={t('common.email')} />
                             <TextInput
                                 id="edit_email"
                                 type="email"
@@ -486,7 +486,7 @@ export default function Index({ auth, students, availableBadges }) {
                         </div>
 
                         <div>
-                            <InputLabel htmlFor="edit_phone" value="الهاتف (اختياري)" />
+                            <InputLabel htmlFor="edit_phone" value={t('schoolStudentsIndexPage.form.phoneOptional')} />
                             <TextInput
                                 id="edit_phone"
                                 type="text"
@@ -498,20 +498,20 @@ export default function Index({ auth, students, availableBadges }) {
                         </div>
 
                         <div>
-                            <InputLabel htmlFor="edit_year" value="السنة الدراسية" />
+                            <InputLabel htmlFor="edit_year" value={t('schoolStudentsIndexPage.form.year')} />
                             <TextInput
                                 id="edit_year"
                                 type="number"
                                 className="mt-1 block w-full"
                                 value={editForm.data.year}
                                 onChange={(e) => editForm.setData('year', e.target.value)}
-                                placeholder="مثال: 2026"
+                                placeholder={t('schoolStudentsIndexPage.form.yearPlaceholder')}
                             />
                             <InputError message={editForm.errors.year} className="mt-2" />
                         </div>
 
                         <div>
-                            <InputLabel htmlFor="edit_password" value="كلمة المرور (اتركه فارغاً إذا لم ترد تغييره)" />
+                            <InputLabel htmlFor="edit_password" value={t('schoolStudentsIndexPage.form.passwordOptionalHint')} />
                             <TextInput
                                 id="edit_password"
                                 type="password"
@@ -529,10 +529,10 @@ export default function Index({ auth, students, availableBadges }) {
                             onClick={() => setShowEditModal(false)}
                             className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
                         >
-                            إلغاء
+                            {t('common.cancel')}
                         </button>
                         <PrimaryButton type="submit" disabled={editForm.processing}>
-                            تحديث
+                            {t('schoolStudentsIndexPage.actions.update')}
                         </PrimaryButton>
                     </div>
                 </form>
@@ -543,7 +543,7 @@ export default function Index({ auth, students, availableBadges }) {
                 <form onSubmit={handleSubmitBadge} className="p-6">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-bold text-gray-900">
-                            منح شارة للطالب: {selectedStudent?.name}
+                            {t('schoolStudentsIndexPage.modals.awardBadge.title', { name: selectedStudent?.name })}
                         </h3>
                         <button
                             type="button"
@@ -556,7 +556,7 @@ export default function Index({ auth, students, availableBadges }) {
 
                     <div className="space-y-4">
                         <div>
-                            <InputLabel htmlFor="badge_id" value="الشارة" />
+                            <InputLabel htmlFor="badge_id" value={t('common.badges')} />
                             <select
                                 id="badge_id"
                                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
@@ -564,7 +564,7 @@ export default function Index({ auth, students, availableBadges }) {
                                 onChange={(e) => badgeForm.setData('badge_id', e.target.value)}
                                 required
                             >
-                                <option value="">اختر شارة</option>
+                                <option value="">{t('schoolStudentsIndexPage.form.selectBadge')}</option>
                                 {availableBadges.map((badge) => (
                                     <option key={badge.id} value={badge.id}>
                                         {badge.name_ar || badge.name}
@@ -575,7 +575,7 @@ export default function Index({ auth, students, availableBadges }) {
                         </div>
 
                         <div>
-                            <InputLabel htmlFor="reason" value="السبب (اختياري)" />
+                            <InputLabel htmlFor="reason" value={t('schoolStudentsIndexPage.form.reasonOptional')} />
                             <textarea
                                 id="reason"
                                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
@@ -593,10 +593,10 @@ export default function Index({ auth, students, availableBadges }) {
                             onClick={() => setShowBadgeModal(false)}
                             className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
                         >
-                            إلغاء
+                            {t('common.cancel')}
                         </button>
                         <PrimaryButton type="submit" disabled={badgeForm.processing}>
-                            منح الشارة
+                            {t('schoolStudentsIndexPage.actions.awardBadge')}
                         </PrimaryButton>
                     </div>
                 </form>
@@ -607,7 +607,7 @@ export default function Index({ auth, students, availableBadges }) {
                 <div className="p-6">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-bold text-gray-900">
-                            شارات الطالب: {selectedStudent?.name}
+                            {t('schoolStudentsIndexPage.modals.badgesList.title', { name: selectedStudent?.name })}
                         </h3>
                         <button
                             type="button"
@@ -641,7 +641,7 @@ export default function Index({ auth, students, availableBadges }) {
                                     <button
                                         onClick={() => handleRemoveBadge(badge.id, badge.name_ar || badge.name)}
                                         className="text-red-600 hover:text-red-800 p-2 rounded hover:bg-red-50"
-                                        title="إزالة الشارة"
+                                        title={t('schoolStudentsIndexPage.actions.removeBadge')}
                                     >
                                         <FaTrash />
                                     </button>
@@ -649,7 +649,7 @@ export default function Index({ auth, students, availableBadges }) {
                             ))}
                         </div>
                     ) : (
-                        <p className="text-center text-gray-500 py-8">لا توجد شارات ممنوحة لهذا الطالب</p>
+                        <p className="text-center text-gray-500 py-8">{t('schoolStudentsIndexPage.badgesList.empty')}</p>
                     )}
                 </div>
             </Modal>

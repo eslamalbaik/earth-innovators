@@ -1,6 +1,7 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState, useCallback } from 'react';
+import { useTranslation } from '@/i18n';
 import {
     FaSearch,
     FaFilter,
@@ -14,6 +15,7 @@ import {
 } from 'react-icons/fa';
 
 export default function PermissionsIndex({ adminUsers, stats, filters, auth }) {
+    const { t } = useTranslation();
     const [search, setSearch] = useState(filters?.search || '');
     const [roleFilter, setRoleFilter] = useState(filters?.role || 'all');
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -50,9 +52,9 @@ export default function PermissionsIndex({ adminUsers, stats, filters, auth }) {
 
     const getRoleBadge = (role) => {
         const roleMap = {
-            'admin': { bg: 'bg-red-100', text: 'text-red-800', label: 'مدير', icon: FaUser },
-            'system_supervisor': { bg: 'bg-orange-100', text: 'text-orange-800', label: 'مشرف النظام', icon: FaShieldAlt },
-            'school_support_coordinator': { bg: 'bg-indigo-100', text: 'text-indigo-800', label: 'منسق دعم المؤسسات تعليمية', icon: FaUserTie },
+            admin: { bg: 'bg-red-100', text: 'text-red-800', label: t('adminPermissionsPage.roles.admin'), icon: FaUser },
+            system_supervisor: { bg: 'bg-orange-100', text: 'text-orange-800', label: t('adminPermissionsPage.roles.systemSupervisor'), icon: FaShieldAlt },
+            school_support_coordinator: { bg: 'bg-indigo-100', text: 'text-indigo-800', label: t('adminPermissionsPage.roles.schoolSupportCoordinator'), icon: FaUserTie },
         };
         const roleConfig = roleMap[role] || { bg: 'bg-gray-100', text: 'text-gray-800', label: role, icon: FaUser };
         const Icon = roleConfig.icon;
@@ -65,15 +67,15 @@ export default function PermissionsIndex({ adminUsers, stats, filters, auth }) {
     };
 
     return (
-        <DashboardLayout header="إدارة الصلاحيات" auth={auth}>
-            <Head title="إدارة الصلاحيات" />
+        <DashboardLayout header={t('adminPermissionsPage.title')} auth={auth}>
+            <Head title={t('adminPermissionsPage.pageTitle', { appName: t('common.appName') })} />
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <div className="bg-white rounded-xl shadow-lg p-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">إجمالي المستخدمين الإداريين</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('adminPermissionsPage.stats.totalAdminUsers')}</p>
                             <p className="text-3xl font-bold text-gray-900">{stats?.total_admin_users || 0}</p>
                         </div>
                         <FaUserShield className="text-3xl text-gray-400" />
@@ -82,7 +84,7 @@ export default function PermissionsIndex({ adminUsers, stats, filters, auth }) {
                 <div className="bg-white rounded-xl shadow-lg p-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">مشرفو النظام</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('adminPermissionsPage.stats.systemSupervisors')}</p>
                             <p className="text-3xl font-bold text-orange-600">{stats?.system_supervisors || 0}</p>
                         </div>
                         <FaShieldAlt className="text-3xl text-orange-400" />
@@ -91,7 +93,7 @@ export default function PermissionsIndex({ adminUsers, stats, filters, auth }) {
                 <div className="bg-white rounded-xl shadow-lg p-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">منسقو دعم المؤسسات تعليمية</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('adminPermissionsPage.stats.schoolSupportCoordinators')}</p>
                             <p className="text-3xl font-bold text-indigo-600">{stats?.school_support_coordinators || 0}</p>
                         </div>
                         <FaUserTie className="text-3xl text-indigo-400" />
@@ -100,7 +102,7 @@ export default function PermissionsIndex({ adminUsers, stats, filters, auth }) {
                 <div className="bg-white rounded-xl shadow-lg p-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">المدراء</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('adminPermissionsPage.stats.admins')}</p>
                             <p className="text-3xl font-bold text-red-600">{stats?.admins || 0}</p>
                         </div>
                         <FaUser className="text-3xl text-red-400" />
@@ -120,7 +122,7 @@ export default function PermissionsIndex({ adminUsers, stats, filters, auth }) {
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                                    placeholder="ابحث بالاسم أو البريد الإلكتروني..."
+                                    placeholder={t('adminPermissionsPage.searchPlaceholder')}
                                     className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
                             </div>
@@ -131,10 +133,10 @@ export default function PermissionsIndex({ adminUsers, stats, filters, auth }) {
                                 onChange={(e) => setRoleFilter(e.target.value)}
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             >
-                                <option value="all">جميع الأدوار</option>
-                                <option value="admin">مدير</option>
-                                <option value="system_supervisor">مشرف النظام</option>
-                                <option value="school_support_coordinator">منسق دعم المؤسسات تعليمية</option>
+                                <option value="all">{t('adminPermissionsPage.roleFilter.all')}</option>
+                                <option value="admin">{t('adminPermissionsPage.roles.admin')}</option>
+                                <option value="system_supervisor">{t('adminPermissionsPage.roles.systemSupervisor')}</option>
+                                <option value="school_support_coordinator">{t('adminPermissionsPage.roles.schoolSupportCoordinator')}</option>
                             </select>
                         </div>
                         <button
@@ -142,7 +144,7 @@ export default function PermissionsIndex({ adminUsers, stats, filters, auth }) {
                             className="px-6 py-2 bg-[#A3C042] hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
                         >
                             <FaFilter />
-                            بحث
+                            {t('common.search')}
                         </button>
                     </div>
                     <Link
@@ -150,7 +152,7 @@ export default function PermissionsIndex({ adminUsers, stats, filters, auth }) {
                         className="px-6 py-2 bg-[#A3C042] hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
                     >
                         <FaPlus />
-                        إضافة مستخدم إداري
+                        {t('adminPermissionsPage.addAdminUser')}
                     </Link>
                 </div>
             </div>
@@ -162,22 +164,22 @@ export default function PermissionsIndex({ adminUsers, stats, filters, auth }) {
                         <thead className="bg-gray-50">
                             <tr>
                                 <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    الاسم
+                                    {t('common.name')}
                                 </th>
                                 <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    البريد الإلكتروني
+                                    {t('common.email')}
                                 </th>
                                 <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    الهاتف
+                                    {t('common.phone')}
                                 </th>
                                 <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    نوع الصلاحية
+                                    {t('adminPermissionsPage.table.role')}
                                 </th>
                                 <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    تاريخ الإنشاء
+                                    {t('adminPermissionsPage.table.createdAt')}
                                 </th>
                                 <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    الإجراءات
+                                    {t('common.actions')}
                                 </th>
                             </tr>
                         </thead>
@@ -223,7 +225,7 @@ export default function PermissionsIndex({ adminUsers, stats, filters, auth }) {
                             ) : (
                                 <tr>
                                     <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
-                                        لا توجد بيانات
+                                        {t('common.noData')}
                                     </td>
                                 </tr>
                             )}
@@ -240,7 +242,7 @@ export default function PermissionsIndex({ adminUsers, stats, filters, auth }) {
                                     href={adminUsers.links[0].url}
                                     className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                 >
-                                    السابق
+                                    {t('pagination.previous')}
                                 </Link>
                             )}
                             {adminUsers.links[adminUsers.links.length - 1].url && (
@@ -248,16 +250,17 @@ export default function PermissionsIndex({ adminUsers, stats, filters, auth }) {
                                     href={adminUsers.links[adminUsers.links.length - 1].url}
                                     className="me-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                 >
-                                    التالي
+                                    {t('pagination.next')}
                                 </Link>
                             )}
                         </div>
                         <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                             <div>
                                 <p className="text-sm text-gray-700">
-                                    عرض <span className="font-medium">{adminUsers.from}</span> إلى{' '}
-                                    <span className="font-medium">{adminUsers.to}</span> من{' '}
-                                    <span className="font-medium">{adminUsers.total}</span> نتيجة
+                                    {t('pagination.showing')}{' '}
+                                    <span className="font-medium">{adminUsers.from}</span> {t('pagination.to')}{' '}
+                                    <span className="font-medium">{adminUsers.to}</span> {t('pagination.of')}{' '}
+                                    <span className="font-medium">{adminUsers.total}</span> {t('pagination.results')}
                                 </p>
                             </div>
                             <div>
@@ -288,10 +291,10 @@ export default function PermissionsIndex({ adminUsers, stats, filters, auth }) {
                             <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
                                 <FaTrash className="h-6 w-6 text-red-600" />
                             </div>
-                            <h3 className="text-lg font-medium text-gray-900 mt-5">تأكيد الحذف</h3>
+                            <h3 className="text-lg font-medium text-gray-900 mt-5">{t('adminPermissionsPage.deleteConfirmTitle')}</h3>
                             <div className="mt-2 px-7 py-3">
                                 <p className="text-sm text-gray-500">
-                                    هل أنت متأكد من حذف المستخدم الإداري "{userToDelete?.name}"؟ هذا الإجراء لا يمكن التراجع عنه.
+                                    {t('adminPermissionsPage.deleteConfirmMessage', { name: userToDelete?.name })}
                                 </p>
                             </div>
                             <div className="items-center px-4 py-3 flex gap-3 justify-center">
@@ -299,7 +302,7 @@ export default function PermissionsIndex({ adminUsers, stats, filters, auth }) {
                                     onClick={confirmDelete}
                                     className="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
                                 >
-                                    حذف
+                                    {t('common.delete')}
                                 </button>
                                 <button
                                     onClick={() => {
@@ -308,7 +311,7 @@ export default function PermissionsIndex({ adminUsers, stats, filters, auth }) {
                                     }}
                                     className="px-4 py-2 bg-gray-200 text-gray-800 text-base font-medium rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
                                 >
-                                    إلغاء
+                                    {t('common.cancel')}
                                 </button>
                             </div>
                         </div>

@@ -2,8 +2,10 @@ import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FaArrowRight, FaSave, FaTimes, FaImage, FaTrash } from 'react-icons/fa';
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from '@/i18n';
 
 export default function AdminChallengesEdit({ challenge, schools }) {
+    const { t, language } = useTranslation();
     const [imagePreview, setImagePreview] = useState(null);
     const [existingImage, setExistingImage] = useState(challenge?.image_url || null);
     const imageInputRef = useRef(null);
@@ -39,12 +41,12 @@ export default function AdminChallengesEdit({ challenge, schools }) {
             const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
 
             if (file.size > maxSize) {
-                alert('الصورة أكبر من 5 ميجابايت');
+                alert(t('adminChallengesEditPage.errors.imageTooLarge', { maxMb: 5 }));
                 return;
             }
 
             if (!validTypes.includes(file.type)) {
-                alert('نوع الصورة غير مدعوم. يرجى اختيار صورة بصيغة JPEG, PNG, GIF, أو WebP');
+                alert(t('adminChallengesEditPage.errors.imageTypeNotSupported'));
                 return;
             }
 
@@ -69,46 +71,47 @@ export default function AdminChallengesEdit({ challenge, schools }) {
     };
 
     return (
-        <DashboardLayout header="تعديل التحدي">
-            <Head title="تعديل التحدي" />
+        <DashboardLayout header={t('adminChallengesEditPage.title')}>
+            <Head title={t('adminChallengesEditPage.pageTitle', { appName: t('common.appName') })} />
 
-            <div className="mb-6">
-                <Link
-                    href={route('admin.challenges.index')}
-                    className="text-blue-600 hover:text-blue-800 flex items-center gap-2"
-                >
-                    <FaArrowRight className="transform rotate-180" />
-                    العودة إلى قائمة التحديات
-                </Link>
-            </div>
+            <div dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                <div className="mb-6">
+                    <Link
+                        href={route('admin.challenges.index')}
+                        className="text-blue-600 hover:text-blue-800 flex items-center gap-2"
+                    >
+                        <FaArrowRight className="transform rotate-180" />
+                        {t('adminChallengesEditPage.actions.backToList')}
+                    </Link>
+                </div>
 
-            <div className="bg-white rounded-xl shadow-lg p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">معلومات التحدي</h2>
+                <div className="bg-white rounded-xl shadow-lg p-6">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('adminChallengesEditPage.sections.challengeInfo')}</h2>
 
-                <form onSubmit={submit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* العنوان */}
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                عنوان التحدي <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                value={data.title}
-                                onChange={(e) => setData('title', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.title ? 'border-red-500' : 'border-gray-300'
-                                    }`}
-                                required
-                            />
-                            {errors.title && (
-                                <p className="mt-1 text-sm text-red-600">{errors.title}</p>
-                            )}
-                        </div>
+                    <form onSubmit={submit} className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* العنوان */}
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    {t('adminChallengesEditPage.fields.title')} <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    value={data.title}
+                                    onChange={(e) => setData('title', e.target.value)}
+                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.title ? 'border-red-500' : 'border-gray-300'
+                                        }`}
+                                    required
+                                />
+                                {errors.title && (
+                                    <p className="mt-1 text-sm text-red-600">{errors.title}</p>
+                                )}
+                            </div>
 
                         {/* الهدف */}
                         <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                الهدف من التحدي <span className="text-red-500">*</span>
+                                {t('adminChallengesEditPage.fields.objective')} <span className="text-red-500">*</span>
                             </label>
                             <textarea
                                 value={data.objective}
@@ -126,7 +129,7 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                         {/* الوصف */}
                         <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                وصف التحدي <span className="text-red-500">*</span>
+                                {t('adminChallengesEditPage.fields.description')} <span className="text-red-500">*</span>
                             </label>
                             <textarea
                                 value={data.description}
@@ -144,14 +147,14 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                         {/* صورة التحدي */}
                         <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                صورة التحدي (اختياري)
+                                {t('adminChallengesEditPage.fields.imageOptional')}
                             </label>
                             <div>
                                 {imagePreview ? (
                                     <div className="relative">
                                         <img
                                             src={imagePreview}
-                                            alt="Preview"
+                                            alt={t('adminChallengesEditPage.image.previewAlt')}
                                             className="w-full h-64 object-cover rounded-lg border border-gray-300"
                                         />
                                         <button
@@ -166,7 +169,7 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                                     <div className="relative">
                                         <img
                                             src={existingImage}
-                                            alt="Current"
+                                            alt={t('adminChallengesEditPage.image.currentAlt')}
                                             className="w-full h-64 object-cover rounded-lg border border-gray-300"
                                         />
                                         <button
@@ -181,7 +184,7 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                                             onClick={() => imageInputRef.current?.click()}
                                             className="absolute bottom-2 right-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-[#A3C042] transition"
                                         >
-                                            تغيير الصورة
+                                            {t('adminChallengesEditPage.actions.changeImage')}
                                         </button>
                                     </div>
                                 ) : (
@@ -190,8 +193,8 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                                         className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-500 transition"
                                     >
                                         <FaImage className="mx-auto text-gray-400 text-4xl mb-2" />
-                                        <p className="text-gray-600">انقر لرفع صورة</p>
-                                        <p className="text-sm text-gray-400 mt-1">JPEG, PNG, GIF, WebP (حد أقصى 5 ميجابايت)</p>
+                                        <p className="text-gray-600">{t('adminChallengesEditPage.image.clickToUpload')}</p>
+                                        <p className="text-sm text-gray-400 mt-1">{t('adminChallengesEditPage.image.hint', { maxMb: 5 })}</p>
                                     </div>
                                 )}
                                 <input
@@ -211,7 +214,7 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                         {/* كيفية التنفيذ */}
                         <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                كيفية التنفيذ <span className="text-red-500">*</span>
+                                {t('adminChallengesEditPage.fields.instructions')} <span className="text-red-500">*</span>
                             </label>
                             <textarea
                                 value={data.instructions}
@@ -229,7 +232,7 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                         {/* نوع التحدي */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                نوع التحدي <span className="text-red-500">*</span>
+                                {t('adminChallengesEditPage.fields.challengeType')} <span className="text-red-500">*</span>
                             </label>
                             <select
                                 value={data.challenge_type}
@@ -238,21 +241,21 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                                     }`}
                                 required
                             >
-                                <option value="">اختر نوع التحدي</option>
-                                <option value="cognitive">تحدّي معرفي</option>
-                                <option value="applied">تحدّي تطبيقي/مهاري</option>
-                                <option value="creative">تحدّي إبداعي</option>
-                                <option value="artistic_creative">تحدّي إبداعي فني</option>
-                                <option value="collaborative">تحدّي تعاوني</option>
-                                <option value="analytical">تحدّي تحليلي/استقصائي</option>
-                                <option value="technological">تحدّي تكنولوجي</option>
-                                <option value="behavioral">تحدّي سلوكي/قيمي</option>
-                                <option value="60_seconds">تحدّي 60 ثانية</option>
-                                <option value="mental_math">حلها بدون قلم</option>
-                                <option value="conversions">تحدّي التحويلات</option>
-                                <option value="team_fastest">تحدّي الفريق الأسرع</option>
-                                <option value="build_problem">ابنِ مسألة</option>
-                                <option value="custom">تحدّي مخصص</option>
+                                <option value="">{t('common.selectOption')}</option>
+                                <option value="cognitive">{t('adminChallengesEditPage.challengeTypes.cognitive')}</option>
+                                <option value="applied">{t('adminChallengesEditPage.challengeTypes.applied')}</option>
+                                <option value="creative">{t('adminChallengesEditPage.challengeTypes.creative')}</option>
+                                <option value="artistic_creative">{t('adminChallengesEditPage.challengeTypes.artisticCreative')}</option>
+                                <option value="collaborative">{t('adminChallengesEditPage.challengeTypes.collaborative')}</option>
+                                <option value="analytical">{t('adminChallengesEditPage.challengeTypes.analytical')}</option>
+                                <option value="technological">{t('adminChallengesEditPage.challengeTypes.technological')}</option>
+                                <option value="behavioral">{t('adminChallengesEditPage.challengeTypes.behavioral')}</option>
+                                <option value="60_seconds">{t('adminChallengesEditPage.challengeTypes.sixtySeconds')}</option>
+                                <option value="mental_math">{t('adminChallengesEditPage.challengeTypes.mentalMath')}</option>
+                                <option value="conversions">{t('adminChallengesEditPage.challengeTypes.conversions')}</option>
+                                <option value="team_fastest">{t('adminChallengesEditPage.challengeTypes.teamFastest')}</option>
+                                <option value="build_problem">{t('adminChallengesEditPage.challengeTypes.buildProblem')}</option>
+                                <option value="custom">{t('adminChallengesEditPage.challengeTypes.custom')}</option>
                             </select>
                             {errors.challenge_type && (
                                 <p className="mt-1 text-sm text-red-600">{errors.challenge_type}</p>
@@ -262,7 +265,7 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                         {/* الفئة */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                الفئة <span className="text-red-500">*</span>
+                                {t('adminChallengesEditPage.fields.category')} <span className="text-red-500">*</span>
                             </label>
                             <select
                                 value={data.category}
@@ -271,13 +274,13 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                                     }`}
                                 required
                             >
-                                <option value="">اختر الفئة</option>
-                                <option value="science">علوم</option>
-                                <option value="technology">تقنية</option>
-                                <option value="engineering">هندسة</option>
-                                <option value="mathematics">رياضيات</option>
-                                <option value="arts">فنون</option>
-                                <option value="other">أخرى</option>
+                                <option value="">{t('common.selectOption')}</option>
+                                <option value="science">{t('common.categories.science')}</option>
+                                <option value="technology">{t('common.categories.technology')}</option>
+                                <option value="engineering">{t('common.categories.engineering')}</option>
+                                <option value="mathematics">{t('common.categories.mathematics')}</option>
+                                <option value="arts">{t('common.categories.arts')}</option>
+                                <option value="other">{t('common.categories.other')}</option>
                             </select>
                             {errors.category && (
                                 <p className="mt-1 text-sm text-red-600">{errors.category}</p>
@@ -287,7 +290,7 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                         {/* الفئة العمرية */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                الفئة العمرية <span className="text-red-500">*</span>
+                                {t('adminChallengesEditPage.fields.ageGroup')} <span className="text-red-500">*</span>
                             </label>
                             <select
                                 value={data.age_group}
@@ -296,11 +299,11 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                                     }`}
                                 required
                             >
-                                <option value="">اختر الفئة العمرية</option>
-                                <option value="6-9">6-9 سنوات</option>
-                                <option value="10-13">10-13 سنة</option>
-                                <option value="14-17">14-17 سنة</option>
-                                <option value="18+">18+ سنة</option>
+                                <option value="">{t('common.selectOption')}</option>
+                                <option value="6-9">{t('adminChallengesEditPage.ageGroups.sixToNine')}</option>
+                                <option value="10-13">{t('adminChallengesEditPage.ageGroups.tenToThirteen')}</option>
+                                <option value="14-17">{t('adminChallengesEditPage.ageGroups.fourteenToSeventeen')}</option>
+                                <option value="18+">{t('adminChallengesEditPage.ageGroups.eighteenPlus')}</option>
                             </select>
                             {errors.age_group && (
                                 <p className="mt-1 text-sm text-red-600">{errors.age_group}</p>
@@ -310,7 +313,7 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                         {/* المدرسة */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                المدرسة
+                                {t('adminChallengesEditPage.fields.school')}
                             </label>
                             <select
                                 value={data.school_id}
@@ -318,7 +321,7 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.school_id ? 'border-red-500' : 'border-gray-300'
                                     }`}
                             >
-                                <option value="">اختر مدرسة</option>
+                                <option value="">{t('adminChallengesEditPage.placeholders.selectSchool')}</option>
                                 {schools.map((school) => (
                                     <option key={school.id} value={school.id}>
                                         {school.name}
@@ -333,7 +336,7 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                         {/* تاريخ البدء */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                تاريخ البدء <span className="text-red-500">*</span>
+                                {t('adminChallengesEditPage.fields.startDate')} <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="datetime-local"
@@ -351,7 +354,7 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                         {/* تاريخ الانتهاء */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                تاريخ الانتهاء <span className="text-red-500">*</span>
+                                {t('adminChallengesEditPage.fields.deadline')} <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="datetime-local"
@@ -369,7 +372,7 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                         {/* الحالة */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                الحالة
+                                {t('common.status')}
                             </label>
                             <select
                                 value={data.status}
@@ -377,10 +380,10 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.status ? 'border-red-500' : 'border-gray-300'
                                     }`}
                             >
-                                <option value="draft">مسودة</option>
-                                <option value="active">نشط</option>
-                                <option value="completed">مكتمل</option>
-                                <option value="cancelled">ملغي</option>
+                                <option value="draft">{t('common.draft')}</option>
+                                <option value="active">{t('common.active')}</option>
+                                <option value="completed">{t('common.completed')}</option>
+                                <option value="cancelled">{t('common.cancelled')}</option>
                             </select>
                             {errors.status && (
                                 <p className="mt-1 text-sm text-red-600">{errors.status}</p>
@@ -390,7 +393,7 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                         {/* نقاط المكافأة */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                نقاط المكافأة
+                                {t('adminChallengesEditPage.fields.pointsReward')}
                             </label>
                             <input
                                 type="number"
@@ -408,7 +411,7 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                         {/* الحد الأقصى للمشاركين */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                الحد الأقصى للمشاركين
+                                {t('adminChallengesEditPage.fields.maxParticipants')}
                             </label>
                             <input
                                 type="number"
@@ -417,7 +420,7 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                                 onChange={(e) => setData('max_participants', e.target.value ? parseInt(e.target.value) : null)}
                                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.max_participants ? 'border-red-500' : 'border-gray-300'
                                     }`}
-                                placeholder="غير محدود"
+                                placeholder={t('adminChallengesEditPage.placeholders.unlimited')}
                             />
                             {errors.max_participants && (
                                 <p className="mt-1 text-sm text-red-600">{errors.max_participants}</p>
@@ -433,17 +436,18 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                             className="px-6 py-2 bg-[#A3C042] hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50"
                         >
                             <FaSave />
-                            {processing ? 'جاري الحفظ...' : 'حفظ التغييرات'}
+                            {processing ? t('profilePage.actions.saving') : t('profilePage.actions.saveChanges')}
                         </button>
                         <Link
                             href={route('admin.challenges.index')}
                             className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg flex items-center gap-2"
                         >
                             <FaTimes />
-                            إلغاء
+                            {t('common.cancel')}
                         </Link>
                     </div>
                 </form>
+            </div>
             </div>
         </DashboardLayout>
     );

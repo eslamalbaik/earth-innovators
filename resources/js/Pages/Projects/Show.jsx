@@ -5,6 +5,7 @@ import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import { useToast } from '@/Contexts/ToastContext';
 import { useState, useRef } from 'react';
 import { toHijriDate } from '@/utils/dateUtils';
+import { useTranslation } from '@/i18n';
 import {
     FaArrowLeft,
     FaUpload,
@@ -30,6 +31,7 @@ import PrimaryButton from '../../Components/PrimaryButton';
 
 export default function ProjectShow({ auth, project, existingSubmission, userRole, canSubmit }) {
     const { showError } = useToast();
+    const { t, language } = useTranslation();
     const [activeTab, setActiveTab] = useState('details'); // 'details', 'submit', 'comments'
     const [fileList, setFileList] = useState([]);
     const [dragActive, setDragActive] = useState(false);
@@ -60,12 +62,12 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
             ];
 
             if (file.size > maxSize) {
-                showError(`الملف ${file.name} أكبر من 10 ميجابايت`);
+                showError(t('studentProjectShowPage.errors.fileTooLarge', { name: file.name, maxMb: 10 }));
                 return false;
             }
 
             if (!validTypes.includes(file.type)) {
-                showError(`نوع الملف ${file.name} غير مدعوم`);
+                showError(t('studentProjectShowPage.errors.fileTypeNotSupported', { name: file.name }));
                 return false;
             }
 
@@ -162,7 +164,7 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                             }`}
                     >
-                        التفاصيل
+                        {t('studentProjectShowPage.tabs.details')}
                     </button>
                     {canSubmit && (
                         <button
@@ -173,7 +175,7 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                 }`}
                         >
-                            {existingSubmission ? 'تحديث' : 'تسليم'}
+                            {existingSubmission ? t('studentProjectShowPage.tabs.updateSubmission') : t('studentProjectShowPage.tabs.submit')}
                         </button>
                     )}
                     <button
@@ -184,7 +186,7 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                             }`}
                     >
-                        التعليقات ({project.comments?.length || 0})
+                        {t('studentProjectShowPage.tabs.comments', { count: project.comments?.length || 0 })}
                     </button>
                 </div>
             </div>
@@ -196,14 +198,10 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
                         <h1 className="text-xl font-extrabold text-gray-900 mb-3">{project.title}</h1>
                         <div className="flex items-center gap-2 flex-wrap mb-3">
                             <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold border border-green-300">
-                                معتمد
+                                {t('common.approved')}
                             </span>
                             <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-xs font-bold border border-gray-200">
-                                {project.category === 'science' ? 'علوم' :
-                                    project.category === 'technology' ? 'تقنية' :
-                                        project.category === 'engineering' ? 'هندسة' :
-                                            project.category === 'mathematics' ? 'رياضيات' :
-                                                project.category === 'arts' ? 'فنون' : 'أخرى'}
+                                {t(`common.categories.${project.category || 'other'}`)}
                             </span>
                             <div className="flex items-center gap-1 text-gray-600 text-xs">
                                 <FaEye />
@@ -222,27 +220,27 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
                         {project.teacher && project.user?.role !== 'admin' && (
                             <div className="flex items-center gap-2 text-sm">
                                 <FaGraduationCap className="text-blue-600" />
-                                <span className="text-gray-600">المعلم:</span>
-                                <span className="font-semibold text-gray-900">{project.teacher.name_ar || project.teacher.user?.name || 'غير محدد'}</span>
+                                <span className="text-gray-600">{t('studentProjectShowPage.labels.teacher')}:</span>
+                                <span className="font-semibold text-gray-900">{project.teacher.name_ar || project.teacher.user?.name || t('common.notAvailable')}</span>
                             </div>
                         )}
                         {/* عرض المدرسة أو الإدارة */}
                         {project.school ? (
                             <div className="flex items-center gap-2 text-sm">
                                 <FaSchool className="text-green-600" />
-                                <span className="text-gray-600">المدرسة:</span>
+                                <span className="text-gray-600">{t('studentProjectShowPage.labels.school')}:</span>
                                 <span className="font-semibold text-gray-900">{project.school.name}</span>
                             </div>
                         ) : project.user?.role === 'admin' ? (
                             <div className="flex items-center gap-2 text-sm">
                                 <FaSchool className="text-purple-600" />
-                                <span className="font-semibold text-gray-900">من إدارة مجتمع إرث المبتكرين</span>
+                                <span className="font-semibold text-gray-900">{t('studentProjectShowPage.fromAdmin')}</span>
                             </div>
                         ) : null}
                         {project.approved_at && (
                             <div className="flex items-center gap-2 text-sm">
                                 <FaCalendar className="text-gray-400" />
-                                <span className="text-gray-600">تاريخ الموافقة:</span>
+                                <span className="text-gray-600">{t('studentProjectShowPage.labels.approvedAt')}:</span>
                                 <span className="font-semibold text-gray-900">{toHijriDate(project.approved_at)}</span>
                             </div>
                         )}
@@ -257,7 +255,7 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
                                 className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-[#A3C042] text-white rounded-xl hover:bg-[#8CA635] transition font-bold text-sm"
                             >
                                 <FaPlus />
-                                {existingSubmission ? 'تعديل التسليم' : 'إضافة تسليم'}
+                                {existingSubmission ? t('projectShowPage.actions.editSubmission') : t('projectShowPage.actions.addSubmission')}
                             </button>
                         )}
                         {userRole === 'teacher' && auth?.user && (
@@ -266,7 +264,7 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
                                 className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-[#A3C042] text-white rounded-xl hover:bg-[#8CA635] transition font-bold text-sm"
                             >
                                 <FaEdit />
-                                عرض التسليمات
+                                {t('projectShowPage.actions.viewSubmissions')}
                             </Link>
                         )}
                     </div>
@@ -274,16 +272,16 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
                     {/* Existing Submission */}
                     {existingSubmission && (
                         <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
-                            <h3 className="text-sm font-bold text-blue-900 mb-2">تسليمك الحالي</h3>
+                            <h3 className="text-sm font-bold text-blue-900 mb-2">{t('projectShowPage.currentSubmission.title')}</h3>
                             <p className="text-xs text-blue-800 mb-2">
-                                الحالة: <span className="font-medium">{existingSubmission.status}</span>
+                                {t('common.status')}: <span className="font-medium">{existingSubmission.status}</span>
                             </p>
                             {existingSubmission.comment && (
                                 <p className="text-xs text-blue-700 mb-2">{existingSubmission.comment}</p>
                             )}
                             {existingSubmission.feedback && (
                                 <div className="mt-2 p-3 bg-white rounded-xl border border-blue-200">
-                                    <p className="text-xs font-medium text-blue-900 mb-1">الرد:</p>
+                                    <p className="text-xs font-medium text-blue-900 mb-1">{t('projectShowPage.currentSubmission.reply')}:</p>
                                     <p className="text-xs text-blue-800">{existingSubmission.feedback}</p>
                                 </div>
                             )}
@@ -297,20 +295,20 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
                 <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-4">
                     <form onSubmit={submitProject} className="space-y-4">
                         <div>
-                            <InputLabel htmlFor="comment" value="تعليق (اختياري)" className="text-sm font-medium text-gray-700 mb-2" />
+                            <InputLabel htmlFor="comment" value={t('studentProjectShowPage.form.commentLabel')} className="text-sm font-medium text-gray-700 mb-2" />
                             <textarea
                                 id="comment"
                                 value={submissionForm.data.comment}
                                 onChange={(e) => submissionForm.setData('comment', e.target.value)}
                                 rows={4}
                                 className="block w-full rounded-xl border-gray-200 bg-gray-50 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042]"
-                                placeholder="اكتب تعليقاً على تسليمك..."
+                                placeholder={t('studentProjectShowPage.form.commentPlaceholder')}
                             />
                             <InputError message={submissionForm.errors.comment} className="mt-2" />
                         </div>
 
                         <div>
-                            <InputLabel value="الملفات" className="text-sm font-medium text-gray-700 mb-2" />
+                            <InputLabel value={t('studentProjectShowPage.form.filesLabel')} className="text-sm font-medium text-gray-700 mb-2" />
                             <div
                                 onDragEnter={handleDrag}
                                 onDragLeave={handleDrag}
@@ -331,17 +329,17 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
                                 />
                                 <FaCloudUploadAlt className="mx-auto text-4xl text-gray-400 mb-3" />
                                 <p className="text-sm text-gray-700 mb-2">
-                                    اسحب وأفلت الملفات هنا أو انقر للاختيار
+                                    {t('studentProjectShowPage.dropzone.title')}
                                 </p>
                                 <p className="text-xs text-gray-500 mb-3">
-                                    صور، فيديو، PDF، ZIP (الحد الأقصى: 10 ميجابايت لكل ملف)
+                                    {t('studentProjectShowPage.dropzone.hint', { maxMb: 10 })}
                                 </p>
                                 <button
                                     type="button"
                                     onClick={() => fileInputRef.current?.click()}
                                     className="px-4 py-2 bg-[#A3C042] text-white rounded-xl hover:bg-[#8CA635] transition font-bold text-sm"
                                 >
-                                    اختر ملفات
+                                    {t('studentProjectShowPage.actions.chooseFiles')}
                                 </button>
                             </div>
                             <InputError message={submissionForm.errors.files} className="mt-2" />
@@ -382,12 +380,12 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
                                 {submissionForm.processing ? (
                                     <>
                                         <FaSpinner className="animate-spin ms-2" />
-                                        جاري التسليم...
+                                        {t('studentProjectShowPage.actions.submitting')}
                                     </>
                                 ) : (
                                     <>
                                         <FaUpload className="ms-2" />
-                                        {existingSubmission ? 'تحديث التسليم' : 'تسليم المشروع'}
+                                        {existingSubmission ? t('studentProjectShowPage.actions.updateSubmission') : t('studentProjectShowPage.actions.submitProject')}
                                     </>
                                 )}
                             </PrimaryButton>
@@ -403,7 +401,7 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
                     {auth.user && (
                         <div className="bg-white rounded-2xl border border-gray-100 p-4">
                             <h3 className="text-sm font-bold text-gray-900 mb-3">
-                                {replyingTo ? 'رد على التعليق' : 'إضافة تعليق'}
+                                {replyingTo ? t('studentProjectShowPage.comments.replyTitle') : t('studentProjectShowPage.comments.addTitle')}
                             </h3>
                             <form onSubmit={submitComment} className="space-y-3">
                                 <div>
@@ -412,7 +410,7 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
                                         onChange={(e) => commentForm.setData('comment', e.target.value)}
                                         rows={4}
                                         className="block w-full rounded-xl border-gray-200 bg-gray-50 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042]"
-                                        placeholder="اكتب تعليقك..."
+                                    placeholder={t('studentProjectShowPage.comments.placeholder')}
                                         required
                                     />
                                     <InputError message={commentForm.errors.comment} className="mt-2" />
@@ -427,7 +425,7 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
                                             }}
                                             className="text-sm text-gray-600 hover:text-gray-900"
                                         >
-                                            إلغاء
+                                            {t('common.cancel')}
                                         </button>
                                     )}
                                     <PrimaryButton
@@ -438,12 +436,12 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
                                         {commentForm.processing ? (
                                             <>
                                                 <FaSpinner className="animate-spin ms-2" />
-                                                جاري الإرسال...
+                                                {t('studentProjectShowPage.comments.sending')}
                                             </>
                                         ) : (
                                             <>
                                                 <FaComment className="ms-2" />
-                                                {replyingTo ? 'إرسال الرد' : 'إرسال التعليق'}
+                                                {replyingTo ? t('studentProjectShowPage.comments.sendReply') : t('studentProjectShowPage.comments.sendComment')}
                                             </>
                                         )}
                                     </PrimaryButton>
@@ -464,7 +462,7 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
                                             </div>
                                             <div>
                                                 <p className="text-sm font-semibold text-gray-900">
-                                                    {comment.user?.name || 'مستخدم'}
+                                                    {comment.user?.name || t('common.user')}
                                                 </p>
                                                 <p className="text-xs text-gray-500">
                                                     {toHijriDate(comment.created_at)}
@@ -490,7 +488,7 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
                                                 className="text-[#A3C042] hover:text-[#8CA635] text-xs flex items-center gap-1"
                                             >
                                                 <FaReply />
-                                                رد
+                                                {t('studentProjectShowPage.comments.replyAction')}
                                             </button>
                                         </div>
                                     )}
@@ -506,7 +504,7 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
                                                     <div className="flex-1">
                                                         <div className="flex items-center justify-between mb-1">
                                                             <p className="text-xs font-semibold text-gray-900">
-                                                                {reply.user?.name || 'مستخدم'}
+                                                                {reply.user?.name || t('common.user')}
                                                             </p>
                                                             {auth.user && reply.user_id === auth.user.id && (
                                                                 <button
@@ -532,7 +530,7 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
                         ) : (
                             <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
                                 <FaComment className="mx-auto text-3xl text-gray-300 mb-3" />
-                                <p className="text-sm text-gray-500">لا توجد تعليقات بعد</p>
+                                <p className="text-sm text-gray-500">{t('studentProjectShowPage.comments.empty')}</p>
                             </div>
                         )}
                     </div>
@@ -542,14 +540,14 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
     );
 
     return (
-        <div dir="rtl" className="min-h-screen bg-gray-50">
+        <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
             <Head title={project.title} />
 
             {/* Mobile View */}
             <div className="block md:hidden">
                 <MobileAppLayout
                     auth={auth}
-                    title="إرث المبتكرين"
+                    title={t('common.appName')}
                     activeNav="explore"
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
@@ -562,7 +560,7 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
             {/* Desktop View */}
             <div className="hidden md:block">
                 <MobileTopBar
-                    title="إرث المبتكرين"
+                    title={t('common.appName')}
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
                     onBack={() => router.visit('/projects')}

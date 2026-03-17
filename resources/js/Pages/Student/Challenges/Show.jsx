@@ -21,8 +21,10 @@ import TextInput from '../../../Components/TextInput';
 import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
 import PrimaryButton from '../../../Components/PrimaryButton';
+import { useTranslation } from '@/i18n';
 
 export default function StudentChallengeShow({ auth, challenge }) {
+    const { t, language } = useTranslation();
     const [activeTab, setActiveTab] = useState('details');
     const [fileList, setFileList] = useState([]);
     const [dragActive, setDragActive] = useState(false);
@@ -39,26 +41,39 @@ export default function StudentChallengeShow({ auth, challenge }) {
     const formatDate = (date) => {
         if (!date) return '';
         const d = new Date(date);
-        const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+        const months = [
+            t('common.january'),
+            t('common.february'),
+            t('common.march'),
+            t('common.april'),
+            t('common.may'),
+            t('common.june'),
+            t('common.july'),
+            t('common.august'),
+            t('common.september'),
+            t('common.october'),
+            t('common.november'),
+            t('common.december'),
+        ];
         return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
     };
 
     const getChallengeTypeLabel = (type) => {
         const labels = {
-            'cognitive': 'تحدّي معرفي',
-            'applied': 'تحدّي تطبيقي/مهاري',
-            'creative': 'تحدّي إبداعي',
-            'artistic_creative': 'تحدّي إبداعي فني',
-            'collaborative': 'تحدّي تعاوني',
-            'analytical': 'تحدّي تحليلي/استقصائي',
-            'technological': 'تحدّي تكنولوجي',
-            'behavioral': 'تحدّي سلوكي/قيمي',
-            '60_seconds': 'تحدّي 60 ثانية',
-            'mental_math': 'حلها بدون قلم',
-            'conversions': 'تحدّي التحويلات',
-            'team_fastest': 'تحدّي الفريق الأسرع',
-            'build_problem': 'ابنِ مسألة',
-            'custom': 'تحدّي مخصص',
+            cognitive: t('challenges.cognitive'),
+            applied: t('challenges.applied'),
+            creative: t('challenges.creative'),
+            artistic_creative: t('challenges.artisticCreative'),
+            collaborative: t('challenges.collaborative'),
+            analytical: t('challenges.analytical'),
+            technological: t('challenges.technological'),
+            behavioral: t('challenges.behavioral'),
+            '60_seconds': t('challenges.minseconds'),
+            mental_math: t('challenges.mentalMath'),
+            conversions: t('challenges.conversions'),
+            team_fastest: t('challenges.teamFastest'),
+            build_problem: t('challenges.buildProblem'),
+            custom: t('studentChallengesShowPage.types.custom'),
         };
         return labels[type] || type;
     };
@@ -69,12 +84,22 @@ export default function StudentChallengeShow({ auth, challenge }) {
         const deadline = new Date(challenge.deadline);
 
         if (challenge.status === 'active' && startDate <= now && deadline >= now) {
-            return { bg: 'bg-green-100', text: 'text-green-800', label: 'نشط', icon: FaCheckCircle };
+            return { bg: 'bg-green-100', text: 'text-green-800', label: t('common.active'), icon: FaCheckCircle };
         } else if (challenge.status === 'active' && startDate > now) {
-            return { bg: 'bg-blue-100', text: 'text-blue-800', label: 'قادم', icon: FaClock };
+            return { bg: 'bg-blue-100', text: 'text-blue-800', label: t('common.upcoming'), icon: FaClock };
         } else {
-            return { bg: 'bg-gray-100', text: 'text-gray-800', label: 'منتهي', icon: FaTimesCircle };
+            return { bg: 'bg-gray-100', text: 'text-gray-800', label: t('studentChallengesIndexPage.status.finished'), icon: FaTimesCircle };
         }
+    };
+
+    const getSubmissionStatusLabel = (status) => {
+        const map = {
+            submitted: t('studentChallengesIndexPage.submissionStatuses.submitted'),
+            reviewed: t('studentChallengesIndexPage.submissionStatuses.reviewed'),
+            approved: t('studentChallengesIndexPage.submissionStatuses.approved'),
+            rejected: t('studentChallengesIndexPage.submissionStatuses.rejected'),
+        };
+        return map[status] || status;
     };
 
     const handleFiles = (files) => {
@@ -82,7 +107,7 @@ export default function StudentChallengeShow({ auth, challenge }) {
         const validFiles = fileArray.filter(file => {
             const maxSize = 10 * 1024 * 1024; // 10 MB
             if (file.size > maxSize) {
-                alert(`الملف ${file.name} أكبر من 10 ميجابايت`);
+                alert(t('studentChallengesShowPage.errors.fileTooLarge', { name: file.name }));
                 return false;
             }
             return true;
@@ -138,7 +163,7 @@ export default function StudentChallengeShow({ auth, challenge }) {
 
         // Validate that at least answer or files are provided
         if (!submissionForm.data.answer?.trim() && fileList.length === 0) {
-            alert('يجب تقديم إجابة أو رفع ملف واحد على الأقل');
+            alert(t('studentChallengesShowPage.errors.answerOrFileRequired'));
             return;
         }
 
@@ -190,7 +215,7 @@ export default function StudentChallengeShow({ auth, challenge }) {
                         {challenge.points_reward > 0 && (
                             <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full flex items-center gap-1">
                                 <FaStar className="text-[10px]" />
-                                {challenge.points_reward} نقطة
+                                {challenge.points_reward} {t('common.point')}
                             </span>
                         )}
                         {challenge.max_participants && (
@@ -205,11 +230,11 @@ export default function StudentChallengeShow({ auth, challenge }) {
                 <div className="space-y-2 text-xs text-gray-600 pt-3 border-t border-gray-200">
                     <div className="flex items-center gap-2">
                         <FaCalendar className="text-gray-400" />
-                        <span><strong>تاريخ البدء:</strong> {formatDate(challenge.start_date)}</span>
+                        <span><strong>{t('adminChallengesIndexPage.table.startDate')}:</strong> {formatDate(challenge.start_date)}</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <FaCalendar className="text-gray-400" />
-                        <span><strong>تاريخ الانتهاء:</strong> {formatDate(challenge.deadline)}</span>
+                        <span><strong>{t('adminChallengesIndexPage.table.endDate')}:</strong> {formatDate(challenge.deadline)}</span>
                     </div>
                 </div>
             </div>
@@ -223,7 +248,7 @@ export default function StudentChallengeShow({ auth, challenge }) {
                         : 'border-transparent text-gray-600'
                         }`}
                 >
-                    التفاصيل
+                    {t('studentChallengesShowPage.tabs.details')}
                 </button>
                 {isActive && (
                     <button
@@ -233,7 +258,7 @@ export default function StudentChallengeShow({ auth, challenge }) {
                             : 'border-transparent text-gray-600'
                             }`}
                     >
-                        {existingSubmission ? 'تحديث التقديم' : 'تقديم الحل'}
+                        {existingSubmission ? t('studentChallengesShowPage.tabs.updateSubmission') : t('studentChallengesShowPage.tabs.submitSolution')}
                     </button>
                 )}
             </div>
@@ -243,47 +268,42 @@ export default function StudentChallengeShow({ auth, challenge }) {
                 <div className="space-y-4">
                     {challenge.objective && (
                         <div className="bg-white rounded-2xl border border-gray-100 p-4">
-                            <h3 className="text-sm font-bold text-gray-900 mb-2">الهدف</h3>
+                            <h3 className="text-sm font-bold text-gray-900 mb-2">{t('studentChallengesShowPage.sections.objective')}</h3>
                             <p className="text-sm text-gray-700">{challenge.objective}</p>
                         </div>
                     )}
 
                     {challenge.description && (
                         <div className="bg-white rounded-2xl border border-gray-100 p-4">
-                            <h3 className="text-sm font-bold text-gray-900 mb-2">الوصف</h3>
+                            <h3 className="text-sm font-bold text-gray-900 mb-2">{t('studentChallengesShowPage.sections.description')}</h3>
                             <p className="text-sm text-gray-700 whitespace-pre-line">{challenge.description}</p>
                         </div>
                     )}
 
                     {challenge.instructions && (
                         <div className="bg-white rounded-2xl border border-gray-100 p-4">
-                            <h3 className="text-sm font-bold text-gray-900 mb-2">كيفية التنفيذ</h3>
+                            <h3 className="text-sm font-bold text-gray-900 mb-2">{t('studentChallengesShowPage.sections.howTo')}</h3>
                             <p className="text-sm text-gray-700 whitespace-pre-line">{challenge.instructions}</p>
                         </div>
                     )}
 
                     {existingSubmission && (
                         <div className="bg-blue-50 rounded-2xl border-2 border-blue-200 p-4">
-                            <h3 className="text-sm font-bold text-gray-900 mb-3">حالة التقديم</h3>
+                            <h3 className="text-sm font-bold text-gray-900 mb-3">{t('studentChallengesShowPage.submissionStatus.title')}</h3>
                             <div className="space-y-2 text-sm">
-                                <p><strong>الحالة:</strong> {
-                                    existingSubmission.status === 'submitted' ? 'تم التقديم' :
-                                        existingSubmission.status === 'reviewed' ? 'قيد المراجعة' :
-                                            existingSubmission.status === 'approved' ? 'مقبول' :
-                                                existingSubmission.status === 'rejected' ? 'مرفوض' : existingSubmission.status
-                                }</p>
+                                <p><strong>{t('common.status')}:</strong> {getSubmissionStatusLabel(existingSubmission.status)}</p>
                                 {existingSubmission.rating && (
-                                    <p><strong>التقييم:</strong> {existingSubmission.rating} / 10</p>
+                                    <p><strong>{t('studentChallengesShowPage.submissionStatus.rating')}:</strong> {existingSubmission.rating} / 10</p>
                                 )}
                                 {existingSubmission.points_earned > 0 && (
                                     <p className="flex items-center gap-1 text-green-700">
                                         <FaAward />
-                                        <strong>النقاط المكتسبة:</strong> {existingSubmission.points_earned}
+                                        <strong>{t('studentChallengesShowPage.submissionStatus.pointsEarned')}:</strong> {existingSubmission.points_earned}
                                     </p>
                                 )}
                                 {existingSubmission.feedback && (
                                     <div>
-                                        <strong>ملاحظات المقيّم:</strong>
+                                        <strong>{t('studentChallengesShowPage.submissionStatus.reviewerNotes')}:</strong>
                                         <p className="text-gray-700 mt-1">{existingSubmission.feedback}</p>
                                     </div>
                                 )}
@@ -298,34 +318,34 @@ export default function StudentChallengeShow({ auth, challenge }) {
                 <div className="bg-white rounded-2xl border border-gray-100 p-4">
                     <form onSubmit={submitChallenge}>
                         <div className="mb-4">
-                            <InputLabel htmlFor="answer" value="الحل / الإجابة *" className="text-sm" />
+                            <InputLabel htmlFor="answer" value={t('studentChallengesShowPage.form.answerLabel')} className="text-sm" />
                             <textarea
                                 id="answer"
                                 value={submissionForm.data.answer}
                                 onChange={(e) => submissionForm.setData('answer', e.target.value)}
                                 rows={8}
                                 className="mt-2 block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042] text-sm"
-                                placeholder="اكتب حل التحدي أو إجابتك هنا..."
+                                placeholder={t('studentChallengesShowPage.form.answerPlaceholder')}
                                 required
                             />
                             <InputError message={submissionForm.errors.answer} className="mt-2" />
                         </div>
 
                         <div className="mb-4">
-                            <InputLabel htmlFor="comment" value="تعليق (اختياري)" className="text-sm" />
+                            <InputLabel htmlFor="comment" value={t('studentChallengesShowPage.form.commentLabel')} className="text-sm" />
                             <textarea
                                 id="comment"
                                 value={submissionForm.data.comment}
                                 onChange={(e) => submissionForm.setData('comment', e.target.value)}
                                 rows={4}
                                 className="mt-2 block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042] text-sm"
-                                placeholder="أضف أي تعليقات إضافية..."
+                                placeholder={t('studentChallengesShowPage.form.commentPlaceholder')}
                             />
                             <InputError message={submissionForm.errors.comment} className="mt-2" />
                         </div>
 
                         <div className="mb-4">
-                            <InputLabel value="الملفات (اختياري)" className="text-sm" />
+                            <InputLabel value={t('studentChallengesShowPage.form.filesLabel')} className="text-sm" />
                             <div
                                 className={`mt-2 border-2 border-dashed rounded-2xl p-6 text-center transition ${dragActive ? 'border-[#A3C042] bg-green-50' : 'border-gray-300'
                                     }`}
@@ -336,15 +356,15 @@ export default function StudentChallengeShow({ auth, challenge }) {
                             >
                                 <FaCloudUploadAlt className="mx-auto text-3xl text-gray-400 mb-3" />
                                 <p className="text-sm text-gray-700 mb-2">
-                                    اسحب الملفات هنا أو انقر للاختيار
+                                    {t('studentChallengesShowPage.form.dropzoneTitle')}
                                 </p>
-                                <p className="text-xs text-gray-500 mb-3">حجم الملف الأقصى: 10 ميجابايت</p>
+                                <p className="text-xs text-gray-500 mb-3">{t('studentChallengesShowPage.form.maxFileSize')}</p>
                                 <button
                                     type="button"
                                     onClick={() => fileInputRef.current?.click()}
                                     className="px-4 py-2 bg-[#A3C042] text-white rounded-xl hover:bg-[#8CA635] transition text-sm font-semibold"
                                 >
-                                    اختر ملفات
+                                    {t('studentChallengesShowPage.actions.chooseFiles')}
                                 </button>
                                 <input
                                     ref={fileInputRef}
@@ -387,12 +407,12 @@ export default function StudentChallengeShow({ auth, challenge }) {
                                 {submissionForm.processing ? (
                                     <>
                                         <FaSpinner className="animate-spin me-2" />
-                                        جاري الإرسال...
+                                        {t('studentChallengesShowPage.actions.sending')}
                                     </>
                                 ) : (
                                     <>
                                         <FaUpload className="me-2" />
-                                        {existingSubmission ? 'تحديث التقديم' : 'تقديم الحل'}
+                                        {existingSubmission ? t('studentChallengesShowPage.tabs.updateSubmission') : t('studentChallengesShowPage.tabs.submitSolution')}
                                     </>
                                 )}
                             </PrimaryButton>
@@ -404,8 +424,8 @@ export default function StudentChallengeShow({ auth, challenge }) {
     );
 
     return (
-        <div dir="rtl" className="min-h-screen bg-gray-50">
-            <Head title={challenge.title} />
+        <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
+            <Head title={t('studentChallengesShowPage.pageTitle', { title: challenge.title, appName: t('common.appName') })} />
 
             {/* Mobile View */}
             <div className="block md:hidden">

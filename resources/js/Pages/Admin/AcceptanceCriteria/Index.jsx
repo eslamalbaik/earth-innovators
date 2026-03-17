@@ -3,13 +3,15 @@ import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 import { Head, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { FaPlus, FaEdit, FaTrash, FaInfoCircle, FaSave, FaTimes } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0, projects = [], selectedProjectId = null }) {
+    const { t } = useTranslation();
     const { confirm } = useConfirmDialog();
     const [editingId, setEditingId] = useState(null);
     const [showAddForm, setShowAddForm] = useState(false);
 
-    const { data: formData, setData: setFormData, post: submitForm, put: updateForm, processing, errors, reset } = useForm({
+    const { data: formData, setData: setFormData, post: submitForm, processing, errors, reset } = useForm({
         project_id: selectedProjectId || '',
         name_ar: '',
         description_ar: '',
@@ -30,21 +32,25 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
     const handleAdd = (e) => {
         e.preventDefault();
 
-        // التحقق من أن الوزن لا يتجاوز الحد المسموح
         const maxAllowed = getMaxAllowedWeightForAdd(formData.project_id || null);
         if (parseFloat(formData.weight) > maxAllowed) {
-            alert(`الوزن المدخل (${formData.weight}%) يتجاوز الحد الأقصى المسموح (${maxAllowed.toFixed(2)}%)`);
+            alert(t('acceptanceCriteriaPage.errors.weightExceeds', {
+                weight: formData.weight,
+                max: maxAllowed.toFixed(2),
+            }));
             return;
         }
 
-        // التحقق من أن مجموع الأوزان لا يتجاوز 100%
         const currentTotal = formData.project_id
             ? getTotalWeightForProject(formData.project_id)
             : criteria.filter(c => !c.project_id).reduce((sum, c) => sum + parseFloat(c.weight || 0), 0);
         const newTotal = currentTotal + parseFloat(formData.weight);
 
         if (newTotal > 100) {
-            alert(`مجموع الأوزان سيكون ${newTotal.toFixed(2)}% وهو أكبر من 100%. الحد الأقصى المسموح: ${maxAllowed.toFixed(2)}%`);
+            alert(t('acceptanceCriteriaPage.errors.totalExceeds', {
+                total: newTotal.toFixed(2),
+                max: maxAllowed.toFixed(2),
+            }));
             return;
         }
 
@@ -69,19 +75,23 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
     };
 
     const handleUpdate = (id) => {
-        // التحقق من أن الوزن لا يتجاوز الحد المسموح
         const maxAllowed = getMaxAllowedWeight(id, editData.project_id || null);
         if (parseFloat(editData.weight) > maxAllowed) {
-            alert(`الوزن المدخل (${editData.weight}%) يتجاوز الحد الأقصى المسموح (${maxAllowed.toFixed(2)}%)`);
+            alert(t('acceptanceCriteriaPage.errors.weightExceeds', {
+                weight: editData.weight,
+                max: maxAllowed.toFixed(2),
+            }));
             return;
         }
 
-        // التحقق من أن مجموع الأوزان لا يتجاوز 100%
         const currentTotal = getTotalWeightExcludingCurrent(id, editData.project_id || null);
         const newTotal = currentTotal + parseFloat(editData.weight);
 
         if (newTotal > 100) {
-            alert(`مجموع الأوزان سيكون ${newTotal.toFixed(2)}% وهو أكبر من 100%. الحد الأقصى المسموح: ${maxAllowed.toFixed(2)}%`);
+            alert(t('acceptanceCriteriaPage.errors.totalExceeds', {
+                total: newTotal.toFixed(2),
+                max: maxAllowed.toFixed(2),
+            }));
             return;
         }
 
@@ -95,10 +105,10 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
 
     const handleDelete = async (id, criterionName) => {
         const confirmed = await confirm({
-            title: 'تأكيد الحذف',
-            message: `هل أنت متأكد من حذف المعيار "${criterionName}"؟`,
-            confirmText: 'حذف',
-            cancelText: 'إلغاء',
+            title: t('acceptanceCriteriaPage.confirmDelete.title'),
+            message: t('acceptanceCriteriaPage.confirmDelete.message', { name: criterionName }),
+            confirmText: t('acceptanceCriteriaPage.confirmDelete.confirm'),
+            cancelText: t('acceptanceCriteriaPage.confirmDelete.cancel'),
             variant: 'danger',
         });
 
@@ -113,7 +123,6 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
         const criterion = criteria.find(c => c.id === id);
         if (criterion) {
             let weightValue = parseFloat(newWeight) || 0;
-            // منع الوزن من تجاوز 100%
             if (weightValue > 100) {
                 weightValue = 100;
             }
@@ -129,7 +138,6 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
 
     const handleAddWeightChange = (newWeight) => {
         let weightValue = parseFloat(newWeight) || 0;
-        // منع الوزن من تجاوز 100%
         if (weightValue > 100) {
             weightValue = 100;
         }
@@ -172,16 +180,19 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
         });
     };
 
+    const generalCriteriaTotal = criteria
+        .filter(c => !c.project_id)
+        .reduce((sum, c) => sum + parseFloat(c.weight || 0), 0);
+
     return (
-        <DashboardLayout header="معايير القبول">
-            <Head title="معايير القبول" />
+        <DashboardLayout header={t('acceptanceCriteriaPage.title')}>
+            <Head title={t('acceptanceCriteriaPage.pageTitle', { appName: t('common.appName') })} />
 
             <div className="space-y-6">
-                {/* Header */}
                 <div className="flex justify-between items-center">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">معايير القبول</h1>
-                        <p className="text-gray-600 mt-2">تخصيص معايير القبول للمشاريع</p>
+                        <h1 className="text-3xl font-bold text-gray-900">{t('acceptanceCriteriaPage.title')}</h1>
+                        <p className="text-gray-600 mt-2">{t('acceptanceCriteriaPage.subtitle')}</p>
                     </div>
                     {!showAddForm && (
                         <button
@@ -189,22 +200,21 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                             className="bg-[#A3C042] hover:bg-[#8CA635] text-white font-semibold py-3 px-6 rounded-lg flex items-center gap-2"
                         >
                             <FaPlus />
-                            إضافة معيار جديد
+                            {t('acceptanceCriteriaPage.addNew')}
                         </button>
                     )}
                 </div>
 
-                {/* Project Filter */}
                 <div className="bg-white rounded-xl shadow-lg p-4 border border-gray-200">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                        اختر المشروع
+                        {t('acceptanceCriteriaPage.projectFilterLabel')}
                     </label>
                     <select
                         value={selectedProjectId || ''}
                         onChange={(e) => handleProjectChange(e.target.value || null)}
                         className="w-full md:w-1/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     >
-                        <option value="">جميع المعايير (عام)</option>
+                        <option value="">{t('acceptanceCriteriaPage.projectAllOption')}</option>
                         {projects.map((project) => (
                             <option key={project.id} value={project.id}>
                                 {project.title}
@@ -213,22 +223,24 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                     </select>
                     {selectedProjectId && (
                         <p className="mt-2 text-sm text-gray-600">
-                            عرض معايير المشروع: {projects.find(p => p.id == selectedProjectId)?.title}
+                            {t('acceptanceCriteriaPage.projectCriteriaLabel', {
+                                title: projects.find(p => p.id == selectedProjectId)?.title,
+                            })}
                         </p>
                     )}
                 </div>
 
-                {/* Add Form */}
                 {showAddForm && (
                     <div className="bg-white rounded-xl shadow-lg p-6 border-2 border-green-200">
                         <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-xl font-bold text-gray-900">إضافة معيار جديد</h2>
+                            <h2 className="text-xl font-bold text-gray-900">{t('acceptanceCriteriaPage.addFormTitle')}</h2>
                             <button
                                 onClick={() => {
                                     setShowAddForm(false);
                                     reset();
                                 }}
                                 className="text-gray-400 hover:text-gray-600"
+                                aria-label={t('acceptanceCriteriaPage.close')}
                             >
                                 <FaTimes className="text-xl" />
                             </button>
@@ -236,14 +248,14 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                         <form onSubmit={handleAdd} className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    المشروع (اختياري - اتركه فارغاً للمعايير العامة)
+                                    {t('acceptanceCriteriaPage.projectFieldLabel')}
                                 </label>
                                 <select
                                     value={formData.project_id || ''}
                                     onChange={(e) => setFormData('project_id', e.target.value || null)}
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                 >
-                                    <option value="">معايير عامة</option>
+                                    <option value="">{t('acceptanceCriteriaPage.projectGeneralOption')}</option>
                                     {projects.map((project) => (
                                         <option key={project.id} value={project.id}>
                                             {project.title}
@@ -253,7 +265,7 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    اسم المعيار <span className="text-red-500">*</span>
+                                    {t('acceptanceCriteriaPage.nameLabel')} <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="text"
@@ -269,7 +281,7 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    الوصف
+                                    {t('acceptanceCriteriaPage.descriptionLabel')}
                                 </label>
                                 <textarea
                                     value={formData.description_ar}
@@ -281,7 +293,7 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    الوزن (%) <span className="text-red-500">*</span>
+                                    {t('acceptanceCriteriaPage.weightLabel')} <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="number"
@@ -298,20 +310,26 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                     <p className="mt-1 text-sm text-red-600">{errors.weight}</p>
                                 )}
                                 <p className="mt-1 text-xs text-gray-500">
-                                    الحد الأقصى المسموح: {getMaxAllowedWeightForAdd(formData.project_id || null).toFixed(2)}%
+                                    {t('acceptanceCriteriaPage.maxAllowedLabel', {
+                                        value: getMaxAllowedWeightForAdd(formData.project_id || null).toFixed(2),
+                                    })}
                                     {formData.project_id ? (
                                         <span className="block mt-1">
-                                            المجموع الحالي للمشروع: {getTotalWeightForProject(formData.project_id).toFixed(2)}%
+                                            {t('acceptanceCriteriaPage.currentProjectTotalLabel', {
+                                                value: getTotalWeightForProject(formData.project_id).toFixed(2),
+                                            })}
                                         </span>
                                     ) : (
                                         <span className="block mt-1">
-                                            المجموع الحالي للمعايير العامة: {criteria.filter(c => !c.project_id).reduce((sum, c) => sum + parseFloat(c.weight || 0), 0).toFixed(2)}%
+                                            {t('acceptanceCriteriaPage.currentGeneralTotalLabel', {
+                                                value: generalCriteriaTotal.toFixed(2),
+                                            })}
                                         </span>
                                     )}
                                 </p>
-                                {parseFloat(formData.weight) + (formData.project_id ? getTotalWeightForProject(formData.project_id) : criteria.filter(c => !c.project_id).reduce((sum, c) => sum + parseFloat(c.weight || 0), 0)) > 100 && (
+                                {parseFloat(formData.weight) + (formData.project_id ? getTotalWeightForProject(formData.project_id) : generalCriteriaTotal) > 100 && (
                                     <p className="mt-1 text-sm text-red-600 font-semibold">
-                                        ⚠️ تحذير: مجموع الأوزان سيتجاوز 100%!
+                                        {t('acceptanceCriteriaPage.weightWarning')}
                                     </p>
                                 )}
                             </div>
@@ -322,7 +340,7 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                     className="bg-[#A3C042] hover:bg-[#8CA635] text-white font-semibold py-2 px-6 rounded-lg flex items-center gap-2 disabled:opacity-50"
                                 >
                                     <FaSave />
-                                    {processing ? 'جاري الحفظ...' : 'حفظ'}
+                                    {processing ? t('acceptanceCriteriaPage.saving') : t('acceptanceCriteriaPage.save')}
                                 </button>
                                 <button
                                     type="button"
@@ -333,14 +351,13 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                     className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded-lg flex items-center gap-2"
                                 >
                                     <FaTimes />
-                                    إلغاء
+                                    {t('acceptanceCriteriaPage.cancel')}
                                 </button>
                             </div>
                         </form>
                     </div>
                 )}
 
-                {/* Criteria List */}
                 <div className="space-y-4">
                     {criteria.map((criterion) => (
                         <div
@@ -350,13 +367,14 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                             {editingId === criterion.id ? (
                                 <div className="space-y-4">
                                     <div className="flex justify-between items-center">
-                                        <h3 className="text-lg font-bold text-gray-900">تعديل المعيار</h3>
+                                        <h3 className="text-lg font-bold text-gray-900">{t('acceptanceCriteriaPage.editTitle')}</h3>
                                         <button
                                             onClick={() => {
                                                 setEditingId(null);
                                                 resetEdit();
                                             }}
                                             className="text-gray-400 hover:text-gray-600"
+                                            aria-label={t('acceptanceCriteriaPage.close')}
                                         >
                                             <FaTimes />
                                         </button>
@@ -364,14 +382,14 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                     <div className="space-y-4">
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                المشروع (اختياري)
+                                                {t('acceptanceCriteriaPage.editProjectLabel')}
                                             </label>
                                             <select
                                                 value={editData.project_id || ''}
                                                 onChange={(e) => setEditData('project_id', e.target.value || null)}
                                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                                             >
-                                                <option value="">معايير عامة</option>
+                                                <option value="">{t('acceptanceCriteriaPage.projectGeneralOption')}</option>
                                                 {projects.map((project) => (
                                                     <option key={project.id} value={project.id}>
                                                         {project.title}
@@ -382,7 +400,7 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                    اسم المعيار
+                                                    {t('acceptanceCriteriaPage.editNameLabel')}
                                                 </label>
                                                 <input
                                                     type="text"
@@ -394,7 +412,7 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                    الوزن (%)
+                                                    {t('acceptanceCriteriaPage.editWeightLabel')}
                                                 </label>
                                                 <input
                                                     type="number"
@@ -407,14 +425,18 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                                         }`}
                                                 />
                                                 <p className="mt-1 text-xs text-gray-500">
-                                                    المجموع الحالي (بدون هذا المعيار): {getTotalWeightExcludingCurrent(criterion.id, editData.project_id || null).toFixed(2)}%
+                                                    {t('acceptanceCriteriaPage.currentTotalExcludingLabel', {
+                                                        value: getTotalWeightExcludingCurrent(criterion.id, editData.project_id || null).toFixed(2),
+                                                    })}
                                                 </p>
                                                 <p className="mt-1 text-xs text-blue-600">
-                                                    الحد الأقصى المسموح: {getMaxAllowedWeight(criterion.id, editData.project_id || null).toFixed(2)}%
+                                                    {t('acceptanceCriteriaPage.maxAllowedLabel', {
+                                                        value: getMaxAllowedWeight(criterion.id, editData.project_id || null).toFixed(2),
+                                                    })}
                                                 </p>
                                                 {parseFloat(editData.weight) + getTotalWeightExcludingCurrent(criterion.id, editData.project_id || null) > 100 && (
                                                     <p className="mt-1 text-sm text-red-600 font-semibold">
-                                                        ⚠️ تحذير: مجموع الأوزان سيتجاوز 100%!
+                                                        {t('acceptanceCriteriaPage.weightWarning')}
                                                     </p>
                                                 )}
                                             </div>
@@ -422,7 +444,7 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            الوصف
+                                            {t('acceptanceCriteriaPage.editDescriptionLabel')}
                                         </label>
                                         <textarea
                                             value={editData.description_ar}
@@ -438,7 +460,7 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                             className="bg-[#A3C042] hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg flex items-center gap-2 disabled:opacity-50"
                                         >
                                             <FaSave />
-                                            {editProcessing ? 'جاري الحفظ...' : 'حفظ التعديلات'}
+                                            {editProcessing ? t('acceptanceCriteriaPage.saving') : t('acceptanceCriteriaPage.saveChanges')}
                                         </button>
                                         <button
                                             onClick={() => {
@@ -448,22 +470,20 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                             className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded-lg flex items-center gap-2"
                                         >
                                             <FaTimes />
-                                            إلغاء
+                                            {t('acceptanceCriteriaPage.cancel')}
                                         </button>
                                     </div>
                                 </div>
                             ) : (
                                 <div className="flex items-center gap-6">
-                                    {/* Weight */}
                                     <div className="text-4xl font-bold text-gray-900 min-w-[100px] text-left">
                                         {parseFloat(criterion.weight || 0).toFixed(0)}%
                                     </div>
 
-                                    {/* Content */}
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2 mb-1">
                                             <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                                {criterion.project_title || 'عام'}
+                                                {criterion.project_title || t('acceptanceCriteriaPage.generalLabel')}
                                             </span>
                                         </div>
                                         <h3 className="text-xl font-bold text-gray-900 mb-2">
@@ -474,7 +494,6 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                         )}
                                     </div>
 
-                                    {/* Slider */}
                                     <div className="flex items-center gap-4 min-w-[200px]">
                                         <div className="flex-1">
                                             <div className="w-full bg-gray-200 rounded-full h-3 relative">
@@ -486,19 +505,18 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                         </div>
                                     </div>
 
-                                    {/* Actions */}
                                     <div className="flex items-center gap-2">
                                         <button
                                             onClick={() => handleEdit(criterion)}
                                             className="text-yellow-600 hover:text-yellow-800 p-2 rounded-lg hover:bg-yellow-50"
-                                            title="تعديل"
+                                            title={t('acceptanceCriteriaPage.editAction')}
                                         >
                                             <FaEdit />
                                         </button>
                                         <button
                                             onClick={() => handleDelete(criterion.id, criterion.name_ar || criterion.name)}
                                             className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50"
-                                            title="حذف"
+                                            title={t('acceptanceCriteriaPage.deleteAction')}
                                         >
                                             <FaTrash />
                                         </button>
@@ -510,35 +528,32 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
 
                     {criteria.length === 0 && !showAddForm && (
                         <div className="bg-white rounded-xl shadow-lg p-12 text-center">
-                            <p className="text-gray-500 text-lg">لا توجد معايير قبول</p>
+                            <p className="text-gray-500 text-lg">{t('acceptanceCriteriaPage.emptyState')}</p>
                             <button
                                 onClick={() => setShowAddForm(true)}
                                 className="mt-4 bg-[#A3C042] hover:bg-[#8CA635] text-white font-semibold py-2 px-6 rounded-lg inline-flex items-center gap-2"
                             >
                                 <FaPlus />
-                                إضافة معيار جديد
+                                {t('acceptanceCriteriaPage.addNew')}
                             </button>
                         </div>
                     )}
                 </div>
 
-                {/* Info Box */}
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
                     <div className="flex items-start gap-4">
                         <FaInfoCircle className="text-blue-600 text-2xl mt-1 flex-shrink-0" />
                         <div>
-                            <h3 className="text-lg font-bold text-gray-900 mb-2">كيف تعمل معايير القبول؟</h3>
+                            <h3 className="text-lg font-bold text-gray-900 mb-2">{t('acceptanceCriteriaPage.info.title')}</h3>
                             <p className="text-gray-700">
-                                يتم استخدام معايير القبول لتقييم المشاريع وتحديد ما إذا كانت تستوفي المتطلبات الأساسية للقبول.
-                                كل معيار له وزن نسبي يؤثر على قرار القبول النهائي.
-                                تأكد دائماً أن مجموع الأوزان يساوي 100% للحصول على تقييم دقيق.
+                                {t('acceptanceCriteriaPage.info.description')}
                                 <br />
-                                <strong>المجموع الحالي: {parseFloat(totalWeight).toFixed(2)}%</strong>
+                                <strong>{t('acceptanceCriteriaPage.info.currentTotal', { total: parseFloat(totalWeight).toFixed(2) })}</strong>
                                 {parseFloat(totalWeight) !== 100 && (
                                     <span className={`block mt-2 ${parseFloat(totalWeight) > 100 ? 'text-red-600' : 'text-yellow-600'}`}>
                                         {parseFloat(totalWeight) > 100
-                                            ? '⚠️ مجموع الأوزان أكبر من 100%'
-                                            : '⚠️ مجموع الأوزان أقل من 100%'}
+                                            ? t('acceptanceCriteriaPage.info.overWeight')
+                                            : t('acceptanceCriteriaPage.info.underWeight')}
                                     </span>
                                 )}
                             </p>
@@ -549,4 +564,3 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
         </DashboardLayout>
     );
 }
-

@@ -1,11 +1,13 @@
 import { memo, useMemo } from 'react';
 import { FaUsers, FaCheckCircle, FaChartLine, FaTrophy } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 /**
  * PERFORMANCE OPTIMIZED: AnalyticsPreview with React.memo and useMemo
  * Memoizes calculations to prevent unnecessary recalculations
  */
 function AnalyticsPreview({ stats }) {
+    const { t, language } = useTranslation();
     // PERFORMANCE: Early return with memoization check
     if (!stats) return null;
 
@@ -24,11 +26,11 @@ function AnalyticsPreview({ stats }) {
     }, [stats.total_participants, stats.completed_submissions]);
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                     <FaChartLine className="text-primary-500" />
-                    نظرة سريعة على الأداء
+                    {t('adminChallengesIndexPage.analyticsPreview.title')}
                 </h3>
             </div>
 
@@ -41,8 +43,8 @@ function AnalyticsPreview({ stats }) {
                                 <FaUsers className="text-blue-600" />
                             </div>
                             <div>
-                                <div className="text-sm font-medium text-gray-700">معدل المشاركة</div>
-                                <div className="text-xs text-gray-500">من إجمالي التحديات</div>
+                                <div className="text-sm font-medium text-gray-700">{t('adminChallengesIndexPage.analyticsPreview.participationRate')}</div>
+                                <div className="text-xs text-gray-500">{t('adminChallengesIndexPage.analyticsPreview.ofTotalChallenges')}</div>
                             </div>
                         </div>
                         <div className="text-2xl font-bold text-blue-600">
@@ -65,8 +67,8 @@ function AnalyticsPreview({ stats }) {
                                 <FaCheckCircle className="text-green-600" />
                             </div>
                             <div>
-                                <div className="text-sm font-medium text-gray-700">معدل الإتمام</div>
-                                <div className="text-xs text-gray-500">من إجمالي المشاركين</div>
+                                <div className="text-sm font-medium text-gray-700">{t('adminChallengesIndexPage.analyticsPreview.completionRate')}</div>
+                                <div className="text-xs text-gray-500">{t('adminChallengesIndexPage.analyticsPreview.ofTotalParticipants')}</div>
                             </div>
                         </div>
                         <div className="text-2xl font-bold text-green-600">
@@ -86,11 +88,11 @@ function AnalyticsPreview({ stats }) {
             <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-gray-200">
                 <div className="text-center">
                     <div className="text-2xl font-bold text-gray-900">{stats.total_participants || 0}</div>
-                    <div className="text-xs text-gray-500 mt-1">إجمالي المشاركين</div>
+                    <div className="text-xs text-gray-500 mt-1">{t('adminChallengesIndexPage.analyticsPreview.totalParticipants')}</div>
                 </div>
                 <div className="text-center">
                     <div className="text-2xl font-bold text-gray-900">{stats.completed_submissions || 0}</div>
-                    <div className="text-xs text-gray-500 mt-1">تسليمات مكتملة</div>
+                    <div className="text-xs text-gray-500 mt-1">{t('adminChallengesIndexPage.analyticsPreview.completedSubmissions')}</div>
                 </div>
             </div>
         </div>

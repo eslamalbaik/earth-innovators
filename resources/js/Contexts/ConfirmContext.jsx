@@ -1,15 +1,17 @@
 import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
 import ConfirmDialog from '@/Components/ConfirmDialog';
+import { useTranslation } from '@/i18n';
 
 const ConfirmContext = createContext(null);
 
 export function ConfirmProvider({ children }) {
+    const { t } = useTranslation();
     const [confirmState, setConfirmState] = useState({
         show: false,
-        title: 'تأكيد الإجراء',
-        message: 'هل أنت متأكد من تنفيذ هذا الإجراء؟',
-        confirmText: 'تأكيد',
-        cancelText: 'إلغاء',
+        title: t('confirmDialog.title'),
+        message: t('confirmDialog.message'),
+        confirmText: t('common.confirm'),
+        cancelText: t('common.cancel'),
         variant: 'danger',
     });
 
@@ -20,14 +22,14 @@ export function ConfirmProvider({ children }) {
             resolveRef.current = resolve;
             setConfirmState({
                 show: true,
-                title: options.title || 'تأكيد الإجراء',
-                message: options.message || 'هل أنت متأكد من تنفيذ هذا الإجراء؟',
-                confirmText: options.confirmText || 'تأكيد',
-                cancelText: options.cancelText || 'إلغاء',
+                title: options.title || t('confirmDialog.title'),
+                message: options.message || t('confirmDialog.message'),
+                confirmText: options.confirmText || t('common.confirm'),
+                cancelText: options.cancelText || t('common.cancel'),
                 variant: options.variant || 'danger',
             });
         });
-    }, []);
+    }, [t]);
 
     const handleConfirm = useCallback(() => {
         setConfirmState((prev) => ({ ...prev, show: false }));
@@ -69,4 +71,3 @@ export function useConfirmDialog() {
     }
     return context;
 }
-

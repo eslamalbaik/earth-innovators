@@ -9,8 +9,10 @@ import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import MobileAppLayout from '@/Layouts/MobileAppLayout';
 import DesktopFooter from '@/Components/Mobile/DesktopFooter';
+import { useTranslation } from '@/i18n';
 
 export default function Index({ auth, notifications, unread_count }) {
+    const { t, language } = useTranslation();
     const user = auth?.user;
     const isAuthed = !!user;
     const [selectedNotification, setSelectedNotification] = useState(null);
@@ -45,7 +47,7 @@ export default function Index({ auth, notifications, unread_count }) {
                         data: e.notification.data || {},
                         read_at: null,
                         created_at: new Date().toISOString(),
-                        created_at_human: 'الآن',
+                        created_at_human: t('notificationsPage.now'),
                     };
 
                     setNotificationsList(prev => [newNotification, ...prev]);
@@ -202,15 +204,15 @@ export default function Index({ auth, notifications, unread_count }) {
                     <div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <FaBellSlash className="text-gray-400 text-3xl" />
                     </div>
-                    <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">لا توجد إشعارات</h3>
+                    <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">{t('notificationsPage.empty.title')}</h3>
                     <p className="text-sm md:text-base text-gray-600 mb-6">
-                        لم تتلق أي إشعارات بعد. سنقوم بإشعارك عند وجود تحديثات جديدة.
+                        {t('notificationsPage.empty.description')}
                     </p>
                     <Link
                         href="/"
                         className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#A3C042] to-[#8CA635] text-white rounded-xl font-bold text-sm md:text-base hover:opacity-90 transition shadow-lg"
                     >
-                        العودة للرئيسية
+                        {t('notificationsPage.actions.backHome')}
                         <FaRocket className="text-sm" />
                     </Link>
                 </div>
@@ -227,7 +229,7 @@ export default function Index({ auth, notifications, unread_count }) {
                                 <FaBell className="text-red-500 text-sm" />
                             </div>
                             <span className="text-sm font-bold text-gray-900">
-                                {unreadCount} إشعار غير مقروء
+                                {t('notificationsPage.unreadCount', { count: unreadCount })}
                             </span>
                         </div>
                         <button
@@ -237,7 +239,7 @@ export default function Index({ auth, notifications, unread_count }) {
                             className="flex items-center gap-2 px-4 py-2 bg-[#A3C042] text-white rounded-xl text-sm font-bold hover:bg-[#8CA635] transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <FaCheckCircle className="text-xs" />
-                            تحديد الكل كمقروء
+                            {t('notificationsPage.actions.markAllRead')}
                         </button>
                     </div>
                 )}
@@ -267,7 +269,7 @@ export default function Index({ auth, notifications, unread_count }) {
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-start justify-between gap-2 mb-1">
                                             <h3 className="text-sm md:text-base font-bold text-gray-900 line-clamp-2">
-                                                {data.title || data.message || 'إشعار جديد'}
+                                                {data.title || data.message || t('notificationsPage.defaultTitle')}
                                             </h3>
                                             {!isRead && (
                                                 <button
@@ -277,7 +279,7 @@ export default function Index({ auth, notifications, unread_count }) {
                                                         handleMarkAsRead(notification.id);
                                                     }}
                                                     className="flex-shrink-0 text-gray-400 hover:text-green-600 transition p-1.5 rounded-lg hover:bg-gray-50"
-                                                    aria-label="تحديد كمقروء"
+                                                    aria-label={t('notificationsPage.actions.markRead')}
                                                     disabled={isLoading}
                                                 >
                                                     <FaCheck className="text-xs" />
@@ -341,14 +343,14 @@ export default function Index({ auth, notifications, unread_count }) {
     };
 
     return (
-        <div dir="rtl" className="min-h-screen bg-gray-50">
-            <Head title="الإشعارات - إرث المبتكرين" />
+        <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
+            <Head title={t('notificationsPage.pageTitle', { appName: t('common.appName') })} />
 
             {/* Mobile View */}
             <div className="block md:hidden">
                 <MobileAppLayout
                     auth={auth}
-                    title="الإشعارات"
+                    title={t('notificationsPage.title')}
                     activeNav="profile"
                     unreadCount={unreadCount}
                     onNotifications={() => router.visit('/notifications')}
@@ -361,7 +363,7 @@ export default function Index({ auth, notifications, unread_count }) {
             {/* Desktop View */}
             <div className="hidden md:block">
                 <MobileTopBar
-                    title="الإشعارات"
+                    title={t('notificationsPage.title')}
                     unreadCount={unreadCount}
                     onNotifications={() => router.visit('/notifications')}
                     onBack={() => router.visit('/')}

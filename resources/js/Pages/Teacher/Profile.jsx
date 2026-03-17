@@ -4,6 +4,7 @@ import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaGraduationCap, FaSave, F
 import { useState, useRef } from 'react';
 import { getInitials, getColorFromName } from '@/utils/imageUtils';
 import { useToast } from '@/Contexts/ToastContext';
+import { useTranslation } from '@/i18n';
 
 const getImageUrl = (image) => {
     if (!image) return null;
@@ -18,6 +19,7 @@ const getImageUrl = (image) => {
 
 export default function Profile({ teacher, subjects, cities }) {
     const { showError } = useToast();
+    const { t } = useTranslation();
     const [isEditing, setIsEditing] = useState(false);
     const [imagePreview, setImagePreview] = useState(null);
     const [selectedImage, setSelectedImage] = useState(null);
@@ -48,14 +50,14 @@ export default function Profile({ teacher, subjects, cities }) {
         const file = e.target.files[0];
         if (file) {
             if (file.size > 2 * 1024 * 1024) {
-                showError('حجم الصورة يجب أن يكون أقل من 2 ميجابايت');
+                showError(t('teacherDashboardProfilePage.errors.imageTooLarge', { maxMb: 2 }));
                 if (fileInputRef.current) {
                     fileInputRef.current.value = '';
                 }
                 return;
             }
             if (!file.type.startsWith('image/')) {
-                showError('الملف المحدد ليس صورة');
+                showError(t('teacherDashboardProfilePage.errors.fileNotImage'));
                 if (fileInputRef.current) {
                     fileInputRef.current.value = '';
                 }
@@ -124,18 +126,18 @@ export default function Profile({ teacher, subjects, cities }) {
                 }, 200);
             },
             onError: (errors) => {
-                let errorMessage = 'حدث خطأ أثناء حفظ البيانات:\n';
+                let errorMessage = `${t('teacherDashboardProfilePage.errors.saveFailed')}\n`;
                 if (errors.image) {
-                    errorMessage += 'الصورة: ' + (Array.isArray(errors.image) ? errors.image.join(', ') : errors.image) + '\n';
+                    errorMessage += `${t('teacherDashboardProfilePage.fields.image')}: ${Array.isArray(errors.image) ? errors.image.join(', ') : errors.image}\n`;
                 }
                 if (errors.name_ar) {
-                    errorMessage += 'الاسم بالعربية: ' + (Array.isArray(errors.name_ar) ? errors.name_ar.join(', ') : errors.name_ar) + '\n';
+                    errorMessage += `${t('teacherDashboardProfilePage.fields.nameAr')}: ${Array.isArray(errors.name_ar) ? errors.name_ar.join(', ') : errors.name_ar}\n`;
                 }
                 if (errors.subjects) {
-                    errorMessage += 'المواد: ' + (Array.isArray(errors.subjects) ? errors.subjects.join(', ') : errors.subjects) + '\n';
+                    errorMessage += `${t('teacherDashboardProfilePage.fields.subjects')}: ${Array.isArray(errors.subjects) ? errors.subjects.join(', ') : errors.subjects}\n`;
                 }
                 if (errors.stages) {
-                    errorMessage += 'المراحل: ' + (Array.isArray(errors.stages) ? errors.stages.join(', ') : errors.stages) + '\n';
+                    errorMessage += `${t('teacherDashboardProfilePage.fields.stages')}: ${Array.isArray(errors.stages) ? errors.stages.join(', ') : errors.stages}\n`;
                 }
 
                 Object.keys(errors).forEach(key => {
@@ -176,9 +178,25 @@ export default function Profile({ teacher, subjects, cities }) {
         }
     };
 
+    const stageOptions = [
+        { value: 'الابتدائية', key: 'primary' },
+        { value: 'المتوسطة', key: 'middle' },
+        { value: 'الثانوية', key: 'high' },
+        { value: 'الجامعية', key: 'university' },
+    ];
+
+    const neighborhoodOptions = [
+        { value: 'الرياض', key: 'riyadh' },
+        { value: 'جدة', key: 'jeddah' },
+        { value: 'الدمام', key: 'dammam' },
+        { value: 'مكة', key: 'makkah' },
+        { value: 'المدينة', key: 'madinah' },
+        { value: 'الطائف', key: 'taif' },
+    ];
+
     return (
-        <DashboardLayout header="الملف الشخصي">
-            <Head title="الملف الشخصي" />
+        <DashboardLayout header={t('teacherDashboardProfilePage.title')}>
+            <Head title={t('teacherDashboardProfilePage.pageTitle', { appName: t('common.appName') })} />
 
             <div className="max-w-4xl mx-auto">
                 <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
@@ -206,7 +224,7 @@ export default function Profile({ teacher, subjects, cities }) {
                                         type="button"
                                         onClick={() => fileInputRef.current?.click()}
                                         className="absolute bottom-0 start-0 bg-yellow-500 hover:bg-yellow-600 text-white rounded-full p-2 shadow-lg transition"
-                                        title="تغيير الصورة"
+                                        title={t('teacherDashboardProfilePage.actions.changeImage')}
                                     >
                                         <FaUpload className="text-sm" />
                                     </button>
@@ -224,10 +242,10 @@ export default function Profile({ teacher, subjects, cities }) {
                                 <p className="text-gray-600">{teacher?.name_en}</p>
                                 <div className="flex items-center gap-4 mt-2">
                                     <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
-                                        {teacher?.is_verified ? 'معتمد' : 'غير معتمد'}
+                                        {teacher?.is_verified ? t('teacherDashboardProfilePage.badges.verified') : t('teacherDashboardProfilePage.badges.notVerified')}
                                     </span>
                                     <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                                        {teacher?.is_active ? 'نشط' : 'غير نشط'}
+                                        {teacher?.is_active ? t('teacherDashboardProfilePage.badges.active') : t('teacherDashboardProfilePage.badges.inactive')}
                                     </span>
                                 </div>
                             </div>
@@ -249,7 +267,7 @@ export default function Profile({ teacher, subjects, cities }) {
                                 className="flex items-center gap-2 px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-black font-medium rounded-lg transition"
                             >
                                 <FaEdit />
-                                {isEditing ? 'إلغاء التعديل' : 'تعديل الملف'}
+                                {isEditing ? t('teacherDashboardProfilePage.actions.cancelEdit') : t('teacherDashboardProfilePage.actions.editProfile')}
                             </button>
                         </div>
                     </div>
@@ -261,26 +279,26 @@ export default function Profile({ teacher, subjects, cities }) {
                         <div>
                             <div className="flex items-center gap-2 mb-2">
                                 <span className="text-2xl">🎓</span>
-                                <h2 className="text-xl font-bold">بطاقة عضوية المعلم</h2>
+                                <h2 className="text-xl font-bold">{t('teacherDashboardProfilePage.membershipCard.title')}</h2>
                             </div>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
                                 <div>
-                                    <div className="text-sm opacity-80">نوع العضوية</div>
-                                    <div className="font-bold text-lg">{data.membership_type === 'premium' ? 'مميزة' : 'عادية'}</div>
+                                    <div className="text-sm opacity-80">{t('teacherDashboardProfilePage.membershipCard.membershipType')}</div>
+                                    <div className="font-bold text-lg">{data.membership_type === 'premium' ? t('teacherDashboardProfilePage.membershipTypes.premium') : t('teacherDashboardProfilePage.membershipTypes.standard')}</div>
                                 </div>
                                 <div>
-                                    <div className="text-sm opacity-80">حالة العقد</div>
+                                    <div className="text-sm opacity-80">{t('teacherDashboardProfilePage.membershipCard.contractStatus')}</div>
                                     <div className={`font-bold text-lg ${data.contract_status === 'active' ? 'text-green-300' : 'text-red-300'}`}>
-                                        {data.contract_status === 'active' ? 'نشط' : 'غير نشط'}
+                                        {data.contract_status === 'active' ? t('teacherDashboardProfilePage.contractStatus.active') : t('teacherDashboardProfilePage.contractStatus.inactive')}
                                     </div>
                                 </div>
                                 <div>
-                                    <div className="text-sm opacity-80">تاريخ البداية</div>
-                                    <div className="font-bold">{data.contract_start_date || 'غير محدد'}</div>
+                                    <div className="text-sm opacity-80">{t('teacherDashboardProfilePage.membershipCard.startDate')}</div>
+                                    <div className="font-bold">{data.contract_start_date || t('common.notAvailable')}</div>
                                 </div>
                                 <div>
-                                    <div className="text-sm opacity-80">تاريخ الانتهاء</div>
-                                    <div className="font-bold">{data.contract_end_date || 'غير محدد'}</div>
+                                    <div className="text-sm opacity-80">{t('teacherDashboardProfilePage.membershipCard.endDate')}</div>
+                                    <div className="font-bold">{data.contract_end_date || t('common.notAvailable')}</div>
                                 </div>
                             </div>
                         </div>
@@ -296,11 +314,11 @@ export default function Profile({ teacher, subjects, cities }) {
                     <div className="bg-white rounded-xl shadow-lg p-6">
                         <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                             <FaUser />
-                            المعلومات الشخصية
+                            {t('teacherDashboardProfilePage.sections.personalInfo')}
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">الاسم بالعربية *</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t('teacherDashboardProfilePage.fields.nameAr')} *</label>
                                 <input
                                     type="text"
                                     value={data.name_ar}
@@ -312,7 +330,7 @@ export default function Profile({ teacher, subjects, cities }) {
                                 {errors.name_ar && <p className="text-red-500 text-sm mt-1">{errors.name_ar}</p>}
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">الاسم بالإنجليزية *</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t('teacherDashboardProfilePage.fields.nameEn')} *</label>
                                 <input
                                     type="text"
                                     value={data.name_en}
@@ -324,7 +342,7 @@ export default function Profile({ teacher, subjects, cities }) {
                                 {errors.name_en && <p className="text-red-500 text-sm mt-1">{errors.name_en}</p>}
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">الجنسية *</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t('teacherDashboardProfilePage.fields.nationality')} *</label>
                                 <select
                                     value={data.nationality}
                                     onChange={(e) => setData('nationality', e.target.value)}
@@ -332,19 +350,19 @@ export default function Profile({ teacher, subjects, cities }) {
                                     className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-transparent disabled:bg-gray-100"
                                     required
                                 >
-                                    <option value="">اختر الجنسية</option>
-                                    <option value="إماراتي">إماراتي</option>
-                                    <option value="سعودي">سعودي</option>
-                                    <option value="مصري">مصري</option>
-                                    <option value="سوري">سوري</option>
-                                    <option value="أردني">أردني</option>
-                                    <option value="لبناني">لبناني</option>
-                                    <option value="أخرى">أخرى</option>
+                                    <option value="">{t('teacherDashboardProfilePage.placeholders.selectNationality')}</option>
+                                    <option value="إماراتي">{t('teacherDashboardProfilePage.nationalities.emirati')}</option>
+                                    <option value="سعودي">{t('teacherDashboardProfilePage.nationalities.saudi')}</option>
+                                    <option value="مصري">{t('teacherDashboardProfilePage.nationalities.egyptian')}</option>
+                                    <option value="سوري">{t('teacherDashboardProfilePage.nationalities.syrian')}</option>
+                                    <option value="أردني">{t('teacherDashboardProfilePage.nationalities.jordanian')}</option>
+                                    <option value="لبناني">{t('teacherDashboardProfilePage.nationalities.lebanese')}</option>
+                                    <option value="أخرى">{t('common.other')}</option>
                                 </select>
                                 {errors.nationality && <p className="text-red-500 text-sm mt-1">{errors.nationality}</p>}
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">الجنس *</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t('teacherDashboardProfilePage.fields.gender')} *</label>
                                 <select
                                     value={data.gender}
                                     onChange={(e) => setData('gender', e.target.value)}
@@ -352,14 +370,14 @@ export default function Profile({ teacher, subjects, cities }) {
                                     className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-transparent disabled:bg-gray-100"
                                     required
                                 >
-                                    <option value="">اختر الجنس</option>
-                                    <option value="ذكر">ذكر</option>
-                                    <option value="أنثى">أنثى</option>
+                                    <option value="">{t('teacherDashboardProfilePage.placeholders.selectGender')}</option>
+                                    <option value="ذكر">{t('common.gender.male')}</option>
+                                    <option value="أنثى">{t('common.gender.female')}</option>
                                 </select>
                                 {errors.gender && <p className="text-red-500 text-sm mt-1">{errors.gender}</p>}
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">البريد الإلكتروني *</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t('teacherDashboardProfilePage.fields.email')} *</label>
                                 <input
                                     type="email"
                                     value={data.email}
@@ -371,7 +389,7 @@ export default function Profile({ teacher, subjects, cities }) {
                                 {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">رقم الجوال *</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t('teacherDashboardProfilePage.fields.phone')} *</label>
                                 <input
                                     type="tel"
                                     value={data.phone}
@@ -388,38 +406,38 @@ export default function Profile({ teacher, subjects, cities }) {
                     <div className="bg-white rounded-xl shadow-lg p-6">
                         <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                             <FaGraduationCap />
-                            المعلومات المهنية
+                            {t('teacherDashboardProfilePage.sections.professionalInfo')}
                         </h2>
                         <div className="space-y-6">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">السيرة الذاتية *</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t('teacherDashboardProfilePage.fields.bio')} *</label>
                                 <textarea
                                     value={data.bio}
                                     onChange={(e) => setData('bio', e.target.value)}
                                     disabled={!isEditing}
                                     rows="4"
                                     className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-transparent disabled:bg-gray-100"
-                                    placeholder="اكتب سيرتك الذاتية..."
+                                    placeholder={t('teacherDashboardProfilePage.placeholders.bio')}
                                     required
                                 />
                                 {errors.bio && <p className="text-red-500 text-sm mt-1">{errors.bio}</p>}
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">المؤهلات والخبرات *</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t('teacherDashboardProfilePage.fields.qualifications')} *</label>
                                 <textarea
                                     value={data.qualifications}
                                     onChange={(e) => setData('qualifications', e.target.value)}
                                     disabled={!isEditing}
                                     rows="4"
                                     className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-transparent disabled:bg-gray-100"
-                                    placeholder="اكتب مؤهلاتك وخبراتك..."
+                                    placeholder={t('teacherDashboardProfilePage.placeholders.qualifications')}
                                     required
                                 />
                                 {errors.qualifications && <p className="text-red-500 text-sm mt-1">{errors.qualifications}</p>}
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">سنوات الخبرة *</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('teacherDashboardProfilePage.fields.experienceYears')} *</label>
                                     <input
                                         type="number"
                                         value={data.experience_years}
@@ -432,7 +450,7 @@ export default function Profile({ teacher, subjects, cities }) {
                                     {errors.experience_years && <p className="text-red-500 text-sm mt-1">{errors.experience_years}</p>}
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">السعر في الساعة (ريال) *</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('teacherDashboardProfilePage.fields.pricePerHour')} *</label>
                                     <input
                                         type="number"
                                         value={data.price_per_hour}
@@ -449,7 +467,7 @@ export default function Profile({ teacher, subjects, cities }) {
                     </div>
 
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                        <h2 className="text-xl font-bold text-gray-900 mb-4">المواد التي أدرسها *</h2>
+                        <h2 className="text-xl font-bold text-gray-900 mb-4">{t('teacherDashboardProfilePage.sections.subjects')} *</h2>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                             {subjects?.map((subject) => (
                                 <label key={subject.id} className="flex items-center gap-2 cursor-pointer">
@@ -468,18 +486,18 @@ export default function Profile({ teacher, subjects, cities }) {
                     </div>
 
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                        <h2 className="text-xl font-bold text-gray-900 mb-4">المراحل الدراسية *</h2>
+                        <h2 className="text-xl font-bold text-gray-900 mb-4">{t('teacherDashboardProfilePage.sections.stages')} *</h2>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            {['الابتدائية', 'المتوسطة', 'الثانوية', 'الجامعية'].map((stage) => (
-                                <label key={stage} className="flex items-center gap-2 cursor-pointer">
+                            {stageOptions.map(({ value, key }) => (
+                                <label key={key} className="flex items-center gap-2 cursor-pointer">
                                     <input
                                         type="checkbox"
-                                        checked={data.stages.includes(stage)}
-                                        onChange={() => handleStageChange(stage)}
+                                        checked={data.stages.includes(value)}
+                                        onChange={() => handleStageChange(value)}
                                         disabled={!isEditing}
                                         className="rounded border-gray-300 text-yellow-400 focus:ring-yellow-400 disabled:opacity-50"
                                     />
-                                    <span className="text-sm text-gray-700">{stage}</span>
+                                    <span className="text-sm text-gray-700">{t(`teacherDashboardProfilePage.stageLabels.${key}`)}</span>
                                 </label>
                             ))}
                         </div>
@@ -489,11 +507,11 @@ export default function Profile({ teacher, subjects, cities }) {
                     <div className="bg-white rounded-xl shadow-lg p-6">
                         <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                             <FaMapMarkerAlt />
-                            الموقع
+                            {t('teacherDashboardProfilePage.sections.location')}
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">المدينة *</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t('teacherDashboardProfilePage.fields.city')} *</label>
                                 <select
                                     value={data.city}
                                     onChange={(e) => setData('city', e.target.value)}
@@ -501,7 +519,7 @@ export default function Profile({ teacher, subjects, cities }) {
                                     className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-transparent disabled:bg-gray-100"
                                     required
                                 >
-                                    <option value="">اختر المدينة</option>
+                                    <option value="">{t('teacherDashboardProfilePage.placeholders.selectCity')}</option>
                                     {cities?.map((city) => (
                                         <option key={city} value={city}>{city}</option>
                                     ))}
@@ -509,18 +527,18 @@ export default function Profile({ teacher, subjects, cities }) {
                                 {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">الأحياء</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t('teacherDashboardProfilePage.fields.neighborhoods')}</label>
                                 <div className="grid grid-cols-2 gap-2">
-                                    {['الرياض', 'جدة', 'الدمام', 'مكة', 'المدينة', 'الطائف'].map((neighborhood) => (
-                                        <label key={neighborhood} className="flex items-center gap-2 cursor-pointer">
+                                    {neighborhoodOptions.map(({ value, key }) => (
+                                        <label key={key} className="flex items-center gap-2 cursor-pointer">
                                             <input
                                                 type="checkbox"
-                                                checked={data.neighborhoods.includes(neighborhood)}
-                                                onChange={() => handleNeighborhoodChange(neighborhood)}
+                                                checked={data.neighborhoods.includes(value)}
+                                                onChange={() => handleNeighborhoodChange(value)}
                                                 disabled={!isEditing}
                                                 className="rounded border-gray-300 text-yellow-400 focus:ring-yellow-400 disabled:opacity-50"
                                             />
-                                            <span className="text-sm text-gray-700">{neighborhood}</span>
+                                            <span className="text-sm text-gray-700">{t(`teacherDashboardProfilePage.neighborhoodLabels.${key}`)}</span>
                                         </label>
                                     ))}
                                 </div>
@@ -534,35 +552,35 @@ export default function Profile({ teacher, subjects, cities }) {
                         <div className="bg-white rounded-xl shadow-lg p-6">
                             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                                 <FaUser />
-                                معلومات العقد والعضوية
+                                {t('teacherDashboardProfilePage.sections.contractAndMembership')}
                             </h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">نوع العضوية</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('teacherDashboardProfilePage.fields.membershipType')}</label>
                                     <select
                                         value={data.membership_type}
                                         onChange={(e) => setData('membership_type', e.target.value)}
                                         className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
                                     >
-                                        <option value="standard">عادية</option>
-                                        <option value="premium">مميزة</option>
+                                        <option value="standard">{t('teacherDashboardProfilePage.membershipTypes.standard')}</option>
+                                        <option value="premium">{t('teacherDashboardProfilePage.membershipTypes.premium')}</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">حالة العقد</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('teacherDashboardProfilePage.fields.contractStatus')}</label>
                                     <select
                                         value={data.contract_status}
                                         onChange={(e) => setData('contract_status', e.target.value)}
                                         className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
                                     >
-                                        <option value="active">نشط</option>
-                                        <option value="inactive">غير نشط</option>
-                                        <option value="expired">منتهي</option>
-                                        <option value="pending">قيد الانتظار</option>
+                                        <option value="active">{t('teacherDashboardProfilePage.contractStatus.active')}</option>
+                                        <option value="inactive">{t('teacherDashboardProfilePage.contractStatus.inactive')}</option>
+                                        <option value="expired">{t('teacherDashboardProfilePage.contractStatus.expired')}</option>
+                                        <option value="pending">{t('teacherDashboardProfilePage.contractStatus.pending')}</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">تاريخ بداية العقد</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('teacherDashboardProfilePage.fields.contractStartDate')}</label>
                                     <input
                                         type="date"
                                         value={data.contract_start_date}
@@ -571,7 +589,7 @@ export default function Profile({ teacher, subjects, cities }) {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">تاريخ نهاية العقد</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('teacherDashboardProfilePage.fields.contractEndDate')}</label>
                                     <input
                                         type="date"
                                         value={data.contract_end_date}
@@ -591,7 +609,7 @@ export default function Profile({ teacher, subjects, cities }) {
                                 className="flex items-center gap-2 px-6 py-3 bg-yellow-400 hover:bg-yellow-500 text-black font-bold rounded-lg transition disabled:opacity-50"
                             >
                                 <FaSave />
-                                {processing ? 'جاري الحفظ...' : 'حفظ التغييرات'}
+                                {processing ? t('teacherDashboardProfilePage.actions.saving') : t('common.saveChanges')}
                             </button>
                         </div>
                     )}

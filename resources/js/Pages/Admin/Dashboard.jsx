@@ -35,6 +35,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import UserEngagementCard from '@/Components/Dashboard/UserEngagementCard';
+import { useTranslation } from '@/i18n';
 
 // Register Chart.js components
 ChartJS.register(
@@ -64,6 +65,8 @@ export default function AdminDashboard({
     notifications = null,
     unread_count = 0
 }) {
+    const { t, language } = useTranslation();
+    const isArabic = language === 'ar';
     const [currentYear, setCurrentYear] = useState(selectedYear);
     const [loading, setLoading] = useState(false);
     const [chartDataState, setChartDataState] = useState(chartData || null);
@@ -118,24 +121,20 @@ export default function AdminDashboard({
             }
         }
     }, []); // Only run on mount
-    const formatCurrency = (amount) => {
-        const formatted = new Intl.NumberFormat('ar-AE', {
-            style: 'currency',
-            currency: 'AED',
-            minimumFractionDigits: 0,
-        }).format(amount || 0);
-        // Ensure RTL formatting: "0 د.إ."
-        return formatted;
-    };
+    const formatCurrency = (amount) => new Intl.NumberFormat(isArabic ? 'ar-AE' : 'en-US', {
+        style: 'currency',
+        currency: 'AED',
+        minimumFractionDigits: 0,
+    }).format(amount || 0);
 
     const getStatusBadge = (status) => {
         const statusMap = {
-            'active': { bg: 'bg-green-100', text: 'text-green-800', label: 'نشط' },
-            'pending': { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'قيد الانتظار' },
-            'expired': { bg: 'bg-red-100', text: 'text-red-800', label: 'منتهي' },
-            'cancelled': { bg: 'bg-gray-100', text: 'text-gray-800', label: 'ملغي' },
-            'completed': { bg: 'bg-green-100', text: 'text-green-800', label: 'مكتمل' },
-            'failed': { bg: 'bg-red-100', text: 'text-red-800', label: 'فاشل' },
+            active: { bg: 'bg-green-100', text: 'text-green-800', label: t('common.active') },
+            pending: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: t('common.pending') },
+            expired: { bg: 'bg-red-100', text: 'text-red-800', label: t('common.expired') },
+            cancelled: { bg: 'bg-gray-100', text: 'text-gray-800', label: t('common.cancelled') },
+            completed: { bg: 'bg-green-100', text: 'text-green-800', label: t('common.completed') },
+            failed: { bg: 'bg-red-100', text: 'text-red-800', label: t('common.failed') },
         };
 
         const statusConfig = statusMap[status] || { bg: 'bg-gray-100', text: 'text-gray-800', label: status };
@@ -150,7 +149,7 @@ export default function AdminDashboard({
     const handleYearChange = useCallback(async (year) => {
         const yearInt = parseInt(year);
         if (isNaN(yearInt)) {
-            setError('سنة غير صحيحة');
+            setError(t('adminDashboardPage.invalidYear'));
             return;
         }
 
@@ -181,24 +180,23 @@ export default function AdminDashboard({
                 setChartDataState(response.data);
                 setError(null);
             } else {
-                const errorMsg = 'بيانات غير صحيحة من الخادم';
-                setError(errorMsg);
+                setError(t('adminDashboardPage.invalidDataFromServer'));
             }
         } catch (error) {
-            let errorMsg = 'حدث خطأ أثناء جلب البيانات';
+            let errorMsg = t('adminDashboardPage.fetchError');
 
             if (error.response) {
                 if (error.response.status === 404) {
-                    errorMsg = 'المسار غير موجود';
+                    errorMsg = t('adminDashboardPage.routeNotFound');
                 } else if (error.response.status === 500) {
-                    errorMsg = 'خطأ في الخادم';
+                    errorMsg = t('adminDashboardPage.serverError');
                 } else if (error.response.data && error.response.data.error) {
                     errorMsg = error.response.data.error;
                 }
             } else if (error.request) {
-                errorMsg = 'لا يوجد اتصال بالخادم';
+                errorMsg = t('adminDashboardPage.noServerConnection');
             } else {
-                errorMsg = error.message || 'خطأ غير معروف';
+                errorMsg = error.message || t('adminDashboardPage.unknownError');
             }
 
             setError(errorMsg);
@@ -235,7 +233,7 @@ export default function AdminDashboard({
             labels: chartDataState.labels || [],
             datasets: [
                 {
-                    label: 'المشاريع',
+                    label: t('adminDashboardPage.projectsChartLabel'),
                     data: chartDataState.projects || [],
                     borderColor: 'rgb(34, 197, 94)', // Green
                     backgroundColor: (context) => {
@@ -251,7 +249,7 @@ export default function AdminDashboard({
                     borderWidth: 2,
                 },
                 {
-                    label: 'المستخدمون',
+                    label: t('adminDashboardPage.usersChartLabel'),
                     data: chartDataState.users || [],
                     borderColor: 'rgb(59, 130, 246)', // Blue
                     backgroundColor: (context) => {
@@ -290,7 +288,7 @@ export default function AdminDashboard({
             },
             title: {
                 display: true,
-                text: `نشاط المنصة (${currentYear})`,
+                text: t('adminDashboardPage.platformActivityTitle', { year: currentYear }),
                 position: 'top',
                 align: 'start',
                 font: {
@@ -305,12 +303,12 @@ export default function AdminDashboard({
             },
             tooltip: {
                 enabled: true,
-                rtl: true,
+                rtl: isArabic,
             },
         },
         scales: {
             x: {
-                reverse: true, // RTL: Start from right (January) to left (December)
+                reverse: isArabic,
                 grid: {
                     display: false,
                 },
@@ -353,14 +351,13 @@ export default function AdminDashboard({
     }), [currentYear]);
 
     return (
-        <DashboardLayout header="لوحة التحكم">
-            <Head title="لوحة التحكم" />
+        <DashboardLayout header={t('dashboard.adminDashboard')}>
+            <Head title={t('adminDashboardPage.pageTitle')} />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                {/* إجمالي المشاريع */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
                     <div className="flex items-center justify-between mb-4">
                         <div>
-                            <p className="text-gray-500 text-sm font-medium mb-2">إجمالي المشاريع</p>
+                            <p className="text-gray-500 text-sm font-medium mb-2">{t('adminDashboardPage.totalProjects')}</p>
                             <p className="text-3xl font-bold text-gray-900">{kpis.total_projects || 0}</p>
                         </div>
                         <div className="p-3 bg-blue-50 rounded-2xl">
@@ -368,16 +365,15 @@ export default function AdminDashboard({
                         </div>
                     </div>
                     <div className="flex items-center justify-between text-sm pt-3 border-t border-gray-100">
-                        <span className="text-gray-600">منشور: <span className="font-semibold text-gray-900">{kpis.published_projects || 0}</span></span>
-                        <span className="text-gray-600">قيد المراجعة: <span className="font-semibold text-gray-900">{kpis.pending_projects || 0}</span></span>
+                        <span className="text-gray-600">{t('adminDashboardPage.publishedProjects')}: <span className="font-semibold text-gray-900">{kpis.published_projects || 0}</span></span>
+                        <span className="text-gray-600">{t('adminDashboardPage.pendingReview')}: <span className="font-semibold text-gray-900">{kpis.pending_projects || 0}</span></span>
                     </div>
                 </div>
 
-                {/* إجمالي المستخدمين */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
                     <div className="flex items-center justify-between mb-4">
                         <div>
-                            <p className="text-gray-500 text-sm font-medium mb-2">إجمالي المستخدمين</p>
+                            <p className="text-gray-500 text-sm font-medium mb-2">{t('adminDashboardPage.totalUsers')}</p>
                             <p className="text-3xl font-bold text-gray-900">{kpis.total_users || 0}</p>
                         </div>
                         <div className="p-3 bg-purple-50 rounded-2xl">
@@ -385,17 +381,16 @@ export default function AdminDashboard({
                         </div>
                     </div>
                     <div className="flex items-center justify-between text-sm pt-3 border-t border-gray-100">
-                        <span className="text-gray-600">مؤسسات تعليمية: <span className="font-semibold text-gray-900">{usersByRole.schools || 0}</span></span>
-                        <span className="text-gray-600">طلاب: <span className="font-semibold text-gray-900">{usersByRole.students || 0}</span></span>
-                        <span className="text-gray-600">معلمين: <span className="font-semibold text-gray-900">{usersByRole.teachers || 0}</span></span>
+                        <span className="text-gray-600">{t('adminDashboardPage.educationalInstitutions')}: <span className="font-semibold text-gray-900">{usersByRole.schools || 0}</span></span>
+                        <span className="text-gray-600">{t('adminDashboardPage.students')}: <span className="font-semibold text-gray-900">{usersByRole.students || 0}</span></span>
+                        <span className="text-gray-600">{t('adminDashboardPage.teachers')}: <span className="font-semibold text-gray-900">{usersByRole.teachers || 0}</span></span>
                     </div>
                 </div>
 
-                {/* إجمالي الإيرادات */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
                     <div className="flex items-center justify-between mb-4">
                         <div>
-                            <p className="text-gray-500 text-sm font-medium mb-2">إجمالي الإيرادات</p>
+                            <p className="text-gray-500 text-sm font-medium mb-2">{t('adminDashboardPage.totalRevenue')}</p>
                             <p className="text-3xl font-bold text-gray-900">{formatCurrency(kpis.total_revenue || 0)}</p>
                         </div>
                         <div className="p-3 bg-green-50 rounded-2xl">
@@ -404,15 +399,14 @@ export default function AdminDashboard({
                     </div>
                     <div className="flex items-center text-sm pt-3 border-t border-gray-100">
                         <FaChartLine className="me-1 text-gray-400" />
-                        <span className="text-gray-600">من الاشتراكات: <span className="font-semibold text-gray-900">{formatCurrency(kpis.subscription_revenue || 0)}</span></span>
+                        <span className="text-gray-600">{t('adminDashboardPage.subscriptionRevenue')}: <span className="font-semibold text-gray-900">{formatCurrency(kpis.subscription_revenue || 0)}</span></span>
                     </div>
                 </div>
 
-                {/* الاشتراكات النشطة */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
                     <div className="flex items-center justify-between mb-4">
                         <div>
-                            <p className="text-gray-500 text-sm font-medium mb-2">الاشتراكات النشطة</p>
+                            <p className="text-gray-500 text-sm font-medium mb-2">{t('adminDashboardPage.activeSubscriptions')}</p>
                             <p className="text-3xl font-bold text-gray-900">{kpis.active_subscriptions || 0}</p>
                         </div>
                         <div className="p-3 bg-orange-50 rounded-2xl">
@@ -420,12 +414,11 @@ export default function AdminDashboard({
                         </div>
                     </div>
                     <div className="flex items-center text-sm pt-3 border-t border-gray-100">
-                        <span className="text-gray-600">من إجمالي: <span className="font-semibold text-gray-900">{kpis.total_subscriptions || 0}</span> اشتراك</span>
+                        <span className="text-gray-600">{t('adminDashboardPage.totalSubscriptionsSummary', { count: kpis.total_subscriptions || 0 })}</span>
                     </div>
                 </div>
             </div>
             <div className="">
-                {/* مؤشر تفاعل الطلاب - في الأعلى */}
                 <div className="mb-8">
                     <UserEngagementCard
                         listItems={engagementData?.listItems || []}
@@ -438,17 +431,17 @@ export default function AdminDashboard({
 
 
             {/* Analytical Reports Chart */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8" dir="rtl">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8" dir={isArabic ? 'rtl' : 'ltr'}>
                 <div className="mb-6 flex items-center justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-2">التقارير التحليلية</h2>
-                        <p className="text-gray-600 text-sm">نظرة شاملة على أداء المنصة والنمو الابتكاري</p>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('adminDashboardPage.analyticsReportsTitle')}</h2>
+                        <p className="text-gray-600 text-sm">{t('adminDashboardPage.analyticsReportsSubtitle')}</p>
                     </div>
                     {availableYears && availableYears.length > 0 && (
                         <div className="flex flex-col items-end gap-2">
                             <div className="flex items-center gap-3">
                                 <label htmlFor="year-select" className="text-sm font-medium text-gray-700">
-                                    السنة:
+                                    {t('adminDashboardPage.yearLabel')}:
                                 </label>
                                 <select
                                     id="year-select"
@@ -493,34 +486,33 @@ export default function AdminDashboard({
                         />
                     ) : (
                         <div className="flex items-center justify-center h-full text-gray-500">
-                            لا توجد بيانات متاحة
+                            {t('adminDashboardPage.noData')}
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* المشاريع المنشورة */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
                 <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-xl font-bold text-gray-900">المشاريع المنشورة</h3>
+                    <h3 className="text-xl font-bold text-gray-900">{t('adminDashboardPage.publishedProjectsTitle')}</h3>
                     <Link
                         href={route('admin.projects.index')}
                         className="text-blue-600 hover:text-blue-700 text-sm font-semibold"
                     >
-                        عرض الكل
+                        {t('common.viewAll')}
                     </Link>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full">
                         <thead>
                             <tr className="border-b border-gray-100">
-                                <th className=" py-3 px-4 text-sm font-semibold text-gray-700">المشروع</th>
-                                <th className=" py-3 px-4 text-sm font-semibold text-gray-700">الطالب</th>
-                                <th className=" py-3 px-4 text-sm font-semibold text-gray-700">المدرسة</th>
-                                <th className=" py-3 px-4 text-sm font-semibold text-gray-700">المعلم</th>
-                                <th className=" py-3 px-4 text-sm font-semibold text-gray-700">المشاهدات</th>
-                                <th className=" py-3 px-4 text-sm font-semibold text-gray-700">الإعجابات</th>
-                                <th className=" py-3 px-4 text-sm font-semibold text-gray-700">تاريخ النشر</th>
+                                <th className=" py-3 px-4 text-sm font-semibold text-gray-700">{t('adminDashboardPage.projectColumn')}</th>
+                                <th className=" py-3 px-4 text-sm font-semibold text-gray-700">{t('adminDashboardPage.studentColumn')}</th>
+                                <th className=" py-3 px-4 text-sm font-semibold text-gray-700">{t('adminDashboardPage.schoolColumn')}</th>
+                                <th className=" py-3 px-4 text-sm font-semibold text-gray-700">{t('adminDashboardPage.teacherColumn')}</th>
+                                <th className=" py-3 px-4 text-sm font-semibold text-gray-700">{t('adminDashboardPage.viewsColumn')}</th>
+                                <th className=" py-3 px-4 text-sm font-semibold text-gray-700">{t('adminDashboardPage.likesColumn')}</th>
+                                <th className=" py-3 px-4 text-sm font-semibold text-gray-700">{t('adminDashboardPage.publishDateColumn')}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -556,7 +548,7 @@ export default function AdminDashboard({
                             ) : (
                                 <tr>
                                     <td colSpan="7" className="py-8 text-center text-gray-500">
-                                        لا توجد مشاريع منشورة
+                                        {t('adminDashboardPage.noPublishedProjects')}
                                     </td>
                                 </tr>
                             )}
@@ -565,17 +557,15 @@ export default function AdminDashboard({
                 </div>
             </div>
 
-            {/* المدفوعات والاشتراكات */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                {/* المدفوعات الأخيرة */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                     <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-xl font-bold text-gray-900">المدفوعات الأخيرة</h3>
+                        <h3 className="text-xl font-bold text-gray-900">{t('adminDashboardPage.recentPaymentsTitle')}</h3>
                         <Link
                             href={route('payments.index')}
                             className="text-blue-600 hover:text-blue-700 text-sm font-semibold"
                         >
-                            عرض الكل
+                            {t('common.viewAll')}
                         </Link>
                     </div>
                     <div className="space-y-3">
@@ -595,35 +585,34 @@ export default function AdminDashboard({
                             ))
                         ) : (
                             <div className="text-center text-gray-500 py-8">
-                                لا توجد مدفوعات
+                                {t('adminDashboardPage.noPayments')}
                             </div>
                         )}
                     </div>
                     <div className="mt-6 pt-6 border-t border-gray-100 grid grid-cols-3 gap-4">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">إجمالي الإيرادات</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('adminDashboardPage.paymentsTotalRevenue')}</p>
                             <p className="text-lg font-bold text-green-600">{formatCurrency(paymentStats.total_revenue || 0)}</p>
                         </div>
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">مكتملة</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('adminDashboardPage.paymentsCompleted')}</p>
                             <p className="text-lg font-bold text-blue-600">{paymentStats.completed_payments || 0}</p>
                         </div>
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">قيد الانتظار</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('adminDashboardPage.paymentsPending')}</p>
                             <p className="text-lg font-bold text-yellow-600">{paymentStats.pending_payments || 0}</p>
                         </div>
                     </div>
                 </div>
 
-                {/* طلبات الاشتراك */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                     <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-xl font-bold text-gray-900">طلبات الاشتراك</h3>
+                        <h3 className="text-xl font-bold text-gray-900">{t('adminDashboardPage.subscriptionRequestsTitle')}</h3>
                         <Link
                             href={route('admin.packages.index')}
                             className="text-blue-600 hover:text-blue-700 text-sm font-semibold"
                         >
-                            عرض الكل
+                            {t('common.viewAll')}
                         </Link>
                     </div>
                     <div className="space-y-3">
@@ -645,32 +634,31 @@ export default function AdminDashboard({
                             ))
                         ) : (
                             <div className="text-center text-gray-500 py-8">
-                                لا توجد اشتراكات
+                                {t('adminDashboardPage.noSubscriptions')}
                             </div>
                         )}
                     </div>
                     <div className="mt-6 pt-6 border-t border-gray-100 grid grid-cols-3 gap-4">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">إجمالي الاشتراكات</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('adminDashboardPage.subscriptionsTotal')}</p>
                             <p className="text-lg font-bold text-blue-600">{subscriptionStats.total_subscriptions || 0}</p>
                         </div>
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">نشطة</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('adminDashboardPage.subscriptionsActive')}</p>
                             <p className="text-lg font-bold text-green-600">{subscriptionStats.active_subscriptions || 0}</p>
                         </div>
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">إيرادات الاشتراكات</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('adminDashboardPage.subscriptionsRevenue')}</p>
                             <p className="text-lg font-bold text-green-600">{formatCurrency(subscriptionStats.subscription_revenue || 0)}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* صندوق الإشعارات */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
-                        <h3 className="text-xl font-bold text-gray-900">الإشعارات</h3>
+                        <h3 className="text-xl font-bold text-gray-900">{t('notifications.title')}</h3>
                         {unread_count > 0 && (
                             <span className="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                                 {unread_count}
@@ -684,14 +672,14 @@ export default function AdminDashboard({
                                 className="text-sm text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-2"
                             >
                                 <FaCheckCircle />
-                                تحديد الكل كمقروء
+                                {t('notifications.markAllRead')}
                             </button>
                         )}
                         <Link
                             href={route('notifications.index')}
                             className="text-blue-600 hover:text-blue-700 text-sm font-semibold"
                         >
-                            عرض الكل
+                            {t('notifications.viewAll')}
                         </Link>
                     </div>
                 </div>
@@ -720,10 +708,10 @@ export default function AdminDashboard({
                                                     <h4 className={`text-sm font-semibold mb-1 ${
                                                         !isRead ? 'text-gray-900' : 'text-gray-700'
                                                     }`}>
-                                                        {data.title || 'إشعار جديد'}
+                                                        {data.title || t('notifications.newNotification')}
                                                     </h4>
                                                     <p className="text-sm text-gray-600 mb-1 line-clamp-2">
-                                                        {data.message || 'لديك إشعار جديد'}
+                                                        {data.message || t('notifications.newNotificationMessage')}
                                                     </p>
                                                     {data.badge_name && (
                                                         <div className="flex items-center gap-2 mt-2">
@@ -741,7 +729,7 @@ export default function AdminDashboard({
                                                     <button
                                                         onClick={() => handleMarkAsRead(notification.id)}
                                                         className="flex-shrink-0 text-gray-400 hover:text-green-600 transition p-1.5 rounded-lg hover:bg-white"
-                                                        title="تحديد كمقروء"
+                                                        title={t('notifications.markAsRead')}
                                                     >
                                                         <FaCheck className="text-sm" />
                                                     </button>
@@ -755,7 +743,7 @@ export default function AdminDashboard({
                     ) : (
                         <div className="text-center text-gray-500 py-8">
                             <FaBell className="mx-auto text-4xl text-gray-300 mb-3" />
-                            <p className="text-sm">لا توجد إشعارات</p>
+                            <p className="text-sm">{t('notifications.noNotifications')}</p>
                         </div>
                     )}
                 </div>
@@ -764,4 +752,3 @@ export default function AdminDashboard({
         </DashboardLayout>
     );
 }
-

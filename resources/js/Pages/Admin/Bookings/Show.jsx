@@ -3,9 +3,11 @@ import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 import { Head, useForm, router } from '@inertiajs/react';
 import { FaArrowRight, FaEdit, FaSave, FaEnvelope, FaUser, FaCalendar, FaClock, FaDollarSign, FaCheck, FaTimes, FaSpinner, FaPhone, FaMapMarkerAlt, FaGraduationCap } from 'react-icons/fa';
 import { useState } from 'react';
+import { useTranslation } from '@/i18n';
 
 export default function BookingShow({ booking, auth }) {
     const { confirm } = useConfirmDialog();
+    const { t, language } = useTranslation();
     const [isEditing, setIsEditing] = useState(false);
     const [showEmailModal, setShowEmailModal] = useState(false);
 
@@ -41,10 +43,10 @@ export default function BookingShow({ booking, auth }) {
 
     const handleDelete = async () => {
         const confirmed = await confirm({
-            title: 'تأكيد الحذف',
-            message: 'هل أنت متأكد من حذف هذا الحجز؟ هذا الإجراء لا يمكن التراجع عنه.',
-            confirmText: 'حذف',
-            cancelText: 'إلغاء',
+            title: t('adminBookingsIndexPage.deleteConfirm.title'),
+            message: t('adminBookingsIndexPage.deleteConfirm.message'),
+            confirmText: t('common.delete'),
+            cancelText: t('common.cancel'),
             variant: 'danger',
         });
 
@@ -81,17 +83,17 @@ export default function BookingShow({ booking, auth }) {
     const getStatusText = (status) => {
         switch (status) {
             case 'pending':
-                return 'في الانتظار';
+                return t('adminBookingsIndexPage.status.pending');
             case 'approved':
-                return 'موافق عليه';
+                return t('adminBookingsIndexPage.status.approved');
             case 'rejected':
-                return 'مرفوض';
+                return t('adminBookingsIndexPage.status.rejected');
             case 'cancelled':
-                return 'ملغي';
+                return t('adminBookingsIndexPage.status.cancelled');
             case 'completed':
-                return 'مكتمل';
+                return t('adminBookingsIndexPage.status.completed');
             default:
-                return 'غير معروف';
+                return t('adminBookingsIndexPage.status.unknown');
         }
     };
 
@@ -111,21 +113,21 @@ export default function BookingShow({ booking, auth }) {
     const getPaymentStatusText = (status) => {
         switch (status) {
             case 'pending':
-                return 'في الانتظار';
+                return t('adminBookingsIndexPage.paymentStatus.pending');
             case 'paid':
-                return 'مدفوع';
+                return t('adminBookingsIndexPage.paymentStatus.paid');
             case 'refunded':
-                return 'مسترد';
+                return t('adminBookingsIndexPage.paymentStatus.refunded');
             default:
-                return 'غير معروف';
+                return t('adminBookingsIndexPage.paymentStatus.unknown');
         }
     };
 
     return (
         <DashboardLayout auth={auth}>
-            <Head title={`تفاصيل الطلب #${booking.id}`} />
+            <Head title={t('adminBookingsShowPage.pageTitle', { id: booking.id, appName: t('common.appName') })} />
 
-            <div className="py-6">
+            <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="py-6">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="mb-6">
                         <div className="flex items-center justify-between">
@@ -135,11 +137,11 @@ export default function BookingShow({ booking, auth }) {
                                     className="flex items-center text-gray-600 hover:text-gray-900 transition duration-300"
                                 >
                                     <FaArrowRight className="me-2" />
-                                    العودة
+                                    {t('common.back')}
                                 </button>
                                 <div>
-                                    <h1 className="text-2xl font-bold text-gray-900">تفاصيل الطلب #{booking.id}</h1>
-                                    <p className="text-gray-600">عرض وإدارة تفاصيل طلب الحجز</p>
+                                    <h1 className="text-2xl font-bold text-gray-900">{t('adminBookingsShowPage.title', { id: booking.id })}</h1>
+                                    <p className="text-gray-600">{t('adminBookingsShowPage.subtitle')}</p>
                                 </div>
                             </div>
                             <div className="flex items-center space-x-4 space-x-reverse">
@@ -148,14 +150,14 @@ export default function BookingShow({ booking, auth }) {
                                     className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-[#A3C042] transition duration-300"
                                 >
                                     <FaEnvelope className="me-2" />
-                                    إرسال إيميل
+                                    {t('adminBookingsShowPage.actions.sendEmail')}
                                 </button>
                                 <button
                                     onClick={() => setIsEditing(!isEditing)}
                                     className="flex items-center px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition duration-300"
                                 >
                                     <FaEdit className="me-2" />
-                                    {isEditing ? 'إلغاء التعديل' : 'تعديل'}
+                                    {isEditing ? t('adminBookingsShowPage.actions.cancelEdit') : t('common.edit')}
                                 </button>
                             </div>
                         </div>
@@ -164,21 +166,21 @@ export default function BookingShow({ booking, auth }) {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div className="lg:col-span-2 space-y-6">
                             <div className="bg-white rounded-lg shadow p-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">حالة الطلب</h3>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('adminBookingsShowPage.sections.status')}</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">حالة الطلب</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminBookingsShowPage.fields.bookingStatus')}</label>
                                         {isEditing ? (
                                             <select
                                                 value={data.status}
                                                 onChange={(e) => setData('status', e.target.value)}
                                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                                             >
-                                                <option value="pending">في الانتظار</option>
-                                                <option value="approved">موافق عليه</option>
-                                                <option value="rejected">مرفوض</option>
-                                                <option value="cancelled">ملغي</option>
-                                                <option value="completed">مكتمل</option>
+                                                <option value="pending">{t('adminBookingsIndexPage.status.pending')}</option>
+                                                <option value="approved">{t('adminBookingsIndexPage.status.approved')}</option>
+                                                <option value="rejected">{t('adminBookingsIndexPage.status.rejected')}</option>
+                                                <option value="cancelled">{t('adminBookingsIndexPage.status.cancelled')}</option>
+                                                <option value="completed">{t('adminBookingsIndexPage.status.completed')}</option>
                                             </select>
                                         ) : (
                                             <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(booking.status)}`}>
@@ -187,16 +189,16 @@ export default function BookingShow({ booking, auth }) {
                                         )}
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">حالة الدفع</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminBookingsShowPage.fields.paymentStatus')}</label>
                                         {isEditing ? (
                                             <select
                                                 value={data.payment_status}
                                                 onChange={(e) => setData('payment_status', e.target.value)}
                                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                                             >
-                                                <option value="pending">في الانتظار</option>
-                                                <option value="paid">مدفوع</option>
-                                                <option value="refunded">مسترد</option>
+                                                <option value="pending">{t('adminBookingsIndexPage.paymentStatus.pending')}</option>
+                                                <option value="paid">{t('adminBookingsIndexPage.paymentStatus.paid')}</option>
+                                                <option value="refunded">{t('adminBookingsIndexPage.paymentStatus.refunded')}</option>
                                             </select>
                                         ) : (
                                             <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${getPaymentStatusColor(booking.payment_status)}`}>
@@ -208,32 +210,32 @@ export default function BookingShow({ booking, auth }) {
                             </div>
 
                             <div className="bg-white rounded-lg shadow p-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">معلومات الطالب</h3>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('adminBookingsShowPage.sections.studentInfo')}</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">الاسم</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.name')}</label>
                                         <div className="flex items-center">
                                             <FaUser className="me-2 text-gray-400" />
                                             <span className="text-gray-900">
-                                                {(booking.student && booking.student.name) ? booking.student.name : (booking.student_name || 'غير محدد')}
+                                                {(booking.student && booking.student.name) ? booking.student.name : (booking.student_name || t('common.notAvailable'))}
                                             </span>
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">البريد الإلكتروني</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.email')}</label>
                                         <div className="flex items-center">
                                             <FaEnvelope className="me-2 text-gray-400" />
                                             <span className="text-gray-900">
-                                                {(booking.student && booking.student.email) ? booking.student.email : (booking.student_email || 'غير محدد')}
+                                                {(booking.student && booking.student.email) ? booking.student.email : (booking.student_email || t('common.notAvailable'))}
                                             </span>
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">رقم الجوال</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminBookingsShowPage.fields.phone')}</label>
                                         <div className="flex items-center">
                                             <FaPhone className="me-2 text-gray-400" />
                                             <span className="text-gray-900">
-                                                {(booking.student && booking.student.phone) ? booking.student.phone : (booking.student_phone || 'غير محدد')}
+                                                {(booking.student && booking.student.phone) ? booking.student.phone : (booking.student_phone || t('common.notAvailable'))}
                                             </span>
                                         </div>
                                     </div>
@@ -242,35 +244,35 @@ export default function BookingShow({ booking, auth }) {
 
                             {/* Teacher Information */}
                             <div className="bg-white rounded-lg shadow p-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">معلومات المعلم</h3>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('adminBookingsShowPage.sections.teacherInfo')}</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">الاسم</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.name')}</label>
                                         <div className="flex items-center">
                                             <FaUser className="me-2 text-gray-400" />
-                                            <span className="text-gray-900">{booking.teacher?.user?.name || 'غير محدد'}</span>
+                                            <span className="text-gray-900">{booking.teacher?.user?.name || t('common.notAvailable')}</span>
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">البريد الإلكتروني</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.email')}</label>
                                         <div className="flex items-center">
                                             <FaEnvelope className="me-2 text-gray-400" />
-                                            <span className="text-gray-900">{booking.teacher?.user?.email || 'غير محدد'}</span>
+                                            <span className="text-gray-900">{booking.teacher?.user?.email || t('common.notAvailable')}</span>
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">المدينة</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.city')}</label>
                                         <div className="flex items-center">
                                             <FaMapMarkerAlt className="me-2 text-gray-400" />
-                                            <span className="text-gray-900">{booking.teacher?.city || 'غير محدد'}</span>
+                                            <span className="text-gray-900">{booking.teacher?.city || t('common.notAvailable')}</span>
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">المواد</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.subjects')}</label>
                                         <div className="flex items-center">
                                             <FaGraduationCap className="me-2 text-gray-400" />
                                             <span className="text-gray-900">
-                                                {booking.teacher?.subjects ? booking.teacher.subjects.join(', ') : 'غير محدد'}
+                                                {booking.teacher?.subjects ? booking.teacher.subjects.join(', ') : t('common.notAvailable')}
                                             </span>
                                         </div>
                                     </div>
@@ -278,67 +280,67 @@ export default function BookingShow({ booking, auth }) {
                             </div>
 
                             <div className="bg-white rounded-lg shadow p-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">تفاصيل الحجز</h3>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('adminBookingsShowPage.sections.bookingDetails')}</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">التاريخ</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.date')}</label>
                                         <div className="flex items-center">
                                             <FaCalendar className="me-2 text-gray-400" />
                                             <span className="text-gray-900">
-                                                {booking.availability?.date ? new Date(booking.availability.date).toLocaleDateString('en-US') : 'غير محدد'}
+                                                {booking.availability?.date ? new Date(booking.availability.date).toLocaleDateString('en-US') : t('common.notAvailable')}
                                             </span>
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">الوقت</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.time')}</label>
                                         <div className="flex items-center">
                                             <FaClock className="me-2 text-gray-400" />
                                             <span className="text-gray-900">
-                                                {booking.availability?.start_time ? new Date(booking.availability.start_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : 'غير محدد'}
+                                                {booking.availability?.start_time ? new Date(booking.availability.start_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : t('common.notAvailable')}
                                             </span>
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">السعر</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.price')}</label>
                                         <div className="flex items-center">
                                             <FaDollarSign className="me-2 text-gray-400" />
-                                            <span className="text-gray-900">{booking.price ? `${booking.price} ريال` : 'غير محدد'}</span>
+                                            <span className="text-gray-900">{booking.price ? t('adminBookingsShowPage.priceSar', { price: booking.price }) : t('common.notAvailable')}</span>
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">طريقة الدفع</label>
-                                        <span className="text-gray-900">{booking.payment_method || 'غير محدد'}</span>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminBookingsShowPage.fields.paymentMethod')}</label>
+                                        <span className="text-gray-900">{booking.payment_method || t('common.notAvailable')}</span>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="bg-white rounded-lg shadow p-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">الملاحظات</h3>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('adminBookingsShowPage.sections.notes')}</h3>
                                 <div className="space-y-4">
                                     {booking.student_notes && (
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">ملاحظات الطالب</label>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminBookingsShowPage.fields.studentNotes')}</label>
                                             <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{booking.student_notes}</p>
                                         </div>
                                     )}
                                     {booking.teacher_notes && (
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">ملاحظات المعلم</label>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminBookingsShowPage.fields.teacherNotes')}</label>
                                             <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{booking.teacher_notes}</p>
                                         </div>
                                     )}
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">ملاحظات الإدارة</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminBookingsShowPage.fields.adminNotes')}</label>
                                         {isEditing ? (
                                             <textarea
                                                 value={data.admin_notes}
                                                 onChange={(e) => setData('admin_notes', e.target.value)}
                                                 rows="3"
                                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                                                placeholder="أضف ملاحظات الإدارة..."
+                                                placeholder={t('adminBookingsShowPage.placeholders.adminNotes')}
                                             />
                                         ) : (
-                                            <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{booking.admin_notes || 'لا توجد ملاحظات'}</p>
+                                            <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{booking.admin_notes || t('adminBookingsShowPage.noNotes')}</p>
                                         )}
                                     </div>
                                 </div>
@@ -347,78 +349,78 @@ export default function BookingShow({ booking, auth }) {
 
                         <div className="lg:col-span-1 space-y-6">
                             <div className="bg-white rounded-lg shadow p-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">الإجراءات السريعة</h3>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('adminBookingsShowPage.sections.quickActions')}</h3>
                                 <div className="space-y-3">
                                     <button
                                         onClick={() => handleStatusUpdate('approved')}
                                         className="w-full flex items-center justify-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-[#A3C042] transition duration-300"
                                     >
                                         <FaCheck className="me-2" />
-                                        موافقة
+                                        {t('adminBookingsShowPage.actions.approve')}
                                     </button>
                                     <button
                                         onClick={() => handleStatusUpdate('rejected')}
                                         className="w-full flex items-center justify-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300"
                                     >
                                         <FaTimes className="me-2" />
-                                        رفض
+                                        {t('adminBookingsShowPage.actions.reject')}
                                     </button>
                                     <button
                                         onClick={() => handleStatusUpdate('completed')}
                                         className="w-full flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-[#A3C042] transition duration-300"
                                     >
                                         <FaCheck className="me-2" />
-                                        إكمال
+                                        {t('adminBookingsShowPage.actions.complete')}
                                     </button>
                                 </div>
                             </div>
 
                             <div className="bg-white rounded-lg shadow p-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">معلومات الدفع</h3>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('adminBookingsShowPage.sections.paymentInfo')}</h3>
                                 <div className="space-y-3">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">طريقة الدفع</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('adminBookingsShowPage.fields.paymentMethod')}</label>
                                         {isEditing ? (
                                             <input
                                                 type="text"
                                                 value={data.payment_method}
                                                 onChange={(e) => setData('payment_method', e.target.value)}
                                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                                                placeholder="طريقة الدفع..."
+                                                placeholder={t('adminBookingsShowPage.placeholders.paymentMethod')}
                                             />
                                         ) : (
-                                            <span className="text-gray-900">{booking.payment_method || 'غير محدد'}</span>
+                                            <span className="text-gray-900">{booking.payment_method || t('common.notAvailable')}</span>
                                         )}
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">رقم المرجع</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('adminBookingsShowPage.fields.paymentReference')}</label>
                                         {isEditing ? (
                                             <input
                                                 type="text"
                                                 value={data.payment_reference}
                                                 onChange={(e) => setData('payment_reference', e.target.value)}
                                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                                                placeholder="رقم المرجع..."
+                                                placeholder={t('adminBookingsShowPage.placeholders.paymentReference')}
                                             />
                                         ) : (
-                                            <span className="text-gray-900">{booking.payment_reference || 'غير محدد'}</span>
+                                            <span className="text-gray-900">{booking.payment_reference || t('common.notAvailable')}</span>
                                         )}
                                     </div>
                                 </div>
                             </div>
 
                             <div className="bg-white rounded-lg shadow p-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">التواريخ</h3>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('adminBookingsShowPage.sections.dates')}</h3>
                                 <div className="space-y-3 text-sm">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">تاريخ الإنشاء</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('adminBookingsShowPage.fields.createdAt')}</label>
                                         <span className="text-gray-900">
-                                            {booking.created_at ? new Date(booking.created_at).toLocaleString('en-US') : 'غير محدد'}
+                                            {booking.created_at ? new Date(booking.created_at).toLocaleString('en-US') : t('common.notAvailable')}
                                         </span>
                                     </div>
                                     {booking.approved_at && (
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">تاريخ الموافقة</label>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">{t('adminBookingsShowPage.fields.approvedAt')}</label>
                                             <span className="text-gray-900">
                                                 {new Date(booking.approved_at).toLocaleString('en-US')}
                                             </span>
@@ -426,7 +428,7 @@ export default function BookingShow({ booking, auth }) {
                                     )}
                                     {booking.rejected_at && (
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">تاريخ الرفض</label>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">{t('adminBookingsShowPage.fields.rejectedAt')}</label>
                                             <span className="text-gray-900">
                                                 {new Date(booking.rejected_at).toLocaleString('en-US')}
                                             </span>
@@ -434,7 +436,7 @@ export default function BookingShow({ booking, auth }) {
                                     )}
                                     {booking.completed_at && (
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">تاريخ الإكمال</label>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">{t('adminBookingsShowPage.fields.completedAt')}</label>
                                             <span className="text-gray-900">
                                                 {new Date(booking.completed_at).toLocaleString('en-US')}
                                             </span>
@@ -453,7 +455,7 @@ export default function BookingShow({ booking, auth }) {
                                 className="flex items-center px-6 py-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 disabled:opacity-50 transition duration-300"
                             >
                                 {processing ? <FaSpinner className="animate-spin me-2" /> : <FaSave className="me-2" />}
-                                {processing ? 'جاري الحفظ...' : 'حفظ التغييرات'}
+                                {processing ? t('profilePage.actions.saving') : t('profilePage.actions.saveChanges')}
                             </button>
                         </div>
                     )}

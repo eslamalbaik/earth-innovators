@@ -6,8 +6,10 @@ import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
+import { useTranslation } from '@/i18n';
 
 export default function CreateSchoolProject({ auth }) {
+    const { t, language } = useTranslation();
     const { data, setData, post, processing, errors } = useForm({
         title: '',
         description: '',
@@ -38,12 +40,12 @@ export default function CreateSchoolProject({ auth }) {
             ];
             
             if (file.size > maxSize) {
-                alert(`الملف ${file.name} أكبر من 10 ميجابايت`);
+                alert(t('schoolProjectsCreatePage.errors.fileTooLarge', { name: file.name, maxMb: 10 }));
                 return false;
             }
             
             if (!validTypes.includes(file.type)) {
-                alert(`نوع الملف ${file.name} غير مدعوم`);
+                alert(t('schoolProjectsCreatePage.errors.fileTypeNotSupported', { name: file.name }));
                 return false;
             }
             
@@ -67,12 +69,12 @@ export default function CreateSchoolProject({ auth }) {
             const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
             
             if (file.size > maxSize) {
-                alert(`الصورة ${file.name} أكبر من 5 ميجابايت`);
+                alert(t('schoolProjectsCreatePage.errors.imageTooLarge', { name: file.name, maxMb: 5 }));
                 return false;
             }
             
             if (!validTypes.includes(file.type)) {
-                alert(`نوع الصورة ${file.name} غير مدعوم`);
+                alert(t('schoolProjectsCreatePage.errors.imageTypeNotSupported', { name: file.name }));
                 return false;
             }
             
@@ -121,72 +123,72 @@ export default function CreateSchoolProject({ auth }) {
     };
 
     const categoryOptions = [
-        { value: 'science', label: 'علوم' },
-        { value: 'technology', label: 'تقني' },
-        { value: 'engineering', label: 'هندسة' },
-        { value: 'mathematics', label: 'رياضيات' },
-        { value: 'arts', label: 'فنون' },
-        { value: 'other', label: 'أخرى' },
+        { value: 'science', label: t('common.categories.science') },
+        { value: 'technology', label: t('common.categories.technology') },
+        { value: 'engineering', label: t('common.categories.engineering') },
+        { value: 'mathematics', label: t('common.categories.mathematics') },
+        { value: 'arts', label: t('common.categories.arts') },
+        { value: 'other', label: t('common.categories.other') },
     ];
 
     // فئات النهج التعليمي
     const instructionalApproachOptions = [
-        { value: 'play_based', label: 'النهج القائم على اللعب' },
-        { value: 'problem_based', label: 'النهج القائم على حل المشكلات' },
-        { value: 'pbl', label: 'مشاريع التعلم القائم على المشاريع (PBL)' },
-        { value: 'transformative', label: 'التعليم التحويلي' },
-        { value: 'accelerated', label: 'التعليم المسرّع (AEP)' },
-        { value: 'improvement', label: 'منهج التحسين' },
+        { value: 'play_based', label: t('schoolProjectsCreatePage.instructionalApproach.playBased') },
+        { value: 'problem_based', label: t('schoolProjectsCreatePage.instructionalApproach.problemBased') },
+        { value: 'pbl', label: t('schoolProjectsCreatePage.instructionalApproach.pbl') },
+        { value: 'transformative', label: t('schoolProjectsCreatePage.instructionalApproach.transformative') },
+        { value: 'accelerated', label: t('schoolProjectsCreatePage.instructionalApproach.accelerated') },
+        { value: 'improvement', label: t('schoolProjectsCreatePage.instructionalApproach.improvement') },
     ];
 
     // المواد
     const subjectOptions = [
-        { value: 'math', label: 'الرياضيات' },
-        { value: 'arabic', label: 'اللغة العربية' },
-        { value: 'english', label: 'اللغة الإنجليزية' },
-        { value: 'social_studies', label: 'الدراسات الاجتماعية' },
-        { value: 'arts_subject', label: 'الفنون' },
-        { value: 'sports', label: 'الرياضة' },
-        { value: 'engineering_subject', label: 'الهندسة' },
-        { value: 'science_subject', label: 'العلوم' },
-        { value: 'technology_subject', label: 'التقنية' },
-        { value: 'physics_chem_bio', label: 'الفيزياء والكيمياء والأحياء' },
+        { value: 'math', label: t('schoolProjectsCreatePage.subjects.math') },
+        { value: 'arabic', label: t('schoolProjectsCreatePage.subjects.arabic') },
+        { value: 'english', label: t('schoolProjectsCreatePage.subjects.english') },
+        { value: 'social_studies', label: t('schoolProjectsCreatePage.subjects.socialStudies') },
+        { value: 'arts_subject', label: t('schoolProjectsCreatePage.subjects.arts') },
+        { value: 'sports', label: t('schoolProjectsCreatePage.subjects.sports') },
+        { value: 'engineering_subject', label: t('schoolProjectsCreatePage.subjects.engineering') },
+        { value: 'science_subject', label: t('schoolProjectsCreatePage.subjects.science') },
+        { value: 'technology_subject', label: t('schoolProjectsCreatePage.subjects.technology') },
+        { value: 'physics_chem_bio', label: t('schoolProjectsCreatePage.subjects.physicsChemBio') },
     ];
 
     // الصفوف
     const gradeOptions = [
-        { value: 'grade_1', label: 'الصف الأول' },
-        { value: 'grade_2', label: 'الصف الثاني' },
-        { value: 'grade_3', label: 'الصف الثالث' },
-        { value: 'grade_4', label: 'الصف الرابع' },
-        { value: 'grade_5', label: 'الصف الخامس' },
-        { value: 'grade_6', label: 'الصف السادس' },
-        { value: 'grade_7', label: 'الصف السابع' },
-        { value: 'grade_8', label: 'الصف الثامن' },
-        { value: 'grade_9', label: 'الصف التاسع' },
-        { value: 'grade_10', label: 'الصف العاشر' },
-        { value: 'grade_11', label: 'الصف الحادي عشر' },
-        { value: 'grade_12', label: 'الصف الثاني عشر' },
+        { value: 'grade_1', label: t('schoolProjectsCreatePage.grades.grade1') },
+        { value: 'grade_2', label: t('schoolProjectsCreatePage.grades.grade2') },
+        { value: 'grade_3', label: t('schoolProjectsCreatePage.grades.grade3') },
+        { value: 'grade_4', label: t('schoolProjectsCreatePage.grades.grade4') },
+        { value: 'grade_5', label: t('schoolProjectsCreatePage.grades.grade5') },
+        { value: 'grade_6', label: t('schoolProjectsCreatePage.grades.grade6') },
+        { value: 'grade_7', label: t('schoolProjectsCreatePage.grades.grade7') },
+        { value: 'grade_8', label: t('schoolProjectsCreatePage.grades.grade8') },
+        { value: 'grade_9', label: t('schoolProjectsCreatePage.grades.grade9') },
+        { value: 'grade_10', label: t('schoolProjectsCreatePage.grades.grade10') },
+        { value: 'grade_11', label: t('schoolProjectsCreatePage.grades.grade11') },
+        { value: 'grade_12', label: t('schoolProjectsCreatePage.grades.grade12') },
     ];
 
     return (
-        <DashboardLayout header="إنشاء مشروع جديد">
-            <Head title="إنشاء مشروع جديد - إرث المبتكرين" />
+        <DashboardLayout header={t('schoolProjectsCreatePage.title')}>
+            <Head title={t('schoolProjectsCreatePage.pageTitle', { appName: t('common.appName') })} />
 
-            <div className="max-w-4xl mx-auto">
+            <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="max-w-4xl mx-auto">
                 <Link
                     href="/school/projects"
                     className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
                 >
                     <FaArrowLeft />
-                    <span>العودة إلى المشاريع</span>
+                    <span>{t('schoolProjectsCreatePage.actions.backToProjects')}</span>
                 </Link>
 
                 <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg p-6">
                     <div className="space-y-6">
                         {/* العنوان */}
                         <div>
-                            <InputLabel htmlFor="title" value="عنوان المشروع *" />
+                            <InputLabel htmlFor="title" value={t('schoolProjectsCreatePage.form.titleLabel')} />
                             <TextInput
                                 id="title"
                                 type="text"
@@ -200,7 +202,7 @@ export default function CreateSchoolProject({ auth }) {
 
                         {/* الوصف */}
                         <div>
-                            <InputLabel htmlFor="description" value="وصف المشروع *" />
+                            <InputLabel htmlFor="description" value={t('schoolProjectsCreatePage.form.descriptionLabel')} />
                             <textarea
                                 id="description"
                                 value={data.description}
@@ -214,7 +216,7 @@ export default function CreateSchoolProject({ auth }) {
 
                         {/* الفئة */}
                         <div>
-                            <InputLabel htmlFor="category" value="فئة المشروع *" />
+                            <InputLabel htmlFor="category" value={t('schoolProjectsCreatePage.form.categoryLabel')} />
                             <select
                                 id="category"
                                 value={data.category}
@@ -233,7 +235,7 @@ export default function CreateSchoolProject({ auth }) {
 
                         {/* الصف (بديل الفئة العمرية) */}
                         <div>
-                            <InputLabel htmlFor="grade" value="الصف *" />
+                            <InputLabel htmlFor="grade" value={t('schoolProjectsCreatePage.form.gradeLabel')} />
                             <select
                                 id="grade"
                                 value={data.grade}
@@ -241,7 +243,7 @@ export default function CreateSchoolProject({ auth }) {
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring focus:ring-[#A3C042] focus:ring-opacity-50"
                                 required
                             >
-                                <option value="">اختر الصف</option>
+                                <option value="">{t('schoolProjectsCreatePage.placeholders.selectGrade')}</option>
                                 {gradeOptions.map(option => (
                                     <option key={option.value} value={option.value}>
                                         {option.label}
@@ -253,14 +255,14 @@ export default function CreateSchoolProject({ auth }) {
 
                         {/* المادة */}
                         <div>
-                            <InputLabel htmlFor="subject" value="المادة" />
+                            <InputLabel htmlFor="subject" value={t('schoolProjectsCreatePage.form.subjectLabel')} />
                             <select
                                 id="subject"
                                 value={data.subject}
                                 onChange={(e) => setData('subject', e.target.value)}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring focus:ring-[#A3C042] focus:ring-opacity-50"
                             >
-                                <option value="">اختر المادة</option>
+                                <option value="">{t('schoolProjectsCreatePage.placeholders.selectSubject')}</option>
                                 {subjectOptions.map(option => (
                                     <option key={option.value} value={option.value}>
                                         {option.label}
@@ -272,14 +274,14 @@ export default function CreateSchoolProject({ auth }) {
 
                         {/* النهج التعليمي */}
                         <div>
-                            <InputLabel htmlFor="instructional_approach" value="فئة النهج التعليمي" />
+                            <InputLabel htmlFor="instructional_approach" value={t('schoolProjectsCreatePage.form.instructionalApproachLabel')} />
                             <select
                                 id="instructional_approach"
                                 value={data.instructional_approach}
                                 onChange={(e) => setData('instructional_approach', e.target.value)}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring focus:ring-[#A3C042] focus:ring-opacity-50"
                             >
-                                <option value="">اختر النهج التعليمي</option>
+                                <option value="">{t('schoolProjectsCreatePage.placeholders.selectInstructionalApproach')}</option>
                                 {instructionalApproachOptions.map(option => (
                                     <option key={option.value} value={option.value}>
                                         {option.label}
@@ -291,7 +293,7 @@ export default function CreateSchoolProject({ auth }) {
 
                         {/* رفع الصور */}
                         <div>
-                            <InputLabel value="صور المشروع" />
+                            <InputLabel value={t('schoolProjectsCreatePage.form.imagesLabel')} />
                             <div
                                 className={`mt-2 border-2 border-dashed rounded-lg p-6 text-center transition ${
                                     dragActive ? 'border-[#A3C042] bg-green-50' : 'border-gray-300'
@@ -312,13 +314,13 @@ export default function CreateSchoolProject({ auth }) {
                                 }}
                             >
                                 <FaCloudUploadAlt className="mx-auto text-4xl text-gray-400 mb-2" />
-                                <p className="text-gray-600 mb-2">اسحب وأفلت الصور هنا أو</p>
+                                <p className="text-gray-600 mb-2">{t('schoolProjectsCreatePage.dropzone.imagesTitle')}</p>
                                 <button
                                     type="button"
                                     onClick={() => imageInputRef.current?.click()}
                                     className="text-[#A3C042] hover:text-legacy-blue font-medium"
                                 >
-                                    اختر الصور
+                                    {t('schoolProjectsCreatePage.actions.chooseImages')}
                                 </button>
                                 <input
                                     ref={imageInputRef}
@@ -353,7 +355,7 @@ export default function CreateSchoolProject({ auth }) {
 
                         {/* رفع الملفات */}
                         <div>
-                            <InputLabel value="ملفات المشروع" />
+                            <InputLabel value={t('schoolProjectsCreatePage.form.filesLabel')} />
                             <div
                                 className={`mt-2 border-2 border-dashed rounded-lg p-6 text-center transition ${
                                     dragActive ? 'border-[#A3C042] bg-green-50' : 'border-gray-300'
@@ -374,13 +376,13 @@ export default function CreateSchoolProject({ auth }) {
                                 }}
                             >
                                 <FaCloudUploadAlt className="mx-auto text-4xl text-gray-400 mb-2" />
-                                <p className="text-gray-600 mb-2">اسحب وأفلت الملفات هنا أو</p>
+                                <p className="text-gray-600 mb-2">{t('schoolProjectsCreatePage.dropzone.filesTitle')}</p>
                                 <button
                                     type="button"
                                     onClick={() => fileInputRef.current?.click()}
                                     className="text-[#A3C042] hover:text-legacy-blue font-medium"
                                 >
-                                    اختر الملفات
+                                    {t('schoolProjectsCreatePage.actions.chooseFiles')}
                                 </button>
                                 <input
                                     ref={fileInputRef}
@@ -416,7 +418,7 @@ export default function CreateSchoolProject({ auth }) {
 
                         {/* التقرير */}
                         <div>
-                            <InputLabel htmlFor="report" value="تقرير المشروع (اختياري)" />
+                            <InputLabel htmlFor="report" value={t('schoolProjectsCreatePage.form.reportLabel')} />
                             <textarea
                                 id="report"
                                 value={data.report}
@@ -433,16 +435,16 @@ export default function CreateSchoolProject({ auth }) {
                                 href="/school/projects"
                                 className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
                             >
-                                إلغاء
+                                {t('common.cancel')}
                             </Link>
                             <PrimaryButton type="submit" disabled={processing}>
                                 {processing ? (
                                     <>
                                         <FaSpinner className="animate-spin ms-2" />
-                                        جاري الحفظ...
+                                        {t('schoolProjectsCreatePage.actions.saving')}
                                     </>
                                 ) : (
-                                    'إنشاء المشروع'
+                                    t('schoolProjectsCreatePage.actions.createProject')
                                 )}
                             </PrimaryButton>
                         </div>

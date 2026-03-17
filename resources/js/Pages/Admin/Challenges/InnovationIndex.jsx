@@ -4,21 +4,14 @@ import { useState, useCallback } from 'react';
 import { FaPlus, FaSearch, FaTrophy } from 'react-icons/fa';
 import InnovationChallengeCard from '@/Components/Challenges/InnovationChallengeCard';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
+import { useTranslation } from '@/i18n';
 
-/**
- * صفحة التحديات الابتكارية - لوحة تحكم Admin
- * تصميم مطابق للصورة المرفقة:
- * - عنوان رئيسي مع زر "إطلاق تحدي جديد"
- * - شريط تصفية (مكتمل، قادم، نشط، الكل) مع بحث
- * - بطاقات التحديات في grid (عمودين)
- * - Banner سفلي ثابت
- */
 export default function AdminInnovationChallengesIndex({ challenges, stats, filters }) {
     const { confirm } = useConfirmDialog();
+    const { t, language } = useTranslation();
     const [search, setSearch] = useState(filters?.search || '');
     const [selectedStatus, setSelectedStatus] = useState(filters?.status || 'active');
 
-    // معالجة التصفية
     const handleStatusFilter = useCallback((status) => {
         setSelectedStatus(status);
         router.get(route('admin.challenges.index'), {
@@ -31,7 +24,6 @@ export default function AdminInnovationChallengesIndex({ challenges, stats, filt
         });
     }, [search]);
 
-    // معالجة البحث
     const handleSearch = useCallback((e) => {
         e.preventDefault();
         router.get(route('admin.challenges.index'), {
@@ -44,17 +36,14 @@ export default function AdminInnovationChallengesIndex({ challenges, stats, filt
         });
     }, [search, selectedStatus]);
 
-    // معالجة تعديل التحدي
     const handleEdit = useCallback((challenge) => {
         router.visit(route('admin.challenges.edit', challenge.id));
     }, []);
 
-    // معالجة إدارة المشاركين
     const handleManageParticipants = useCallback((challenge) => {
         router.visit(route('admin.challenges.show', challenge.id) + '?tab=participants');
     }, []);
 
-    // تصفية التحديات حسب الحالة المحددة
     const challengesData = (challenges?.data || []).filter(challenge => {
         if (!selectedStatus) return true;
         return challenge.status === selectedStatus;
@@ -62,20 +51,20 @@ export default function AdminInnovationChallengesIndex({ challenges, stats, filt
     const hasChallenges = challengesData.length > 0;
 
     return (
-        <DashboardLayout header="التحديات الابتكارية">
-            <Head title="التحديات الابتكارية" />
+        <DashboardLayout header={t('adminChallengesIndexPage.title')}>
+            <Head title={t('adminChallengesIndexPage.pageTitle', { appName: t('common.appName') })} />
 
-            <div className="min-h-screen bg-gray-50 pb-32" dir="rtl">
+            <div className="min-h-screen bg-gray-50 pb-32" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     {/* Header Section */}
                     <div className="mb-8">
                         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
                             <div>
                                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                                    التحديات الابتكارية
+                                    {t('adminChallengesIndexPage.title')}
                                 </h1>
                                 <p className="text-gray-600">
-                                    إطلاق وإدارة مسابقات الابتكار بين الطلاب
+                                    {t('adminChallengesIndexPage.subtitle')}
                                 </p>
                             </div>
                             <Link
@@ -83,11 +72,11 @@ export default function AdminInnovationChallengesIndex({ challenges, stats, filt
                                 className="inline-flex items-center gap-2 px-6 py-3 bg-[#A3C042] text-white rounded-lg hover:bg-[#8CA635] transition-colors font-semibold shadow-md hover:shadow-lg"
                             >
                                 <FaPlus />
-                                إطلاق تحدي جديد
+                                {t('adminChallengesIndexPage.actions.launchNew')}
                             </Link>
                         </div>
 
-                        {/* Navigation Tabs - شريط التصفية */}
+                        {/* Navigation Tabs */}
                         <div className="flex flex-wrap items-center gap-4 mb-6">
                             <button
                                 onClick={() => handleStatusFilter('')}
@@ -96,7 +85,7 @@ export default function AdminInnovationChallengesIndex({ challenges, stats, filt
                                     : 'bg-white text-gray-700 hover:bg-gray-100'
                                     }`}
                             >
-                                الكل
+                                {t('adminChallengesIndexPage.filters.all')}
                             </button>
                             <button
                                 onClick={() => handleStatusFilter('completed')}
@@ -105,7 +94,7 @@ export default function AdminInnovationChallengesIndex({ challenges, stats, filt
                                     : 'bg-white text-gray-700 hover:bg-gray-100'
                                     }`}
                             >
-                                مكتمل
+                                {t('common.completed')}
                             </button>
                             <button
                                 onClick={() => handleStatusFilter('upcoming')}
@@ -114,7 +103,7 @@ export default function AdminInnovationChallengesIndex({ challenges, stats, filt
                                     : 'bg-white text-gray-700 hover:bg-gray-100'
                                     }`}
                             >
-                                قادم
+                                {t('common.upcoming')}
                             </button>
                             <button
                                 onClick={() => handleStatusFilter('active')}
@@ -123,7 +112,7 @@ export default function AdminInnovationChallengesIndex({ challenges, stats, filt
                                     : 'bg-white text-gray-700 hover:bg-gray-100'
                                     }`}
                             >
-                                نشط
+                                {t('common.active')}
                             </button>
                         </div>
 
@@ -135,14 +124,14 @@ export default function AdminInnovationChallengesIndex({ challenges, stats, filt
                                     type="text"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
-                                    placeholder="ابحث عن تحدي..."
+                                    placeholder={t('adminChallengesIndexPage.searchPlaceholder')}
                                     className="w-full ps-10 pe-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                 />
                             </div>
                         </form>
                     </div>
 
-                    {/* Challenges Grid - بطاقات التحديات */}
+                    {/* Challenges Grid */}
                     {hasChallenges ? (
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             {challengesData.map((challenge) => (
@@ -161,16 +150,16 @@ export default function AdminInnovationChallengesIndex({ challenges, stats, filt
                                 <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
                                     <FaTrophy className="text-4xl text-gray-400" />
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-900 mb-2">لا توجد تحديات</h3>
+                                <h3 className="text-xl font-bold text-gray-900 mb-2">{t('adminChallengesIndexPage.empty.title')}</h3>
                                 <p className="text-gray-500 mb-6">
-                                    ابدأ بإنشاء تحدٍ جديد لإشراك الطلاب في أنشطة تعليمية ممتعة
+                                    {t('adminChallengesIndexPage.empty.description')}
                                 </p>
                                 <Link
                                     href={route('admin.challenges.create')}
                                     className="inline-flex items-center gap-2 px-6 py-3.5 bg-[#A3C042] text-white rounded-xl hover:bg-[#8CA635] transition-all shadow-lg hover:shadow-xl font-bold"
                                 >
                                     <FaPlus />
-                                    <span>إنشاء تحدي</span>
+                                    <span>{t('adminChallengesIndexPage.actions.create')}</span>
                                 </Link>
                             </div>
                         </div>
@@ -197,32 +186,32 @@ export default function AdminInnovationChallengesIndex({ challenges, stats, filt
                 </div>
             </div>
 
-            {/* Bottom Banner - Banner سفلي */}
-            <div className="mt-8 bg-purple-900 text-white p-6 rounded-xl shadow-2xl" dir="rtl">
+            {/* Bottom Banner */}
+            <div className="mt-8 bg-purple-900 text-white p-6 rounded-xl shadow-2xl" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                    {/* Right Side - أيقونة كأس */}
+                    {/* Right Side */}
                     <div className="hidden md:flex items-center justify-center">
                         <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center">
                             <FaTrophy className="text-4xl text-white" />
                         </div>
                     </div>
 
-                    {/* Center - النص */}
+                    {/* Center */}
                     <div className="flex-1 text-center md:">
-                        <h3 className="text-2xl font-bold mb-2">قم بتحفيز طلابك اليوم!</h3>
+                        <h3 className="text-2xl font-bold mb-2">{t('adminChallengesIndexPage.banner.title')}</h3>
                         <p className="text-purple-100 text-sm md:text-base">
-                            أفادت الدراسات أن المسابقات الودية تزيد من معدل إنتاجية الابتكار بنسبة 40%. اختر موضوعًا شيقًا وابدأ التحدي الآن.
+                            {t('adminChallengesIndexPage.banner.description')}
                         </p>
                     </div>
 
-                    {/* Left Side - زر إنشاء تحدي */}
+                    {/* Left Side */}
                     <div className="flex-shrink-0">
                         <Link
                             href={route('admin.challenges.create')}
                             className="inline-flex items-center gap-2 px-6 py-3 bg-white text-purple-900 rounded-lg hover:bg-purple-50 transition-colors font-bold shadow-lg hover:shadow-xl"
                         >
                             <FaPlus />
-                            إنشاء تحدي مخصص
+                            {t('adminChallengesIndexPage.actions.createCustom')}
                         </Link>
                     </div>
                 </div>

@@ -6,10 +6,12 @@ import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import Modal from '@/Components/Modal';
 import DangerButton from '@/Components/DangerButton';
 import { useToast } from '@/Contexts/ToastContext';
+import { useTranslation } from '@/i18n';
 import { FaChevronLeft, FaStar, FaMedal, FaBookmark, FaHeart, FaAward, FaEdit, FaCog, FaIdCard, FaArrowRight, FaTrophy, FaChartLine, FaGift, FaCamera, FaLock, FaTrash, FaSave, FaTimes, FaCreditCard } from 'react-icons/fa';
 import { getInitials, getColorFromName, getUserImageUrl } from '@/utils/imageUtils';
 
 function StudentProfileContent({ user, stats = {}, badges = [], projects = [], activities = [], school, availableSchools = [], tags = [], onImageChange, imageInputRef, imagePreview, showPasswordModal, setShowPasswordModal, showDeleteModal, setShowDeleteModal, onSchoolChange, showSchoolModal, setShowSchoolModal, selectedSchoolId, setSelectedSchoolId }) {
+    const { t } = useTranslation();
     // Use real data from backend - no fallback to static data
     const displayStats = {
         points: stats?.points ?? 0,
@@ -67,7 +69,7 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
         return 'bg-gray-400';
     };
 
-    const schoolName = school?.name || user?.school?.name || 'غير محدد';
+    const schoolName = school?.name || user?.school?.name || t('studentProfilePage.school.notSet');
 
     // Left Column Content (Header + Stats + Badges)
     const leftColumnContent = (
@@ -106,7 +108,7 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                         <button
                             onClick={() => imageInputRef.current?.click()}
                             className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center shadow hover:bg-[#A3C042] transition"
-                            aria-label="تعديل الصورة"
+                            aria-label={t('studentProfilePage.actions.editImage')}
                         >
                             <FaCamera className="text-sm" />
                         </button>
@@ -114,7 +116,7 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
 
                     {/* Name + tags */}
                     <div className="flex-1">
-                        <div className="text-lg font-bold text-gray-900 leading-tight">{user?.name || 'المستخدم'}</div>
+                        <div className="text-lg font-bold text-gray-900 leading-tight">{user?.name || t('studentProfilePage.userFallback')}</div>
                         <button
                             type="button"
                             onClick={(e) => {
@@ -149,7 +151,7 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                             type="button"
                             onClick={() => setShowPasswordModal(true)}
                             className="w-11 h-11 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shadow hover:bg-blue-200 transition"
-                            aria-label="تغيير كلمة المرور"
+                            aria-label={t('studentProfilePage.actions.changePassword')}
                         >
                             <FaLock className="text-lg" />
                         </button>
@@ -157,7 +159,7 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                             type="button"
                             onClick={() => setShowDeleteModal(true)}
                             className="w-11 h-11 rounded-full bg-red-100 text-red-600 flex items-center justify-center shadow hover:bg-red-200 transition"
-                            aria-label="حذف الحساب"
+                            aria-label={t('studentProfilePage.actions.deleteAccount')}
                         >
                             <FaTrash className="text-lg" />
                         </button>
@@ -167,23 +169,23 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
 
             {/* Stats */}
             <div className="bg-white rounded-3xl shadow-sm p-4 border border-gray-100">
-                <div className=" font-bold text-gray-900 mb-3">إحصائياتي</div>
+                <div className=" font-bold text-gray-900 mb-3">{t('studentProfilePage.stats.title')}</div>
                 <div className="grid grid-cols-4 gap-2 text-center">
                     <div>
                         <div className="text-lg font-extrabold text-gray-900">{displayStats.points}</div>
-                        <div className="text-xs text-gray-500 mt-1">النقاط</div>
+                        <div className="text-xs text-gray-500 mt-1">{t('common.points')}</div>
                     </div>
                     <div>
                         <div className="text-lg font-extrabold text-gray-900">{displayStats.projects}</div>
-                        <div className="text-xs text-gray-500 mt-1">المشاريع</div>
+                        <div className="text-xs text-gray-500 mt-1">{t('common.projects')}</div>
                     </div>
                     <div>
                         <div className="text-lg font-extrabold text-gray-900">{displayStats.badges}</div>
-                        <div className="text-xs text-gray-500 mt-1">الشارات</div>
+                        <div className="text-xs text-gray-500 mt-1">{t('common.badges')}</div>
                     </div>
                     <div>
                         <div className="text-lg font-extrabold text-gray-900">{displayStats.winning}</div>
-                        <div className="text-xs text-gray-500 mt-1">الفائزة</div>
+                        <div className="text-xs text-gray-500 mt-1">{t('studentProfilePage.stats.winning')}</div>
                     </div>
                 </div>
             </div>
@@ -196,11 +198,11 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                 if (points >= 98 && points <= 100) {
                     classification = {
                         level: 'outstanding',
-                        label: 'المتفوقون',
+                        label: t('studentProfilePage.classification.levels.outstanding.label'),
                         range: '100-98',
-                        description: 'إتقان تام + ابتكار',
-                        skill: 'حل المشكلات المعقدة، ربط معرفي شامل',
-                        action: 'تحفيز قيادي (مساعد معلم)',
+                        description: t('studentProfilePage.classification.levels.outstanding.description'),
+                        skill: t('studentProfilePage.classification.levels.outstanding.skill'),
+                        action: t('studentProfilePage.classification.levels.outstanding.action'),
                         color: 'from-yellow-400 to-orange-500',
                         bgColor: 'bg-yellow-50',
                         borderColor: 'border-yellow-400',
@@ -210,11 +212,11 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                 } else if (points >= 90 && points <= 97) {
                     classification = {
                         level: 'distinguished',
-                        label: 'المتميزون',
+                        label: t('studentProfilePage.classification.levels.distinguished.label'),
                         range: '97-90',
-                        description: 'استيعاب مرتفع',
-                        skill: 'تنفيذ دقيق للمهام، أخطاء هامشية',
-                        action: 'تغذية راجعة لتجويد التفاصيل',
+                        description: t('studentProfilePage.classification.levels.distinguished.description'),
+                        skill: t('studentProfilePage.classification.levels.distinguished.skill'),
+                        action: t('studentProfilePage.classification.levels.distinguished.action'),
                         color: 'from-blue-400 to-blue-600',
                         bgColor: 'bg-blue-50',
                         borderColor: 'border-blue-400',
@@ -224,11 +226,11 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                 } else if (points >= 70 && points <= 89) {
                     classification = {
                         level: 'average',
-                        label: 'المتوسطون',
+                        label: t('studentProfilePage.classification.levels.average.label'),
                         range: '89-70',
-                        description: 'تطبيق أساسي',
-                        skill: 'فهم المفاهيم الكبرى، صعوبة في التحليل',
-                        action: 'تدريبات لتعزيز مهارات الاستنتاج',
+                        description: t('studentProfilePage.classification.levels.average.description'),
+                        skill: t('studentProfilePage.classification.levels.average.skill'),
+                        action: t('studentProfilePage.classification.levels.average.action'),
                         color: 'from-amber-400 to-yellow-500',
                         bgColor: 'bg-amber-50',
                         borderColor: 'border-amber-400',
@@ -238,11 +240,11 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                 } else {
                     classification = {
                         level: 'needs_followup',
-                        label: 'المتابعة',
-                        range: 'أقل من 70',
-                        description: 'إلمام محدود',
-                        skill: 'ضعف في ربط المعلومات والمهام المركبة',
-                        action: 'خطة علاجية (تبسيط المهارة + إعادة شرح)',
+                        label: t('studentProfilePage.classification.levels.needsFollowup.label'),
+                        range: t('studentProfilePage.classification.levels.needsFollowup.range'),
+                        description: t('studentProfilePage.classification.levels.needsFollowup.description'),
+                        skill: t('studentProfilePage.classification.levels.needsFollowup.skill'),
+                        action: t('studentProfilePage.classification.levels.needsFollowup.action'),
                         color: 'from-red-400 to-red-600',
                         bgColor: 'bg-red-50',
                         borderColor: 'border-red-400',
@@ -259,21 +261,21 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                                 <div className="font-bold text-lg text-gray-900">{classification.label}</div>
                             </div>
                             <div className="px-3 py-1 bg-white rounded-full text-sm font-bold text-gray-600">
-                                {classification.range} نقطة
+                                {t('studentProfilePage.classification.rangePoints', { range: classification.range })}
                             </div>
                         </div>
                         
                         <div className="space-y-2">
                             <div className="flex items-start gap-2">
-                                <span className="text-xs font-bold text-gray-500 w-16">الوصف:</span>
+                                <span className="text-xs font-bold text-gray-500 w-16">{t('studentProfilePage.classification.labels.description')}:</span>
                                 <span className={`text-sm font-medium ${classification.textColor}`}>{classification.description}</span>
                             </div>
                             <div className="flex items-start gap-2">
-                                <span className="text-xs font-bold text-gray-500 w-16">المهارة:</span>
+                                <span className="text-xs font-bold text-gray-500 w-16">{t('studentProfilePage.classification.labels.skill')}:</span>
                                 <span className="text-sm text-gray-700">{classification.skill}</span>
                             </div>
                             <div className="flex items-start gap-2">
-                                <span className="text-xs font-bold text-gray-500 w-16">الإجراء:</span>
+                                <span className="text-xs font-bold text-gray-500 w-16">{t('studentProfilePage.classification.labels.action')}:</span>
                                 <span className={`text-sm font-medium ${classification.textColor}`}>{classification.action}</span>
                             </div>
                         </div>
@@ -294,8 +296,8 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                             <FaTrophy className="text-white text-xl" />
                         </div>
                         <div className="flex-1">
-                            <div className="text-white font-bold text-sm">الإنجازات</div>
-                            <div className="text-white/80 text-xs mt-0.5">عرض جميع إنجازاتك</div>
+                            <div className="text-white font-bold text-sm">{t('common.achievements')}</div>
+                            <div className="text-white/80 text-xs mt-0.5">{t('studentProfilePage.quickAccess.achievementsSubtitle')}</div>
                         </div>
                         <FaChevronLeft className="text-white/80 text-sm" />
                     </div>
@@ -312,8 +314,8 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                             <FaChartLine className="text-white text-xl" />
                         </div>
                         <div className="flex-1">
-                            <div className="text-white font-bold text-sm">النقاط</div>
-                            <div className="text-white/80 text-xs mt-0.5">تتبع نقاطك</div>
+                            <div className="text-white font-bold text-sm">{t('common.points')}</div>
+                            <div className="text-white/80 text-xs mt-0.5">{t('studentProfilePage.quickAccess.pointsSubtitle')}</div>
                         </div>
                         <FaChevronLeft className="text-white/80 text-sm" />
                     </div>
@@ -330,8 +332,8 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                             <FaCreditCard className="text-white text-xl" />
                         </div>
                         <div className="flex-1">
-                            <div className="text-white font-bold text-sm">الباقات</div>
-                            <div className="text-white/80 text-xs mt-0.5">اشترك واحصل على ميزات</div>
+                            <div className="text-white font-bold text-sm">{t('common.packages')}</div>
+                            <div className="text-white/80 text-xs mt-0.5">{t('studentProfilePage.quickAccess.packagesSubtitle')}</div>
                         </div>
                         <FaChevronLeft className="text-white/80 text-sm" />
                     </div>
@@ -349,8 +351,8 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                             <FaGift className="text-white text-2xl" />
                         </div>
                         <div className="flex-1">
-                            <div className="text-white font-bold text-base">بطاقة عضوية المتجر</div>
-                            <div className="text-white/90 text-xs mt-1">استبدل نقاطك بجوائز رائعة</div>
+                            <div className="text-white font-bold text-base">{t('studentProfilePage.quickAccess.storeMembershipTitle')}</div>
+                            <div className="text-white/90 text-xs mt-1">{t('studentProfilePage.quickAccess.storeMembershipSubtitle')}</div>
                         </div>
                         <FaChevronLeft className="text-white/80 text-base" />
                     </div>
@@ -366,8 +368,8 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
             {/* Badges */}
             <div className="bg-white rounded-3xl shadow-sm p-4 border border-gray-100">
                 <div className="flex items-center justify-between mb-3">
-                    <div className=" font-bold text-gray-900">شاراتي</div>
-                    <Link href="/student/badges" className="text-[#A3C042] text-sm font-semibold">عرض الكل</Link>
+                    <div className=" font-bold text-gray-900">{t('studentProfilePage.sections.myBadges')}</div>
+                    <Link href="/student/badges" className="text-[#A3C042] text-sm font-semibold">{t('common.viewAll')}</Link>
                 </div>
 
                 {displayBadges.length > 0 ? (
@@ -383,14 +385,14 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center py-4 text-gray-500 text-sm">لا توجد شارات مكتسبة بعد</div>
+                    <div className="text-center py-4 text-gray-500 text-sm">{t('profilePage.badges.empty')}</div>
                 )}
             </div>
             {/* Projects */}
             <div className="bg-white rounded-3xl shadow-sm p-4 border border-gray-100">
                 <div className="flex items-center justify-between mb-3">
-                    <div className=" font-bold text-gray-900">مشاريعي</div>
-                    <Link href="/student/projects" className="text-[#A3C042] text-sm font-semibold">عرض الكل</Link>
+                    <div className=" font-bold text-gray-900">{t('studentProfilePage.sections.myProjects')}</div>
+                    <Link href="/student/projects" className="text-[#A3C042] text-sm font-semibold">{t('common.viewAll')}</Link>
                 </div>
 
                 {displayProjects.length > 0 ? (
@@ -403,7 +405,9 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                                         ? 'bg-green-100 text-green-700'
                                         : 'bg-yellow-100 text-yellow-700'
                                         }`}>
-                                        {project.status === 'approved' ? 'تمت المراجعة' : 'قيد المراجعة'}
+                                        {project.status === 'approved'
+                                            ? t('studentProfilePage.projects.status.reviewed')
+                                            : t('studentProfilePage.projects.status.underReview')}
                                     </span>
                                 </div>
                                 <div className="flex items-center gap-4 text-xs font-bold">
@@ -420,13 +424,13 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center py-4 text-gray-500 text-sm">لا توجد مشاريع بعد</div>
+                    <div className="text-center py-4 text-gray-500 text-sm">{t('studentProfilePage.projects.empty')}</div>
                 )}
             </div>
 
             {/* Activities */}
             <div className="bg-white rounded-3xl shadow-sm p-4 border border-gray-100">
-                <div className=" font-bold text-gray-900 mb-3">نشاطاتي</div>
+                <div className=" font-bold text-gray-900 mb-3">{t('studentProfilePage.sections.myActivities')}</div>
                 {displayActivities.length > 0 ? (
                     <div className="space-y-3">
                         {displayActivities.slice(0, 3).map((a) => (
@@ -440,7 +444,7 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center py-4 text-gray-500 text-sm">لا توجد نشاطات بعد</div>
+                    <div className="text-center py-4 text-gray-500 text-sm">{t('studentProfilePage.activities.empty')}</div>
                 )}
             </div>
         </>
@@ -471,6 +475,7 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
     const user = auth?.user;
     const { flash } = usePage().props;
     const { showSuccess, showError } = useToast();
+    const { t, language } = useTranslation();
     const [imagePreview, setImagePreview] = useState(null);
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -531,7 +536,7 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
                 },
                 onError: (errors) => {
                     if (errors.image) {
-                        alert('خطأ في رفع الصورة: ' + errors.image);
+                        alert(t('profilePage.alerts.imageUploadError', { message: errors.image }));
                     }
                     setImagePreview(null);
                 },
@@ -546,7 +551,7 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
             onSuccess: () => {
                 passwordForm.reset();
                 setShowPasswordModal(false);
-                alert('تم تحديث كلمة المرور بنجاح');
+                alert(t('studentProfilePage.alerts.passwordUpdated'));
             },
             onError: (errors) => {
             },
@@ -555,7 +560,7 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
 
     const handleDeleteAccount = (e) => {
         e.preventDefault();
-        if (!confirm('هل أنت متأكد من حذف حسابك؟ سيتم حذف جميع بياناتك بشكل دائم.')) {
+        if (!confirm(t('studentProfilePage.deleteConfirm'))) {
             return;
         }
         deleteForm.delete(route('profile.destroy'), {
@@ -581,25 +586,25 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
             },
             onError: (errors) => {
                 if (errors.school_id) {
-                    showError('خطأ في تحديث المدرسة: ' + errors.school_id);
+                    showError(t('studentProfilePage.alerts.updateSchoolErrorWithMessage', { message: errors.school_id }));
                 } else if (errors.message) {
                     showError(errors.message);
                 } else {
-                    showError('حدث خطأ أثناء تحديث المدرسة');
+                    showError(t('studentProfilePage.alerts.updateSchoolError'));
                 }
             },
         });
     };
 
     return (
-        <div dir="rtl" className="min-h-screen bg-gray-50">
-            <Head title="الملف الشخصي - إرث المبتكرين" />
+        <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
+            <Head title={t('studentProfilePage.pageTitle', { appName: t('common.appName') })} />
 
             {/* Mobile View (MobileAppLayout as requested) */}
             <div className="block md:hidden">
                 <MobileAppLayout
                     auth={auth}
-                    title="الملف الشخصي"
+                    title={t('studentProfilePage.title')}
                     activeNav="profile"
                     unreadCount={0}
                     onNotifications={() => router.visit('/profile')}
@@ -640,7 +645,7 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
             {/* Desktop View */}
             <div className="hidden md:block">
                 <MobileTopBar
-                    title="الملف الشخصي"
+                    title={t('studentProfilePage.title')}
                     unreadCount={0}
                     onNotifications={() => router.visit('/profile')}
                     onBack={() => router.visit('/student/dashboard')}
@@ -691,7 +696,7 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                             <FaLock />
-                            تغيير كلمة المرور
+                            {t('studentProfilePage.modals.password.title')}
                         </h2>
                         <button
                             onClick={() => setShowPasswordModal(false)}
@@ -704,7 +709,7 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
                     <form onSubmit={handlePasswordSubmit} className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                كلمة المرور الحالية *
+                                {t('profilePage.password.current')} *
                             </label>
                             <input
                                 type="password"
@@ -720,7 +725,7 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                كلمة المرور الجديدة *
+                                {t('profilePage.password.new')} *
                             </label>
                             <input
                                 type="password"
@@ -737,7 +742,7 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                تأكيد كلمة المرور *
+                                {t('profilePage.password.confirm')} *
                             </label>
                             <input
                                 type="password"
@@ -757,7 +762,7 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
                                 onClick={() => setShowPasswordModal(false)}
                                 className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-medium transition"
                             >
-                                إلغاء
+                                {t('common.cancel')}
                             </button>
                             <button
                                 type="submit"
@@ -765,7 +770,7 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
                                 className="flex-1 bg-[#A3C042] hover:bg-[#8CA635] text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 transition disabled:opacity-50"
                             >
                                 <FaSave />
-                                {passwordForm.processing ? 'جاري الحفظ...' : 'تحديث كلمة المرور'}
+                                {passwordForm.processing ? t('profilePage.actions.saving') : t('profilePage.actions.updatePassword')}
                             </button>
                         </div>
                     </form>
@@ -778,7 +783,7 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-xl font-bold text-red-600 flex items-center gap-2">
                             <FaTrash />
-                            حذف الحساب
+                            {t('profilePage.sections.deleteAccount')}
                         </h2>
                         <button
                             onClick={() => setShowDeleteModal(false)}
@@ -789,17 +794,16 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
                     </div>
 
                     <div className="bg-red-50 border-r-4 border-red-500 p-4 rounded-lg mb-6">
-                        <p className="text-red-800 font-medium mb-2">تحذير!</p>
+                        <p className="text-red-800 font-medium mb-2">{t('profilePage.danger.warningTitle')}</p>
                         <p className="text-red-700 text-sm">
-                            عند حذف حسابك، سيتم حذف جميع بياناتك بشكل دائم ولن تتمكن من استرجاعها.
-                            يرجى التأكد قبل المتابعة.
+                            {t('profilePage.danger.warningBody')}
                         </p>
                     </div>
 
                     <form onSubmit={handleDeleteAccount} className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                كلمة المرور للتأكيد *
+                                {t('studentProfilePage.modals.delete.passwordToConfirm')} *
                             </label>
                             <input
                                 type="password"
@@ -820,14 +824,14 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
                                 onClick={() => setShowDeleteModal(false)}
                                 className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-medium transition"
                             >
-                                إلغاء
+                                {t('common.cancel')}
                             </button>
                             <DangerButton
                                 type="submit"
                                 disabled={deleteForm.processing}
                                 className="flex-1"
                             >
-                                {deleteForm.processing ? 'جاري الحذف...' : 'حذف الحساب'}
+                                {deleteForm.processing ? t('profilePage.actions.deleting') : t('profilePage.actions.confirmDeleteAccount')}
                             </DangerButton>
                         </div>
                     </form>
@@ -840,7 +844,7 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                             <FaIdCard />
-                            تغيير المدرسة
+                            {t('studentProfilePage.modals.school.title')}
                         </h2>
                         <button
                             onClick={() => setShowSchoolModal(false)}
@@ -853,21 +857,21 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
                     <div className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                المدرسة الحالية
+                                {t('studentProfilePage.modals.school.currentSchool')}
                             </label>
-                            <div className="text-base font-bold text-gray-900">{school?.name || user?.school?.name || 'غير محدد'}</div>
+                            <div className="text-base font-bold text-gray-900">{school?.name || user?.school?.name || t('studentProfilePage.school.notSet')}</div>
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                اختر مدرسة جديدة
+                                {t('studentProfilePage.modals.school.chooseNew')}
                             </label>
                             <select
                                 value={selectedSchoolId || ''}
                                 onChange={(e) => setSelectedSchoolId(e.target.value ? parseInt(e.target.value) : null)}
                                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#A3C042] focus:border-transparent"
                             >
-                                <option value="">اختر مدرسة</option>
+                                <option value="">{t('studentProfilePage.modals.school.selectPlaceholder')}</option>
                                 {availableSchools.map((schoolOption) => (
                                     <option key={schoolOption.id} value={schoolOption.id}>
                                         {schoolOption.name}
@@ -882,7 +886,7 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
                                 onClick={() => setShowSchoolModal(false)}
                                 className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-medium transition"
                             >
-                                إلغاء
+                                {t('common.cancel')}
                             </button>
                             <button
                                 type="button"
@@ -890,14 +894,14 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
                                     if (selectedSchoolId && selectedSchoolId !== (school?.id || user?.school_id)) {
                                         handleSchoolChange(selectedSchoolId);
                                     } else {
-                                        alert('يرجى اختيار مدرسة مختلفة');
+                                        alert(t('studentProfilePage.modals.school.pickDifferentSchoolAlert'));
                                     }
                                 }}
                                 disabled={!selectedSchoolId || selectedSchoolId === (school?.id || user?.school_id)}
                                 className="flex-1 bg-[#A3C042] hover:bg-[#8CA635] text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <FaSave />
-                                حفظ التغيير
+                                {t('studentProfilePage.modals.school.saveChange')}
                             </button>
                         </div>
                     </div>

@@ -6,16 +6,18 @@ import StudentCurrentChallengeSection from '@/Pages/Student/Home/StudentCurrentC
 import StudentLatestProjectsSection from '@/Pages/Student/Home/StudentLatestProjectsSection';
 import StudentSuggestChallengeCard from '@/Pages/Student/Home/StudentSuggestChallengeCard';
 import StudentWelcomeCard from '@/Pages/Student/Home/StudentWelcomeCard';
+import { useTranslation } from '@/i18n';
 
 export default function StudentDashboard({ auth, stats = {}, communityScorePercent = 0 }) {
     const user = auth?.user;
+    const { t, language } = useTranslation();
 
     return (
-        <div dir="rtl" className="min-h-screen bg-gray-50">
-            <Head title="الرئيسية - إرث المبتكرين" />
+        <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
+            <Head title={t('homePage.pageTitle')} />
 
             <MobileTopBar
-                title="الرئيسية"
+                title={t('common.home')}
                 unreadCount={stats.unreadCount || 0}
                 onNotifications={() => router.visit('/notifications')}
                 onBack={() => router.visit('/')}

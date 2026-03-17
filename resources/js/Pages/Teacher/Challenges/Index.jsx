@@ -4,17 +4,19 @@ import { FaTrophy, FaPlus, FaCalendar, FaEye, FaEdit, FaTrash, FaUsers, FaSearch
 import { useState } from 'react';
 import InnovationChallengeCard from '@/Components/Challenges/InnovationChallengeCard';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
+import { useTranslation } from '@/i18n';
 
 export default function TeacherChallengesIndex({ auth, challenges }) {
     const { confirm } = useConfirmDialog();
+    const { t, language } = useTranslation();
     const [processing, setProcessing] = useState(null);
 
     const handleDelete = async (challengeId) => {
         const confirmed = await confirm({
-            title: 'تأكيد الحذف',
-            message: 'هل أنت متأكد من حذف هذا التحدي؟ هذا الإجراء لا يمكن التراجع عنه.',
-            confirmText: 'حذف',
-            cancelText: 'إلغاء',
+            title: t('teacherChallengesIndexPage.deleteConfirm.title'),
+            message: t('teacherChallengesIndexPage.deleteConfirm.message'),
+            confirmText: t('common.delete'),
+            cancelText: t('common.cancel'),
             variant: 'danger',
         });
 
@@ -30,48 +32,61 @@ export default function TeacherChallengesIndex({ auth, challenges }) {
     const formatDate = (date) => {
         if (!date) return '';
         const d = new Date(date);
-        const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+        const months = [
+            t('common.months.january'),
+            t('common.months.february'),
+            t('common.months.march'),
+            t('common.months.april'),
+            t('common.months.may'),
+            t('common.months.june'),
+            t('common.months.july'),
+            t('common.months.august'),
+            t('common.months.september'),
+            t('common.months.october'),
+            t('common.months.november'),
+            t('common.months.december'),
+        ];
         return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
     };
 
     const getChallengeTypeLabel = (type) => {
         const labels = {
-            'cognitive': 'تحدّي معرفي',
-            'applied': 'تحدّي تطبيقي/مهاري',
-            'creative': 'تحدّي إبداعي',
-            'artistic_creative': 'تحدّي إبداعي فني',
-            'collaborative': 'تحدّي تعاوني',
-            'analytical': 'تحدّي تحليلي/استقصائي',
-            'technological': 'تحدّي تكنولوجي',
-            'behavioral': 'تحدّي سلوكي/قيمي',
-            '60_seconds': 'تحدّي 60 ثانية',
-            'mental_math': 'حلها بدون قلم',
-            'conversions': 'تحدّي التحويلات',
-            'team_fastest': 'تحدّي الفريق الأسرع',
-            'build_problem': 'ابنِ مسألة',
-            'custom': 'تحدّي مخصص',
+            cognitive: t('challenges.cognitive'),
+            applied: t('challenges.applied'),
+            creative: t('challenges.creative'),
+            artistic_creative: t('challenges.artisticCreative'),
+            collaborative: t('challenges.collaborative'),
+            analytical: t('challenges.analytical'),
+            technological: t('challenges.technological'),
+            behavioral: t('challenges.behavioral'),
+            '60_seconds': t('challenges.minseconds'),
+            mental_math: t('challenges.mentalMath'),
+            conversions: t('challenges.conversions'),
+            team_fastest: t('challenges.teamFastest'),
+            build_problem: t('challenges.buildProblem'),
+            custom: t('teacherChallengesIndexPage.types.custom'),
         };
         return labels[type] || type;
     };
 
     const getCategoryLabel = (category) => {
         const labels = {
-            science: 'علوم',
-            technology: 'تقنية',
-            engineering: 'هندسة',
-            mathematics: 'رياضيات',
-            arts: 'فنون',
-            other: 'أخرى',
+            science: t('categories.science'),
+            technology: t('categories.technology'),
+            engineering: t('categories.engineering'),
+            mathematics: t('categories.mathematics'),
+            arts: t('categories.arts'),
+            other: t('categories.other'),
         };
         return labels[category] || category;
     };
 
     const getStatusBadge = (status) => {
         const badges = {
-            draft: { bg: 'bg-gray-100', text: 'text-gray-800', label: 'مسودة' },
-            active: { bg: 'bg-green-100', text: 'text-green-800', label: 'نشط' },
-            completed: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'مكتمل' },
-            cancelled: { bg: 'bg-red-100', text: 'text-red-800', label: 'ملغي' },
+            draft: { bg: 'bg-gray-100', text: 'text-gray-800', label: t('common.draft') },
+            active: { bg: 'bg-green-100', text: 'text-green-800', label: t('common.active') },
+            completed: { bg: 'bg-blue-100', text: 'text-blue-800', label: t('common.completed') },
+            cancelled: { bg: 'bg-red-100', text: 'text-red-800', label: t('common.cancelled') },
         };
         const badge = badges[status] || badges.draft;
         return (
@@ -84,21 +99,21 @@ export default function TeacherChallengesIndex({ auth, challenges }) {
     return (
         <DashboardLayout
             auth={auth}
-            header="التحديات الابتكارية"
+            header={t('teacherChallengesIndexPage.title')}
         >
-            <Head title="التحديات الابتكارية - لوحة المعلم" />
+            <Head title={t('teacherChallengesIndexPage.pageTitle', { appName: t('common.appName') })} />
 
-            <div className="min-h-screen bg-gray-50 pb-32" dir="rtl">
+            <div className="min-h-screen bg-gray-50 pb-32" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    {/* Header with Actions - تصميم جديد */}
+                    {/* Header with Actions */}
                     <div className="mb-8">
                         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
                             <div>
                                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                                    التحديات الابتكارية
+                                    {t('teacherChallengesIndexPage.title')}
                                 </h1>
                                 <p className="text-gray-600">
-                                    إطلاق وإدارة مسابقات الابتكار بين الطلاب
+                                    {t('teacherChallengesIndexPage.subtitle')}
                                 </p>
                             </div>
                             <Link
@@ -106,35 +121,35 @@ export default function TeacherChallengesIndex({ auth, challenges }) {
                                 className="inline-flex items-center gap-2 px-6 py-3 bg-[#A3C042] text-white rounded-lg hover:bg-[#8CA635] transition-colors font-semibold shadow-md hover:shadow-lg"
                             >
                                 <FaPlus />
-                                إطلاق تحدي جديد
+                                {t('teacherChallengesIndexPage.actions.launchNew')}
                             </Link>
                         </div>
 
-                        {/* Navigation Tabs - شريط التصفية */}
+                        {/* Navigation Tabs */}
                         <div className="flex flex-wrap items-center gap-4 mb-6">
                             <button
                                 onClick={() => router.get('/teacher/challenges', { status: '' }, { preserveState: true })}
                                 className="px-4 py-2 rounded-lg font-medium transition-colors bg-[#A3C042] text-white"
                             >
-                                الكل
+                                {t('common.all')}
                             </button>
                             <button
                                 onClick={() => router.get('/teacher/challenges', { status: 'completed' }, { preserveState: true })}
                                 className="px-4 py-2 rounded-lg font-medium transition-colors bg-white text-gray-700 hover:bg-gray-100"
                             >
-                                مكتمل
+                                {t('common.completed')}
                             </button>
                             <button
                                 onClick={() => router.get('/teacher/challenges', { status: 'upcoming' }, { preserveState: true })}
                                 className="px-4 py-2 rounded-lg font-medium transition-colors bg-white text-gray-700 hover:bg-gray-100"
                             >
-                                قادم
+                                {t('teacherChallengesIndexPage.tabs.upcoming')}
                             </button>
                             <button
                                 onClick={() => router.get('/teacher/challenges', { status: 'active' }, { preserveState: true })}
                                 className="px-4 py-2 rounded-lg font-medium transition-colors bg-white text-gray-700 hover:bg-gray-100"
                             >
-                                نشط
+                                {t('common.active')}
                             </button>
                         </div>
 
@@ -144,14 +159,14 @@ export default function TeacherChallengesIndex({ auth, challenges }) {
                                 <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                                 <input
                                     type="text"
-                                    placeholder="ابحث عن تحدي..."
+                                    placeholder={t('teacherChallengesIndexPage.searchPlaceholder')}
                                     className="w-full ps-10 pe-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                 />
                             </div>
                         </form>
                     </div>
 
-                    {/* Challenges Grid - بطاقات التحديات */}
+                    {/* Challenges Grid */}
                     <div className="bg-white rounded-lg shadow">
                         {challenges.data && challenges.data.length > 0 ? (
                             <div className="p-6">
@@ -172,13 +187,13 @@ export default function TeacherChallengesIndex({ auth, challenges }) {
                         ) : (
                             <div className="text-center py-12">
                                 <FaTrophy className="mx-auto text-6xl text-gray-300 mb-4" />
-                                <p className="text-gray-500 text-lg mb-4">لا توجد تحديات</p>
+                                <p className="text-gray-500 text-lg mb-4">{t('teacherChallengesIndexPage.empty')}</p>
                                 <Link
                                     href="/teacher/challenges/create"
                                     className="inline-flex items-center gap-2 px-6 py-3 bg-[#A3C042] text-white rounded-lg hover:opacity-90 transition"
                                 >
                                     <FaPlus />
-                                    إنشاء تحدّي جديد
+                                    {t('teacherChallengesIndexPage.actions.createNew')}
                                 </Link>
                             </div>
                         )}
@@ -205,32 +220,32 @@ export default function TeacherChallengesIndex({ auth, challenges }) {
                 </div>
             </div>
 
-            {/* Bottom Banner - Banner سفلي */}
-            <div className="mt-8 bg-purple-900 text-white p-6 rounded-xl shadow-2xl" dir="rtl">
+            {/* Bottom Banner */}
+            <div className="mt-8 bg-purple-900 text-white p-6 rounded-xl shadow-2xl" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                    {/* Right Side - أيقونة كأس */}
+                    {/* Right Side */}
                     <div className="hidden md:flex items-center justify-center">
                         <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center">
                             <FaTrophy className="text-4xl text-white" />
                         </div>
                     </div>
 
-                    {/* Center - النص */}
+                    {/* Center */}
                     <div className="flex-1 text-center md:">
-                        <h3 className="text-2xl font-bold mb-2">قم بتحفيز طلابك اليوم!</h3>
+                        <h3 className="text-2xl font-bold mb-2">{t('teacherChallengesIndexPage.banner.title')}</h3>
                         <p className="text-purple-100 text-sm md:text-base">
-                            أفادت الدراسات أن المسابقات الودية تزيد من معدل إنتاجية الابتكار بنسبة 40%. اختر موضوعًا شيقًا وابدأ التحدي الآن.
+                            {t('teacherChallengesIndexPage.banner.description')}
                         </p>
                     </div>
 
-                    {/* Left Side - زر إنشاء تحدي */}
+                    {/* Left Side */}
                     <div className="flex-shrink-0">
                         <Link
                             href="/teacher/challenges/create"
                             className="inline-flex items-center gap-2 px-6 py-3 bg-white text-purple-900 rounded-lg hover:bg-purple-50 transition-colors font-bold shadow-lg hover:shadow-xl"
                         >
                             <FaPlus />
-                            إنشاء تحدي مخصص
+                            {t('teacherChallengesIndexPage.actions.createCustom')}
                         </Link>
                     </div>
                 </div>

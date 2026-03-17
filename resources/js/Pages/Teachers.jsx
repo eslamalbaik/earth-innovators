@@ -5,8 +5,10 @@ import TeachersFilters from '../Components/Teachers/TeachersFilters';
 import TeacherCard from '../Components/Teachers/TeacherCard';
 import CTASection from '../Components/Sections/CTASection';
 import SectionTitle from '../Components/SectionTitle';
+import { useTranslation } from '@/i18n';
 
 export default function Teachers({ auth, teachers = [], filters: initialFilters = {}, filterOptions = {} }) {
+    const { t } = useTranslation();
     const normalizeFilterValue = (value) => {
         if (!value || value === '') return '';
         if (Array.isArray(value)) return value;
@@ -46,7 +48,7 @@ export default function Teachers({ auth, teachers = [], filters: initialFilters 
         });
     };
 
-    const handleFilterChange = (filterType, value, label) => {
+    const handleFilterChange = (filterType, value) => {
         const newFilters = { ...filters, [filterType]: value };
         setFilters(newFilters);
         applyFilters(newFilters);
@@ -60,20 +62,20 @@ export default function Teachers({ auth, teachers = [], filters: initialFilters 
 
     return (
         <MainLayout auth={auth}>
-            <Head title="المعلمون - معلمك" />
+            <Head title={t('teachersPage.pageTitle', { appName: t('common.appName') })} />
 
             <section className="py-6 pb-2 bg-white">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center">
                         <SectionTitle
-                            text="ابحث عن معلمك المثالي بسهولة"
+                            text={t('teachersPage.heroTitle')}
                             size="2xl"
                             align="center"
                             className="pb-2"
                         />
 
                         <p className="mb-6 text-lg text-gray-800 max-w-3xl mx-auto leading-relaxed">
-                            تصفح قائمة واسعة من المعلمين الخصوصيين في مختلف المواد والمراحل، واختر على أساس الخبرة والموقع والتقييمات.
+                            {t('teachersPage.heroSubtitle')}
                         </p>
                     </div>
                 </div>
@@ -86,6 +88,7 @@ export default function Teachers({ auth, teachers = [], filters: initialFilters 
                             <TeachersFilters
                                 filters={filters}
                                 onFilterChange={handleFilterChange}
+                                onSearchChange={handleSearchChange}
                                 filterOptions={filterOptions}
                             />
                         </div>
@@ -114,7 +117,7 @@ export default function Teachers({ auth, teachers = [], filters: initialFilters 
                                                 }}
                                                 className="underline text-yellow-400 text-sm font-medium transition duration-300"
                                             >
-                                                مسح الكل
+                                                {t('teachersPage.clearAll')}
                                             </button>
                                         </div>
                                     </div>
@@ -148,7 +151,7 @@ export default function Teachers({ auth, teachers = [], filters: initialFilters 
                                 </>
                             ) : (
                                 <div className="text-center py-12">
-                                    <p className="text-gray-600 text-lg">لا يوجد معلمون متاحون</p>
+                                    <p className="text-gray-600 text-lg">{t('teachersPage.noTeachers')}</p>
                                 </div>
                             )}
                         </div>

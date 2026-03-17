@@ -178,6 +178,7 @@ function UserEngagementCard({
  * Individual item in the top engaged innovators list
  */
 const EngagementListItem = memo(({ item, index }) => {
+    const { t } = useTranslation();
     return (
         <div
             className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 p-4 flex items-center gap-4"

@@ -12,9 +12,11 @@ import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
 import axios from 'axios';
 import { useToast } from '@/Contexts/ToastContext';
+import { useTranslation } from '@/i18n';
 
 export default function Index({ auth, students, description }) {
     const { showSuccess, showError } = useToast();
+    const { t, language } = useTranslation();
     const [selectedStudent, setSelectedStudent] = useState(null);
     const [showGenerateModal, setShowGenerateModal] = useState(false);
     const [showPreviewModal, setShowPreviewModal] = useState(false);
@@ -28,7 +30,7 @@ export default function Index({ auth, students, description }) {
         student_name: '',
         student_id: '',
         membership_number: '',
-        course_name: 'شهادة إتمام',
+        course_name: t('schoolCertificatesIndexPage.certificateTypes.student'),
         date: new Date().toISOString().split('T')[0],
         signature: '',
         issued_by: auth.user?.name || '',
@@ -37,6 +39,25 @@ export default function Index({ auth, students, description }) {
         therapeutic_plan: '',
     });
 
+    const getDefaultDescription = (type) => {
+        switch (type) {
+            case 'general_completion':
+                return t('schoolCertificatesIndexPage.defaultDescriptions.generalCompletion');
+            case 'academic_excellence':
+                return t('schoolCertificatesIndexPage.defaultDescriptions.academicExcellence');
+            case 'motivation':
+                return t('schoolCertificatesIndexPage.defaultDescriptions.motivation');
+            case 'innovation':
+                return t('schoolCertificatesIndexPage.defaultDescriptions.innovation');
+            case 'achievement':
+                return t('schoolCertificatesIndexPage.defaultDescriptions.achievement');
+            case 'membership':
+                return t('schoolCertificatesIndexPage.defaultDescriptions.membership');
+            default:
+                return t('schoolCertificatesIndexPage.defaultDescriptions.student');
+        }
+    };
+
     const handleSelectStudent = (student) => {
         setSelectedStudent(student);
         setCertificateType('student');
@@ -44,7 +65,7 @@ export default function Index({ auth, students, description }) {
             student_name: student.name,
             student_id: student.id.toString(),
             membership_number: student.membership_number || '',
-            course_name: 'شهادة إتمام',
+            course_name: t('schoolCertificatesIndexPage.certificateTypes.student'),
             date: new Date().toISOString().split('T')[0],
             signature: '',
             issued_by: auth.user?.name || '',
@@ -58,7 +79,11 @@ export default function Index({ auth, students, description }) {
     const handlePreview = () => {
         const preview = { ...formData, date_format: dateFormat, certificate_type: certificateType };
         if (certificateType === 'membership') {
-            preview.join_date = formData.join_date || selectedStudent?.created_at ? new Date(selectedStudent.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+            preview.join_date =
+                formData.join_date ||
+                (selectedStudent?.created_at
+                    ? new Date(selectedStudent.created_at).toISOString().split('T')[0]
+                    : new Date().toISOString().split('T')[0]);
         }
         setPreviewData(preview);
         setShowPreviewModal(true);
@@ -81,7 +106,7 @@ export default function Index({ auth, students, description }) {
             // Add membership-specific fields
             if (certificateType === 'membership') {
                 overrides.join_date = formData.join_date;
-                overrides.course_name = 'شهادة عضوية';
+                overrides.course_name = t('schoolCertificatesIndexPage.certificateTypes.membership');
             }
 
             // Add custom description if provided
@@ -105,7 +130,7 @@ export default function Index({ auth, students, description }) {
             });
 
             if (response.data.success) {
-                showSuccess('تم إنشاء الشهادة بنجاح');
+                showSuccess(t('schoolCertificatesIndexPage.toasts.generateSuccess'));
                 setShowGenerateModal(false);
                 setSelectedStudent(null);
 
@@ -119,10 +144,10 @@ export default function Index({ auth, students, description }) {
                 // Refresh the page to update student list
                 router.reload();
             } else {
-                showError(response.data.message || 'حدث خطأ أثناء إنشاء الشهادة');
+                showError(response.data.message || t('schoolCertificatesIndexPage.toasts.generateError'));
             }
         } catch (error) {
-            showError(error.response?.data?.message || 'حدث خطأ أثناء إنشاء الشهادة');
+            showError(error.response?.data?.message || t('schoolCertificatesIndexPage.toasts.generateError'));
         } finally {
             setGenerating(false);
         }
@@ -132,8 +157,18 @@ export default function Index({ auth, students, description }) {
         const date = new Date(dateString);
         if (format === 'long') {
             const months = [
-                'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-                'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+                t('common.months.january'),
+                t('common.months.february'),
+                t('common.months.march'),
+                t('common.months.april'),
+                t('common.months.may'),
+                t('common.months.june'),
+                t('common.months.july'),
+                t('common.months.august'),
+                t('common.months.september'),
+                t('common.months.october'),
+                t('common.months.november'),
+                t('common.months.december'),
             ];
             return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
         } else if (format === 'short') {
@@ -150,10 +185,10 @@ export default function Index({ auth, students, description }) {
     ) || [];
 
     return (
-        <DashboardLayout header="إدارة الشهادات">
-            <Head title="الشهادات" />
+        <DashboardLayout header={t('schoolCertificatesIndexPage.title')}>
+            <Head title={t('schoolCertificatesIndexPage.pageTitle', { appName: t('common.appName') })} />
 
-            <div className="py-6">
+            <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="py-6">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     {/* Description */}
                     {description && (
@@ -168,7 +203,7 @@ export default function Index({ auth, students, description }) {
                             <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                             <input
                                 type="text"
-                                placeholder="ابحث عن طالب..."
+                                placeholder={t('schoolCertificatesIndexPage.searchPlaceholder')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -183,19 +218,19 @@ export default function Index({ auth, students, description }) {
                                 <thead className="bg-gray-50">
                                     <tr>
                                         <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            الاسم
+                                            {t('common.name')}
                                         </th>
                                         <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            رقم العضوية
+                                            {t('schoolCertificatesIndexPage.table.membershipNumber')}
                                         </th>
                                         <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            البريد الإلكتروني
+                                            {t('common.email')}
                                         </th>
                                         <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            عدد الشهادات
+                                            {t('schoolCertificatesIndexPage.table.certificatesCount')}
                                         </th>
                                         <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            الإجراءات
+                                            {t('common.actions')}
                                         </th>
                                     </tr>
                                 </thead>
@@ -203,7 +238,7 @@ export default function Index({ auth, students, description }) {
                                     {filteredStudents.length === 0 ? (
                                         <tr>
                                             <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
-                                                لا توجد طلاب
+                                                {t('schoolCertificatesIndexPage.empty')}
                                             </td>
                                         </tr>
                                     ) : (
@@ -218,7 +253,7 @@ export default function Index({ auth, students, description }) {
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {student.membership_number || 'N/A'}
+                                                    {student.membership_number || t('common.notAvailable')}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                     {student.email}
@@ -232,7 +267,7 @@ export default function Index({ auth, students, description }) {
                                                         className="text-blue-600 hover:text-blue-900 flex items-center"
                                                     >
                                                         <FaFilePdf className="me-1" />
-                                                        إنشاء شهادة
+                                                        {t('schoolCertificatesIndexPage.actions.createCertificate')}
                                                     </button>
                                                 </td>
                                             </tr>
@@ -252,7 +287,7 @@ export default function Index({ auth, students, description }) {
                                                 onClick={() => router.visit(students.links.prev.url)}
                                                 className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                             >
-                                                السابق
+                                                {t('common.previous')}
                                             </button>
                                         )}
                                         {students.links.next && (
@@ -260,7 +295,7 @@ export default function Index({ auth, students, description }) {
                                                 onClick={() => router.visit(students.links.next.url)}
                                                 className="ms-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                             >
-                                                التالي
+                                                {t('common.next')}
                                             </button>
                                         )}
                                     </div>
@@ -275,7 +310,7 @@ export default function Index({ auth, students, description }) {
             <Modal show={showGenerateModal} onClose={() => setShowGenerateModal(false)}>
                 <div className="p-6">
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold">إنشاء شهادة للطالب: {selectedStudent?.name}</h3>
+                        <h3 className="text-lg font-semibold">{t('schoolCertificatesIndexPage.modals.generate.title', { name: selectedStudent?.name })}</h3>
                         <button
                             onClick={() => setShowGenerateModal(false)}
                             className="text-gray-400 hover:text-gray-600"
@@ -287,40 +322,40 @@ export default function Index({ auth, students, description }) {
                     <div className="space-y-4">
                         {/* Certificate Type */}
                         <div>
-                            <InputLabel htmlFor="certificate_type" value="نوع الشهادة *" />
+                            <InputLabel htmlFor="certificate_type" value={t('schoolCertificatesIndexPage.form.certificateTypeLabel')} />
                             <select
                                 id="certificate_type"
                                 value={certificateType}
                                 onChange={(e) => {
                                     setCertificateType(e.target.value);
                                     if (e.target.value === 'membership') {
-                                        setFormData({ ...formData, course_name: 'شهادة عضوية' });
+                                        setFormData({ ...formData, course_name: t('schoolCertificatesIndexPage.certificateTypes.membership') });
                                     } else if (e.target.value === 'general_completion') {
-                                        setFormData({ ...formData, course_name: 'شهادة إتمام عامة' });
+                                        setFormData({ ...formData, course_name: t('schoolCertificatesIndexPage.certificateTypes.generalCompletion') });
                                     } else if (e.target.value === 'academic_excellence') {
-                                        setFormData({ ...formData, course_name: 'شهادة تميز أكاديمي' });
+                                        setFormData({ ...formData, course_name: t('schoolCertificatesIndexPage.certificateTypes.academicExcellence') });
                                     } else if (e.target.value === 'motivation') {
-                                        setFormData({ ...formData, course_name: 'شهادة تحفيز وتشجيع' });
+                                        setFormData({ ...formData, course_name: t('schoolCertificatesIndexPage.certificateTypes.motivation') });
                                     } else if (e.target.value === 'innovation') {
-                                        setFormData({ ...formData, course_name: 'شهادة إبداع أو ابتكار' });
+                                        setFormData({ ...formData, course_name: t('schoolCertificatesIndexPage.certificateTypes.innovation') });
                                     } else {
-                                        setFormData({ ...formData, course_name: 'شهادة إتمام' });
+                                        setFormData({ ...formData, course_name: t('schoolCertificatesIndexPage.certificateTypes.student') });
                                     }
                                 }}
                                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
                             >
-                                <option value="student">شهادة إتمام</option>
-                                <option value="general_completion">شهادة إتمام عامة</option>
-                                <option value="academic_excellence">شهادة تميز أكاديمي</option>
-                                <option value="motivation">شهادة تحفيز وتشجيع</option>
-                                <option value="innovation">شهادة إبداع أو ابتكار</option>
-                                <option value="membership">شهادة عضوية</option>
-                                <option value="achievement">شهادة إنجاز</option>
+                                <option value="student">{t('schoolCertificatesIndexPage.certificateTypes.student')}</option>
+                                <option value="general_completion">{t('schoolCertificatesIndexPage.certificateTypes.generalCompletion')}</option>
+                                <option value="academic_excellence">{t('schoolCertificatesIndexPage.certificateTypes.academicExcellence')}</option>
+                                <option value="motivation">{t('schoolCertificatesIndexPage.certificateTypes.motivation')}</option>
+                                <option value="innovation">{t('schoolCertificatesIndexPage.certificateTypes.innovation')}</option>
+                                <option value="membership">{t('schoolCertificatesIndexPage.certificateTypes.membership')}</option>
+                                <option value="achievement">{t('schoolCertificatesIndexPage.certificateTypes.achievement')}</option>
                             </select>
                         </div>
 
                         <div>
-                            <InputLabel htmlFor="student_name" value="الاسم الكامل *" />
+                            <InputLabel htmlFor="student_name" value={t('schoolCertificatesIndexPage.form.fullNameLabel')} />
                             <TextInput
                                 id="student_name"
                                 type="text"
@@ -332,7 +367,7 @@ export default function Index({ auth, students, description }) {
                         </div>
 
                         <div>
-                            <InputLabel htmlFor="membership_number" value="رقم العضوية *" />
+                            <InputLabel htmlFor="membership_number" value={t('schoolCertificatesIndexPage.form.membershipNumberLabel')} />
                             <TextInput
                                 id="membership_number"
                                 type="text"
@@ -346,7 +381,7 @@ export default function Index({ auth, students, description }) {
                         {/* Show join date only for membership certificates */}
                         {certificateType === 'membership' && (
                             <div>
-                                <InputLabel htmlFor="join_date" value="تاريخ بدء الانضمام *" />
+                                <InputLabel htmlFor="join_date" value={t('schoolCertificatesIndexPage.form.joinDateLabel')} />
                                 <TextInput
                                     id="join_date"
                                     type="date"
@@ -361,7 +396,7 @@ export default function Index({ auth, students, description }) {
                         {/* Show course name only for non-membership certificates */}
                         {certificateType !== 'membership' && (
                             <div>
-                                <InputLabel htmlFor="course_name" value="اسم الدورة/المادة" />
+                                <InputLabel htmlFor="course_name" value={t('schoolCertificatesIndexPage.form.courseNameLabel')} />
                                 <TextInput
                                     id="course_name"
                                     type="text"
@@ -373,7 +408,7 @@ export default function Index({ auth, students, description }) {
                         )}
 
                         <div>
-                            <InputLabel htmlFor="date_format" value="تنسيق التاريخ" />
+                            <InputLabel htmlFor="date_format" value={t('schoolCertificatesIndexPage.form.dateFormatLabel')} />
                             <select
                                 id="date_format"
                                 value={dateFormat}
@@ -383,50 +418,42 @@ export default function Index({ auth, students, description }) {
                                 <option value="Y-m-d">2025-12-09</option>
                                 <option value="d-m-Y">09-12-2025</option>
                                 <option value="short">09/12/2025</option>
-                                <option value="long">9 ديسمبر 2025</option>
+                                <option value="long">{t('schoolCertificatesIndexPage.dateFormatExamples.long')}</option>
                             </select>
                         </div>
 
                         {/* Description Field - Optional */}
                         <div>
-                            <InputLabel htmlFor="description" value="نص الشهادة (اختياري)" />
+                            <InputLabel htmlFor="description" value={t('schoolCertificatesIndexPage.form.descriptionLabel')} />
                             <textarea
                                 id="description"
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 rows={3}
                                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                placeholder="أدخل نص الشهادة المخصص..."
+                                placeholder={t('schoolCertificatesIndexPage.placeholders.description')}
                             />
                             <p className="text-xs text-gray-500 mt-1">
-                                {!formData.description && certificateType === 'general_completion' && 
-                                    'تُمنح هذه الشهادة للطالب تقديرًا لإتمامه الدورة بنجاح، وإشادةً بجدّه واجتهاده وتميّزه الأكاديمي.'}
-                                {!formData.description && certificateType === 'academic_excellence' && 
-                                    'تُمنح هذه الشهادة للطالب تقديرًا لإتمامه الدورة بنجاح، وإشادةً بجدّه واجتهاده وتميّزه الأكاديمي.'}
-                                {!formData.description && certificateType === 'motivation' && 
-                                    'تُمنح هذه الشهادة للطالب تحفيزًا وتشجيعًا على مزيد من التفوق والنجاح.'}
-                                {!formData.description && certificateType === 'innovation' && 
-                                    'تُمنح هذه الشهادة للطالب تقديرًا لإبداعه وابتكاره المتميز.'}
+                                {!formData.description && certificateType === 'general_completion' && getDefaultDescription('general_completion')}
+                                {!formData.description && certificateType === 'academic_excellence' && getDefaultDescription('academic_excellence')}
+                                {!formData.description && certificateType === 'motivation' && getDefaultDescription('motivation')}
+                                {!formData.description && certificateType === 'innovation' && getDefaultDescription('innovation')}
                             </p>
                         </div>
 
                         {/* Therapeutic Support Plan - Optional */}
                         <div>
-                            <InputLabel htmlFor="therapeutic_plan" value="خطة الدعم العلاجية الفردية (اختياري)" />
+                            <InputLabel htmlFor="therapeutic_plan" value={t('schoolCertificatesIndexPage.form.therapeuticPlanLabel')} />
                             <textarea
                                 id="therapeutic_plan"
                                 value={formData.therapeutic_plan}
                                 onChange={(e) => setFormData({ ...formData, therapeutic_plan: e.target.value })}
                                 rows={4}
                                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                placeholder="أدخل معلومات خطة الدعم العلاجية...
-- تحديد نقاط القوة والضعف
-- أهداف قصيرة وطويلة المدى
-- أنشطة أسبوعية
-- متابعة دورية"
+                                placeholder={t('schoolCertificatesIndexPage.placeholders.therapeuticPlan')}
                             />
                             <p className="text-xs text-gray-500 mt-1">
-                                يُمكن إضافة معلومات خطة الدعم العلاجية الفردية هنا
+                                {t('schoolCertificatesIndexPage.hints.therapeuticPlan')}
                             </p>
                         </div>
 
@@ -436,20 +463,20 @@ export default function Index({ auth, students, description }) {
                                 onClick={() => setShowGenerateModal(false)}
                                 className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
                             >
-                                إلغاء
+                                {t('common.cancel')}
                             </button>
                             <button
                                 type="button"
                                 onClick={handlePreview}
                                 className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
                             >
-                                معاينة
+                                {t('schoolCertificatesIndexPage.actions.preview')}
                             </button>
                             <PrimaryButton
                                 onClick={handleGenerate}
                                 disabled={generating}
                             >
-                                {generating ? 'جاري الإنشاء...' : 'إنشاء وتحميل'}
+                                {generating ? t('schoolCertificatesIndexPage.actions.generating') : t('schoolCertificatesIndexPage.actions.generateAndDownload')}
                             </PrimaryButton>
                         </div>
                     </div>
@@ -460,7 +487,7 @@ export default function Index({ auth, students, description }) {
             <Modal show={showPreviewModal} onClose={() => setShowPreviewModal(false)}>
                 <div className="p-6">
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold">معاينة بيانات الشهادة</h3>
+                        <h3 className="text-lg font-semibold">{t('schoolCertificatesIndexPage.modals.preview.title')}</h3>
                         <button
                             onClick={() => setShowPreviewModal(false)}
                             className="text-gray-400 hover:text-gray-600"
@@ -471,25 +498,25 @@ export default function Index({ auth, students, description }) {
 
                     {previewData && (
                         <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
-                            <div><strong>نوع الشهادة:</strong> {certificateType === 'membership' ? 'شهادة عضوية' : certificateType === 'achievement' ? 'شهادة إنجاز' : 'شهادة إتمام'}</div>
-                            <div><strong>الاسم الكامل:</strong> {previewData.student_name}</div>
-                            <div><strong>رقم العضوية:</strong> {previewData.membership_number}</div>
+                            <div><strong>{t('schoolCertificatesIndexPage.preview.labels.certificateType')}:</strong> {certificateType === 'membership' ? t('schoolCertificatesIndexPage.certificateTypes.membership') : certificateType === 'achievement' ? t('schoolCertificatesIndexPage.certificateTypes.achievement') : t('schoolCertificatesIndexPage.certificateTypes.student')}</div>
+                            <div><strong>{t('schoolCertificatesIndexPage.preview.labels.fullName')}:</strong> {previewData.student_name}</div>
+                            <div><strong>{t('schoolCertificatesIndexPage.preview.labels.membershipNumber')}:</strong> {previewData.membership_number}</div>
                             {certificateType === 'membership' && previewData.join_date && (
-                                <div><strong>تاريخ بدء الانضمام:</strong> {formatDatePreview(previewData.join_date, previewData.date_format)}</div>
+                                <div><strong>{t('schoolCertificatesIndexPage.preview.labels.joinDate')}:</strong> {formatDatePreview(previewData.join_date, previewData.date_format)}</div>
                             )}
                             {certificateType === 'membership' && (
                                 <>
-                                    <div><strong>وقت الإصدار:</strong> {new Date().toLocaleTimeString('en-US')}</div>
-                                    <div><strong>تاريخ اليوم:</strong> {formatDatePreview(new Date().toISOString().split('T')[0], previewData.date_format)}</div>
+                                    <div><strong>{t('schoolCertificatesIndexPage.preview.labels.issueTime')}:</strong> {new Date().toLocaleTimeString('en-US')}</div>
+                                    <div><strong>{t('schoolCertificatesIndexPage.preview.labels.todayDate')}:</strong> {formatDatePreview(new Date().toISOString().split('T')[0], previewData.date_format)}</div>
                                 </>
                             )}
                             {certificateType !== 'membership' && (
                                 <>
-                                    <div><strong>اسم الدورة:</strong> {previewData.course_name}</div>
-                                    <div><strong>التاريخ:</strong> {formatDatePreview(previewData.date, previewData.date_format)}</div>
+                                    <div><strong>{t('schoolCertificatesIndexPage.preview.labels.courseName')}:</strong> {previewData.course_name}</div>
+                                    <div><strong>{t('common.date')}:</strong> {formatDatePreview(previewData.date, previewData.date_format)}</div>
                                 </>
                             )}
-                            <div><strong>صادر عن:</strong> {previewData.issued_by}</div>
+                            <div><strong>{t('schoolCertificatesIndexPage.preview.labels.issuedBy')}:</strong> {previewData.issued_by}</div>
                         </div>
                     )}
 
@@ -498,7 +525,7 @@ export default function Index({ auth, students, description }) {
                             onClick={() => setShowPreviewModal(false)}
                             className="px-4 py-2 bg-[#A3C042] text-white rounded-md hover:bg-blue-700"
                         >
-                            إغلاق
+                            {t('common.close')}
                         </button>
                     </div>
                 </div>

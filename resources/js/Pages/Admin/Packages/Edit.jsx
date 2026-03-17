@@ -2,8 +2,10 @@ import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FaArrowRight, FaSave, FaTimes } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
+import { useTranslation } from '@/i18n';
 
 export default function AdminPackagesEdit({ package: pkg }) {
+    const { t } = useTranslation();
     const [features, setFeatures] = useState(pkg.features && pkg.features.length > 0 ? pkg.features : ['']);
     const [featuresAr, setFeaturesAr] = useState(pkg.features_ar && pkg.features_ar.length > 0 ? pkg.features_ar : ['']);
 
@@ -67,8 +69,8 @@ export default function AdminPackagesEdit({ package: pkg }) {
     };
 
     return (
-        <DashboardLayout header="تعديل الباقة">
-            <Head title="تعديل الباقة" />
+        <DashboardLayout header={t('adminPackagesEditPage.title')}>
+            <Head title={t('adminPackagesEditPage.pageTitle', { appName: t('common.appName') })} />
 
             <div className="mb-6">
                 <Link
@@ -76,19 +78,19 @@ export default function AdminPackagesEdit({ package: pkg }) {
                     className="text-blue-600 hover:text-blue-800 flex items-center gap-2"
                 >
                     <FaArrowRight className="transform rotate-180" />
-                    العودة إلى قائمة الباقات
+                    {t('adminPackagesEditPage.actions.backToPackages')}
                 </Link>
             </div>
 
             <div className="bg-white rounded-xl shadow-lg p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">معلومات الباقة</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('adminPackagesEditPage.sections.packageInfo')}</h2>
 
                 <form onSubmit={submit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* الاسم (إنجليزي) */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                الاسم (إنجليزي) <span className="text-red-500">*</span>
+                                {t('adminPackagesCreatePage.fields.nameEn')} <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
@@ -106,7 +108,7 @@ export default function AdminPackagesEdit({ package: pkg }) {
                         {/* الاسم (عربي) */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                الاسم (عربي)
+                                {t('adminPackagesCreatePage.fields.nameAr')}
                             </label>
                             <input
                                 type="text"
@@ -123,7 +125,7 @@ export default function AdminPackagesEdit({ package: pkg }) {
                         {/* الوصف */}
                         <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                الوصف
+                                {t('adminPackagesCreatePage.fields.description')}
                             </label>
                             <textarea
                                 value={data.description}
@@ -137,7 +139,7 @@ export default function AdminPackagesEdit({ package: pkg }) {
                         {/* الوصف (عربي) */}
                         <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                الوصف (عربي)
+                                {t('adminPackagesCreatePage.fields.descriptionAr')}
                             </label>
                             <textarea
                                 value={data.description_ar}
@@ -151,7 +153,7 @@ export default function AdminPackagesEdit({ package: pkg }) {
                         {/* السعر */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                السعر <span className="text-red-500">*</span>
+                                {t('adminPackagesCreatePage.fields.price')} <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="number"
@@ -171,7 +173,7 @@ export default function AdminPackagesEdit({ package: pkg }) {
                         {/* العملة */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                العملة <span className="text-red-500">*</span>
+                                {t('adminPackagesCreatePage.fields.currency')} <span className="text-red-500">*</span>
                             </label>
                             <select
                                 value={data.currency}
@@ -180,16 +182,16 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                     }`}
                                 required
                             >
-                                <option value="SAR">ريال سعودي (SAR)</option>
-                                <option value="USD">دولار (USD)</option>
-                                <option value="AED">درهم إماراتي (AED)</option>
+                                <option value="SAR">{t('adminPackagesCreatePage.currencies.sar')}</option>
+                                <option value="USD">{t('adminPackagesCreatePage.currencies.usd')}</option>
+                                <option value="AED">{t('adminPackagesCreatePage.currencies.aed')}</option>
                             </select>
                         </div>
 
                         {/* نوع المدة */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                نوع المدة <span className="text-red-500">*</span>
+                                {t('adminPackagesCreatePage.fields.durationType')} <span className="text-red-500">*</span>
                             </label>
                             <select
                                 value={data.duration_type}
@@ -197,17 +199,17 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent border-gray-300"
                                 required
                             >
-                                <option value="monthly">شهري</option>
-                                <option value="quarterly">ربع سنوي</option>
-                                <option value="yearly">سنوي</option>
-                                <option value="lifetime">مدى الحياة</option>
+                                <option value="monthly">{t('packagesIndexPage.duration.monthly')}</option>
+                                <option value="quarterly">{t('packagesIndexPage.duration.quarterly')}</option>
+                                <option value="yearly">{t('packagesIndexPage.duration.yearly')}</option>
+                                <option value="lifetime">{t('packagesIndexPage.duration.lifetime')}</option>
                             </select>
                         </div>
 
                         {/* عدد الأشهر */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                عدد الأشهر
+                                {t('adminPackagesCreatePage.fields.durationMonths')}
                             </label>
                             <input
                                 type="number"
@@ -221,7 +223,7 @@ export default function AdminPackagesEdit({ package: pkg }) {
                         {/* نقاط المكافأة */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                نقاط المكافأة
+                                {t('adminPackagesCreatePage.fields.pointsBonus')}
                             </label>
                             <input
                                 type="number"
@@ -235,7 +237,7 @@ export default function AdminPackagesEdit({ package: pkg }) {
                         {/* حد المشاريع */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                حد المشاريع
+                                {t('adminPackagesEditPage.fields.projectsLimit')}
                             </label>
                             <input
                                 type="number"
@@ -243,14 +245,14 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                 value={data.projects_limit || ''}
                                 onChange={(e) => setData('projects_limit', e.target.value ? parseInt(e.target.value) : null)}
                                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent border-gray-300"
-                                placeholder="غير محدود"
+                                placeholder={t('adminPackagesCreatePage.placeholders.unlimited')}
                             />
                         </div>
 
                         {/* حد التحديات */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                حد التحديات
+                                {t('adminPackagesEditPage.fields.challengesLimit')}
                             </label>
                             <input
                                 type="number"
@@ -258,7 +260,7 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                 value={data.challenges_limit || ''}
                                 onChange={(e) => setData('challenges_limit', e.target.value ? parseInt(e.target.value) : null)}
                                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent border-gray-300"
-                                placeholder="غير محدود"
+                                placeholder={t('adminPackagesCreatePage.placeholders.unlimited')}
                             />
                         </div>
 
@@ -272,7 +274,7 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                                 />
                                 <label className="ms-2 text-sm font-medium text-gray-700">
-                                    الوصول إلى الشهادات
+                                    {t('adminPackagesCreatePage.fields.certificateAccess')}
                                 </label>
                             </div>
 
@@ -284,7 +286,7 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                                 />
                                 <label className="ms-2 text-sm font-medium text-gray-700">
-                                    الوصول إلى الشارات
+                                    {t('adminPackagesCreatePage.fields.badgeAccess')}
                                 </label>
                             </div>
 
@@ -296,7 +298,7 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                                 />
                                 <label className="ms-2 text-sm font-medium text-gray-700">
-                                    نشط
+                                    {t('adminPackagesCreatePage.fields.isActive')}
                                 </label>
                             </div>
 
@@ -308,14 +310,14 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                                 />
                                 <label className="ms-2 text-sm font-medium text-gray-700">
-                                    شائع
+                                    {t('adminPackagesCreatePage.fields.isPopular')}
                                 </label>
                             </div>
                         </div>
 
                         {/* Features Section */}
                         <div className="md:col-span-2">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">الميزات (إنجليزي)</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('adminPackagesCreatePage.sections.featuresEn')}</h3>
                             <div className="space-y-3">
                                 {features.map((feature, index) => (
                                     <div key={index} className="flex gap-2">
@@ -323,7 +325,7 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                             type="text"
                                             value={feature}
                                             onChange={(e) => updateFeature(index, e.target.value, false)}
-                                            placeholder={`ميزة ${index + 1}`}
+                                            placeholder={t('adminPackagesCreatePage.placeholders.featureNumber', { number: index + 1 })}
                                             className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         />
                                         <button
@@ -340,14 +342,14 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                     onClick={() => addFeature(false)}
                                     className="w-full px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-500 hover:text-blue-600 transition"
                                 >
-                                    + إضافة ميزة
+                                    {t('adminPackagesCreatePage.actions.addFeature')}
                                 </button>
                             </div>
                         </div>
 
                         {/* Features AR Section */}
                         <div className="md:col-span-2">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">الميزات (عربي)</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('adminPackagesCreatePage.sections.featuresAr')}</h3>
                             <div className="space-y-3">
                                 {featuresAr.map((feature, index) => (
                                     <div key={index} className="flex gap-2">
@@ -355,7 +357,7 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                             type="text"
                                             value={feature}
                                             onChange={(e) => updateFeature(index, e.target.value, true)}
-                                            placeholder={`ميزة ${index + 1}`}
+                                            placeholder={t('adminPackagesCreatePage.placeholders.featureNumber', { number: index + 1 })}
                                             dir="rtl"
                                             className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent "
                                         />
@@ -373,7 +375,7 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                     onClick={() => addFeature(true)}
                                     className="w-full px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-500 hover:text-blue-600 transition"
                                 >
-                                    + إضافة ميزة
+                                    {t('adminPackagesCreatePage.actions.addFeature')}
                                 </button>
                             </div>
                         </div>
@@ -387,14 +389,14 @@ export default function AdminPackagesEdit({ package: pkg }) {
                             className="px-6 py-2 bg-[#A3C042] hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50"
                         >
                             <FaSave />
-                            {processing ? 'جاري الحفظ...' : 'حفظ التغييرات'}
+                            {processing ? t('common.saving') : t('common.saveChanges')}
                         </button>
                         <Link
                             href={route('admin.packages.index')}
                             className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg flex items-center gap-2"
                         >
                             <FaTimes />
-                            إلغاء
+                            {t('common.cancel')}
                         </Link>
                     </div>
                 </form>

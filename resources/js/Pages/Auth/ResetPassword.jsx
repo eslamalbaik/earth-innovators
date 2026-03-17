@@ -7,10 +7,12 @@ import TextInput from '@/Components/TextInput';
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
 import { Head } from '@inertiajs/react';
+import { useTranslation } from '@/i18n';
 
 export default function ResetPassword({ token, email, status }) {
     const [showPassword, setShowPassword] = useState(false);
     const [showPasswordConfirmation, setShowPasswordConfirmation] = useState(false);
+    const { t } = useTranslation();
 
     const { data, setData, post, processing, errors } = useForm({
         token: token,
@@ -26,7 +28,7 @@ export default function ResetPassword({ token, email, status }) {
 
     return (
         <GuestLayout>
-            <Head title="إعادة تعيين كلمة المرور" />
+            <Head title={t('auth.resetPasswordTitle')} />
             <div className="flex items-center justify-center sm:px-4">
                 <div className="w-full sm:space-y-8">
                     {status && (
@@ -44,13 +46,13 @@ export default function ResetPassword({ token, email, status }) {
 
 <div className="relative min-h-screen overflow-hidden bg-white shadow-lg sm:rounded-2xl px-4 py-10 w-[100vw] sm:w-[400px] md:w-[450px] max-w-5xl sm:mx-auto">
 <form onSubmit={submit} className="space-y-6">
-                            <img src="/images/avatar.svg" alt="avatar" className="absolute -top-24 -start-24 w-48 h-48" />
-                            <img src="/images/avatar1.svg" alt="avatar" className="absolute -bottom-8 end-0 w-28 h-28" />
+                            <img src="/images/avatar.svg" alt={t('common.avatar')} className="absolute -top-24 -start-24 w-48 h-48" />
+                            <img src="/images/avatar1.svg" alt={t('common.avatar')} className="absolute -bottom-8 end-0 w-28 h-28" />
                             <div className="flex flex-col items-center">
                                 <div>
                                     <img
                                         src="/images/logo-modified.png"
-                                        alt="إرث المبتكرين - Innovators Legacy"
+                                        alt={t('common.appName')}
                                         className="h-24 w-auto object-contain"
                                     />
                                 </div>
@@ -58,10 +60,10 @@ export default function ResetPassword({ token, email, status }) {
 
                             <div className="text-center">
                                 <h2 className="text-2xl font-extrabold text-gray-900 mb-2">
-                                    إعادة تعيين كلمة المرور
+                                    {t('auth.resetPasswordTitle')}
                                 </h2>
                                 <p className="text-sm text-gray-600">
-                                    أدخل كلمة المرور الجديدة
+                                    {t('auth.resetPasswordSubtitle')}
                                 </p>
                             </div>
 
@@ -78,7 +80,7 @@ export default function ResetPassword({ token, email, status }) {
                                             autoComplete="new-password"
                                             required
                                             className="block w-full ps-10 pe-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
-                                            placeholder="كلمة المرور الجديدة"
+                                            placeholder={t('auth.newPassword')}
                                             value={data.password}
                                             onChange={(e) => setData('password', e.target.value)}
                                         />
@@ -109,7 +111,7 @@ export default function ResetPassword({ token, email, status }) {
                                             autoComplete="new-password"
                                             required
                                             className="block w-full ps-10 pe-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
-                                            placeholder="تأكيد كلمة المرور"
+                                            placeholder={t('auth.confirmPassword')}
                                             value={data.password_confirmation}
                                             onChange={(e) => setData('password_confirmation', e.target.value)}
                                         />
@@ -137,10 +139,10 @@ export default function ResetPassword({ token, email, status }) {
                                     {processing ? (
                                         <div className="flex items-center">
                                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white me-2"></div>
-                                            جاري التحديث...
+                                            {t('auth.updating')}
                                         </div>
                                     ) : (
-                                        'تحديث كلمة المرور'
+                                        t('auth.updatePassword')
                                     )}
                                 </PrimaryButton>
                             </div>
@@ -151,7 +153,7 @@ export default function ResetPassword({ token, email, status }) {
                                     className="font-medium text-[#A3C042] hover:text-[#F9D536] flex items-center justify-center gap-2"
                                 >
                                     <FaArrowRight />
-                                    العودة لتسجيل الدخول
+                                    {t('auth.backToLogin')}
                                 </Link>
                             </div>
                         </form>

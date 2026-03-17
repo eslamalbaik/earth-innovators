@@ -2,43 +2,45 @@ import { Head, Link } from '@inertiajs/react';
 import MainLayout from '../Layouts/MainLayout';
 import { FaClock, FaStar, FaUser, FaSearch } from 'react-icons/fa';
 import { useState } from 'react';
+import { useTranslation } from '@/i18n';
 
 export default function Courses({ auth, courses = [] }) {
+    const { t } = useTranslation();
     const [searchTerm, setSearchTerm] = useState('');
 
     const sampleCourses = [
         {
             id: 1,
-            title: 'أساسيات البرمجة',
-            description: 'تعلم أساسيات البرمجة من الصفر',
-            instructor: 'أحمد محمد',
-            duration: '8 ساعات',
+            title: t('coursesPage.sampleCourses.programmingBasics.title'),
+            description: t('coursesPage.sampleCourses.programmingBasics.description'),
+            instructor: t('coursesPage.sampleCourses.programmingBasics.instructor'),
+            duration: t('coursesPage.sampleCourses.programmingBasics.duration'),
             rating: 4.5,
             students: 150,
             image: '/images/course1.jpg',
-            price: 'مجاني'
+            price: t('coursesPage.sampleCourses.programmingBasics.price')
         },
         {
             id: 2,
-            title: 'تطوير المواقع',
-            description: 'تعلم تطوير المواقع الحديثة',
-            instructor: 'سارة علي',
-            duration: '12 ساعة',
+            title: t('coursesPage.sampleCourses.webDevelopment.title'),
+            description: t('coursesPage.sampleCourses.webDevelopment.description'),
+            instructor: t('coursesPage.sampleCourses.webDevelopment.instructor'),
+            duration: t('coursesPage.sampleCourses.webDevelopment.duration'),
             rating: 4.8,
             students: 200,
             image: '/images/course2.jpg',
-            price: '99 ريال'
+            price: t('coursesPage.sampleCourses.webDevelopment.price')
         },
         {
             id: 3,
-            title: 'تصميم الجرافيك',
-            description: 'احترف تصميم الجرافيك والإبداع',
-            instructor: 'محمد خالد',
-            duration: '10 ساعات',
+            title: t('coursesPage.sampleCourses.graphicDesign.title'),
+            description: t('coursesPage.sampleCourses.graphicDesign.description'),
+            instructor: t('coursesPage.sampleCourses.graphicDesign.instructor'),
+            duration: t('coursesPage.sampleCourses.graphicDesign.duration'),
             rating: 4.6,
             students: 120,
             image: '/images/course3.jpg',
-            price: '79 ريال'
+            price: t('coursesPage.sampleCourses.graphicDesign.price')
         },
     ];
 
@@ -46,11 +48,11 @@ export default function Courses({ auth, courses = [] }) {
 
     return (
         <MainLayout auth={auth}>
-            <Head title="الدورات التعليمية" />
+            <Head title={t('coursesPage.pageTitle', { appName: t('common.appName') })} />
 
             <div className="mb-8">
-                <h1 className="text-4xl font-bold text-gray-800 mb-4">الدورات التعليمية</h1>
-                <p className="text-lg text-gray-600">اكتشف مجموعة واسعة من الدورات في مختلف المجالات</p>
+                <h1 className="text-4xl font-bold text-gray-800 mb-4">{t('coursesPage.title')}</h1>
+                <p className="text-lg text-gray-600">{t('coursesPage.subtitle')}</p>
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-6 mb-8">
@@ -59,23 +61,23 @@ export default function Courses({ auth, courses = [] }) {
                         <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                         <input
                             type="text"
-                            placeholder="ابحث عن دورة..."
+                            placeholder={t('coursesPage.searchPlaceholder')}
                             className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
                     <select className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                        <option>جميع الفئات</option>
-                        <option>البرمجة</option>
-                        <option>التصميم</option>
-                        <option>الأعمال</option>
-                        <option>التسويق</option>
+                        <option>{t('coursesPage.filters.allCategories')}</option>
+                        <option>{t('coursesPage.filters.programming')}</option>
+                        <option>{t('coursesPage.filters.design')}</option>
+                        <option>{t('coursesPage.filters.business')}</option>
+                        <option>{t('coursesPage.filters.marketing')}</option>
                     </select>
                     <select className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                        <option>الأحدث</option>
-                        <option>الأعلى تقييماً</option>
-                        <option>الأكثر مبيعاً</option>
+                        <option>{t('coursesPage.sort.latest')}</option>
+                        <option>{t('coursesPage.sort.topRated')}</option>
+                        <option>{t('coursesPage.sort.bestSelling')}</option>
                     </select>
                 </div>
             </div>
@@ -105,7 +107,9 @@ export default function Courses({ auth, courses = [] }) {
                                 <div className="flex items-center">
                                     <FaStar className="text-yellow-400 me-1" />
                                     <span className="font-semibold">{course.rating}</span>
-                                    <span className="text-gray-500 text-sm ms-2">({course.students} طالب)</span>
+                                    <span className="text-gray-500 text-sm ms-2">
+                                        {t('coursesPage.studentsCount', { count: course.students })}
+                                    </span>
                                 </div>
                                 <span className="text-lg font-bold text-blue-600">{course.price}</span>
                             </div>
@@ -114,7 +118,7 @@ export default function Courses({ auth, courses = [] }) {
                                 href={`/courses/${course.id}`}
                                 className="block w-full text-center bg-[#A3C042] text-white py-2 rounded-lg hover:bg-blue-700 transition"
                             >
-                                عرض التفاصيل
+                                {t('coursesPage.viewDetails')}
                             </Link>
                         </div>
                     </div>
@@ -123,7 +127,7 @@ export default function Courses({ auth, courses = [] }) {
 
             {displayCourses.length === 0 && (
                 <div className="text-center py-12">
-                    <p className="text-gray-500 text-lg">لا توجد دورات متاحة حالياً</p>
+                    <p className="text-gray-500 text-lg">{t('coursesPage.noCourses')}</p>
                 </div>
             )}
         </MainLayout>

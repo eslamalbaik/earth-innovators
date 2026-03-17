@@ -2,9 +2,11 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FaEnvelope, FaSignOutAlt } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function VerifyEmail({ status }) {
     const { post, processing } = useForm({});
+    const { t } = useTranslation();
 
     const submit = (e) => {
         e.preventDefault();
@@ -13,7 +15,7 @@ export default function VerifyEmail({ status }) {
 
     return (
         <GuestLayout>
-            <Head title="التحقق من البريد الإلكتروني" />
+            <Head title={t('auth.verifyEmailTitle')} />
             <div className="flex items-center justify-center sm:px-4">
                 <div className="w-full sm:space-y-8">
                     {status === 'verification-link-sent' && (
@@ -26,7 +28,7 @@ export default function VerifyEmail({ status }) {
                                 </div>
                                 <div className="ms-3">
                                     <p className="text-sm font-medium text-green-800">
-                                        تم إرسال رابط التحقق الجديد إلى عنوان البريد الإلكتروني الذي قدمته أثناء التسجيل.
+                                        {t('auth.verifyEmailSentMessage')}
                                     </p>
                                 </div>
                             </div>
@@ -35,13 +37,13 @@ export default function VerifyEmail({ status }) {
 
                     <div className="relative overflow-hidden bg-white shadow-lg sm:rounded-2xl px-4 py-10 w-[100vw] sm:w-[400px] md:w-[450px] max-w-5xl sm:mx-auto">
                         <form onSubmit={submit} className="space-y-6">
-                            <img src="/images/avatar.svg" alt="avatar" className="absolute -top-24 -start-24 w-48 h-48" />
-                            <img src="/images/avatar1.svg" alt="avatar" className="absolute -bottom-8 end-0 w-28 h-28" />
+                            <img src="/images/avatar.svg" alt={t('common.avatar')} className="absolute -top-24 -start-24 w-48 h-48" />
+                            <img src="/images/avatar1.svg" alt={t('common.avatar')} className="absolute -bottom-8 end-0 w-28 h-28" />
                             <div className="flex flex-col items-center">
                                 <div>
                                     <img
                                         src="/images/logo-modified.png"
-                                        alt="إرث المبتكرين - Innovators Legacy"
+                                        alt={t('common.appName')}
                                         className="h-24 w-auto object-contain"
                                     />
                                 </div>
@@ -52,10 +54,10 @@ export default function VerifyEmail({ status }) {
                                     <FaEnvelope className="text-[#A3C042] text-2xl" />
                                 </div>
                                 <h2 className="text-2xl font-extrabold text-gray-900 mb-2">
-                                    التحقق من البريد الإلكتروني
+                                    {t('auth.verifyEmailTitle')}
                                 </h2>
                                 <p className="text-sm text-gray-600">
-                                    شكراً لك على التسجيل! قبل البدء، يرجى التحقق من عنوان بريدك الإلكتروني بالنقر على الرابط الذي أرسلناه إليك. إذا لم تستلم البريد الإلكتروني، سنرسل لك رابطاً آخر بكل سرور.
+                                    {t('auth.verifyEmailDescription')}
                                 </p>
                             </div>
 
@@ -67,10 +69,10 @@ export default function VerifyEmail({ status }) {
                                     {processing ? (
                                         <div className="flex items-center">
                                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white me-2"></div>
-                                            جاري الإرسال...
+                                            {t('auth.sending')}
                                         </div>
                                     ) : (
-                                        'إعادة إرسال رابط التحقق'
+                                        {t('auth.resendVerification')}
                                     )}
                                 </PrimaryButton>
 
@@ -81,7 +83,7 @@ export default function VerifyEmail({ status }) {
                                     className="w-full flex items-center justify-center gap-2 py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#A3C042]"
                                 >
                                     <FaSignOutAlt />
-                                    تسجيل الخروج
+                                    {t('profile.logout')}
                                 </Link>
                             </div>
                         </form>

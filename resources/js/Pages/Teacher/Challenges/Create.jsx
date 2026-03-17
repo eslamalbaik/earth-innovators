@@ -6,8 +6,10 @@ import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
 import PrimaryButton from '../../../Components/PrimaryButton';
 import { useState, useRef } from 'react';
+import { useTranslation } from '@/i18n';
 
 export default function TeacherChallengeCreate({ auth, school }) {
+    const { t } = useTranslation();
     const [imagePreview, setImagePreview] = useState(null);
     const imageInputRef = useRef(null);
 
@@ -35,12 +37,12 @@ export default function TeacherChallengeCreate({ auth, school }) {
             const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
 
             if (file.size > maxSize) {
-                alert('الصورة أكبر من 5 ميجابايت');
+                alert(t('teacherChallengesCreatePage.errors.imageTooLarge', { maxMb: 5 }));
                 return;
             }
 
             if (!validTypes.includes(file.type)) {
-                alert('نوع الصورة غير مدعوم. يرجى اختيار صورة بصيغة JPEG, PNG, GIF, أو WebP');
+                alert(t('teacherChallengesCreatePage.errors.imageTypeNotSupported'));
                 return;
             }
 
@@ -81,61 +83,45 @@ export default function TeacherChallengeCreate({ auth, school }) {
     };
 
     const challengeTypes = [
-        { value: 'cognitive', label: 'تحدّي معرفي' },
-        { value: 'applied', label: 'تحدّي تطبيقي/مهاري' },
-        { value: 'creative', label: 'تحدّي إبداعي' },
-        { value: 'artistic_creative', label: 'تحدّي إبداعي فني' },
-        { value: 'collaborative', label: 'تحدّي تعاوني' },
-        { value: 'analytical', label: 'تحدّي تحليلي/استقصائي' },
-        { value: 'technological', label: 'تحدّي تكنولوجي' },
-        { value: 'behavioral', label: 'تحدّي سلوكي/قيمي' },
-        { value: '60_seconds', label: 'تحدّي 60 ثانية' },
-        { value: 'mental_math', label: 'حلها بدون قلم' },
-        { value: 'conversions', label: 'تحدّي التحويلات' },
-        { value: 'team_fastest', label: 'تحدّي الفريق الأسرع' },
-        { value: 'build_problem', label: 'ابنِ مسألة' },
-        { value: 'custom', label: 'تحدّي مخصص' },
+        'cognitive',
+        'applied',
+        'creative',
+        'artistic_creative',
+        'collaborative',
+        'analytical',
+        'technological',
+        'behavioral',
+        '60_seconds',
+        'mental_math',
+        'conversions',
+        'team_fastest',
+        'build_problem',
+        'custom',
     ];
 
-    const difficultyLevels = [
-        { value: 'easy', label: 'سهل' },
-        { value: 'medium', label: 'متوسط' },
-        { value: 'hard', label: 'صعب' },
-    ];
+    const difficultyLevels = ['easy', 'medium', 'hard'];
 
-    const categories = [
-        { value: 'science', label: 'علوم' },
-        { value: 'technology', label: 'تقنية' },
-        { value: 'engineering', label: 'هندسة' },
-        { value: 'mathematics', label: 'رياضيات' },
-        { value: 'arts', label: 'فنون' },
-        { value: 'other', label: 'أخرى' },
-    ];
+    const categories = ['science', 'technology', 'engineering', 'mathematics', 'arts', 'other'];
 
-    const ageGroups = [
-        { value: '6-9', label: '6-9 سنوات' },
-        { value: '10-13', label: '10-13 سنة' },
-        { value: '14-17', label: '14-17 سنة' },
-        { value: '18+', label: '18+ سنة' },
-    ];
+    const ageGroups = ['6-9', '10-13', '14-17', '18+'];
 
     if (!school) {
         return (
             <DashboardLayout
                 auth={auth}
-                header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">إنشاء تحدّي جديد</h2>}
+                header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">{t('teacherChallengesCreatePage.title')}</h2>}
             >
-                <Head title="إنشاء تحدّي جديد - لوحة المعلم" />
+                <Head title={t('teacherChallengesCreatePage.pageTitle')} />
                 <div className="py-6">
                     <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
                         <div className="bg-white shadow-sm rounded-lg p-6">
-                            <p className="text-red-600 mb-4">يجب أن تكون مرتبطاً بمدرسة لإنشاء تحديات.</p>
+                            <p className="text-red-600 mb-4">{t('teacherChallengesCreatePage.mustBeLinkedToSchool')}</p>
                             <Link
                                 href="/teacher/challenges"
                                 className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition"
                             >
                                 <FaArrowRight />
-                                العودة
+                                {t('common.back')}
                             </Link>
                         </div>
                     </div>
@@ -147,9 +133,9 @@ export default function TeacherChallengeCreate({ auth, school }) {
     return (
         <DashboardLayout
             auth={auth}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">إنشاء تحدّي جديد</h2>}
+            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">{t('teacherChallengesCreatePage.title')}</h2>}
         >
-            <Head title="إنشاء تحدّي جديد - لوحة المعلم" />
+            <Head title={t('teacherChallengesCreatePage.pageTitle')} />
 
             <div className="py-6">
                 <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
@@ -159,14 +145,14 @@ export default function TeacherChallengeCreate({ auth, school }) {
                             className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900"
                         >
                             <FaArrowRight />
-                            العودة إلى التحديات
+                            {t('teacherChallengesCreatePage.actions.backToChallenges')}
                         </Link>
                     </div>
 
                     <form onSubmit={submit} className="bg-white shadow-sm rounded-lg p-6 space-y-6">
                         {/* Title */}
                         <div>
-                            <InputLabel htmlFor="title" value="عنوان التحدي *" />
+                            <InputLabel htmlFor="title" value={t('teacherChallengesCreatePage.fields.title')} />
                             <TextInput
                                 id="title"
                                 type="text"
@@ -180,7 +166,7 @@ export default function TeacherChallengeCreate({ auth, school }) {
 
                         {/* Objective */}
                         <div>
-                            <InputLabel htmlFor="objective" value="الهدف من التحدي *" />
+                            <InputLabel htmlFor="objective" value={t('teacherChallengesCreatePage.fields.objective')} />
                             <textarea
                                 id="objective"
                                 value={data.objective}
@@ -194,7 +180,7 @@ export default function TeacherChallengeCreate({ auth, school }) {
 
                         {/* Description */}
                         <div>
-                            <InputLabel htmlFor="description" value="وصف التحدي *" />
+                            <InputLabel htmlFor="description" value={t('teacherChallengesCreatePage.fields.description')} />
                             <textarea
                                 id="description"
                                 value={data.description}
@@ -208,13 +194,13 @@ export default function TeacherChallengeCreate({ auth, school }) {
 
                         {/* Image */}
                         <div>
-                            <InputLabel htmlFor="image" value="صورة التحدي (اختياري)" />
+                            <InputLabel htmlFor="image" value={t('teacherChallengesCreatePage.fields.imageOptional')} />
                             <div className="mt-1">
                                 {imagePreview ? (
                                     <div className="relative">
                                         <img
                                             src={imagePreview}
-                                            alt="Preview"
+                                            alt={t('teacherChallengesCreatePage.image.previewAlt')}
                                             className="w-full h-64 object-cover rounded-lg border border-gray-300"
                                         />
                                         <button
@@ -231,8 +217,8 @@ export default function TeacherChallengeCreate({ auth, school }) {
                                         className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-[#A3C042] transition"
                                     >
                                         <FaImage className="mx-auto text-gray-400 text-4xl mb-2" />
-                                        <p className="text-gray-600">انقر لرفع صورة</p>
-                                        <p className="text-sm text-gray-400 mt-1">JPEG, PNG, GIF, WebP (حد أقصى 5 ميجابايت)</p>
+                                        <p className="text-gray-600">{t('teacherChallengesCreatePage.image.clickToUpload')}</p>
+                                        <p className="text-sm text-gray-400 mt-1">{t('teacherChallengesCreatePage.image.hint', { maxMb: 5 })}</p>
                                     </div>
                                 )}
                                 <input
@@ -249,7 +235,7 @@ export default function TeacherChallengeCreate({ auth, school }) {
 
                         {/* Instructions */}
                         <div>
-                            <InputLabel htmlFor="instructions" value="كيفية التنفيذ *" />
+                            <InputLabel htmlFor="instructions" value={t('teacherChallengesCreatePage.fields.instructions')} />
                             <textarea
                                 id="instructions"
                                 value={data.instructions}
@@ -263,7 +249,7 @@ export default function TeacherChallengeCreate({ auth, school }) {
 
                         {/* Challenge Type */}
                         <div>
-                            <InputLabel htmlFor="challenge_type" value="نوع التحدي *" />
+                            <InputLabel htmlFor="challenge_type" value={t('teacherChallengesCreatePage.fields.challengeType')} />
                             <select
                                 id="challenge_type"
                                 value={data.challenge_type}
@@ -272,8 +258,8 @@ export default function TeacherChallengeCreate({ auth, school }) {
                                 required
                             >
                                 {challengeTypes.map((type) => (
-                                    <option key={type.value} value={type.value}>
-                                        {type.label}
+                                    <option key={type} value={type}>
+                                        {t(`common.challengeTypes.${type}`)}
                                     </option>
                                 ))}
                             </select>
@@ -282,7 +268,7 @@ export default function TeacherChallengeCreate({ auth, school }) {
 
                         {/* Category */}
                         <div>
-                            <InputLabel htmlFor="category" value="الفئة *" />
+                            <InputLabel htmlFor="category" value={t('teacherChallengesCreatePage.fields.category')} />
                             <select
                                 id="category"
                                 value={data.category}
@@ -291,8 +277,8 @@ export default function TeacherChallengeCreate({ auth, school }) {
                                 required
                             >
                                 {categories.map((cat) => (
-                                    <option key={cat.value} value={cat.value}>
-                                        {cat.label}
+                                    <option key={cat} value={cat}>
+                                        {t(`common.categories.${cat}`)}
                                     </option>
                                 ))}
                             </select>
@@ -301,7 +287,7 @@ export default function TeacherChallengeCreate({ auth, school }) {
 
                         {/* Age Group */}
                         <div>
-                            <InputLabel htmlFor="age_group" value="الفئة العمرية *" />
+                            <InputLabel htmlFor="age_group" value={t('teacherChallengesCreatePage.fields.ageGroup')} />
                             <select
                                 id="age_group"
                                 value={data.age_group}
@@ -310,8 +296,8 @@ export default function TeacherChallengeCreate({ auth, school }) {
                                 required
                             >
                                 {ageGroups.map((age) => (
-                                    <option key={age.value} value={age.value}>
-                                        {age.label}
+                                    <option key={age} value={age}>
+                                        {t(`common.ageGroups.${age}`)}
                                     </option>
                                 ))}
                             </select>
@@ -320,7 +306,7 @@ export default function TeacherChallengeCreate({ auth, school }) {
 
                         {/* Difficulty Level */}
                         <div>
-                            <InputLabel htmlFor="difficulty" value="مستوى الصعوبة" />
+                            <InputLabel htmlFor="difficulty" value={t('teacherChallengesCreatePage.fields.difficulty')} />
                             <select
                                 id="difficulty"
                                 value={data.difficulty}
@@ -328,8 +314,8 @@ export default function TeacherChallengeCreate({ auth, school }) {
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                             >
                                 {difficultyLevels.map((level) => (
-                                    <option key={level.value} value={level.value}>
-                                        {level.label}
+                                    <option key={level} value={level}>
+                                        {t(`common.difficultyLevels.${level}`)}
                                     </option>
                                 ))}
                             </select>
@@ -338,19 +324,19 @@ export default function TeacherChallengeCreate({ auth, school }) {
 
                         {/* Points Reward */}
                         <div>
-                            <InputLabel htmlFor="points_reward" value="نقاط المكافأة" />
+                            <InputLabel htmlFor="points_reward" value={t('teacherChallengesCreatePage.fields.pointsReward')} />
                             <select
                                 id="points_reward"
                                 value={data.points_reward}
                                 onChange={(e) => setData('points_reward', parseInt(e.target.value))}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                             >
-                                <option value={0}>0 نقطة</option>
-                                <option value={10}>10 نقاط</option>
-                                <option value={20}>20 نقطة</option>
-                                <option value={30}>30 نقطة</option>
-                                <option value={50}>50 نقطة</option>
-                                <option value={100}>100 نقطة</option>
+                                <option value={0}>{t('teacherChallengesCreatePage.pointsOptions', { count: 0 })}</option>
+                                <option value={10}>{t('teacherChallengesCreatePage.pointsOptions', { count: 10 })}</option>
+                                <option value={20}>{t('teacherChallengesCreatePage.pointsOptions', { count: 20 })}</option>
+                                <option value={30}>{t('teacherChallengesCreatePage.pointsOptions', { count: 30 })}</option>
+                                <option value={50}>{t('teacherChallengesCreatePage.pointsOptions', { count: 50 })}</option>
+                                <option value={100}>{t('teacherChallengesCreatePage.pointsOptions', { count: 100 })}</option>
                             </select>
                             <InputError message={errors.points_reward} className="mt-2" />
                         </div>
@@ -358,7 +344,7 @@ export default function TeacherChallengeCreate({ auth, school }) {
                         {/* Date Range */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <InputLabel htmlFor="start_date" value="تاريخ البدء *" />
+                                <InputLabel htmlFor="start_date" value={t('teacherChallengesCreatePage.fields.startDate')} />
                                 <TextInput
                                     id="start_date"
                                     type="date"
@@ -370,7 +356,7 @@ export default function TeacherChallengeCreate({ auth, school }) {
                                 <InputError message={errors.start_date} className="mt-2" />
                             </div>
                             <div>
-                                <InputLabel htmlFor="deadline" value="تاريخ الانتهاء *" />
+                                <InputLabel htmlFor="deadline" value={t('teacherChallengesCreatePage.fields.deadline')} />
                                 <TextInput
                                     id="deadline"
                                     type="date"
@@ -386,7 +372,7 @@ export default function TeacherChallengeCreate({ auth, school }) {
                         {/* Points and Participants */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <InputLabel htmlFor="points_reward" value="نقاط المكافأة" />
+                                <InputLabel htmlFor="points_reward" value={t('teacherChallengesCreatePage.fields.pointsReward')} />
                                 <TextInput
                                     id="points_reward"
                                     type="number"
@@ -398,7 +384,7 @@ export default function TeacherChallengeCreate({ auth, school }) {
                                 <InputError message={errors.points_reward} className="mt-2" />
                             </div>
                             <div>
-                                <InputLabel htmlFor="max_participants" value="الحد الأقصى للمشاركين (اختياري)" />
+                                <InputLabel htmlFor="max_participants" value={t('teacherChallengesCreatePage.fields.maxParticipantsOptional')} />
                                 <TextInput
                                     id="max_participants"
                                     type="number"
@@ -413,17 +399,17 @@ export default function TeacherChallengeCreate({ auth, school }) {
 
                         {/* Status */}
                         <div>
-                            <InputLabel htmlFor="status" value="الحالة" />
+                            <InputLabel htmlFor="status" value={t('teacherChallengesCreatePage.fields.status')} />
                             <select
                                 id="status"
                                 value={data.status}
                                 onChange={(e) => setData('status', e.target.value)}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                             >
-                                <option value="draft">مسودة</option>
-                                <option value="active">نشط</option>
-                                <option value="completed">مكتمل</option>
-                                <option value="cancelled">ملغي</option>
+                                <option value="draft">{t('common.challengeStatuses.draft')}</option>
+                                <option value="active">{t('common.challengeStatuses.active')}</option>
+                                <option value="completed">{t('common.challengeStatuses.completed')}</option>
+                                <option value="cancelled">{t('common.challengeStatuses.cancelled')}</option>
                             </select>
                             <InputError message={errors.status} className="mt-2" />
                         </div>
@@ -434,12 +420,12 @@ export default function TeacherChallengeCreate({ auth, school }) {
                                 {processing ? (
                                     <>
                                         <FaSpinner className="animate-spin ms-2" />
-                                        جاري الحفظ...
+                                        {t('common.saving')}
                                     </>
                                 ) : (
                                     <>
                                         <FaTrophy className="ms-2" />
-                                        إنشاء التحدي
+                                        {t('teacherChallengesCreatePage.actions.create')}
                                     </>
                                 )}
                             </PrimaryButton>

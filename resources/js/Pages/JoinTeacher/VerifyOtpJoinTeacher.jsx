@@ -4,10 +4,12 @@ import GuestLayout from '@/Layouts/GuestLayout';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Head, Link, useForm, usePage, router } from '@inertiajs/react';
 import { useEffect, useState, useRef } from 'react';
-import { FaKey, FaEnvelope, FaUser, FaPhone, FaExclamationTriangle, FaTimes } from 'react-icons/fa';
+import { FaEnvelope, FaUser, FaPhone, FaExclamationTriangle, FaTimes } from 'react-icons/fa';
 import axios from 'axios';
+import { useTranslation } from '@/i18n';
 
 export default function VerifyOtpJoinTeacher() {
+    const { t } = useTranslation();
     const { props } = usePage();
     const otpData = props.otp || null;
     const userData = props.userData || null;
@@ -163,18 +165,15 @@ export default function VerifyOtpJoinTeacher() {
 
         const formDataToSend = new FormData();
 
-        // دمج رقم الجوال مع المقدمة
         let cleanedPhone = String(userData?.phone || data.phone || '').replace(/\D/g, '');
         if (cleanedPhone.startsWith('0')) {
             cleanedPhone = cleanedPhone.substring(1);
         }
         const fullPhone = `${userData?.dial_code || data.dial_code || '+971'}${cleanedPhone}`;
 
-        // إضافة جميع البيانات من userData
         if (userData) {
             Object.keys(userData).forEach(key => {
                 if (key === 'dial_code' || key === 'password' || key === 'password_confirmation') {
-                    // dial_code تم دمجه مع phone، password موجود في userData
                     return;
                 }
                 if (key === 'subjects' || key === 'stages' || key === 'certifications' || key === 'experiences') {
@@ -193,7 +192,6 @@ export default function VerifyOtpJoinTeacher() {
             });
         }
 
-        // إضافة OTP
         formDataToSend.append('otp_code', otpCode);
         formDataToSend.append('otp_token', otpData?.token || data.otp_token);
         formDataToSend.append('phone', fullPhone);
@@ -223,7 +221,7 @@ export default function VerifyOtpJoinTeacher() {
                     setShowErrorsAlert(true);
                 }
             } else {
-                setPageErrors({ otp_code: err.response?.data?.message || 'حدث خطأ أثناء التحقق من الرمز' });
+                setPageErrors({ otp_code: err.response?.data?.message || t('joinTeacherVerifyOtpPage.errorFallback') });
                 setShowErrorsAlert(true);
             }
         });
@@ -232,17 +230,17 @@ export default function VerifyOtpJoinTeacher() {
     if (!otpData?.token) {
         return (
             <GuestLayout>
-                <Head title="رمز التحقق" />
+                <Head title={t('joinTeacherVerifyOtpPage.pageTitle', { appName: t('common.appName') })} />
                 <div className="flex items-center justify-center min-h-screen py-8 px-4">
                     <div className="max-w-md w-full text-center">
                         <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                            <p className="text-red-800">رمز التحقق غير متوفر. يرجى العودة إلى صفحة الانضمام.</p>
+                            <p className="text-red-800">{t('joinTeacherVerifyOtpPage.missingTokenMessage')}</p>
                         </div>
                         <Link
                             href="/join-teacher"
                             className="text-yellow-600 hover:text-yellow-500 font-medium"
                         >
-                            العودة إلى صفحة الانضمام
+                            {t('joinTeacherVerifyOtpPage.backToJoin')}
                         </Link>
                     </div>
                 </div>
@@ -252,7 +250,7 @@ export default function VerifyOtpJoinTeacher() {
 
     return (
         <GuestLayout>
-            <Head title="رمز التحقق" />
+            <Head title={t('joinTeacherVerifyOtpPage.pageTitle', { appName: t('common.appName') })} />
 
             <div className="flex items-center justify-center py-8 px-4">
                 <div className="max-w-md w-full space-y-6">
@@ -263,33 +261,31 @@ export default function VerifyOtpJoinTeacher() {
                             </Link>
                         </div>
                         <h2 className="text-2xl font-bold text-gray-900 mt-4">
-                            تأكيد رمز التحقق
+                            {t('joinTeacherVerifyOtpPage.title')}
                         </h2>
                     </div>
 
                     <div className="bg-white shadow-lg rounded-2xl px-4 py-10 min-w-[92vw] sm:min-w-[350px]">
-                        {/* عرض بيانات المستخدم */}
                         <div className="mb-6 space-y-3">
                             <div className="flex items-center gap-3 text-sm text-gray-700">
                                 <FaUser className="text-gray-400" />
-                                <span className="font-medium">الاسم:</span>
-                                <span>{userData?.name || 'غير متوفر'}</span>
+                                <span className="font-medium">{t('joinTeacherVerifyOtpPage.nameLabel')}</span>
+                                <span>{userData?.name || t('common.notAvailable')}</span>
                             </div>
                             <div className="flex items-center gap-3 text-sm text-gray-700">
                                 <FaEnvelope className="text-gray-400" />
-                                <span className="font-medium">البريد الإلكتروني:</span>
-                                <span>{otpData?.email || userData?.email || 'غير متوفر'}</span>
+                                <span className="font-medium">{t('joinTeacherVerifyOtpPage.emailLabel')}</span>
+                                <span>{otpData?.email || userData?.email || t('common.notAvailable')}</span>
                             </div>
                             {userData?.phone && (
                                 <div className="flex items-center gap-3 text-sm text-gray-700">
                                     <FaPhone className="text-gray-400" />
-                                    <span className="font-medium">رقم الجوال:</span>
+                                    <span className="font-medium">{t('joinTeacherVerifyOtpPage.phoneLabel')}</span>
                                     <span>{userData.dial_code || '+971'} {userData.phone}</span>
                                 </div>
                             )}
                         </div>
 
-                        {/* عرض جميع الأخطاء */}
                         {showErrorsAlert && Object.keys(errors).length > 0 && (
                             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
                                 <div className="flex items-start justify-between">
@@ -297,7 +293,7 @@ export default function VerifyOtpJoinTeacher() {
                                         <FaExclamationTriangle className="text-red-500 text-xl mt-0.5 me-3 flex-shrink-0" />
                                         <div className="flex-1">
                                             <h3 className="text-sm font-semibold text-red-800 mb-2">
-                                                يرجى تصحيح الأخطاء التالية:
+                                                {t('joinTeacherVerifyOtpPage.errorsTitle')}
                                             </h3>
                                             <ul className="list-disc list-inside space-y-1 text-sm text-red-700">
                                                 {Object.entries(errors).map(([key, value]) => {
@@ -323,7 +319,7 @@ export default function VerifyOtpJoinTeacher() {
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-4 text-center">
-                                    أدخل رمز التحقق المكون من 4 أرقام
+                                    {t('joinTeacherVerifyOtpPage.otpPrompt')}
                                 </label>
                                 <div className="flex justify-center gap-3">
                                     {otpValues.slice().reverse().map((value, reverseIndex) => {
@@ -354,10 +350,11 @@ export default function VerifyOtpJoinTeacher() {
                                 </div>
                                 <InputError message={errors.otp_code} className="mt-2 text-center" />
                                 <p className="mt-4 text-xs text-gray-500 text-center">
-                                    تم إرسال رمز مكون من 4 أرقام إلى بريدك الإلكتروني{' '}
-                                    <span className="font-medium">{otpData?.email || userData?.email}</span>.
+                                    {t('joinTeacherVerifyOtpPage.otpSentLine1', {
+                                        email: otpData?.email || userData?.email,
+                                    })}
                                     <br />
-                                    يرجى إدخاله خلال 10 دقائق لإكمال عملية الانضمام.
+                                    {t('joinTeacherVerifyOtpPage.otpSentLine2')}
                                 </p>
                             </div>
 
@@ -370,22 +367,22 @@ export default function VerifyOtpJoinTeacher() {
                                     {processing ? (
                                         <div className="flex items-center">
                                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white ms-2"></div>
-                                            جاري التحقق...
+                                            {t('joinTeacherVerifyOtpPage.verifying')}
                                         </div>
                                     ) : (
-                                        'تأكيد الرمز'
+                                        t('joinTeacherVerifyOtpPage.confirmCode')
                                     )}
                                 </PrimaryButton>
                             </div>
 
                             <div className="text-center">
                                 <p className="text-sm text-gray-600">
-                                    لم تستلم الرمز؟{' '}
+                                    {t('joinTeacherVerifyOtpPage.noCode')}
                                     <Link
                                         href="/join-teacher"
                                         className="font-medium text-yellow-600 hover:text-yellow-500"
                                     >
-                                        العودة إلى صفحة الانضمام
+                                        {t('joinTeacherVerifyOtpPage.backToJoin')}
                                     </Link>
                                 </p>
                             </div>
@@ -396,4 +393,3 @@ export default function VerifyOtpJoinTeacher() {
         </GuestLayout>
     );
 }
-

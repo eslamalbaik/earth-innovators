@@ -11,22 +11,43 @@
  * Formats dates in Arabic format (Gregorian)
  */
 
+import store from '@/store/store';
+import { getTranslation } from '@/i18n';
+
+const getCurrentLanguage = () => store?.getState?.()?.language?.currentLanguage || 'ar';
+
+const getGregorianMonths = (language) => ([
+    getTranslation(language, 'common.months.january'),
+    getTranslation(language, 'common.months.february'),
+    getTranslation(language, 'common.months.march'),
+    getTranslation(language, 'common.months.april'),
+    getTranslation(language, 'common.months.may'),
+    getTranslation(language, 'common.months.june'),
+    getTranslation(language, 'common.months.july'),
+    getTranslation(language, 'common.months.august'),
+    getTranslation(language, 'common.months.september'),
+    getTranslation(language, 'common.months.october'),
+    getTranslation(language, 'common.months.november'),
+    getTranslation(language, 'common.months.december'),
+]);
+
+const getNotAvailableLabel = (language) => getTranslation(language, 'common.notAvailable');
+const getInvalidDateLabel = (language) => getTranslation(language, 'common.invalidDate');
+
 /**
- * Format date in Arabic Gregorian format
+ * Format date in localized Gregorian format
  * @param {Date|string} date - The date to format
  * @param {boolean} includeTime - Whether to include time in the output
+ * @param {string} language - Language code
  * @returns {string} - Formatted date string
  */
-export function toHijriDate(date, includeTime = false) {
-    if (!date) return 'غير محدد';
+export function toHijriDate(date, includeTime = false, language = getCurrentLanguage()) {
+    if (!date) return getNotAvailableLabel(language);
     
     const gregorianDate = new Date(date);
-    if (isNaN(gregorianDate.getTime())) return 'تاريخ غير صحيح';
+    if (isNaN(gregorianDate.getTime())) return getInvalidDateLabel(language);
 
-    const gregorianMonths = [
-        'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-        'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
-    ];
+    const gregorianMonths = getGregorianMonths(language);
 
     const day = gregorianDate.getDate();
     const month = gregorianMonths[gregorianDate.getMonth()];
@@ -49,11 +70,11 @@ export function toHijriDate(date, includeTime = false) {
  * @param {Date|string} date - The date to format
  * @returns {string} - Formatted date string (DD/MM/YYYY)
  */
-export function toHijriDateShort(date) {
-    if (!date) return 'غير محدد';
+export function toHijriDateShort(date, language = getCurrentLanguage()) {
+    if (!date) return getNotAvailableLabel(language);
     
     const gregorianDate = new Date(date);
-    if (isNaN(gregorianDate.getTime())) return 'تاريخ غير صحيح';
+    if (isNaN(gregorianDate.getTime())) return getInvalidDateLabel(language);
 
     const day = gregorianDate.getDate();
     const month = gregorianDate.getMonth() + 1;
@@ -168,21 +189,19 @@ function getHijriYearLength(year) {
 }
 
 /**
- * Format Gregorian date in Arabic format
+ * Format Gregorian date in localized format
  * @param {Date|string} date - The date to format
  * @param {boolean} includeTime - Whether to include time in the output
- * @returns {string} - Formatted Gregorian date string in Arabic
+ * @param {string} language - Language code
+ * @returns {string} - Formatted Gregorian date string
  */
-export function toGregorianDate(date, includeTime = false) {
-    if (!date) return 'غير محدد';
+export function toGregorianDate(date, includeTime = false, language = getCurrentLanguage()) {
+    if (!date) return getNotAvailableLabel(language);
     
     const gregorianDate = new Date(date);
-    if (isNaN(gregorianDate.getTime())) return 'تاريخ غير صحيح';
+    if (isNaN(gregorianDate.getTime())) return getInvalidDateLabel(language);
 
-    const gregorianMonths = [
-        'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-        'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
-    ];
+    const gregorianMonths = getGregorianMonths(language);
 
     const day = gregorianDate.getDate();
     const month = gregorianMonths[gregorianDate.getMonth()];
@@ -210,23 +229,24 @@ export function formatDate(date, options = {}) {
     const {
         includeTime = false,
         includeGregorian = false,
-        format = 'full' // 'full', 'short', 'long'
+        format = 'full', // 'full', 'short', 'long'
+        language = getCurrentLanguage(),
     } = options;
 
-    if (!date) return 'غير محدد';
+    if (!date) return getNotAvailableLabel(language);
 
     if (format === 'short') {
-        return toHijriDateShort(date);
+        return toHijriDateShort(date, language);
     }
 
-    let result = toHijriDate(date, includeTime);
+    let result = toHijriDate(date, includeTime, language);
 
     if (includeGregorian) {
         const gregorianDate = new Date(date);
-        const gregorianStr = gregorianDate.toLocaleDateString('en-US');
+        const locale = language === 'ar' ? 'ar' : 'en-US';
+        const gregorianStr = gregorianDate.toLocaleDateString(locale);
         result += ` (${gregorianStr})`;
     }
 
     return result;
 }
-

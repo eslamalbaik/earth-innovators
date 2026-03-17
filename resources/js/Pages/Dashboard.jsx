@@ -8,7 +8,7 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
     const { t } = useTranslation();
     const user = auth.user;
 
-    // استخدام الإحصائيات من قاعدة البيانات فقط
+    // Use stats from the database only
     const displayStats = stats || {
         totalTeachers: 0,
         totalBookings: 0,
@@ -22,12 +22,12 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
     };
 
     const statusLabels = {
-        pending: 'قيد الانتظار',
-        approved: 'مؤكد',
-        confirmed: 'مؤكد',
-        rejected: 'مرفوض',
-        cancelled: 'ملغي',
-        completed: 'مكتمل',
+        pending: t('bookings.pending'),
+        approved: t('bookings.approved'),
+        confirmed: t('bookings.confirmed'),
+        rejected: t('bookings.rejected'),
+        cancelled: t('bookings.cancelled'),
+        completed: t('bookings.completed'),
     };
 
     const statusColors = {
@@ -55,8 +55,8 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
     const isStudent = user.role === 'student' || (!user.role || (user.role !== 'admin' && user.role !== 'teacher'));
 
     return (
-        <DashboardLayout header="لوحة التحكم">
-            <Head title="لوحة التحكم" />
+        <DashboardLayout header={t('dashboard.dashboard')}>
+            <Head title={t('dashboard.dashboard')} />
 
             {isStudent && (
                 <>
@@ -66,7 +66,7 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
                                     {t('common.welcomeBack')} {user.name}
                                 </h1>
-                                <p className="text-white text-base md:text-lg">{t('dashboard.trackBookings') || 'تابع حجوزاتك وجلساتك التعليمية'}</p>
+                                <p className="text-white text-base md:text-lg">{t('dashboard.trackBookings')}</p>
                             </div>
                             <div className="bg-white bg-opacity-20 rounded-full p-4 self-center md:self-auto">
                                 <FaGraduationCap className="text-4xl md:text-6xl text-white" />
@@ -80,7 +80,7 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition duration-300">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="text-gray-600 text-sm font-medium">إجمالي الحجوزات</p>
+                                        <p className="text-gray-600 text-sm font-medium">{t('dashboard.totalBookings')}</p>
                                         <p className="text-2xl font-bold text-gray-900 mt-2">{stats.totalBookings || 0}</p>
                                     </div>
                                     <div className="bg-blue-100 p-3 rounded-full">
@@ -92,7 +92,7 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition duration-300">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="text-gray-600 text-sm font-medium">قيد الانتظار</p>
+                                        <p className="text-gray-600 text-sm font-medium">{t('dashboard.pendingBookings')}</p>
                                         <p className="text-2xl font-bold text-gray-900 mt-2">{stats.pendingBookings || 0}</p>
                                     </div>
                                     <div className="bg-yellow-100 p-3 rounded-full">
@@ -104,7 +104,7 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition duration-300">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="text-gray-600 text-sm font-medium">المكتملة</p>
+                                        <p className="text-gray-600 text-sm font-medium">{t('dashboard.completedBookings')}</p>
                                         <p className="text-2xl font-bold text-gray-900 mt-2">{stats.completedBookings || 0}</p>
                                     </div>
                                     <div className="bg-green-100 p-3 rounded-full">
@@ -116,10 +116,10 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition duration-300">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="text-gray-600 text-sm font-medium">إجمالي المصروف</p>
+                                        <p className="text-gray-600 text-sm font-medium">{t('dashboard.totalSpent')}</p>
                                         <div className="text-sm font-bold text-gray-900 flex items-center ">
                                             <p className="text-2xl font-bold text-gray-900 mt-2">{stats.totalSpent?.toFixed(0) || 0}</p>
-                                            <img src="/images/aed-currency(black).svg" alt="currency" className="w-8 h-8" />
+                                            <img src="/images/aed-currency(black).svg" alt={t('common.currencySymbol')} className="w-8 h-8" />
                                         </div>
                                     </div>
                                     <div className="bg-purple-100 p-3 rounded-full">
@@ -133,7 +133,7 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition duration-300">
                                         <div className="flex items-center justify-between">
                                             <div>
-                                                <p className="text-gray-600 text-sm font-medium">إجمالي المدفوعات</p>
+                                                <p className="text-gray-600 text-sm font-medium">{t('dashboard.totalPayments')}</p>
                                                 <p className="text-2xl font-bold text-gray-900 mt-2">{stats.totalPayments || 0}</p>
                                             </div>
                                             <div className="bg-indigo-100 p-3 rounded-full">
@@ -145,7 +145,7 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                                         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition duration-300">
                                             <div className="flex items-center justify-between">
                                                 <div>
-                                                    <p className="text-gray-600 text-sm font-medium">مدفوعات معلقة</p>
+                                                    <p className="text-gray-600 text-sm font-medium">{t('dashboard.pendingPayments')}</p>
                                                     <p className="text-2xl font-bold text-yellow-600 mt-2">{stats.pendingPayments || 0}</p>
                                                 </div>
                                                 <div className="bg-yellow-100 p-3 rounded-full">
@@ -164,7 +164,7 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                             <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
                                 <h3 className="font-bold text-gray-900 flex items-center gap-2">
                                     <FaClock className="text-blue-600" />
-                                    الجلسات القادمة
+                                    {t('dashboard.upcomingSessions')}
                                 </h3>
                             </div>
                             <div className="p-6">
@@ -184,7 +184,7 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                                 ) : (
                                     <div className="text-center py-8">
                                         <FaClock className="mx-auto text-4xl text-gray-300 mb-4" />
-                                        <p className="text-gray-500">لا توجد جلسات قادمة</p>
+                                        <p className="text-gray-500">{t('dashboard.noUpcomingSessions')}</p>
                                     </div>
                                 )}
                             </div>
@@ -194,22 +194,22 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                             <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
                                 <h3 className="font-bold text-gray-900 flex items-center gap-2">
                                     <FaBookOpen className="text-yellow-600" />
-                                    ملخص الحجوزات الأخيرة
+                                    {t('dashboard.recentBookingsSummary')}
                                 </h3>
                             </div>
                             <div className="p-6">
                                 {stats && (
                                     <div className="space-y-3">
                                         <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
-                                            <span className="text-gray-700">المؤكدة</span>
+                                            <span className="text-gray-700">{t('dashboard.confirmedBookings')}</span>
                                             <span className="font-bold text-blue-600">{stats.confirmedBookings || 0}</span>
                                         </div>
                                         <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
-                                            <span className="text-gray-700">قيد الانتظار</span>
+                                            <span className="text-gray-700">{t('dashboard.pendingBookings')}</span>
                                             <span className="font-bold text-yellow-600">{stats.pendingBookings || 0}</span>
                                         </div>
                                         <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                                            <span className="text-gray-700">المكتملة</span>
+                                            <span className="text-gray-700">{t('dashboard.completedBookings')}</span>
                                             <span className="font-bold text-green-600">{stats.completedBookings || 0}</span>
                                         </div>
                                     </div>
@@ -226,7 +226,7 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                         <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-blue-500 hover:shadow-xl transition-shadow">
                             <div className="flex items-center justify-between mb-4">
                                 <div>
-                                    <p className="text-sm text-gray-600 mb-1">المعلمون</p>
+                                    <p className="text-sm text-gray-600 mb-1">{t('dashboard.teachers')}</p>
                                     <p className="text-2xl font-bold text-gray-900">{displayStats.totalTeachers || 0}</p>
                                 </div>
                                 <div className="p-4 bg-blue-100 rounded-2xl">
@@ -235,7 +235,7 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                             </div>
                             <div className="flex items-center text-sm text-gray-500">
                                 <FaChartLine className="me-1" />
-                                <span>المعلمون النشطون</span>
+                                <span>{t('dashboard.activeTeachers')}</span>
                             </div>
                         </div>
                     )}
@@ -243,7 +243,7 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                     <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-yellow-500 hover:shadow-xl transition-shadow">
                         <div className="flex items-center justify-between mb-4">
                             <div>
-                                <p className="text-sm text-gray-600 mb-1">الحجوزات</p>
+                                <p className="text-sm text-gray-600 mb-1">{t('dashboard.bookings')}</p>
                                 <p className="text-2xl font-bold text-gray-900">{displayStats.totalBookings || 0}</p>
                             </div>
                             <div className="p-4 bg-yellow-100 rounded-2xl">
@@ -252,7 +252,7 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                         </div>
                         <div className="flex items-center text-sm text-gray-500">
                             <FaChartLine className="me-1" />
-                            <span>إجمالي الحجوزات</span>
+                            <span>{t('dashboard.totalBookings')}</span>
                         </div>
                     </div>
 
@@ -260,18 +260,18 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                         <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-green-500 hover:shadow-xl transition-shadow">
                             <div className="flex items-center justify-between mb-4">
                                 <div>
-                                    <p className="text-sm text-gray-600 mb-1">الإيرادات</p>
+                                    <p className="text-sm text-gray-600 mb-1">{t('dashboard.revenue')}</p>
                                     <div className="flex items-center gap-2">
                                         <p className="text-2xl font-bold mt-1">{(displayStats.totalRevenue || 0).toLocaleString()}</p>
                                     </div>
                                 </div>
                                 <div className="p-4 bg-green-300 rounded-2xl">
-                                    <img src="/images/aed-currency(white).svg" alt="currency" className="w-7 h-7" />
+                                    <img src="/images/aed-currency(white).svg" alt={t('common.currencySymbol')} className="w-7 h-7" />
                                 </div>
                             </div>
                             <div className="flex items-center text-sm text-gray-500">
                                 <FaChartLine className="me-1" />
-                                <span>إجمالي الإيرادات</span>
+                                <span>{t('dashboard.totalRevenue')}</span>
                             </div>
                         </div>
                     )}
@@ -279,7 +279,7 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                     <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-purple-500 hover:shadow-xl transition-shadow">
                         <div className="flex items-center justify-between mb-4">
                             <div>
-                                <p className="text-sm text-gray-600 mb-1">التقييم المتوسط</p>
+                                <p className="text-sm text-gray-600 mb-1">{t('dashboard.avgRating')}</p>
                                 <p className="text-2xl font-bold text-gray-900">{displayStats.avgRating || 0}/5</p>
                             </div>
                             <div className="p-4 bg-purple-100 rounded-2xl">
@@ -288,7 +288,7 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                         </div>
                         <div className="flex items-center text-sm text-gray-500">
                             <FaChartLine className="me-1" />
-                            <span>متوسط تقييم المعلمين</span>
+                            <span>{t('dashboard.avgTeacherRating')}</span>
                         </div>
                     </div>
                 </div>
@@ -297,12 +297,12 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
             {isStudent && recentBookings && (
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                     <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-yellow-50 to-yellow-100 flex items-center justify-between">
-                        <h3 className="text-xl font-bold text-gray-900">حجوزاتي الأخيرة</h3>
+                        <h3 className="text-xl font-bold text-gray-900">{t('dashboard.myRecentBookings')}</h3>
                         <Link
                             href="/my-bookings"
                             className="text-blue-600 hover:text-blue-700 text-sm font-medium"
                         >
-                            عرض الكل
+                            {t('common.viewAll')}
                         </Link>
                     </div>
                     <div className="overflow-x-auto">
@@ -310,22 +310,22 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                             <thead className="bg-gray-50">
                                 <tr>
                                     <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        المعلم
+                                        {t('dashboard.teacher')}
                                     </th>
                                     <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        المادة
+                                        {t('dashboard.subject')}
                                     </th>
                                     <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        عدد الحصص
+                                        {t('dashboard.sessionCount')}
                                     </th>
                                     <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        السعر
+                                        {t('dashboard.price')}
                                     </th>
                                     <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        التاريخ
+                                        {t('dashboard.date')}
                                     </th>
                                     <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        الحالة
+                                        {t('dashboard.status')}
                                     </th>
                                 </tr>
                             </thead>
@@ -334,7 +334,7 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                                     <tr>
                                         <td colSpan="6" className="px-6 py-12 text-center text-gray-500">
                                             <FaBookOpen className="mx-auto text-4xl mb-4 text-gray-300" />
-                                            <p>لا توجد حجوزات حالياً</p>
+                                            <p>{t('dashboard.noBookings')}</p>
                                         </td>
                                     </tr>
                                 ) : (
@@ -347,12 +347,12 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                                                 <div className="text-sm text-gray-900">{booking.subject}</div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">{booking.sessions_count} حصة</div>
+                                                <div className="text-sm text-gray-900">{t('dashboard.sessionsCount', { count: booking.sessions_count })}</div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="text-sm text-gray-900 flex items-center ">
                                                     <p className="text-gray-900 mt-2">{booking.total_price}</p>
-                                                    <img src="/images/aed-currency(black).svg" alt="currency" className="w-5 h-5" />
+                                                    <img src="/images/aed-currency(black).svg" alt={t('common.currencySymbol')} className="w-5 h-5" />
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
@@ -373,26 +373,26 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
             {!isStudent && (
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                     <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-yellow-50 to-yellow-100">
-                        <h3 className="text-xl font-bold text-gray-900">الحجوزات الأخيرة</h3>
+                        <h3 className="text-xl font-bold text-gray-900">{t('dashboard.recentBookings')}</h3>
                     </div>
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
                                     <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        الطالب
+                                        {t('dashboard.student')}
                                     </th>
                                     <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        المعلم
+                                        {t('dashboard.teacher')}
                                     </th>
                                     <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        المادة
+                                        {t('dashboard.subject')}
                                     </th>
                                     <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        التاريخ
+                                        {t('dashboard.date')}
                                     </th>
                                     <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        الحالة
+                                        {t('dashboard.status')}
                                     </th>
                                 </tr>
                             </thead>
@@ -401,7 +401,7 @@ export default function Dashboard({ auth, stats, recentBookings, upcomingSession
                                     <tr>
                                         <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
                                             <FaBookOpen className="mx-auto text-4xl mb-4 text-gray-300" />
-                                            <p>لا توجد حجوزات حالياً</p>
+                                            <p>{t('dashboard.noBookings')}</p>
                                         </td>
                                     </tr>
                                 ) : (

@@ -1,10 +1,12 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import { useTranslation } from '@/i18n';
 
 export default function ImportIndex({ auth }) {
     const [files, setFiles] = useState({ students: null, teachers: null, bookings: null });
     const { props } = usePage();
+    const { t, language } = useTranslation();
 
     const submit = (type) => {
         const form = new FormData();
@@ -14,9 +16,9 @@ export default function ImportIndex({ auth }) {
 
     return (
         <DashboardLayout auth={auth}>
-            <Head title="CSV Import" />
-            <div className="max-w-4xl mx-auto p-6 bg-white rounded shadow">
-                <h1 className="text-xl font-bold mb-6">CSV Import</h1>
+            <Head title={t('adminImportPage.pageTitle', { appName: t('common.appName') })} />
+            <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="max-w-4xl mx-auto p-6 bg-white rounded shadow">
+                <h1 className="text-xl font-bold mb-6">{t('adminImportPage.title')}</h1>
                 {props.flash?.success && (
                     <div className="mb-4 p-3 rounded bg-green-100 text-green-800">{props.flash.success}</div>
                 )}
@@ -25,14 +27,18 @@ export default function ImportIndex({ auth }) {
                 )}
                 {props.import_errors && props.import_errors.length > 0 && (
                     <div className="mb-4 p-3 rounded bg-yellow-50 text-yellow-900">
-                        <div className="font-semibold mb-2">تحذيرات الاستيراد:</div>
+                        <div className="font-semibold mb-2">{t('adminImportPage.importWarningsTitle')}</div>
                         <ul className="list-disc ps-6">
                             {props.import_errors.map((e, i) => (<li key={i}>{e}</li>))}
                         </ul>
                     </div>
                 )}
                 <div className="space-y-6">
-                    {[{ key: 'students', label: 'Students' }, { key: 'teachers', label: 'Teachers' }, { key: 'bookings', label: 'Bookings' }].map(item => (
+                    {[
+                        { key: 'students', label: t('common.students') },
+                        { key: 'teachers', label: t('common.teachers') },
+                        { key: 'bookings', label: t('adminImportPage.sections.bookings') },
+                    ].map(item => (
                         <div key={item.key} className="border rounded p-4">
                             <h2 className="font-semibold mb-2">{item.label}</h2>
                             <input type="file" accept=".csv" onChange={(e) => setFiles({ ...files, [item.key]: e.target.files[0] })} />
@@ -41,15 +47,15 @@ export default function ImportIndex({ auth }) {
                                 disabled={!files[item.key]}
                                 className="me-3 px-4 py-2 rounded bg-yellow-600 text-white disabled:opacity-50"
                             >
-                                Import
+                                {t('adminImportPage.actions.import')}
                             </button>
                         </div>
                     ))}
                     <div className="mt-8 text-sm text-gray-600">
-                        <div className="font-semibold mb-2">أعمدة مطلوبة:</div>
-                        <div className="mb-1">الطلاب: name,email,password</div>
-                        <div className="mb-1">المعلمون: name_ar,email,(اختياري: name_en,city,nationality,price_per_hour,subjects a|b,stages a|b,experience_years)</div>
-                        <div className="mb-1">الحجوزات: student_email,teacher_email,availability_id,status,price,(اختياري: payment_status,payment_method,payment_reference)</div>
+                        <div className="font-semibold mb-2">{t('adminImportPage.requiredColumnsTitle')}</div>
+                        <div className="mb-1">{t('adminImportPage.requiredColumns.students')}</div>
+                        <div className="mb-1">{t('adminImportPage.requiredColumns.teachers')}</div>
+                        <div className="mb-1">{t('adminImportPage.requiredColumns.bookings')}</div>
                     </div>
                 </div>
             </div>

@@ -5,9 +5,11 @@ import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function ConfirmPassword() {
     const [showPassword, setShowPassword] = useState(false);
+    const { t } = useTranslation();
     const { data, setData, post, processing, errors, reset } = useForm({
         password: '',
     });
@@ -21,18 +23,18 @@ export default function ConfirmPassword() {
 
     return (
         <GuestLayout>
-            <Head title="تأكيد كلمة المرور" />
+            <Head title={t('auth.confirmPasswordTitle')} />
             <div className="flex items-center justify-center sm:px-4">
                 <div className="w-full sm:space-y-8">
                     <div className="relative overflow-hidden bg-white shadow-lg sm:rounded-2xl px-4 py-10 w-[100vw] sm:w-[400px] md:w-[450px] max-w-5xl sm:mx-auto">
                         <form onSubmit={submit} className="space-y-6">
-                            <img src="/images/avatar.svg" alt="avatar" className="absolute -top-24 -start-24 w-48 h-48" />
-                            <img src="/images/avatar1.svg" alt="avatar" className="absolute -bottom-8 end-0 w-28 h-28" />
+                            <img src="/images/avatar.svg" alt={t('common.avatar')} className="absolute -top-24 -start-24 w-48 h-48" />
+                            <img src="/images/avatar1.svg" alt={t('common.avatar')} className="absolute -bottom-8 end-0 w-28 h-28" />
                             <div className="flex flex-col items-center">
                                 <div>
                                     <img
                                         src="/images/logo-modified.png"
-                                        alt="إرث المبتكرين - Innovators Legacy"
+                                        alt={t('common.appName')}
                                         className="h-24 w-auto object-contain"
                                     />
                                 </div>
@@ -40,10 +42,10 @@ export default function ConfirmPassword() {
 
                             <div className="text-center">
                                 <h2 className="text-2xl font-extrabold text-gray-900 mb-2">
-                                    تأكيد كلمة المرور
+                                    {t('auth.confirmPasswordTitle')}
                                 </h2>
                                 <p className="text-sm text-gray-600">
-                                    هذه منطقة آمنة من التطبيق. يرجى تأكيد كلمة المرور للمتابعة.
+                                    {t('auth.confirmPasswordDescription')}
                                 </p>
                             </div>
 
@@ -61,7 +63,7 @@ export default function ConfirmPassword() {
                                         autoComplete="current-password"
                                         isFocused={true}
                                         onChange={(e) => setData('password', e.target.value)}
-                                        placeholder="كلمة المرور"
+                                        placeholder={t('auth.password')}
                                     />
                                     <button
                                         type="button"
@@ -86,10 +88,10 @@ export default function ConfirmPassword() {
                                     {processing ? (
                                         <div className="flex items-center">
                                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white me-2"></div>
-                                            جاري التأكيد...
+                                            {t('auth.confirming')}
                                         </div>
                                     ) : (
-                                        'تأكيد'
+                                        {t('common.confirm')}
                                     )}
                                 </PrimaryButton>
                             </div>

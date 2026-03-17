@@ -12,19 +12,22 @@ import {
     FaGraduationCap,
     FaBan,
 } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
+import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 
 export default function StudentPayments({ payments, stats, filters }) {
+    const { t } = useTranslation();
     const [statusFilter, setStatusFilter] = useState(filters?.status || 'all');
     const [methodFilter, setMethodFilter] = useState(filters?.payment_method || 'all');
     const [cancellingId, setCancellingId] = useState(null);
 
     const statusLabels = {
-        pending: 'قيد الانتظار',
-        processing: 'قيد المعالجة',
-        completed: 'مكتمل',
-        failed: 'فشل',
-        cancelled: 'ملغي',
-        refunded: 'مسترد',
+        pending: t('studentPaymentsPage.status.pending'),
+        processing: t('studentPaymentsPage.status.processing'),
+        completed: t('studentPaymentsPage.status.completed'),
+        failed: t('studentPaymentsPage.status.failed'),
+        cancelled: t('studentPaymentsPage.status.cancelled'),
+        refunded: t('studentPaymentsPage.status.refunded'),
     };
 
     const statusColors = {
@@ -39,7 +42,7 @@ export default function StudentPayments({ payments, stats, filters }) {
     const methodLabels = {
         stripe: 'Stripe',
         paypal: 'PayPal',
-        mada: 'مدى',
+        mada: t('studentPaymentsPage.methods.mada'),
     };
 
     const handleFilter = (newStatus, newMethod) => {
@@ -56,10 +59,10 @@ export default function StudentPayments({ payments, stats, filters }) {
 
     const handleCancel = async (paymentId) => {
         const confirmed = await confirm({
-            title: 'تأكيد الإلغاء',
-            message: 'هل أنت متأكد من إلغاء هذا الدفع؟',
-            confirmText: 'إلغاء',
-            cancelText: 'تراجع',
+            title: t('studentPaymentsPage.confirm.cancelTitle'),
+            message: t('studentPaymentsPage.confirm.cancelMessage'),
+            confirmText: t('studentPaymentsPage.actions.cancelPayment'),
+            cancelText: t('common.cancel'),
             variant: 'warning',
         });
 
@@ -105,24 +108,24 @@ export default function StudentPayments({ payments, stats, filters }) {
     };
 
     const handleRefund = async (paymentId) => {
-        const amount = prompt('أدخل المبلغ المراد refundه (اتركه فارغاً للـ refund الكامل):');
+        const amount = prompt(t('studentPaymentsPage.prompts.refundAmount'));
         if (amount === null) {
             return; // المستخدم ألغى
         }
 
         const refundAmount = amount ? parseFloat(amount) : null;
         if (amount && (isNaN(refundAmount) || refundAmount <= 0)) {
-            alert('المبلغ غير صحيح');
+            alert(t('studentPaymentsPage.errors.invalidAmount'));
             return;
         }
 
-        const comment = prompt('أدخل تعليق (اختياري):') || '';
+        const comment = prompt(t('studentPaymentsPage.prompts.refundComment')) || '';
 
         const confirmed = await confirm({
-            title: 'تأكيد الاسترجاع',
-            message: 'هل أنت متأكد من refund هذا الدفع؟',
-            confirmText: 'استرجاع',
-            cancelText: 'إلغاء',
+            title: t('studentPaymentsPage.confirm.refundTitle'),
+            message: t('studentPaymentsPage.confirm.refundMessage'),
+            confirmText: t('studentPaymentsPage.actions.refund'),
+            cancelText: t('common.cancel'),
             variant: 'warning',
         });
 
@@ -153,10 +156,10 @@ export default function StudentPayments({ payments, stats, filters }) {
 
     const handleCapture = async (paymentId) => {
         const confirmed = await confirm({
-            title: 'تأكيد Capture',
-            message: 'هل أنت متأكد من capture هذا الدفع؟',
-            confirmText: 'Capture',
-            cancelText: 'إلغاء',
+            title: t('studentPaymentsPage.confirm.captureTitle'),
+            message: t('studentPaymentsPage.confirm.captureMessage'),
+            confirmText: t('studentPaymentsPage.actions.capture'),
+            cancelText: t('common.cancel'),
             variant: 'info',
         });
 
@@ -183,14 +186,14 @@ export default function StudentPayments({ payments, stats, filters }) {
     };
 
     return (
-        <DashboardLayout header="المدفوعات">
-            <Head title="المدفوعات" />
+        <DashboardLayout header={t('studentPaymentsPage.title')}>
+            <Head title={t('studentPaymentsPage.pageTitle', { appName: t('common.appName') })} />
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
                 <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-blue-500">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">إجمالي المدفوعات</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('studentPaymentsPage.stats.totalPayments')}</p>
                             <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
                         </div>
                         <div className="p-3 bg-blue-100 rounded-full">
@@ -202,7 +205,7 @@ export default function StudentPayments({ payments, stats, filters }) {
                 <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-green-500">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">المدفوعة</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('studentPaymentsPage.stats.completed')}</p>
                             <p className="text-3xl font-bold text-green-600">{stats.completed}</p>
                         </div>
                         <div className="p-3 bg-green-100 rounded-full">
@@ -214,7 +217,7 @@ export default function StudentPayments({ payments, stats, filters }) {
                 <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-yellow-500">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">قيد الانتظار</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('studentPaymentsPage.stats.pending')}</p>
                             <p className="text-3xl font-bold text-yellow-600">{stats.pending}</p>
                         </div>
                         <div className="p-3 bg-yellow-100 rounded-full">
@@ -226,7 +229,7 @@ export default function StudentPayments({ payments, stats, filters }) {
                 <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-purple-500">
                     <div className="flex items-center justify-between mb-4">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">إجمالي المصروف</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('studentPaymentsPage.stats.totalSpent')}</p>
                             <p className="text-3xl font-bold text-purple-600">{stats.totalPaid.toFixed(2)}</p>
                         </div>
                         <div className="p-3 bg-purple-100 rounded-full">
@@ -240,14 +243,14 @@ export default function StudentPayments({ payments, stats, filters }) {
                 <div className="flex items-center gap-4 flex-wrap">
                     <div className="flex items-center gap-2 text-gray-700">
                         <FaFilter className="text-lg" />
-                        <span className="font-medium">فلترة:</span>
+                        <span className="font-medium">{t('studentPaymentsPage.filters.title')}:</span>
                     </div>
                     <select
                         value={statusFilter}
                         onChange={(e) => handleFilter(e.target.value, methodFilter)}
                         className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400"
                     >
-                        <option value="all">كل الحالات</option>
+                        <option value="all">{t('studentPaymentsPage.filters.allStatuses')}</option>
                         {Object.entries(statusLabels).map(([key, label]) => (
                             <option key={key} value={key}>{label}</option>
                         ))}
@@ -257,7 +260,7 @@ export default function StudentPayments({ payments, stats, filters }) {
                         onChange={(e) => handleFilter(statusFilter, e.target.value)}
                         className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400"
                     >
-                        <option value="all">كل الطرق</option>
+                        <option value="all">{t('studentPaymentsPage.filters.allMethods')}</option>
                         {Object.entries(methodLabels).map(([key, label]) => (
                             <option key={key} value={key}>{label}</option>
                         ))}
@@ -267,21 +270,21 @@ export default function StudentPayments({ payments, stats, filters }) {
 
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-yellow-50 to-yellow-100">
-                    <h3 className="text-lg font-bold text-gray-900">سجل المدفوعات</h3>
+                    <h3 className="text-lg font-bold text-gray-900">{t('studentPaymentsPage.table.title')}</h3>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full">
                         <thead className="bg-gray-50">
                             <tr>
                                 <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">#</th>
-                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">المعلم</th>
-                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">المادة</th>
-                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">المبلغ</th>
-                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">طريقة الدفع</th>
-                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">الحالة</th>
-                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">تاريخ الدفع</th>
-                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">رقم المعاملة</th>
-                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">إجراءات</th>
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">{t('studentPaymentsPage.table.teacher')}</th>
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">{t('studentPaymentsPage.table.subject')}</th>
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">{t('studentPaymentsPage.table.amount')}</th>
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">{t('studentPaymentsPage.table.method')}</th>
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">{t('studentPaymentsPage.table.status')}</th>
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">{t('studentPaymentsPage.table.paidAt')}</th>
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">{t('studentPaymentsPage.table.transactionId')}</th>
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">{t('common.actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
@@ -289,14 +292,14 @@ export default function StudentPayments({ payments, stats, filters }) {
                                 <tr>
                                     <td colSpan="8" className="px-6 py-12 text-center text-gray-500">
                                         <FaCreditCard className="mx-auto text-4xl mb-4 text-gray-300" />
-                                        <p>لا توجد مدفوعات حالياً</p>
+                                        <p>{t('studentPaymentsPage.empty')}</p>
                                     </td>
                                 </tr>
                             ) : (
                                 payments?.data?.map((payment) => (
                                     <tr key={payment.id} className="hover:bg-gray-50">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                            {payment.booking_id ? `#${payment.booking_id}` : 'اشتراك باقة'}
+                                            {payment.booking_id ? `#${payment.booking_id}` : t('studentPaymentsPage.packageSubscription')}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center gap-2">
@@ -333,10 +336,10 @@ export default function StudentPayments({ payments, stats, filters }) {
                                                         onClick={() => handleCapture(payment.id)}
                                                         disabled={cancellingId === payment.id}
                                                         className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                                        title="Capture الدفع"
+                                                        title={t('studentPaymentsPage.actions.capture')}
                                                     >
                                                         <FaCheckCircle />
-                                                        {cancellingId === payment.id ? 'جاري...' : 'Capture'}
+                                                        {cancellingId === payment.id ? t('studentPaymentsPage.actions.processing') : t('studentPaymentsPage.actions.capture')}
                                                     </button>
                                                 )}
                                                 {canRefundPayment(payment) && (
@@ -344,10 +347,10 @@ export default function StudentPayments({ payments, stats, filters }) {
                                                         onClick={() => handleRefund(payment.id)}
                                                         disabled={cancellingId === payment.id}
                                                         className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                                        title="Refund الدفع"
+                                                        title={t('studentPaymentsPage.actions.refund')}
                                                     >
                                                         <FaDollarSign />
-                                                        {cancellingId === payment.id ? 'جاري...' : 'Refund'}
+                                                        {cancellingId === payment.id ? t('studentPaymentsPage.actions.processing') : t('studentPaymentsPage.actions.refund')}
                                                     </button>
                                                 )}
                                                 {canCancelPayment(payment) && (
@@ -355,10 +358,10 @@ export default function StudentPayments({ payments, stats, filters }) {
                                                         onClick={() => handleCancel(payment.id)}
                                                         disabled={cancellingId === payment.id}
                                                         className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                                        title="إلغاء الدفع"
+                                                        title={t('studentPaymentsPage.actions.cancelPayment')}
                                                     >
                                                         <FaBan />
-                                                        {cancellingId === payment.id ? 'جاري الإلغاء...' : 'إلغاء'}
+                                                        {cancellingId === payment.id ? t('studentPaymentsPage.actions.cancelling') : t('studentPaymentsPage.actions.cancelPayment')}
                                                     </button>
                                                 )}
                                             </div>
@@ -373,7 +376,7 @@ export default function StudentPayments({ payments, stats, filters }) {
                 {payments?.links && payments.links.length > 3 && (
                     <div className="bg-white px-4 py-3 border-t border-gray-200 flex items-center justify-between">
                         <div className="text-sm text-gray-700">
-                            عرض {payments.from} إلى {payments.to} من {payments.total} مدفوعة
+                            {t('studentPaymentsPage.pagination.showing', { from: payments.from, to: payments.to, total: payments.total })}
                         </div>
                         <div className="flex gap-2">
                             {payments.links.map((link, idx) => (

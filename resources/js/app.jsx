@@ -10,6 +10,7 @@ import { queryClient } from './lib/react-query';
 import { ToastProvider } from './Contexts/ToastContext';
 import { ConfirmProvider } from './Contexts/ConfirmContext';
 import store from './store/store';
+import { getTranslation } from './i18n';
 
 const getStoredLanguage = () => {
     if (typeof window !== 'undefined') {
@@ -23,9 +24,9 @@ const getStoredLanguage = () => {
     return 'ar';
 };
 
-getStoredLanguage();
+const currentLanguage = getStoredLanguage();
 
-const appName = import.meta.env.VITE_APP_NAME || 'إرث المبتكرين - Innovators Legacy';
+const appName = import.meta.env.VITE_APP_NAME || getTranslation(currentLanguage, 'common.appName');
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,

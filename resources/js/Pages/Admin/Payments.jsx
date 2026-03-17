@@ -3,30 +3,26 @@ import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import {
     FaCreditCard,
-    FaCheckCircle,
-    FaClock,
-    FaTimes,
     FaFilter,
-    FaDollarSign,
     FaUser,
     FaGraduationCap,
     FaEye,
-    FaDownload,
-    FaBan,
 } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function AdminPayments({ payments, stats, teachers, filters }) {
+    const { t } = useTranslation();
     const [statusFilter, setStatusFilter] = useState(filters?.status || 'all');
     const [methodFilter, setMethodFilter] = useState(filters?.payment_method || 'all');
     const [teacherFilter, setTeacherFilter] = useState(filters?.teacher_id || 'all');
 
     const statusLabels = {
-        pending: 'قيد الانتظار',
-        processing: 'قيد المعالجة',
-        completed: 'مكتمل',
-        failed: 'فشل',
-        cancelled: 'ملغي',
-        refunded: 'مسترد',
+        pending: t('adminPaymentsPage.statuses.pending'),
+        processing: t('adminPaymentsPage.statuses.processing'),
+        completed: t('adminPaymentsPage.statuses.completed'),
+        failed: t('adminPaymentsPage.statuses.failed'),
+        cancelled: t('adminPaymentsPage.statuses.cancelled'),
+        refunded: t('adminPaymentsPage.statuses.refunded'),
     };
 
     const statusColors = {
@@ -39,12 +35,12 @@ export default function AdminPayments({ payments, stats, teachers, filters }) {
     };
 
     const methodLabels = {
-        stripe: 'Stripe',
-        paypal: 'PayPal',
-        ziina: 'Ziina',
-        tamara: 'Tamara',
-        mada: 'مدى',
-        bank_transfer: 'تحويل بنكي',
+        stripe: t('adminPaymentsPage.methods.stripe'),
+        paypal: t('adminPaymentsPage.methods.paypal'),
+        ziina: t('adminPaymentsPage.methods.ziina'),
+        tamara: t('adminPaymentsPage.methods.tamara'),
+        mada: t('adminPaymentsPage.methods.mada'),
+        bank_transfer: t('adminPaymentsPage.methods.bankTransfer'),
     };
 
     const handleFilter = () => {
@@ -60,39 +56,39 @@ export default function AdminPayments({ payments, stats, teachers, filters }) {
     };
 
     return (
-        <DashboardLayout header="إدارة المدفوعات">
-            <Head title="إدارة المدفوعات" />
+        <DashboardLayout header={t('adminPaymentsPage.title')}>
+            <Head title={t('adminPaymentsPage.pageTitle', { appName: t('common.appName') })} />
 
             <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
                 <div className="bg-white rounded-xl shadow-lg p-4 border-r-4 border-blue-500">
-                    <p className="text-xs text-gray-600 mb-1">إجمالي</p>
+                    <p className="text-xs text-gray-600 mb-1">{t('adminPaymentsPage.stats.total')}</p>
                     <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
                 </div>
                 <div className="bg-white rounded-xl shadow-lg p-4 border-r-4 border-green-500">
-                    <p className="text-xs text-gray-600 mb-1">مكتملة</p>
+                    <p className="text-xs text-gray-600 mb-1">{t('adminPaymentsPage.stats.completed')}</p>
                     <p className="text-2xl font-bold text-green-600">{stats.completed}</p>
                 </div>
                 <div className="bg-white rounded-xl shadow-lg p-4 border-r-4 border-yellow-500">
-                    <p className="text-xs text-gray-600 mb-1">قيد الانتظار</p>
+                    <p className="text-xs text-gray-600 mb-1">{t('adminPaymentsPage.stats.pending')}</p>
                     <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
                 </div>
                 <div className="bg-white rounded-xl shadow-lg p-4 border-r-4 border-red-500">
-                    <p className="text-xs text-gray-600 mb-1">فشل</p>
+                    <p className="text-xs text-gray-600 mb-1">{t('adminPaymentsPage.stats.failed')}</p>
                     <p className="text-2xl font-bold text-red-600">{stats.failed}</p>
                 </div>
                 <div className="bg-white rounded-xl shadow-lg p-4 border-r-4 border-purple-500">
-                    <p className="text-xs text-gray-600 mb-1">مسترد</p>
+                    <p className="text-xs text-gray-600 mb-1">{t('adminPaymentsPage.stats.refunded')}</p>
                     <p className="text-2xl font-bold text-purple-600">{stats.refunded}</p>
                 </div>
                 <div className="bg-white rounded-xl shadow-lg p-4 border-r-4 border-indigo-500">
-                    <p className="text-xs text-gray-600 mb-1">إجمالي الإيرادات</p>
+                    <p className="text-xs text-gray-600 mb-1">{t('adminPaymentsPage.stats.totalRevenue')}</p>
                     <div className="font-bold text-indigo-600 flex items-center ">
                         <p className="text-xl mt-1">{(stats.totalRevenue || 0).toFixed(2)}</p>
                         <img src="/images/aed-currency(black).svg" alt="currency" className="w-6 h-6" />
                     </div>
                 </div>
                 <div className="bg-white rounded-xl shadow-lg p-4 border-r-4 border-orange-500">
-                    <p className="text-xs text-gray-600 mb-1">معلق</p>
+                    <p className="text-xs text-gray-600 mb-1">{t('adminPaymentsPage.stats.pendingAmount')}</p>
                     <div className="font-bold text-orange-600 flex items-center ">
                         <p className="text-xl mt-1">{(stats.pendingAmount || 0).toFixed(2)}</p>
                         <img src="/images/aed-currency(black).svg" alt="currency" className="w-6 h-6" />
@@ -104,7 +100,7 @@ export default function AdminPayments({ payments, stats, teachers, filters }) {
                 <div className="flex items-center gap-4 flex-wrap">
                     <div className="flex items-center gap-2 text-gray-700">
                         <FaFilter className="text-lg" />
-                        <span className="font-medium">فلترة:</span>
+                        <span className="font-medium">{t('adminPaymentsPage.filters.label')}</span>
                     </div>
                     <select
                         value={statusFilter}
@@ -114,7 +110,7 @@ export default function AdminPayments({ payments, stats, teachers, filters }) {
                         }}
                         className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400"
                     >
-                        <option value="all">كل الحالات</option>
+                        <option value="all">{t('adminPaymentsPage.filters.allStatuses')}</option>
                         {Object.entries(statusLabels).map(([key, label]) => (
                             <option key={key} value={key}>{label}</option>
                         ))}
@@ -127,7 +123,7 @@ export default function AdminPayments({ payments, stats, teachers, filters }) {
                         }}
                         className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400"
                     >
-                        <option value="all">كل الطرق</option>
+                        <option value="all">{t('adminPaymentsPage.filters.allMethods')}</option>
                         {Object.entries(methodLabels).map(([key, label]) => (
                             <option key={key} value={key}>{label}</option>
                         ))}
@@ -140,7 +136,7 @@ export default function AdminPayments({ payments, stats, teachers, filters }) {
                         }}
                         className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400"
                     >
-                        <option value="all">كل المعلمين</option>
+                        <option value="all">{t('adminPaymentsPage.filters.allTeachers')}</option>
                         {teachers?.map((teacher) => (
                             <option key={teacher.id} value={teacher.id}>{teacher.name}</option>
                         ))}
@@ -149,27 +145,27 @@ export default function AdminPayments({ payments, stats, teachers, filters }) {
                         onClick={handleFilter}
                         className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-medium"
                     >
-                        تطبيق
+                        {t('adminPaymentsPage.filters.apply')}
                     </button>
                 </div>
             </div>
 
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-yellow-50 to-yellow-100 flex items-center justify-between">
-                    <h3 className="text-lg font-bold text-gray-900">سجل جميع المدفوعات</h3>
+                    <h3 className="text-lg font-bold text-gray-900">{t('adminPaymentsPage.table.title')}</h3>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full">
                         <thead className="bg-gray-50">
                             <tr>
                                 <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">#</th>
-                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">الطالب</th>
-                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">المعلم</th>
-                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">المبلغ</th>
-                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">طريقة الدفع</th>
-                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">الحالة</th>
-                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">تاريخ الدفع</th>
-                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">إجراءات</th>
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">{t('adminPaymentsPage.table.student')}</th>
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">{t('adminPaymentsPage.table.teacher')}</th>
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">{t('adminPaymentsPage.table.amount')}</th>
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">{t('adminPaymentsPage.table.paymentMethod')}</th>
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">{t('adminPaymentsPage.table.status')}</th>
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">{t('adminPaymentsPage.table.paymentDate')}</th>
+                                <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase">{t('adminPaymentsPage.table.actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
@@ -177,14 +173,16 @@ export default function AdminPayments({ payments, stats, teachers, filters }) {
                                 <tr>
                                     <td colSpan="8" className="px-6 py-12 text-center text-gray-500">
                                         <FaCreditCard className="mx-auto text-4xl mb-4 text-gray-300" />
-                                        <p>لا توجد مدفوعات حالياً</p>
+                                        <p>{t('adminPaymentsPage.table.noPayments')}</p>
                                     </td>
                                 </tr>
                             ) : (
                                 payments?.data?.map((payment) => (
                                     <tr key={payment.id} className="hover:bg-gray-50">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                            {payment.booking_id ? `#${payment.booking_id}` : 'اشتراك باقة'}
+                                            {payment.booking_id
+                                                ? `#${payment.booking_id}`
+                                                : t('adminPaymentsPage.table.subscriptionLabel')}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center gap-2">
@@ -222,7 +220,7 @@ export default function AdminPayments({ payments, stats, teachers, filters }) {
                                                 className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
                                             >
                                                 <FaEye />
-                                                عرض
+                                                {t('adminPaymentsPage.table.view')}
                                             </Link>
                                         </td>
                                     </tr>
@@ -235,7 +233,11 @@ export default function AdminPayments({ payments, stats, teachers, filters }) {
                 {payments?.links && payments.links.length > 3 && (
                     <div className="bg-white px-4 py-3 border-t border-gray-200 flex items-center justify-between">
                         <div className="text-sm text-gray-700">
-                            عرض {payments.from} إلى {payments.to} من {payments.total} مدفوعة
+                            {t('adminPaymentsPage.paginationSummary', {
+                                from: payments.from,
+                                to: payments.to,
+                                total: payments.total,
+                            })}
                         </div>
                         <div className="flex gap-2">
                             {payments.links.map((link, idx) => (
@@ -257,4 +259,3 @@ export default function AdminPayments({ payments, stats, teachers, filters }) {
         </DashboardLayout>
     );
 }
-

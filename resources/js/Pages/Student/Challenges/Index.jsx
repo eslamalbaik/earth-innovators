@@ -3,8 +3,10 @@ import { useState, useMemo } from 'react';
 import { FaSearch, FaFilter, FaTrophy, FaTimes, FaUsers, FaCalendar, FaClock, FaCheckCircle, FaTimesCircle, FaExclamationCircle, FaQuestionCircle, FaRocket, FaBrain } from 'react-icons/fa';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
+import { useTranslation } from '@/i18n';
 
 export default function StudentChallengesIndex({ auth, challenges, filters, message, categories = [] }) {
+    const { t, language } = useTranslation();
     const [search, setSearch] = useState('');
     const [selectedStatus, setSelectedStatus] = useState(filters?.status || '');
     const [showFilterModal, setShowFilterModal] = useState(false);
@@ -12,19 +14,19 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
 
     // Use categories from database, fallback to default if empty
     const categoriesList = categories && categories.length > 0 ? categories : [
-        { value: '', label: 'الكل' },
-        { value: 'science', label: 'علمي' },
-        { value: 'arts', label: 'فني' },
-        { value: 'technology', label: 'تقني' },
-        { value: 'heritage', label: 'تراثي' },
-        { value: 'environmental', label: 'بيئي' },
+        { value: '', label: t('common.all') },
+        { value: 'science', label: t('categories.science') },
+        { value: 'arts', label: t('categories.arts') },
+        { value: 'technology', label: t('categories.technology') },
+        { value: 'heritage', label: t('studentChallengesIndexPage.categories.heritage') },
+        { value: 'environmental', label: t('studentChallengesIndexPage.categories.environmental') },
     ];
 
     const statusOptions = [
-        { value: '', label: 'الكل' },
-        { value: 'active', label: 'نشط' },
-        { value: 'upcoming', label: 'قادم' },
-        { value: 'finished', label: 'منتهي' },
+        { value: '', label: t('common.all') },
+        { value: 'active', label: t('common.active') },
+        { value: 'upcoming', label: t('common.upcoming') },
+        { value: 'finished', label: t('studentChallengesIndexPage.status.finished') },
     ];
 
     const handleStatusFilter = (status) => {
@@ -76,26 +78,39 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
     const formatDate = (date) => {
         if (!date) return '';
         const d = new Date(date);
-        const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+        const months = [
+            t('common.january'),
+            t('common.february'),
+            t('common.march'),
+            t('common.april'),
+            t('common.may'),
+            t('common.june'),
+            t('common.july'),
+            t('common.august'),
+            t('common.september'),
+            t('common.october'),
+            t('common.november'),
+            t('common.december'),
+        ];
         return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
     };
 
     const getChallengeTypeLabel = (type) => {
         const labels = {
-            'cognitive': 'تحدّي معرفي',
-            'applied': 'تحدّي تطبيقي',
-            'creative': 'تحدّي إبداعي',
-            'artistic_creative': 'إبداعي فني',
-            'collaborative': 'تحدّي تعاوني',
-            'analytical': 'تحليلي',
-            'technological': 'تكنولوجي',
-            'behavioral': 'سلوكي',
-            '60_seconds': '60 ثانية',
-            'mental_math': 'بدون قلم',
-            'conversions': 'التحويلات',
-            'team_fastest': 'الفريق الأسرع',
-            'build_problem': 'ابنِ مسألة',
-            'custom': 'مخصص',
+            cognitive: t('challenges.cognitive'),
+            applied: t('challenges.applied'),
+            creative: t('challenges.creative'),
+            artistic_creative: t('challenges.artisticCreative'),
+            collaborative: t('challenges.collaborative'),
+            analytical: t('challenges.analytical'),
+            technological: t('challenges.technological'),
+            behavioral: t('challenges.behavioral'),
+            '60_seconds': t('challenges.minseconds'),
+            mental_math: t('challenges.mentalMath'),
+            conversions: t('challenges.conversions'),
+            team_fastest: t('challenges.teamFastest'),
+            build_problem: t('challenges.buildProblem'),
+            custom: t('studentChallengesIndexPage.types.custom'),
         };
         return labels[type] || type;
     };
@@ -106,27 +121,27 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
         const deadline = new Date(challenge.deadline);
 
         if (challenge.status === 'active' && startDate <= now && deadline >= now) {
-            return { bg: 'bg-green-100', text: 'text-green-700', border: 'border-green-300', label: 'نشط', icon: FaCheckCircle };
+            return { key: 'active', bg: 'bg-green-100', text: 'text-green-700', border: 'border-green-300', label: t('common.active'), icon: FaCheckCircle };
         } else if (challenge.status === 'active' && startDate > now) {
-            return { bg: 'bg-blue-100', text: 'text-blue-700', border: 'border-blue-300', label: 'قادم', icon: FaClock };
+            return { key: 'upcoming', bg: 'bg-blue-100', text: 'text-blue-700', border: 'border-blue-300', label: t('common.upcoming'), icon: FaClock };
         } else {
-            return { bg: 'bg-gray-100', text: 'text-gray-700', border: 'border-gray-300', label: 'منتهي', icon: FaTimesCircle };
+            return { key: 'finished', bg: 'bg-gray-100', text: 'text-gray-700', border: 'border-gray-300', label: t('studentChallengesIndexPage.status.finished'), icon: FaTimesCircle };
         }
     };
 
     const getSubmissionStatusBadge = (status) => {
         const badges = {
-            submitted: { bg: 'bg-yellow-100', text: 'text-yellow-700', border: 'border-yellow-300', label: 'تم التقديم' },
-            reviewed: { bg: 'bg-blue-100', text: 'text-blue-700', border: 'border-blue-300', label: 'قيد المراجعة' },
-            approved: { bg: 'bg-green-100', text: 'text-green-700', border: 'border-green-300', label: 'مقبول' },
-            rejected: { bg: 'bg-red-100', text: 'text-red-700', border: 'border-red-300', label: 'مرفوض' },
+            submitted: { bg: 'bg-yellow-100', text: 'text-yellow-700', border: 'border-yellow-300', label: t('studentChallengesIndexPage.submissionStatuses.submitted') },
+            reviewed: { bg: 'bg-blue-100', text: 'text-blue-700', border: 'border-blue-300', label: t('studentChallengesIndexPage.submissionStatuses.reviewed') },
+            approved: { bg: 'bg-green-100', text: 'text-green-700', border: 'border-green-300', label: t('schoolChallengeSubmissionShowPage.statusApproved') },
+            rejected: { bg: 'bg-red-100', text: 'text-red-700', border: 'border-red-300', label: t('schoolChallengeSubmissionShowPage.statusRejected') },
         };
         return badges[status] || null;
     };
 
     const getCategoryLabel = (cat) => {
         const found = categoriesList.find((c) => c.value === cat);
-        return found ? found.label : 'أخرى';
+        return found ? found.label : t('categories.other');
     };
 
     // Use backend filtered data directly, but apply client-side filtering for status if needed
@@ -137,7 +152,7 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
         if (!selectedStatus) return list;
         return list.filter((c) => {
             const statusBadge = getStatusBadge(c);
-            return statusBadge.label === selectedStatus;
+            return statusBadge.key === selectedStatus;
         });
     }, [challenges?.data, selectedStatus]);
 
@@ -156,7 +171,7 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
                     type="button"
                     onClick={() => setShowFilterModal(true)}
                     className="h-10 w-10 rounded-xl bg-[#A3C042] flex items-center justify-center hover:bg-[#8CA635] transition flex-shrink-0"
-                    aria-label="فلترة"
+                    aria-label={t('common.filter')}
                 >
                     <FaFilter className="text-white text-sm" />
                 </button>
@@ -166,7 +181,7 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder="ابحث عن التحديات .."
+                            placeholder={t('studentChallengesIndexPage.searchPlaceholder')}
                             className="w-full h-10 ps-10 pe-4 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042] text-sm"
                         />
                         <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
@@ -203,7 +218,7 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
 
             {/* Challenges Count */}
             <div className="text-sm text-gray-700">
-                {filteredChallenges.length} تحديات
+                {t('studentChallengesIndexPage.count', { count: filteredChallenges.length })}
             </div>
 
             {/* Challenges Grid */}
@@ -246,7 +261,7 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
                                 </div>
                                 <div className="p-3">
                                     <h3 className="text-sm font-bold text-gray-900 mb-2 line-clamp-2 min-h-[2.5rem]">
-                                        {challenge.title || 'تحدي الابتكار'}
+                                        {challenge.title || t('projects.innovationChallenge')}
                                     </h3>
                                     {challenge.objective && (
                                         <p className="text-xs text-gray-600 mb-2 line-clamp-2">
@@ -254,7 +269,7 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
                                         </p>
                                     )}
                                     <div className="text-xs text-gray-600 mb-2">
-                                        {deadline && <div>الموعد النهائي: {deadline}</div>}
+                                        {deadline && <div>{t('studentChallengesIndexPage.deadlineLabel', { date: deadline })}</div>}
                                     </div>
                                     <div className="flex items-center justify-between text-xs text-gray-500">
                                         <div className="flex items-center gap-1">
@@ -272,7 +287,7 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
                                     </div>
                                     {challenge.points_reward > 0 && (
                                         <div className="mt-2 text-xs text-green-600 font-semibold">
-                                            {challenge.points_reward} نقطة
+                                            {challenge.points_reward} {t('common.point')}
                                         </div>
                                     )}
                                 </div>
@@ -285,13 +300,13 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
                     <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
                         <FaTrophy className="text-gray-400 text-4xl" />
                     </div>
-                    <p className="text-gray-400 text-sm mb-2">لا توجد تحديات تطابق معايير البحث</p>
+                    <p className="text-gray-400 text-sm mb-2">{t('studentChallengesIndexPage.empty')}</p>
                     <button
                         type="button"
                         onClick={handleClearFilters}
                         className="text-[#A3C042] text-sm font-semibold hover:text-[#8CA635]"
                     >
-                        عرض كل التحديات
+                        {t('studentChallengesIndexPage.actions.viewAll')}
                     </button>
                 </div>
             )}
@@ -302,38 +317,38 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
                 <div className="bg-white rounded-2xl border border-gray-100 p-4">
                     <div className="flex items-center gap-2 mb-4">
                         <FaCheckCircle className="text-[#A3C042] text-lg" />
-                        <h3 className="text-sm font-extrabold text-gray-900">شروط المشاركة في التحديات</h3>
+                        <h3 className="text-sm font-extrabold text-gray-900">{t('studentChallengesIndexPage.conditions.title')}</h3>
                     </div>
                     <div className="space-y-3">
                         {[
                             {
-                                text: 'التسجيل في الموقع',
+                                text: t('studentChallengesIndexPage.conditions.items.register'),
                                 icon: FaExclamationCircle,
-                                tag: 'إلزامي',
+                                tag: t('studentChallengesIndexPage.tags.mandatory'),
                                 tagColor: 'bg-red-100 text-red-700 border-red-300'
                             },
                             {
-                                text: 'إكمال الملف الشخصي',
+                                text: t('studentChallengesIndexPage.conditions.items.completeProfile'),
                                 icon: FaExclamationCircle,
-                                tag: 'إلزامي',
+                                tag: t('studentChallengesIndexPage.tags.mandatory'),
                                 tagColor: 'bg-red-100 text-red-700 border-red-300'
                             },
                             {
-                                text: 'المستوى المطلوب',
+                                text: t('studentChallengesIndexPage.conditions.items.requiredLevel'),
                                 icon: FaExclamationCircle,
-                                tag: 'إلزامي',
+                                tag: t('studentChallengesIndexPage.tags.mandatory'),
                                 tagColor: 'bg-red-100 text-red-700 border-red-300'
                             },
                             {
-                                text: 'المشاركة السابقة',
+                                text: t('studentChallengesIndexPage.conditions.items.previousParticipation'),
                                 icon: FaQuestionCircle,
-                                tag: 'مفضل',
+                                tag: t('studentChallengesIndexPage.tags.preferred'),
                                 tagColor: 'bg-blue-100 text-blue-700 border-blue-300'
                             },
                             {
-                                text: 'الالتزام بالمواعيد',
+                                text: t('studentChallengesIndexPage.conditions.items.commitDeadlines'),
                                 icon: FaExclamationCircle,
-                                tag: 'إلزامي',
+                                tag: t('studentChallengesIndexPage.tags.mandatory'),
                                 tagColor: 'bg-red-100 text-red-700 border-red-300'
                             },
                         ].map((condition, index) => {
@@ -357,22 +372,22 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
                 <div className="bg-white rounded-2xl border border-gray-100 p-4">
                     <div className="flex items-center gap-2 mb-4">
                         <FaTrophy className="text-yellow-500 text-lg" />
-                        <h3 className="text-sm font-extrabold text-gray-900">الفائزون السابقون</h3>
+                        <h3 className="text-sm font-extrabold text-gray-900">{t('studentChallengesIndexPage.winners.title')}</h3>
                     </div>
                     <div className="space-y-4">
                         {[
                             {
-                                name: 'فرح حرز',
-                                project: 'تصميم منصة تعليمية',
-                                date: 'أبريل 2023',
-                                badge: { text: 'صانع التغيير', icon: FaRocket, color: 'bg-green-100 text-green-700 border-green-300' },
+                                name: t('studentChallengesIndexPage.winners.items.1.name'),
+                                project: t('studentChallengesIndexPage.winners.items.1.project'),
+                                date: t('studentChallengesIndexPage.winners.items.1.date'),
+                                badge: { text: t('studentChallengesIndexPage.winners.items.1.badge'), icon: FaRocket, color: 'bg-green-100 text-green-700 border-green-300' },
                                 avatar: '/images/hero.png',
                             },
                             {
-                                name: 'سارة أحمد',
-                                project: 'تصميم منصة تعليمية',
-                                date: 'مارس 2023',
-                                badge: { text: 'قائد إبداعي', icon: FaBrain, color: 'bg-green-100 text-green-700 border-green-300' },
+                                name: t('studentChallengesIndexPage.winners.items.2.name'),
+                                project: t('studentChallengesIndexPage.winners.items.2.project'),
+                                date: t('studentChallengesIndexPage.winners.items.2.date'),
+                                badge: { text: t('studentChallengesIndexPage.winners.items.2.badge'), icon: FaBrain, color: 'bg-green-100 text-green-700 border-green-300' },
                                 avatar: '/images/hero.png',
                             },
                         ].map((winner, index) => {
@@ -407,7 +422,7 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
                         onClick={() => router.visit('/challenges/winners')}
                         className="mt-4 w-full text-center text-xs font-semibold text-[#A3C042] hover:text-[#8CA635] transition"
                     >
-                        عرض جميع الفائزين
+                        {t('studentChallengesIndexPage.actions.viewAllWinners')}
                     </button>
                 </div>
             </div>
@@ -434,13 +449,13 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
     );
 
     return (
-        <div dir="rtl" className="min-h-screen bg-gray-50">
-            <Head title="التحديات - إرث المبتكرين" />
+        <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
+            <Head title={t('studentChallengesIndexPage.pageTitle', { appName: t('common.appName') })} />
 
             {/* Mobile View */}
             <div className="block md:hidden">
                 <MobileTopBar
-                    title="إرث المبتكرين"
+                    title={t('common.appName')}
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
                     onBack={() => router.visit('/')}
@@ -454,7 +469,7 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
             {/* Desktop View */}
             <div className="hidden md:block">
                 <MobileTopBar
-                    title="إرث المبتكرين"
+                    title={t('common.appName')}
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
                     onBack={() => router.visit('/')}
@@ -477,11 +492,11 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
                                 type="button"
                                 onClick={() => setShowFilterModal(false)}
                                 className="text-gray-700 text-xl leading-none"
-                                aria-label="إغلاق"
+                                aria-label={t('common.close')}
                             >
                                 <FaTimes />
                             </button>
-                            <div className="text-sm font-extrabold text-gray-900">خيارات الفلترة</div>
+                            <div className="text-sm font-extrabold text-gray-900">{t('studentChallengesIndexPage.filterOptions')}</div>
                             <div className="w-6" />
                         </div>
 
@@ -489,7 +504,7 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
                         <div className="p-4 space-y-6 max-h-[70vh] overflow-y-auto">
                             {/* Status Filter */}
                             <div>
-                                <div className="text-sm font-bold text-gray-900 mb-3">الحالة</div>
+                                <div className="text-sm font-bold text-gray-900 mb-3">{t('common.status')}</div>
                                 <div className="grid grid-cols-2 gap-2">
                                     {statusOptions.map((status) => (
                                         <button
@@ -515,7 +530,7 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
                                 onClick={handleApplyFilters}
                                 className="w-full rounded-xl bg-[#A3C042] py-3 text-sm font-bold text-white hover:bg-[#8CA635] transition"
                             >
-                                تطبيق الفلاتر
+                                {t('studentChallengesIndexPage.actions.applyFilters')}
                             </button>
                         </div>
                     </div>

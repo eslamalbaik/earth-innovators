@@ -9,6 +9,7 @@ import HomeLatestProjectsSection from '@/Pages/Home/HomeLatestProjectsSection';
 import HomeSuggestChallengeCard from '@/Pages/Home/HomeSuggestChallengeCard';
 import HomeWelcomeCard from '@/Pages/Home/HomeWelcomeCard';
 import { FaCreditCard, FaChevronLeft } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function Home({ auth, cities = [], subjects = [], featuredTeachers = [], testimonials = [], stats = [], featuredPublications = [], featuredProjects = [], uaeSchools = [], packages = [] }) {
     const user = auth?.user || null;
@@ -16,6 +17,7 @@ export default function Home({ auth, cities = [], subjects = [], featuredTeacher
     const { showSuccess, showError } = useToast();
     const [suggestOpen, setSuggestOpen] = useState(false);
     const [suggestText, setSuggestText] = useState('');
+    const { t, language } = useTranslation();
 
     const uploadTarget = (() => {
         const role = user?.role;
@@ -27,15 +29,15 @@ export default function Home({ auth, cities = [], subjects = [], featuredTeacher
     })();
 
     return (
-        <div dir="rtl" className="min-h-screen bg-gray-50">
-            <Head title="الرئيسية - إرث المبتكرين" />
+        <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
+            <Head title={t('homePage.pageTitle')} />
 
             {/* Mobile: phone-like frame */}
             <div className="block md:hidden">
                 <div className="mx-auto w-full">
                     <div className="bg-gray-50 min-h-screen">
                         <MobileTopBar
-                            title="الرئيسية"
+                            title={t('common.home')}
                             unreadCount={isAuthed ? (auth?.unreadCount || 0) : 0}
                             onNotifications={() => router.visit(isAuthed ? '/notifications' : '/login')}
                             onBack={() => router.visit('/')}
@@ -67,8 +69,8 @@ export default function Home({ auth, cities = [], subjects = [], featuredTeacher
                                             <FaCreditCard className="text-white text-2xl" />
                                         </div>
                                         <div className="flex-1">
-                                            <div className="text-white font-bold text-base">باقات الاشتراك</div>
-                                            <div className="text-white/90 text-xs mt-1">احصل على ميزات حصرية وإمكانيات متقدمة</div>
+                                            <div className="text-white font-bold text-base">{t('homePage.packagesCardTitle')}</div>
+                                            <div className="text-white/90 text-xs mt-1">{t('homePage.packagesCardSubtitle')}</div>
                                         </div>
                                         <FaChevronLeft className="text-white/80 text-base" />
                                     </div>
@@ -105,7 +107,7 @@ export default function Home({ auth, cities = [], subjects = [], featuredTeacher
             {/* Desktop: full-width layout like dashboard */}
             <div className="hidden md:block">
                 <MobileTopBar
-                    title="الرئيسية"
+                    title={t('common.home')}
                     unreadCount={isAuthed ? (auth?.unreadCount || 0) : 0}
                     onNotifications={() => router.visit(isAuthed ? '/notifications' : '/login')}
                     onBack={() => router.visit('/')}
@@ -138,8 +140,8 @@ export default function Home({ auth, cities = [], subjects = [], featuredTeacher
                                                 <FaCreditCard className="text-white text-2xl" />
                                             </div>
                                             <div className="flex-1">
-                                                <div className="text-white font-bold text-base">باقات الاشتراك</div>
-                                                <div className="text-white/90 text-xs mt-1">احصل على ميزات حصرية وإمكانيات متقدمة</div>
+                                                <div className="text-white font-bold text-base">{t('homePage.packagesCardTitle')}</div>
+                                                <div className="text-white/90 text-xs mt-1">{t('homePage.packagesCardSubtitle')}</div>
                                             </div>
                                             <FaChevronLeft className="text-white/80 text-base" />
                                         </div>
@@ -176,7 +178,7 @@ export default function Home({ auth, cities = [], subjects = [], featuredTeacher
                 <MobileBottomNav active="home" role={user?.role} isAuthed={isAuthed} user={user} />
             </div>
 
-            {/* Modal - اقترح تحدياً جديداً (مثل الصورة) */}
+            {/* Modal - Suggest a new challenge */}
             {suggestOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm px-4">
                     <div className="w-full max-w-md rounded-2xl bg-[#eef8d6] border border-[#d7d39a] shadow-2xl overflow-hidden">
@@ -185,18 +187,18 @@ export default function Home({ auth, cities = [], subjects = [], featuredTeacher
                                 type="button"
                                 onClick={() => setSuggestOpen(false)}
                                 className="text-gray-700 text-xl leading-none"
-                                aria-label="إغلاق"
+                                aria-label={t('common.close')}
                             >
                                 ×
                             </button>
-                            <div className="text-sm font-extrabold text-gray-900">اقترح تحدياً جديداً</div>
+                            <div className="text-sm font-extrabold text-gray-900">{t('homePage.suggestModalTitle')}</div>
                             <div className="w-6" />
                         </div>
                         <div className="p-4">
                             <textarea
                                 value={suggestText}
                                 onChange={(e) => setSuggestText(e.target.value)}
-                                placeholder="أدخل تحدي جديد"
+                                placeholder={t('homePage.suggestModalPlaceholder')}
                                 rows={4}
                                 className="w-full rounded-xl border border-gray-200 bg-white p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30"
                             />
@@ -205,21 +207,21 @@ export default function Home({ auth, cities = [], subjects = [], featuredTeacher
                                 onClick={() => {
                                     const text = suggestText.trim();
                                     if (!text) {
-                                        showError('اكتب اقتراح التحدي أولاً');
+                                        showError(t('homePage.suggestModalEmptyError'));
                                         return;
                                     }
                                     if (!isAuthed) {
                                         router.visit('/login');
                                         return;
                                     }
-                                    // لا يوجد endpoint حالياً - نحفظها كتجربة UI مثل التصميم
-                                    showSuccess('تم إرسال الاقتراح');
+                                    // No endpoint yet - keep as UI demo behavior
+                                    showSuccess(t('homePage.suggestModalSuccess'));
                                     setSuggestText('');
                                     setSuggestOpen(false);
                                 }}
                                 className="mt-4 w-40 rounded-xl bg-[#A3C042] py-2 text-sm font-extrabold text-white hover:bg-[#8CA635] transition"
                             >
-                                إرسال
+                                {t('homePage.suggestModalSubmit')}
                             </button>
                         </div>
                     </div>

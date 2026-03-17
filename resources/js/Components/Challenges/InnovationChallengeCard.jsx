@@ -14,9 +14,9 @@ import { useTranslation, useBackIcon } from '@/i18n';
  * - Management buttons at bottom
  */
 export default function InnovationChallengeCard({ challenge, onEdit, onManageParticipants, routePrefix = 'admin.challenges' }) {
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
     const BackIcon = useBackIcon();
-    // تحديد لون الأيقونة الدائرية (بنفسجي فاتح أو أزرق فاتح)
+    // Pick a soft accent color for the circle icon
     const iconColors = [
         'bg-purple-100 text-purple-600',
         'bg-blue-100 text-blue-600',
@@ -25,14 +25,14 @@ export default function InnovationChallengeCard({ challenge, onEdit, onManagePar
     ];
     const iconColor = iconColors[challenge.id % iconColors.length];
 
-    // تنسيق التاريخ
+    // Date formatting
     const formatDate = (dateString) => {
         if (!dateString) return '';
         const date = new Date(dateString);
         return date.toISOString().split('T')[0]; // YYYY-MM-DD
     };
 
-    // الحصول على تسمية الفئة
+    // Category label
     const getCategoryLabel = (category) => {
         const labels = {
             'science': t('categories.science'),
@@ -40,12 +40,12 @@ export default function InnovationChallengeCard({ challenge, onEdit, onManagePar
             'engineering': t('categories.engineering'),
             'mathematics': t('categories.mathematics'),
             'arts': t('categories.arts'),
-            'other': t('common.other'),
+            'other': t('categories.other'),
         };
         return labels[category] || category;
     };
 
-    // الحصول على نص المكافأة
+    // Reward text
     const getRewardText = () => {
         if (challenge.id === 1) {
             return t('challenges.reward1');
@@ -69,15 +69,15 @@ export default function InnovationChallengeCard({ challenge, onEdit, onManagePar
         : `/${routePrefix.replace('.', '/')}/${challenge.id}`;
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 overflow-hidden" dir="rtl">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 overflow-hidden" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             {/* Header with Icon and Status */}
             <div className="relative p-6 pb-4">
-                {/* أيقونة دائرية علوية يسار */}
+                {/* Circular icon */}
                 <div className={`absolute top-6 right-6 w-12 h-12 rounded-full ${iconColor} flex items-center justify-center`}>
                     <FaFlag className="text-lg" />
                 </div>
 
-                {/* زر "نشط" أخضر فاتح صغير يمين العلو */}
+                {/* Active badge */}
                 {challenge.status === 'active' && (
                     <div className="absolute top-6 left-6">
                         <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
@@ -86,12 +86,12 @@ export default function InnovationChallengeCard({ challenge, onEdit, onManagePar
                     </div>
                 )}
 
-                {/* Title - عنوان رئيسي كبير */}
+                {/* Title */}
                 <div className="ps-16 pe-20">
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">
                         {challenge.title}
                     </h3>
-                    {/* Description - وصف صغير */}
+                    {/* Description */}
                     {challenge.description && (
                         <p className="text-sm text-gray-600 line-clamp-2">
                             {challenge.description}
@@ -100,9 +100,9 @@ export default function InnovationChallengeCard({ challenge, onEdit, onManagePar
                 </div>
             </div>
 
-            {/* Three Badges - ثلاثة badges أفقية */}
+            {/* Badges */}
             <div className="px-6 pb-4 grid grid-cols-3 gap-3">
-                {/* الفئة */}
+                {/* Category */}
                 <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
                     <div className="flex items-center gap-2 mb-1">
                         <FaFlag className="text-gray-400 text-xs" />
@@ -136,7 +136,7 @@ export default function InnovationChallengeCard({ challenge, onEdit, onManagePar
                 </div>
             </div>
 
-            {/* Reward Bar - شريط أخضر فاتح مع المكافأة */}
+            {/* Reward Bar */}
             <div className="mx-6 mb-4 bg-green-50 border border-green-200 rounded-lg p-3">
                 <div className="flex items-center gap-2">
                     <FaStar className="text-green-600 text-sm" />
@@ -147,9 +147,9 @@ export default function InnovationChallengeCard({ challenge, onEdit, onManagePar
                 </div>
             </div>
 
-            {/* Actions - أزرار الإدارة */}
+            {/* Actions */}
             <div className="px-6 pb-6 space-y-3">
-                {/* أزرار أفقية */}
+                {/* Primary actions */}
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => onManageParticipants && onManageParticipants(challenge)}
@@ -166,7 +166,7 @@ export default function InnovationChallengeCard({ challenge, onEdit, onManagePar
                     </button>
                 </div>
 
-                {/* View all submissions link */}
+                {/* View submissions */}
                 <Link
                     href={`${showRoute}?tab=submissions`}
                     className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"

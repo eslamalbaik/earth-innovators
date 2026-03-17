@@ -2,8 +2,10 @@ import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, useForm, router } from '@inertiajs/react';
 import { FaSearch, FaFilter, FaEye, FaEdit, FaTrash, FaDownload, FaUser, FaEnvelope, FaPhone, FaCalendar, FaSpinner, FaPlus } from 'react-icons/fa';
 import { useState } from 'react';
+import { useTranslation } from '@/i18n';
 
 export default function StudentsIndex({ students, filters, auth }) {
+    const { t, language } = useTranslation();
     const [searchTerm, setSearchTerm] = useState(filters.search || '');
     const [statusFilter, setStatusFilter] = useState(filters.status || 'all');
     const [dateFrom, setDateFrom] = useState(filters.date_from || '');
@@ -21,7 +23,6 @@ export default function StudentsIndex({ students, filters, auth }) {
         password_confirmation: '',
     });
 
-    // البيانات مفلترة بالفعل من الـ server
     const filteredStudents = students.data || [];
 
     const handleSearch = () => {
@@ -73,27 +74,27 @@ export default function StudentsIndex({ students, filters, auth }) {
     const getStatusText = (status) => {
         switch (status) {
             case 'active':
-                return 'نشط';
+                return t('common.active');
             case 'inactive':
-                return 'غير نشط';
+                return t('common.inactive');
             case 'suspended':
-                return 'معلق';
+                return t('adminStudentsIndexPage.statuses.suspended');
             default:
-                return 'غير معروف';
+                return t('adminStudentsIndexPage.statuses.unknown');
         }
     };
 
     return (
         <DashboardLayout auth={auth}>
-            <Head title="إدارة الطلاب" />
+            <Head title={t('adminStudentsIndexPage.pageTitle', { appName: t('common.appName') })} />
 
             <div className="py-6">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="mb-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h1 className="text-2xl font-bold text-gray-900">إدارة الطلاب</h1>
-                                <p className="text-gray-600">عرض وإدارة جميع الطلاب المسجلين</p>
+                                <h1 className="text-2xl font-bold text-gray-900">{t('adminStudentsIndexPage.title')}</h1>
+                                <p className="text-gray-600">{t('adminStudentsIndexPage.subtitle')}</p>
                             </div>
                             <div className="flex items-center space-x-4 space-x-reverse">
                                 <button
@@ -101,7 +102,7 @@ export default function StudentsIndex({ students, filters, auth }) {
                                     className="flex items-center px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-300"
                                 >
                                     <FaFilter className="me-2" />
-                                    فلترة
+                                    {t('common.filter')}
                                 </button>
                             </div>
                         </div>
@@ -109,16 +110,16 @@ export default function StudentsIndex({ students, filters, auth }) {
 
                     {showFilters && (
                         <div className="mb-6 bg-white rounded-lg shadow p-6">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">فلترة الطلاب</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('adminStudentsIndexPage.filters.title')}</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">البحث</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.search')}</label>
                                     <div className="relative">
                                         <input
                                             type="text"
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
-                                            placeholder="اسم الطالب، البريد الإلكتروني..."
+                                            placeholder={t('adminStudentsIndexPage.filters.searchPlaceholder')}
                                             className="w-full pe-10 ps-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                                         />
                                         <FaSearch className="absolute left-3 top-3 text-gray-400" />
@@ -126,21 +127,21 @@ export default function StudentsIndex({ students, filters, auth }) {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">الحالة</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.status')}</label>
                                     <select
                                         value={statusFilter}
                                         onChange={(e) => setStatusFilter(e.target.value)}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                                     >
-                                        <option value="all">جميع الحالات</option>
-                                        <option value="active">نشط</option>
-                                        <option value="inactive">غير نشط</option>
-                                        <option value="suspended">معلق</option>
+                                        <option value="all">{t('adminStudentsIndexPage.filters.allStatuses')}</option>
+                                        <option value="active">{t('common.active')}</option>
+                                        <option value="inactive">{t('common.inactive')}</option>
+                                        <option value="suspended">{t('adminStudentsIndexPage.statuses.suspended')}</option>
                                     </select>
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">من تاريخ</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminStudentsIndexPage.filters.dateFrom')}</label>
                                     <input
                                         type="date"
                                         value={dateFrom}
@@ -150,7 +151,7 @@ export default function StudentsIndex({ students, filters, auth }) {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">إلى تاريخ</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminStudentsIndexPage.filters.dateTo')}</label>
                                     <input
                                         type="date"
                                         value={dateTo}
@@ -170,13 +171,13 @@ export default function StudentsIndex({ students, filters, auth }) {
                                     }}
                                     className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition duration-300"
                                 >
-                                    مسح الفلاتر
+                                    {t('adminStudentsIndexPage.filters.clear')}
                                 </button>
                                 <button
                                     onClick={handleSearch}
                                     className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition duration-300"
                                 >
-                                    تطبيق الفلاتر
+                                    {t('adminStudentsIndexPage.filters.apply')}
                                 </button>
                             </div>
                         </div>
@@ -186,26 +187,26 @@ export default function StudentsIndex({ students, filters, auth }) {
                         <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
                             <div className="flex items-center justify-between">
                                 <span className="text-sm font-medium text-blue-800">
-                                    تم اختيار {selectedStudents.length} طالب
+                                    {t('adminStudentsIndexPage.bulk.selectedCount', { count: selectedStudents.length })}
                                 </span>
                                 <div className="flex items-center space-x-2 space-x-reverse">
                                     <button
                                         onClick={() => handleBulkAction('activate')}
                                         className="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-[#A3C042] transition duration-300"
                                     >
-                                        تفعيل
+                                        {t('adminStudentsIndexPage.bulk.activate')}
                                     </button>
                                     <button
                                         onClick={() => handleBulkAction('deactivate')}
                                         className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition duration-300"
                                     >
-                                        إلغاء التفعيل
+                                        {t('adminStudentsIndexPage.bulk.deactivate')}
                                     </button>
                                     <button
                                         onClick={() => setSelectedStudents([])}
                                         className="px-3 py-1 bg-gray-500 text-white text-sm rounded hover:bg-gray-600 transition duration-300"
                                     >
-                                        إلغاء
+                                        {t('common.cancel')}
                                     </button>
                                 </div>
                             </div>
@@ -231,22 +232,22 @@ export default function StudentsIndex({ students, filters, auth }) {
                                             />
                                         </th>
                                         <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            الطالب
+                                            {t('common.student')}
                                         </th>
                                         <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            البريد الإلكتروني
+                                            {t('common.email')}
                                         </th>
                                         <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            رقم الجوال
+                                            {t('common.phone')}
                                         </th>
                                         <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            تاريخ التسجيل
+                                            {t('adminStudentsIndexPage.table.registeredAt')}
                                         </th>
                                         <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            الحالة
+                                            {t('common.status')}
                                         </th>
                                         <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            الإجراءات
+                                            {t('common.actions')}
                                         </th>
                                     </tr>
                                 </thead>
@@ -276,10 +277,10 @@ export default function StudentsIndex({ students, filters, auth }) {
                                                     </div>
                                                     <div className="ms-4">
                                                         <div className="text-sm font-medium text-gray-900">
-                                                            {student.name || 'غير محدد'}
+                                                            {student.name || t('common.notAvailable')}
                                                         </div>
                                                         <div className="text-sm text-gray-500">
-                                                            ID: #{student.id}
+                                                            {t('adminStudentsIndexPage.table.idLabel', { id: student.id })}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -287,19 +288,21 @@ export default function StudentsIndex({ students, filters, auth }) {
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center">
                                                     <FaEnvelope className="me-2 text-gray-400" />
-                                                    <span className="text-sm text-gray-900">{student.email || 'غير محدد'}</span>
+                                                    <span className="text-sm text-gray-900">{student.email || t('common.notAvailable')}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center">
                                                     <FaPhone className="me-2 text-gray-400" />
-                                                    <span className="text-sm text-gray-900">{student.phone || 'غير محدد'}</span>
+                                                    <span className="text-sm text-gray-900">{student.phone || t('common.notAvailable')}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                 <div className="flex items-center">
                                                     <FaCalendar className="me-2 text-gray-400" />
-                                                    {student.created_at ? new Date(student.created_at).toLocaleDateString('en-US') : 'غير محدد'}
+                                                    {student.created_at
+                                                        ? new Date(student.created_at).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')
+                                                        : t('common.notAvailable')}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
@@ -312,21 +315,21 @@ export default function StudentsIndex({ students, filters, auth }) {
                                                     <button
                                                         onClick={() => router.get(`/admin/students/${student.id}`)}
                                                         className="text-blue-600 hover:text-blue-900"
-                                                        title="عرض التفاصيل"
+                                                        title={t('common.viewDetails')}
                                                     >
                                                         <FaEye />
                                                     </button>
                                                     <button
                                                         onClick={() => router.get(`/admin/students/${student.id}/edit`)}
                                                         className="text-yellow-600 hover:text-yellow-900"
-                                                        title="تعديل"
+                                                        title={t('common.edit')}
                                                     >
                                                         <FaEdit />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(student)}
                                                         className="text-red-600 hover:text-red-900"
-                                                        title="حذف"
+                                                        title={t('common.delete')}
                                                     >
                                                         <FaTrash />
                                                     </button>
@@ -346,7 +349,7 @@ export default function StudentsIndex({ students, filters, auth }) {
                                             onClick={() => router.get(students.prev_page_url)}
                                             className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                         >
-                                            السابق
+                                            {t('common.previous')}
                                         </button>
                                     )}
                                     {students.next_page_url && (
@@ -354,14 +357,14 @@ export default function StudentsIndex({ students, filters, auth }) {
                                             onClick={() => router.get(students.next_page_url)}
                                             className="me-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                         >
-                                            التالي
+                                            {t('common.next')}
                                         </button>
                                     )}
                                 </div>
                                 <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                                     <div>
                                         <p className="text-sm text-gray-700">
-                                            عرض <span className="font-medium">{students.from}</span> إلى <span className="font-medium">{students.to}</span> من <span className="font-medium">{students.total}</span> نتيجة
+                                            {t('adminStudentsIndexPage.paginationSummary', { from: students.from, to: students.to, total: students.total })}
                                         </p>
                                     </div>
                                     <div>
@@ -390,23 +393,22 @@ export default function StudentsIndex({ students, filters, auth }) {
             {showDeleteModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg p-6 w-full max-w-md">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">تأكيد الحذف</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('adminStudentsIndexPage.deleteConfirm.title')}</h3>
                         <p className="text-gray-600 mb-6">
-                            هل أنت متأكد من حذف الطالب <strong>{studentToDelete?.name}</strong>؟
-                            هذا الإجراء لا يمكن التراجع عنه.
+                            {t('adminStudentsIndexPage.deleteConfirm.message', { name: studentToDelete?.name || '' })}
                         </p>
                         <div className="flex items-center justify-end space-x-4 space-x-reverse">
                             <button
                                 onClick={() => setShowDeleteModal(false)}
                                 className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition duration-300"
                             >
-                                إلغاء
+                                {t('common.cancel')}
                             </button>
                             <button
                                 onClick={confirmDelete}
                                 className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300"
                             >
-                                حذف
+                                {t('common.delete')}
                             </button>
                         </div>
                     </div>

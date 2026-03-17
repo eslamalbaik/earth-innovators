@@ -4,8 +4,10 @@ import MobileAppLayout from '@/Layouts/MobileAppLayout';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import DesktopFooter from '@/Components/Mobile/DesktopFooter';
+import { useTranslation } from '@/i18n';
 
 export default function TeacherCertificateShow({ auth, user, stats, certificate }) {
+    const { t, language } = useTranslation();
     const isAuthed = !!auth?.user;
     const currentUser = auth?.user;
 
@@ -23,15 +25,15 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate 
         if (navigator.share) {
             try {
                 await navigator.share({
-                    title: 'شهادة العضوية - إرث المبتكرين',
-                    text: `شهادة عضوية ${user?.name} في منصة إرث المبتكرين`,
+                    title: t('teacherCertificateShowPage.share.title', { appName: t('common.appName') }),
+                    text: t('teacherCertificateShowPage.share.text', { name: user?.name || t('common.user'), appName: t('common.appName') }),
                     url: window.location.href,
                 });
             } catch (error) {
             }
         } else {
             navigator.clipboard.writeText(window.location.href);
-            alert('تم نسخ الرابط إلى الحافظة');
+            alert(t('teacherCertificateShowPage.toasts.linkCopied'));
         }
     };
 
@@ -51,7 +53,7 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate 
 
     return (
         <>
-            <Head title="شهادة العضوية - إرث المبتكرين">
+            <Head title={t('teacherCertificateShowPage.pageTitle', { appName: t('common.appName') })}>
                 <style>{`
                     @media print {
                         @page {
@@ -77,35 +79,35 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate 
                     }
                 `}</style>
             </Head>
-            <div dir="rtl" className="min-h-screen bg-gray-50">
+            <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
 
                 {/* Mobile View */}
                 <div className="block md:hidden">
                     <MobileAppLayout
                         auth={auth}
-                        title="الشهادة"
+                        title={t('teacherCertificateShowPage.navTitle')}
                         activeNav="profile"
                         onBack={() => router.visit('/')}
                     >
                         <div className="space-y-4">
                             {/* Teacher Information Section */}
                             <div className="bg-white rounded-2xl border border-gray-100 p-4 no-print">
-                                <h2 className="text-base font-bold text-gray-900 mb-4">معلومات المعلم</h2>
+                                <h2 className="text-base font-bold text-gray-900 mb-4">{t('teacherCertificateShowPage.teacherInfo.title')}</h2>
                                 <div className="grid grid-cols-2 gap-3">
                                     <div>
-                                        <label className="text-xs text-gray-600 mb-1 block">الاسم</label>
-                                        <div className="text-sm font-bold text-gray-900">{user?.name || 'غير محدد'}</div>
+                                        <label className="text-xs text-gray-600 mb-1 block">{t('teacherCertificateShowPage.teacherInfo.name')}</label>
+                                        <div className="text-sm font-bold text-gray-900">{user?.name || t('common.notAvailable')}</div>
                                     </div>
                                     <div>
-                                        <label className="text-xs text-gray-600 mb-1 block">رقم العضوية:</label>
-                                        <div className="text-sm font-bold text-gray-900">{user?.membership_number || 'غير محدد'}</div>
+                                        <label className="text-xs text-gray-600 mb-1 block">{t('teacherCertificateShowPage.teacherInfo.membershipNumber')}:</label>
+                                        <div className="text-sm font-bold text-gray-900">{user?.membership_number || t('common.notAvailable')}</div>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Certificate Section */}
                             <div className="bg-white rounded-2xl border border-gray-100 p-4">
-                                <h2 className="text-base font-bold text-gray-900 mb-4">شهادة العضوية</h2>
+                                <h2 className="text-base font-bold text-gray-900 mb-4">{t('teacherCertificateShowPage.certificate.title')}</h2>
 
                                 {/* Certificate Display */}
                                 <div className="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-4 relative">
@@ -114,7 +116,7 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate 
                                         <div className="flex items-center justify-between mb-4">
                                             <div className="flex-1"></div>
                                             <h1 className="text-lg font-extrabold text-orange-600 text-center flex-2">
-                                                شهادة عضوية و تقدير
+                                                {t('teacherCertificateShowPage.certificate.heading')}
                                             </h1>
                                             <div className="flex-1 flex justify-end">
                                                 <img
@@ -129,40 +131,37 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate 
                                         {/* Certificate Body */}
                                         <div className="space-y-3 text-sm text-gray-800 leading-relaxed">
                                             <p className="text-center text-xs text-gray-600">
-                                                تشهد منصة إرث المبتكرين بأن
+                                                {t('teacherCertificateShowPage.certificate.platformCertifies', { appName: t('common.appName') })}
                                             </p>
 
                                             <p className="text-center">
-                                                <span className="font-bold text-[#A3C042] text-base">الأستاذة: {user?.name || 'المعلم'}</span>
+                                                <span className="font-bold text-[#A3C042] text-base">{t('teacherCertificateShowPage.certificate.nameLine', { name: user?.name || t('teacherCertificateShowPage.certificate.teacherFallback') })}</span>
                                             </p>
 
                                             <div className="border-b-2 border-dotted border-gray-300 my-2"></div>
 
                                             <p className="text-center text-xs text-gray-600 mb-3">
-                                                رقم العضوية: <span className="font-bold">{user?.membership_number || 'غير محدد'}</span>
+                                                {t('teacherCertificateShowPage.teacherInfo.membershipNumber')}: <span className="font-bold">{user?.membership_number || t('common.notAvailable')}</span>
                                             </p>
 
                                             <p className="text-justify leading-relaxed text-xs mb-2">
-                                                هي عضو رسمي وفعّال في لجنة التحكيم لبرنامج{' '}
-                                                <span className="font-bold text-[#A3C042]">"معلمو النخبة: تميزي العلمي"</span>
+                                                {t('teacherCertificateShowPage.certificate.committeeLinePrefix')}{' '}
+                                                <span className="font-bold text-[#A3C042]">{t('teacherCertificateShowPage.certificate.programName')}</span>
                                             </p>
 
                                             {certificate?.period_start && certificate?.period_end && (
                                                 <p className="text-center text-xs text-gray-600 mb-2">
-                                                    وذلك للفترة من{' '}
-                                                    <span className="font-bold">{formatDate(certificate.period_start)}</span>{' '}
-                                                    وحتى{' '}
-                                                    <span className="font-bold">{formatDate(certificate.period_end)}</span>.
+                                                    {t('teacherCertificateShowPage.certificate.periodLine', { start: formatDate(certificate.period_start), end: formatDate(certificate.period_end) })}
                                                 </p>
                                             )}
 
                                             <p className="text-justify leading-relaxed text-xs mb-3">
-                                                وقد تميزت خلال فترة عضويتها بالتزام تربوي رفيع، وساهمت في إثراء المبادرات التعليمية بابتكارات نوعية، تعكس روح الانتماء والتميز في الأداء التربوي والمهني.
+                                                {t('teacherCertificateShowPage.certificate.excellenceParagraph')}
                                             </p>
 
                                             <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-3 my-4 shadow-sm">
                                                 <p className="text-center text-xs text-yellow-800 leading-relaxed font-medium">
-                                                    نزرع الشعف نحصد النجاح
+                                                    {t('teacherCertificateShowPage.certificate.motto')}
                                                 </p>
                                             </div>
 
@@ -172,15 +171,15 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate 
                                         <div className="mt-6 pt-4 border-t border-gray-200">
                                             <div className="flex items-center justify-between">
                                                 <div className="text-center flex-1">
-                                                    <div className="text-[10px] text-gray-500 mb-1">المدير التنفيذي</div>
-                                                    <div className="text-xs font-bold text-gray-700">أ. ليلى إبراهيم الجسمي</div>
-                                                    <div className="text-[10px] text-gray-500 mt-1">مؤسسة أوح لنشر مطبوعات الثقافة والفنون</div>
+                                                    <div className="text-[10px] text-gray-500 mb-1">{t('teacherCertificateShowPage.certificate.ceoTitle')}</div>
+                                                    <div className="text-xs font-bold text-gray-700">{t('teacherCertificateShowPage.certificate.ceoName')}</div>
+                                                    <div className="text-[10px] text-gray-500 mt-1">{t('teacherCertificateShowPage.certificate.ceoOrg')}</div>
                                                 </div>
                                                 <div className="w-10 h-10 border-2 border-green-500 rounded-full flex items-center justify-center mx-3">
                                                     <FaMedal className="text-green-500 text-sm" />
                                                 </div>
                                                 <div className="text-center flex-1">
-                                                    <div className="text-[10px] text-gray-500 mb-1">تاريخ الإصدار:</div>
+                                                    <div className="text-[10px] text-gray-500 mb-1">{t('teacherCertificateShowPage.certificate.issueDate')}:</div>
                                                     <div className="text-xs font-bold text-gray-700">
                                                         {formatDate(certificate?.issue_date) || formatDate(new Date())}
                                                     </div>
@@ -197,21 +196,21 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate 
                                         className="flex flex-col items-center justify-center gap-2 bg-purple-50 text-purple-600 rounded-xl py-3 hover:bg-purple-100 transition"
                                     >
                                         <FaShare className="text-lg" />
-                                        <span className="text-xs font-bold">مشاركة</span>
+                                        <span className="text-xs font-bold">{t('teacherCertificateShowPage.actions.share')}</span>
                                     </button>
                                     <button
                                         onClick={handlePrint}
                                         className="flex flex-col items-center justify-center gap-2 bg-[#A3C042] text-white rounded-xl py-3 hover:bg-[#8CA635] transition"
                                     >
                                         <FaPrint className="text-lg" />
-                                        <span className="text-xs font-bold">طباعة</span>
+                                        <span className="text-xs font-bold">{t('teacherCertificateShowPage.actions.print')}</span>
                                     </button>
                                     <button
                                         onClick={handleDownload}
                                         className="flex flex-col items-center justify-center gap-2 bg-blue-50 text-blue-600 rounded-xl py-3 hover:bg-blue-100 transition"
                                     >
                                         <FaDownload className="text-lg" />
-                                        <span className="text-xs font-bold">تحميل</span>
+                                        <span className="text-xs font-bold">{t('teacherCertificateShowPage.actions.download')}</span>
                                     </button>
                                 </div>
                             </div>
@@ -223,7 +222,7 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate 
                 <div className="hidden md:block">
                     <div className="no-print">
                         <MobileTopBar
-                            title="الشهادة"
+                            title={t('teacherCertificateShowPage.navTitle')}
                             onBack={() => router.visit('/')}
                             reverseOrder={false}
                             auth={auth}
@@ -234,15 +233,15 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate 
                             {/* Teacher Information Section */}
                             <div className="lg:col-span-1 no-print">
                                 <div className="bg-white rounded-2xl border border-gray-100 p-6 sticky top-4">
-                                    <h2 className="text-xl font-bold text-gray-900 mb-6">معلومات المعلم</h2>
+                                    <h2 className="text-xl font-bold text-gray-900 mb-6">{t('teacherCertificateShowPage.teacherInfo.title')}</h2>
                                     <div className="space-y-4">
                                         <div>
-                                            <label className="text-sm text-gray-600 mb-2 block">الاسم</label>
-                                            <div className="text-base font-bold text-gray-900">{user?.name || 'غير محدد'}</div>
+                                            <label className="text-sm text-gray-600 mb-2 block">{t('teacherCertificateShowPage.teacherInfo.name')}</label>
+                                            <div className="text-base font-bold text-gray-900">{user?.name || t('common.notAvailable')}</div>
                                         </div>
                                         <div>
-                                            <label className="text-sm text-gray-600 mb-2 block">رقم العضوية:</label>
-                                            <div className="text-base font-bold text-gray-900">{user?.membership_number || 'غير محدد'}</div>
+                                            <label className="text-sm text-gray-600 mb-2 block">{t('teacherCertificateShowPage.teacherInfo.membershipNumber')}:</label>
+                                            <div className="text-base font-bold text-gray-900">{user?.membership_number || t('common.notAvailable')}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -251,7 +250,7 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate 
                             {/* Certificate Section */}
                             <div className="lg:col-span-2">
                                 <div className="bg-white rounded-2xl border border-gray-100 p-6">
-                                    <h2 className="text-xl font-bold text-gray-900 mb-6 no-print">شهادة العضوية</h2>
+                                    <h2 className="text-xl font-bold text-gray-900 mb-6 no-print">{t('teacherCertificateShowPage.certificate.title')}</h2>
 
                                     {/* Certificate Display */}
                                     <div className="certificate-print bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-6 relative">
@@ -260,7 +259,7 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate 
                                             <div className="flex items-center justify-between mb-6">
                                                 <div className="flex-1"></div>
                                                 <h1 className="text-2xl font-extrabold text-orange-600 text-center flex-2">
-                                                    شهادة عضوية و تقدير
+                                                    {t('teacherCertificateShowPage.certificate.heading')}
                                                 </h1>
                                                 <div className="flex-1 flex justify-end">
                                                     <img
@@ -275,40 +274,37 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate 
                                             {/* Certificate Body */}
                                             <div className="space-y-4 text-base text-gray-800 leading-relaxed">
                                                 <p className="text-center text-sm text-gray-600">
-                                                    تشهد منصة إرث المبتكرين بأن
+                                                    {t('teacherCertificateShowPage.certificate.platformCertifies', { appName: t('common.appName') })}
                                                 </p>
 
                                                 <p className="text-center">
-                                                    <span className="font-bold text-[#A3C042] text-2xl">الأستاذة: {user?.name || 'المعلم'}</span>
+                                                    <span className="font-bold text-[#A3C042] text-2xl">{t('teacherCertificateShowPage.certificate.nameLine', { name: user?.name || t('teacherCertificateShowPage.certificate.teacherFallback') })}</span>
                                                 </p>
 
                                                 <div className="border-b-2 border-dotted border-gray-300 my-4"></div>
 
                                                 <p className="text-center text-sm text-gray-600 mb-4">
-                                                    رقم العضوية: <span className="font-bold">{user?.membership_number || 'غير محدد'}</span>
+                                                    {t('teacherCertificateShowPage.teacherInfo.membershipNumber')}: <span className="font-bold">{user?.membership_number || t('common.notAvailable')}</span>
                                                 </p>
 
                                                 <p className="text-justify leading-relaxed text-base mb-4">
-                                                    هي عضو رسمي وفعّال في لجنة التحكيم لبرنامج{' '}
-                                                    <span className="font-bold text-[#A3C042]">"معلمو النخبة: تميزي العلمي"</span>
+                                                    {t('teacherCertificateShowPage.certificate.committeeLinePrefix')}{' '}
+                                                    <span className="font-bold text-[#A3C042]">{t('teacherCertificateShowPage.certificate.programName')}</span>
                                                 </p>
 
                                                 {certificate?.period_start && certificate?.period_end && (
                                                     <p className="text-center text-sm text-gray-600 mb-4">
-                                                        وذلك للفترة من{' '}
-                                                        <span className="font-bold">{formatDate(certificate.period_start)}</span>{' '}
-                                                        وحتى{' '}
-                                                        <span className="font-bold">{formatDate(certificate.period_end)}</span>.
+                                                        {t('teacherCertificateShowPage.certificate.periodLine', { start: formatDate(certificate.period_start), end: formatDate(certificate.period_end) })}
                                                     </p>
                                                 )}
 
                                                 <p className="text-justify leading-relaxed text-base mb-4">
-                                                    وقد تميزت خلال فترة عضويتها بالتزام تربوي رفيع، وساهمت في إثراء المبادرات التعليمية بابتكارات نوعية، تعكس روح الانتماء والتميز في الأداء التربوي والمهني.
+                                                    {t('teacherCertificateShowPage.certificate.excellenceParagraph')}
                                                 </p>
 
                                                 <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 my-6 shadow-sm">
                                                     <p className="text-center text-sm text-yellow-800 leading-relaxed font-medium">
-                                                        نزرع الشعف نحصد النجاح
+                                                        {t('teacherCertificateShowPage.certificate.motto')}
                                                     </p>
                                                 </div>
                                             </div>
@@ -317,15 +313,15 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate 
                                             <div className="mt-8 pt-6 border-t border-gray-200">
                                                 <div className="flex items-center justify-between">
                                                     <div className="text-center flex-1">
-                                                        <div className="text-sm text-gray-500 mb-2">المدير التنفيذي</div>
-                                                        <div className="text-base font-bold text-gray-700">أ. ليلى إبراهيم الجسمي</div>
-                                                        <div className="text-xs text-gray-500 mt-2">مؤسسة أوح لنشر مطبوعات الثقافة والفنون</div>
+                                                        <div className="text-sm text-gray-500 mb-2">{t('teacherCertificateShowPage.certificate.ceoTitle')}</div>
+                                                        <div className="text-base font-bold text-gray-700">{t('teacherCertificateShowPage.certificate.ceoName')}</div>
+                                                        <div className="text-xs text-gray-500 mt-2">{t('teacherCertificateShowPage.certificate.ceoOrg')}</div>
                                                     </div>
                                                     <div className="w-16 h-16 border-2 border-green-500 rounded-full flex items-center justify-center mx-6">
                                                         <FaMedal className="text-green-500 text-xl" />
                                                     </div>
                                                     <div className="text-center flex-1">
-                                                        <div className="text-sm text-gray-500 mb-2">تاريخ الإصدار:</div>
+                                                        <div className="text-sm text-gray-500 mb-2">{t('teacherCertificateShowPage.certificate.issueDate')}:</div>
                                                         <div className="text-base font-bold text-gray-700">
                                                             {formatDate(certificate?.issue_date) || formatDate(new Date())}
                                                         </div>
@@ -342,21 +338,21 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate 
                                             className="flex flex-col items-center justify-center gap-2 bg-purple-50 text-purple-600 rounded-xl py-4 hover:bg-purple-100 transition"
                                         >
                                             <FaShare className="text-xl" />
-                                            <span className="text-sm font-bold">مشاركة</span>
+                                            <span className="text-sm font-bold">{t('teacherCertificateShowPage.actions.share')}</span>
                                         </button>
                                         <button
                                             onClick={handlePrint}
                                             className="flex flex-col items-center justify-center gap-2 bg-[#A3C042] text-white rounded-xl py-4 hover:bg-[#8CA635] transition"
                                         >
                                             <FaPrint className="text-xl" />
-                                            <span className="text-sm font-bold">طباعة</span>
+                                            <span className="text-sm font-bold">{t('teacherCertificateShowPage.actions.print')}</span>
                                         </button>
                                         <button
                                             onClick={handleDownload}
                                             className="flex flex-col items-center justify-center gap-2 bg-blue-50 text-blue-600 rounded-xl py-4 hover:bg-blue-100 transition"
                                         >
                                             <FaDownload className="text-xl" />
-                                            <span className="text-sm font-bold">تحميل</span>
+                                            <span className="text-sm font-bold">{t('teacherCertificateShowPage.actions.download')}</span>
                                         </button>
                                     </div>
                                 </div>

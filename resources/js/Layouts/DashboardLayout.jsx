@@ -801,17 +801,17 @@ export default function DashboardLayout({ children, header }) {
                                                                                 )}
                                                                             {notification.data?.project_title && (
                                                                                 <p className="text-xs text-gray-600 mb-1">
-                                                                                    المشروع: {notification.data.project_title}
+                                                                                    {t('notifications.project')}: {notification.data.project_title}
                                                                                 </p>
                                                                             )}
                                                                             {notification.data?.challenge_title && (
                                                                                 <p className="text-xs text-gray-600 mb-1">
-                                                                                    التحدي: {notification.data.challenge_title}
+                                                                                    {t('notifications.challenge')}: {notification.data.challenge_title}
                                                                                 </p>
                                                                             )}
                                                                             {notification.data?.publication_title && (
                                                                                 <p className="text-xs text-gray-600 mb-1">
-                                                                                    المقال: {notification.data.publication_title}
+                                                                                    {t('notifications.publication')}: {notification.data.publication_title}
                                                                                 </p>
                                                                             )}
                                                                             {notification.data?.rating && (

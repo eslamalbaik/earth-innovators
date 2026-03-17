@@ -2,6 +2,7 @@ import { Link } from '@inertiajs/react';
 import { memo, useMemo } from 'react';
 import { FaTrophy, FaCalendar, FaUsers, FaChartLine, FaSchool, FaUser } from 'react-icons/fa';
 import ActionsMenu from './ActionsMenu';
+import { useTranslation } from '@/i18n';
 
 /**
  * Modern Challenge Card Component with improved visual hierarchy
@@ -28,6 +29,7 @@ const ModernChallengeCard = memo(function ModernChallengeCard({
     deletingIds,
     updatingId,
 }) {
+    const { t, language } = useTranslation();
     const isDeleting = deletingIds?.has(challenge.id) || false;
     const isUpdating = updatingId === challenge.id;
 
@@ -87,7 +89,7 @@ const ModernChallengeCard = memo(function ModernChallengeCard({
                                 <div className="text-2xl font-bold text-gray-900">
                                     {challenge.points_reward}
                                 </div>
-                                <div className="text-xs font-medium text-gray-600">نقطة</div>
+                                <div className="text-xs font-medium text-gray-600">{t('common.point')}</div>
                             </div>
                         </div>
                     )}
@@ -156,14 +158,14 @@ const ModernChallengeCard = memo(function ModernChallengeCard({
                 <div className="bg-gray-50 rounded-lg p-4 mb-4">
                     <div className="flex items-center gap-2 text-sm text-gray-700 mb-2">
                         <FaCalendar className="text-gray-400 flex-shrink-0" />
-                        <span className="font-medium">التواريخ</span>
+                        <span className="font-medium">{t('challenges.dates')}</span>
                     </div>
                     <div className="space-y-1 text-xs text-gray-600 ps-6">
                         <div>
-                            <span className="font-medium">بدء:</span> {formattedStartDate}
+                            <span className="font-medium">{t('challenges.start')}:</span> {formattedStartDate}
                         </div>
                         <div>
-                            <span className="font-medium">انتهاء:</span> {formattedDeadline}
+                            <span className="font-medium">{t('challenges.end')}:</span> {formattedDeadline}
                         </div>
                     </div>
                 </div>
@@ -173,7 +175,7 @@ const ModernChallengeCard = memo(function ModernChallengeCard({
                     <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2 text-sm text-gray-700">
                             <FaUsers className="text-gray-400 flex-shrink-0" />
-                            <span className="font-medium">المشاركون</span>
+                            <span className="font-medium">{t('challenges.participants')}</span>
                         </div>
                         <div className="text-sm font-semibold text-gray-900">
                             {challenge.current_participants || 0}
@@ -197,7 +199,7 @@ const ModernChallengeCard = memo(function ModernChallengeCard({
                         className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors text-sm font-medium w-full justify-center"
                     >
                         <FaChartLine />
-                        <span>تحليل الأداء</span>
+                        <span>{t('challenges.analytics')}</span>
                     </Link>
                 )}
             </div>
@@ -233,7 +235,7 @@ function ModernChallengeCardGrid({
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6" dir="rtl">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             {challenges.map((challenge) => (
                 <ModernChallengeCard
                     key={challenge.id}

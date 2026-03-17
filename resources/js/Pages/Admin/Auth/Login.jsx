@@ -8,8 +8,10 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function AdminLogin({ status }) {
+    const { t } = useTranslation();
     const [showPassword, setShowPassword] = useState(false);
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
@@ -27,7 +29,7 @@ export default function AdminLogin({ status }) {
 
     return (
         <GuestLayout>
-            <Head title="تسجيل دخول المشرف" />
+            <Head title={t('adminLoginPage.pageTitle', { appName: t('common.appName') })} />
 
             <div className="min-h-screen flex items-center justify-center py-8 px-4">
                 <div className="max-w-md w-full space-y-6">
@@ -38,7 +40,7 @@ export default function AdminLogin({ status }) {
                             </Link>
                         </div>
                         <h2 className="text-3xl font-bold text-gray-900">
-                            تسجيل دخول الأدمن
+                            {t('adminLoginPage.title')}
                         </h2>
                     </div>
 
@@ -57,7 +59,7 @@ export default function AdminLogin({ status }) {
                     <div className="bg-white shadow-lg rounded-2xl px-4 py-10 min-w-[92vw] sm:min-w-[350px]">
                         <form onSubmit={submit} className="space-y-6">
                             <div>
-                                <InputLabel htmlFor="email" value="البريد الإلكتروني" className="text-sm font-medium text-gray-700 mb-2" />
+                                <InputLabel htmlFor="email" value={t('adminLoginPage.emailLabel')} className="text-sm font-medium text-gray-700 mb-2" />
                                 <div className="relative">
                                     <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                         <FaEnvelope className="h-5 w-5 text-gray-400" />
@@ -71,14 +73,14 @@ export default function AdminLogin({ status }) {
                                         autoComplete="username"
                                         isFocused
                                         onChange={(e) => setData('email', e.target.value)}
-                                        placeholder="admin@example.com"
+                                        placeholder={t('adminLoginPage.emailPlaceholder')}
                                     />
                                 </div>
                                 <InputError message={errors.email} className="mt-2" />
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="password" value="كلمة المرور" className="text-sm font-medium text-gray-700 mb-2" />
+                                <InputLabel htmlFor="password" value={t('adminLoginPage.passwordLabel')} className="text-sm font-medium text-gray-700 mb-2" />
                                 <div className="relative">
                                     <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                         <FaLock className="h-5 w-5 text-gray-400" />
@@ -91,12 +93,13 @@ export default function AdminLogin({ status }) {
                                         className="block w-full ps-10 pe-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
                                         autoComplete="current-password"
                                         onChange={(e) => setData('password', e.target.value)}
-                                        placeholder="••••••••"
+                                        placeholder={t('adminLoginPage.passwordPlaceholder')}
                                     />
                                     <button
                                         type="button"
                                         className="absolute inset-y-0 end-0 pe-3 flex items-center"
                                         onClick={() => setShowPassword(!showPassword)}
+                                        aria-label={t('adminLoginPage.togglePassword')}
                                     >
                                         {showPassword ? (
                                             <FaEyeSlash className="h-5 w-5 text-gray-400 hover:text-gray-600" />
@@ -116,7 +119,7 @@ export default function AdminLogin({ status }) {
                                         onChange={(e) => setData('remember', e.target.checked)}
                                     />
                                     <label className="ms-2 block text-sm text-gray-900">
-                                        تذكرني
+                                        {t('adminLoginPage.rememberMe')}
                                     </label>
                                 </div>
                             </div>
@@ -129,10 +132,10 @@ export default function AdminLogin({ status }) {
                                     {processing ? (
                                         <div className="flex items-center">
                                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white me-2"></div>
-                                            جاري تسجيل الدخول...
+                                            {t('adminLoginPage.loggingIn')}
                                         </div>
                                     ) : (
-                                        'تسجيل الدخول'
+                                        t('adminLoginPage.loginButton')
                                     )}
                                 </PrimaryButton>
                             </div>
@@ -143,4 +146,3 @@ export default function AdminLogin({ status }) {
         </GuestLayout>
     );
 }
-

@@ -1,8 +1,10 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, useForm, router } from '@inertiajs/react';
 import { FaSave, FaTimes, FaSpinner } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function EditStudent({ student, auth }) {
+    const { t } = useTranslation();
     const { data, setData, post, processing, errors } = useForm({
         name: student.name || '',
         email: student.email || '',
@@ -19,12 +21,12 @@ export default function EditStudent({ student, auth }) {
 
     return (
         <DashboardLayout auth={auth}>
-            <Head title={`تعديل الطالب: ${student.name}`} />
+            <Head title={t('adminStudentsEditPage.pageTitle', { name: student.name })} />
             <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow">
-                <h1 className="text-xl font-bold mb-6">تعديل بيانات الطالب</h1>
+                <h1 className="text-xl font-bold mb-6">{t('adminStudentsEditPage.title')}</h1>
                 <form onSubmit={submit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">الاسم</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('adminStudentsEditPage.nameLabel')}</label>
                         <input
                             type="text"
                             value={data.name}
@@ -34,7 +36,7 @@ export default function EditStudent({ student, auth }) {
                         {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('adminStudentsEditPage.emailLabel')}</label>
                         <input
                             type="email"
                             value={data.email}
@@ -44,7 +46,7 @@ export default function EditStudent({ student, auth }) {
                         {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">رقم الجوال</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('adminStudentsEditPage.phoneLabel')}</label>
                         <input
                             type="text"
                             value={data.phone || ''}
@@ -55,7 +57,7 @@ export default function EditStudent({ student, auth }) {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">كلمة المرور (اختياري)</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">{t('adminStudentsEditPage.passwordLabel')}</label>
                             <input
                                 type="password"
                                 value={data.password}
@@ -65,7 +67,7 @@ export default function EditStudent({ student, auth }) {
                             {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">تأكيد كلمة المرور</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">{t('adminStudentsEditPage.passwordConfirmLabel')}</label>
                             <input
                                 type="password"
                                 value={data.password_confirmation}
@@ -81,14 +83,14 @@ export default function EditStudent({ student, auth }) {
                             onClick={() => router.visit(route('admin.students.index'))}
                             className="px-4 py-2 border rounded text-gray-700"
                         >
-                            <FaTimes className="inline me-2" /> إلغاء
+                            <FaTimes className="inline me-2" /> {t('common.cancel')}
                         </button>
                         <button
                             type="submit"
                             disabled={processing}
                             className="px-4 py-2 rounded text-white bg-yellow-600 hover:bg-yellow-700 disabled:opacity-75"
                         >
-                            {processing ? <FaSpinner className="inline animate-spin me-2" /> : <FaSave className="inline me-2" />} حفظ
+                            {processing ? <FaSpinner className="inline animate-spin me-2" /> : <FaSave className="inline me-2" />} {processing ? t('adminStudentsEditPage.saving') : t('common.save')}
                         </button>
                     </div>
                 </form>
@@ -96,5 +98,3 @@ export default function EditStudent({ student, auth }) {
         </DashboardLayout>
     );
 }
-
-

@@ -9,6 +9,7 @@
         "lint:fix": "eslint resources/js --ext .js,.jsx --fix",
         "format": "prettier --write \"resources/js/**/*.{js,jsx}\"",
         "format:check": "prettier --check \"resources/js/**/*.{js,jsx}\"",
+        "i18n:audit": "node scripts/i18n-audit.mjs",
         "echo-server": "laravel-echo-server start",
         "dev:full": "concurrently \"npm run dev\" \"laravel-echo-server start\" \"php artisan serve\" \"php artisan queue:listen\""
     },

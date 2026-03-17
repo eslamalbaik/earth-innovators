@@ -1,14 +1,18 @@
 import { FaProjectDiagram, FaUsers, FaTrophy } from 'react-icons/fa';
 import { router } from '@inertiajs/react';
 import { useSelector } from 'react-redux';
+import { useTranslation } from '@/i18n';
 
 export default function HeroSection({
-    title = "نحن معا نحو التقدم والتطور",
-    subtitle = "مشاريع إبداعية في كل المجالات",
+    title,
+    subtitle,
     cities = [],
     subjects = []
 }) {
     const { dir } = useSelector((state) => state.language);
+    const { t } = useTranslation();
+    const resolvedTitle = title ?? t('hero.title');
+    const resolvedSubtitle = subtitle ?? t('hero.subtitle');
     
     const handleStartJourney = () => {
         router.visit('/register');
@@ -60,12 +64,12 @@ export default function HeroSection({
 
                         {/* Main headline */}
                         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-[#A3C042] bg-clip-text text-transparent leading-tight">
-                            {title}
+                            {resolvedTitle}
                         </h1>
 
                         {/* Subtitle */}
                         <p className="text-xl md:text-2xl text-legacy-blue font-medium">
-                            {subtitle}
+                            {resolvedSubtitle}
                         </p>
 
                         {/* CTA Button */}
@@ -74,7 +78,7 @@ export default function HeroSection({
                                 onClick={handleStartJourney}
                                 className="bg-[#A3C042] hover:from-primary-600 hover:to-blue-700 text-white px-12 py-4 rounded-xl font-semibold text-lg transition duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
                             >
-                                ابدأ رحلتك معنا
+                                {t('hero.startJourney')}
                             </button>
                         </div>
                     </div>
@@ -84,7 +88,7 @@ export default function HeroSection({
                         <div className="relative w-full h-full flex items-center justify-center">
                             <img
                                 src="/images/hero.png"
-                                alt="Hero"
+                                alt={t('hero.imageAlt')}
                                 className="w-full h-auto max-w-xl object-contain"
                             />
                         </div>
@@ -99,7 +103,7 @@ export default function HeroSection({
                         </div>
                         <div>
                             <div className="text-2xl md:text-3xl font-bold bg-[#A3C042] bg-clip-text text-transparent">٣٢ ألف</div>
-                            <div className="text-sm text-gray-700">ساعة تعليمية</div>
+                            <div className="text-sm text-gray-700">{t('stats.hours')}</div>
                         </div>
                     </div>
 
@@ -109,7 +113,7 @@ export default function HeroSection({
                         </div>
                         <div>
                             <div className="text-2xl md:text-3xl font-bold bg-[#A3C042] bg-clip-text text-transparent">٣.٤ ألف</div>
-                            <div className="text-sm text-gray-700">درس</div>
+                            <div className="text-sm text-gray-700">{t('common.lessons')}</div>
                         </div>
                     </div>
 
@@ -119,7 +123,7 @@ export default function HeroSection({
                         </div>
                         <div>
                             <div className="text-2xl md:text-3xl font-bold bg-[#A3C042] bg-clip-text text-transparent">١٣٥.١ ألف</div>
-                            <div className="text-sm text-gray-700">طالب</div>
+                            <div className="text-sm text-gray-700">{t('common.students')}</div>
                         </div>
                     </div>
 
@@ -129,7 +133,7 @@ export default function HeroSection({
                         </div>
                         <div>
                             <div className="text-2xl md:text-3xl font-bold bg-[#A3C042] bg-clip-text text-transparent">٣١٧</div>
-                            <div className="text-sm text-gray-700">كورس</div>
+                            <div className="text-sm text-gray-700">{t('common.courses')}</div>
                         </div>
                     </div>
                 </div>

@@ -2,6 +2,7 @@ import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { useState, useCallback, useMemo } from 'react';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
+import { useTranslation } from '@/i18n';
 import {
     FaSearch,
     FaFilter,
@@ -15,6 +16,7 @@ import {
 
 export default function AdminProjectsIndex({ projects, stats, filters, users, schools, teachers }) {
     const { confirm } = useConfirmDialog();
+    const { t, language } = useTranslation();
     const [search, setSearch] = useState(filters?.search || '');
     const [status, setStatus] = useState(filters?.status || '');
     const [category, setCategory] = useState(filters?.category || '');
@@ -107,11 +109,11 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
             });
             setShowEditModal(true);
         } catch (error) {
-            alert('حدث خطأ أثناء تحميل بيانات المشروع');
+            alert(t('adminProjectsIndexPage.alerts.loadProjectError'));
         } finally {
             setIsLoadingProject(false);
         }
-    }, [setEditData]);
+    }, [setEditData, t]);
 
     const handleEditSubmit = useCallback((e) => {
         e.preventDefault();
@@ -165,10 +167,10 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
      */
     const handleDelete = useCallback(async (project) => {
         const confirmed = await confirm({
-            title: 'تأكيد الحذف',
-            message: `هل أنت متأكد من حذف المشروع "${project.title}"؟ هذا الإجراء لا يمكن التراجع عنه.`,
-            confirmText: 'حذف',
-            cancelText: 'إلغاء',
+            title: t('adminProjectsIndexPage.deleteConfirm.title'),
+            message: t('adminProjectsIndexPage.deleteConfirm.message', { title: project.title }),
+            confirmText: t('common.delete'),
+            cancelText: t('common.cancel'),
             variant: 'danger',
         });
 
@@ -204,24 +206,24 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                 });
             },
         });
-    }, [projects, confirm]);
+    }, [projects, confirm, t]);
 
     /**
      * PERFORMANCE: Memoize status badge helper to prevent recreation on each render
      */
     const getStatusBadge = useCallback((status) => {
         const statusMap = {
-            'approved': { bg: 'bg-green-100', text: 'text-green-800', label: 'معتمد' },
-            'pending': { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'قيد المراجعة' },
-            'rejected': { bg: 'bg-red-100', text: 'text-red-800', label: 'مرفوض' },
+            approved: { bg: 'bg-green-100', text: 'text-green-800', labelKey: 'adminProjectsIndexPage.status.approved' },
+            pending: { bg: 'bg-yellow-100', text: 'text-yellow-800', labelKey: 'adminProjectsIndexPage.status.pending' },
+            rejected: { bg: 'bg-red-100', text: 'text-red-800', labelKey: 'adminProjectsIndexPage.status.rejected' },
         };
         const statusConfig = statusMap[status] || { bg: 'bg-gray-100', text: 'text-gray-800', label: status };
         return (
             <span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusConfig.bg} ${statusConfig.text}`}>
-                {statusConfig.label}
+                {statusConfig.labelKey ? t(statusConfig.labelKey) : statusConfig.label}
             </span>
         );
-    }, []);
+    }, [t]);
 
     /**
      * PERFORMANCE: Use optimistic state if available, otherwise use server data
@@ -235,25 +237,25 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
     }, [optimisticProjects, projects]);
 
     return (
-        <DashboardLayout header="إدارة المشاريع">
-            <Head title="إدارة المشاريع" />
+        <DashboardLayout header={t('adminProjectsIndexPage.title')}>
+            <Head title={t('adminProjectsIndexPage.pageTitle', { appName: t('common.appName') })} />
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <div className="bg-white rounded-xl shadow-lg p-6">
-                    <p className="text-sm text-gray-600 mb-2">إجمالي المشاريع</p>
+                    <p className="text-sm text-gray-600 mb-2">{t('adminProjectsIndexPage.stats.total')}</p>
                     <p className="text-3xl font-bold text-gray-900">{stats.total || 0}</p>
                 </div>
                 <div className="bg-white rounded-xl shadow-lg p-6">
-                    <p className="text-sm text-gray-600 mb-2">معتمدة</p>
+                    <p className="text-sm text-gray-600 mb-2">{t('adminProjectsIndexPage.stats.approved')}</p>
                     <p className="text-3xl font-bold text-green-600">{stats.approved || 0}</p>
                 </div>
                 <div className="bg-white rounded-xl shadow-lg p-6">
-                    <p className="text-sm text-gray-600 mb-2">قيد المراجعة</p>
+                    <p className="text-sm text-gray-600 mb-2">{t('adminProjectsIndexPage.stats.pending')}</p>
                     <p className="text-3xl font-bold text-yellow-600">{stats.pending || 0}</p>
                 </div>
                 <div className="bg-white rounded-xl shadow-lg p-6">
-                    <p className="text-sm text-gray-600 mb-2">مرفوضة</p>
+                    <p className="text-sm text-gray-600 mb-2">{t('adminProjectsIndexPage.stats.rejected')}</p>
                     <p className="text-3xl font-bold text-red-600">{stats.rejected || 0}</p>
                 </div>
             </div>
@@ -261,49 +263,49 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
             {/* Filters and Actions */}
             <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-bold text-gray-900">البحث والتصفية</h2>
+                    <h2 className="text-lg font-bold text-gray-900">{t('adminProjectsIndexPage.searchAndFilter')}</h2>
                     <button
                         onClick={() => setShowCreateModal(true)}
                         className="px-6 py-2 bg-[#A3C042] hover:bg-[#8CA635] text-white font-semibold rounded-lg flex items-center gap-2"
                     >
                         <FaPlus />
-                        إضافة مشروع جديد
+                        {t('adminProjectsIndexPage.actions.addNew')}
                     </button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">البحث</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.search')}</label>
                         <div className="relative">
                             <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                             <input
                                 type="text"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                placeholder="ابحث عن مشروع..."
+                                placeholder={t('adminProjectsIndexPage.placeholders.search')}
                                 className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
                         </div>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">الحالة</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.status')}</label>
                         <select
                             value={status}
                             onChange={(e) => setStatus(e.target.value)}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         >
-                            <option value="">الكل</option>
-                            <option value="approved">معتمد</option>
-                            <option value="pending">قيد المراجعة</option>
-                            <option value="rejected">مرفوض</option>
+                            <option value="">{t('common.all')}</option>
+                            <option value="approved">{t('adminProjectsIndexPage.status.approved')}</option>
+                            <option value="pending">{t('adminProjectsIndexPage.status.pending')}</option>
+                            <option value="rejected">{t('adminProjectsIndexPage.status.rejected')}</option>
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">الفئة</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminProjectsIndexPage.fields.category')}</label>
                         <input
                             type="text"
                             value={category}
                             onChange={(e) => setCategory(e.target.value)}
-                            placeholder="الفئة..."
+                            placeholder={t('adminProjectsIndexPage.placeholders.category')}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
                     </div>
@@ -313,7 +315,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                             className="w-full bg-[#A3C042] hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
                         >
                             <FaFilter />
-                            تصفية
+                            {t('common.filter')}
                         </button>
                     </div>
                 </div>
@@ -325,12 +327,12 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                     <table className="w-full">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">المشروع</th>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الناشر</th>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">المؤسسة التعليمية</th>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الحالة</th>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">تاريخ الإنشاء</th>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الإجراءات</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminProjectsIndexPage.table.project')}</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminProjectsIndexPage.table.publisher')}</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminProjectsIndexPage.table.school')}</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('common.status')}</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminProjectsIndexPage.table.createdAt')}</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('common.actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
@@ -369,7 +371,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                                     <Link
                                                         href={route('admin.projects.show', project.id)}
                                                         className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50 transition"
-                                                        title="عرض التفاصيل"
+                                                        title={t('common.viewDetails')}
                                                     >
                                                         <FaEye />
                                                     </Link>
@@ -377,7 +379,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                                         onClick={() => handleEdit(project)}
                                                         disabled={isLoadingProject}
                                                         className="text-yellow-600 hover:text-yellow-800 p-2 rounded-lg hover:bg-yellow-50 transition disabled:opacity-50"
-                                                        title="تعديل"
+                                                        title={t('common.edit')}
                                                     >
                                                         <FaEdit />
                                                     </button>
@@ -385,7 +387,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                                         onClick={() => handleDelete(project)}
                                                         disabled={isDeleting}
                                                         className={`text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50 transition ${isDeleting ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                        title={isDeleting ? 'جاري الحذف...' : 'حذف'}
+                                                        title={isDeleting ? t('adminProjectsIndexPage.actions.deleting') : t('common.delete')}
                                                     >
                                                         {isDeleting ? (
                                                             <span className="animate-spin text-xs">⏳</span>
@@ -401,7 +403,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                             ) : (
                                 <tr>
                                     <td colSpan="6" className="py-12 text-center text-gray-500">
-                                        لا توجد مشاريع
+                                        {t('adminProjectsIndexPage.emptyState')}
                                     </td>
                                 </tr>
                             )}
@@ -414,7 +416,11 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                     <div className="px-6 py-4 border-t border-gray-200">
                         <div className="flex items-center justify-between">
                             <div className="text-sm text-gray-700">
-                                عرض {projects.from} إلى {projects.to} من {projects.total} مشروع
+                                {t('adminProjectsIndexPage.pagination.showing', {
+                                    from: projects.from,
+                                    to: projects.to,
+                                    total: projects.total,
+                                })}
                             </div>
                             <div className="flex gap-2">
                                 {projects.links.map((link, index) => (
@@ -436,10 +442,10 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
 
             {/* Edit Modal */}
             {showEditModal && projectToEdit && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+                <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
                     <div className="bg-white rounded-xl shadow-lg p-6 max-w-3xl w-full my-8 max-h-[90vh] overflow-y-auto">
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-2xl font-bold text-gray-900">تعديل مشروع</h3>
+                            <h3 className="text-2xl font-bold text-gray-900">{t('adminProjectsIndexPage.modals.edit.title')}</h3>
                             <button
                                 onClick={closeEditModal}
                                 className="text-gray-400 hover:text-gray-600 transition"
@@ -448,14 +454,14 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                             </button>
                         </div>
 
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6">معلومات المشروع</h2>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('adminProjectsIndexPage.modals.projectInfoTitle')}</h2>
 
                         <form onSubmit={handleEditSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* العنوان */}
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        العنوان <span className="text-red-500">*</span>
+                                        {t('common.title')} <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="text"
@@ -473,7 +479,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                 {/* الوصف */}
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        الوصف <span className="text-red-500">*</span>
+                                        {t('common.description')} <span className="text-red-500">*</span>
                                     </label>
                                     <textarea
                                         value={editData.description}
@@ -491,7 +497,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                 {/* الفئة */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        الفئة
+                                        {t('adminProjectsIndexPage.fields.category')}
                                     </label>
                                     <select
                                         value={editData.category}
@@ -499,13 +505,13 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.category ? 'border-red-500' : 'border-gray-300'
                                             }`}
                                     >
-                                        <option value="">اختر فئة</option>
-                                        <option value="science">علوم</option>
-                                        <option value="technology">تقنية</option>
-                                        <option value="engineering">هندسة</option>
-                                        <option value="mathematics">رياضيات</option>
-                                        <option value="arts">فنون</option>
-                                        <option value="other">أخرى</option>
+                                        <option value="">{t('common.selectOption')}</option>
+                                        <option value="science">{t('common.categories.science')}</option>
+                                        <option value="technology">{t('common.categories.technology')}</option>
+                                        <option value="engineering">{t('common.categories.engineering')}</option>
+                                        <option value="mathematics">{t('common.categories.mathematics')}</option>
+                                        <option value="arts">{t('common.categories.arts')}</option>
+                                        <option value="other">{t('common.categories.other')}</option>
                                     </select>
                                     {editErrors.category && (
                                         <p className="mt-1 text-sm text-red-600">{editErrors.category}</p>
@@ -515,7 +521,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                 {/* الحالة */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        الحالة <span className="text-red-500">*</span>
+                                        {t('common.status')} <span className="text-red-500">*</span>
                                     </label>
                                     <select
                                         value={editData.status}
@@ -524,9 +530,9 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                             }`}
                                         required
                                     >
-                                        <option value="pending">قيد المراجعة</option>
-                                        <option value="approved">معتمد</option>
-                                        <option value="rejected">مرفوض</option>
+                                        <option value="pending">{t('adminProjectsIndexPage.status.pending')}</option>
+                                        <option value="approved">{t('adminProjectsIndexPage.status.approved')}</option>
+                                        <option value="rejected">{t('adminProjectsIndexPage.status.rejected')}</option>
                                     </select>
                                     {editErrors.status && (
                                         <p className="mt-1 text-sm text-red-600">{editErrors.status}</p>
@@ -536,7 +542,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                 {/* المؤسسة التعليمية */}
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        المؤسسة التعليمية
+                                        {t('adminProjectsIndexPage.fields.school')}
                                     </label>
                                     <div className="space-y-3">
                                         <label className="flex items-center gap-2 cursor-pointer">
@@ -551,7 +557,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                                 }}
                                                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                                             />
-                                            <span className="text-sm text-gray-700">متاح لجميع المؤسسات التعليمية</span>
+                                            <span className="text-sm text-gray-700">{t('adminProjectsIndexPage.fields.availableToAllSchools')}</span>
                                         </label>
                                         {!editData.for_all_schools && (
                                             <select
@@ -560,7 +566,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.school_id ? 'border-red-500' : 'border-gray-300'
                                                     }`}
                                             >
-                                                <option value="">اختر مؤسسة تعليمية</option>
+                                                <option value="">{t('adminProjectsIndexPage.placeholders.selectSchool')}</option>
                                                 {schools && schools.map((school) => (
                                                     <option key={school.id} value={school.id}>
                                                         {school.name}
@@ -570,12 +576,12 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                         )}
                                         {editData.for_all_schools && (
                                             <p className="text-sm text-blue-600 bg-blue-50 p-3 rounded-lg">
-                                                سيصبح هذا المشروع متاحاً لجميع طلاب جميع المؤسسات التعليمية
+                                                {t('adminProjectsIndexPage.schoolAvailability.allSchools')}
                                             </p>
                                         )}
                                         {!editData.for_all_schools && editData.school_id && (
                                             <p className="text-sm text-green-600 bg-green-50 p-3 rounded-lg">
-                                                سيصبح هذا المشروع متاحاً لجميع طلاب المؤسسة التعليمية المختارة
+                                                {t('adminProjectsIndexPage.schoolAvailability.selectedSchool')}
                                             </p>
                                         )}
                                     </div>
@@ -597,7 +603,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                     className="px-6 py-2 bg-[#A3C042] hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50"
                                 >
                                     <FaSave />
-                                    {editProcessing ? 'جاري التحديث...' : 'تحديث'}
+                                    {editProcessing ? t('adminProjectsIndexPage.actions.updating') : t('adminProjectsIndexPage.actions.update')}
                                 </button>
                                 <button
                                     type="button"
@@ -605,7 +611,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                     className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg flex items-center gap-2"
                                 >
                                     <FaTimes />
-                                    إلغاء
+                                    {t('common.cancel')}
                                 </button>
                             </div>
                         </form>
@@ -615,10 +621,10 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
 
             {/* Create Modal */}
             {showCreateModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+                <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
                     <div className="bg-white rounded-xl shadow-lg p-6 max-w-3xl w-full my-8 max-h-[90vh] overflow-y-auto">
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-2xl font-bold text-gray-900">إضافة مشروع جديد</h3>
+                            <h3 className="text-2xl font-bold text-gray-900">{t('adminProjectsIndexPage.modals.create.title')}</h3>
                             <button
                                 onClick={closeCreateModal}
                                 className="text-gray-400 hover:text-gray-600 transition"
@@ -627,14 +633,14 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                             </button>
                         </div>
 
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6">معلومات المشروع</h2>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('adminProjectsIndexPage.modals.projectInfoTitle')}</h2>
 
                         <form onSubmit={handleCreateSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* العنوان */}
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        العنوان <span className="text-red-500">*</span>
+                                        {t('common.title')} <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="text"
@@ -652,7 +658,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                 {/* الوصف */}
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        الوصف <span className="text-red-500">*</span>
+                                        {t('common.description')} <span className="text-red-500">*</span>
                                     </label>
                                     <textarea
                                         value={createData.description}
@@ -670,7 +676,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                 {/* الفئة */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        الفئة
+                                        {t('adminProjectsIndexPage.fields.category')}
                                     </label>
                                     <select
                                         value={createData.category}
@@ -678,13 +684,13 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${createErrors.category ? 'border-red-500' : 'border-gray-300'
                                             }`}
                                     >
-                                        <option value="">اختر فئة</option>
-                                        <option value="science">علوم</option>
-                                        <option value="technology">تقنية</option>
-                                        <option value="engineering">هندسة</option>
-                                        <option value="mathematics">رياضيات</option>
-                                        <option value="arts">فنون</option>
-                                        <option value="other">أخرى</option>
+                                        <option value="">{t('common.selectOption')}</option>
+                                        <option value="science">{t('common.categories.science')}</option>
+                                        <option value="technology">{t('common.categories.technology')}</option>
+                                        <option value="engineering">{t('common.categories.engineering')}</option>
+                                        <option value="mathematics">{t('common.categories.mathematics')}</option>
+                                        <option value="arts">{t('common.categories.arts')}</option>
+                                        <option value="other">{t('common.categories.other')}</option>
                                     </select>
                                     {createErrors.category && (
                                         <p className="mt-1 text-sm text-red-600">{createErrors.category}</p>
@@ -694,7 +700,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                 {/* الحالة */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        الحالة <span className="text-red-500">*</span>
+                                        {t('common.status')} <span className="text-red-500">*</span>
                                     </label>
                                     <select
                                         value={createData.status}
@@ -703,9 +709,9 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                             }`}
                                         required
                                     >
-                                        <option value="pending">قيد المراجعة</option>
-                                        <option value="approved">معتمد</option>
-                                        <option value="rejected">مرفوض</option>
+                                        <option value="pending">{t('adminProjectsIndexPage.status.pending')}</option>
+                                        <option value="approved">{t('adminProjectsIndexPage.status.approved')}</option>
+                                        <option value="rejected">{t('adminProjectsIndexPage.status.rejected')}</option>
                                     </select>
                                     {createErrors.status && (
                                         <p className="mt-1 text-sm text-red-600">{createErrors.status}</p>
@@ -715,7 +721,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                 {/* المؤسسة التعليمية */}
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        المؤسسة التعليمية
+                                        {t('adminProjectsIndexPage.fields.school')}
                                     </label>
                                     <div className="space-y-3">
                                         <label className="flex items-center gap-2 cursor-pointer">
@@ -730,7 +736,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                                 }}
                                                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                                             />
-                                            <span className="text-sm text-gray-700">متاح لجميع المؤسسات التعليمية</span>
+                                            <span className="text-sm text-gray-700">{t('adminProjectsIndexPage.fields.availableToAllSchools')}</span>
                                         </label>
                                         {!createData.for_all_schools && (
                                             <select
@@ -739,7 +745,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${createErrors.school_id ? 'border-red-500' : 'border-gray-300'
                                                     }`}
                                             >
-                                                <option value="">اختر مؤسسة تعليمية</option>
+                                                <option value="">{t('adminProjectsIndexPage.placeholders.selectSchool')}</option>
                                                 {schools && schools.map((school) => (
                                                     <option key={school.id} value={school.id}>
                                                         {school.name}
@@ -749,12 +755,12 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                         )}
                                         {createData.for_all_schools && (
                                             <p className="text-sm text-blue-600 bg-blue-50 p-3 rounded-lg">
-                                                سيصبح هذا المشروع متاحاً لجميع طلاب جميع المؤسسات التعليمية
+                                                {t('adminProjectsIndexPage.schoolAvailability.allSchools')}
                                             </p>
                                         )}
                                         {!createData.for_all_schools && createData.school_id && (
                                             <p className="text-sm text-green-600 bg-green-50 p-3 rounded-lg">
-                                                سيصبح هذا المشروع متاحاً لجميع طلاب المؤسسة التعليمية المختارة
+                                                {t('adminProjectsIndexPage.schoolAvailability.selectedSchool')}
                                             </p>
                                         )}
                                     </div>
@@ -776,7 +782,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                     className="px-6 py-2 bg-[#A3C042] hover:bg-[#8CA635] text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50"
                                 >
                                     <FaSave />
-                                    {createProcessing ? 'جاري الحفظ...' : 'حفظ'}
+                                    {createProcessing ? t('adminProjectsIndexPage.actions.saving') : t('common.save')}
                                 </button>
                                 <button
                                     type="button"
@@ -784,7 +790,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                     className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg flex items-center gap-2"
                                 >
                                     <FaTimes />
-                                    إلغاء
+                                    {t('common.cancel')}
                                 </button>
                             </div>
                         </form>

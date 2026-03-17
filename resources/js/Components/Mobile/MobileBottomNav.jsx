@@ -89,7 +89,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
         { key: 'challenges', label: t('common.challenges'), icon: FaTrophy, href: links.challenges },
     ];
 
-    // If user is not authenticated or doesn't have a role, hide "مشاريعي" and show only "استكشاف"
+    // If user is not authenticated or doesn't have a role, hide "My Projects" and show only explore
     const filteredItems = isAuthed && role ? items : items.filter(item => item.key !== 'projects');
 
     const userImage = user ? getUserImageUrl(user) : null;
@@ -121,8 +121,8 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                                         type="button"
                                         onClick={() => router.visit(item.href)}
                                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all mb-1 ${isActive
-                                                ? 'bg-[#A3C042]/10 text-[#A3C042] border border-[#A3C042]/20'
-                                                : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                                            ? 'bg-[#A3C042]/10 text-[#A3C042] border border-[#A3C042]/20'
+                                            : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                                             }`}
                                     >
                                         <Icon className="text-lg" />
@@ -142,7 +142,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-gray-700 hover:bg-gray-50 transition"
                                 >
                                     <FaCreditCard className="text-base" />
-                                    <span>الباقات</span>
+                                    <span>{t('common.packages')}</span>
                                 </button>
                                 <button
                                     type="button"
@@ -150,7 +150,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-gray-700 hover:bg-gray-50 transition"
                                 >
                                     <FaCompass className="text-base" />
-                                    <span>الإصدارات</span>
+                                    <span>{t('common.publications')}</span>
                                 </button>
                                 <button
                                     type="button"
@@ -158,7 +158,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-gray-700 hover:bg-gray-50 transition"
                                 >
                                     <FaTrophy className="text-base" />
-                                    <span>الشارات</span>
+                                    <span>{t('common.badges')}</span>
                                 </button>
                                 <button
                                     type="button"
@@ -166,7 +166,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-gray-700 hover:bg-gray-50 transition"
                                 >
                                     <FaCompass className="text-base" />
-                                    <span>من نحن</span>
+                                    <span>{t('common.about')}</span>
                                 </button>
                             </div>
                         </div>
@@ -202,9 +202,9 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                                         <div className="flex-1 min-w-0">
                                             <div className="text-sm font-bold text-gray-900 truncate">{userName}</div>
                                             <div className="text-xs text-gray-500">
-                                                {role === 'student' && 'طالب'}
-                                                {role === 'teacher' && 'معلم'}
-                                                {role === 'school' && 'مدرسة'}
+                                                {role === 'student' && t('roles.student')}
+                                                {role === 'teacher' && t('roles.teacher')}
+                                                {role === 'school' && t('roles.school')}
                                             </div>
                                         </div>
                                     </div>
@@ -213,7 +213,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                                         onClick={() => router.visit(links.profile)}
                                         className="w-full mt-2 px-3 py-2 bg-[#A3C042] text-white rounded-lg text-xs font-semibold hover:bg-[#8CA635] transition"
                                     >
-                                        عرض الملف الشخصي
+                                        {t('profile.viewProfile')}
                                     </button>
                                 </div>
                             </div>
@@ -282,14 +282,14 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                                     </div>
                                     <span className={`text-[11px] font-semibold truncate max-w-[60px] ${active === 'profile' ? 'text-[#A3C042]' : 'text-gray-400'
                                         }`}>
-                                        {userName.split(' ')[0] || 'الملف'}
+                                        {userName.split(' ')[0] || t('profile.profile')}
                                     </span>
                                 </button>
 
                                 {/* User Dropdown Menu */}
                                 {userDropdownOpen && (
                                     <div className="absolute bottom-full end-0 mb-2 w-40 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden z-50">
-                                        {/* لوحة التحكم - تظهر لجميع الأدوار */}
+                                        {/* Dashboard link for all roles */}
                                         {(role === 'admin' || role === 'teacher' || role === 'school' || role === 'student') && (
                                             <>
                                                 <button
@@ -300,7 +300,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                                                     }}
                                                     className="w-full px-4 py-3 text-sm font-semibold text-[#A3C042] hover:bg-[#A3C042]/10 transition flex items-center justify-between gap-2"
                                                 >
-                                                    <span>لوحة التحكم</span>
+                                                    <span>{t('sidebar.dashboard')}</span>
                                                     <FaTachometerAlt className="text-xs" />
                                                 </button>
                                                 <div className="border-t border-gray-100" />
@@ -314,7 +314,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                                             }}
                                             className="w-full  px-4 py-3 text-sm font-semibold text-gray-900 hover:bg-gray-50 transition flex items-center justify-between"
                                         >
-                                            <span>الملف الشخصي</span>
+                                            <span>{t('profile.profile')}</span>
                                         </button>
                                         {role === 'student' && (
                                             <>
@@ -327,7 +327,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                                                     }}
                                                     className="w-full  px-4 py-3 text-sm font-semibold text-[#A3C042] hover:bg-[#A3C042]/10 transition flex items-center justify-between gap-2"
                                                 >
-                                                    <span>الباقات</span>
+                                                    <span>{t('common.packages')}</span>
                                                     <FaCreditCard className="text-xs" />
                                                 </button>
                                             </>
@@ -341,7 +341,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                                             }}
                                             className="w-full  px-4 py-3 text-sm font-semibold text-red-600 hover:bg-red-50 transition flex items-center justify-between gap-2"
                                         >
-                                            <span>تسجيل الخروج</span>
+                                            <span>{t('profile.logout')}</span>
                                             <FaSignOutAlt className="text-xs" />
                                         </button>
                                     </div>
@@ -357,7 +357,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                                     <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
                                         <FaUser className="text-gray-400 text-xs" />
                                     </div>
-                                    <span className="text-[11px] font-semibold text-gray-400">تسجيل</span>
+                                    <span className="text-[11px] font-semibold text-gray-400">{t('common.login')}</span>
                                 </button>
 
                                 {/* Dropdown Menu */}
@@ -371,7 +371,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                                             }}
                                             className="w-full  px-4 py-3 text-sm font-semibold text-gray-900 hover:bg-gray-50 transition flex items-center justify-between"
                                         >
-                                            <span>تسجيل الدخول</span>
+                                            <span>{t('common.login')}</span>
                                         </button>
                                         <div className="border-t border-gray-100" />
                                         <button
@@ -382,7 +382,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                                             }}
                                             className="w-full  px-4 py-3 text-sm font-semibold text-[#A3C042] hover:bg-[#A3C042]/5 transition flex items-center justify-between"
                                         >
-                                            <span>إنشاء حساب</span>
+                                            <span>{t('common.register')}</span>
                                         </button>
                                     </div>
                                 )}
@@ -394,5 +394,3 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
         </>
     );
 }
-
-

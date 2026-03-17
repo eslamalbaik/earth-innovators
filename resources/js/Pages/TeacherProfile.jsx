@@ -7,8 +7,10 @@ import ExperienceSection from '../Components/TeacherProfile/ExperienceSection';
 import CertificationsSection from '../Components/TeacherProfile/CertificationsSection';
 import ReviewsSection from '../Components/TeacherProfile/ReviewsSection';
 import BookingModal from '../Components/Booking/BookingModal';
+import { useTranslation } from '@/i18n';
 
 export default function TeacherProfile({ auth, teacher = {} }) {
+    const { t } = useTranslation();
     const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
 
     const teacherData = {
@@ -35,10 +37,10 @@ export default function TeacherProfile({ auth, teacher = {} }) {
     if (!teacher.id) {
         return (
             <MainLayout auth={auth}>
-                <Head title="المعلم غير موجود" />
+                <Head title={t('teacherProfilePage.notFoundTitle')} />
                 <div className="max-w-5xl mx-auto px-4 py-8 text-center">
-                    <h1 className="text-2xl font-bold text-gray-900 mb-4">المعلم غير موجود</h1>
-                    <p className="text-gray-600">لم يتم العثور على المعلم المطلوب.</p>
+                    <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('teacherProfilePage.notFoundTitle')}</h1>
+                    <p className="text-gray-600">{t('teacherProfilePage.notFoundMessage')}</p>
                 </div>
             </MainLayout>
         );
@@ -46,14 +48,14 @@ export default function TeacherProfile({ auth, teacher = {} }) {
 
     return (
         <MainLayout auth={auth}>
-            <Head title={`${teacherData.name} - معلمك`} />
+            <Head title={t('teacherProfilePage.pageTitle', { name: teacherData.name })} />
 
             <section className="py-4 bg-gray-100">
                 <div className="max-w-5xl mx-auto">
                     <div className="text-sm text-gray-600 flex justify-start items-center gap-0.5">
-                        <span>الرئيسية</span>
+                        <span>{t('teacherProfilePage.breadcrumbHome')}</span>
                         <span className="mx-1"><FaChevronLeft className="text-xs" /></span>
-                        <span>المعلمين</span>
+                        <span>{t('teacherProfilePage.breadcrumbTeachers')}</span>
                         <span className="mx-1"><FaChevronLeft className="text-xs" /></span>
                         <span className="text-gray-900 font-medium">{teacherData.name}</span>
                     </div>

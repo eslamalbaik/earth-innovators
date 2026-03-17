@@ -4,8 +4,10 @@ import MobileAppLayout from '@/Layouts/MobileAppLayout';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import DesktopFooter from '@/Components/Mobile/DesktopFooter';
+import { useTranslation } from '@/i18n';
 
 export default function StudentCertificateShow({ auth, user, stats, certificate }) {
+    const { t, language } = useTranslation();
     const isAuthed = !!auth?.user;
     const currentUser = auth?.user;
 
@@ -23,15 +25,15 @@ export default function StudentCertificateShow({ auth, user, stats, certificate 
         if (navigator.share) {
             try {
                 await navigator.share({
-                    title: 'شهادة العضوية - إرث المبتكرين',
-                    text: `شهادة عضوية ${user?.name} في منصة إرث المبتكرين`,
+                    title: t('studentCertificateShowPage.share.title', { appName: t('common.appName') }),
+                    text: t('studentCertificateShowPage.share.text', { name: user?.name || t('common.user'), appName: t('common.appName') }),
                     url: window.location.href,
                 });
             } catch (error) {
             }
         } else {
             navigator.clipboard.writeText(window.location.href);
-            alert('تم نسخ الرابط إلى الحافظة');
+            alert(t('studentCertificateShowPage.toasts.linkCopied'));
         }
     };
 
@@ -65,7 +67,7 @@ export default function StudentCertificateShow({ auth, user, stats, certificate 
 
     return (
         <>
-            <Head title="شهادة العضوية - إرث المبتكرين">
+            <Head title={t('studentCertificateShowPage.pageTitle', { appName: t('common.appName') })}>
                 <style>{`
                     @media print {
                         @page {
@@ -91,31 +93,31 @@ export default function StudentCertificateShow({ auth, user, stats, certificate 
                     }
                 `}</style>
             </Head>
-            <div dir="rtl" className="min-h-screen bg-gray-50">
+            <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
 
                 {/* Mobile View */}
                 <div className="block md:hidden">
                     <MobileAppLayout
                         auth={auth}
-                        title="الشهادة"
+                        title={t('studentCertificateShowPage.navTitle')}
                         activeNav="profile"
                         onBack={() => router.visit('/')}
                     >
                         <div className="space-y-4">
                             {/* Student Information Section */}
                             <div className="bg-white rounded-2xl border border-gray-100 p-4 no-print">
-                                <h2 className="text-base font-bold text-gray-900 mb-4">معلومات الطالب</h2>
+                                <h2 className="text-base font-bold text-gray-900 mb-4">{t('studentCertificateShowPage.studentInfo.title')}</h2>
                                 <div className="space-y-3">
                                     <div>
-                                        <label className="text-xs text-gray-600 mb-1 block">الاسم</label>
-                                        <div className="text-sm font-bold text-gray-900">{user?.name || 'غير محدد'}</div>
+                                        <label className="text-xs text-gray-600 mb-1 block">{t('studentCertificateShowPage.studentInfo.name')}</label>
+                                        <div className="text-sm font-bold text-gray-900">{user?.name || t('common.notAvailable')}</div>
                                     </div>
                                     <div>
-                                        <label className="text-xs text-gray-600 mb-1 block">رقم العضوية:</label>
-                                        <div className="text-sm font-bold text-gray-900">{user?.membership_number || 'غير محدد'}</div>
+                                        <label className="text-xs text-gray-600 mb-1 block">{t('studentCertificateShowPage.studentInfo.membershipNumber')}:</label>
+                                        <div className="text-sm font-bold text-gray-900">{user?.membership_number || t('common.notAvailable')}</div>
                                     </div>
                                     <div>
-                                        <label className="text-xs text-gray-600 mb-1 block">تاريخ الانضمام:</label>
+                                        <label className="text-xs text-gray-600 mb-1 block">{t('studentCertificateShowPage.studentInfo.joinDate')}:</label>
                                         <div className="text-sm font-bold text-gray-900 flex items-center gap-2">
                                             <FaCalendarAlt className="text-gray-400" />
                                             {formatDate(stats?.join_date)}
@@ -123,14 +125,14 @@ export default function StudentCertificateShow({ auth, user, stats, certificate 
                                     </div>
                                     <div className="grid grid-cols-2 gap-3">
                                         <div>
-                                            <label className="text-xs text-gray-600 mb-1 block">عدد المشاريع:</label>
+                                            <label className="text-xs text-gray-600 mb-1 block">{t('studentCertificateShowPage.studentInfo.projectsCount')}:</label>
                                             <div className="text-sm font-bold text-gray-900 flex items-center gap-2">
                                                 <FaProjectDiagram className="text-[#A3C042]" />
                                                 {stats?.projects_count || 0}
                                             </div>
                                         </div>
                                         <div>
-                                            <label className="text-xs text-gray-600 mb-1 block">عدد الشارات:</label>
+                                            <label className="text-xs text-gray-600 mb-1 block">{t('studentCertificateShowPage.studentInfo.badgesCount')}:</label>
                                             <div className="text-sm font-bold text-gray-900 flex items-center gap-2">
                                                 <FaMedal className="text-purple-500" />
                                                 {stats?.badges_count || 0}
@@ -142,7 +144,7 @@ export default function StudentCertificateShow({ auth, user, stats, certificate 
 
                             {/* Certificate Section */}
                             <div className="bg-white rounded-2xl border border-gray-100 p-4">
-                                <h2 className="text-base font-bold text-gray-900 mb-4 no-print">شهادة العضوية</h2>
+                                <h2 className="text-base font-bold text-gray-900 mb-4 no-print">{t('studentCertificateShowPage.certificate.title')}</h2>
 
                                 {/* Certificate Display */}
                                 <div className="certificate-print bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-4 relative">
@@ -151,7 +153,7 @@ export default function StudentCertificateShow({ auth, user, stats, certificate 
                                         <div className="flex items-center justify-between mb-4">
                                             <div className="flex-1"></div>
                                             <h1 className="text-lg font-extrabold text-orange-600 text-center flex-2">
-                                                شهادة عضوية و تقدير
+                                                {t('studentCertificateShowPage.certificate.heading')}
                                             </h1>
                                             <div className="flex-1 flex justify-end">
                                                 <img
@@ -166,29 +168,29 @@ export default function StudentCertificateShow({ auth, user, stats, certificate 
                                         {/* Certificate Body */}
                                         <div className="space-y-3 text-sm text-gray-800 leading-relaxed">
                                             <p className="text-center">
-                                                <span className="font-bold text-[#A3C042] text-base">{user?.name || 'الطالب'}</span>
+                                                <span className="font-bold text-[#A3C042] text-base">{user?.name || t('studentCertificateShowPage.certificate.studentFallback')}</span>
                                             </p>
 
                                             <p className="text-center text-xs text-gray-600 mb-3">
-                                                رقم العضوية: <span className="font-bold">{user?.membership_number || 'غير محدد'}</span>
+                                                {t('studentCertificateShowPage.studentInfo.membershipNumber')}: <span className="font-bold">{user?.membership_number || t('common.notAvailable')}</span>
                                             </p>
 
                                             <p className="text-justify leading-relaxed text-xs mb-3">
-                                                هو/هي عضو رسمي وفعّال في منصة إرث المبتكرين، ونقدم له/لها هذا التكريم اعترافاً بإنجازه/إنجازها العلمي المتميز وجهوده/جهودها التعليمية الرائدة، التي تجسد روح الاجتهاد والالتزام، وتعكس رغبة صادقة في تطوير الذات والمجتمع العلمي.
+                                                {t('studentCertificateShowPage.certificate.bodyParagraph')}
                                             </p>
 
                                             {certificate?.achievement_period_start && certificate?.achievement_period_end && (
                                                 <p className="text-center text-xs text-gray-600 mb-3">
-                                                    تم تحقيق هذا الإنجاز العلمي خلال الفترة من{' '}
-                                                    <span className="font-bold">[{formatDateForCertificate(certificate.achievement_period_start)}]</span>{' '}
-                                                    إلى{' '}
-                                                    <span className="font-bold">[{formatDateForCertificate(certificate.achievement_period_end)}]</span>.
+                                                    {t('studentCertificateShowPage.certificate.achievementPeriodLine', {
+                                                        start: formatDateForCertificate(certificate.achievement_period_start),
+                                                        end: formatDateForCertificate(certificate.achievement_period_end),
+                                                    })}
                                                 </p>
                                             )}
 
                                             <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-3 my-4 shadow-sm">
                                                 <p className="text-center text-xs text-yellow-800 leading-relaxed font-medium">
-                                                    إن هذا الإنجاز هو نموذج يحتذى به في التميز والابتكار، ويشكل مصدر فخر لنا جميعاً في مؤسسة أوج لنشر مطبوعات الثقافة والفنون
+                                                    {t('studentCertificateShowPage.certificate.highlight')}
                                                 </p>
                                             </div>
                                         </div>
@@ -197,14 +199,14 @@ export default function StudentCertificateShow({ auth, user, stats, certificate 
                                         <div className="mt-6 pt-4 border-t border-gray-200">
                                             <div className="flex items-center justify-between">
                                                 <div className="text-center flex-1">
-                                                    <div className="text-[10px] text-gray-500 mb-1">المدير التنفيذي</div>
-                                                    <div className="text-xs font-bold text-gray-700">أ. ليلى إبراهيم الجسمي</div>
+                                                    <div className="text-[10px] text-gray-500 mb-1">{t('studentCertificateShowPage.certificate.ceoTitle')}</div>
+                                                    <div className="text-xs font-bold text-gray-700">{t('studentCertificateShowPage.certificate.ceoName')}</div>
                                                 </div>
                                                 <div className="w-10 h-10 border-2 border-green-500 rounded-full flex items-center justify-center mx-3">
                                                     <FaMedal className="text-green-500 text-sm" />
                                                 </div>
                                                 <div className="text-center flex-1">
-                                                    <div className="text-[10px] text-gray-500 mb-1">تاريخ الإصدار:</div>
+                                                    <div className="text-[10px] text-gray-500 mb-1">{t('studentCertificateShowPage.certificate.issueDate')}:</div>
                                                     <div className="text-xs font-bold text-gray-700">
                                                         {formatDate(certificate?.issue_date) || formatDate(new Date())}
                                                     </div>
@@ -221,21 +223,21 @@ export default function StudentCertificateShow({ auth, user, stats, certificate 
                                         className="flex flex-col items-center justify-center gap-2 bg-blue-50 text-blue-600 rounded-xl py-3 hover:bg-blue-100 transition"
                                     >
                                         <FaDownload className="text-lg" />
-                                        <span className="text-xs font-bold">تحميل</span>
+                                        <span className="text-xs font-bold">{t('studentCertificateShowPage.actions.download')}</span>
                                     </button>
                                     <button
                                         onClick={handlePrint}
                                         className="flex flex-col items-center justify-center gap-2 bg-[#A3C042] text-white rounded-xl py-3 hover:bg-[#8CA635] transition"
                                     >
                                         <FaPrint className="text-lg" />
-                                        <span className="text-xs font-bold">طباعة</span>
+                                        <span className="text-xs font-bold">{t('studentCertificateShowPage.actions.print')}</span>
                                     </button>
                                     <button
                                         onClick={handleShare}
                                         className="flex flex-col items-center justify-center gap-2 bg-purple-50 text-purple-600 rounded-xl py-3 hover:bg-purple-100 transition"
                                     >
                                         <FaShare className="text-lg" />
-                                        <span className="text-xs font-bold">مشاركة</span>
+                                        <span className="text-xs font-bold">{t('studentCertificateShowPage.actions.share')}</span>
                                     </button>
                                 </div>
                             </div>
@@ -247,7 +249,7 @@ export default function StudentCertificateShow({ auth, user, stats, certificate 
                 <div className="hidden md:block">
                     <div className="no-print">
                         <MobileTopBar
-                            title="الشهادة"
+                            title={t('studentCertificateShowPage.navTitle')}
                             onBack={() => router.visit('/')}
                             reverseOrder={false}
                             auth={auth}
@@ -258,32 +260,32 @@ export default function StudentCertificateShow({ auth, user, stats, certificate 
                             {/* Student Information Section */}
                             <div className="lg:col-span-1 no-print">
                                 <div className="bg-white rounded-2xl border border-gray-100 p-6 sticky top-20">
-                                    <h2 className="text-xl font-bold text-gray-900 mb-6">معلومات الطالب</h2>
+                                    <h2 className="text-xl font-bold text-gray-900 mb-6">{t('studentCertificateShowPage.studentInfo.title')}</h2>
                                     <div className="space-y-4">
                                         <div>
-                                            <label className="text-sm text-gray-600 mb-2 block">الاسم</label>
-                                            <div className="text-base font-bold text-gray-900">{user?.name || 'غير محدد'}</div>
+                                            <label className="text-sm text-gray-600 mb-2 block">{t('studentCertificateShowPage.studentInfo.name')}</label>
+                                            <div className="text-base font-bold text-gray-900">{user?.name || t('common.notAvailable')}</div>
                                         </div>
                                         <div>
-                                            <label className="text-sm text-gray-600 mb-2 block">رقم العضوية:</label>
-                                            <div className="text-base font-bold text-gray-900">{user?.membership_number || 'غير محدد'}</div>
+                                            <label className="text-sm text-gray-600 mb-2 block">{t('studentCertificateShowPage.studentInfo.membershipNumber')}:</label>
+                                            <div className="text-base font-bold text-gray-900">{user?.membership_number || t('common.notAvailable')}</div>
                                         </div>
                                         <div>
-                                            <label className="text-sm text-gray-600 mb-2 block">تاريخ الانضمام:</label>
+                                            <label className="text-sm text-gray-600 mb-2 block">{t('studentCertificateShowPage.studentInfo.joinDate')}:</label>
                                             <div className="text-base font-bold text-gray-900 flex items-center gap-2">
                                                 <FaCalendarAlt className="text-gray-400" />
                                                 {formatDate(stats?.join_date)}
                                             </div>
                                         </div>
                                         <div>
-                                            <label className="text-sm text-gray-600 mb-2 block">عدد المشاريع:</label>
+                                            <label className="text-sm text-gray-600 mb-2 block">{t('studentCertificateShowPage.studentInfo.projectsCount')}:</label>
                                             <div className="text-base font-bold text-gray-900 flex items-center gap-2">
                                                 <FaProjectDiagram className="text-[#A3C042]" />
                                                 {stats?.projects_count || 0}
                                             </div>
                                         </div>
                                         <div>
-                                            <label className="text-sm text-gray-600 mb-2 block">عدد الشارات:</label>
+                                            <label className="text-sm text-gray-600 mb-2 block">{t('studentCertificateShowPage.studentInfo.badgesCount')}:</label>
                                             <div className="text-base font-bold text-gray-900 flex items-center gap-2">
                                                 <FaMedal className="text-purple-500" />
                                                 {stats?.badges_count || 0}
@@ -296,7 +298,7 @@ export default function StudentCertificateShow({ auth, user, stats, certificate 
                             {/* Certificate Section */}
                             <div className="lg:col-span-2">
                                 <div className="bg-white rounded-2xl border border-gray-100 p-6">
-                                    <h2 className="text-xl font-bold text-gray-900 mb-6 no-print">شهادة العضوية</h2>
+                                    <h2 className="text-xl font-bold text-gray-900 mb-6 no-print">{t('studentCertificateShowPage.certificate.title')}</h2>
 
                                     {/* Certificate Display */}
                                     <div className="certificate-print bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-6 relative">
@@ -305,7 +307,7 @@ export default function StudentCertificateShow({ auth, user, stats, certificate 
                                             <div className="flex items-center justify-between mb-6">
                                                 <div className="flex-1"></div>
                                                 <h1 className="text-2xl font-extrabold text-orange-600 text-center flex-2">
-                                                    شهادة عضوية و تقدير
+                                                    {t('studentCertificateShowPage.certificate.heading')}
                                                 </h1>
                                                 <div className="flex-1 flex justify-end">
                                                     <img
@@ -320,29 +322,29 @@ export default function StudentCertificateShow({ auth, user, stats, certificate 
                                             {/* Certificate Body */}
                                             <div className="space-y-4 text-base text-gray-800 leading-relaxed">
                                                 <p className="text-center">
-                                                    <span className="font-bold text-[#A3C042] text-2xl">{user?.name || 'الطالب'}</span>
+                                                    <span className="font-bold text-[#A3C042] text-2xl">{user?.name || t('studentCertificateShowPage.certificate.studentFallback')}</span>
                                                 </p>
 
                                                 <p className="text-center text-sm text-gray-600 mb-4">
-                                                    رقم العضوية: <span className="font-bold">{user?.membership_number || 'غير محدد'}</span>
+                                                    {t('studentCertificateShowPage.studentInfo.membershipNumber')}: <span className="font-bold">{user?.membership_number || t('common.notAvailable')}</span>
                                                 </p>
 
                                                 <p className="text-justify leading-relaxed text-base mb-4">
-                                                    هو/هي عضو رسمي وفعّال في منصة إرث المبتكرين، ونقدم له/لها هذا التكريم اعترافاً بإنجازه/إنجازها العلمي المتميز وجهوده/جهودها التعليمية الرائدة، التي تجسد روح الاجتهاد والالتزام، وتعكس رغبة صادقة في تطوير الذات والمجتمع العلمي.
+                                                    {t('studentCertificateShowPage.certificate.bodyParagraph')}
                                                 </p>
 
                                                 {certificate?.achievement_period_start && certificate?.achievement_period_end && (
                                                     <p className="text-center text-sm text-gray-600 mb-4">
-                                                        تم تحقيق هذا الإنجاز العلمي خلال الفترة من{' '}
-                                                        <span className="font-bold">[{formatDateForCertificate(certificate.achievement_period_start)}]</span>{' '}
-                                                        إلى{' '}
-                                                        <span className="font-bold">[{formatDateForCertificate(certificate.achievement_period_end)}]</span>.
+                                                        {t('studentCertificateShowPage.certificate.achievementPeriodLine', {
+                                                            start: formatDateForCertificate(certificate.achievement_period_start),
+                                                            end: formatDateForCertificate(certificate.achievement_period_end),
+                                                        })}
                                                     </p>
                                                 )}
 
                                                 <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 my-6 shadow-sm">
                                                     <p className="text-center text-sm text-yellow-800 leading-relaxed font-medium">
-                                                        إن هذا الإنجاز هو نموذج يحتذى به في التميز والابتكار، ويشكل مصدر فخر لنا جميعاً في مؤسسة أوج لنشر مطبوعات الثقافة والفنون
+                                                        {t('studentCertificateShowPage.certificate.highlight')}
                                                     </p>
                                                 </div>
                                             </div>
@@ -351,14 +353,14 @@ export default function StudentCertificateShow({ auth, user, stats, certificate 
                                             <div className="mt-8 pt-6 border-t border-gray-200">
                                                 <div className="flex items-center justify-between">
                                                     <div className="text-center flex-1">
-                                                        <div className="text-sm text-gray-500 mb-2">المدير التنفيذي</div>
-                                                        <div className="text-base font-bold text-gray-700">أ. ليلى إبراهيم الجسمي</div>
+                                                        <div className="text-sm text-gray-500 mb-2">{t('studentCertificateShowPage.certificate.ceoTitle')}</div>
+                                                        <div className="text-base font-bold text-gray-700">{t('studentCertificateShowPage.certificate.ceoName')}</div>
                                                     </div>
                                                     <div className="w-16 h-16 border-2 border-green-500 rounded-full flex items-center justify-center mx-6">
                                                         <FaMedal className="text-green-500 text-xl" />
                                                     </div>
                                                     <div className="text-center flex-1">
-                                                        <div className="text-sm text-gray-500 mb-2">تاريخ الإصدار:</div>
+                                                        <div className="text-sm text-gray-500 mb-2">{t('studentCertificateShowPage.certificate.issueDate')}:</div>
                                                         <div className="text-base font-bold text-gray-700">
                                                             {formatDate(certificate?.issue_date) || formatDate(new Date())}
                                                         </div>
@@ -375,21 +377,21 @@ export default function StudentCertificateShow({ auth, user, stats, certificate 
                                             className="flex flex-col items-center justify-center gap-2 bg-blue-50 text-blue-600 rounded-xl py-4 hover:bg-blue-100 transition"
                                         >
                                             <FaDownload className="text-xl" />
-                                            <span className="text-sm font-bold">تحميل</span>
+                                            <span className="text-sm font-bold">{t('studentCertificateShowPage.actions.download')}</span>
                                         </button>
                                         <button
                                             onClick={handlePrint}
                                             className="flex flex-col items-center justify-center gap-2 bg-[#A3C042] text-white rounded-xl py-4 hover:bg-[#8CA635] transition"
                                         >
                                             <FaPrint className="text-xl" />
-                                            <span className="text-sm font-bold">طباعة</span>
+                                            <span className="text-sm font-bold">{t('studentCertificateShowPage.actions.print')}</span>
                                         </button>
                                         <button
                                             onClick={handleShare}
                                             className="flex flex-col items-center justify-center gap-2 bg-purple-50 text-purple-600 rounded-xl py-4 hover:bg-purple-100 transition"
                                         >
                                             <FaShare className="text-xl" />
-                                            <span className="text-sm font-bold">مشاركة</span>
+                                            <span className="text-sm font-bold">{t('studentCertificateShowPage.actions.share')}</span>
                                         </button>
                                     </div>
                                 </div>

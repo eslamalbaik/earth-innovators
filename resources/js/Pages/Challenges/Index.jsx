@@ -16,36 +16,36 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
 
     // Use categories from database, fallback to default if empty
     const categoriesList = categories && categories.length > 0 ? categories : [
-        { value: '', label: t('common.all') || 'الكل' },
-        { value: 'science', label: t('challenges.scientific') || 'علمي' },
-        { value: 'arts', label: t('challenges.technical') || 'فني' },
-        { value: 'technology', label: t('categories.technology') || 'تقني' },
-        { value: 'heritage', label: t('challenges.heritage') || 'تراثي' },
-        { value: 'environmental', label: t('challenges.environmental') || 'بيئي' },
+        { value: '', label: t('common.all') },
+        { value: 'science', label: t('challenges.scientific') },
+        { value: 'arts', label: t('challenges.technical') },
+        { value: 'technology', label: t('categories.technology') },
+        { value: 'heritage', label: t('challenges.heritage') },
+        { value: 'environmental', label: t('challenges.environmental') },
     ];
 
     const challengeTypes = [
-        { value: '', label: t('common.all') || 'الكل' },
-        { value: 'cognitive', label: t('challenges.cognitive') || 'تحدّي معرفي' },
-        { value: 'applied', label: t('challenges.applied') || 'تحدّي تطبيقي' },
-        { value: 'creative', label: t('challenges.creative') || 'تحدّي إبداعي' },
-        { value: 'artistic_creative', label: t('challenges.artisticCreative') || 'إبداعي فني' },
-        { value: 'collaborative', label: t('challenges.collaborative') || 'تحدّي تعاوني' },
-        { value: 'analytical', label: t('challenges.analytical') || 'تحليلي' },
-        { value: 'technological', label: t('challenges.technological') || 'تكنولوجي' },
-        { value: 'behavioral', label: t('challenges.behavioral') || 'سلوكي' },
-        { value: '60_seconds', label: t('challenges.minseconds') || '60 ثانية' },
-        { value: 'mental_math', label: t('challenges.mentalMath') || 'بدون قلم' },
-        { value: 'conversions', label: t('challenges.conversions') || 'التحويلات' },
-        { value: 'team_fastest', label: t('challenges.teamFastest') || 'الفريق الأسرع' },
-        { value: 'build_problem', label: t('challenges.buildProblem') || 'ابنِ مسألة' },
+        { value: '', label: t('common.all') },
+        { value: 'cognitive', label: t('challenges.cognitive') },
+        { value: 'applied', label: t('challenges.applied') },
+        { value: 'creative', label: t('challenges.creative') },
+        { value: 'artistic_creative', label: t('challenges.artisticCreative') },
+        { value: 'collaborative', label: t('challenges.collaborative') },
+        { value: 'analytical', label: t('challenges.analytical') },
+        { value: 'technological', label: t('challenges.technological') },
+        { value: 'behavioral', label: t('challenges.behavioral') },
+        { value: '60_seconds', label: t('challenges.minseconds') },
+        { value: 'mental_math', label: t('challenges.mentalMath') },
+        { value: 'conversions', label: t('challenges.conversions') },
+        { value: 'team_fastest', label: t('challenges.teamFastest') },
+        { value: 'build_problem', label: t('challenges.buildProblem') },
     ];
 
     const statusOptions = [
-        { value: '', label: t('common.all') || 'الكل' },
-        { value: 'active', label: t('challenges.active') || 'نشط' },
-        { value: 'upcoming', label: t('challenges.upcoming') || 'قادم' },
-        { value: 'finished', label: t('challenges.finished') || 'منتهي' },
+        { value: '', label: t('common.all') },
+        { value: 'active', label: t('challenges.active') },
+        { value: 'upcoming', label: t('challenges.upcoming') },
+        { value: 'finished', label: t('challenges.finished') },
     ];
 
     const handleSearch = (e) => {
@@ -88,7 +88,7 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
 
     const getCategoryLabel = (cat) => {
         const found = categoriesList.find((c) => c.value === cat);
-        return found ? found.label : t('categories.other') || 'أخرى';
+        return found ? found.label : t('categories.other');
     };
 
     const getChallengeTypeLabel = (type) => {
@@ -100,18 +100,18 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
         if (!date) return '';
         const d = new Date(date);
         const months = [
-            t('common.january') || 'يناير',
-            t('common.february') || 'فبراير',
-            t('common.march') || 'مارس',
-            t('common.april') || 'أبريل',
-            t('common.may') || 'مايو',
-            t('common.june') || 'يونيو',
-            t('common.july') || 'يوليو',
-            t('common.august') || 'أغسطس',
-            t('common.september') || 'سبتمبر',
-            t('common.october') || 'أكتوبر',
-            t('common.november') || 'نوفمبر',
-            t('common.december') || 'ديسمبر'
+            t('common.january'),
+            t('common.february'),
+            t('common.march'),
+            t('common.april'),
+            t('common.may'),
+            t('common.june'),
+            t('common.july'),
+            t('common.august'),
+            t('common.september'),
+            t('common.october'),
+            t('common.november'),
+            t('common.december')
         ];
         return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
     };
@@ -121,9 +121,9 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
         const startDate = new Date(challenge.start_date);
         const endDate = new Date(challenge.end_date);
 
-        if (now < startDate) return { label: t('challenges.upcoming') || 'قادم', color: 'bg-blue-100 text-blue-700 border-blue-300', icon: FaClock };
-        if (now > endDate) return { label: t('challenges.finished') || 'منتهي', color: 'bg-gray-100 text-gray-700 border-gray-300', icon: FaCalendar };
-        return { label: t('challenges.active') || 'نشط', color: 'bg-green-100 text-green-700 border-green-300', icon: FaTrophy };
+        if (now < startDate) return { label: t('challenges.upcoming'), color: 'bg-blue-100 text-blue-700 border-blue-300', icon: FaClock };
+        if (now > endDate) return { label: t('challenges.finished'), color: 'bg-gray-100 text-gray-700 border-gray-300', icon: FaCalendar };
+        return { label: t('challenges.active'), color: 'bg-green-100 text-green-700 border-green-300', icon: FaTrophy };
     };
 
     const filteredChallenges = useMemo(() => {
@@ -153,7 +153,7 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder={t('challenges.searchPlaceholder') || 'ابحث عن التحديات ..'}
+                            placeholder={t('challenges.searchPlaceholder')}
                             className="w-full h-10 ps-10 pe-4 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042] text-sm"
                         />
                         <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
@@ -223,7 +223,7 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                                 </div>
                                 <div className="p-3">
                                     <h3 className="text-sm font-bold text-gray-900 mb-2 line-clamp-2 min-h-[2.5rem]">
-                                        {challenge.title || 'تحدي الابتكار'}
+                                        {challenge.title || t('challenges.defaultTitle')}
                                     </h3>
                                     <div className="text-xs text-gray-600 mb-2 space-y-1">
                                         {startDate && <div>{t('challenges.start')}: {startDate}</div>}
@@ -337,7 +337,7 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                                                 <span className="text-[10px] text-gray-500">{winner.date}</span>
                                                 {winner.rating > 0 && (
                                                     <span className="px-2 py-1 rounded-full text-[10px] font-semibold border bg-green-100 text-green-700 border-green-300">
-                                                        {winner.rating.toFixed(1)} ⭐
+                                                        {t('challenges.ratingLabel', { rating: winner.rating.toFixed(1) })}
                                                     </span>
                                                 )}
                                                 {winner.points > 0 && (

@@ -70,8 +70,8 @@ export default function Login({ status, canResetPassword }) {
 
 <div className="relative min-h-screen overflow-hidden bg-white shadow-lg sm:rounded-2xl px-4 py-10 w-[100vw] sm:w-[400px] md:w-[450px] max-w-5xl sm:mx-auto">
 <form onSubmit={submit} className="space-y-6">
-                            <img src="/images/avatar.svg" alt="avatar" className="absolute -top-24 -start-24 w-48 h-48" />
-                            <img src="/images/avatar1.svg" alt="avatar" className="absolute -bottom-8 end-0 w-28 h-28" />
+                            <img src="/images/avatar.svg" alt={t('common.avatar')} className="absolute -top-24 -start-24 w-48 h-48" />
+                            <img src="/images/avatar1.svg" alt={t('common.avatar')} className="absolute -bottom-8 end-0 w-28 h-28" />
                             <div className="flex flex-col items-center">
                                 <div>
                                     <img
@@ -83,13 +83,13 @@ export default function Login({ status, canResetPassword }) {
                             </div>
 
                             <div>
-                            <div className='text-xs mb-1 opacity-75'>{t('auth.loginAs') || 'تسجيل الدخول كـ'}</div>
+                            <div className='text-xs mb-1 opacity-75'>{t('auth.loginAs')}</div>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5 md:gap-3">
                                     {[
-                                        { key: 'student', label: t('roles.student'), description: t('auth.studentAccess') || 'للوصول إلى لوحة الطالب', icon: FaUserGraduate },
-                                        { key: 'teacher', label: t('roles.teacher'), description: t('auth.teacherAccess') || 'للوصول إلى لوحة المعلم', icon: FaChalkboardTeacher },
-                                        { key: 'school', label: t('roles.school'), description: t('auth.schoolAccess') || 'للوصول إلى لوحة المدرسة', icon: FaSchool },
-                                        { key: 'educational_institution', label: t('roles.educationalInstitution'), description: t('auth.institutionAccess') || 'للوصول إلى لوحة المؤسسة التعليمية', icon: FaUniversity },
+                                        { key: 'student', label: t('roles.student'), description: t('auth.studentAccess'), icon: FaUserGraduate },
+                                        { key: 'teacher', label: t('roles.teacher'), description: t('auth.teacherAccess'), icon: FaChalkboardTeacher },
+                                        { key: 'school', label: t('roles.school'), description: t('auth.schoolAccess'), icon: FaSchool },
+                                        { key: 'educational_institution', label: t('roles.educationalInstitution'), description: t('auth.institutionAccess'), icon: FaUniversity },
                                     ].map((roleOption) => {
                                         const isActive = data.role === roleOption.key;
                                         const IconComponent = roleOption.icon;
@@ -176,7 +176,7 @@ export default function Login({ status, canResetPassword }) {
                                         onChange={(e) => setData('remember', e.target.checked)}
                                     />
                                     <label className="ms-2 block text-sm text-gray-900">
-                                        {t('auth.rememberMe') || 'تذكرني'}
+                                        {t('auth.rememberMe')}
                                     </label>
                                 </div>
 
@@ -186,7 +186,7 @@ export default function Login({ status, canResetPassword }) {
                                             href={route('password.request')}
                                             className="font-medium text-[#A3C042] hover:text-[#F9D536]"
                                         >
-                                            {t('auth.forgotPassword') || 'نسيت كلمة المرور؟'}
+                                            {t('auth.forgotPassword')}
                                         </Link>
                                     </div>
                                 )}
@@ -200,7 +200,7 @@ export default function Login({ status, canResetPassword }) {
                                     {processing ? (
                                         <div className="flex items-center">
                                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white me-2"></div>
-                                            {t('auth.loggingIn') || 'جاري تسجيل الدخول...'}
+                                            {t('auth.loggingIn')}
                                         </div>
                                     ) : (
                                         t('auth.login')
@@ -211,7 +211,7 @@ export default function Login({ status, canResetPassword }) {
                             <div className="text-center space-y-2"> 
                                 <div className="text-sm text-gray-600">
                                     <p>
-                                        {t('auth.noAccount') || 'ليس لديك حساب؟'}{' '}
+                                        {t('auth.noAccount')}{' '}
                                         <Link
                                             href={route('register')}
                                             className="font-medium text-[#A3C042] hover:text-[#F9D536]"

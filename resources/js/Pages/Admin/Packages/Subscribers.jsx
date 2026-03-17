@@ -3,9 +3,11 @@ import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { FaArrowRight, FaUsers, FaCalendar, FaCheckCircle, FaClock, FaTimesCircle, FaSearch, FaSync, FaBan, FaEdit } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function AdminPackagesSubscribers({ package: pkg, subscribers, filters = {} }) {
     const { confirm } = useConfirmDialog();
+    const { t } = useTranslation();
     const [search, setSearch] = useState(filters.search || '');
     const [statusFilter, setStatusFilter] = useState(filters.status || '');
 
@@ -21,10 +23,10 @@ export default function AdminPackagesSubscribers({ package: pkg, subscribers, fi
 
     const handleStatusChange = async (subscriberId, newStatus) => {
         const confirmed = await confirm({
-            title: 'تأكيد التغيير',
-            message: `هل أنت متأكد من تغيير حالة المشترك إلى "${newStatus}"؟`,
-            confirmText: 'تغيير',
-            cancelText: 'إلغاء',
+            title: t('adminPackagesSubscribersPage.confirm.changeStatusTitle'),
+            message: t('adminPackagesSubscribersPage.confirm.changeStatusMessage', { status: t(`adminPackagesSubscribersPage.status.${newStatus}`) }),
+            confirmText: t('adminPackagesSubscribersPage.actions.change'),
+            cancelText: t('common.cancel'),
             variant: 'info',
         });
 
@@ -37,7 +39,7 @@ export default function AdminPackagesSubscribers({ package: pkg, subscribers, fi
                     // Success handled by Inertia
                 },
                 onError: (errors) => {
-                    alert('حدث خطأ أثناء تحديث الحالة');
+                    alert(t('adminPackagesSubscribersPage.errors.updateStatusFailed'));
                 },
             });
         }
@@ -45,10 +47,10 @@ export default function AdminPackagesSubscribers({ package: pkg, subscribers, fi
 
     const handleCancelSubscription = async (subscriberId) => {
         const confirmed = await confirm({
-            title: 'تأكيد الإلغاء',
-            message: 'هل أنت متأكد من إلغاء هذا الاشتراك؟',
-            confirmText: 'إلغاء',
-            cancelText: 'تراجع',
+            title: t('adminPackagesSubscribersPage.confirm.cancelTitle'),
+            message: t('adminPackagesSubscribersPage.confirm.cancelMessage'),
+            confirmText: t('adminPackagesSubscribersPage.actions.cancel'),
+            cancelText: t('common.cancel'),
             variant: 'warning',
         });
 
@@ -59,14 +61,14 @@ export default function AdminPackagesSubscribers({ package: pkg, subscribers, fi
                     // Success handled by Inertia
                 },
                 onError: (errors) => {
-                    alert('حدث خطأ أثناء إلغاء الاشتراك');
+                    alert(t('adminPackagesSubscribersPage.errors.cancelFailed'));
                 },
             });
         }
     };
 
     const handleRenewSubscription = (subscriberId) => {
-        const months = prompt('كم شهر تريد تجديد الاشتراك؟', '1');
+        const months = prompt(t('adminPackagesSubscribersPage.prompts.renewMonths'), '1');
         if (months && parseInt(months) > 0) {
             router.post(route('admin.packages.subscribers.renew', subscriberId), {
                 months: parseInt(months),
@@ -76,7 +78,7 @@ export default function AdminPackagesSubscribers({ package: pkg, subscribers, fi
                     // Success handled by Inertia
                 },
                 onError: (errors) => {
-                    alert('حدث خطأ أثناء تجديد الاشتراك');
+                    alert(t('adminPackagesSubscribersPage.errors.renewFailed'));
                 },
             });
         }
@@ -84,9 +86,9 @@ export default function AdminPackagesSubscribers({ package: pkg, subscribers, fi
 
     const getStatusBadge = (status) => {
         const statusMap = {
-            'active': { bg: 'bg-green-100', text: 'text-green-800', label: 'نشط', icon: FaCheckCircle },
-            'expired': { bg: 'bg-gray-100', text: 'text-gray-800', label: 'منتهي', icon: FaClock },
-            'cancelled': { bg: 'bg-red-100', text: 'text-red-800', label: 'ملغي', icon: FaTimesCircle },
+            active: { bg: 'bg-green-100', text: 'text-green-800', label: t('adminPackagesSubscribersPage.status.active'), icon: FaCheckCircle },
+            expired: { bg: 'bg-gray-100', text: 'text-gray-800', label: t('adminPackagesSubscribersPage.status.expired'), icon: FaClock },
+            cancelled: { bg: 'bg-red-100', text: 'text-red-800', label: t('adminPackagesSubscribersPage.status.cancelled'), icon: FaTimesCircle },
         };
         const statusConfig = statusMap[status] || { bg: 'bg-gray-100', text: 'text-gray-800', label: status, icon: FaCheckCircle };
         const Icon = statusConfig.icon;
@@ -99,8 +101,8 @@ export default function AdminPackagesSubscribers({ package: pkg, subscribers, fi
     };
 
     return (
-        <DashboardLayout header={`مشتركي الباقة: ${pkg.name_ar || pkg.name}`}>
-            <Head title={`مشتركي الباقة: ${pkg.name_ar || pkg.name}`} />
+        <DashboardLayout header={t('adminPackagesSubscribersPage.title', { name: pkg.name_ar || pkg.name })}>
+            <Head title={t('adminPackagesSubscribersPage.pageTitle', { name: pkg.name_ar || pkg.name, appName: t('common.appName') })} />
 
             <div className="mb-6">
                 <Link
@@ -108,7 +110,7 @@ export default function AdminPackagesSubscribers({ package: pkg, subscribers, fi
                     className="text-blue-600 hover:text-blue-800 flex items-center gap-2"
                 >
                     <FaArrowRight className="transform rotate-180" />
-                    العودة إلى قائمة الباقات
+                    {t('adminPackagesSubscribersPage.actions.backToPackages')}
                 </Link>
             </div>
 
@@ -117,20 +119,17 @@ export default function AdminPackagesSubscribers({ package: pkg, subscribers, fi
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">{pkg.name_ar || pkg.name}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                        <p className="text-sm text-gray-600">السعر</p>
+                        <p className="text-sm text-gray-600">{t('adminPackagesSubscribersPage.packageInfo.price')}</p>
                         <p className="text-lg font-semibold text-gray-900">{pkg.price} {pkg.currency}</p>
                     </div>
                     <div>
-                        <p className="text-sm text-gray-600">المدة</p>
+                        <p className="text-sm text-gray-600">{t('adminPackagesSubscribersPage.packageInfo.duration')}</p>
                         <p className="text-lg font-semibold text-gray-900">
-                            {pkg.duration_type === 'monthly' && 'شهري'}
-                            {pkg.duration_type === 'quarterly' && 'ربع سنوي'}
-                            {pkg.duration_type === 'yearly' && 'سنوي'}
-                            {pkg.duration_type === 'lifetime' && 'مدى الحياة'}
+                            {t(`packagesIndexPage.duration.${pkg.duration_type || 'monthly'}`)}
                         </p>
                     </div>
                     <div>
-                        <p className="text-sm text-gray-600">إجمالي المشتركين</p>
+                        <p className="text-sm text-gray-600">{t('adminPackagesSubscribersPage.packageInfo.totalSubscribers')}</p>
                         <p className="text-lg font-semibold text-gray-900">{subscribers.total || 0}</p>
                     </div>
                 </div>
@@ -147,7 +146,7 @@ export default function AdminPackagesSubscribers({ package: pkg, subscribers, fi
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                                placeholder="ابحث عن مشترك..."
+                                placeholder={t('adminPackagesSubscribersPage.placeholders.search')}
                                 className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
                         </div>
@@ -158,10 +157,10 @@ export default function AdminPackagesSubscribers({ package: pkg, subscribers, fi
                             onChange={(e) => setStatusFilter(e.target.value)}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         >
-                            <option value="">جميع الحالات</option>
-                            <option value="active">نشط</option>
-                            <option value="expired">منتهي</option>
-                            <option value="cancelled">ملغي</option>
+                            <option value="">{t('adminPackagesSubscribersPage.filters.allStatuses')}</option>
+                            <option value="active">{t('adminPackagesSubscribersPage.status.active')}</option>
+                            <option value="expired">{t('adminPackagesSubscribersPage.status.expired')}</option>
+                            <option value="cancelled">{t('adminPackagesSubscribersPage.status.cancelled')}</option>
                         </select>
                     </div>
                     <div className="md:col-span-3 flex justify-end">
@@ -170,7 +169,7 @@ export default function AdminPackagesSubscribers({ package: pkg, subscribers, fi
                             className="px-6 py-2 bg-[#A3C042] hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center gap-2"
                         >
                             <FaSearch />
-                            بحث
+                            {t('common.search')}
                         </button>
                     </div>
                 </div>
@@ -182,13 +181,13 @@ export default function AdminPackagesSubscribers({ package: pkg, subscribers, fi
                     <table className="w-full">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">المستخدم</th>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">تاريخ البدء</th>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">تاريخ الانتهاء</th>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الحالة</th>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">المبلغ المدفوع</th>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">تاريخ الاشتراك</th>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الإجراءات</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminPackagesSubscribersPage.table.user')}</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminPackagesSubscribersPage.table.startDate')}</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminPackagesSubscribersPage.table.endDate')}</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminPackagesSubscribersPage.table.status')}</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminPackagesSubscribersPage.table.paidAmount')}</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminPackagesSubscribersPage.table.subscribedAt')}</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('common.actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
@@ -197,7 +196,7 @@ export default function AdminPackagesSubscribers({ package: pkg, subscribers, fi
                                     <tr key={subscriber.id} className="hover:bg-gray-50">
                                         <td className="py-4 px-6">
                                             <div>
-                                                <p className="font-medium text-gray-900">{subscriber.user?.name || 'غير معروف'}</p>
+                                                <p className="font-medium text-gray-900">{subscriber.user?.name || t('common.notAvailable')}</p>
                                                 <p className="text-sm text-gray-500">{subscriber.user?.email || '—'}</p>
                                             </div>
                                         </td>
@@ -225,18 +224,18 @@ export default function AdminPackagesSubscribers({ package: pkg, subscribers, fi
                                                         <button
                                                             onClick={() => handleRenewSubscription(subscriber.id)}
                                                             className="px-3 py-1 bg-[#A3C042] hover:bg-[#8CA635] text-white rounded text-xs font-semibold flex items-center gap-1"
-                                                            title="تجديد"
+                                                            title={t('adminPackagesSubscribersPage.actions.renew')}
                                                         >
                                                             <FaSync />
-                                                            تجديد
+                                                            {t('adminPackagesSubscribersPage.actions.renew')}
                                                         </button>
                                                         <button
                                                             onClick={() => handleCancelSubscription(subscriber.id)}
                                                             className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-xs font-semibold flex items-center gap-1"
-                                                            title="إلغاء"
+                                                            title={t('adminPackagesSubscribersPage.actions.cancel')}
                                                         >
                                                             <FaBan />
-                                                            إلغاء
+                                                            {t('adminPackagesSubscribersPage.actions.cancel')}
                                                         </button>
                                                     </>
                                                 )}
@@ -245,9 +244,9 @@ export default function AdminPackagesSubscribers({ package: pkg, subscribers, fi
                                                     onChange={(e) => handleStatusChange(subscriber.id, e.target.value)}
                                                     className="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-2 focus:ring-blue-500"
                                                 >
-                                                    <option value="active">نشط</option>
-                                                    <option value="expired">منتهي</option>
-                                                    <option value="cancelled">ملغي</option>
+                                                    <option value="active">{t('adminPackagesSubscribersPage.status.active')}</option>
+                                                    <option value="expired">{t('adminPackagesSubscribersPage.status.expired')}</option>
+                                                    <option value="cancelled">{t('adminPackagesSubscribersPage.status.cancelled')}</option>
                                                 </select>
                                             </div>
                                         </td>
@@ -257,7 +256,7 @@ export default function AdminPackagesSubscribers({ package: pkg, subscribers, fi
                                 <tr>
                                     <td colSpan="7" className="py-12 text-center text-gray-500">
                                         <FaUsers className="mx-auto text-4xl text-gray-300 mb-2" />
-                                        لا يوجد مشتركين لهذه الباقة
+                                        {t('adminPackagesSubscribersPage.empty')}
                                     </td>
                                 </tr>
                             )}
@@ -270,7 +269,7 @@ export default function AdminPackagesSubscribers({ package: pkg, subscribers, fi
                     <div className="px-6 py-4 border-t border-gray-200">
                         <div className="flex items-center justify-between">
                             <div className="text-sm text-gray-700">
-                                عرض {subscribers.from} إلى {subscribers.to} من {subscribers.total} مشترك
+                                {t('adminPackagesSubscribersPage.pagination.showing', { from: subscribers.from, to: subscribers.to, total: subscribers.total })}
                             </div>
                             <div className="flex gap-2">
                                 {subscribers.links.map((link, index) => (

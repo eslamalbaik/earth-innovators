@@ -22,9 +22,11 @@ import {
 } from 'react-icons/fa';
 import { useToast } from '@/Contexts/ToastContext';
 import { toHijriDate } from '@/utils/dateUtils';
+import { useTranslation } from '@/i18n';
 
 export default function PackagesIndex({ auth, packages = [], userPackage = null }) {
     const { showSuccess, showError } = useToast();
+    const { t, language } = useTranslation();
     const [subscribingPackageId, setSubscribingPackageId] = useState(null);
 
     const IconMap = {
@@ -36,12 +38,12 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
 
     const getDurationLabel = (durationType, durationMonths) => {
         const labels = {
-            monthly: 'شهري',
-            quarterly: 'ربع سنوي',
-            yearly: 'سنوي',
-            lifetime: 'مدى الحياة'
+            monthly: t('packagesIndexPage.duration.monthly'),
+            quarterly: t('packagesIndexPage.duration.quarterly'),
+            yearly: t('packagesIndexPage.duration.yearly'),
+            lifetime: t('packagesIndexPage.duration.lifetime'),
         };
-        return labels[durationType] || `${durationMonths} شهر`;
+        return labels[durationType] || t('packagesIndexPage.duration.months', { count: durationMonths });
     };
 
     const handleSubscribe = async (packageId) => {
@@ -51,7 +53,7 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
         }
 
         if (userPackage && userPackage.status === 'active') {
-            showError('لديك اشتراك نشط بالفعل. يرجى إلغاء الاشتراك الحالي أولاً.');
+            showError(t('packagesIndexPage.errors.activeSubscriptionExists'));
             return;
         }
 
@@ -61,13 +63,13 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
                 preserveScroll: true,
                 onError: (errors) => {
                     setSubscribingPackageId(null);
-                    const errorMessage = errors.error || Object.values(errors)[0] || 'حدث خطأ أثناء الاشتراك';
+                    const errorMessage = errors.error || Object.values(errors)[0] || t('packagesIndexPage.errors.subscribeFailed');
                     showError(Array.isArray(errorMessage) ? errorMessage[0] : errorMessage);
                 },
             });
         } catch (error) {
             setSubscribingPackageId(null);
-            showError('حدث خطأ أثناء الاشتراك');
+            showError(t('packagesIndexPage.errors.subscribeFailed'));
         }
     };
 
@@ -76,10 +78,10 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
             {/* Header */}
             <div className={isDesktop ? "mb-6 text-center" : "mb-4"}>
                 <h1 className={isDesktop ? "text-3xl font-extrabold text-gray-900 mb-3" : "text-lg font-extrabold text-gray-900 mb-2"}>
-                    باقات الاشتراك
+                    {t('packagesIndexPage.title')}
                 </h1>
                 <p className={isDesktop ? "text-lg text-gray-600 max-w-2xl mx-auto" : "text-sm text-gray-600"}>
-                    اختر الباقة المناسبة لك واحصل على ميزات حصرية وإمكانيات متقدمة
+                    {t('packagesIndexPage.subtitle')}
                 </p>
             </div>
 
@@ -90,24 +92,24 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
                         <div className="flex-1">
                             <h3 className={`${isDesktop ? 'text-base' : 'text-sm'} font-bold text-green-900 mb-1 flex items-center gap-2`}>
                                 <FaCheckCircle className="text-green-600" />
-                                باقتي الحالية
+                                {t('packagesIndexPage.currentPackage.title')}
                             </h3>
                             <p className={`${isDesktop ? 'text-base' : 'text-sm'} text-green-800 mb-1`}>
                                 {userPackage.package?.name_ar || userPackage.package?.name}
                             </p>
                             <p className={`${isDesktop ? 'text-sm' : 'text-xs'} text-green-700`}>
-                                تنتهي في: {toHijriDate(userPackage.end_date)}
+                                {t('packagesIndexPage.currentPackage.endsAt')}: {toHijriDate(userPackage.end_date)}
                             </p>
                         </div>
                         <span className={`px-3 py-1 bg-[#A3C042] text-white ${isDesktop ? 'text-sm' : 'text-xs'} font-semibold rounded-full`}>
-                            نشطة
+                            {t('packagesIndexPage.currentPackage.active')}
                         </span>
                     </div>
                     <Link
                         href="/my-subscriptions"
                         className={`${isDesktop ? 'text-sm' : 'text-xs'} text-green-700 hover:text-green-900 font-medium`}
                     >
-                        عرض جميع الاشتراكات →
+                        {t('packagesIndexPage.currentPackage.viewAll')}
                     </Link>
                 </div>
             )}
@@ -134,12 +136,12 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
                             >
                                 {isPopular && (
                                     <div className="absolute top-0 end-0 start-0 bg-gradient-to-r from-[#A3C042] to-[#8CA635] text-white text-center py-1.5 font-bold text-xs">
-                                        ⭐ الأكثر شعبية
+                                        {t('packagesIndexPage.badges.mostPopular')}
                                     </div>
                                 )}
                                 {isCurrentPackage && (
                                     <div className="absolute top-0 end-0 start-0 bg-[#A3C042] text-white text-center py-1.5 font-bold text-xs">
-                                        ✓ باقتك الحالية
+                                        {t('packagesIndexPage.badges.currentPackage')}
                                     </div>
                                 )}
                                 <div className={`${isDesktop ? 'p-6' : 'p-4'} ${isPopular || isCurrentPackage ? isDesktop ? 'pt-16' : 'pt-12' : ''}`}>
@@ -168,46 +170,46 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
 
                                     {/* Features */}
                                     <div className="border-t border-gray-200 pt-4 mb-4">
-                                        <h4 className={`font-semibold text-gray-900 mb-3 ${isDesktop ? 'text-base' : 'text-sm'}`}>الميزات:</h4>
+                                        <h4 className={`font-semibold text-gray-900 mb-3 ${isDesktop ? 'text-base' : 'text-sm'}`}>{t('packagesIndexPage.features.title')}:</h4>
                                         <ul className={`${isDesktop ? 'space-y-3' : 'space-y-2'}`}>
                                             {pkg.projects_limit !== null ? (
                                                 <li className={`flex items-center gap-2 ${isDesktop ? 'text-sm' : 'text-xs'}`}>
                                                     <FaCheck className={`text-[#A3C042] flex-shrink-0 ${isDesktop ? 'text-sm' : 'text-xs'}`} />
-                                                    <span className="text-gray-700">حتى {pkg.projects_limit} مشروع</span>
+                                                    <span className="text-gray-700">{t('packagesIndexPage.features.projectsLimit', { count: pkg.projects_limit })}</span>
                                                 </li>
                                             ) : (
                                                 <li className={`flex items-center gap-2 ${isDesktop ? 'text-sm' : 'text-xs'}`}>
                                                     <FaInfinity className={`text-[#A3C042] flex-shrink-0 ${isDesktop ? 'text-sm' : 'text-xs'}`} />
-                                                    <span className="text-gray-700">مشاريع غير محدودة</span>
+                                                    <span className="text-gray-700">{t('packagesIndexPage.features.unlimitedProjects')}</span>
                                                 </li>
                                             )}
                                             {pkg.challenges_limit !== null ? (
                                                 <li className={`flex items-center gap-2 ${isDesktop ? 'text-sm' : 'text-xs'}`}>
                                                     <FaCheck className={`text-[#A3C042] flex-shrink-0 ${isDesktop ? 'text-sm' : 'text-xs'}`} />
-                                                    <span className="text-gray-700">حتى {pkg.challenges_limit} تحدٍ</span>
+                                                    <span className="text-gray-700">{t('packagesIndexPage.features.challengesLimit', { count: pkg.challenges_limit })}</span>
                                                 </li>
                                             ) : (
                                                 <li className={`flex items-center gap-2 ${isDesktop ? 'text-sm' : 'text-xs'}`}>
                                                     <FaInfinity className={`text-[#A3C042] flex-shrink-0 ${isDesktop ? 'text-sm' : 'text-xs'}`} />
-                                                    <span className="text-gray-700">تحديات غير محدودة</span>
+                                                    <span className="text-gray-700">{t('packagesIndexPage.features.unlimitedChallenges')}</span>
                                                 </li>
                                             )}
                                             {pkg.points_bonus > 0 && (
                                                 <li className={`flex items-center gap-2 ${isDesktop ? 'text-sm' : 'text-xs'}`}>
                                                     <FaGift className={`text-[#A3C042] flex-shrink-0 ${isDesktop ? 'text-sm' : 'text-xs'}`} />
-                                                    <span className="text-gray-700">{pkg.points_bonus} نقطة إضافية</span>
+                                                    <span className="text-gray-700">{t('packagesIndexPage.features.pointsBonus', { count: pkg.points_bonus })}</span>
                                                 </li>
                                             )}
                                             {pkg.badge_access && (
                                                 <li className={`flex items-center gap-2 ${isDesktop ? 'text-sm' : 'text-xs'}`}>
                                                     <FaAward className={`text-[#A3C042] flex-shrink-0 ${isDesktop ? 'text-sm' : 'text-xs'}`} />
-                                                    <span className="text-gray-700">إمكانية الحصول على شارات</span>
+                                                    <span className="text-gray-700">{t('packagesIndexPage.features.badgesAccess')}</span>
                                                 </li>
                                             )}
                                             {pkg.certificate_access && (
                                                 <li className={`flex items-center gap-2 ${isDesktop ? 'text-sm' : 'text-xs'}`}>
                                                     <FaTrophy className={`text-[#A3C042] flex-shrink-0 ${isDesktop ? 'text-sm' : 'text-xs'}`} />
-                                                    <span className="text-gray-700">إمكانية الحصول على شهادات</span>
+                                                    <span className="text-gray-700">{t('packagesIndexPage.features.certificatesAccess')}</span>
                                                 </li>
                                             )}
                                             {features.map((feature, index) => (
@@ -234,14 +236,14 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
                                             {isSubscribing ? (
                                                 <>
                                                     <FaSpinner className="animate-spin inline me-2" />
-                                                    جاري المعالجة...
+                                                    {t('packagesIndexPage.actions.processing')}
                                                 </>
                                             ) : isCurrentPackage ? (
-                                                'باقتك الحالية'
+                                                t('packagesIndexPage.badges.currentPackage')
                                             ) : (
                                                 <>
                                                     <FaCreditCard className="inline me-2" />
-                                                    {userPackage?.package_id === pkg.id ? 'تجديد الاشتراك' : 'اشترك الآن'}
+                                                    {userPackage?.package_id === pkg.id ? t('packagesIndexPage.actions.renew') : t('packagesIndexPage.actions.subscribeNow')}
                                                 </>
                                             )}
                                         </button>
@@ -253,7 +255,7 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
                                                 : 'bg-[#A3C042] text-white hover:bg-[#8CA635]'
                                                 }`}
                                         >
-                                            سجل للاشتراك
+                                            {t('packagesIndexPage.actions.registerToSubscribe')}
                                         </Link>
                                     )}
                                 </div>
@@ -264,7 +266,7 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
             ) : (
                 <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
                     <FaBox className="mx-auto text-4xl text-gray-300 mb-3" />
-                    <p className="text-sm text-gray-500">لا توجد باقات متاحة حالياً</p>
+                    <p className="text-sm text-gray-500">{t('packagesIndexPage.empty')}</p>
                 </div>
             )}
 
@@ -274,11 +276,11 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
                     <div className="flex items-start gap-2">
                         <FaInfoCircle className={`text-blue-600 ${isDesktop ? 'text-base' : 'text-sm'} mt-0.5 flex-shrink-0`} />
                         <div className={`${isDesktop ? 'text-sm' : 'text-xs'} text-blue-800`}>
-                            <p className="font-semibold mb-1">معلومات مهمة:</p>
+                            <p className="font-semibold mb-1">{t('packagesIndexPage.info.title')}:</p>
                             <ul className={`${isDesktop ? 'space-y-2' : 'space-y-1'} list-disc list-inside`}>
-                                <li>يمكنك إلغاء الاشتراك في أي وقت</li>
-                                <li>سيتم تجديد الاشتراك تلقائياً عند انتهاء المدة</li>
-                                <li>يمكنك عرض جميع اشتراكاتك من صفحة "اشتراكاتي"</li>
+                                <li>{t('packagesIndexPage.info.items.cancelAnytime')}</li>
+                                <li>{t('packagesIndexPage.info.items.autoRenew')}</li>
+                                <li>{t('packagesIndexPage.info.items.viewAllFromMySubscriptions')}</li>
                             </ul>
                         </div>
                     </div>
@@ -288,14 +290,14 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
     );
 
     return (
-        <div dir="rtl" className="min-h-screen bg-gray-50">
-            <Head title="الباقات - إرث المبتكرين" />
+        <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
+            <Head title={t('packagesIndexPage.pageTitle', { appName: t('common.appName') })} />
 
             {/* Mobile View */}
             <div className="block md:hidden">
                 <MobileAppLayout
                     auth={auth}
-                    title="الباقات"
+                    title={t('packagesIndexPage.navTitle')}
                     activeNav="packages"
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
@@ -308,7 +310,7 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
             {/* Desktop View */}
             <div className="hidden md:block">
                 <MobileTopBar
-                    title="الباقات"
+                    title={t('packagesIndexPage.navTitle')}
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
                     onBack={() => router.visit('/')}

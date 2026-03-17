@@ -2,8 +2,12 @@ import { Head, router } from '@inertiajs/react';
 import { FaTrophy, FaArrowLeft } from 'react-icons/fa';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
+import { useTranslation } from '@/i18n';
 
 export default function Winners({ auth, winners = [] }) {
+    const { t, language } = useTranslation();
+    const isArabic = language === 'ar';
+
     const getAvatarUrl = (avatar) => {
         if (!avatar) return '/images/hero.png';
         if (avatar.startsWith('http://') || avatar.startsWith('https://')) return avatar;
@@ -13,18 +17,16 @@ export default function Winners({ auth, winners = [] }) {
 
     const WinnersContent = () => (
         <div className="space-y-4">
-            {/* Header */}
             <div className="bg-white rounded-2xl border border-gray-100 p-4">
                 <div className="flex items-center gap-2 mb-2">
                     <FaTrophy className="text-yellow-500 text-xl" />
-                    <h1 className="text-lg font-extrabold text-gray-900">الفائزون في التحديات</h1>
+                    <h1 className="text-lg font-extrabold text-gray-900">{t('challengeWinnersPage.headerTitle')}</h1>
                 </div>
                 <p className="text-sm text-gray-600">
-                    قائمة بجميع الفائزين في التحديات المختلفة
+                    {t('challengeWinnersPage.headerSubtitle')}
                 </p>
             </div>
 
-            {/* Winners List */}
             {winners.length > 0 ? (
                 <div className="space-y-4">
                     {winners.map((winner, index) => (
@@ -53,7 +55,7 @@ export default function Winners({ auth, winners = [] }) {
                                         <h3 className="text-base font-bold text-gray-900">{winner.name}</h3>
                                         {index < 3 && (
                                             <span className="px-2 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700 border border-yellow-300">
-                                                #{index + 1}
+                                                {t('challengeWinnersPage.rankLabel', { rank: index + 1 })}
                                             </span>
                                         )}
                                     </div>
@@ -62,12 +64,12 @@ export default function Winners({ auth, winners = [] }) {
                                         <span className="text-xs text-gray-500">{winner.date}</span>
                                         {winner.rating > 0 && (
                                             <span className="px-2 py-1 rounded-full text-xs font-semibold border bg-green-100 text-green-700 border-green-300">
-                                                {winner.rating.toFixed(1)} ⭐
+                                                {t('challengeWinnersPage.ratingLabel', { rating: winner.rating.toFixed(1) })}
                                             </span>
                                         )}
                                         {winner.points > 0 && (
                                             <span className="px-2 py-1 rounded-full text-xs font-semibold border bg-blue-100 text-blue-700 border-blue-300">
-                                                {winner.points} نقطة
+                                                {t('challengeWinnersPage.pointsLabel', { points: winner.points })}
                                             </span>
                                         )}
                                     </div>
@@ -81,30 +83,28 @@ export default function Winners({ auth, winners = [] }) {
                     <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
                         <FaTrophy className="text-gray-400 text-4xl" />
                     </div>
-                    <p className="text-gray-400 text-sm mb-2">لا توجد فائزين حالياً</p>
+                    <p className="text-gray-400 text-sm mb-2">{t('challengeWinnersPage.noWinners')}</p>
                 </div>
             )}
 
-            {/* Back Button */}
             <button
                 type="button"
                 onClick={() => router.visit('/challenges')}
                 className="w-full bg-white rounded-2xl border border-gray-100 p-4 flex items-center justify-between hover:shadow-md transition"
             >
-                <span className="text-sm font-semibold text-gray-700">العودة إلى التحديات</span>
+                <span className="text-sm font-semibold text-gray-700">{t('challengeWinnersPage.backToChallenges')}</span>
                 <FaArrowLeft className="text-gray-400" />
             </button>
         </div>
     );
 
     return (
-        <div dir="rtl" className="min-h-screen bg-gray-50">
-            <Head title="الفائزون - إرث المبتكرين" />
+        <div dir={isArabic ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
+            <Head title={t('challengeWinnersPage.pageTitle', { appName: t('common.appName') })} />
 
-            {/* Mobile View */}
             <div className="block md:hidden">
                 <MobileTopBar
-                    title="الفائزون"
+                    title={t('challengeWinnersPage.title')}
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
                     onBack={() => router.visit('/challenges')}
@@ -115,10 +115,9 @@ export default function Winners({ auth, winners = [] }) {
                 <MobileBottomNav active="challenges" role={auth?.user?.role} isAuthed={!!auth?.user} user={auth?.user} />
             </div>
 
-            {/* Desktop View */}
             <div className="hidden md:block">
                 <MobileTopBar
-                    title="الفائزون"
+                    title={t('challengeWinnersPage.title')}
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
                     onBack={() => router.visit('/challenges')}
@@ -133,4 +132,3 @@ export default function Winners({ auth, winners = [] }) {
         </div>
     );
 }
-

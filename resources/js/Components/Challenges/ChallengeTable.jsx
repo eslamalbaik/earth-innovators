@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import { memo, useMemo } from 'react';
 import { FaEye, FaEdit, FaTrash, FaCalendar, FaUsers, FaTrophy, FaChartLine } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 /**
  * PERFORMANCE: Memoized table row component to prevent unnecessary re-renders
@@ -20,6 +21,7 @@ const ChallengeTableRow = memo(function ChallengeTableRow({
     deletingIds,
     updatingId
 }) {
+    const { t, language } = useTranslation();
     const isDeleting = deletingIds.has(challenge.id);
     const isUpdating = updatingId === challenge.id;
     
@@ -92,7 +94,7 @@ const ChallengeTableRow = memo(function ChallengeTableRow({
                             {challenge.points_reward > 0 && (
                                 <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-yellow-50 text-yellow-700 rounded-md text-xs font-medium">
                                     <FaTrophy className="text-xs" />
-                                    {challenge.points_reward} نقطة
+                                    {challenge.points_reward} {t('common.point')}
                                 </span>
                             )}
                         </div>
@@ -104,7 +106,7 @@ const ChallengeTableRow = memo(function ChallengeTableRow({
             {showSchool && (
                 <td className="px-6 py-4">
                     <div className="text-sm text-gray-900 font-medium">
-                        {challenge.school_name || 'غير محدد'}
+                        {challenge.school_name || t('common.notAvailable')}
                     </div>
                     {challenge.creator_name && (
                         <div className="text-xs text-gray-500 mt-1">
@@ -136,12 +138,12 @@ const ChallengeTableRow = memo(function ChallengeTableRow({
                 <div className="space-y-1 text-xs">
                     <div className="flex items-center gap-1.5 text-gray-700">
                         <FaCalendar className="text-gray-400 text-xs" />
-                        <span className="font-medium">بدء:</span>
+                        <span className="font-medium">{t('challenges.start')}:</span>
                         <span>{formattedStartDate}</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-gray-600">
                         <FaCalendar className="text-gray-400 text-xs" />
-                        <span className="font-medium">انتهاء:</span>
+                        <span className="font-medium">{t('challenges.end')}:</span>
                         <span>{formattedDeadline}</span>
                     </div>
                 </div>
@@ -157,7 +159,7 @@ const ChallengeTableRow = memo(function ChallengeTableRow({
                         </div>
                         {challenge.max_participants && (
                             <div className="text-xs text-gray-500">
-                                من {challenge.max_participants}
+                                {t('challenges.maxParticipants')}: {challenge.max_participants}
                             </div>
                         )}
                     </div>
@@ -185,7 +187,7 @@ const ChallengeTableRow = memo(function ChallengeTableRow({
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors text-xs font-medium"
                     >
                         <FaChartLine className="text-xs" />
-                        تحليل
+                        {t('challenges.analytics')}
                     </Link>
                 </td>
             )}
@@ -197,7 +199,7 @@ const ChallengeTableRow = memo(function ChallengeTableRow({
                         <button
                             onClick={() => onView(challenge)}
                             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="عرض"
+                            title={t('common.view')}
                         >
                             <FaEye className="text-sm" />
                         </button>
@@ -206,7 +208,7 @@ const ChallengeTableRow = memo(function ChallengeTableRow({
                         <button
                             onClick={() => onEdit(challenge)}
                             className="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
-                            title="تعديل"
+                            title={t('common.edit')}
                         >
                             <FaEdit className="text-sm" />
                         </button>
@@ -216,7 +218,7 @@ const ChallengeTableRow = memo(function ChallengeTableRow({
                             onClick={() => onDelete(challenge.id)}
                             disabled={isDeleting || isUpdating}
                             className={`p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors ${isDeleting || isUpdating ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            title={isDeleting ? 'جاري الحذف...' : 'حذف'}
+                            title={isDeleting ? t('adminUsersIndexPage.deleting') : t('common.delete')}
                         >
                             {isDeleting ? (
                                 <span className="animate-spin text-xs">⏳</span>
@@ -250,42 +252,43 @@ function ChallengeTable({
     deletingIds = new Set(),
     updatingId = null
 }) {
+    const { t, language } = useTranslation();
     if (!challenges || challenges.length === 0) {
         return null;
     }
 
     return (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
                     <tr>
                         <th className="px-6 py-4  text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                            التحدي
+                            {t('challenges.challenge')}
                         </th>
                         {showSchool && (
                             <th className="px-6 py-4  text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                المدرسة
+                                {t('common.school')}
                             </th>
                         )}
                         <th className="px-6 py-4  text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                            النوع / الفئة
+                            {t('adminChallengesIndexPage.table.typeCategory')}
                         </th>
                         <th className="px-6 py-4  text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                            التواريخ
+                            {t('challenges.dates')}
                         </th>
                         <th className="px-6 py-4  text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                            المشاركون
+                            {t('challenges.participants')}
                         </th>
                         <th className="px-6 py-4  text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                            الحالة
+                            {t('common.status')}
                         </th>
                         {showAnalytics && (
                             <th className="px-6 py-4  text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                الأداء
+                                {t('challenges.analytics')}
                             </th>
                         )}
                         <th className="px-6 py-4  text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                            الإجراءات
+                            {t('common.actions')}
                         </th>
                     </tr>
                 </thead>

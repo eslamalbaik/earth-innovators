@@ -5,6 +5,7 @@ import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import { useState, useRef, useMemo, useCallback, useEffect } from 'react';
 import { toHijriDate, toGregorianDate } from '@/utils/dateUtils';
 import { useToast } from '@/Contexts/ToastContext';
+import { useTranslation } from '@/i18n';
 import {
     FaArrowLeft,
     FaUpload,
@@ -30,6 +31,7 @@ import InputError from '../../../Components/InputError';
 import PrimaryButton from '../../../Components/PrimaryButton';
 
 export default function StudentProjectShow({ auth, project, existingSubmission }) {
+    const { t, language } = useTranslation();
     const [activeTab, setActiveTab] = useState('details'); // 'details', 'submit', 'comments'
     const [fileList, setFileList] = useState([]);
     const [dragActive, setDragActive] = useState(false);
@@ -60,12 +62,12 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
             ];
 
             if (file.size > maxSize) {
-                alert(`الملف ${file.name} أكبر من 10 ميجابايت`);
+                alert(t('studentProjectShowPage.errors.fileTooLarge', { name: file.name, maxMb: 10 }));
                 return false;
             }
 
             if (!validTypes.includes(file.type)) {
-                alert(`نوع الملف ${file.name} غير مدعوم`);
+                alert(t('studentProjectShowPage.errors.fileTypeNotSupported', { name: file.name }));
                 return false;
             }
 
@@ -127,8 +129,8 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                 submissionForm.reset();
                 setFileList([]);
                 // Show success notification on the left
-                showSuccess('تم تسليم المشروع بنجاح!', {
-                    title: 'نجاح التسليم',
+                showSuccess(t('studentProjectShowPage.toasts.submitSuccess'), {
+                    title: t('common.success'),
                     autoDismiss: 5000,
                 });
                 // Switch to details tab
@@ -190,14 +192,10 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                 <h1 className="text-lg font-extrabold text-gray-900 mb-2">{project.title}</h1>
                 <div className="flex items-center gap-2 flex-wrap">
                     <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
-                        معتمد
+                        {t('common.approved')}
                     </span>
                     <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-full">
-                        {project.category === 'science' ? 'علوم' :
-                            project.category === 'technology' ? 'تقنية' :
-                                project.category === 'engineering' ? 'هندسة' :
-                                    project.category === 'mathematics' ? 'رياضيات' :
-                                        project.category === 'arts' ? 'فنون' : 'أخرى'}
+                        {t(`common.categories.${project.category || 'other'}`)}
                     </span>
                     <div className="flex items-center gap-1 text-gray-600 text-xs">
                         <FaEye />
@@ -215,7 +213,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                         : 'border-transparent text-gray-600'
                         }`}
                 >
-                    التفاصيل
+                    {t('studentProjectShowPage.tabs.details')}
                 </button>
                 <button
                     onClick={() => setActiveTab('submit')}
@@ -224,7 +222,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                         : 'border-transparent text-gray-600'
                         }`}
                 >
-                    {existingSubmission ? 'تحديث' : 'تسليم'}
+                    {existingSubmission ? t('studentProjectShowPage.tabs.updateSubmission') : t('studentProjectShowPage.tabs.submit')}
                 </button>
                 <button
                     onClick={() => setActiveTab('comments')}
@@ -233,7 +231,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                         : 'border-transparent text-gray-600'
                         }`}
                 >
-                    التعليقات ({project.comments?.length || 0})
+                    {t('studentProjectShowPage.tabs.comments', { count: project.comments?.length || 0 })}
                 </button>
             </div>
 
@@ -250,9 +248,9 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                             {/* عرض المعلم فقط إذا لم يكن المشروع من الإدارة */}
                             {project.teacher && project.user?.role !== 'admin' && (
                                 <div className="flex items-center gap-2">
-                                    <p className="text-xs text-gray-600">المعلم:</p>
+                                    <p className="text-xs text-gray-600">{t('studentProjectShowPage.labels.teacher')}:</p>
                                     <p className="text-sm font-semibold text-gray-900">
-                                        {project.teacher.name || project.user?.name || 'غير محدد'}
+                                        {project.teacher.name || project.user?.name || t('common.notAvailable')}
                                     </p>
                                 </div>
                             )}
@@ -260,7 +258,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                             {project.school ? (
                                 <div className="flex items-center gap-2">
                                     <FaSchool className="text-green-600 text-sm" />
-                                    <p className="text-xs text-gray-600">المدرسة:</p>
+                                    <p className="text-xs text-gray-600">{t('studentProjectShowPage.labels.school')}:</p>
                                     <p className="text-sm font-semibold text-gray-900">
                                         {project.school.name}
                                     </p>
@@ -269,14 +267,14 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                 <div className="flex items-center gap-2">
                                     <FaSchool className="text-purple-600 text-sm" />
                                     <p className="text-sm font-semibold text-gray-900">
-                                        من إدارة مجتمع إرث المبتكرين
+                                        {t('studentProjectShowPage.fromAdmin')}
                                     </p>
                                 </div>
                             ) : null}
                             {project.approved_at && (
                                 <div className="flex items-center gap-2">
                                     <FaCalendar className="text-gray-400 text-sm" />
-                                    <p className="text-xs text-gray-600">تاريخ الموافقة:</p>
+                                    <p className="text-xs text-gray-600">{t('studentProjectShowPage.labels.approvedAt')}:</p>
                                     <p className="text-sm font-semibold text-gray-900">
                                         {toHijriDate(project.approved_at)}
                                     </p>
@@ -293,7 +291,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                 <div className="flex items-center justify-between mb-3">
                                     <h3 className="text-sm font-bold text-green-900 flex items-center gap-2">
                                         <FaCheckCircle className="text-green-600" />
-                                        تم تسليم المشروع
+                                        {t('studentProjectShowPage.submission.submittedTitle')}
                                     </h3>
                                     {/* إخفاء زر التعديل إذا تم تقييم المشروع */}
                                     {!existingSubmission.reviewed_at && existingSubmission.status === 'submitted' && (
@@ -301,27 +299,24 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                             onClick={() => setActiveTab('submit')}
                                             className="px-3 py-1.5 bg-[#A3C042] text-white rounded-xl hover:bg-[#8CA635] transition text-xs font-semibold"
                                         >
-                                            تعديل
+                                            {t('common.edit')}
                                         </button>
                                     )}
                                 </div>
                                 <div className="space-y-2">
                                     <p className="text-sm text-green-800">
-                                        الحالة: <span className="font-bold text-green-900">
-                                            {existingSubmission.status === 'submitted' ? 'مُسلم' :
-                                                existingSubmission.status === 'reviewed' ? 'تم المراجعة' :
-                                                    existingSubmission.status === 'approved' ? 'مقبول' :
-                                                        existingSubmission.status === 'rejected' ? 'مرفوض' : existingSubmission.status}
+                                        {t('common.status')}: <span className="font-bold text-green-900">
+                                            {t(`studentProjectShowPage.submission.status.${existingSubmission.status || 'unknown'}`)}
                                         </span>
                                     </p>
                                     {(existingSubmission.submitted_at || existingSubmission.created_at) && (
                                         <p className="text-xs text-green-700">
-                                            تاريخ التسليم: {toGregorianDate(existingSubmission.submitted_at || existingSubmission.created_at)}
+                                            {t('studentProjectShowPage.submission.submittedAt')}: {toGregorianDate(existingSubmission.submitted_at || existingSubmission.created_at)}
                                         </p>
                                     )}
                                     {existingSubmission.comment && (
                                         <div className="mt-2">
-                                            <p className="text-sm font-medium text-green-900 mb-1">تعليقك:</p>
+                                            <p className="text-sm font-medium text-green-900 mb-1">{t('studentProjectShowPage.submission.yourComment')}:</p>
                                             <p className="text-sm text-green-800 bg-white p-2 rounded border border-green-200">{existingSubmission.comment}</p>
                                         </div>
                                     )}
@@ -333,13 +328,13 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                 <div className="bg-green-50 border-2 border-green-300 rounded-2xl p-4">
                                     <h3 className="text-base font-bold text-green-900 mb-4 flex items-center gap-2">
                                         <span>✨</span>
-                                        <span>تقييم مشروعك</span>
+                                        <span>{t('studentProjectShowPage.evaluation.title')}</span>
                                     </h3>
 
                                     {/* Rating */}
                                     {existingSubmission.rating && (
                                         <div className="mb-4">
-                                            <p className="text-sm font-medium text-green-800 mb-2">التقييم:</p>
+                                            <p className="text-sm font-medium text-green-800 mb-2">{t('studentProjectShowPage.evaluation.rating')}:</p>
                                             <div className="flex items-center gap-2" dir="ltr">
                                                 {[1, 2, 3, 4, 5].map((star) => (
                                                     <span
@@ -362,7 +357,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                     {/* Feedback */}
                                     {existingSubmission.feedback && (
                                         <div className="mb-4">
-                                            <p className="text-sm font-medium text-green-800 mb-2">ملاحظات المعلم:</p>
+                                            <p className="text-sm font-medium text-green-800 mb-2">{t('studentProjectShowPage.evaluation.teacherNotes')}:</p>
                                             <div className="p-3 bg-white rounded border border-green-200">
                                                 <p className="text-sm text-green-900 whitespace-pre-line">{existingSubmission.feedback}</p>
                                             </div>
@@ -372,7 +367,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                     {/* Badges */}
                                     {existingSubmission.badges && existingSubmission.badges.length > 0 && (
                                         <div>
-                                            <p className="text-sm font-medium text-green-800 mb-2">الشارات الممنوحة:</p>
+                                            <p className="text-sm font-medium text-green-800 mb-2">{t('studentProjectShowPage.evaluation.awardedBadges')}:</p>
                                             <div className="flex flex-wrap gap-2">
                                                 {existingSubmission.badges.map((badgeId, index) => {
                                                     const badge = existingSubmission.badges_data?.find(b => b.id === badgeId);
@@ -382,7 +377,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                                             className="inline-flex items-center gap-1 px-3 py-1 bg-yellow-100 text-yellow-800 text-sm font-medium rounded-full border border-yellow-300"
                                                         >
                                                             {badge?.icon ? <span>{badge.icon}</span> : <FaAward />}
-                                                            <span>{badge?.name_ar || badge?.name || `شارة #${badgeId}`}</span>
+                                                            <span>{badge?.name_ar || badge?.name || t('studentProjectShowPage.evaluation.badgeFallback', { id: badgeId })}</span>
                                                         </span>
                                                     );
                                                 })}
@@ -392,7 +387,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
 
                                     {existingSubmission.reviewed_at && (
                                         <p className="text-xs text-green-700 mt-4">
-                                            تم التقييم في: {toGregorianDate(existingSubmission.reviewed_at)}
+                                            {t('studentProjectShowPage.evaluation.reviewedAt')}: {toGregorianDate(existingSubmission.reviewed_at)}
                                         </p>
                                     )}
                                 </div>
@@ -407,20 +402,20 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                 <div className="bg-white rounded-2xl border border-gray-100 p-4">
                     <form onSubmit={submitProject}>
                         <div className="mb-4">
-                            <InputLabel htmlFor="comment" value="تعليق (اختياري)" className="text-sm" />
+                            <InputLabel htmlFor="comment" value={t('studentProjectShowPage.form.commentLabel')} className="text-sm" />
                             <textarea
                                 id="comment"
                                 value={submissionForm.data.comment}
                                 onChange={(e) => submissionForm.setData('comment', e.target.value)}
                                 rows={4}
                                 className="block w-full mt-2 rounded-xl border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042] text-sm"
-                                placeholder="اكتب تعليقاً على تسليمك..."
+                                placeholder={t('studentProjectShowPage.form.commentPlaceholder')}
                             />
                             <InputError message={submissionForm.errors.comment} />
                         </div>
 
                         <div className="mb-4">
-                            <InputLabel value="الملفات" className="text-sm" />
+                            <InputLabel value={t('studentProjectShowPage.form.filesLabel')} className="text-sm" />
                             <div
                                 onDragEnter={handleDrag}
                                 onDragLeave={handleDrag}
@@ -441,17 +436,17 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                 />
                                 <FaCloudUploadAlt className="mx-auto text-3xl text-gray-400 mb-3" />
                                 <p className="text-sm text-gray-700 mb-2">
-                                    اسحب وأفلت الملفات هنا أو انقر للاختيار
+                                    {t('studentProjectShowPage.dropzone.title')}
                                 </p>
                                 <p className="text-xs text-gray-500 mb-3">
-                                    صور، فيديو، PDF، ZIP (الحد الأقصى: 10 ميجابايت لكل ملف)
+                                    {t('studentProjectShowPage.dropzone.hint', { maxMb: 10 })}
                                 </p>
                                 <button
                                     type="button"
                                     onClick={() => fileInputRef.current?.click()}
                                     className="px-4 py-2 bg-[#A3C042] text-white rounded-xl hover:bg-[#8CA635] transition text-sm font-semibold"
                                 >
-                                    اختر ملفات
+                                    {t('studentProjectShowPage.actions.chooseFiles')}
                                 </button>
                             </div>
                             <InputError message={submissionForm.errors.files} />
@@ -492,12 +487,12 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                 {submissionForm.processing ? (
                                     <>
                                         <FaSpinner className="animate-spin me-2" />
-                                        جاري التسليم...
+                                        {t('studentProjectShowPage.actions.submitting')}
                                     </>
                                 ) : (
                                     <>
                                         <FaUpload className="me-2" />
-                                        {existingSubmission ? 'تحديث التسليم' : 'تسليم المشروع'}
+                                        {existingSubmission ? t('studentProjectShowPage.actions.updateSubmission') : t('studentProjectShowPage.actions.submitProject')}
                                     </>
                                 )}
                             </PrimaryButton>
@@ -512,7 +507,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                     {/* Add Comment Form */}
                     <div className="bg-white rounded-2xl border border-gray-100 p-4">
                         <h3 className="text-sm font-bold text-gray-900 mb-3">
-                            {replyingTo ? 'رد على التعليق' : 'إضافة تعليق'}
+                            {replyingTo ? t('studentProjectShowPage.comments.replyTitle') : t('studentProjectShowPage.comments.addTitle')}
                         </h3>
                         <form onSubmit={submitComment}>
                             <div className="mb-3">
@@ -523,7 +518,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                     onChange={handleCommentChange}
                                     rows={4}
                                     className="block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042] text-sm"
-                                    placeholder="اكتب تعليقك..."
+                                    placeholder={t('studentProjectShowPage.comments.placeholder')}
                                     required
                                     autoComplete="off"
                                 />
@@ -538,7 +533,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                     }}
                                     className="text-sm text-gray-600 hover:text-gray-900"
                                 >
-                                    إلغاء
+                                    {t('common.cancel')}
                                 </button>
                                 <PrimaryButton
                                     type="submit"
@@ -548,12 +543,12 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                     {isSubmittingComment ? (
                                         <>
                                             <FaSpinner className="animate-spin me-2" />
-                                            جاري الإرسال...
+                                            {t('studentProjectShowPage.comments.sending')}
                                         </>
                                     ) : (
                                         <>
                                             <FaComment className="me-2" />
-                                            {replyingTo ? 'إرسال الرد' : 'إرسال التعليق'}
+                                            {replyingTo ? t('studentProjectShowPage.comments.sendReply') : t('studentProjectShowPage.comments.sendComment')}
                                         </>
                                     )}
                                 </PrimaryButton>
@@ -573,7 +568,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                             </div>
                                             <div>
                                                 <p className="text-xs font-semibold text-gray-900">
-                                                    {comment.user?.name || 'مستخدم'}
+                                                    {comment.user?.name || t('common.user')}
                                                 </p>
                                                 <p className="text-[10px] text-gray-500">
                                                     {toHijriDate(comment.created_at)}
@@ -596,7 +591,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                             className="text-[#A3C042] hover:text-[#8CA635] text-xs flex items-center gap-1"
                                         >
                                             <FaReply />
-                                            رد
+                                            {t('studentProjectShowPage.comments.replyAction')}
                                         </button>
                                     </div>
 
@@ -611,7 +606,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                                     <div className="flex-1">
                                                         <div className="flex items-center justify-between mb-1">
                                                             <p className="text-xs font-semibold text-gray-900">
-                                                                {reply.user?.name || 'مستخدم'}
+                                                                {reply.user?.name || t('common.user')}
                                                             </p>
                                                             {reply.user_id === auth.user.id && (
                                                                 <button
@@ -636,7 +631,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                         ) : (
                             <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
                                 <FaComment className="mx-auto text-3xl text-gray-300 mb-3" />
-                                <p className="text-sm text-gray-500">لا توجد تعليقات بعد</p>
+                                <p className="text-sm text-gray-500">{t('studentProjectShowPage.comments.empty')}</p>
                             </div>
                         )}
                     </div>
@@ -646,7 +641,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
     );
 
     return (
-        <div dir="rtl" className="min-h-screen bg-gray-50">
+        <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
             <Head title={project.title} />
 
             {/* Mobile View */}

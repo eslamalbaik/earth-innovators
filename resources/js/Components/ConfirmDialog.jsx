@@ -19,10 +19,10 @@ export default function ConfirmDialog({
 }) {
     const { t } = useTranslation();
     
-    const defaultTitle = t('common.confirm') || 'تأكيد الإجراء';
-    const defaultMessage = t('errors.required') || 'هل أنت متأكد من تنفيذ هذا الإجراء؟';
-    const defaultConfirmText = t('common.yes') || 'تأكيد';
-    const defaultCancelText = t('common.cancel') || 'إلغاء';
+    const defaultTitle = t('confirmDialog.title');
+    const defaultMessage = t('confirmDialog.message');
+    const defaultConfirmText = t('common.confirm');
+    const defaultCancelText = t('common.cancel');
     const variantStyles = {
         danger: {
             iconBg: 'bg-red-100',
@@ -119,4 +119,3 @@ export default function ConfirmDialog({
         </Transition>
     );
 }
-

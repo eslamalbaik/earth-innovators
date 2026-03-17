@@ -2,6 +2,7 @@ import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { useState, useEffect, useCallback } from 'react';
 import { useOptimisticCRUD } from '@/Hooks/useOptimisticCRUD';
+import { useTranslation } from '@/i18n';
 import {
     FaSearch,
     FaFilter,
@@ -22,6 +23,7 @@ import {
 } from 'react-icons/fa';
 
 export default function UsersIndex({ users, stats, filters, auth, schools: initialSchools }) {
+    const { t, language } = useTranslation();
     const [search, setSearch] = useState(filters?.search || '');
     const [roleFilter, setRoleFilter] = useState(filters?.role || 'all');
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -139,7 +141,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
 
     const handleBulkDelete = () => {
         if (selectedUsers.length === 0) {
-            alert('يرجى تحديد مستخدم واحد على الأقل للحذف');
+            alert(t('adminUsersIndexPage.alerts.selectAtLeastOneToDelete'));
             return;
         }
         setShowBulkDeleteModal(true);
@@ -210,13 +212,13 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
 
     const getRoleBadge = (role, accountType) => {
         const roleMap = {
-            'admin': { bg: 'bg-red-100', text: 'text-red-800', label: 'أدمن', icon: FaUser },
-            'teacher': { bg: 'bg-purple-100', text: 'text-purple-800', label: 'معلم', icon: FaChalkboardTeacher },
-            'student': { bg: 'bg-green-100', text: 'text-green-800', label: 'طالب', icon: FaGraduationCap },
-            'school': { bg: 'bg-blue-100', text: 'text-blue-800', label: 'مدرسة', icon: FaSchool },
-            'educational_institution': { bg: 'bg-cyan-100', text: 'text-cyan-800', label: 'مؤسسة تعليمية', icon: FaSchool },
-            'system_supervisor': { bg: 'bg-orange-100', text: 'text-orange-800', label: 'مشرف النظام', icon: FaUser },
-            'school_support_coordinator': { bg: 'bg-indigo-100', text: 'text-indigo-800', label: 'منسق دعم المؤسسات تعليمية', icon: FaUser },
+            admin: { bg: 'bg-red-100', text: 'text-red-800', label: t('adminUsersIndexPage.roles.admin'), icon: FaUser },
+            teacher: { bg: 'bg-purple-100', text: 'text-purple-800', label: t('adminUsersIndexPage.roles.teacher'), icon: FaChalkboardTeacher },
+            student: { bg: 'bg-green-100', text: 'text-green-800', label: t('adminUsersIndexPage.roles.student'), icon: FaGraduationCap },
+            school: { bg: 'bg-blue-100', text: 'text-blue-800', label: t('adminUsersIndexPage.roles.school'), icon: FaSchool },
+            educational_institution: { bg: 'bg-cyan-100', text: 'text-cyan-800', label: t('adminUsersIndexPage.roles.educationalInstitution'), icon: FaSchool },
+            system_supervisor: { bg: 'bg-orange-100', text: 'text-orange-800', label: t('adminUsersIndexPage.roles.systemSupervisor'), icon: FaUser },
+            school_support_coordinator: { bg: 'bg-indigo-100', text: 'text-indigo-800', label: t('adminUsersIndexPage.roles.schoolSupportCoordinator'), icon: FaUser },
         };
         const roleConfig = roleMap[role] || { bg: 'bg-gray-100', text: 'text-gray-800', label: role, icon: FaUser };
         const Icon = roleConfig.icon;
@@ -228,7 +230,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                 </span>
                 {accountType === 'project' && (
                     <span className="px-2 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
-                        حساب مشروع
+                        {t('adminUsersIndexPage.accountTypes.projectBadge')}
                     </span>
                 )}
             </div>
@@ -236,15 +238,17 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
     };
 
     return (
-        <DashboardLayout header="إدارة المستخدمين" auth={auth}>
-            <Head title="إدارة المستخدمين" />
+        <DashboardLayout header={t('adminUsersIndexPage.title')} auth={auth}>
+            <Head title={t('adminUsersIndexPage.pageTitle', { appName: t('common.appName') })} />
+
+            <div dir={language === 'ar' ? 'rtl' : 'ltr'}>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
                 <div className="bg-white rounded-xl shadow-lg p-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">إجمالي المستخدمين</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('adminUsersIndexPage.stats.totalUsers')}</p>
                             <p className="text-3xl font-bold text-gray-900">{stats?.total || 0}</p>
                         </div>
                         <FaUsers className="text-3xl text-gray-400" />
@@ -253,7 +257,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                 <div className="bg-white rounded-xl shadow-lg p-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">المؤسسات تعليمية</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('adminUsersIndexPage.stats.educationalInstitutions')}</p>
                             <p className="text-3xl font-bold text-blue-600">{stats?.schools || 0}</p>
                         </div>
                         <FaSchool className="text-3xl text-blue-400" />
@@ -262,7 +266,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                 <div className="bg-white rounded-xl shadow-lg p-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">الطلاب</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('adminUsersIndexPage.stats.students')}</p>
                             <p className="text-3xl font-bold text-green-600">{stats?.students || 0}</p>
                         </div>
                         <FaGraduationCap className="text-3xl text-green-400" />
@@ -271,7 +275,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                 <div className="bg-white rounded-xl shadow-lg p-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">المعلمون</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('adminUsersIndexPage.stats.teachers')}</p>
                             <p className="text-3xl font-bold text-purple-600">{stats?.teachers || 0}</p>
                         </div>
                         <FaChalkboardTeacher className="text-3xl text-purple-400" />
@@ -280,7 +284,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                 <div className="bg-white rounded-xl shadow-lg p-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">الأدمن</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('adminUsersIndexPage.stats.admins')}</p>
                             <p className="text-3xl font-bold text-red-600">{stats?.admins || 0}</p>
                         </div>
                         <FaUser className="text-3xl text-red-400" />
@@ -300,7 +304,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                                    placeholder="ابحث بـ ID، الاسم، البريد الإلكتروني..."
+                                placeholder={t('adminUsersIndexPage.searchPlaceholder')}
                                     className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
                             </div>
@@ -311,14 +315,14 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                 onChange={(e) => setRoleFilter(e.target.value)}
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             >
-                                <option value="all">جميع الأدوار</option>
-                                <option value="admin">أدمن</option>
-                                <option value="school">مدرسة</option>
-                                <option value="educational_institution">مؤسسة تعليمية</option>
-                                <option value="teacher">معلم</option>
-                                <option value="student">طالب</option>
-                                <option value="system_supervisor">مشرف النظام</option>
-                                <option value="school_support_coordinator">منسق دعم المؤسسات تعليمية</option>
+                                <option value="all">{t('adminUsersIndexPage.roleFilter.all')}</option>
+                                <option value="admin">{t('adminUsersIndexPage.roles.admin')}</option>
+                                <option value="school">{t('adminUsersIndexPage.roles.school')}</option>
+                                <option value="educational_institution">{t('adminUsersIndexPage.roles.educationalInstitution')}</option>
+                                <option value="teacher">{t('adminUsersIndexPage.roles.teacher')}</option>
+                                <option value="student">{t('adminUsersIndexPage.roles.student')}</option>
+                                <option value="system_supervisor">{t('adminUsersIndexPage.roles.systemSupervisor')}</option>
+                                <option value="school_support_coordinator">{t('adminUsersIndexPage.roles.schoolSupportCoordinator')}</option>
                             </select>
                         </div>
                         <button
@@ -326,7 +330,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                             className="px-6 py-2 bg-[#A3C042] hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
                         >
                             <FaFilter />
-                            بحث
+                            {t('common.search')}
                         </button>
                     </div>
                     <div className="flex gap-3">
@@ -336,7 +340,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                 className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
                             >
                                 <FaTrash />
-                                حذف المحدد ({selectedUsers.length})
+                                {t('adminUsersIndexPage.actions.deleteSelected', { count: selectedUsers.length })}
                             </button>
                         )}
                         <button
@@ -344,14 +348,14 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                             className="px-6 py-2 bg-[#A3C042] hover:bg-[#8CA635] text-white font-semibold rounded-lg flex items-center justify-center gap-2"
                         >
                             <FaFileExcel />
-                            تصدير Excel
+                            {t('adminUsersIndexPage.actions.exportExcel')}
                         </button>
                         <Link
                             href={route('admin.users.create')}
                             className="px-6 py-2 bg-[#A3C042] hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
                         >
                             <FaPlus />
-                            إضافة مستخدم جديد
+                            {t('adminUsersIndexPage.actions.addNew')}
                         </Link>
                     </div>
                 </div>
@@ -367,19 +371,19 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                     <button
                                         onClick={handleSelectAll}
                                         className="text-gray-600 hover:text-gray-900"
-                                        title={selectAll ? 'إلغاء تحديد الكل' : 'تحديد الكل'}
+                                        title={selectAll ? t('adminUsersIndexPage.table.unselectAll') : t('adminUsersIndexPage.table.selectAll')}
                                     >
                                         {selectAll ? <FaCheckSquare className="text-lg" /> : <FaSquare className="text-lg" />}
                                     </button>
                                 </th>
                                 <th className=" py-4 px-6 text-sm font-semibold text-gray-700">ID</th>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الاسم</th>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">البريد الإلكتروني</th>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الدور</th>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">المدرسة</th>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">النقاط</th>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">تاريخ التسجيل</th>
-                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الإجراءات</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('common.name')}</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('common.email')}</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminUsersIndexPage.table.role')}</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminUsersIndexPage.table.school')}</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminUsersIndexPage.table.points')}</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminUsersIndexPage.table.registeredAt')}</th>
+                                <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('common.actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
@@ -422,14 +426,14 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                                     <Link
                                                         href={route('admin.users.show', user.id)}
                                                         className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
-                                                        title="عرض التفاصيل"
+                                                        title={t('common.viewDetails')}
                                                     >
                                                         <FaEye />
                                                     </Link>
                                                     <button
                                                         onClick={() => handleEdit(user)}
                                                         className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg transition"
-                                                        title="تعديل"
+                                                        title={t('common.edit')}
                                                     >
                                                         <FaEdit />
                                                     </button>
@@ -437,7 +441,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                                         onClick={() => handleDelete(user)}
                                                         disabled={deleting}
                                                         className={`p-2 text-red-600 hover:bg-red-50 rounded-lg transition ${deleting ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                        title={deleting ? 'جاري الحذف...' : 'حذف'}
+                                                        title={deleting ? t('adminUsersIndexPage.deleting') : t('common.delete')}
                                                     >
                                                         {deleting ? (
                                                             <span className="animate-spin text-xs">⏳</span>
@@ -453,7 +457,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                             ) : (
                                 <tr>
                                     <td colSpan="9" className="py-12 text-center text-gray-500">
-                                        لا توجد مستخدمين
+                                        {t('adminUsersIndexPage.empty')}
                                     </td>
                                 </tr>
                             )}
@@ -466,7 +470,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                     <div className="px-6 py-4 border-t border-gray-200">
                         <div className="flex items-center justify-between">
                             <div className="text-sm text-gray-700">
-                                عرض {users.from} إلى {users.to} من {users.total} مستخدم
+                                {t('adminUsersIndexPage.paginationSummary', { from: users.from, to: users.to, total: users.total })}
                             </div>
                             <div className="flex gap-2">
                                 {users.links.map((link, index) => (
@@ -491,7 +495,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
                     <div className="bg-white rounded-xl shadow-xl p-6 max-w-2xl w-full my-8">
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-2xl font-bold text-gray-900">تعديل مستخدم</h3>
+                            <h3 className="text-2xl font-bold text-gray-900">{t('adminUsersIndexPage.editModal.title')}</h3>
                             <button
                                 onClick={closeEditModal}
                                 className="text-gray-400 hover:text-gray-600 transition"
@@ -502,10 +506,10 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
 
                         <form onSubmit={handleEditSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {/* الاسم */}
+                                {/* Name */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        الاسم <span className="text-red-500">*</span>
+                                        {t('common.name')} <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="text"
@@ -520,10 +524,10 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                     )}
                                 </div>
 
-                                {/* البريد الإلكتروني */}
+                                {/* Email */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        البريد الإلكتروني <span className="text-red-500">*</span>
+                                        {t('common.email')} <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="email"
@@ -538,10 +542,10 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                     )}
                                 </div>
 
-                                {/* الهاتف */}
+                                {/* Phone */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        الهاتف
+                                        {t('common.phone')}
                                     </label>
                                     <input
                                         type="tel"
@@ -555,10 +559,10 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                     )}
                                 </div>
 
-                                {/* نوع الحساب */}
+                                {/* Account Type */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        نوع الحساب <span className="text-red-500">*</span>
+                                        {t('adminUsersIndexPage.editModal.accountTypeLabel')} <span className="text-red-500">*</span>
                                     </label>
                                     <select
                                         value={editData.account_type}
@@ -567,18 +571,18 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                             }`}
                                         required
                                     >
-                                        <option value="regular">حساب عادي</option>
-                                        <option value="project">حساب مشروع</option>
+                                        <option value="regular">{t('adminUsersIndexPage.accountTypes.regular')}</option>
+                                        <option value="project">{t('adminUsersIndexPage.accountTypes.project')}</option>
                                     </select>
                                     {editErrors.account_type && (
                                         <p className="mt-1 text-sm text-red-600">{editErrors.account_type}</p>
                                     )}
                                 </div>
 
-                                {/* الدور */}
+                                {/* Role */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        الدور <span className="text-red-500">*</span>
+                                        {t('adminUsersIndexPage.editModal.roleLabel')} <span className="text-red-500">*</span>
                                     </label>
                                     <select
                                         value={editData.role}
@@ -587,15 +591,15 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                             }`}
                                         required
                                     >
-                                        <option value="student">طالب</option>
-                                        <option value="teacher">معلم</option>
-                                        <option value="school">مدرسة</option>
-                                        <option value="educational_institution">مؤسسة تعليمية</option>
-                                        <option value="admin">أدمن</option>
+                                        <option value="student">{t('adminUsersIndexPage.roles.student')}</option>
+                                        <option value="teacher">{t('adminUsersIndexPage.roles.teacher')}</option>
+                                        <option value="school">{t('adminUsersIndexPage.roles.school')}</option>
+                                        <option value="educational_institution">{t('adminUsersIndexPage.roles.educationalInstitution')}</option>
+                                        <option value="admin">{t('adminUsersIndexPage.roles.admin')}</option>
                                         {editData.account_type === 'project' && (
                                             <>
-                                                <option value="system_supervisor">مشرف النظام</option>
-                                                <option value="school_support_coordinator">منسق دعم المؤسسات تعليمية</option>
+                                                <option value="system_supervisor">{t('adminUsersIndexPage.roles.systemSupervisor')}</option>
+                                                <option value="school_support_coordinator">{t('adminUsersIndexPage.roles.schoolSupportCoordinator')}</option>
                                             </>
                                         )}
                                     </select>
@@ -604,11 +608,11 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                     )}
                                 </div>
 
-                                {/* نوع العضوية */}
+                                {/* Membership Type */}
                                 {editData.account_type === 'regular' && (
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            نوع العضوية
+                                                {t('adminUsersIndexPage.editModal.membershipTypeLabel')}
                                         </label>
                                         <select
                                             value={editData.membership_type}
@@ -616,9 +620,9 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.membership_type ? 'border-red-500' : 'border-gray-300'
                                                 }`}
                                         >
-                                            <option value="">بدون عضوية</option>
-                                            <option value="basic">عضوية أساسية</option>
-                                            <option value="subscription">اشتراك عضوية</option>
+                                            <option value="">{t('adminUsersIndexPage.membershipTypes.none')}</option>
+                                            <option value="basic">{t('adminUsersIndexPage.membershipTypes.basic')}</option>
+                                            <option value="subscription">{t('adminUsersIndexPage.membershipTypes.subscription')}</option>
                                         </select>
                                         {editErrors.membership_type && (
                                             <p className="mt-1 text-sm text-red-600">{editErrors.membership_type}</p>
@@ -626,11 +630,11 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                     </div>
                                 )}
 
-                                {/* المدرسة */}
+                                {/* School */}
                                 {editData.role === 'student' && (
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            المدرسة
+                                            {t('adminUsersIndexPage.editModal.schoolLabel')}
                                         </label>
                                         <select
                                             value={editData.school_id}
@@ -638,7 +642,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.school_id ? 'border-red-500' : 'border-gray-300'
                                                 }`}
                                         >
-                                            <option value="">اختر مدرسة</option>
+                                            <option value="">{t('adminUsersIndexPage.editModal.selectSchool')}</option>
                                             {schools.map((school) => (
                                                 <option key={school.id} value={school.id}>
                                                     {school.name}
@@ -651,11 +655,11 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                     </div>
                                 )}
 
-                                {/* النقاط */}
+                                {/* Points */}
                                 {editData.role === 'student' && (
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            النقاط
+                                            {t('adminUsersIndexPage.editModal.pointsLabel')}
                                         </label>
                                         <input
                                             type="number"
@@ -671,10 +675,10 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                     </div>
                                 )}
 
-                                {/* كلمة المرور */}
+                                {/* Password */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        كلمة المرور (اتركه فارغاً إذا لم تريد تغييره)
+                                        {t('adminUsersIndexPage.editModal.passwordHint')}
                                     </label>
                                     <input
                                         type="password"
@@ -688,11 +692,11 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                     )}
                                 </div>
 
-                                {/* تأكيد كلمة المرور */}
+                                {/* Confirm Password */}
                                 {editData.password && (
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            تأكيد كلمة المرور
+                                                {t('adminUsersIndexPage.editModal.passwordConfirmLabel')}
                                         </label>
                                         <input
                                             type="password"
@@ -716,7 +720,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                     className="px-6 py-2 bg-[#A3C042] hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50"
                                 >
                                     <FaSave />
-                                    {editProcessing ? 'جاري التحديث...' : 'تحديث'}
+                                    {editProcessing ? t('adminUsersIndexPage.editModal.saving') : t('adminUsersIndexPage.editModal.update')}
                                 </button>
                                 <button
                                     type="button"
@@ -724,7 +728,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                     className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg flex items-center gap-2"
                                 >
                                     <FaTimes />
-                                    إلغاء
+                                    {t('common.cancel')}
                                 </button>
                             </div>
                         </form>
@@ -736,11 +740,9 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
             {showDeleteModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-xl shadow-xl p-6 max-w-md w-full mx-4">
-                        <h3 className="text-xl font-bold text-gray-900 mb-4">تأكيد الحذف</h3>
+                        <h3 className="text-xl font-bold text-gray-900 mb-4">{t('adminUsersIndexPage.deleteConfirm.title')}</h3>
                         <p className="text-gray-700 mb-6">
-                            هل أنت متأكد من حذف المستخدم <strong>{userToDelete?.name}</strong>؟
-                            <br />
-                            <span className="text-sm text-red-600">هذا الإجراء لا يمكن التراجع عنه.</span>
+                            {t('adminUsersIndexPage.deleteConfirm.message', { name: userToDelete?.name || '' })}
                         </p>
                         <div className="flex gap-4">
                             <button
@@ -750,13 +752,13 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                 }}
                                 className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg transition"
                             >
-                                إلغاء
+                                {t('common.cancel')}
                             </button>
                             <button
                                 onClick={confirmDelete}
                                 className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition"
                             >
-                                حذف
+                                {t('common.delete')}
                             </button>
                         </div>
                     </div>
@@ -767,11 +769,9 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
             {showBulkDeleteModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-xl shadow-xl p-6 max-w-md w-full mx-4">
-                        <h3 className="text-xl font-bold text-gray-900 mb-4">تأكيد الحذف المتعدد</h3>
+                        <h3 className="text-xl font-bold text-gray-900 mb-4">{t('adminUsersIndexPage.bulkDeleteConfirm.title')}</h3>
                         <p className="text-gray-700 mb-6">
-                            هل أنت متأكد من حذف <strong>{selectedUsers.length}</strong> مستخدم؟
-                            <br />
-                            <span className="text-sm text-red-600">هذا الإجراء لا يمكن التراجع عنه.</span>
+                            {t('adminUsersIndexPage.bulkDeleteConfirm.message', { count: selectedUsers.length })}
                         </p>
                         <div className="flex gap-4">
                             <button
@@ -780,18 +780,19 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                 }}
                                 className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg transition"
                             >
-                                إلغاء
+                                {t('common.cancel')}
                             </button>
                             <button
                                 onClick={confirmBulkDelete}
                                 className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition"
                             >
-                                حذف المحدد
+                                {t('adminUsersIndexPage.actions.deleteSelectedOnly')}
                             </button>
                         </div>
                     </div>
                 </div>
             )}
+            </div>
         </DashboardLayout>
     );
 }

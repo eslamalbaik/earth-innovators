@@ -2,6 +2,7 @@ import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { FaSearch, FaFilter, FaEye, FaCreditCard, FaCalendar, FaDollarSign, FaUsers, FaCheckCircle, FaTimesCircle, FaClock, FaExclamationCircle } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function AdminSubscriptionsIndex({
     subscriptions,
@@ -11,6 +12,7 @@ export default function AdminSubscriptionsIndex({
     totalStats,
     filters
 }) {
+    const { t, language } = useTranslation();
     const [type, setType] = useState(filters?.type || 'subscriptions');
     const [search, setSearch] = useState(filters?.search || '');
     const [status, setStatus] = useState(filters?.status || 'all');
@@ -36,34 +38,34 @@ export default function AdminSubscriptionsIndex({
 
     const getSubscriptionStatusBadge = (status) => {
         const statusMap = {
-            'active': { bg: 'bg-green-100', text: 'text-green-800', label: 'نشط', icon: FaCheckCircle },
-            'expired': { bg: 'bg-gray-100', text: 'text-gray-800', label: 'منتهي', icon: FaClock },
-            'cancelled': { bg: 'bg-red-100', text: 'text-red-800', label: 'ملغي', icon: FaTimesCircle },
+            active: { bg: 'bg-green-100', text: 'text-green-800', labelKey: 'adminSubscriptionsIndexPage.subscriptionStatus.active', icon: FaCheckCircle },
+            expired: { bg: 'bg-gray-100', text: 'text-gray-800', labelKey: 'adminSubscriptionsIndexPage.subscriptionStatus.expired', icon: FaClock },
+            cancelled: { bg: 'bg-red-100', text: 'text-red-800', labelKey: 'adminSubscriptionsIndexPage.subscriptionStatus.cancelled', icon: FaTimesCircle },
         };
         const statusConfig = statusMap[status] || { bg: 'bg-gray-100', text: 'text-gray-800', label: status, icon: FaCheckCircle };
         const Icon = statusConfig.icon;
         return (
             <span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusConfig.bg} ${statusConfig.text} flex items-center gap-1`}>
                 <Icon className="text-xs" />
-                {statusConfig.label}
+                {statusConfig.labelKey ? t(statusConfig.labelKey) : statusConfig.label}
             </span>
         );
     };
 
     const getPaymentStatusBadge = (status) => {
         const statusMap = {
-            'completed': { bg: 'bg-green-100', text: 'text-green-800', label: 'مكتمل', icon: FaCheckCircle },
-            'pending': { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'قيد الانتظار', icon: FaClock },
-            'failed': { bg: 'bg-red-100', text: 'text-red-800', label: 'فاشل', icon: FaTimesCircle },
-            'refunded': { bg: 'bg-blue-100', text: 'text-blue-800', label: 'مسترد', icon: FaExclamationCircle },
-            'processing': { bg: 'bg-blue-100', text: 'text-blue-800', label: 'قيد المعالجة', icon: FaClock },
+            completed: { bg: 'bg-green-100', text: 'text-green-800', labelKey: 'adminSubscriptionsIndexPage.paymentStatus.completed', icon: FaCheckCircle },
+            pending: { bg: 'bg-yellow-100', text: 'text-yellow-800', labelKey: 'adminSubscriptionsIndexPage.paymentStatus.pending', icon: FaClock },
+            failed: { bg: 'bg-red-100', text: 'text-red-800', labelKey: 'adminSubscriptionsIndexPage.paymentStatus.failed', icon: FaTimesCircle },
+            refunded: { bg: 'bg-blue-100', text: 'text-blue-800', labelKey: 'adminSubscriptionsIndexPage.paymentStatus.refunded', icon: FaExclamationCircle },
+            processing: { bg: 'bg-blue-100', text: 'text-blue-800', labelKey: 'adminSubscriptionsIndexPage.paymentStatus.processing', icon: FaClock },
         };
         const statusConfig = statusMap[status] || { bg: 'bg-gray-100', text: 'text-gray-800', label: status, icon: FaCheckCircle };
         const Icon = statusConfig.icon;
         return (
             <span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusConfig.bg} ${statusConfig.text} flex items-center gap-1`}>
                 <Icon className="text-xs" />
-                {statusConfig.label}
+                {statusConfig.labelKey ? t(statusConfig.labelKey) : statusConfig.label}
             </span>
         );
     };
@@ -76,11 +78,11 @@ export default function AdminSubscriptionsIndex({
     };
 
     return (
-        <DashboardLayout header="الاشتراكات والمدفوعات">
-            <Head title="الاشتراكات والمدفوعات" />
+        <DashboardLayout header={t('adminSubscriptionsIndexPage.title')}>
+            <Head title={t('adminSubscriptionsIndexPage.pageTitle', { appName: t('common.appName') })} />
 
             {/* Tabs */}
-            <div className="mb-6 bg-white rounded-xl shadow-lg p-4">
+            <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="mb-6 bg-white rounded-xl shadow-lg p-4">
                 <div className="flex gap-4 border-b border-gray-200">
                     <button
                         onClick={() => {
@@ -93,7 +95,7 @@ export default function AdminSubscriptionsIndex({
                             }`}
                     >
                         <FaUsers className="inline me-2" />
-                        الاشتراكات ({subscriptionStats.total})
+                        {t('adminSubscriptionsIndexPage.tabs.subscriptions', { count: subscriptionStats.total })}
                     </button>
                     <button
                         onClick={() => {
@@ -106,7 +108,7 @@ export default function AdminSubscriptionsIndex({
                             }`}
                     >
                         <FaCreditCard className="inline me-2" />
-                        المدفوعات ({paymentStats.total})
+                        {t('adminSubscriptionsIndexPage.tabs.payments', { count: paymentStats.total })}
                     </button>
                 </div>
             </div>
@@ -115,54 +117,54 @@ export default function AdminSubscriptionsIndex({
             {type === 'subscriptions' ? (
                 <div className="grid grid-cols-1 md:grid-cols-6 gap-6 mb-8">
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                        <p className="text-sm text-gray-600 mb-2">إجمالي الاشتراكات</p>
+                        <p className="text-sm text-gray-600 mb-2">{t('adminSubscriptionsIndexPage.stats.totalSubscriptions')}</p>
                         <p className="text-3xl font-bold text-gray-900">{subscriptionStats.total || 0}</p>
                     </div>
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                        <p className="text-sm text-gray-600 mb-2">نشطة</p>
+                        <p className="text-sm text-gray-600 mb-2">{t('adminSubscriptionsIndexPage.stats.active')}</p>
                         <p className="text-3xl font-bold text-green-600">{subscriptionStats.active || 0}</p>
                     </div>
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                        <p className="text-sm text-gray-600 mb-2">منتهية</p>
+                        <p className="text-sm text-gray-600 mb-2">{t('adminSubscriptionsIndexPage.stats.expired')}</p>
                         <p className="text-3xl font-bold text-gray-600">{subscriptionStats.expired || 0}</p>
                     </div>
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                        <p className="text-sm text-gray-600 mb-2">ملغاة</p>
+                        <p className="text-sm text-gray-600 mb-2">{t('adminSubscriptionsIndexPage.stats.cancelled')}</p>
                         <p className="text-3xl font-bold text-red-600">{subscriptionStats.cancelled || 0}</p>
                     </div>
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                        <p className="text-sm text-gray-600 mb-2">تجديد تلقائي</p>
+                        <p className="text-sm text-gray-600 mb-2">{t('adminSubscriptionsIndexPage.stats.autoRenew')}</p>
                         <p className="text-3xl font-bold text-blue-600">{subscriptionStats.auto_renew_count || 0}</p>
                     </div>
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                        <p className="text-sm text-gray-600 mb-2">إجمالي الإيرادات</p>
+                        <p className="text-sm text-gray-600 mb-2">{t('adminSubscriptionsIndexPage.stats.totalRevenue')}</p>
                         <p className="text-3xl font-bold text-green-600">{formatCurrency(subscriptionStats.total_revenue || 0)}</p>
                     </div>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-6 gap-6 mb-8">
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                        <p className="text-sm text-gray-600 mb-2">إجمالي المدفوعات</p>
+                        <p className="text-sm text-gray-600 mb-2">{t('adminSubscriptionsIndexPage.stats.totalPayments')}</p>
                         <p className="text-3xl font-bold text-gray-900">{paymentStats.total || 0}</p>
                     </div>
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                        <p className="text-sm text-gray-600 mb-2">مكتملة</p>
+                        <p className="text-sm text-gray-600 mb-2">{t('adminSubscriptionsIndexPage.paymentStatus.completed')}</p>
                         <p className="text-3xl font-bold text-green-600">{paymentStats.completed || 0}</p>
                     </div>
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                        <p className="text-sm text-gray-600 mb-2">قيد الانتظار</p>
+                        <p className="text-sm text-gray-600 mb-2">{t('adminSubscriptionsIndexPage.paymentStatus.pending')}</p>
                         <p className="text-3xl font-bold text-yellow-600">{paymentStats.pending || 0}</p>
                     </div>
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                        <p className="text-sm text-gray-600 mb-2">فاشلة</p>
+                        <p className="text-sm text-gray-600 mb-2">{t('adminSubscriptionsIndexPage.paymentStatus.failed')}</p>
                         <p className="text-3xl font-bold text-red-600">{paymentStats.failed || 0}</p>
                     </div>
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                        <p className="text-sm text-gray-600 mb-2">مستردة</p>
+                        <p className="text-sm text-gray-600 mb-2">{t('adminSubscriptionsIndexPage.paymentStatus.refunded')}</p>
                         <p className="text-3xl font-bold text-blue-600">{paymentStats.refunded || 0}</p>
                     </div>
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                        <p className="text-sm text-gray-600 mb-2">إجمالي الإيرادات</p>
+                        <p className="text-sm text-gray-600 mb-2">{t('adminSubscriptionsIndexPage.stats.totalRevenue')}</p>
                         <p className="text-3xl font-bold text-green-600">{formatCurrency(paymentStats.total_revenue || 0)}</p>
                     </div>
                 </div>
@@ -172,14 +174,14 @@ export default function AdminSubscriptionsIndex({
             <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">البحث</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.search')}</label>
                         <div className="relative">
                             <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                             <input
                                 type="text"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                placeholder="ابحث..."
+                                placeholder={t('adminSubscriptionsIndexPage.placeholders.search')}
                                 className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
                         </div>
@@ -187,53 +189,53 @@ export default function AdminSubscriptionsIndex({
 
                     {type === 'subscriptions' ? (
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">حالة الاشتراك</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminSubscriptionsIndexPage.filters.subscriptionStatus')}</label>
                             <select
                                 value={status}
                                 onChange={(e) => setStatus(e.target.value)}
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             >
-                                <option value="all">الكل</option>
-                                <option value="active">نشط</option>
-                                <option value="expired">منتهي</option>
-                                <option value="cancelled">ملغي</option>
+                                <option value="all">{t('common.all')}</option>
+                                <option value="active">{t('adminSubscriptionsIndexPage.subscriptionStatus.active')}</option>
+                                <option value="expired">{t('adminSubscriptionsIndexPage.subscriptionStatus.expired')}</option>
+                                <option value="cancelled">{t('adminSubscriptionsIndexPage.subscriptionStatus.cancelled')}</option>
                             </select>
                         </div>
                     ) : (
                         <>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">حالة الدفع</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminSubscriptionsIndexPage.filters.paymentStatus')}</label>
                                 <select
                                     value={paymentStatus}
                                     onChange={(e) => setPaymentStatus(e.target.value)}
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 >
-                                    <option value="all">الكل</option>
-                                    <option value="completed">مكتمل</option>
-                                    <option value="pending">قيد الانتظار</option>
-                                    <option value="failed">فاشل</option>
-                                    <option value="refunded">مسترد</option>
+                                    <option value="all">{t('common.all')}</option>
+                                    <option value="completed">{t('adminSubscriptionsIndexPage.paymentStatus.completed')}</option>
+                                    <option value="pending">{t('adminSubscriptionsIndexPage.paymentStatus.pending')}</option>
+                                    <option value="failed">{t('adminSubscriptionsIndexPage.paymentStatus.failed')}</option>
+                                    <option value="refunded">{t('adminSubscriptionsIndexPage.paymentStatus.refunded')}</option>
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">طريقة الدفع</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminSubscriptionsIndexPage.filters.paymentMethod')}</label>
                                 <select
                                     value={paymentMethod}
                                     onChange={(e) => setPaymentMethod(e.target.value)}
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 >
-                                    <option value="all">الكل</option>
-                                    <option value="credit_card">بطاقة ائتمانية</option>
-                                    <option value="debit_card">بطاقة خصم</option>
-                                    <option value="bank_transfer">تحويل بنكي</option>
-                                    <option value="cash">نقدي</option>
+                                    <option value="all">{t('common.all')}</option>
+                                    <option value="credit_card">{t('adminSubscriptionsIndexPage.paymentMethods.creditCard')}</option>
+                                    <option value="debit_card">{t('adminSubscriptionsIndexPage.paymentMethods.debitCard')}</option>
+                                    <option value="bank_transfer">{t('adminSubscriptionsIndexPage.paymentMethods.bankTransfer')}</option>
+                                    <option value="cash">{t('adminSubscriptionsIndexPage.paymentMethods.cash')}</option>
                                 </select>
                             </div>
                         </>
                     )}
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">من تاريخ</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminSubscriptionsIndexPage.filters.fromDate')}</label>
                         <input
                             type="date"
                             value={dateFrom}
@@ -242,7 +244,7 @@ export default function AdminSubscriptionsIndex({
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">إلى تاريخ</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminSubscriptionsIndexPage.filters.toDate')}</label>
                         <input
                             type="date"
                             value={dateTo}
@@ -256,7 +258,7 @@ export default function AdminSubscriptionsIndex({
                             className="w-full bg-[#A3C042] hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
                         >
                             <FaFilter />
-                            تصفية
+                            {t('common.filter')}
                         </button>
                     </div>
                 </div>
@@ -269,14 +271,14 @@ export default function AdminSubscriptionsIndex({
                         <table className="w-full">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">المستخدم</th>
-                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الباقة</th>
-                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">تاريخ البدء</th>
-                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">تاريخ الانتهاء</th>
-                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">المبلغ</th>
-                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الحالة</th>
-                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">رقم المعاملة</th>
-                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الإجراءات</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminSubscriptionsIndexPage.table.user')}</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminSubscriptionsIndexPage.table.package')}</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminSubscriptionsIndexPage.table.startDate')}</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminSubscriptionsIndexPage.table.endDate')}</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminSubscriptionsIndexPage.table.amount')}</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('common.status')}</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminSubscriptionsIndexPage.table.transactionId')}</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('common.actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200">
@@ -303,7 +305,7 @@ export default function AdminSubscriptionsIndex({
                                                 <Link
                                                     href={route('admin.subscriptions.show-subscription', subscription.id)}
                                                     className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50"
-                                                    title="عرض التفاصيل"
+                                                    title={t('common.viewDetails')}
                                                 >
                                                     <FaEye />
                                                 </Link>
@@ -313,7 +315,7 @@ export default function AdminSubscriptionsIndex({
                                 ) : (
                                     <tr>
                                         <td colSpan="8" className="py-12 text-center text-gray-500">
-                                            لا توجد اشتراكات
+                                            {t('adminSubscriptionsIndexPage.empty.subscriptions')}
                                         </td>
                                     </tr>
                                 )}
@@ -325,14 +327,14 @@ export default function AdminSubscriptionsIndex({
                         <table className="w-full">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الطالب</th>
-                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">المعلم</th>
-                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">المادة</th>
-                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">المبلغ</th>
-                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">الحالة</th>
-                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">طريقة الدفع</th>
-                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">رقم المعاملة</th>
-                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">التاريخ</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('common.student')}</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('common.teacher')}</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('common.subjects')}</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminSubscriptionsIndexPage.table.amount')}</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('common.status')}</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminSubscriptionsIndexPage.filters.paymentMethod')}</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('adminSubscriptionsIndexPage.table.transactionId')}</th>
+                                    <th className=" py-4 px-6 text-sm font-semibold text-gray-700">{t('common.date')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200">
@@ -363,7 +365,7 @@ export default function AdminSubscriptionsIndex({
                                 ) : (
                                     <tr>
                                         <td colSpan="8" className="py-12 text-center text-gray-500">
-                                            لا توجد مدفوعات
+                                            {t('adminSubscriptionsIndexPage.empty.payments')}
                                         </td>
                                     </tr>
                                 )}
@@ -379,9 +381,9 @@ export default function AdminSubscriptionsIndex({
                             <div className="flex items-center justify-between">
                                 <div className="text-sm text-gray-700">
                                     {type === 'subscriptions' ? (
-                                        <>عرض {subscriptions.from} إلى {subscriptions.to} من {subscriptions.total} اشتراك</>
+                                        <>{t('adminSubscriptionsIndexPage.pagination.subscriptions', { from: subscriptions.from, to: subscriptions.to, total: subscriptions.total })}</>
                                     ) : (
-                                        <>عرض {payments.from} إلى {payments.to} من {payments.total} دفعة</>
+                                        <>{t('adminSubscriptionsIndexPage.pagination.payments', { from: payments.from, to: payments.to, total: payments.total })}</>
                                     )}
                                 </div>
                                 <div className="flex gap-2">

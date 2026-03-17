@@ -8,18 +8,20 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Head, Link, useForm, usePage, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaPhone, FaChevronDown, FaExclamationTriangle, FaTimes, FaSchool, FaUserGraduate, FaChalkboardTeacher, FaUniversity } from 'react-icons/fa';
-import { useTranslation } from '@/i18n';
+import { getTranslation, useTranslation } from '@/i18n';
 
 const DEFAULT_DIAL_CODE = '+971';
 
-// قائمة مقدمات الدول
-const dialCodeOptions = [
-    { value: '+971', label: '+971 (الإمارات)', flag: '🇦🇪' },
-];
+// Country dialing codes
 
 export default function Register({ schools = [] }) {
     const { t, language } = useTranslation();
     const { props } = usePage();
+    const phoneInUseMessage = getTranslation('ar', 'auth.phoneInUseMessage');
+
+    const dialCodeOptions = [
+        { value: '+971', label: `+971 (${t('countries.uae')})`, flag: '🇦🇪' },
+    ];
 
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -39,23 +41,23 @@ export default function Register({ schools = [] }) {
     });
 
     const roleOptions = [
-        { key: 'student', label: t('roles.student'), description: t('auth.createAsStudent') || 'إنشاء حساب كطالب', icon: FaUserGraduate },
-        { key: 'teacher', label: t('roles.teacher'), description: t('auth.createAsTeacher') || 'إنشاء حساب كمعلم', icon: FaChalkboardTeacher },
-        { key: 'school', label: t('roles.school'), description: t('auth.createAsSchool') || 'إنشاء حساب كمدرسة', icon: FaSchool },
-        { key: 'educational_institution', label: t('roles.educationalInstitution'), description: t('auth.createAsInstitution') || 'إنشاء حساب كمؤسسة تعليمية', icon: FaUniversity },
+        { key: 'student', label: t('roles.student'), description: t('auth.createAsStudent'), icon: FaUserGraduate },
+        { key: 'teacher', label: t('roles.teacher'), description: t('auth.createAsTeacher'), icon: FaChalkboardTeacher },
+        { key: 'school', label: t('roles.school'), description: t('auth.createAsSchool'), icon: FaSchool },
+        { key: 'educational_institution', label: t('roles.educationalInstitution'), description: t('auth.createAsInstitution'), icon: FaUniversity },
     ];
 
-    // الحصول على الأخطاء من Inertia (من usePage) أو من state المحلي أو من useForm
+    // Collect errors from Inertia (usePage), local state, or useForm
     const errors = props.errors || pageErrors || formErrors;
 
-    // إظهار تنبيه الأخطاء عند وجود أخطاء جديدة
+    // Show error alert when new errors appear
     useEffect(() => {
         if (Object.keys(errors).length > 0) {
             setShowErrorsAlert(true);
         }
     }, [errors]);
 
-    // تحديث الأخطاء من props.errors عند تغييرها
+    // Sync errors from props.errors when they change
     useEffect(() => {
         if (props.errors && Object.keys(props.errors).length > 0) {
             setPageErrors(props.errors);
@@ -63,7 +65,7 @@ export default function Register({ schools = [] }) {
         }
     }, [props.errors]);
 
-    // مسح school_id عند تغيير role إلى school
+    // Clear school_id when switching role to school
     useEffect(() => {
         if (data.role === 'school') {
             setData('school_id', '');
@@ -71,7 +73,7 @@ export default function Register({ schools = [] }) {
     }, [data.role]);
 
     const handlePhoneInputChange = (e) => {
-        // السماح فقط بالأرقام والرموز الخاصة (+)
+        // Allow only digits and plus sign
         const sanitized = e.target.value.replace(/[^\d+]/g, '');
         setData('phone', sanitized);
     };
@@ -115,19 +117,19 @@ export default function Register({ schools = [] }) {
                 <div className="w-full sm:space-y-8">
                 <div className="relative min-h-screen overflow-hidden bg-white shadow-lg sm:rounded-2xl px-4 py-10 w-[100vw] sm:w-[400px] md:w-[450px] max-w-5xl sm:mx-auto">
                 <form onSubmit={submit} className="space-y-6">
-                            <img src="/images/avatar.svg" alt="avatar" className="absolute -top-24 -start-24 w-48 h-48" />
-                            <img src="/images/avatar1.svg" alt="avatar" className="absolute -bottom-8 end-0 w-28 h-28" />
+                            <img src="/images/avatar.svg" alt={t('common.avatar')} className="absolute -top-24 -start-24 w-48 h-48" />
+                            <img src="/images/avatar1.svg" alt={t('common.avatar')} className="absolute -bottom-8 end-0 w-28 h-28" />
                             <div className="flex flex-col items-center">
                                 <div>
                                     <img
                                         src="/images/logo-modified.png"
-                                        alt="إرث المبتكرين - Innovators Legacy"
+                                        alt={t('common.appName')}
                                         className="h-24 w-auto object-contain"
                                     />
                                 </div>
                             </div>
                             <div>
-                                <div className='text-xs mb-1 opacity-75'>{t('auth.createAccountAs') || 'إنشاء حساب كـ'}</div>
+                                <div className='text-xs mb-1 opacity-75'>{t('auth.createAccountAs')}</div>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5 md:gap-3">
                                     {roleOptions.map((roleOption) => {
                                         const isActive = data.role === roleOption.key;
@@ -156,7 +158,7 @@ export default function Register({ schools = [] }) {
                                 <InputError message={errors.role} className="mt-2" />
                             </div>
 
-                            {/* حقل اختيار المدرسة للطلاب والمعلمين */}
+                            {/* School selector for students and teachers */}
                             {(data.role === 'student' || data.role === 'teacher') && (
                                 <div>
                                     <div className="relative">
@@ -172,7 +174,7 @@ export default function Register({ schools = [] }) {
                                                 className="block w-full ps-10 pe-3 py-3 border-2 border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-1 sm:text-sm transition-all"
                                                 required
                                             >
-                                                <option value="">{t('auth.selectSchool') || 'اختر مدرستك'}</option>
+                                                <option value="">{t('auth.selectSchool')}</option>
                                                 {schools.map((school) => (
                                                     <option key={school.id} value={school.id}>
                                                         {school.name}
@@ -181,21 +183,21 @@ export default function Register({ schools = [] }) {
                                             </SelectInput>
                                         ) : (
                                             <div className="block w-full ps-10 pe-3 py-2 border border-red-300 rounded-md shadow-sm bg-red-50 text-red-700 text-sm">
-                                                <p className="font-semibold">{t('auth.noInstitutions') || 'تحذير: لا توجد مؤسسات تعليمية مسجلة في النظام'}</p>
-                                                <p className="text-xs mt-1">{t('auth.contactAdmin') || 'يرجى التواصل مع الإدارة لإنشاء حساب مدرسة أولاً'}</p>
+                                                <p className="font-semibold">{t('auth.noInstitutions')}</p>
+                                                <p className="text-xs mt-1">{t('auth.contactAdmin')}</p>
                                             </div>
                                         )}
                                     </div>
                                     <InputError message={errors.school_id} className="mt-2" />
                                     {schools && schools.length === 0 && (
                                         <p className="mt-2 text-sm text-red-600">
-                                            {t('auth.schoolRequired') || 'يجب أن تكون هناك مدرسة مسجلة في النظام أولاً. يرجى التواصل مع الإدارة.'}
+                                            {t('auth.schoolRequired')}
                                         </p>
                                     )}
                                 </div>
                             )}
 
-                            {/* عرض جميع الأخطاء في أعلى النموذج */}
+                            {/* Show all errors at the top of the form */}
                             {showErrorsAlert && Object.keys(errors).length > 0 && (
                                 <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
                                     <div className="flex items-start justify-between">
@@ -203,13 +205,13 @@ export default function Register({ schools = [] }) {
                                             <FaExclamationTriangle className="text-red-500 text-xl mt-0.5 me-3 flex-shrink-0" />
                                             <div className="flex-1">
                                                 <h3 className="text-sm font-semibold text-red-800 mb-2">
-                                                    {t('auth.fixErrors') || 'يرجى تصحيح الأخطاء التالية:'}
+                                                    {t('auth.fixErrors')}
                                                 </h3>
                                                 <ul className="list-disc list-inside space-y-1 text-sm text-red-700">
                                                     {Object.entries(errors).map(([key, value]) => {
                                                         const errorMessage = Array.isArray(value) ? value[0] : value;
-                                                        // إبراز رسالة رقم الهاتف المستخدم
-                                                        const isPhoneUniqueError = key === 'phone' && errorMessage && errorMessage.includes('مسجل لمستخدم آخر');
+                                                        // Highlight duplicate phone error
+                                                        const isPhoneUniqueError = key === 'phone' && errorMessage && errorMessage.includes(phoneInUseMessage);
                                                         return (
                                                             <li
                                                                 key={key}
@@ -330,7 +332,7 @@ export default function Register({ schools = [] }) {
                                 </div>
                                 <InputError
                                     message={errors.phone}
-                                    className={`mt-2 ${errors.phone && errors.phone.includes('مسجل لمستخدم آخر') ? 'font-bold text-red-800 bg-red-50 px-3 py-2 rounded border border-red-200' : ''}`}
+                                    className={`mt-2 ${errors.phone && errors.phone.includes(phoneInUseMessage) ? 'font-bold text-red-800 bg-red-50 px-3 py-2 rounded border border-red-200' : ''}`}
                                 />
                             </div>
 
@@ -407,7 +409,7 @@ export default function Register({ schools = [] }) {
                                     {processing ? (
                                         <div className="flex items-center">
                                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white ms-2"></div>
-                                            {t('auth.creating') || 'جاري إنشاء الحساب...'}
+                                            {t('auth.creating')}
                                         </div>
                                     ) : (
                                         t('auth.register')
@@ -417,7 +419,7 @@ export default function Register({ schools = [] }) {
 
                             <div className="text-center">
                                 <p className="text-sm text-gray-600">
-                                    {t('auth.hasAccount') || 'لديك حساب بالفعل؟'}{' '}
+                                    {t('auth.hasAccount')}{' '}
                                     <Link
                                         href={route('login')}
                                         className="font-medium text-[#A3C042] hover:text-[#F9D536]"

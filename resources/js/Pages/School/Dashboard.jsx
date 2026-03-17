@@ -24,20 +24,20 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
     };
 
     const categoryLabels = {
-        science: 'علوم',
-        technology: 'تقني',
-        engineering: 'هندسة',
-        mathematics: 'رياضيات',
-        arts: 'فنون',
-        other: 'أخرى',
+        science: t('common.categories.science'),
+        technology: t('common.categories.technology'),
+        engineering: t('common.categories.engineering'),
+        mathematics: t('common.categories.mathematics'),
+        arts: t('common.categories.arts'),
+        other: t('common.categories.other'),
     };
 
     const handleApprove = async (projectId, projectTitle) => {
         const confirmed = await confirm({
-            title: 'تأكيد القبول',
-            message: `هل أنت متأكد من قبول المشروع "${projectTitle}"؟`,
-            confirmText: 'قبول',
-            cancelText: 'إلغاء',
+            title: t('schoolDashboardPage.confirmApproveTitle'),
+            message: t('schoolDashboardPage.confirmApproveMessage', { title: projectTitle }),
+            confirmText: t('schoolDashboardPage.approveAction'),
+            cancelText: t('common.cancel'),
             variant: 'info',
         });
 
@@ -50,10 +50,10 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
 
     const handleReject = async (projectId, projectTitle) => {
         const confirmed = await confirm({
-            title: 'تأكيد الرفض',
-            message: `هل أنت متأكد من رفض المشروع "${projectTitle}"؟`,
-            confirmText: 'رفض',
-            cancelText: 'إلغاء',
+            title: t('schoolDashboardPage.confirmRejectTitle'),
+            message: t('schoolDashboardPage.confirmRejectMessage', { title: projectTitle }),
+            confirmText: t('schoolDashboardPage.rejectAction'),
+            cancelText: t('common.cancel'),
             variant: 'warning',
         });
 
@@ -65,27 +65,27 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
     };
 
     return (
-        <DashboardLayout header="لوحة تحكم المدرسة">
-            <Head title="لوحة تحكم المدرسة - إرث المبتكرين" />
+        <DashboardLayout header={t('dashboard.schoolDashboard')}>
+            <Head title={t('schoolDashboardPage.pageTitle', { appName: t('common.appName') })} />
 
             {/* Welcome Card */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 mb-8">
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold mb-2 text-gray-900">{t('common.welcomeBack')} {user.name}</h1>
-                        <p className="text-gray-600 text-base md:text-lg">{t('dashboard.manageStudentProjects') || 'إدارة مشاريع طلابك ومتابعة إنجازاتهم'}</p>
+                        <p className="text-gray-600 text-base md:text-lg">{t('dashboard.manageStudentProjects')}</p>
                         {stats.rank && (
                             <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
                                 <div className="bg-blue-50 rounded-xl px-4 py-2 border border-blue-100">
                                     <div className="flex items-center gap-2">
                                         <FaTrophy className="text-yellow-500" />
-                                        <span className="font-semibold text-gray-900">{t('dashboard.rank') || 'الترتيب'}: {stats.rank} {t('dashboard.from') || 'من'} {stats.totalSchools}</span>
+                                        <span className="font-semibold text-gray-900">{t('dashboard.rank')}: {stats.rank} {t('dashboard.from')} {stats.totalSchools}</span>
                                     </div>
                                 </div>
                                 <div className="bg-green-50 rounded-xl px-4 py-2 border border-green-100">
                                     <div className="flex items-center gap-2">
                                         <FaStar className="text-yellow-500" />
-                                        <span className="font-semibold text-gray-900">{t('dashboard.totalPoints') || 'إجمالي النقاط'}: {stats.totalPoints || 0}</span>
+                                        <span className="font-semibold text-gray-900">{t('dashboard.totalPoints')}: {stats.totalPoints || 0}</span>
                                     </div>
                                 </div>
                             </div>
@@ -97,12 +97,11 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                 </div>
             </div>
 
-            {/* الإحصائيات */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
                     <div className="flex items-center justify-between mb-4">
                         <div>
-                            <p className="text-sm text-gray-500 font-medium mb-2">إجمالي المشاريع</p>
+                            <p className="text-sm text-gray-500 font-medium mb-2">{t('schoolDashboardPage.totalProjects')}</p>
                             <p className="text-3xl font-bold text-gray-900">{stats.totalProjects || 0}</p>
                         </div>
                         <div className="p-4 bg-green-50 rounded-2xl">
@@ -110,15 +109,15 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                         </div>
                     </div>
                     <div className="flex items-center text-sm text-gray-600 gap-4 pt-3 border-t border-gray-100">
-                        <span className="font-semibold text-gray-900">{stats.approvedProjects || 0} موافق</span>
-                        <span className="font-semibold text-gray-900">{stats.pendingProjects || 0} قيد المراجعة</span>
+                        <span className="font-semibold text-gray-900">{stats.approvedProjects || 0} {t('schoolDashboardPage.approvedShort')}</span>
+                        <span className="font-semibold text-gray-900">{stats.pendingProjects || 0} {t('schoolDashboardPage.pendingReviewShort')}</span>
                     </div>
                 </div>
 
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
                     <div className="flex items-center justify-between mb-4">
                         <div>
-                            <p className="text-sm text-gray-500 font-medium mb-2">عدد الطلاب</p>
+                            <p className="text-sm text-gray-500 font-medium mb-2">{t('schoolDashboardPage.totalStudents')}</p>
                             <p className="text-3xl font-bold text-gray-900">{stats.totalStudents || 0}</p>
                         </div>
                         <div className="p-4 bg-blue-50 rounded-2xl">
@@ -126,14 +125,14 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                         </div>
                     </div>
                     <div className="flex items-center text-sm text-gray-600 pt-3 border-t border-gray-100">
-                        <span className="font-semibold text-gray-900">{stats.studentsWithProjects || 0} لديهم مشاريع</span>
+                        <span className="font-semibold text-gray-900">{t('schoolDashboardPage.studentsWithProjects', { count: stats.studentsWithProjects || 0 })}</span>
                     </div>
                 </div>
 
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
                     <div className="flex items-center justify-between mb-4">
                         <div>
-                            <p className="text-sm text-gray-500 font-medium mb-2">إجمالي النقاط</p>
+                            <p className="text-sm text-gray-500 font-medium mb-2">{t('schoolDashboardPage.totalPoints')}</p>
                             <p className="text-3xl font-bold text-gray-900">{stats.totalPoints || 0}</p>
                         </div>
                         <div className="p-4 bg-yellow-50 rounded-2xl">
@@ -141,14 +140,14 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                         </div>
                     </div>
                     <div className="flex items-center text-sm text-gray-600 pt-3 border-t border-gray-100">
-                        <span className="font-semibold text-gray-900">متوسط: {stats.avgPointsPerStudent || 0} نقطة/طالب</span>
+                        <span className="font-semibold text-gray-900">{t('schoolDashboardPage.avgPointsPerStudent', { points: stats.avgPointsPerStudent || 0 })}</span>
                     </div>
                 </div>
 
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
                     <div className="flex items-center justify-between mb-4">
                         <div>
-                            <p className="text-sm text-gray-500 font-medium mb-2">الشارات المكتسبة</p>
+                            <p className="text-sm text-gray-500 font-medium mb-2">{t('schoolDashboardPage.totalBadges')}</p>
                             <p className="text-3xl font-bold text-gray-900">{stats.totalBadges || 0}</p>
                         </div>
                         <div className="p-4 bg-purple-50 rounded-2xl">
@@ -156,16 +155,15 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                         </div>
                     </div>
                     <div className="flex items-center text-sm text-gray-600 pt-3 border-t border-gray-100">
-                        <span className="font-semibold text-gray-900">{stats.uniqueBadges || 0} نوع مختلف</span>
+                        <span className="font-semibold text-gray-900">{t('schoolDashboardPage.uniqueBadges', { count: stats.uniqueBadges || 0 })}</span>
                     </div>
                 </div>
 
-                {/* إحصائيات التسليمات */}
                 {stats.submissions && (
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
                         <div className="flex items-center justify-between mb-4">
                             <div>
-                                <p className="text-sm text-gray-500 font-medium mb-2">تسليمات المشاريع</p>
+                                <p className="text-sm text-gray-500 font-medium mb-2">{t('schoolDashboardPage.submissionsTitle')}</p>
                                 <p className="text-3xl font-bold text-gray-900">{stats.submissions.total || 0}</p>
                             </div>
                             <div className="p-4 bg-indigo-50 rounded-2xl">
@@ -173,30 +171,29 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                             </div>
                         </div>
                         <div className="flex items-center text-sm text-gray-600 gap-4 pt-3 border-t border-gray-100">
-                            <span className="font-semibold text-gray-900">{stats.submissions.submitted || 0} مُسلمة</span>
-                            <span className="font-semibold text-gray-900">{stats.submissions.approved || 0} مقبولة</span>
+                            <span className="font-semibold text-gray-900">{t('schoolDashboardPage.submittedCount', { count: stats.submissions.submitted || 0 })}</span>
+                            <span className="font-semibold text-gray-900">{t('schoolDashboardPage.acceptedCount', { count: stats.submissions.approved || 0 })}</span>
                         </div>
                         <Link
                             href="/school/submissions"
                             className="block mt-4 text-center text-indigo-600 hover:text-indigo-700 font-medium text-sm"
                         >
-                            عرض جميع التسليمات
+                            {t('schoolDashboardPage.viewAllSubmissions')}
                         </Link>
                     </div>
                 )}
             </div>
 
-            {/* المشاريع المعلقة للمراجعة */}
             {pendingProjects && pendingProjects.length > 0 && (
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-8">
                     <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
                         <div className="flex items-center justify-between">
                             <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                                 <FaClock className="text-yellow-600" />
-                                المشاريع المعلقة للمراجعة ({pendingProjects.length})
+                                {t('schoolDashboardPage.pendingProjectsTitle', { count: pendingProjects.length })}
                             </h3>
                             <Link href="/school/projects/pending" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                                عرض الكل
+                                {t('common.viewAll')}
                             </Link>
                         </div>
                     </div>
@@ -209,11 +206,11 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                                             <div className="flex items-center gap-3 mb-2">
                                                 <h4 className="text-lg font-semibold text-gray-900">{project.title}</h4>
                                                 <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${categoryColors[project.category] || categoryColors.other}`}>
-                                                    {categoryLabels[project.category] || 'أخرى'}
+                                                    {categoryLabels[project.category] || t('common.categories.other')}
                                                 </span>
                                             </div>
-                                            <p className="text-sm text-gray-600 mb-2">الطالب: {project.student_name}</p>
-                                            <p className="text-xs text-gray-500">تاريخ الإرسال: {toHijriDate(project.created_at)}</p>
+                                            <p className="text-sm text-gray-600 mb-2">{t('schoolDashboardPage.studentLabel', { name: project.student_name })}</p>
+                                            <p className="text-xs text-gray-500">{t('schoolDashboardPage.submissionDateLabel', { date: toHijriDate(project.created_at) })}</p>
                                         </div>
                                         <div className="flex items-center gap-2 ms-4">
                                             <button
@@ -221,20 +218,20 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                                                 className="bg-[#A3C042] hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center gap-2 shadow-md"
                                             >
                                                 <FaCheckCircle />
-                                                قبول
+                                                {t('schoolDashboardPage.approveAction')}
                                             </button>
                                             <button
                                                 onClick={() => handleReject(project.id, project.title)}
                                                 className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center gap-2 shadow-md"
                                             >
                                                 <FaTimesCircle />
-                                                رفض
+                                                {t('schoolDashboardPage.rejectAction')}
                                             </button>
                                             <Link
                                                 href={`/school/projects/${project.id}`}
                                                 className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center gap-2"
                                             >
-                                                عرض
+                                                {t('schoolDashboardPage.viewAction')}
                                             </Link>
                                         </div>
                                     </div>
@@ -245,17 +242,16 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                 </div>
             )}
 
-            {/* المشاريع المقبولة حديثاً */}
             {recentApprovedProjects && recentApprovedProjects.length > 0 && (
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-8">
                     <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
                         <div className="flex items-center justify-between">
                             <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                                 <FaCheckCircle className="text-green-600" />
-                                المشاريع المقبولة حديثاً
+                                {t('schoolDashboardPage.recentApprovedProjectsTitle')}
                             </h3>
                             <Link href="/school/projects" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                                عرض الكل
+                                {t('common.viewAll')}
                             </Link>
                         </div>
                     </div>
@@ -266,14 +262,14 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                                     <div className="flex items-center gap-2 mb-2">
                                         <h4 className="text-lg font-semibold text-gray-900">{project.title}</h4>
                                         <span className={`px-2 py-1 rounded-full text-xs font-semibold border ${categoryColors[project.category] || categoryColors.other}`}>
-                                            {categoryLabels[project.category] || 'أخرى'}
+                                            {categoryLabels[project.category] || t('common.categories.other')}
                                         </span>
                                     </div>
-                                    <p className="text-sm text-gray-600 mb-2">الطالب: {project.student_name}</p>
+                                    <p className="text-sm text-gray-600 mb-2">{t('schoolDashboardPage.studentLabel', { name: project.student_name })}</p>
                                     <div className="flex items-center justify-between mt-3">
                                         <div className="flex items-center gap-2 text-sm text-gray-600">
                                             <FaStar className="text-yellow-500" />
-                                            <span>{project.points_earned || 0} نقطة</span>
+                                            <span>{t('schoolDashboardPage.pointsLabel', { points: project.points_earned || 0 })}</span>
                                         </div>
                                         <p className="text-xs text-gray-500">{toHijriDate(project.approved_at)}</p>
                                     </div>
@@ -284,7 +280,6 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                 </div>
             )}
 
-            {/* إجراءات سريعة */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Link
                     href="/school/projects/pending"
@@ -295,8 +290,8 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                             <FaClock className="text-3xl text-yellow-600" />
                         </div>
                         <div>
-                            <h3 className="text-lg font-bold text-gray-900 mb-1">مراجعة المشاريع</h3>
-                            <p className="text-sm text-gray-600">قبول أو رفض المشاريع المعلقة</p>
+                            <h3 className="text-lg font-bold text-gray-900 mb-1">{t('schoolDashboardPage.reviewProjectsTitle')}</h3>
+                            <p className="text-sm text-gray-600">{t('schoolDashboardPage.reviewProjectsSubtitle')}</p>
                         </div>
                     </div>
                 </Link>
@@ -310,8 +305,8 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                             <FaProjectDiagram className="text-3xl text-blue-600" />
                         </div>
                         <div>
-                            <h3 className="text-lg font-bold text-gray-900 mb-1">إنشاء مشروع</h3>
-                            <p className="text-sm text-gray-600">نشر مشروع جديد للمدرسة</p>
+                            <h3 className="text-lg font-bold text-gray-900 mb-1">{t('schoolDashboardPage.createProjectTitle')}</h3>
+                            <p className="text-sm text-gray-600">{t('schoolDashboardPage.createProjectSubtitle')}</p>
                         </div>
                     </div>
                 </Link>
@@ -325,8 +320,8 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                             <FaTrophy className="text-3xl text-orange-600" />
                         </div>
                         <div>
-                            <h3 className="text-lg font-bold text-gray-900 mb-1">الترتيب والشارات</h3>
-                            <p className="text-sm text-gray-600">متابعة ترتيب المدرسة والمنافسة</p>
+                            <h3 className="text-lg font-bold text-gray-900 mb-1">{t('schoolDashboardPage.rankingTitle')}</h3>
+                            <p className="text-sm text-gray-600">{t('schoolDashboardPage.rankingSubtitle')}</p>
                         </div>
                     </div>
                 </Link>
@@ -340,8 +335,8 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                             <FaUsers className="text-3xl text-purple-600" />
                         </div>
                         <div>
-                            <h3 className="text-lg font-bold text-gray-900 mb-1">إدارة الطلاب</h3>
-                            <p className="text-sm text-gray-600">عرض وإدارة طلاب المدرسة</p>
+                            <h3 className="text-lg font-bold text-gray-900 mb-1">{t('schoolDashboardPage.manageStudentsTitle')}</h3>
+                            <p className="text-sm text-gray-600">{t('schoolDashboardPage.manageStudentsSubtitle')}</p>
                         </div>
                     </div>
                 </Link>
@@ -349,4 +344,3 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
         </DashboardLayout>
     );
 }
-

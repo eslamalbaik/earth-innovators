@@ -123,7 +123,7 @@ export default function Landing({
                                     </div>
                                     <div className="flex-1">
                                         <h3 className="text-sm font-bold text-gray-900 mb-1">
-                                            🎉 تم منحك شهادة العضوية!
+                                            {t('landingPage.membershipCertificate.title')}
                                         </h3>
                                         <p className="text-xs text-gray-600 mb-2">
                                             {membershipCertificate.description}
@@ -133,7 +133,7 @@ export default function Landing({
                                                 href={getCertificateLink()}
                                                 className="text-xs font-bold text-[#A3C042] hover:text-[#8CA635]"
                                             >
-                                                عرض الشهادة
+                                                {t('landingPage.membershipCertificate.viewCertificate')}
                                             </Link>
                                             <span className="text-gray-300">|</span>
                                             <a
@@ -141,7 +141,7 @@ export default function Landing({
                                                 className="text-xs font-bold text-[#A3C042] hover:text-[#8CA635] flex items-center gap-1"
                                             >
                                                 <FaDownload className="text-xs" />
-                                                تحميل
+                                                {t('common.download')}
                                             </a>
                                         </div>
                                     </div>
@@ -328,11 +328,11 @@ export default function Landing({
                             <div className="bg-gradient-to-br from-[#A3C042] to-[#8CA635] rounded-2xl p-4 md:p-6 text-white">
                                 <TeacherRecruitmentSection
                                     title={t('sections.teacherRecruitment.title')}
-                                    callToAction="انضم إلى إرث المبتكرين!"
-                                    description="شارك في بناء مجتمع المبتكرين. قيّم مشاريع الطلاب، شارك في التحديات، ونشر المقالات التعليمية لتكون جزءاً من حركة الإبداع."
+                                    callToAction={t('sections.joinToInnovators')}
+                                    description={t('sections.joinDescription')}
                                     buttonText={isAuthed ? t('hero.goToDashboard') : t('sections.join')}
                                     imageSrc="/images/avatar2.svg"
-                                    imageAlt="معلم خصوصي"
+                                    imageAlt={t('landingPage.teacherRecruitment.imageAlt')}
                                     onJoinClick={() => router.visit(isAuthed ? '/dashboard' : '/register')}
                                     compact={true}
                                 />
@@ -365,7 +365,7 @@ export default function Landing({
                             <div className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6">
                                 <PublicationsSection
                                     title={t('sections.publications')}
-                                    subtitle="اكتشف محتوى مبتكر من الطلاب والمعلمين: مجلات، كتيبات وتقارير تعرض إبداع مؤسسات تعليميةنا."
+                                    subtitle={t('landingPage.publications.subtitle')}
                                     publications={featuredPublications}
                                     viewAllLink="/publications"
                                     compact={true}
@@ -412,7 +412,7 @@ export default function Landing({
                                     </div>
                                     <div className="flex-1">
                                         <h3 className="text-lg font-bold text-gray-900 mb-2">
-                                            🎉 تم منحك شهادة العضوية!
+                                            {t('landingPage.membershipCertificate.title')}
                                         </h3>
                                         <p className="text-sm text-gray-600 mb-3">
                                             {membershipCertificate.description}
@@ -422,7 +422,7 @@ export default function Landing({
                                                 href={getCertificateLink()}
                                                 className="text-sm font-bold text-[#A3C042] hover:text-[#8CA635]"
                                             >
-                                                عرض الشهادة
+                                                {t('landingPage.membershipCertificate.viewCertificate')}
                                             </Link>
                                             <span className="text-gray-300">|</span>
                                             <a
@@ -430,7 +430,7 @@ export default function Landing({
                                                 className="text-sm font-bold text-[#A3C042] hover:text-[#8CA635] flex items-center gap-1"
                                             >
                                                 <FaDownload />
-                                                تحميل
+                                                {t('common.download')}
                                             </a>
                                         </div>
                                     </div>
@@ -459,7 +459,7 @@ export default function Landing({
                                     <div className={`absolute bg-[#C1DA6C] md:w-[298px] md:h-[1500px] rotate-45 ${dir === 'rtl' ? '' : 'lg:-scale-x-100'}`}></div>
                                     <img
                                         src="/images/hero.png"
-                                        alt="Hero"
+                                        alt={t('hero.imageAlt')}
                                         className="z-10 w-full max-w-md"
                                     />
                                 </div>
@@ -508,7 +508,7 @@ export default function Landing({
                                             <div className="flex items-center gap-2 mb-3">
                                                 <FaProjectDiagram className="text-[#A3C042] text-lg" />
                                                 <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
-                                                    معتمد
+                                                    {t('common.approved')}
                                                 </span>
                                             </div>
                                             <h3 className="text-sm font-bold text-gray-900 mb-2 line-clamp-2">
@@ -616,11 +616,11 @@ export default function Landing({
                             <section className="bg-gradient-to-br from-[#A3C042] to-[#8CA635] rounded-2xl p-6 md:p-8 text-white">
                                 <TeacherRecruitmentSection
                                     title={t('sections.teacherRecruitment.title')}
-                                    callToAction="انضم إلى إرث المبتكرين!"
-                                    description="شارك في بناء مجتمع المبتكرين. قيّم مشاريع الطلاب، شارك في التحديات، ونشر المقالات التعليمية لتكون جزءاً من حركة الإبداع."
+                                    callToAction={t('sections.joinToInnovators')}
+                                    description={t('sections.joinDescription')}
                                     buttonText={isAuthed ? t('hero.goToDashboard') : t('sections.join')}
                                     imageSrc="/images/avatar2.svg"
-                                    imageAlt="معلم خصوصي"
+                                    imageAlt={t('landingPage.teacherRecruitment.imageAlt')}
                                     onJoinClick={() => router.visit(isAuthed ? '/dashboard' : '/register')}
                                     compact={true}
                                 />
@@ -632,7 +632,7 @@ export default function Landing({
                             <section className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8">
                                 <TestimonialsSection
                                     title={t('sections.testimonials.title')}
-                                    subtitle="ماذا يقول مستخدمونا عن منصة إرث المبتكرين"
+                                    subtitle={t('sections.testimonials.subtitle')}
                                     testimonials={testimonials}
                                     compact={true}
                                 />
@@ -653,7 +653,7 @@ export default function Landing({
                             <section className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8">
                                 <PublicationsSection
                                     title={t('sections.publications')}
-                                    subtitle="اكتشف محتوى مبتكر من الطلاب والمعلمين: مجلات، كتيبات وتقارير تعرض إبداع مؤسسات تعليميةنا."
+                                    subtitle={t('landingPage.publications.subtitle')}
                                     publications={featuredPublications}
                                     viewAllLink="/publications"
                                     compact={true}

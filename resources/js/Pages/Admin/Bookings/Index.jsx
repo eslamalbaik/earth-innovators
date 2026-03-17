@@ -2,8 +2,10 @@ import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, useForm, router } from '@inertiajs/react';
 import { FaSearch, FaFilter, FaEye, FaEdit, FaTrash, FaDownload, FaEnvelope, FaCheck, FaTimes, FaClock, FaUser, FaCalendar, FaDollarSign, FaSpinner } from 'react-icons/fa';
 import { useState } from 'react';
+import { useTranslation } from '@/i18n';
 
 export default function BookingsIndex({ bookings, filters, auth, teachers }) {
+    const { t } = useTranslation();
     const [searchTerm, setSearchTerm] = useState(filters.search || '');
     const [statusFilter, setStatusFilter] = useState(filters.status || 'all');
     const [teacherFilter, setTeacherFilter] = useState(filters.teacher_id || '');
@@ -50,10 +52,10 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
 
     const handleDelete = async (bookingId) => {
         const confirmed = await confirm({
-            title: 'تأكيد الحذف',
-            message: 'هل أنت متأكد من حذف هذا الحجز؟ هذا الإجراء لا يمكن التراجع عنه.',
-            confirmText: 'حذف',
-            cancelText: 'إلغاء',
+            title: t('adminBookingsIndexPage.deleteConfirm.title'),
+            message: t('adminBookingsIndexPage.deleteConfirm.message'),
+            confirmText: t('common.delete'),
+            cancelText: t('common.cancel'),
             variant: 'danger',
         });
 
@@ -91,17 +93,17 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
     const getStatusText = (status) => {
         switch (status) {
             case 'pending':
-                return 'في الانتظار';
+                return t('adminBookingsIndexPage.status.pending');
             case 'approved':
-                return 'موافق عليه';
+                return t('adminBookingsIndexPage.status.approved');
             case 'rejected':
-                return 'مرفوض';
+                return t('adminBookingsIndexPage.status.rejected');
             case 'cancelled':
-                return 'ملغي';
+                return t('adminBookingsIndexPage.status.cancelled');
             case 'completed':
-                return 'مكتمل';
+                return t('adminBookingsIndexPage.status.completed');
             default:
-                return 'غير معروف';
+                return t('adminBookingsIndexPage.status.unknown');
         }
     };
 
@@ -121,27 +123,27 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
     const getPaymentStatusText = (status) => {
         switch (status) {
             case 'pending':
-                return 'في الانتظار';
+                return t('adminBookingsIndexPage.paymentStatus.pending');
             case 'paid':
-                return 'مدفوع';
+                return t('adminBookingsIndexPage.paymentStatus.paid');
             case 'refunded':
-                return 'مسترد';
+                return t('adminBookingsIndexPage.paymentStatus.refunded');
             default:
-                return 'غير معروف';
+                return t('adminBookingsIndexPage.paymentStatus.unknown');
         }
     };
 
     return (
         <DashboardLayout auth={auth}>
-            <Head title="إدارة الطلبات" />
+            <Head title={t('adminBookingsIndexPage.pageTitle', { appName: t('common.appName') })} />
 
             <div className="py-6">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="mb-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h1 className="text-2xl font-bold text-gray-900">إدارة الطلبات</h1>
-                                <p className="text-gray-600">عرض وإدارة جميع طلبات الحجز</p>
+                                <h1 className="text-2xl font-bold text-gray-900">{t('adminBookingsIndexPage.title')}</h1>
+                                <p className="text-gray-600">{t('adminBookingsIndexPage.subtitle')}</p>
                             </div>
                             <div className="flex items-center space-x-4 space-x-reverse">
                                 <button
@@ -158,14 +160,14 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                                     className="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-[#A3C042] transition duration-300"
                                 >
                                     <FaDownload className="me-2" />
-                                    تصدير CSV
+                                    {t('adminBookingsIndexPage.exportCsv')}
                                 </button>
                                 <button
                                     onClick={() => setShowFilters(!showFilters)}
                                     className="flex items-center px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-300"
                                 >
                                     <FaFilter className="me-2" />
-                                    فلترة
+                                    {t('common.filter')}
                                 </button>
                             </div>
                         </div>
@@ -173,16 +175,16 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
 
                     {showFilters && (
                         <div className="mb-6 bg-white rounded-lg shadow p-6">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">فلترة الطلبات</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('adminBookingsIndexPage.filters.title')}</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">البحث</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.search')}</label>
                                     <div className="relative">
                                         <input
                                             type="text"
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
-                                            placeholder="رقم الطلب، اسم الطالب، اسم المعلم..."
+                                            placeholder={t('adminBookingsIndexPage.filters.searchPlaceholder')}
                                             className="w-full pe-10 ps-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                                         />
                                         <FaSearch className="absolute left-3 top-3 text-gray-400" />
@@ -190,30 +192,30 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">الحالة</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.status')}</label>
                                     <select
                                         value={statusFilter}
                                         onChange={(e) => setStatusFilter(e.target.value)}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                                     >
-                                        <option value="all">جميع الحالات</option>
-                                        <option value="pending">في الانتظار</option>
-                                        <option value="approved">موافق عليه</option>
-                                        <option value="rejected">مرفوض</option>
-                                        <option value="cancelled">ملغي</option>
-                                        <option value="completed">مكتمل</option>
+                                        <option value="all">{t('adminBookingsIndexPage.filters.allStatuses')}</option>
+                                        <option value="pending">{t('adminBookingsIndexPage.status.pending')}</option>
+                                        <option value="approved">{t('adminBookingsIndexPage.status.approved')}</option>
+                                        <option value="rejected">{t('adminBookingsIndexPage.status.rejected')}</option>
+                                        <option value="cancelled">{t('adminBookingsIndexPage.status.cancelled')}</option>
+                                        <option value="completed">{t('adminBookingsIndexPage.status.completed')}</option>
                                     </select>
                                 </div>
 
                                 {teachers && teachers.length > 0 && (
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">المعلم</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.teacher')}</label>
                                         <select
                                             value={teacherFilter}
                                             onChange={(e) => setTeacherFilter(e.target.value)}
                                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                                         >
-                                            <option value="">جميع المعلمين</option>
+                                            <option value="">{t('adminBookingsIndexPage.filters.allTeachers')}</option>
                                             {teachers.map((teacher) => (
                                                 <option key={teacher.id} value={teacher.teacher.id}>
                                                     {teacher.teacher.name_ar || teacher.teacher.name_en || teacher.name}
@@ -224,7 +226,7 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                                 )}
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">من تاريخ</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminBookingsIndexPage.filters.dateFrom')}</label>
                                     <input
                                         type="date"
                                         value={dateFrom}
@@ -234,7 +236,7 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">إلى تاريخ</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminBookingsIndexPage.filters.dateTo')}</label>
                                     <input
                                         type="date"
                                         value={dateTo}
@@ -258,13 +260,13 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                                     }}
                                     className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition duration-300"
                                 >
-                                    مسح الفلاتر
+                                    {t('adminBookingsIndexPage.filters.clear')}
                                 </button>
                                 <button
                                     onClick={handleSearch}
                                     className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition duration-300"
                                 >
-                                    تطبيق الفلاتر
+                                    {t('adminBookingsIndexPage.filters.apply')}
                                 </button>
                             </div>
                         </div>
@@ -274,26 +276,26 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                         <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
                             <div className="flex items-center justify-between">
                                 <span className="text-sm font-medium text-blue-800">
-                                    تم اختيار {selectedBookings.length} طلب
+                                    {t('adminBookingsIndexPage.bulk.selected', { count: selectedBookings.length })}
                                 </span>
                                 <div className="flex items-center space-x-2 space-x-reverse">
                                     <button
                                         onClick={() => handleBulkAction('approve')}
                                         className="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-[#A3C042] transition duration-300"
                                     >
-                                        موافقة
+                                        {t('adminBookingsIndexPage.bulk.approve')}
                                     </button>
                                     <button
                                         onClick={() => handleBulkAction('reject')}
                                         className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition duration-300"
                                     >
-                                        رفض
+                                        {t('adminBookingsIndexPage.bulk.reject')}
                                     </button>
                                     <button
                                         onClick={() => setSelectedBookings([])}
                                         className="px-3 py-1 bg-gray-500 text-white text-sm rounded hover:bg-gray-600 transition duration-300"
                                     >
-                                        إلغاء
+                                        {t('common.cancel')}
                                     </button>
                                 </div>
                             </div>
@@ -319,31 +321,31 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                                             />
                                         </th>
                                         <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            رقم الطلب
+                                            {t('adminBookingsIndexPage.table.bookingNumber')}
                                         </th>
                                         <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            الطالب
+                                            {t('common.student')}
                                         </th>
                                         <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            المعلم
+                                            {t('common.teacher')}
                                         </th>
                                         <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            التاريخ
+                                            {t('common.date')}
                                         </th>
                                         <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            الوقت
+                                            {t('common.time')}
                                         </th>
                                         <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            السعر
+                                            {t('common.price')}
                                         </th>
                                         <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            الحالة
+                                            {t('common.status')}
                                         </th>
                                         <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            حالة الدفع
+                                            {t('adminBookingsIndexPage.table.paymentStatus')}
                                         </th>
                                         <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            الإجراءات
+                                            {t('common.actions')}
                                         </th>
                                     </tr>
                                 </thead>
@@ -376,10 +378,10 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                                                     </div>
                                                     <div className="ms-4">
                                                         <div className="text-sm font-medium text-gray-900">
-                                                            {booking.student?.name || booking.student_name || 'غير محدد'}
+                                                            {booking.student?.name || booking.student_name || t('common.notAvailable')}
                                                         </div>
                                                         <div className="text-sm text-gray-500">
-                                                            {booking.student?.email || booking.student_email || 'غير محدد'}
+                                                            {booking.student?.email || booking.student_email || t('common.notAvailable')}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -393,10 +395,10 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                                                     </div>
                                                     <div className="ms-4">
                                                         <div className="text-sm font-medium text-gray-900">
-                                                            {booking.teacher?.user?.name || booking.teacher?.name_ar || 'غير محدد'}
+                                                            {booking.teacher?.user?.name || booking.teacher?.name_ar || t('common.notAvailable')}
                                                         </div>
                                                         <div className="text-sm text-gray-500">
-                                                            {booking.teacher?.user?.email || 'غير محدد'}
+                                                            {booking.teacher?.user?.email || t('common.notAvailable')}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -408,7 +410,7 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                                                         const d = booking?.availability?.date
                                                             ? new Date(booking.availability.date)
                                                             : (booking?.date ? new Date(booking.date) : new Date(booking.created_at));
-                                                        return d ? d.toLocaleDateString('en-US') : 'غير محدد';
+                                                        return d ? d.toLocaleDateString('en-US') : t('common.notAvailable');
                                                     })()}
                                                 </div>
                                             </td>
@@ -419,13 +421,13 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                                                         const t = booking?.availability?.start_time
                                                             ? new Date(booking.availability.start_time)
                                                             : (booking?.start_time ? new Date(`1970-01-01T${booking.start_time}`) : new Date(booking.created_at));
-                                                        return t ? t.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : 'غير محدد';
+                                                        return t ? t.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : t('common.notAvailable');
                                                     })()}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                 <div className="flex items-center">
-                                                    <p className="text-md mt-1">{(booking.total_price || booking.price) ? `${booking.total_price || booking.price}` : 'غير محدد'}</p>
+                                                    <p className="text-md mt-1">{(booking.total_price || booking.price) ? `${booking.total_price || booking.price}` : t('common.notAvailable')}</p>
                                                     <img src="/images/aed-currency(black).svg" alt="currency" className="w-4 h-4" />
                                                 </div>
                                             </td>
@@ -444,35 +446,35 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                                                     <button
                                                         onClick={() => router.get(`/admin/bookings/${booking.id}`)}
                                                         className="text-blue-600 hover:text-blue-900"
-                                                        title="عرض التفاصيل"
+                                                        title={t('common.viewDetails')}
                                                     >
                                                         <FaEye />
                                                     </button>
                                                     <button
                                                         onClick={() => router.get(`/admin/bookings/${booking.id}`)}
                                                         className="text-yellow-600 hover:text-yellow-900"
-                                                        title="تعديل"
+                                                        title={t('common.edit')}
                                                     >
                                                         <FaEdit />
                                                     </button>
                                                     <button
                                                         onClick={() => handleStatusUpdate(booking.id, 'approved')}
                                                         className="text-green-600 hover:text-green-900"
-                                                        title="موافقة"
+                                                        title={t('common.accepted')}
                                                     >
                                                         <FaCheck />
                                                     </button>
                                                     <button
                                                         onClick={() => handleStatusUpdate(booking.id, 'rejected')}
                                                         className="text-red-600 hover:text-red-900"
-                                                        title="رفض"
+                                                        title={t('common.rejected')}
                                                     >
                                                         <FaTimes />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(booking.id)}
                                                         className="text-red-600 hover:text-red-900"
-                                                        title="حذف"
+                                                        title={t('common.delete')}
                                                     >
                                                         <FaTrash />
                                                     </button>
@@ -492,7 +494,7 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                                             onClick={() => router.get(bookings.prev_page_url)}
                                             className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                         >
-                                            السابق
+                                            {t('pagination.previous')}
                                         </button>
                                     )}
                                     {bookings.next_page_url && (
@@ -500,14 +502,17 @@ export default function BookingsIndex({ bookings, filters, auth, teachers }) {
                                             onClick={() => router.get(bookings.next_page_url)}
                                             className="me-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                         >
-                                            التالي
+                                            {t('pagination.next')}
                                         </button>
                                     )}
                                 </div>
                                 <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                                     <div>
                                         <p className="text-sm text-gray-700">
-                                            عرض <span className="font-medium">{bookings.from}</span> إلى <span className="font-medium">{bookings.to}</span> من <span className="font-medium">{bookings.total}</span> نتيجة
+                                            {t('pagination.showing')}{' '}
+                                            <span className="font-medium">{bookings.from}</span> {t('pagination.to')}{' '}
+                                            <span className="font-medium">{bookings.to}</span> {t('pagination.of')}{' '}
+                                            <span className="font-medium">{bookings.total}</span> {t('pagination.results')}
                                         </p>
                                     </div>
                                     <div>

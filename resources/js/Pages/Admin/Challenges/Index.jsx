@@ -21,6 +21,7 @@ import ModernChallengeTable from '@/Components/Challenges/ModernChallengeTable';
 import ModernChallengeCardGrid from '@/Components/Challenges/ModernChallengeCard';
 import InnovationChallengeCard from '@/Components/Challenges/InnovationChallengeCard';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
+import { useTranslation } from '@/i18n';
 
 // PERFORMANCE: Lazy load AnalyticsPreview - only loads when analytics prop exists
 // This reduces initial bundle size since analytics is optional
@@ -28,6 +29,7 @@ const AnalyticsPreview = lazy(() => import('@/Components/Challenges/AnalyticsPre
 
 export default function AdminChallengesIndex({ challenges, stats, filters, schools = [], analytics = null }) {
     const { confirm } = useConfirmDialog();
+    const { t, language } = useTranslation();
     const [search, setSearch] = useState(filters?.search || '');
     const [status, setStatus] = useState(filters?.status || '');
     const [category, setCategory] = useState(filters?.category || '');
@@ -107,10 +109,10 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
      */
     const handleDelete = useCallback(async (challengeId) => {
         const confirmed = await confirm({
-            title: 'تأكيد الحذف',
-            message: 'هل أنت متأكد من حذف هذا التحدي؟ هذا الإجراء لا يمكن التراجع عنه.',
-            confirmText: 'حذف',
-            cancelText: 'إلغاء',
+            title: t('adminChallengesIndexPage.deleteConfirm.title'),
+            message: t('adminChallengesIndexPage.deleteConfirm.message'),
+            confirmText: t('common.delete'),
+            cancelText: t('common.cancel'),
             variant: 'danger',
         });
 
@@ -218,11 +220,11 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
      */
     const getStatusBadge = useCallback((status) => {
         const statusMap = {
-            'active': { bg: 'bg-green-100', text: 'text-green-800', label: 'نشط', border: 'border-green-300' },
-            'draft': { bg: 'bg-gray-100', text: 'text-gray-800', label: 'مسودة', border: 'border-gray-300' },
-            'completed': { bg: 'bg-gray-100', text: 'text-gray-800', label: 'منتهي', border: 'border-gray-300' },
-            'cancelled': { bg: 'bg-red-100', text: 'text-red-800', label: 'ملغي', border: 'border-red-300' },
-            'upcoming': { bg: 'bg-blue-100', text: 'text-blue-800', label: 'قادم', border: 'border-blue-300' },
+            active: { bg: 'bg-green-100', text: 'text-green-800', label: t('common.active'), border: 'border-green-300' },
+            draft: { bg: 'bg-gray-100', text: 'text-gray-800', label: t('common.draft'), border: 'border-gray-300' },
+            completed: { bg: 'bg-gray-100', text: 'text-gray-800', label: t('common.completed'), border: 'border-gray-300' },
+            cancelled: { bg: 'bg-red-100', text: 'text-red-800', label: t('common.cancelled'), border: 'border-red-300' },
+            upcoming: { bg: 'bg-blue-100', text: 'text-blue-800', label: t('common.upcoming'), border: 'border-blue-300' },
         };
         const statusConfig = statusMap[status] || { bg: 'bg-gray-100', text: 'text-gray-800', label: status, border: 'border-gray-300' };
         return (
@@ -230,26 +232,39 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                 {statusConfig.label}
             </span>
         );
-    }, []);
+    }, [t]);
 
     const getCategoryLabel = useCallback((category) => {
         const categoryMap = {
-            'science': 'علوم',
-            'technology': 'تقنية',
-            'engineering': 'هندسة',
-            'mathematics': 'رياضيات',
-            'arts': 'فنون',
-            'other': 'أخرى',
+            science: t('categories.science'),
+            technology: t('categories.technology'),
+            engineering: t('categories.engineering'),
+            mathematics: t('categories.mathematics'),
+            arts: t('categories.arts'),
+            other: t('categories.other'),
         };
         return categoryMap[category] || category;
-    }, []);
+    }, [t]);
 
     const formatDate = useCallback((dateString) => {
         if (!dateString) return '';
         const date = new Date(dateString);
-        const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+        const months = [
+            t('common.january'),
+            t('common.february'),
+            t('common.march'),
+            t('common.april'),
+            t('common.may'),
+            t('common.june'),
+            t('common.july'),
+            t('common.august'),
+            t('common.september'),
+            t('common.october'),
+            t('common.november'),
+            t('common.december'),
+        ];
         return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
-    }, []);
+    }, [t]);
 
     /**
      * PERFORMANCE: Use optimistic state if available, otherwise use server data
@@ -265,10 +280,10 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
     const hasChallenges = challengesData.length > 0;
 
     return (
-        <DashboardLayout header="التحديات الابتكارية">
-            <Head title="التحديات الابتكارية" />
+        <DashboardLayout header={t('adminChallengesIndexPage.title')}>
+            <Head title={t('adminChallengesIndexPage.pageTitle', { appName: t('common.appName') })} />
 
-            <div className="min-h-screen bg-gray-50 pb-32" dir="rtl">
+            <div className="min-h-screen bg-gray-50 pb-32" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     {/* Analytics Preview - Admin Only */}
                     {/* PERFORMANCE: Lazy loaded with Suspense to prevent blocking initial render */}
@@ -292,50 +307,50 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                     <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
                         <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
                             <div className="flex items-center justify-between mb-2">
-                                <p className="text-sm font-medium text-gray-600">إجمالي التحديات</p>
+                                <p className="text-sm font-medium text-gray-600">{t('adminChallengesIndexPage.stats.totalChallenges')}</p>
                                 <FaTrophy className="text-gray-400 text-lg" />
                             </div>
                             <p className="text-3xl font-bold text-gray-900">{stats?.total || 0}</p>
                         </div>
                         <div className="bg-gradient-to-br from-green-50 to-white rounded-xl shadow-sm border border-green-200 p-6 hover:shadow-md transition-shadow">
                             <div className="flex items-center justify-between mb-2">
-                                <p className="text-sm font-medium text-gray-600">نشطة</p>
+                                <p className="text-sm font-medium text-gray-600">{t('adminChallengesIndexPage.stats.active')}</p>
                                 <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                             </div>
                             <p className="text-3xl font-bold text-green-600">{stats?.active || 0}</p>
                         </div>
                         <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
                             <div className="flex items-center justify-between mb-2">
-                                <p className="text-sm font-medium text-gray-600">مسودة</p>
+                                <p className="text-sm font-medium text-gray-600">{t('common.draft')}</p>
                                 <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
                             </div>
                             <p className="text-3xl font-bold text-gray-600">{stats?.draft || 0}</p>
                         </div>
                         <div className="bg-gradient-to-br from-blue-50 to-white rounded-xl shadow-sm border border-blue-200 p-6 hover:shadow-md transition-shadow">
                             <div className="flex items-center justify-between mb-2">
-                                <p className="text-sm font-medium text-gray-600">مكتملة</p>
+                                <p className="text-sm font-medium text-gray-600">{t('common.completed')}</p>
                                 <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                             </div>
                             <p className="text-3xl font-bold text-blue-600">{stats?.completed || 0}</p>
                         </div>
                         <div className="bg-gradient-to-br from-red-50 to-white rounded-xl shadow-sm border border-red-200 p-6 hover:shadow-md transition-shadow">
                             <div className="flex items-center justify-between mb-2">
-                                <p className="text-sm font-medium text-gray-600">ملغاة</p>
+                                <p className="text-sm font-medium text-gray-600">{t('common.cancelled')}</p>
                                 <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                             </div>
                             <p className="text-3xl font-bold text-red-600">{stats?.cancelled || 0}</p>
                         </div>
                     </div>
 
-                    {/* Header with Actions - تصميم جديد */}
+                    {/* Header with Actions */}
                     <div className="mb-8">
                         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
                             <div>
                                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                                    التحديات الابتكارية
+                                    {t('adminChallengesIndexPage.title')}
                                 </h1>
                                 <p className="text-gray-600">
-                                    إطلاق وإدارة مسابقات الابتكار بين الطلاب
+                                    {t('adminChallengesIndexPage.subtitle')}
                                 </p>
                             </div>
                             <Link
@@ -343,11 +358,11 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                 className="inline-flex items-center gap-2 px-6 py-3 bg-[#A3C042] text-white rounded-lg hover:bg-[#8CA635] transition-colors font-semibold shadow-md hover:shadow-lg"
                             >
                                 <FaPlus />
-                                إطلاق تحدي جديد
+                                {t('adminChallengesIndexPage.actions.launchNew')}
                             </Link>
                         </div>
 
-                        {/* Navigation Tabs - شريط التصفية */}
+                        {/* Navigation Tabs */}
                         <div className="flex flex-wrap items-center gap-4 mb-6">
                             <button
                                 onClick={() => {
@@ -359,7 +374,7 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                     : 'bg-white text-gray-700 hover:bg-gray-100'
                                     }`}
                             >
-                                الكل
+                                {t('adminChallengesIndexPage.filters.all')}
                             </button>
                             <button
                                 onClick={() => {
@@ -371,7 +386,7 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                     : 'bg-white text-gray-700 hover:bg-gray-100'
                                     }`}
                             >
-                                مكتمل
+                                {t('common.completed')}
                             </button>
                             <button
                                 onClick={() => {
@@ -383,7 +398,7 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                     : 'bg-white text-gray-700 hover:bg-gray-100'
                                     }`}
                             >
-                                قادم
+                                {t('common.upcoming')}
                             </button>
                             <button
                                 onClick={() => {
@@ -395,7 +410,7 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                     : 'bg-white text-gray-700 hover:bg-gray-100'
                                     }`}
                             >
-                                نشط
+                                {t('common.active')}
                             </button>
                         </div>
                     </div>
@@ -409,13 +424,13 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 onKeyPress={(e) => e.key === 'Enter' && handleFilter()}
-                                placeholder="ابحث عن تحدي..."
+                                placeholder={t('adminChallengesIndexPage.searchPlaceholder')}
                                 className="w-full ps-10 pe-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                             />
                         </div>
                     </form>
 
-                    {/* Challenges List - تصميم جديد مع بطاقات */}
+                    {/* Challenges List */}
                     {hasChallenges ? (
                         <>
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -436,7 +451,7 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                 <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
                                     <div className="flex items-center justify-between">
                                         <div className="text-sm text-gray-700">
-                                            عرض {challenges.from} إلى {challenges.to} من {challenges.total} تحدٍ
+                                            {t('adminChallengesIndexPage.paginationSummary', { from: challenges.from, to: challenges.to, total: challenges.total })}
                                         </div>
                                         <div className="flex gap-2">
                                             {challenges.links.map((link, index) => (
@@ -461,47 +476,47 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                 <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
                                     <FaTrophy className="text-4xl text-gray-400" />
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-900 mb-2">لا توجد تحديات</h3>
+                                <h3 className="text-xl font-bold text-gray-900 mb-2">{t('adminChallengesIndexPage.empty.title')}</h3>
                                 <p className="text-gray-500 mb-6">
-                                    ابدأ بإنشاء تحدٍ جديد لإشراك الطلاب في أنشطة تعليمية ممتعة
+                                    {t('adminChallengesIndexPage.empty.description')}
                                 </p>
                                 <Link
                                     href={route('admin.challenges.create')}
                                     className="inline-flex items-center gap-2 px-6 py-3.5 bg-[#A3C042] text-white rounded-xl hover:bg-[#8CA635] transition-all shadow-lg hover:shadow-xl font-bold"
                                 >
                                     <FaPlus />
-                                    <span>إنشاء تحدي</span>
+                                    <span>{t('adminChallengesIndexPage.actions.create')}</span>
                                 </Link>
                             </div>
                         </div>
                     )}
 
-                    {/* Bottom Banner - Banner سفلي */}
-                    <div className="mt-8 bg-purple-900 text-white p-6 rounded-xl shadow-2xl" dir="rtl">
+                    {/* Bottom Banner */}
+                    <div className="mt-8 bg-purple-900 text-white p-6 rounded-xl shadow-2xl" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                            {/* Right Side - أيقونة كأس */}
+                            {/* Right Side */}
                             <div className="hidden md:flex items-center justify-center">
                                 <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center">
                                     <FaTrophy className="text-4xl text-white" />
                                 </div>
                             </div>
 
-                            {/* Center - النص */}
+                            {/* Center */}
                             <div className="flex-1 text-center md:">
-                                <h3 className="text-2xl font-bold mb-2">قم بتحفيز طلابك اليوم!</h3>
+                                <h3 className="text-2xl font-bold mb-2">{t('adminChallengesIndexPage.banner.title')}</h3>
                                 <p className="text-purple-100 text-sm md:text-base">
-                                    أفادت الدراسات أن المسابقات الودية تزيد من معدل إنتاجية الابتكار بنسبة 40%. اختر موضوعًا شيقًا وابدأ التحدي الآن.
+                                    {t('adminChallengesIndexPage.banner.description')}
                                 </p>
                             </div>
 
-                            {/* Left Side - زر إنشاء تحدي */}
+                            {/* Left Side */}
                             <div className="flex-shrink-0">
                                 <Link
                                     href={route('admin.challenges.create')}
                                     className="inline-flex items-center gap-2 px-6 py-3 bg-white text-purple-900 rounded-lg hover:bg-purple-50 transition-colors font-bold shadow-lg hover:shadow-xl"
                                 >
                                     <FaPlus />
-                                    إنشاء تحدي مخصص
+                                    {t('adminChallengesIndexPage.actions.createCustom')}
                                 </Link>
                             </div>
                         </div>
@@ -512,7 +527,7 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
                             <div className="bg-white rounded-xl shadow-xl p-6 max-w-4xl w-full my-8 max-h-[90vh] overflow-y-auto">
                                 <div className="flex items-center justify-between mb-6 sticky top-0 bg-white pb-4 border-b">
-                                    <h3 className="text-2xl font-bold text-gray-900">تعديل التحدي</h3>
+                                    <h3 className="text-2xl font-bold text-gray-900">{t('adminChallengesIndexPage.editModal.title')}</h3>
                                     <button
                                         onClick={closeEditModal}
                                         className="text-gray-400 hover:text-gray-600 transition"
@@ -526,7 +541,7 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                         {/* Title */}
                                         <div className="md:col-span-2">
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                عنوان التحدي <span className="text-red-500">*</span>
+                                                {t('adminChallengesIndexPage.editModal.titleLabel')} <span className="text-red-500">*</span>
                                             </label>
                                             <input
                                                 type="text"
@@ -544,7 +559,7 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                         {/* Objective */}
                                         <div className="md:col-span-2">
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                الهدف من التحدي <span className="text-red-500">*</span>
+                                                {t('adminChallengesIndexPage.editModal.objectiveLabel')} <span className="text-red-500">*</span>
                                             </label>
                                             <textarea
                                                 value={editData.objective}
@@ -562,7 +577,7 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                         {/* Description */}
                                         <div className="md:col-span-2">
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                وصف التحدي <span className="text-red-500">*</span>
+                                                {t('adminChallengesIndexPage.editModal.descriptionLabel')} <span className="text-red-500">*</span>
                                             </label>
                                             <textarea
                                                 value={editData.description}
@@ -580,7 +595,7 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                         {/* Instructions */}
                                         <div className="md:col-span-2">
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                كيفية التنفيذ <span className="text-red-500">*</span>
+                                                {t('adminChallengesIndexPage.editModal.instructionsLabel')} <span className="text-red-500">*</span>
                                             </label>
                                             <textarea
                                                 value={editData.instructions}
@@ -598,7 +613,7 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                         {/* Challenge Type */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                نوع التحدي <span className="text-red-500">*</span>
+                                                {t('adminChallengesIndexPage.editModal.challengeTypeLabel')} <span className="text-red-500">*</span>
                                             </label>
                                             <select
                                                 value={editData.challenge_type}
@@ -607,13 +622,13 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                                     }`}
                                                 required
                                             >
-                                                <option value="">اختر نوع التحدي</option>
-                                                <option value="60_seconds">تحدّي 60 ثانية</option>
-                                                <option value="mental_math">حلها بدون قلم</option>
-                                                <option value="conversions">تحدّي التحويلات</option>
-                                                <option value="team_fastest">تحدّي الفريق الأسرع</option>
-                                                <option value="build_problem">ابنِ مسألة</option>
-                                                <option value="custom">تحدّي مخصص</option>
+                                                <option value="">{t('adminChallengesIndexPage.editModal.selectChallengeType')}</option>
+                                                <option value="60_seconds">{t('challenges.minseconds')}</option>
+                                                <option value="mental_math">{t('challenges.mentalMath')}</option>
+                                                <option value="conversions">{t('challenges.conversions')}</option>
+                                                <option value="team_fastest">{t('challenges.teamFastest')}</option>
+                                                <option value="build_problem">{t('challenges.buildProblem')}</option>
+                                                <option value="custom">{t('adminChallengesIndexPage.types.custom')}</option>
                                             </select>
                                             {editErrors.challenge_type && (
                                                 <p className="mt-1 text-sm text-red-600">{editErrors.challenge_type}</p>
@@ -623,7 +638,7 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                         {/* Category */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                الفئة <span className="text-red-500">*</span>
+                                                {t('adminChallengesIndexPage.editModal.categoryLabel')} <span className="text-red-500">*</span>
                                             </label>
                                             <select
                                                 value={editData.category}
@@ -632,13 +647,13 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                                     }`}
                                                 required
                                             >
-                                                <option value="">اختر الفئة</option>
-                                                <option value="science">علوم</option>
-                                                <option value="technology">تقنية</option>
-                                                <option value="engineering">هندسة</option>
-                                                <option value="mathematics">رياضيات</option>
-                                                <option value="arts">فنون</option>
-                                                <option value="other">أخرى</option>
+                                                <option value="">{t('adminChallengesIndexPage.editModal.selectCategory')}</option>
+                                                <option value="science">{t('categories.science')}</option>
+                                                <option value="technology">{t('categories.technology')}</option>
+                                                <option value="engineering">{t('categories.engineering')}</option>
+                                                <option value="mathematics">{t('categories.mathematics')}</option>
+                                                <option value="arts">{t('categories.arts')}</option>
+                                                <option value="other">{t('categories.other')}</option>
                                             </select>
                                             {editErrors.category && (
                                                 <p className="mt-1 text-sm text-red-600">{editErrors.category}</p>
@@ -648,7 +663,7 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                         {/* Age Group */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                الفئة العمرية <span className="text-red-500">*</span>
+                                                {t('adminChallengesIndexPage.editModal.ageGroupLabel')} <span className="text-red-500">*</span>
                                             </label>
                                             <select
                                                 value={editData.age_group}
@@ -657,11 +672,11 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                                     }`}
                                                 required
                                             >
-                                                <option value="">اختر الفئة العمرية</option>
-                                                <option value="6-9">6-9 سنوات</option>
-                                                <option value="10-13">10-13 سنة</option>
-                                                <option value="14-17">14-17 سنة</option>
-                                                <option value="18+">18+ سنة</option>
+                                                <option value="">{t('adminChallengesIndexPage.editModal.selectAgeGroup')}</option>
+                                                <option value="6-9">{t('adminChallengesIndexPage.ageGroups.6to9')}</option>
+                                                <option value="10-13">{t('adminChallengesIndexPage.ageGroups.10to13')}</option>
+                                                <option value="14-17">{t('adminChallengesIndexPage.ageGroups.14to17')}</option>
+                                                <option value="18+">{t('adminChallengesIndexPage.ageGroups.18plus')}</option>
                                             </select>
                                             {editErrors.age_group && (
                                                 <p className="mt-1 text-sm text-red-600">{editErrors.age_group}</p>
@@ -671,7 +686,7 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                         {/* School */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                المدرسة
+                                                {t('adminChallengesIndexPage.editModal.schoolLabel')}
                                             </label>
                                             <select
                                                 value={editData.school_id}
@@ -679,7 +694,7 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${editErrors.school_id ? 'border-red-500' : 'border-gray-300'
                                                     }`}
                                             >
-                                                <option value="">اختر مدرسة</option>
+                                                <option value="">{t('adminChallengesIndexPage.editModal.selectSchool')}</option>
                                                 {schools.map((school) => (
                                                     <option key={school.id} value={school.id}>
                                                         {school.name}
@@ -694,7 +709,7 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                         {/* Start Date */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                تاريخ البدء <span className="text-red-500">*</span>
+                                                {t('adminChallengesIndexPage.editModal.startDateLabel')} <span className="text-red-500">*</span>
                                             </label>
                                             <input
                                                 type="datetime-local"
@@ -712,7 +727,7 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                         {/* Deadline */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                تاريخ الانتهاء <span className="text-red-500">*</span>
+                                                {t('adminChallengesIndexPage.editModal.deadlineLabel')} <span className="text-red-500">*</span>
                                             </label>
                                             <input
                                                 type="datetime-local"
@@ -730,7 +745,7 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                         {/* Status */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                الحالة
+                                                {t('common.status')}
                                             </label>
                                             <select
                                                 value={editData.status}
@@ -738,10 +753,10 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${editErrors.status ? 'border-red-500' : 'border-gray-300'
                                                     }`}
                                             >
-                                                <option value="draft">مسودة</option>
-                                                <option value="active">نشط</option>
-                                                <option value="completed">مكتمل</option>
-                                                <option value="cancelled">ملغي</option>
+                                                <option value="draft">{t('common.draft')}</option>
+                                                <option value="active">{t('common.active')}</option>
+                                                <option value="completed">{t('common.completed')}</option>
+                                                <option value="cancelled">{t('common.cancelled')}</option>
                                             </select>
                                             {editErrors.status && (
                                                 <p className="mt-1 text-sm text-red-600">{editErrors.status}</p>
@@ -751,7 +766,7 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                         {/* Points Reward */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                نقاط المكافأة
+                                                {t('adminChallengesIndexPage.editModal.pointsRewardLabel')}
                                             </label>
                                             <input
                                                 type="number"
@@ -769,7 +784,7 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                         {/* Max Participants */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                الحد الأقصى للمشاركين
+                                                {t('adminChallengesIndexPage.editModal.maxParticipantsLabel')}
                                             </label>
                                             <input
                                                 type="number"
@@ -778,7 +793,7 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                                 onChange={(e) => setEditData('max_participants', e.target.value ? parseInt(e.target.value) : null)}
                                                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${editErrors.max_participants ? 'border-red-500' : 'border-gray-300'
                                                     }`}
-                                                placeholder="غير محدود"
+                                                placeholder={t('adminChallengesIndexPage.editModal.unlimitedPlaceholder')}
                                             />
                                             {editErrors.max_participants && (
                                                 <p className="mt-1 text-sm text-red-600">{editErrors.max_participants}</p>
@@ -794,7 +809,7 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                             className="px-6 py-2.5 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50 transition-colors"
                                         >
                                             <FaSave />
-                                            {editProcessing ? 'جاري التحديث...' : 'حفظ التغييرات'}
+                                            {editProcessing ? t('adminChallengesIndexPage.editModal.saving') : t('adminChallengesIndexPage.editModal.saveChanges')}
                                         </button>
                                         <button
                                             type="button"
@@ -802,7 +817,7 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                             className="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg flex items-center gap-2 transition-colors"
                                         >
                                             <FaTimes />
-                                            إلغاء
+                                            {t('common.cancel')}
                                         </button>
                                     </div>
                                 </form>

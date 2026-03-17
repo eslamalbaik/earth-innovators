@@ -2,21 +2,27 @@ import { useState, useMemo, useEffect } from 'react';
 import { FaChevronLeft, FaCheck, FaStar, FaXmark, FaCalendar, FaClock, FaCalendarDays, FaChevronRight, FaPlus } from 'react-icons/fa6';
 import axios from 'axios';
 import { getInitials, getColorFromName } from '@/utils/imageUtils';
+import { useTranslation } from '@/i18n';
 
-const formatLocation = (location) => {
+const formatLocation = (location, stageLabels) => {
     if (!location) return '';
 
-    const generalStages = ['الابتدائية', 'المتوسطة', 'الثانوية', 'الجامعية'];
+    const generalStages = ['primary', 'middle', 'high', 'university'];
 
     if (location.includes(' - ')) {
         const [city, stagesPart] = location.split(' - ');
         if (!stagesPart) return city;
 
         const stages = stagesPart.split(' / ').map(s => s.trim());
-        const generalStagesOnly = stages.filter(stage => generalStages.includes(stage));
+        const generalStagesOnly = stages
+            .map((stage) => stageLabels?.toKey?.[stage] || stage)
+            .filter((stage) => generalStages.includes(stage));
 
         if (generalStagesOnly.length > 0) {
-            return `${city} - ${generalStagesOnly.join(' / ')}`;
+            const display = generalStagesOnly
+                .map((key) => stageLabels?.toLabel?.[key] || key)
+                .join(' / ');
+            return `${city} - ${display}`;
         }
         return city;
     }
@@ -95,6 +101,7 @@ const normalizeSubjects = (subjects, subject) => {
 };
 
 export default function BookingModal({ teacher, isOpen, onClose, restoredState = null }) {
+    const { t } = useTranslation();
     const subjects = useMemo(() => normalizeSubjects(teacher.subjects, teacher.subject), [teacher.subjects, teacher.subject]);
     const [selectedSubject, setSelectedSubject] = useState('');
     const [selectedSessions, setSelectedSessions] = useState([]);
@@ -140,6 +147,22 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
         }
     }, [subjects, isOpen, restoredState]);
 
+    const stageLabels = useMemo(() => {
+        const toKey = {
+            الابتدائية: 'primary',
+            المتوسطة: 'middle',
+            الثانوية: 'high',
+            الجامعية: 'university',
+        };
+        const toLabel = {
+            primary: t('bookingModal.stages.primary'),
+            middle: t('bookingModal.stages.middle'),
+            high: t('bookingModal.stages.high'),
+            university: t('bookingModal.stages.university'),
+        };
+        return { toKey, toLabel };
+    }, [t]);
+
     const fetchAvailabilities = async () => {
         if (!selectedSubject) return;
 
@@ -160,7 +183,7 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
                 setAvailabilities(response.data.availabilities || {});
             }
         } catch (err) {
-            setError('فشل تحميل المواعيد');
+            setError(t('bookingModal.errors.failedToLoadAvailabilities'));
         } finally {
             setLoading(false);
         }
@@ -208,7 +231,13 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
             const date = new Date(weekStart);
             date.setDate(weekStart.getDate() + i);
 
-            const dayNames = ['الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+            const dayNames = [
+                t('common.tuesday'),
+                t('common.wednesday'),
+                t('common.thursday'),
+                t('common.friday'),
+                t('common.saturday'),
+            ];
             const dayName = dayNames[i];
             const day = date.getDate();
             const month = date.getMonth() + 1;
@@ -280,8 +309,18 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
         if (calendarData.length === 0) return '';
 
         const monthNames = [
-            'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-            'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+            t('common.months.january'),
+            t('common.months.february'),
+            t('common.months.march'),
+            t('common.months.april'),
+            t('common.months.may'),
+            t('common.months.june'),
+            t('common.months.july'),
+            t('common.months.august'),
+            t('common.months.september'),
+            t('common.months.october'),
+            t('common.months.november'),
+            t('common.months.december'),
         ];
 
         const firstDay = calendarData[0].fullDate;
@@ -291,7 +330,7 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
         const lastMonth = monthNames[lastDay.getMonth()];
 
         return `${firstDay.getDate()} ${firstMonth} ${firstDay.getFullYear()} - ${lastDay.getDate()} ${lastMonth} ${lastDay.getFullYear()}`;
-    }, [calendarData]);
+    }, [calendarData, t]);
 
     const removeSession = (id) => {
         setSelectedSessions(selectedSessions.filter(session => session.id !== id));
@@ -308,12 +347,12 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
         setBookingMessage(null);
 
         if (!selectedSubject) {
-            setBookingError('يرجى اختيار المادة الدراسية أولاً.');
+            setBookingError(t('bookingModal.errors.selectSubjectFirst'));
             return;
         }
 
         if (selectedSessions.length === 0) {
-            setBookingError('يرجى اختيار موعد للحجز قبل المتابعة إلى الدفع.');
+            setBookingError(t('bookingModal.errors.selectSessionFirst'));
             return;
         }
 
@@ -338,10 +377,10 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
                     window.location.href = `/payment/${bookingId}`;
                     return;
                 } else {
-                    setBookingError('تم إنشاء الحجز لكن لم يتم العثور على رقم الحجز. يرجى التحقق من حجوزاتك.');
+                    setBookingError(t('bookingModal.errors.bookingIdMissing'));
                 }
             } else {
-                setBookingError(response.data?.message || 'تعذر إنشاء الحجز. يرجى المحاولة مرة أخرى.');
+                setBookingError(response.data?.message || t('bookingModal.errors.failedToCreateBooking'));
             }
         } catch (e) {
             if (e?.response?.status === 401) {
@@ -379,7 +418,7 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
             } else if (e?.response?.data?.message) {
                 setBookingError(e.response.data.message);
             } else {
-                setBookingError('حدث خطأ أثناء إرسال الحجز. يرجى المحاولة مرة أخرى.');
+                setBookingError(t('bookingModal.errors.failedToSubmitBooking'));
             }
         } finally {
             setBookingSubmitting(false);
@@ -393,10 +432,11 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
         <div onClick={onClose} className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
             <div onClick={(e) => e.stopPropagation()} className="bg-white rounded-lg shadow-2xl w-full max-w-6xl overflow-hidden flex flex-col">
                 <div className="flex items-center justify-between p-4 border-b border-gray-200">
-                    <h2 className="text-lg font-bold text-gray-900">احجز موعد الحصة مع المعلم {teacher.name}:</h2>
+                    <h2 className="text-lg font-bold text-gray-900">{t('bookingModal.title', { name: teacher.name })}</h2>
                     <button
                         onClick={onClose}
                         className="text-gray-400 hover:text-gray-600 transition duration-300"
+                        aria-label={t('common.close')}
                     >
                         <FaXmark className="text-2xl" />
                     </button>
@@ -430,7 +470,7 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
                                             <FaCheck className="text-white text-[8px]" />
                                         </div>
                                     </div>
-                                    <p className="text-sm text-gray-600">{formatLocation(teacher.location)}</p>
+                                    <p className="text-sm text-gray-600">{formatLocation(teacher.location, stageLabels)}</p>
                                     <div className="flex items-center gap-1">
                                         <FaStar className="text-yellow-400 text-sm" />
                                         <span className="text-sm font-medium">{teacher.rating}</span>
@@ -439,7 +479,7 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
                             </div>
                             <div className="mb-4">
                                 <div className="py-2 px-4">
-                                    <label className="block text-sm font-medium text-gray-700 mb-3">حدد المادة الدراسية:</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-3">{t('bookingModal.selectSubject')}</label>
                                     {subjects.length > 0 ? (
                                         <div className="flex gap-2 flex-wrap">
                                             {subjects.map((subject, index) => (
@@ -466,7 +506,7 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
                                             ))}
                                         </div>
                                     ) : (
-                                        <p className="text-sm text-gray-500">لا توجد مواد متاحة لهذا المعلم</p>
+                                        <p className="text-sm text-gray-500">{t('bookingModal.noSubjects')}</p>
                                     )}
                                 </div>
                             </div>
@@ -474,21 +514,24 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
 
                         <div className="bg-white rounded-lg mb-4 shadow-sm">
                             <div className="p-2 border-gray-300 border-b-[1px] pb-2 flex items-center justify-between mb-3">
-                                <h3 className="font-bold text-gray-900 text-sm">الحصص التي تم اختيارها <span className="text-yellow-500">({selectedSessions.length})</span></h3>
+                                <h3 className="font-bold text-gray-900 text-sm">
+                                    {t('bookingModal.selectedSessionsTitle')}{' '}
+                                    <span className="text-yellow-500">({selectedSessions.length})</span>
+                                </h3>
                                 {selectedSessions.length > 0 && (
                                     <button
                                         onClick={clearAllSessions}
                                         className="flex items-center gap-2 px-3 py-1 bg-red-100 text-red-600 rounded-lg text-xs font-medium hover:bg-red-200 transition duration-300"
                                     >
                                         <FaXmark />
-                                        مسح الكل
+                                        {t('bookingModal.clearAll')}
                                     </button>
                                 )}
                             </div>
                             <div className="grid grid-cols-2 items-center gap-2 p-2 max-h-[150px] overflow-y-auto ">
                                 {selectedSessions.length === 0 ? (
                                     <div className="text-center py-6 col-span-2">
-                                        <p className="text-gray-500 text-sm">لم يتم اختيار أي موعد</p>
+                                        <p className="text-gray-500 text-sm">{t('bookingModal.noSelectedSessions')}</p>
                                     </div>
                                 ) : (
                                     selectedSessions.map((session) => (
@@ -497,12 +540,15 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
                                                 <p className="text-sm font-medium text-gray-900">{session.date}</p>
                                                 <p className="text-xs text-gray-600">{session.time}</p>
                                                 {session.subject && (
-                                                    <p className="text-xs text-gray-500 mt-1">المادة: {session.subject}</p>
+                                                    <p className="text-xs text-gray-500 mt-1">
+                                                        {t('bookingModal.subjectLabel', { subject: session.subject })}
+                                                    </p>
                                                 )}
                                             </div>
                                             <button
                                                 onClick={() => removeSession(session.id)}
                                                 className="text-gray-400 hover:text-red-500 transition duration-300"
+                                                aria-label={t('common.delete')}
                                             >
                                                 <FaXmark />
                                             </button>
@@ -524,10 +570,10 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
                                 disabled={bookingSubmitting || selectedSessions.length === 0}
                                 className="w-full flex items-center justify-center bg-yellow-400 hover:bg-yellow-500 disabled:opacity-60 disabled:cursor-not-allowed text-black font-bold py-3 rounded-lg text-sm transition duration-300 transform hover:scale-105"
                             >
-                                {bookingSubmitting ? 'جاري التوجيه إلى بوابة الدفع...' :
+                                {bookingSubmitting ? t('bookingModal.paymentRedirecting') :
                                     <div className="text-sm font-bold text-gray-900 flex items-center gap-1">
-                                        <span>أكمل الدفع بـ {totalPrice}</span>
-                                        <img src="/images/aed-currency(black).svg" alt="currency" className="w-5 h-5" />
+                                        <span>{t('bookingModal.completePayment', { total: totalPrice })}</span>
+                                        <img src="/images/aed-currency(black).svg" alt={t('common.currencySymbol')} className="w-5 h-5" />
                                     </div>
                                 }
                             </button>
@@ -537,14 +583,12 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
                     <div className="col-span-2 overflow-y-auto p-6 ps-2 bg-gray-50">
                         <div className="bg-white shadow-sm rounded-xl">
                             <div className="border-gray-300 border-b-[1px] flex items-center justify-between gap-2 px-4 py-3">
-                                <p className="">
-                                    اختر المواعيد
-                                </p>
+                                <p className="">{t('bookingModal.schedule.chooseTimes')}</p>
                                 <button
                                     onClick={goToNearestAvailable}
                                     className="bg-gray-100 rounded-lg px-2 py-1 text-sm border border-gray-700 shadow-md flex items-center gap-2 text-gray-600 hover:text-gray-900 transition duration-300"
                                 >
-                                    انتقل إلى أقرب حصة متاحة
+                                    {t('bookingModal.schedule.goToNearest')}
                                     <FaChevronLeft className="text-xs" />
                                 </button>
                             </div>
@@ -574,7 +618,7 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
                                             }`}
                                     >
                                         <FaCalendar />
-                                        جدول
+                                        {t('bookingModal.viewMode.schedule')}
                                     </button>
                                     <button
                                         onClick={() => setViewMode('calendar')}
@@ -584,14 +628,14 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
                                             }`}
                                     >
                                         <FaCalendarDays />
-                                        تقويم
+                                        {t('bookingModal.viewMode.calendar')}
                                     </button>
                                 </div>
                             </div>
 
                             {loading ? (
                                 <div className="flex items-center justify-center py-12">
-                                    <div className="text-gray-500">جاري تحميل المواعيد...</div>
+                                    <div className="text-gray-500">{t('common.loading')}</div>
                                 </div>
                             ) : error ? (
                                 <div className="flex items-center justify-center py-12">
@@ -627,12 +671,12 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
                                         onChange={(e) => setShowBookedSessions(e.target.checked)}
                                         className="w-4 h-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500"
                                     />
-                                    <span className="text-sm text-gray-700">إظهار الحصص المحجوزة</span>
+                                    <span className="text-sm text-gray-700">{t('bookingModal.showBookedSessions')}</span>
                                 </label>
                                 <div className="flex items-center gap-2 text-gray-600">
                                     <FaClock />
                                     <select className="border border-gray-300 rounded-lg px-4 py-1 text-sm">
-                                        <option>الرياض</option>
+                                        <option>{t('bookingModal.cityDefault')}</option>
                                     </select>
                                 </div>
                             </div>
@@ -670,11 +714,11 @@ function ScheduleGridView({ calendarData, selectedDay, setSelectedDay, selectedS
                                 <div className="flex flex-col items-center justify-center py-6">
                                     <img
                                         src="/images/avatar4.svg"
-                                        alt="لا توجد حصص متاحة"
+                                        alt={t('bookingModal.emptyAlt')}
                                         className="w-16 h-16 opacity-50 mb-2"
                                     />
                                     <p className="text-sm text-gray-500 text-center">
-                                        لا يوجد مواعيد متاحة حالياً
+                                        {t('bookingModal.noAvailabilities')}
                                     </p>
                                 </div>
                             ) : (
@@ -712,10 +756,17 @@ function ScheduleGridView({ calendarData, selectedDay, setSelectedDay, selectedS
 }
 
 function CalendarGridView({ calendarData, selectedDay, setSelectedDay, selectedSessions, handleTimeSlotClick, isSlotSelected, showBookedSessions }) {
+    const { t } = useTranslation();
     return (
         <div className="px-4 py-3 overflow-y-auto">
             <div className="grid grid-cols-5 gap-2 mb-2">
-                {['الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'].map((dayName) => (
+                {[
+                    t('common.tuesday'),
+                    t('common.wednesday'),
+                    t('common.thursday'),
+                    t('common.friday'),
+                    t('common.saturday'),
+                ].map((dayName) => (
                     <div key={dayName} className="text-center font-bold text-gray-700">
                         {dayName}
                     </div>
@@ -766,7 +817,7 @@ function CalendarGridView({ calendarData, selectedDay, setSelectedDay, selectedS
                                 <div className="text-center text-sm flex flex-col items-center justify-center">
                                     <img
                                         src="/images/avatar4.svg"
-                                        alt="لا توجد حصص لهذا اليوم"
+                                        alt={t('bookingModal.noSessionsTodayAlt')}
                                         className="w-14 h-14 opacity-50"
                                     />
                                 </div>
@@ -785,7 +836,7 @@ function CalendarGridView({ calendarData, selectedDay, setSelectedDay, selectedS
                 return visibleSlotsForDay.length > 0 ? (
                     <div className="mt-6">
                         <h4 className="font-bold text-gray-900 mb-3">
-                            الأوقات المتاحة ليوم {selectedDayData?.displayName}
+                            {t('bookingModal.availableTimesForDay', { day: selectedDayData?.displayName })}
                         </h4>
                         <div className="grid grid-cols-4 gap-2">
                             {visibleSlotsForDay.map((slot) => {
@@ -816,10 +867,10 @@ function CalendarGridView({ calendarData, selectedDay, setSelectedDay, selectedS
                     <div className="text-center text-sm flex flex-col items-center justify-center mt-6">
                         <img
                             src="/images/avatar4.svg"
-                            alt="لا توجد حصص لهذا اليوم"
+                            alt={t('bookingModal.noSessionsTodayAlt')}
                             className="w-100 h-100 opacity-50"
                         />
-                        <p className="mt-2">لا توجد حصص لهذا اليوم</p>
+                        <p className="mt-2">{t('bookingModal.noSessionsToday')}</p>
                     </div>
                 );
             })()}
@@ -828,35 +879,36 @@ function CalendarGridView({ calendarData, selectedDay, setSelectedDay, selectedS
 }
 
 function StudentInfoModal({ open, onClose, studentInfo, setStudentInfo, errors, onSave }) {
+    const { t } = useTranslation();
     if (!open) return null;
     return (
         <div onClick={onClose} className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
             <div onClick={(e) => e.stopPropagation()} className="bg-white rounded-lg shadow-2xl w-full max-w-md overflow-hidden">
-                <div className="p-4 border-b border-gray-200 font-bold text-gray-900">بيانات الطالب</div>
+                <div className="p-4 border-b border-gray-200 font-bold text-gray-900">{t('bookingModal.studentData.title')}</div>
                 <div className="p-4 space-y-3">
                     <div>
-                        <label className="block text-sm text-gray-700 mb-1">الاسم</label>
+                        <label className="block text-sm text-gray-700 mb-1">{t('common.name')}</label>
                         <input value={studentInfo.name} onChange={(e) => setStudentInfo({ ...studentInfo, name: e.target.value })} className="w-full border rounded px-3 py-2" />
                         {errors.name && <div className="text-xs text-red-600 mt-1">{errors.name}</div>}
                     </div>
                     <div>
-                        <label className="block text-sm text-gray-700 mb-1">البريد الإلكتروني (اختياري)</label>
+                        <label className="block text-sm text-gray-700 mb-1">{t('bookingModal.studentData.emailOptional')}</label>
                         <input value={studentInfo.email} onChange={(e) => setStudentInfo({ ...studentInfo, email: e.target.value })} className="w-full border rounded px-3 py-2" />
                         {errors.email && <div className="text-xs text-red-600 mt-1">{errors.email}</div>}
                     </div>
                     <div>
-                        <label className="block text-sm text-gray-700 mb-1">رقم الجوال (اختياري)</label>
+                        <label className="block text-sm text-gray-700 mb-1">{t('bookingModal.studentData.phoneOptional')}</label>
                         <input value={studentInfo.phone} onChange={(e) => setStudentInfo({ ...studentInfo, phone: e.target.value })} className="w-full border rounded px-3 py-2" />
                         {errors.phone && <div className="text-xs text-red-600 mt-1">{errors.phone}</div>}
                     </div>
                     <div>
-                        <label className="block text-sm text-gray-700 mb-1">ملاحظات (اختياري)</label>
+                        <label className="block text-sm text-gray-700 mb-1">{t('bookingModal.studentData.notesOptional')}</label>
                         <textarea value={studentInfo.notes} onChange={(e) => setStudentInfo({ ...studentInfo, notes: e.target.value })} className="w-full border rounded px-3 py-2" rows="3" />
                     </div>
                 </div>
                 <div className="p-4 border-t border-gray-200 flex justify-end gap-2">
-                    <button onClick={onClose} className="px-4 py-2 border rounded">إلغاء</button>
-                    <button onClick={() => { if (onSave) onSave(); }} className="px-4 py-2 bg-yellow-500 text-white rounded">حفظ</button>
+                    <button onClick={onClose} className="px-4 py-2 border rounded">{t('common.cancel')}</button>
+                    <button onClick={() => { if (onSave) onSave(); }} className="px-4 py-2 bg-yellow-500 text-white rounded">{t('common.save')}</button>
                 </div>
             </div>
         </div>
@@ -864,13 +916,14 @@ function StudentInfoModal({ open, onClose, studentInfo, setStudentInfo, errors, 
 }
 
 function SummaryView({ teacher, selectedSubject, selectedSessions, totalPrice, removeSession, onAddMore, onBook }) {
+    const { t } = useTranslation();
     return (
         <div className="max-w-4xl mx-auto">
-            <h3 className="text-2xl font-bold mb-6 text-center">هذا ملخص للحجز الخاص بك</h3>
+            <h3 className="text-2xl font-bold mb-6 text-center">{t('bookingModal.summary.title')}</h3>
 
             <div className="grid grid-cols-2 gap-6">
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
-                    <h4 className="font-bold text-gray-900 mb-4">الحصص التي تم اختيارها ({selectedSessions.length})</h4>
+                    <h4 className="font-bold text-gray-900 mb-4">{t('bookingModal.selectedSessionsTitle')} ({selectedSessions.length})</h4>
                     <div className="space-y-2 mb-6">
                         {selectedSessions.map((session) => (
                             <div key={session.id} className="bg-gray-50 rounded-lg p-3 flex items-center justify-between">
@@ -881,6 +934,7 @@ function SummaryView({ teacher, selectedSubject, selectedSessions, totalPrice, r
                                 <button
                                     onClick={() => removeSession(session.id)}
                                     className="text-gray-400 hover:text-red-500"
+                                    aria-label={t('common.delete')}
                                 >
                                     <FaXmark />
                                 </button>
@@ -891,14 +945,16 @@ function SummaryView({ teacher, selectedSubject, selectedSessions, totalPrice, r
                     <div className="border-t border-gray-200 pt-4">
                         <div className="flex justify-between items-center mb-2">
                             <div className="text-sm font-bold text-gray-900 flex items-center ">
-                                <p className="text-3xl font-bold text-gray-900 mt-2">{selectedSessions.length} حصص × {teacher.price}</p>
-                                <img src="/images/aed-currency(black).svg" alt="currency" className="w-5 h-5" />
+                                <p className="text-3xl font-bold text-gray-900 mt-2">
+                                    {t('bookingModal.summary.sessionsTimesPrice', { count: selectedSessions.length, price: teacher.price })}
+                                </p>
+                                <img src="/images/aed-currency(black).svg" alt={t('common.currencySymbol')} className="w-5 h-5" />
                             </div>
                         </div>
                         <div className="flex justify-between items-center">
                             <div className="text-sm font-bold text-gray-900 flex items-center ">
-                                <span>الإجمالي = {totalPrice} </span>
-                                <img src="/images/aed-currency(black).svg" alt="currency" className="w-5 h-5" />
+                                <span>{t('bookingModal.summary.total', { total: totalPrice })} </span>
+                                <img src="/images/aed-currency(black).svg" alt={t('common.currencySymbol')} className="w-5 h-5" />
                             </div>
                         </div>
                     </div>
@@ -931,7 +987,7 @@ function SummaryView({ teacher, selectedSubject, selectedSessions, totalPrice, r
                                         <FaCheck className="text-white text-[8px]" />
                                     </div>
                                 </div>
-                                <p className="text-sm text-gray-600">{formatLocation(teacher.location)}</p>
+                                <p className="text-sm text-gray-600">{formatLocation(teacher.location, stageLabels)}</p>
                                 <div className="flex items-center gap-1">
                                     <FaStar className="text-yellow-400 text-sm" />
                                     <span className="text-sm font-medium">{teacher.rating}</span>
@@ -941,7 +997,7 @@ function SummaryView({ teacher, selectedSubject, selectedSessions, totalPrice, r
                     </div>
 
                     <div className="bg-white rounded-lg border border-gray-200 p-6">
-                        <h4 className="font-bold text-gray-900 mb-2">المواد الدراسية</h4>
+                        <h4 className="font-bold text-gray-900 mb-2">{t('bookingModal.summary.subjects')}</h4>
                         <p className="text-gray-700">
                             {[...new Set(selectedSessions.map(session => session.subject).filter(Boolean))].join(' / ') || selectedSubject}
                         </p>
@@ -954,14 +1010,14 @@ function SummaryView({ teacher, selectedSubject, selectedSessions, totalPrice, r
                     onClick={onBook}
                     className="flex-1 bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-4 rounded-lg text-lg transition duration-300"
                 >
-                    احجز الآن
+                    {t('bookingModal.bookNow')}
                 </button>
                 <button
                     onClick={onAddMore}
                     className="flex items-center gap-2 px-6 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-4 rounded-lg transition duration-300"
                 >
                     <FaPlus />
-                    إضافة حصة أخرى
+                    {t('bookingModal.addAnotherSession')}
                 </button>
             </div>
         </div>

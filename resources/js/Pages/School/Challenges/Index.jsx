@@ -8,10 +8,12 @@ import ModernChallengeTable from '@/Components/Challenges/ModernChallengeTable';
 import ModernChallengeCardGrid from '@/Components/Challenges/ModernChallengeCard';
 import InnovationChallengeCard from '@/Components/Challenges/InnovationChallengeCard';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
+import { useTranslation } from '@/i18n';
 
 export default function SchoolChallengesIndex({ auth, challenges, stats, filters, submissions = null, selectedChallenge = null }) {
     const { flash } = usePage().props;
     const { confirm } = useConfirmDialog();
+    const { t, language } = useTranslation();
     const [processing, setProcessing] = useState(null);
     const [selectedStatus, setSelectedStatus] = useState(filters?.status || '');
     const [viewMode, setViewMode] = useState('table'); // 'table' or 'card'
@@ -34,10 +36,10 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
 
     const handleDelete = async (challengeId) => {
         const confirmed = await confirm({
-            title: 'تأكيد الحذف',
-            message: 'هل أنت متأكد من حذف هذا التحدي؟ هذا الإجراء لا يمكن التراجع عنه.',
-            confirmText: 'حذف',
-            cancelText: 'إلغاء',
+            title: t('schoolChallengesIndexPage.deleteConfirm.title'),
+            message: t('schoolChallengesIndexPage.deleteConfirm.message'),
+            confirmText: t('common.delete'),
+            cancelText: t('common.cancel'),
             variant: 'danger',
         });
 
@@ -94,10 +96,10 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
 
     const getSubmissionStatusBadge = (status) => {
         const badges = {
-            submitted: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'مُسلم', icon: FaClock },
-            reviewed: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'تم المراجعة', icon: FaCheckCircle },
-            approved: { bg: 'bg-green-100', text: 'text-green-800', label: 'مقبول', icon: FaCheckCircle },
-            rejected: { bg: 'bg-red-100', text: 'text-red-800', label: 'مرفوض', icon: FaTimes },
+            submitted: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: t('schoolChallengeSubmissionShowPage.statusSubmitted'), icon: FaClock },
+            reviewed: { bg: 'bg-blue-100', text: 'text-blue-800', label: t('schoolChallengeSubmissionShowPage.statusReviewed'), icon: FaCheckCircle },
+            approved: { bg: 'bg-green-100', text: 'text-green-800', label: t('schoolChallengeSubmissionShowPage.statusApproved'), icon: FaCheckCircle },
+            rejected: { bg: 'bg-red-100', text: 'text-red-800', label: t('schoolChallengeSubmissionShowPage.statusRejected'), icon: FaTimes },
         };
         return badges[status] || badges.submitted;
     };
@@ -105,38 +107,51 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
     const formatDate = (date) => {
         if (!date) return '';
         const d = new Date(date);
-        const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+        const months = [
+            t('common.january'),
+            t('common.february'),
+            t('common.march'),
+            t('common.april'),
+            t('common.may'),
+            t('common.june'),
+            t('common.july'),
+            t('common.august'),
+            t('common.september'),
+            t('common.october'),
+            t('common.november'),
+            t('common.december'),
+        ];
         return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
     };
 
     const getChallengeTypeLabel = (type) => {
         const labels = {
-            'cognitive': 'تحدّي معرفي',
-            'applied': 'تحدّي تطبيقي/مهاري',
-            'creative': 'تحدّي إبداعي',
-            'artistic_creative': 'تحدّي إبداعي فني',
-            'collaborative': 'تحدّي تعاوني',
-            'analytical': 'تحدّي تحليلي/استقصائي',
-            'technological': 'تحدّي تكنولوجي',
-            'behavioral': 'تحدّي سلوكي/قيمي',
-            '60_seconds': 'تحدّي 60 ثانية',
-            'mental_math': 'حلها بدون قلم',
-            'conversions': 'تحدّي التحويلات',
-            'team_fastest': 'تحدّي الفريق الأسرع',
-            'build_problem': 'ابنِ مسألة',
-            'custom': 'تحدّي مخصص',
+            cognitive: t('challenges.cognitive'),
+            applied: t('challenges.applied'),
+            creative: t('challenges.creative'),
+            artistic_creative: t('challenges.artisticCreative'),
+            collaborative: t('challenges.collaborative'),
+            analytical: t('challenges.analytical'),
+            technological: t('challenges.technological'),
+            behavioral: t('challenges.behavioral'),
+            '60_seconds': t('challenges.minseconds'),
+            mental_math: t('challenges.mentalMath'),
+            conversions: t('challenges.conversions'),
+            team_fastest: t('challenges.teamFastest'),
+            build_problem: t('challenges.buildProblem'),
+            custom: t('schoolChallengesIndexPage.types.custom'),
         };
         return labels[type] || type;
     };
 
     const getCategoryLabel = (category) => {
         const labels = {
-            science: 'علوم',
-            technology: 'تقنية',
-            engineering: 'هندسة',
-            mathematics: 'رياضيات',
-            arts: 'فنون',
-            other: 'أخرى',
+            science: t('categories.science'),
+            technology: t('categories.technology'),
+            engineering: t('categories.engineering'),
+            mathematics: t('categories.mathematics'),
+            arts: t('categories.arts'),
+            other: t('categories.other'),
         };
         return labels[category] || category;
     };
@@ -165,11 +180,11 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
 
     const getStatusBadge = (status) => {
         const badges = {
-            draft: { bg: 'bg-gray-100', text: 'text-gray-800', label: 'مسودة', border: 'border-gray-300' },
-            active: { bg: 'bg-green-100', text: 'text-green-800', label: 'نشط', border: 'border-green-300' },
-            completed: { bg: 'bg-gray-100', text: 'text-gray-800', label: 'منتهي', border: 'border-gray-300' },
-            cancelled: { bg: 'bg-red-100', text: 'text-red-800', label: 'ملغي', border: 'border-red-300' },
-            upcoming: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'قادم', border: 'border-blue-300' },
+            draft: { bg: 'bg-gray-100', text: 'text-gray-800', label: t('common.draft'), border: 'border-gray-300' },
+            active: { bg: 'bg-green-100', text: 'text-green-800', label: t('common.active'), border: 'border-green-300' },
+            completed: { bg: 'bg-gray-100', text: 'text-gray-800', label: t('common.completed'), border: 'border-gray-300' },
+            cancelled: { bg: 'bg-red-100', text: 'text-red-800', label: t('common.cancelled'), border: 'border-red-300' },
+            upcoming: { bg: 'bg-blue-100', text: 'text-blue-800', label: t('common.upcoming'), border: 'border-blue-300' },
         };
         const badge = badges[status] || badges.draft;
         return (
@@ -185,45 +200,45 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
     return (
         <DashboardLayout
             auth={auth}
-            header="التحديات الابتكارية"
+            header={t('schoolChallengesIndexPage.title')}
         >
-            <Head title="التحديات الابتكارية - لوحة المدرسة" />
+            <Head title={t('schoolChallengesIndexPage.pageTitle', { appName: t('common.appName') })} />
 
-            <div className="min-h-screen bg-gray-50 pb-12" dir="rtl">
+            <div className="min-h-screen bg-gray-50 pb-12" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     {/* Stats */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                         <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
                             <div className="flex items-center justify-between mb-2">
-                                <div className="text-gray-600 text-sm font-medium">إجمالي التحديات</div>
+                                <div className="text-gray-600 text-sm font-medium">{t('schoolChallengesIndexPage.stats.totalChallenges')}</div>
                                 <FaTrophy className="text-gray-400 text-lg" />
                             </div>
                             <div className="text-3xl font-bold text-gray-900">{stats?.total || 0}</div>
                         </div>
                         <div className="bg-gradient-to-br from-green-50 to-white rounded-xl shadow-sm border border-green-200 p-6 hover:shadow-md transition-shadow">
                             <div className="flex items-center justify-between mb-2">
-                                <div className="text-gray-600 text-sm font-medium">نشط</div>
+                                <div className="text-gray-600 text-sm font-medium">{t('common.active')}</div>
                                 <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                             </div>
                             <div className="text-3xl font-bold text-green-600">{stats?.active || 0}</div>
                         </div>
                         <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
                             <div className="flex items-center justify-between mb-2">
-                                <div className="text-gray-600 text-sm font-medium">مسودة</div>
+                                <div className="text-gray-600 text-sm font-medium">{t('common.draft')}</div>
                                 <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
                             </div>
                             <div className="text-3xl font-bold text-gray-600">{stats?.draft || 0}</div>
                         </div>
                         <div className="bg-gradient-to-br from-blue-50 to-white rounded-xl shadow-sm border border-blue-200 p-6 hover:shadow-md transition-shadow">
                             <div className="flex items-center justify-between mb-2">
-                                <div className="text-gray-600 text-sm font-medium">مكتمل</div>
+                                <div className="text-gray-600 text-sm font-medium">{t('common.completed')}</div>
                                 <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                             </div>
                             <div className="text-3xl font-bold text-blue-600">{stats?.completed || 0}</div>
                         </div>
                     </div>
 
-                    {/* Header with Actions - تصميم جديد */}
+                    {/* Header with Actions */}
                     <div className="mb-8">
                         {/* Tabs */}
                         <div className="flex items-center gap-4 mb-6 border-b border-gray-200">
@@ -240,7 +255,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                     : 'border-transparent text-gray-600 hover:text-gray-900'
                                     }`}
                             >
-                                التحديات
+                                {t('schoolChallengesIndexPage.tabs.challenges')}
                             </button>
                             {selectedChallenge && (
                                 <button
@@ -250,7 +265,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                         : 'border-transparent text-gray-600 hover:text-gray-900'
                                         }`}
                                 >
-                                    تسليمات: {selectedChallenge.title}
+                                    {t('schoolChallengesIndexPage.submissionsTitle', { title: selectedChallenge.title })}
                                 </button>
                             )}
                         </div>
@@ -258,10 +273,14 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
                             <div>
                                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                                    {activeTab === 'submissions' && selectedChallenge ? `تسليمات: ${selectedChallenge.title}` : 'التحديات الابتكارية'}
+                                    {activeTab === 'submissions' && selectedChallenge
+                                        ? t('schoolChallengesIndexPage.submissionsTitle', { title: selectedChallenge.title })
+                                        : t('schoolChallengesIndexPage.title')}
                                 </h1>
                                 <p className="text-gray-600">
-                                    {activeTab === 'submissions' ? 'عرض وتقييم تسليمات الطلاب لهذا التحدي' : 'إطلاق وإدارة مسابقات الابتكار بين الطلاب'}
+                                    {activeTab === 'submissions'
+                                        ? t('schoolChallengesIndexPage.submissionsSubtitle')
+                                        : t('schoolChallengesIndexPage.subtitle')}
                                 </p>
                             </div>
                             {activeTab === 'challenges' && (
@@ -270,7 +289,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                     className="inline-flex items-center gap-2 px-6 py-3 bg-[#A3C042] text-white rounded-lg hover:bg-[#8CA635] transition-colors font-semibold shadow-md hover:shadow-lg"
                                 >
                                     <FaPlus />
-                                    إطلاق تحدي جديد
+                                    {t('schoolChallengesIndexPage.actions.launchNew')}
                                 </Link>
                             )}
                             {activeTab === 'submissions' && selectedChallenge && (
@@ -285,12 +304,12 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                     className="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-semibold"
                                 >
                                     <FaArrowRight />
-                                    العودة إلى التحديات
+                                    {t('schoolChallengesIndexPage.actions.backToChallenges')}
                                 </button>
                             )}
                         </div>
 
-                        {/* Navigation Tabs - شريط التصفية */}
+                        {/* Navigation Tabs */}
                         {activeTab === 'challenges' && (
                             <>
                                 <div className="flex flex-wrap items-center gap-4 mb-6">
@@ -301,7 +320,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                             : 'bg-white text-gray-700 hover:bg-gray-100'
                                             }`}
                                     >
-                                        الكل
+                                        {t('schoolChallengesIndexPage.filters.all')}
                                     </button>
                                     <button
                                         onClick={() => handleStatusFilter('completed')}
@@ -310,7 +329,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                             : 'bg-white text-gray-700 hover:bg-gray-100'
                                             }`}
                                     >
-                                        مكتمل
+                                        {t('common.completed')}
                                     </button>
                                     <button
                                         onClick={() => handleStatusFilter('upcoming')}
@@ -319,7 +338,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                             : 'bg-white text-gray-700 hover:bg-gray-100'
                                             }`}
                                     >
-                                        قادم
+                                        {t('common.upcoming')}
                                     </button>
                                     <button
                                         onClick={() => handleStatusFilter('active')}
@@ -328,7 +347,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                             : 'bg-white text-gray-700 hover:bg-gray-100'
                                             }`}
                                     >
-                                        نشط
+                                        {t('common.active')}
                                     </button>
                                 </div>
 
@@ -338,7 +357,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                         <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                                         <input
                                             type="text"
-                                            placeholder="ابحث عن تحدي..."
+                                            placeholder={t('schoolChallengesIndexPage.searchPlaceholder')}
                                             className="w-full ps-10 pe-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                         />
                                     </div>
@@ -350,7 +369,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                     {/* Content based on active tab */}
                     {activeTab === 'challenges' ? (
                         <>
-                            {/* Challenges Grid - بطاقات التحديات */}
+                            {/* Challenges Grid */}
                             {hasChallenges ? (
                                 <>
                                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -359,7 +378,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                                 key={challenge.id}
                                                 challenge={{
                                                     ...challenge,
-                                                    school_name: challenge.school?.name || 'مدرستك',
+                                                    school_name: challenge.school?.name || t('schoolChallengesIndexPage.schoolNameFallback'),
                                                     creator_name: challenge.creator?.name || '',
                                                     challenge_type_label: getChallengeTypeLabel(challenge.challenge_type),
                                                 }}
@@ -397,16 +416,16 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                         <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
                                             <FaTrophy className="text-4xl text-gray-400" />
                                         </div>
-                                        <h3 className="text-xl font-bold text-gray-900 mb-2">لا توجد تحديات</h3>
+                                        <h3 className="text-xl font-bold text-gray-900 mb-2">{t('schoolChallengesIndexPage.empty.title')}</h3>
                                         <p className="text-gray-500 mb-6">
-                                            ابدأ بإنشاء تحدٍ جديد لإشراك طلابك في أنشطة تعليمية ممتعة ومبتكرة
+                                            {t('schoolChallengesIndexPage.empty.description')}
                                         </p>
                                         <Link
                                             href={typeof route !== 'undefined' ? route('school.challenges.create') : '/school/challenges/create'}
                                             className="inline-flex items-center gap-2 px-6 py-3.5 bg-[#A3C042] text-white rounded-xl hover:from-primary-600 hover:to-secondary-600 transition-all shadow-lg hover:shadow-xl font-bold text-base transform hover:scale-105"
                                         >
                                             <FaPlus className="text-lg" />
-                                            <span>إنشاء تحدي</span>
+                                            <span>{t('schoolChallengesIndexPage.actions.create')}</span>
                                         </Link>
                                     </div>
                                 </div>
@@ -425,7 +444,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                             }`}
                                     >
-                                        الكل
+                                        {t('schoolChallengesIndexPage.filters.all')}
                                     </button>
                                     <button
                                         onClick={() => handleSubmissionStatusFilter('submitted')}
@@ -434,7 +453,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                             }`}
                                     >
-                                        مُسلم
+                                        {t('schoolChallengeSubmissionShowPage.statusSubmitted')}
                                     </button>
                                     <button
                                         onClick={() => handleSubmissionStatusFilter('reviewed')}
@@ -443,7 +462,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                             }`}
                                     >
-                                        تم المراجعة
+                                        {t('schoolChallengeSubmissionShowPage.statusReviewed')}
                                     </button>
                                     <button
                                         onClick={() => handleSubmissionStatusFilter('approved')}
@@ -452,7 +471,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                             }`}
                                     >
-                                        مقبول
+                                        {t('schoolChallengeSubmissionShowPage.statusApproved')}
                                     </button>
                                     <button
                                         onClick={() => handleSubmissionStatusFilter('rejected')}
@@ -461,7 +480,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                             }`}
                                     >
-                                        مرفوض
+                                        {t('schoolChallengeSubmissionShowPage.statusRejected')}
                                     </button>
                                 </div>
                             </div>
@@ -474,19 +493,19 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                             <thead className="bg-gray-50">
                                                 <tr>
                                                     <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                        الطالب
+                                                        {t('schoolChallengesIndexPage.submissionsTable.student')}
                                                     </th>
                                                     <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                        تاريخ التقديم
+                                                        {t('schoolChallengesIndexPage.submissionsTable.submittedAt')}
                                                     </th>
                                                     <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                        الحالة
+                                                        {t('common.status')}
                                                     </th>
                                                     <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                        التقييم
+                                                        {t('schoolChallengesIndexPage.submissionsTable.rating')}
                                                     </th>
                                                     <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                        الإجراءات
+                                                        {t('common.actions')}
                                                     </th>
                                                 </tr>
                                             </thead>
@@ -500,7 +519,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                                                 <div className="flex items-center">
                                                                     <FaUser className="text-gray-400 ms-2" />
                                                                     <span className="text-sm font-medium text-gray-900">
-                                                                        {submission.student?.name || 'غير معروف'}
+                                                                        {submission.student?.name || t('schoolChallengesIndexPage.unknownStudent')}
                                                                     </span>
                                                                 </div>
                                                             </td>
@@ -532,7 +551,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                                                                     className="text-blue-600 hover:text-blue-900 flex items-center gap-1"
                                                                 >
                                                                     <FaEye />
-                                                                    عرض
+                                                                    {t('common.view')}
                                                                 </Link>
                                                             </td>
                                                         </tr>
@@ -545,7 +564,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                             ) : (
                                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
                                     <FaTrophy className="mx-auto text-6xl text-gray-300 mb-4" />
-                                    <p className="text-gray-500 text-lg">لا توجد تسليمات لهذا التحدي</p>
+                                    <p className="text-gray-500 text-lg">{t('schoolChallengesIndexPage.submissionsEmpty')}</p>
                                 </div>
                             )}
 
@@ -572,32 +591,32 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
                 </div>
             </div>
 
-            {/* Bottom Banner - Banner سفلي */}
-            <div className="bg-purple-900 text-white p-6 rounded-xl shadow-2xl" dir="rtl">
+            {/* Bottom Banner */}
+            <div className="bg-purple-900 text-white p-6 rounded-xl shadow-2xl" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                    {/* Right Side - أيقونة كأس */}
+                    {/* Right Side */}
                     <div className="hidden md:flex items-center justify-center">
                         <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center">
                             <FaTrophy className="text-4xl text-white" />
                         </div>
                     </div>
 
-                    {/* Center - النص */}
+                    {/* Center */}
                     <div className="flex-1 text-center md:">
-                        <h3 className="text-2xl font-bold mb-2">قم بتحفيز طلابك اليوم!</h3>
+                        <h3 className="text-2xl font-bold mb-2">{t('schoolChallengesIndexPage.banner.title')}</h3>
                         <p className="text-purple-100 text-sm md:text-base">
-                            أفادت الدراسات أن المسابقات الودية تزيد من معدل إنتاجية الابتكار بنسبة 40%. اختر موضوعًا شيقًا وابدأ التحدي الآن.
+                            {t('schoolChallengesIndexPage.banner.description')}
                         </p>
                     </div>
 
-                    {/* Left Side - زر إنشاء تحدي */}
+                    {/* Left Side */}
                     <div className="flex-shrink-0">
                         <Link
                             href={typeof route !== 'undefined' ? route('school.challenges.create') : '/school/challenges/create'}
                             className="inline-flex items-center gap-2 px-6 py-3 bg-white text-purple-900 rounded-lg hover:bg-purple-50 transition-colors font-bold shadow-lg hover:shadow-xl"
                         >
                             <FaPlus />
-                            إنشاء تحدي مخصص
+                            {t('schoolChallengesIndexPage.actions.createCustom')}
                         </Link>
                     </div>
                 </div>

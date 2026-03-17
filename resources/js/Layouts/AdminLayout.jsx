@@ -4,28 +4,30 @@ import { FaBars, FaUser, FaCog, FaSignOutAlt, FaHome, FaUsers, FaBook, FaCalenda
 import { useSelector } from 'react-redux';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
+import { useTranslation } from '@/i18n';
 
-export default function AdminLayout({ children, title = 'لوحة الإدارة' }) {
+export default function AdminLayout({ children, title = null }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const { dir } = useSelector((state) => state.language);
+    const { t } = useTranslation();
 
     const navigation = [
-        { name: 'لوحة التحكم', href: '/admin/dashboard', icon: FaHome },
-        { name: 'المعلمين', href: '/admin/teachers', icon: FaUsers },
-        { name: 'طلبات الانضمام', href: '/admin/teacher-applications', icon: FaFileAlt },
-        { name: 'الطلاب', href: '/admin/students', icon: FaUsers },
-        { name: 'الحجوزات', href: '/admin/bookings', icon: FaCalendar },
-        { name: 'التقييمات', href: '/admin/reviews', icon: FaBook },
-        { name: 'المواد', href: '/admin/subjects', icon: FaBook },
-        { name: 'مقالات المجلة', href: '/admin/publications', icon: FaBook },
-        { name: 'التحديات', href: '/admin/challenges', icon: FaTrophy },
-        { name: 'الاشتراكات', href: '/admin/subscriptions', icon: FaCreditCard },
-        { name: 'الصلاحيات', href: '/admin/permissions', icon: FaShieldAlt },
+        { name: t('adminLayout.nav.dashboard'), href: '/admin/dashboard', icon: FaHome },
+        { name: t('adminLayout.nav.teachers'), href: '/admin/teachers', icon: FaUsers },
+        { name: t('adminLayout.nav.teacherApplications'), href: '/admin/teacher-applications', icon: FaFileAlt },
+        { name: t('adminLayout.nav.students'), href: '/admin/students', icon: FaUsers },
+        { name: t('adminLayout.nav.bookings'), href: '/admin/bookings', icon: FaCalendar },
+        { name: t('adminLayout.nav.reviews'), href: '/admin/reviews', icon: FaBook },
+        { name: t('adminLayout.nav.subjects'), href: '/admin/subjects', icon: FaBook },
+        { name: t('adminLayout.nav.publications'), href: '/admin/publications', icon: FaBook },
+        { name: t('adminLayout.nav.challenges'), href: '/admin/challenges', icon: FaTrophy },
+        { name: t('adminLayout.nav.subscriptions'), href: '/admin/subscriptions', icon: FaCreditCard },
+        { name: t('adminLayout.nav.permissions'), href: '/admin/permissions', icon: FaShieldAlt },
     ];
 
     return (
         <div className="min-h-screen bg-gray-50" dir={dir}>
-            <Head title={title} />
+            <Head title={title || t('adminLayout.title')} />
             <div className={`fixed inset-y-0 start-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : 'translate-x-full'
                 } lg:translate-x-0 lg:static lg:inset-0`}>
                 <div className="flex flex-col items-center justify-center h-20 px-6 border-b border-gray-200 relative">
@@ -37,10 +39,10 @@ export default function AdminLayout({ children, title = 'لوحة الإدارة
                     </button>
                     <Link href="/" className="flex items-center gap-3">
                         <ApplicationLogo />
-                        <span className="text-lg font-bold bg-[#A3C042] bg-clip-text text-transparent">إرث المبتكرين</span>
+                        <span className="text-lg font-bold bg-[#A3C042] bg-clip-text text-transparent">{t('common.appName')}</span>
                     </Link>
                     <div className="text-xs text-gray-500 mt-1">
-                        لوحة الإدارة
+                        {t('adminLayout.subtitle')}
                     </div>
                 </div>
 
@@ -78,7 +80,7 @@ export default function AdminLayout({ children, title = 'لوحة الإدارة
                             <div className="relative">
                                 <button className="flex items-center space-x-2 text-gray-700 hover:text-gray-900">
                                     <FaUser className="h-5 w-5" />
-                                    <span className="text-sm font-medium">المدير</span>
+                                    <span className="text-sm font-medium">{t('adminLayout.admin')}</span>
                                 </button>
                             </div>
 
