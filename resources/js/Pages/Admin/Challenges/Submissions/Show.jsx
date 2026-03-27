@@ -20,14 +20,17 @@ import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
+import { useTranslation } from '@/i18n';
 
 export default function AdminChallengeSubmissionShow({ auth, submission, availableBadges }) {
     const { flash } = usePage().props;
+    const { t, language } = useTranslation();
     const [rating, setRating] = useState(submission.rating || 0);
     const [hoveredRating, setHoveredRating] = useState(0);
     const [selectedBadges, setSelectedBadges] = useState(submission.badges || []);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
+    const [toastType, setToastType] = useState('success');
 
     const { data, setData, post, processing, errors } = useForm({
         rating: submission.rating || 0,
@@ -62,11 +65,13 @@ export default function AdminChallengeSubmissionShow({ auth, submission, availab
     useEffect(() => {
         if (flash?.success) {
             setToastMessage(flash.success);
+            setToastType('success');
             setShowToast(true);
             setTimeout(() => setShowToast(false), 5000);
         }
         if (flash?.error) {
             setToastMessage(flash.error);
+            setToastType('error');
             setShowToast(true);
             setTimeout(() => setShowToast(false), 5000);
         }
@@ -86,14 +91,16 @@ export default function AdminChallengeSubmissionShow({ auth, submission, availab
 
     const formatDate = (dateString) => {
         if (!dateString) return '';
-        const date = new Date(dateString);
-        const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
-        return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+        return new Intl.DateTimeFormat(language === 'ar' ? 'ar-EG' : 'en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        }).format(new Date(dateString));
     };
 
     return (
-        <DashboardLayout header="تقييم التحدي">
-            <Head title={`تقييم التحدي: ${submission.challenge?.title}`} />
+        <DashboardLayout header={t('schoolChallengeSubmissionShowPage.evaluationTitle')}>
+            <Head title={t('schoolChallengeSubmissionShowPage.pageTitle', { title: submission.challenge?.title || t('challenges.defaultTitle') })} />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <Link
@@ -101,7 +108,7 @@ export default function AdminChallengeSubmissionShow({ auth, submission, availab
                     className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
                 >
                     <FaArrowLeft />
-                    العودة إلى التسليمات
+                    {t('schoolChallengeSubmissionShowPage.backToSubmissions')}
                 </Link>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -116,7 +123,7 @@ export default function AdminChallengeSubmissionShow({ auth, submission, availab
 
                             {submission.challenge?.objective && (
                                 <p className="text-gray-700 mb-4">
-                                    <strong>الهدف:</strong> {submission.challenge.objective}
+                                    <strong>{t('schoolChallengeSubmissionShowPage.objectiveLabel')}</strong> {submission.challenge.objective}
                                 </p>
                             )}
 
@@ -129,34 +136,35 @@ export default function AdminChallengeSubmissionShow({ auth, submission, availab
                             <div className="flex items-center justify-between mb-6">
                                 <div className="flex items-center gap-2 text-gray-600">
                                     <FaUser className="text-gray-400" />
-                                    <span className="font-medium">الطالب: {submission.student?.name || 'غير محدد'}</span>
+                                    <span className="font-medium">
+                                        {t('schoolChallengeSubmissionShowPage.studentLabel', {
+                                            name: submission.student?.name || t('adminChallengeSubmissionsPage.unknownStudent'),
+                                        })}
+                                    </span>
                                 </div>
                                 <div className="flex items-center gap-2 text-gray-600">
                                     <FaCalendar className="text-gray-400" />
-                                    <span>تاريخ التقديم: {formatDate(submission.submitted_at)}</span>
+                                    <span>{t('schoolChallengeSubmissionShowPage.submissionDateLabel', { date: formatDate(submission.submitted_at) })}</span>
                                 </div>
                             </div>
 
-                            {/* Student Answer */}
                             {submission.answer && (
                                 <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-2">الحل / الإجابة:</h3>
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('schoolChallengeSubmissionShowPage.answerTitle')}</h3>
                                     <p className="text-gray-700 whitespace-pre-line">{submission.answer}</p>
                                 </div>
                             )}
 
-                            {/* Student Comment */}
                             {submission.comment && (
                                 <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-2">تعليق الطالب:</h3>
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('schoolChallengeSubmissionShowPage.commentTitle')}</h3>
                                     <p className="text-gray-700 whitespace-pre-line">{submission.comment}</p>
                                 </div>
                             )}
 
-                            {/* Attached Files */}
                             {submission.files && submission.files.length > 0 && (
                                 <div className="mb-6">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-3">الملفات المرفقة:</h3>
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('schoolChallengeSubmissionShowPage.attachmentsTitle')}</h3>
                                     <div className="space-y-2">
                                         {submission.files.map((file, index) => (
                                             <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition">
@@ -177,31 +185,28 @@ export default function AdminChallengeSubmissionShow({ auth, submission, availab
                             )}
                         </div>
 
-                        {/* Evaluation Section */}
                         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                            <h3 className="text-xl font-bold text-gray-900 mb-6">تقييم التقديم</h3>
+                            <h3 className="text-xl font-bold text-gray-900 mb-6">{t('schoolChallengeSubmissionShowPage.evaluationTitle')}</h3>
 
                             <form onSubmit={handleSubmit} className="space-y-6">
-                                {/* Status */}
                                 <div>
-                                    <InputLabel value="الحالة *" />
+                                    <InputLabel value={t('schoolChallengeSubmissionShowPage.statusLabel')} />
                                     <select
                                         value={data.status}
                                         onChange={(e) => setData('status', e.target.value)}
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                         required
                                     >
-                                        <option value="submitted">مُسلم</option>
-                                        <option value="reviewed">تم المراجعة</option>
-                                        <option value="approved">مقبول</option>
-                                        <option value="rejected">مرفوض</option>
+                                        <option value="submitted">{t('schoolChallengeSubmissionShowPage.statusSubmitted')}</option>
+                                        <option value="reviewed">{t('schoolChallengeSubmissionShowPage.statusReviewed')}</option>
+                                        <option value="approved">{t('schoolChallengeSubmissionShowPage.statusApproved')}</option>
+                                        <option value="rejected">{t('schoolChallengeSubmissionShowPage.statusRejected')}</option>
                                     </select>
                                     <InputError message={errors.status} className="mt-2" />
                                 </div>
 
-                                {/* Rating */}
                                 <div>
-                                    <InputLabel value="التقييم (0-10)" />
+                                    <InputLabel value={t('schoolChallengeSubmissionShowPage.ratingLabel')} />
                                     <div className="flex items-center gap-2 mt-2">
                                         {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
                                             <button
@@ -218,15 +223,14 @@ export default function AdminChallengeSubmissionShow({ auth, submission, availab
                                                 <FaStar />
                                             </button>
                                         ))}
-                                        <span className="ms-2 text-gray-600">({rating} / 10)</span>
+                                        <span className="ms-2 text-gray-600">{t('schoolChallengeSubmissionShowPage.ratingValue', { rating })}</span>
                                     </div>
                                     <InputError message={errors.rating} className="mt-2" />
                                 </div>
 
-                                {/* Points */}
                                 {submission.challenge?.points_reward > 0 && (
                                     <div>
-                                        <InputLabel htmlFor="points_earned" value="النقاط المكتسبة" />
+                                        <InputLabel htmlFor="points_earned" value={t('schoolChallengeSubmissionShowPage.pointsEarnedLabel')} />
                                         <TextInput
                                             id="points_earned"
                                             type="number"
@@ -237,30 +241,28 @@ export default function AdminChallengeSubmissionShow({ auth, submission, availab
                                             max={submission.challenge.points_reward}
                                         />
                                         <p className="mt-1 text-sm text-gray-500">
-                                            الحد الأقصى: {submission.challenge.points_reward} نقطة
+                                            {t('schoolChallengeSubmissionShowPage.pointsMaxLabel', { points: submission.challenge.points_reward })}
                                         </p>
                                         <InputError message={errors.points_earned} className="mt-2" />
                                     </div>
                                 )}
 
-                                {/* Feedback */}
                                 <div>
-                                    <InputLabel htmlFor="feedback" value="ملاحظات المقيّم" />
+                                    <InputLabel htmlFor="feedback" value={t('schoolChallengeSubmissionShowPage.feedbackLabel')} />
                                     <textarea
                                         id="feedback"
                                         value={data.feedback}
                                         onChange={(e) => setData('feedback', e.target.value)}
                                         rows={6}
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                        placeholder="اكتب ملاحظاتك على التقديم..."
+                                        placeholder={t('schoolChallengeSubmissionShowPage.feedbackPlaceholder')}
                                     />
                                     <InputError message={errors.feedback} className="mt-2" />
                                 </div>
 
-                                {/* Badges */}
                                 {availableBadges && availableBadges.length > 0 && (
                                     <div>
-                                        <InputLabel value="الشارات (اختياري)" />
+                                        <InputLabel value={t('schoolChallengeSubmissionShowPage.badgesLabel')} />
                                         <div className="mt-2 grid grid-cols-2 md:grid-cols-3 gap-3">
                                             {availableBadges.map((badge) => (
                                                 <label
@@ -289,11 +291,11 @@ export default function AdminChallengeSubmissionShow({ auth, submission, availab
                                     {processing ? (
                                         <>
                                             <FaSpinner className="animate-spin ms-2" />
-                                            جاري الحفظ...
+                                            {t('schoolChallengeSubmissionShowPage.saving')}
                                         </>
                                     ) : (
                                         <>
-                                            حفظ التقييم
+                                            {t('schoolChallengeSubmissionShowPage.saveEvaluation')}
                                         </>
                                     )}
                                 </PrimaryButton>
@@ -301,24 +303,22 @@ export default function AdminChallengeSubmissionShow({ auth, submission, availab
                         </div>
                     </div>
 
-                    {/* Sidebar */}
                     <div className="space-y-6">
-                        {/* Current Status */}
                         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">الحالة الحالية</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('schoolChallengeSubmissionShowPage.currentStatusTitle')}</h3>
                             <div className="space-y-3">
                                 <div>
-                                    <span className="text-sm text-gray-600">الحالة:</span>
+                                    <span className="text-sm text-gray-600">{t('schoolChallengeSubmissionShowPage.statusShortLabel')}</span>
                                     <p className="font-medium text-gray-900 capitalize">
-                                        {submission.status === 'submitted' ? 'مُسلم' :
-                                            submission.status === 'reviewed' ? 'تم المراجعة' :
-                                                submission.status === 'approved' ? 'مقبول' :
-                                                    submission.status === 'rejected' ? 'مرفوض' : submission.status}
+                                        {submission.status === 'submitted' ? t('submissionStatuses.submitted') :
+                                            submission.status === 'reviewed' ? t('submissionStatuses.reviewed') :
+                                                submission.status === 'approved' ? t('submissionStatuses.approved') :
+                                                    submission.status === 'rejected' ? t('submissionStatuses.rejected') : submission.status}
                                     </p>
                                 </div>
                                 {submission.rating && (
                                     <div>
-                                        <span className="text-sm text-gray-600">التقييم:</span>
+                                        <span className="text-sm text-gray-600">{t('schoolChallengeSubmissionShowPage.ratingShortLabel')}</span>
                                         <div className="flex items-center gap-1">
                                             <FaStar className="text-yellow-500" />
                                             <p className="font-medium text-gray-900">{submission.rating} / 10</p>
@@ -327,19 +327,19 @@ export default function AdminChallengeSubmissionShow({ auth, submission, availab
                                 )}
                                 {submission.points_earned > 0 && (
                                     <div>
-                                        <span className="text-sm text-gray-600">النقاط:</span>
-                                        <p className="font-medium text-green-600">{submission.points_earned} نقطة</p>
+                                        <span className="text-sm text-gray-600">{t('schoolChallengeSubmissionShowPage.pointsShortLabel')}</span>
+                                        <p className="font-medium text-green-600">{t('schoolChallengeSubmissionShowPage.pointsValue', { points: submission.points_earned })}</p>
                                     </div>
                                 )}
                                 {submission.reviewed_at && (
                                     <div>
-                                        <span className="text-sm text-gray-600">تاريخ المراجعة:</span>
+                                        <span className="text-sm text-gray-600">{t('schoolChallengeSubmissionShowPage.reviewedDateLabel')}</span>
                                         <p className="font-medium text-gray-900">{formatDate(submission.reviewed_at)}</p>
                                     </div>
                                 )}
                                 {submission.reviewer && (
                                     <div>
-                                        <span className="text-sm text-gray-600">المقيّم:</span>
+                                        <span className="text-sm text-gray-600">{t('schoolChallengeSubmissionShowPage.reviewerLabel')}</span>
                                         <p className="font-medium text-gray-900">{submission.reviewer.name}</p>
                                     </div>
                                 )}
@@ -349,12 +349,11 @@ export default function AdminChallengeSubmissionShow({ auth, submission, availab
                 </div>
             </div>
 
-            {/* Toast Notification */}
             {showToast && (
                 <div className="fixed top-4 left-4 right-4 md:left-4 md:right-auto md:w-96 z-50 animate-slide-up">
-                    <div className="bg-green-500 text-white rounded-lg shadow-lg p-4 flex items-center justify-between">
+                    <div className={`${toastType === 'error' ? 'bg-red-500' : 'bg-green-500'} text-white rounded-lg shadow-lg p-4 flex items-center justify-between`}>
                         <div className="flex items-center gap-3">
-                            <FaCheckCircle className="text-xl" />
+                            {toastType === 'error' ? <FaTimes className="text-xl" /> : <FaCheckCircle className="text-xl" />}
                             <p className="font-medium">{toastMessage}</p>
                         </div>
                         <button

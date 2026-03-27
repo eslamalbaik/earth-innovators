@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Services\ProfileService;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -49,14 +48,16 @@ class ProfileController extends Controller
 
         if ($user->isStudent()) {
             return Redirect::route('student.profile')
-                ->with('success', 'تم تحديث الملف الشخصي بنجاح');
-        } elseif ($user->isTeacher()) {
+                ->with('success', 'تم تحديث الملف الشخصي بنجاح.');
+        }
+
+        if ($user->isTeacher()) {
             return Redirect::route('teacher.profile')
-                ->with('success', 'تم تحديث الملف الشخصي بنجاح');
+                ->with('success', 'تم تحديث الملف الشخصي بنجاح.');
         }
 
         return Redirect::route('profile.edit')
-            ->with('success', 'تم تحديث الملف الشخصي بنجاح');
+            ->with('success', 'تم تحديث الملف الشخصي بنجاح.');
     }
 
     public function destroy(Request $request): RedirectResponse
@@ -73,6 +74,6 @@ class ProfileController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return Redirect::to('/')->with('success', 'تم حذف الحساب بنجاح');
+        return Redirect::to('/')->with('success', 'تم حذف الحساب بنجاح.');
     }
 }

@@ -2,12 +2,15 @@ import { Head, Link, router, usePage } from '@inertiajs/react';
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { useState, useEffect } from 'react';
 import { FaTrophy, FaUser, FaCalendar, FaStar, FaCheckCircle, FaClock, FaTimesCircle, FaEye, FaArrowLeft, FaTimes } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function AdminChallengeSubmissionsIndex({ auth, submissions, challenge, filters }) {
     const { flash } = usePage().props;
+    const { t, language } = useTranslation();
     const [selectedStatus, setSelectedStatus] = useState(filters?.status || '');
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
+    const [toastType, setToastType] = useState('success');
 
     const handleStatusFilter = (status) => {
         setSelectedStatus(status);
@@ -21,17 +24,19 @@ export default function AdminChallengeSubmissionsIndex({ auth, submissions, chal
 
     const formatDate = (date) => {
         if (!date) return '';
-        const d = new Date(date);
-        const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
-        return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+        return new Intl.DateTimeFormat(language === 'ar' ? 'ar-EG' : 'en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        }).format(new Date(date));
     };
 
     const getStatusBadge = (status) => {
         const badges = {
-            submitted: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'مُسلم', icon: FaClock },
-            reviewed: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'تم المراجعة', icon: FaCheckCircle },
-            approved: { bg: 'bg-green-100', text: 'text-green-800', label: 'مقبول', icon: FaCheckCircle },
-            rejected: { bg: 'bg-red-100', text: 'text-red-800', label: 'مرفوض', icon: FaTimesCircle },
+            submitted: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: t('submissionStatuses.submitted'), icon: FaClock },
+            reviewed: { bg: 'bg-blue-100', text: 'text-blue-800', label: t('submissionStatuses.reviewed'), icon: FaCheckCircle },
+            approved: { bg: 'bg-green-100', text: 'text-green-800', label: t('submissionStatuses.approved'), icon: FaCheckCircle },
+            rejected: { bg: 'bg-red-100', text: 'text-red-800', label: t('submissionStatuses.rejected'), icon: FaTimesCircle },
         };
         return badges[status] || badges.submitted;
     };
@@ -39,19 +44,21 @@ export default function AdminChallengeSubmissionsIndex({ auth, submissions, chal
     useEffect(() => {
         if (flash?.success) {
             setToastMessage(flash.success);
+            setToastType('success');
             setShowToast(true);
             setTimeout(() => setShowToast(false), 5000);
         }
         if (flash?.error) {
             setToastMessage(flash.error);
+            setToastType('error');
             setShowToast(true);
             setTimeout(() => setShowToast(false), 5000);
         }
     }, [flash]);
 
     return (
-        <DashboardLayout header="تسليمات التحدي">
-            <Head title={`تسليمات: ${challenge.title}`} />
+        <DashboardLayout header={t('adminChallengeSubmissionsPage.title')}>
+            <Head title={t('adminChallengeSubmissionsPage.pageTitle', { title: challenge.title })} />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <Link
@@ -59,7 +66,7 @@ export default function AdminChallengeSubmissionsIndex({ auth, submissions, chal
                     className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
                 >
                     <FaArrowLeft />
-                    العودة إلى تفاصيل التحدي
+                    {t('adminChallengeSubmissionsPage.backToChallenge')}
                 </Link>
 
                 <div className="mb-8">
@@ -67,10 +74,9 @@ export default function AdminChallengeSubmissionsIndex({ auth, submissions, chal
                         <FaTrophy className="text-yellow-600 text-2xl" />
                         <h1 className="text-3xl font-bold text-gray-900">{challenge.title}</h1>
                     </div>
-                    <p className="text-gray-600">عرض وتقييم تسليمات الطلاب لهذا التحدي</p>
+                    <p className="text-gray-600">{t('adminChallengeSubmissionsPage.subtitle')}</p>
                 </div>
 
-                {/* Filters */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
                     <div className="flex flex-wrap gap-2">
                         <button
@@ -80,7 +86,7 @@ export default function AdminChallengeSubmissionsIndex({ auth, submissions, chal
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                 }`}
                         >
-                            الكل
+                            {t('common.all')}
                         </button>
                         <button
                             onClick={() => handleStatusFilter('submitted')}
@@ -89,7 +95,7 @@ export default function AdminChallengeSubmissionsIndex({ auth, submissions, chal
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                 }`}
                         >
-                            مُسلم
+                            {t('submissionStatuses.submitted')}
                         </button>
                         <button
                             onClick={() => handleStatusFilter('reviewed')}
@@ -98,7 +104,7 @@ export default function AdminChallengeSubmissionsIndex({ auth, submissions, chal
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                 }`}
                         >
-                            تم المراجعة
+                            {t('submissionStatuses.reviewed')}
                         </button>
                         <button
                             onClick={() => handleStatusFilter('approved')}
@@ -107,7 +113,7 @@ export default function AdminChallengeSubmissionsIndex({ auth, submissions, chal
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                 }`}
                         >
-                            مقبول
+                            {t('submissionStatuses.approved')}
                         </button>
                         <button
                             onClick={() => handleStatusFilter('rejected')}
@@ -116,12 +122,11 @@ export default function AdminChallengeSubmissionsIndex({ auth, submissions, chal
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                 }`}
                         >
-                            مرفوض
+                            {t('submissionStatuses.rejected')}
                         </button>
                     </div>
                 </div>
 
-                {/* Submissions List */}
                 {submissions.data && submissions.data.length > 0 ? (
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                         <div className="overflow-x-auto">
@@ -129,19 +134,19 @@ export default function AdminChallengeSubmissionsIndex({ auth, submissions, chal
                                 <thead className="bg-gray-50">
                                     <tr>
                                         <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            الطالب
+                                            {t('adminChallengeSubmissionsPage.table.student')}
                                         </th>
                                         <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            تاريخ التقديم
+                                            {t('adminChallengeSubmissionsPage.table.submittedAt')}
                                         </th>
                                         <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            الحالة
+                                            {t('adminChallengeSubmissionsPage.table.status')}
                                         </th>
                                         <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            التقييم
+                                            {t('adminChallengeSubmissionsPage.table.rating')}
                                         </th>
                                         <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            الإجراءات
+                                            {t('adminChallengeSubmissionsPage.table.actions')}
                                         </th>
                                     </tr>
                                 </thead>
@@ -155,7 +160,7 @@ export default function AdminChallengeSubmissionsIndex({ auth, submissions, chal
                                                     <div className="flex items-center">
                                                         <FaUser className="text-gray-400 ms-2" />
                                                         <span className="text-sm font-medium text-gray-900">
-                                                            {submission.student?.name || 'غير معروف'}
+                                                            {submission.student?.name || t('adminChallengeSubmissionsPage.unknownStudent')}
                                                         </span>
                                                     </div>
                                                 </td>
@@ -187,7 +192,7 @@ export default function AdminChallengeSubmissionsIndex({ auth, submissions, chal
                                                         className="text-blue-600 hover:text-blue-900 flex items-center gap-1"
                                                     >
                                                         <FaEye />
-                                                        عرض
+                                                        {t('common.view')}
                                                     </Link>
                                                 </td>
                                             </tr>
@@ -200,11 +205,10 @@ export default function AdminChallengeSubmissionsIndex({ auth, submissions, chal
                 ) : (
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
                         <FaTrophy className="mx-auto text-6xl text-gray-300 mb-4" />
-                        <p className="text-gray-500 text-lg">لا توجد تسليمات لهذا التحدي</p>
+                        <p className="text-gray-500 text-lg">{t('adminChallengeSubmissionsPage.empty')}</p>
                     </div>
                 )}
 
-                {/* Pagination */}
                 {submissions.links && submissions.links.length > 3 && (
                     <div className="mt-6 flex justify-center">
                         <div className="flex gap-2">
@@ -224,12 +228,11 @@ export default function AdminChallengeSubmissionsIndex({ auth, submissions, chal
                 )}
             </div>
 
-            {/* Toast Notification */}
             {showToast && (
                 <div className="fixed top-4 left-4 right-4 md:left-4 md:right-auto md:w-96 z-50 animate-slide-up">
-                    <div className="bg-green-500 text-white rounded-lg shadow-lg p-4 flex items-center justify-between">
+                    <div className={`${toastType === 'error' ? 'bg-red-500' : 'bg-green-500'} text-white rounded-lg shadow-lg p-4 flex items-center justify-between`}>
                         <div className="flex items-center gap-3">
-                            <FaCheckCircle className="text-xl" />
+                            {toastType === 'error' ? <FaTimesCircle className="text-xl" /> : <FaCheckCircle className="text-xl" />}
                             <p className="font-medium">{toastMessage}</p>
                         </div>
                         <button

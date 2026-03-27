@@ -1,35 +1,36 @@
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
-import { FaGift, FaCheckCircle, FaTimes, FaClock, FaPaperPlane, FaCalendar, FaArrowRight } from 'react-icons/fa';
+import { FaGift, FaCheckCircle, FaTimes, FaClock, FaPaperPlane, FaCalendar } from 'react-icons/fa';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import { useToast } from '@/Contexts/ToastContext';
+import { useTranslation } from '@/i18n';
 
 export default function StoreMembership({ auth, user, currentBalance = 1190, redeemableItems = [] }) {
     const { showSuccess, showError } = useToast();
+    const { t, language } = useTranslation();
     const [selectedItem, setSelectedItem] = useState(null);
 
-    // Default redeemable items if not provided
     const defaultItems = [
         {
             id: 1,
-            name: 'بطاقة رقمية',
+            name: t('storeMembershipPage.items.digitalCard.name'),
             icon: '🃏',
             points: 1000,
-            status: 'available', // available, insufficient, pending, ready
+            status: 'available',
             statusText: '',
         },
         {
             id: 2,
-            name: 'أدوات رسم إبداعية',
+            name: t('storeMembershipPage.items.creativeTools.name'),
             icon: '🎨',
             points: 1500,
             status: 'insufficient',
-            statusText: 'قريب جدا!',
+            statusText: t('storeMembershipPage.itemStatuses.almostThere'),
         },
         {
             id: 3,
-            name: 'قسيمة وجبة خفيفة',
+            name: t('storeMembershipPage.items.snackVoucher.name'),
             icon: '🍕',
             points: 800,
             status: 'available',
@@ -37,19 +38,19 @@ export default function StoreMembership({ auth, user, currentBalance = 1190, red
         },
         {
             id: 4,
-            name: 'دخول ورشة تعليمية',
+            name: t('storeMembershipPage.items.workshopAccess.name'),
             icon: '🎫',
             points: 1200,
             status: 'pending',
-            statusText: 'احجز الآن',
+            statusText: t('storeMembershipPage.itemStatuses.bookNow'),
         },
         {
             id: 5,
-            name: 'صندوق مفاجأة ذكي',
+            name: t('storeMembershipPage.items.smartBox.name'),
             icon: '🎁',
             points: 900,
             status: 'ready',
-            statusText: 'جاهز للتحويل',
+            statusText: t('storeMembershipPage.itemStatuses.readyForTransfer'),
         },
     ];
 
@@ -58,7 +59,7 @@ export default function StoreMembership({ auth, user, currentBalance = 1190, red
 
     const handleRedeem = () => {
         if (!selectedItem) {
-            showError('يرجى اختيار هدية أولاً');
+            showError(t('storeMembershipPage.messages.selectGiftFirst'));
             return;
         }
 
@@ -66,23 +67,17 @@ export default function StoreMembership({ auth, user, currentBalance = 1190, red
         if (!item) return;
 
         if (item.status === 'insufficient') {
-            showError('النقاط غير كافية لهذه الهدية');
+            showError(t('storeMembershipPage.messages.insufficientGiftPoints'));
             return;
         }
 
         if (balance < item.points) {
-            showError('رصيدك الحالي غير كافٍ');
+            showError(t('storeMembershipPage.messages.insufficientBalance'));
             return;
         }
 
-        // For now, show success message. 
-        // TODO: Create API endpoint for points redemption
-        // This would typically create a Point record with type 'redeemed'
-        // and update the user's points balance
-        showSuccess(`تم استبدال ${item.points} نقطة بنجاح! سيتم إرسال الهدية لحسابك أو بريدك.`);
+        showSuccess(t('storeMembershipPage.messages.redeemSuccess', { points: item.points }));
         setSelectedItem(null);
-
-        // Reload to update balance
         router.reload();
     };
 
@@ -120,19 +115,21 @@ export default function StoreMembership({ auth, user, currentBalance = 1190, red
             <div className={isDesktop ? 'space-y-4' : ''}>
                 {/* Green Banner */}
                 <div className="bg-gradient-to-r from-[#A3C042] to-[#8CA635] rounded-2xl p-4 text-white">
-                    <div className="text-sm font-bold mb-1">إربح مع كل إنجاز!</div>
-                    <div className="text-xs opacity-90">كلما ارتفع مستواك، زادت المزايا والهدايا</div>
+                    <div className="text-sm font-bold mb-1">{t('storeMembershipPage.banner.title')}</div>
+                    <div className="text-xs opacity-90">{t('storeMembershipPage.banner.subtitle')}</div>
                 </div>
 
                 {/* Current Balance */}
                 <div className="bg-white rounded-2xl border border-gray-100 p-4">
-                    <div className="text-xs text-gray-600 mb-2">رصيدك الحالي</div>
+                    <div className="text-xs text-gray-600 mb-2">{t('storeMembershipPage.currentBalanceTitle')}</div>
                     <div className="bg-green-50 rounded-xl p-3 mb-2">
-                        <div className="text-base font-bold text-[#A3C042]">{balance} النقاط</div>
+                        <div className="text-base font-bold text-[#A3C042]">
+                            {t('storeMembershipPage.currentBalanceValue', { points: balance })}
+                        </div>
                     </div>
                     <div className="flex items-center gap-1 text-xs text-gray-600">
                         <FaCheckCircle className="text-green-500 text-[10px]" />
-                        <span>قابلة للتحويل</span>
+                        <span>{t('storeMembershipPage.redeemableStatus')}</span>
                     </div>
                 </div>
 
@@ -140,7 +137,7 @@ export default function StoreMembership({ auth, user, currentBalance = 1190, red
                 <div className="bg-white rounded-2xl border border-gray-100 p-4">
                     <div className="flex items-center gap-2 mb-3">
                         <FaGift className="text-[#A3C042] text-sm" />
-                        <h3 className="text-sm font-extrabold text-gray-900">اختر هديتك</h3>
+                        <h3 className="text-sm font-extrabold text-gray-900">{t('storeMembershipPage.chooseGiftTitle')}</h3>
                     </div>
                     <div className="space-y-3">
                         {items.map((item) => {
@@ -183,10 +180,10 @@ export default function StoreMembership({ auth, user, currentBalance = 1190, red
                     className="w-full bg-[#A3C042] text-white rounded-xl py-3 font-bold text-sm flex items-center justify-center gap-2 hover:bg-[#8CA635] transition"
                 >
                     <FaGift />
-                    استبدل النقاط
+                    {t('storeMembershipPage.redeemButton')}
                 </button>
                 <p className="text-[10px] text-gray-500 text-center">
-                    يتم خصم النقاط تلقائيا وإرسال الهدية لحسابك أو بريدك.
+                    {t('storeMembershipPage.redeemHint')}
                 </p>
             </div>
 
@@ -194,37 +191,37 @@ export default function StoreMembership({ auth, user, currentBalance = 1190, red
             <div className={isDesktop ? 'space-y-4' : ''}>
                 {/* Usage Rules */}
                 <div className="bg-white rounded-2xl border border-gray-100 p-4">
-                    <h3 className="text-sm font-extrabold text-gray-900 mb-3">قواعد الاستخدام</h3>
+                    <h3 className="text-sm font-extrabold text-gray-900 mb-3">{t('storeMembershipPage.rules.title')}</h3>
                     <div className="space-y-2 text-xs text-gray-700">
-                        <div>• النقاط تكتسب من مهام حقيقية أو تحديات معتمدة.</div>
-                        <div>• استبدال واحد فقط كل أسبوع.</div>
-                        <div>• بعض الجوائز تتطلب موافقة ولي الأمر (لمن هم بين 7-16 سنة).</div>
+                        <div>• {t('storeMembershipPage.rules.rule1')}</div>
+                        <div>• {t('storeMembershipPage.rules.rule2')}</div>
+                        <div>• {t('storeMembershipPage.rules.rule3')}</div>
                     </div>
                 </div>
 
                 {/* Digital Win Card */}
                 <div className="bg-gradient-to-r from-[#A3C042] to-[#8CA635] rounded-2xl p-4 text-white">
-                    <div className="text-sm font-bold mb-3">بطاقة فوز رقمية</div>
+                    <div className="text-sm font-bold mb-3">{t('storeMembershipPage.sampleCard.title')}</div>
                     <div className="flex items-center gap-2 mb-3">
                         <div className="bg-white/20 rounded-xl px-2 py-1">
-                            <div className="text-xs font-bold">نقطة 25</div>
+                            <div className="text-xs font-bold">{t('storeMembershipPage.sampleCard.pointsLabel')}</div>
                         </div>
                     </div>
                     <div className="bg-white/20 rounded-xl p-3 mb-2">
                         <div className="text-xs font-mono font-bold">FVZ9-62YP-LK21</div>
                     </div>
                     <div className="flex items-center justify-between text-xs mb-2">
-                        <span>كود البطاقة:</span>
+                        <span>{t('storeMembershipPage.sampleCard.codeLabel')}</span>
                         <div className="flex items-center gap-1">
                             <FaCalendar className="text-[10px]" />
-                            <span>31 ديسمبر 2025</span>
+                            <span>{t('storeMembershipPage.sampleCard.expiryDate')}</span>
                         </div>
                     </div>
                     <div className="flex items-center justify-between text-xs mb-3">
-                        <span>صالح حتى:</span>
+                        <span>{t('storeMembershipPage.sampleCard.validUntilLabel')}</span>
                     </div>
                     <p className="text-[10px] opacity-90">
-                        استخدم الكود في صفحة الشحن لشحن رصيدك بالنقاط!
+                        {t('storeMembershipPage.sampleCard.description')}
                     </p>
                 </div>
             </div>
@@ -232,13 +229,13 @@ export default function StoreMembership({ auth, user, currentBalance = 1190, red
     );
 
     return (
-        <div dir="rtl" className="min-h-screen bg-gray-50">
-            <Head title="بطاقة عضوية المتجر - إرث المبتكرين" />
+        <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
+            <Head title={t('storeMembershipPage.pageTitle', { appName: t('common.appName') })} />
 
             {/* Mobile View */}
             <div className="block md:hidden">
                 <MobileTopBar
-                    title="بطاقة عضوية المتجر"
+                    title={t('storeMembershipPage.title')}
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
                     onBack={() => router.visit('/achievements')}
@@ -253,7 +250,7 @@ export default function StoreMembership({ auth, user, currentBalance = 1190, red
             {/* Desktop View */}
             <div className="hidden md:block">
                 <MobileTopBar
-                    title="بطاقة عضوية المتجر"
+                    title={t('storeMembershipPage.title')}
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
                     onBack={() => router.visit('/achievements')}

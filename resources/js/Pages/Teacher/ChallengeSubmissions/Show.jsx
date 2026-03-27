@@ -1,8 +1,7 @@
-import { Head, Link, useForm, router, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import DashboardLayout from '../../../Layouts/DashboardLayout';
 import { useState, useEffect } from 'react';
 import {
-    FaArrowLeft,
     FaStar,
     FaUser,
     FaCalendar,
@@ -14,18 +13,26 @@ import {
     FaImage,
     FaAward,
     FaTimes,
-    FaCheckCircle
+    FaCheckCircle,
 } from 'react-icons/fa';
 import TextInput from '../../../Components/TextInput';
 import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
 import PrimaryButton from '../../../Components/PrimaryButton';
+import { useBackIcon, useTranslation } from '@/i18n';
+import { toHijriDate } from '@/utils/dateUtils';
 
 export default function TeacherChallengeSubmissionShow({ auth, submission, availableBadges }) {
     const { flash } = usePage().props;
+    const { t, language } = useTranslation();
+    const BackIcon = useBackIcon();
+    const initialBadges = Array.isArray(submission.badges)
+        ? submission.badges.map((badge) => (typeof badge === 'object' ? badge.id : badge))
+        : [];
+
     const [rating, setRating] = useState(submission.rating || 0);
     const [hoveredRating, setHoveredRating] = useState(0);
-    const [selectedBadges, setSelectedBadges] = useState(submission.badges || []);
+    const [selectedBadges, setSelectedBadges] = useState(initialBadges);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
 
@@ -34,7 +41,7 @@ export default function TeacherChallengeSubmissionShow({ auth, submission, avail
         feedback: submission.feedback || '',
         status: submission.status || 'submitted',
         points_earned: submission.points_earned || submission.challenge?.points_reward || 0,
-        badges: submission.badges || [],
+        badges: initialBadges,
     });
 
     const handleRatingClick = (value) => {
@@ -44,19 +51,16 @@ export default function TeacherChallengeSubmissionShow({ auth, submission, avail
 
     const handleBadgeToggle = (badgeId) => {
         const newBadges = selectedBadges.includes(badgeId)
-            ? selectedBadges.filter(id => id !== badgeId)
+            ? selectedBadges.filter((id) => id !== badgeId)
             : [...selectedBadges, badgeId];
+
         setSelectedBadges(newBadges);
         setData('badges', newBadges);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(`/teacher/challenge-submissions/${submission.id}/evaluate`, {
-            onSuccess: () => {
-                // Toast will be shown on redirect page
-            },
-        });
+        post(`/teacher/challenge-submissions/${submission.id}/evaluate`);
     };
 
     useEffect(() => {
@@ -84,39 +88,50 @@ export default function TeacherChallengeSubmissionShow({ auth, submission, avail
         return <FaFile className="text-gray-500 text-xl" />;
     };
 
-    const formatDate = (dateString) => {
-        if (!dateString) return '';
-        const date = new Date(dateString);
-        const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
-        return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+    const formatDate = (value) => {
+        if (!value) return '-';
+
+        if (language === 'ar') {
+            return toHijriDate(value, false, language);
+        }
+
+        return new Intl.DateTimeFormat('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        }).format(new Date(value));
+    };
+
+    const getStatusLabel = (status) => {
+        const key = `submissionStatuses.${status}`;
+        const translated = t(key);
+        return translated === key ? status : translated;
     };
 
     return (
         <DashboardLayout auth={auth}>
-            <Head title={`تقييم التحدي: ${submission.challenge?.title}`} />
+            <Head title={t('teacherChallengeSubmissionShowPage.pageTitle', { title: submission.challenge?.title || '' })} />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <Link
                     href={`/teacher/challenge-submissions?challenge_id=${submission.challenge_id}`}
                     className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
                 >
-                    <FaArrowLeft />
-                    العودة إلى التسليمات
+                    <BackIcon />
+                    {t('teacherChallengeSubmissionShowPage.backToSubmissions')}
                 </Link>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Main Content */}
                     <div className="lg:col-span-2 space-y-6">
-                        {/* Challenge Details */}
                         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                             <div className="flex items-center gap-3 mb-4">
                                 <FaTrophy className="text-yellow-600 text-2xl" />
                                 <h2 className="text-2xl font-bold text-gray-900">{submission.challenge?.title}</h2>
                             </div>
-                            
+
                             {submission.challenge?.objective && (
                                 <p className="text-gray-700 mb-4">
-                                    <strong>الهدف:</strong> {submission.challenge.objective}
+                                    <strong>{t('teacherChallengeSubmissionShowPage.objectiveLabel')}</strong> {submission.challenge.objective}
                                 </p>
                             )}
 
@@ -129,34 +144,35 @@ export default function TeacherChallengeSubmissionShow({ auth, submission, avail
                             <div className="flex items-center justify-between mb-6">
                                 <div className="flex items-center gap-2 text-gray-600">
                                     <FaUser className="text-gray-400" />
-                                    <span className="font-medium">الطالب: {submission.student?.name || 'غير محدد'}</span>
+                                    <span className="font-medium">
+                                        {t('teacherChallengeSubmissionShowPage.studentLabel', {
+                                            name: submission.student?.name || t('teacherChallengeSubmissionShowPage.unknownStudent'),
+                                        })}
+                                    </span>
                                 </div>
                                 <div className="flex items-center gap-2 text-gray-600">
                                     <FaCalendar className="text-gray-400" />
-                                    <span>تاريخ التقديم: {formatDate(submission.submitted_at)}</span>
+                                    <span>{t('teacherChallengeSubmissionShowPage.submissionDateLabel', { date: formatDate(submission.submitted_at) })}</span>
                                 </div>
                             </div>
 
-                            {/* Student Answer */}
                             {submission.answer && (
                                 <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-2">الحل / الإجابة:</h3>
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('teacherChallengeSubmissionShowPage.answerTitle')}</h3>
                                     <p className="text-gray-700 whitespace-pre-line">{submission.answer}</p>
                                 </div>
                             )}
 
-                            {/* Student Comment */}
                             {submission.comment && (
                                 <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-2">تعليق الطالب:</h3>
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('teacherChallengeSubmissionShowPage.commentTitle')}</h3>
                                     <p className="text-gray-700 whitespace-pre-line">{submission.comment}</p>
                                 </div>
                             )}
 
-                            {/* Attached Files */}
                             {submission.files && submission.files.length > 0 && (
                                 <div className="mb-6">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-3">الملفات المرفقة:</h3>
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('teacherChallengeSubmissionShowPage.attachmentsTitle')}</h3>
                                     <div className="space-y-2">
                                         {submission.files.map((file, index) => (
                                             <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition">
@@ -177,31 +193,28 @@ export default function TeacherChallengeSubmissionShow({ auth, submission, avail
                             )}
                         </div>
 
-                        {/* Evaluation Section */}
                         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                            <h3 className="text-xl font-bold text-gray-900 mb-6">تقييم التقديم</h3>
-                            
+                            <h3 className="text-xl font-bold text-gray-900 mb-6">{t('teacherChallengeSubmissionShowPage.evaluationTitle')}</h3>
+
                             <form onSubmit={handleSubmit} className="space-y-6">
-                                {/* Status */}
                                 <div>
-                                    <InputLabel value="الحالة *" />
+                                    <InputLabel value={t('teacherChallengeSubmissionShowPage.statusLabel')} />
                                     <select
                                         value={data.status}
                                         onChange={(e) => setData('status', e.target.value)}
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                         required
                                     >
-                                        <option value="submitted">مُسلم</option>
-                                        <option value="reviewed">تم المراجعة</option>
-                                        <option value="approved">مقبول</option>
-                                        <option value="rejected">مرفوض</option>
+                                        <option value="submitted">{t('submissionStatuses.submitted')}</option>
+                                        <option value="reviewed">{t('submissionStatuses.reviewed')}</option>
+                                        <option value="approved">{t('submissionStatuses.approved')}</option>
+                                        <option value="rejected">{t('submissionStatuses.rejected')}</option>
                                     </select>
                                     <InputError message={errors.status} className="mt-2" />
                                 </div>
 
-                                {/* Rating */}
                                 <div>
-                                    <InputLabel value="التقييم (0-10)" />
+                                    <InputLabel value={t('teacherChallengeSubmissionShowPage.ratingLabel')} />
                                     <div className="flex items-center gap-2 mt-2">
                                         {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
                                             <button
@@ -219,49 +232,48 @@ export default function TeacherChallengeSubmissionShow({ auth, submission, avail
                                                 <FaStar />
                                             </button>
                                         ))}
-                                        <span className="ms-2 text-gray-600">({rating} / 10)</span>
+                                        <span className="ms-2 text-gray-600">
+                                            {t('teacherChallengeSubmissionShowPage.ratingValue', { rating })}
+                                        </span>
                                     </div>
                                     <InputError message={errors.rating} className="mt-2" />
                                 </div>
 
-                                {/* Points */}
                                 {submission.challenge?.points_reward > 0 && (
                                     <div>
-                                        <InputLabel htmlFor="points_earned" value="النقاط المكتسبة" />
+                                        <InputLabel htmlFor="points_earned" value={t('teacherChallengeSubmissionShowPage.pointsEarnedLabel')} />
                                         <TextInput
                                             id="points_earned"
                                             type="number"
                                             value={data.points_earned}
-                                            onChange={(e) => setData('points_earned', parseInt(e.target.value) || 0)}
+                                            onChange={(e) => setData('points_earned', Number.parseInt(e.target.value, 10) || 0)}
                                             className="mt-1 block w-full"
                                             min="0"
                                             max={submission.challenge.points_reward}
                                         />
                                         <p className="mt-1 text-sm text-gray-500">
-                                            الحد الأقصى: {submission.challenge.points_reward} نقطة
+                                            {t('teacherChallengeSubmissionShowPage.pointsMaxLabel', { points: submission.challenge.points_reward })}
                                         </p>
                                         <InputError message={errors.points_earned} className="mt-2" />
                                     </div>
                                 )}
 
-                                {/* Feedback */}
                                 <div>
-                                    <InputLabel htmlFor="feedback" value="ملاحظات المقيّم" />
+                                    <InputLabel htmlFor="feedback" value={t('teacherChallengeSubmissionShowPage.feedbackLabel')} />
                                     <textarea
                                         id="feedback"
                                         value={data.feedback}
                                         onChange={(e) => setData('feedback', e.target.value)}
                                         rows={6}
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                        placeholder="اكتب ملاحظاتك على التقديم..."
+                                        placeholder={t('teacherChallengeSubmissionShowPage.feedbackPlaceholder')}
                                     />
                                     <InputError message={errors.feedback} className="mt-2" />
                                 </div>
 
-                                {/* Badges */}
                                 {availableBadges && availableBadges.length > 0 && (
                                     <div>
-                                        <InputLabel value="الشارات (اختياري)" />
+                                        <InputLabel value={t('teacherChallengeSubmissionShowPage.badgesLabel')} />
                                         <div className="mt-2 grid grid-cols-2 md:grid-cols-3 gap-3">
                                             {availableBadges.map((badge) => (
                                                 <label
@@ -291,36 +303,29 @@ export default function TeacherChallengeSubmissionShow({ auth, submission, avail
                                     {processing ? (
                                         <>
                                             <FaSpinner className="animate-spin ms-2" />
-                                            جاري الحفظ...
+                                            {t('teacherChallengeSubmissionShowPage.saving')}
                                         </>
                                     ) : (
-                                        <>
-                                            حفظ التقييم
-                                        </>
+                                        t('teacherChallengeSubmissionShowPage.saveEvaluation')
                                     )}
                                 </PrimaryButton>
                             </form>
                         </div>
                     </div>
 
-                    {/* Sidebar */}
                     <div className="space-y-6">
-                        {/* Current Status */}
                         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">الحالة الحالية</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('teacherChallengeSubmissionShowPage.currentStatusTitle')}</h3>
                             <div className="space-y-3">
                                 <div>
-                                    <span className="text-sm text-gray-600">الحالة:</span>
+                                    <span className="text-sm text-gray-600">{t('teacherChallengeSubmissionShowPage.statusShortLabel')}</span>
                                     <p className="font-medium text-gray-900 capitalize">
-                                        {submission.status === 'submitted' ? 'مُسلم' :
-                                         submission.status === 'reviewed' ? 'تم المراجعة' :
-                                         submission.status === 'approved' ? 'مقبول' :
-                                         submission.status === 'rejected' ? 'مرفوض' : submission.status}
+                                        {getStatusLabel(submission.status)}
                                     </p>
                                 </div>
-                                {submission.rating && (
+                                {submission.rating !== null && submission.rating !== undefined && (
                                     <div>
-                                        <span className="text-sm text-gray-600">التقييم:</span>
+                                        <span className="text-sm text-gray-600">{t('teacherChallengeSubmissionShowPage.ratingShortLabel')}</span>
                                         <div className="flex items-center gap-1">
                                             <FaStar className="text-yellow-500" />
                                             <p className="font-medium text-gray-900">{submission.rating} / 10</p>
@@ -329,19 +334,21 @@ export default function TeacherChallengeSubmissionShow({ auth, submission, avail
                                 )}
                                 {submission.points_earned > 0 && (
                                     <div>
-                                        <span className="text-sm text-gray-600">النقاط:</span>
-                                        <p className="font-medium text-green-600">{submission.points_earned} نقطة</p>
+                                        <span className="text-sm text-gray-600">{t('teacherChallengeSubmissionShowPage.pointsShortLabel')}</span>
+                                        <p className="font-medium text-green-600">
+                                            {t('teacherChallengeSubmissionShowPage.pointsValue', { points: submission.points_earned })}
+                                        </p>
                                     </div>
                                 )}
                                 {submission.reviewed_at && (
                                     <div>
-                                        <span className="text-sm text-gray-600">تاريخ المراجعة:</span>
+                                        <span className="text-sm text-gray-600">{t('teacherChallengeSubmissionShowPage.reviewedDateLabel')}</span>
                                         <p className="font-medium text-gray-900">{formatDate(submission.reviewed_at)}</p>
                                     </div>
                                 )}
                                 {submission.reviewer && (
                                     <div>
-                                        <span className="text-sm text-gray-600">المقيّم:</span>
+                                        <span className="text-sm text-gray-600">{t('teacherChallengeSubmissionShowPage.reviewerLabel')}</span>
                                         <p className="font-medium text-gray-900">{submission.reviewer.name}</p>
                                     </div>
                                 )}
@@ -351,7 +358,6 @@ export default function TeacherChallengeSubmissionShow({ auth, submission, avail
                 </div>
             </div>
 
-            {/* Toast Notification */}
             {showToast && (
                 <div className="fixed top-4 left-4 right-4 md:left-4 md:right-auto md:w-96 z-50 animate-slide-up">
                     <div className="bg-green-500 text-white rounded-lg shadow-lg p-4 flex items-center justify-between">
@@ -371,4 +377,3 @@ export default function TeacherChallengeSubmissionShow({ auth, submission, avail
         </DashboardLayout>
     );
 }
-

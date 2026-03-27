@@ -91,14 +91,14 @@ class PackageService extends BaseService
             $totalPackages = Package::count();
             $activePackages = Package::where('is_active', true)->count();
             $popularPackages = Package::where('is_popular', true)->count();
-            $totalSubscribers = UserPackage::where('status', 'active')->count();
+            $totalSubscribers = UserPackage::currentActive()->count();
 
             // Revenue statistics
-            $totalRevenue = UserPackage::where('status', 'active')
+            $totalRevenue = UserPackage::currentActive()
                 ->sum('paid_amount');
 
             // Monthly revenue
-            $monthlyRevenue = UserPackage::where('status', 'active')
+            $monthlyRevenue = UserPackage::currentActive()
                 ->whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year)
                 ->sum('paid_amount');
@@ -203,7 +203,7 @@ class PackageService extends BaseService
     {
         // Check if package has active subscribers
         $activeSubscribers = UserPackage::where('package_id', $package->id)
-            ->where('status', 'active')
+            ->currentActive()
             ->count();
 
         if ($activeSubscribers > 0) {
@@ -314,6 +314,11 @@ class PackageService extends BaseService
         }
 
         $userPackage->update(['status' => $status]);
+        $userPackage->loadMissing('user.teacher');
+
+        if ($userPackage->user) {
+            app(MembershipAccessService::class)->syncMembershipFromSubscriptions($userPackage->user);
+        }
 
         // Clear cache
         $this->forgetCacheTags(["package_{$userPackage->package_id}"]);
@@ -346,12 +351,19 @@ class PackageService extends BaseService
      */
     public function renewSubscription(UserPackage $userPackage, int $months = 1): UserPackage
     {
-        $newEndDate = $userPackage->end_date->addMonths($months);
+        $currentEndDate = $userPackage->end_date?->copy() ?? now();
+        $renewalBaseDate = $currentEndDate->greaterThan(now()) ? $currentEndDate : now();
+        $newEndDate = $renewalBaseDate->copy()->addMonths($months);
 
         $userPackage->update([
             'end_date' => $newEndDate,
             'status' => 'active',
         ]);
+        $userPackage->loadMissing('user.teacher');
+
+        if ($userPackage->user) {
+            app(MembershipAccessService::class)->syncMembershipFromSubscriptions($userPackage->user);
+        }
 
         // Clear cache
         $this->forgetCacheTags(["package_{$userPackage->package_id}"]);

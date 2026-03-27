@@ -113,15 +113,6 @@ class AppServiceProvider extends ServiceProvider
         );
 
         $this->app->bind(
-            \App\Services\PaymentService::class,
-            function ($app) {
-                return new \App\Services\PaymentService(
-                    $app->make(\App\Repositories\BookingRepository::class)
-                );
-            }
-        );
-
-        $this->app->bind(
             \App\Services\BadgeService::class,
             function ($app) {
                 return new \App\Services\BadgeService(
@@ -196,7 +187,8 @@ class AppServiceProvider extends ServiceProvider
                 return new \App\Services\PaymentService(
                     $app->make(\App\Services\TamaraService::class),
                     $app->make(\App\Services\BookingService::class),
-                    $app->make(\App\Services\ChatService::class)
+                    $app->make(\App\Services\ChatService::class),
+                    $app->make(\App\Services\MembershipAccessService::class)
                 );
             }
         );

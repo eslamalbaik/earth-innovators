@@ -267,29 +267,26 @@ class PasswordResetOtpTest extends TestCase
     /**
      * Test that rate limiting works
      */
-    public function test_rate_limiting_prevents_rapid_otp_requests(): void
+    public function test_rate_limiting_blocks_excessive_otp_requests_within_the_window(): void
     {
         Mail::fake();
         Cache::flush();
 
         $user = User::factory()->create();
 
-        // First request should succeed
-        $firstResponse = $this->post('/forgot-password', [
+        foreach (range(1, 3) as $attempt) {
+            $response = $this->post('/forgot-password', [
+                'email' => $user->email,
+            ]);
+
+            $response->assertSessionHasNoErrors();
+        }
+
+        $blockedResponse = $this->post('/forgot-password', [
             'email' => $user->email,
         ]);
 
-        $firstResponse->assertSessionHasNoErrors();
-
-        // Second request immediately should be rate limited
-        try {
-            $secondResponse = $this->post('/forgot-password', [
-                'email' => $user->email,
-            ]);
-        } catch (\Exception $e) {
-            // Expected: rate limit exception
-            $this->assertStringContainsString('Too many', $e->getMessage());
-        }
+        $blockedResponse->assertSessionHasErrors(['email']);
     }
 
     /**
@@ -376,27 +373,23 @@ class PasswordResetOtpTest extends TestCase
     {
         $user = User::factory()->create();
 
-        // Create multiple OTPs
-        $otp1 = $this->otpService->generate($user->email, 'password_reset');
-        $otp2 = $this->otpService->generate($user->email, 'password_reset');
+        // Requesting a new OTP should invalidate any previous unused OTP.
+        $this->otpService->generate($user->email, 'password_reset');
+        $latestOtp = $this->otpService->generate($user->email, 'password_reset');
 
-        // Verify and use first OTP
-        $this->otpService->verify($user->email, $otp1->plain_code, 'password_reset', $otp1->token);
+        $this->otpService->verify($user->email, $latestOtp->plain_code, 'password_reset', $latestOtp->token);
 
-        // Reset password
         $this->passwordResetService->resetPassword(
             $user->email,
             'new-password-123',
-            $otp1->token
+            $latestOtp->token
         );
 
-        // Verify unused OTPs are deleted
-        $unusedOtps = EmailOtp::where('email', $user->email)
+        $remainingOtps = EmailOtp::where('email', $user->email)
             ->where('purpose', 'password_reset')
-            ->whereNull('used_at')
             ->count();
 
-        $this->assertEquals(0, $unusedOtps);
+        $this->assertEquals(0, $remainingOtps);
     }
 
     /**
@@ -425,7 +418,14 @@ class PasswordResetOtpTest extends TestCase
             ->first();
 
         $this->assertNotNull($otp);
-        $plainCode = $otp->plain_code;
+        $plainCode = null;
+
+        Mail::assertSent(OtpMail::class, function ($mail) use ($user, &$plainCode) {
+            $plainCode = $mail->code;
+            return $mail->hasTo($user->email) && $mail->purpose === 'password_reset';
+        });
+
+        $this->assertNotNull($plainCode);
 
         // Step 2: Verify OTP
         $verifyResponse = $this->post('/reset-password/verify-otp', [

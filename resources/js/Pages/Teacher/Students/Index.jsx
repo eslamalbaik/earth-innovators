@@ -1,46 +1,50 @@
 import { Head, Link } from '@inertiajs/react';
 import DashboardLayout from '@/Layouts/DashboardLayout';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
-    FaUsers, FaSearch, FaProjectDiagram, FaStar, FaMedal
+    FaUsers, FaSearch, FaProjectDiagram, FaStar, FaMedal,
 } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function Index({ auth, students }) {
+    const { t } = useTranslation();
     const [searchTerm, setSearchTerm] = useState('');
+    const studentRows = students?.data || [];
 
-    const filteredStudents = students.data.filter(student => {
+    const filteredStudents = useMemo(() => studentRows.filter((student) => {
         if (!searchTerm) return true;
         const search = searchTerm.toLowerCase();
+
         return (
-            student.name.toLowerCase().includes(search) ||
-            student.email.toLowerCase().includes(search) ||
+            student.name?.toLowerCase().includes(search) ||
+            student.email?.toLowerCase().includes(search) ||
             (student.phone && student.phone.includes(search))
         );
-    });
+    }), [searchTerm, studentRows]);
 
     return (
-        <DashboardLayout header="الطلاب المتابعون">
-            <Head title="الطلاب المتابعون - إرث المبتكرين" />
+        <DashboardLayout header={t('teacherStudentsPage.title')}>
+            <Head title={t('teacherStudentsPage.pageTitle', { appName: t('common.appName') })} />
 
             <div className="space-y-6">
-                {/* رأس الصفحة */}
                 <div className="bg-white rounded-xl shadow-lg p-6">
                     <div className="flex items-center justify-between mb-6">
                         <div>
                             <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
                                 <FaUsers className="text-[#A3C042]" />
-                                الطلاب المتابعون
+                                {t('teacherStudentsPage.title')}
                             </h2>
-                            <p className="text-gray-600 mt-1">إجمالي الطلاب: {students.total}</p>
+                            <p className="text-gray-600 mt-1">
+                                {t('teacherStudentsPage.totalStudents', { count: students?.total || 0 })}
+                            </p>
                         </div>
                     </div>
 
-                    {/* البحث */}
                     <div className="relative">
                         <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                         <input
                             type="text"
-                            placeholder="ابحث عن طالب..."
+                            placeholder={t('teacherStudentsPage.searchPlaceholder')}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#A3C042] focus:border-transparent"
@@ -48,32 +52,31 @@ export default function Index({ auth, students }) {
                     </div>
                 </div>
 
-                {/* جدول الطلاب */}
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gradient-to-r from-[#A3C042]/10 to-legacy-blue/10">
                                 <tr>
-                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                        الاسم
+                                    <th className="px-6 py-3 text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                        {t('teacherStudentsPage.table.name')}
                                     </th>
-                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                        البريد الإلكتروني
+                                    <th className="px-6 py-3 text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                        {t('teacherStudentsPage.table.email')}
                                     </th>
-                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                        الهاتف
+                                    <th className="px-6 py-3 text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                        {t('teacherStudentsPage.table.phone')}
                                     </th>
-                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                        النقاط
+                                    <th className="px-6 py-3 text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                        {t('teacherStudentsPage.table.points')}
                                     </th>
-                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                        المشاريع
+                                    <th className="px-6 py-3 text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                        {t('teacherStudentsPage.table.projects')}
                                     </th>
-                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                        مشاريعك معه
+                                    <th className="px-6 py-3 text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                        {t('teacherStudentsPage.table.teacherProjects')}
                                     </th>
-                                    <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                        الشارات
+                                    <th className="px-6 py-3 text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                        {t('teacherStudentsPage.table.badges')}
                                     </th>
                                 </tr>
                             </thead>
@@ -81,7 +84,7 @@ export default function Index({ auth, students }) {
                                 {filteredStudents.length === 0 ? (
                                     <tr>
                                         <td colSpan="7" className="px-6 py-12 text-center text-gray-500">
-                                            {searchTerm ? 'لا توجد نتائج للبحث' : 'لا يوجد طلاب متابعين'}
+                                            {searchTerm ? t('teacherStudentsPage.empty.search') : t('teacherStudentsPage.empty.default')}
                                         </td>
                                     </tr>
                                 ) : (
@@ -99,24 +102,24 @@ export default function Index({ auth, students }) {
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-1 text-sm font-semibold text-purple-600">
                                                     <FaStar />
-                                                    {student.points}
+                                                    {student.points || 0}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-1 text-sm text-gray-600">
                                                     <FaProjectDiagram />
-                                                    {student.projects_count} ({student.approved_projects} معتمد)
+                                                    {student.projects_count || 0} ({t('teacherStudentsPage.approvedProjectsCount', { count: student.approved_projects || 0 })})
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="text-sm font-semibold text-[#A3C042]">
-                                                    {student.teacher_projects_count}
+                                                    {student.teacher_projects_count || 0}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-2">
                                                     <FaMedal className="text-orange-500" />
-                                                    <span className="text-sm text-gray-600">{student.badges_count}</span>
+                                                    <span className="text-sm text-gray-600">{student.badges_count || 0}</span>
                                                     {student.badges && student.badges.length > 0 && (
                                                         <div className="flex -space-x-2">
                                                             {student.badges.slice(0, 3).map((badge) => (
@@ -144,7 +147,6 @@ export default function Index({ auth, students }) {
                         </table>
                     </div>
 
-                    {/* Pagination */}
                     {students.links && students.links.length > 3 && (
                         <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
                             <div className="flex items-center justify-between">
@@ -154,7 +156,7 @@ export default function Index({ auth, students }) {
                                             href={students.links[0].url}
                                             className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                         >
-                                            السابق
+                                            {t('common.previous')}
                                         </Link>
                                     )}
                                     {students.links[students.links.length - 1].url && (
@@ -162,16 +164,18 @@ export default function Index({ auth, students }) {
                                             href={students.links[students.links.length - 1].url}
                                             className="me-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                         >
-                                            التالي
+                                            {t('common.next')}
                                         </Link>
                                     )}
                                 </div>
                                 <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                                     <div>
                                         <p className="text-sm text-gray-700">
-                                            عرض <span className="font-medium">{students.from}</span> إلى{' '}
-                                            <span className="font-medium">{students.to}</span> من{' '}
-                                            <span className="font-medium">{students.total}</span> نتيجة
+                                            {t('teacherStudentsPage.paginationSummary', {
+                                                from: students.from || 0,
+                                                to: students.to || 0,
+                                                total: students.total || 0,
+                                            })}
                                         </p>
                                     </div>
                                     <div>
@@ -181,9 +185,9 @@ export default function Index({ auth, students }) {
                                                     key={index}
                                                     href={link.url || '#'}
                                                     className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${link.active
-                                                            ? 'z-10 bg-[#A3C042] border-[#A3C042] text-white'
-                                                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                        ? 'z-10 bg-[#A3C042] border-[#A3C042] text-white'
+                                                        : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                                    } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                                 />
                                             ))}
@@ -198,4 +202,3 @@ export default function Index({ auth, students }) {
         </DashboardLayout>
     );
 }
-

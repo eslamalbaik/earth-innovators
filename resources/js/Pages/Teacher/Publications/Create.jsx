@@ -1,14 +1,17 @@
 import DashboardLayout from '../../../Layouts/DashboardLayout';
 import { Head, useForm, router, Link } from '@inertiajs/react';
 import { useState, useRef } from 'react';
-import { FaArrowLeft, FaUpload, FaImage, FaFileAlt, FaSpinner, FaTrash } from 'react-icons/fa';
+import { FaUpload, FaImage, FaSpinner, FaTrash } from 'react-icons/fa';
 import TextInput from '../../../Components/TextInput';
 import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
 import PrimaryButton from '../../../Components/PrimaryButton';
 import TiptapEditor from '../../../Components/TiptapEditor';
+import { useBackIcon, useTranslation } from '@/i18n';
 
 export default function CreatePublication({ auth, school }) {
+    const { t } = useTranslation();
+    const BackIcon = useBackIcon();
     const { data, setData, post, processing, errors } = useForm({
         title: '',
         content: '',
@@ -23,15 +26,13 @@ export default function CreatePublication({ auth, school }) {
     const handleImageChange = (e) => {
         const file = e.target.files?.[0];
         if (file) {
-            // التحقق من نوع الملف
             if (!file.type.startsWith('image/')) {
-                alert('يرجى اختيار ملف صورة صحيح');
+                alert(t('teacherPublicationCreatePage.alerts.invalidImageType'));
                 return;
             }
 
-            // التحقق من حجم الملف (2 ميجا)
             if (file.size > 2 * 1024 * 1024) {
-                alert('حجم الصورة يجب ألا يتجاوز 2 ميجابايت');
+                alert(t('teacherPublicationCreatePage.alerts.imageTooLarge'));
                 return;
             }
 
@@ -60,13 +61,13 @@ export default function CreatePublication({ auth, school }) {
 
     if (!school) {
         return (
-            <DashboardLayout auth={auth} header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">إنشاء مقال</h2>}>
-                <Head title="إنشاء مقال - لوحة المعلم" />
+            <DashboardLayout auth={auth} header={t('teacherPublicationCreatePage.title')}>
+                <Head title={t('teacherPublicationCreatePage.pageTitle', { appName: t('common.appName') })} />
                 <div className="py-6">
                     <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
                             <p className="text-yellow-800">
-                                يجب أن تكون مرتبطاً بمدرسة لنشر المقالات. يرجى التواصل مع الإدارة.
+                                {t('teacherPublicationCreatePage.noSchoolMessage')}
                             </p>
                         </div>
                     </div>
@@ -78,69 +79,65 @@ export default function CreatePublication({ auth, school }) {
     return (
         <DashboardLayout
             auth={auth}
-            header={
+            header={(
                 <div className="flex items-center gap-3">
                     <Link href="/teacher/publications" className="text-gray-600 hover:text-[#A3C042]">
-                        <FaArrowLeft className="text-xl" />
+                        <BackIcon className="text-xl" />
                     </Link>
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">إنشاء مقال جديد</h2>
+                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">{t('teacherPublicationCreatePage.title')}</h2>
                 </div>
-            }
+            )}
         >
-            <Head title="إنشاء مقال جديد - لوحة المعلم" />
+            <Head title={t('teacherPublicationCreatePage.pageTitle', { appName: t('common.appName') })} />
 
             <div className="py-6">
                 <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
                     <form onSubmit={submit} className="bg-white rounded-xl shadow-lg p-6 space-y-6">
-                        {/* Title */}
                         <div>
-                            <InputLabel htmlFor="title" value="اسم المقال" className="text-sm font-medium text-gray-700 mb-2" />
+                            <InputLabel htmlFor="title" value={t('teacherPublicationCreatePage.titleLabel')} className="text-sm font-medium text-gray-700 mb-2" />
                             <TextInput
                                 id="title"
                                 type="text"
                                 value={data.title}
                                 onChange={(e) => setData('title', e.target.value)}
                                 className="block w-full"
-                                placeholder="أدخل اسم المقال"
+                                placeholder={t('teacherPublicationCreatePage.titlePlaceholder')}
                                 required
                             />
                             <InputError message={errors.title} className="mt-2" />
                         </div>
 
-                        {/* Description */}
                         <div>
-                            <InputLabel htmlFor="description" value="وصف مختصر" className="text-sm font-medium text-gray-700 mb-2" />
+                            <InputLabel htmlFor="description" value={t('teacherPublicationCreatePage.descriptionLabel')} className="text-sm font-medium text-gray-700 mb-2" />
                             <textarea
                                 id="description"
                                 value={data.description}
                                 onChange={(e) => setData('description', e.target.value)}
                                 rows={3}
                                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
-                                placeholder="أدخل وصفاً مختصراً للمقال"
+                                placeholder={t('teacherPublicationCreatePage.descriptionPlaceholder')}
                             />
                             <InputError message={errors.description} className="mt-2" />
                         </div>
 
-                        {/* Content */}
                         <div>
-                            <InputLabel htmlFor="content" value="محتوى المقال" className="text-sm font-medium text-gray-700 mb-2" />
+                            <InputLabel htmlFor="content" value={t('teacherPublicationCreatePage.contentLabel')} className="text-sm font-medium text-gray-700 mb-2" />
                             <TiptapEditor
                                 content={data.content}
                                 onChange={(html) => setData('content', html)}
-                                placeholder="أدخل محتوى المقال..."
+                                placeholder={t('teacherPublicationCreatePage.contentPlaceholder')}
                             />
                             <InputError message={errors.content} className="mt-2" />
                         </div>
 
-                        {/* Cover Image */}
                         <div>
-                            <InputLabel value="صورة المقال" className="text-sm font-medium text-gray-700 mb-2" />
+                            <InputLabel value={t('teacherPublicationCreatePage.coverImageLabel')} className="text-sm font-medium text-gray-700 mb-2" />
 
                             {imagePreview ? (
                                 <div className="relative">
                                     <img
                                         src={imagePreview}
-                                        alt="Preview"
+                                        alt={t('teacherPublicationCreatePage.coverImagePreviewAlt')}
                                         className="w-full h-64 object-cover rounded-lg border border-gray-300"
                                     />
                                     <button
@@ -158,10 +155,10 @@ export default function CreatePublication({ auth, school }) {
                                 >
                                     <FaImage className="mx-auto text-4xl text-gray-400 mb-4" />
                                     <p className="text-gray-700 mb-2">
-                                        انقر لاختيار صورة المقال
+                                        {t('teacherPublicationCreatePage.coverImageSelect')}
                                     </p>
                                     <p className="text-sm text-gray-500">
-                                        PNG, JPG, GIF (الحد الأقصى: 2 ميجابايت)
+                                        {t('teacherPublicationCreatePage.coverImageHint')}
                                     </p>
                                 </div>
                             )}
@@ -176,9 +173,8 @@ export default function CreatePublication({ auth, school }) {
                             <InputError message={errors.cover_image} className="mt-2" />
                         </div>
 
-                        {/* Type */}
                         <div>
-                            <InputLabel htmlFor="type" value="نوع المقال" className="text-sm font-medium text-gray-700 mb-2" />
+                            <InputLabel htmlFor="type" value={t('teacherPublicationCreatePage.typeLabel')} className="text-sm font-medium text-gray-700 mb-2" />
                             <select
                                 id="type"
                                 value={data.type}
@@ -186,34 +182,32 @@ export default function CreatePublication({ auth, school }) {
                                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                                 required
                             >
-                                <option value="magazine">مجلة</option>
-                                <option value="booklet">كتيب</option>
-                                <option value="report">تقرير</option>
-                                <option value="article">مقال</option>
+                                <option value="magazine">{t('teacherPublicationsPage.types.magazine')}</option>
+                                <option value="booklet">{t('teacherPublicationsPage.types.booklet')}</option>
+                                <option value="report">{t('teacherPublicationsPage.types.report')}</option>
+                                <option value="article">{t('teacherPublicationsPage.types.article')}</option>
                             </select>
                             <InputError message={errors.type} className="mt-2" />
                         </div>
 
-                        {/* School Info */}
                         {school && (
                             <div className="bg-[#A3C042]/10 border border-[#A3C042]/20 rounded-lg p-4">
                                 <p className="text-sm text-gray-700">
-                                    <span className="font-semibold">المدرسة:</span> {school.name}
+                                    <span className="font-semibold">{t('teacherPublicationCreatePage.schoolLabel')}:</span> {school.name}
                                 </p>
                                 <p className="text-xs text-gray-600 mt-1">
-                                    سيتم إرسال المقال للمدرسة للمراجعة والموافقة عليه قبل النشر
+                                    {t('teacherPublicationCreatePage.schoolReviewHint')}
                                 </p>
                             </div>
                         )}
 
-                        {/* Submit Button */}
                         <div className="flex items-center justify-end gap-4 pt-4 border-t border-gray-200">
                             <button
                                 type="button"
                                 onClick={() => router.visit('/teacher/publications')}
                                 className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition"
                             >
-                                إلغاء
+                                {t('teacherPublicationCreatePage.cancel')}
                             </button>
                             <PrimaryButton
                                 type="submit"
@@ -223,12 +217,12 @@ export default function CreatePublication({ auth, school }) {
                                 {processing ? (
                                     <>
                                         <FaSpinner className="animate-spin" />
-                                        جاري النشر...
+                                        {t('teacherPublicationCreatePage.publishing')}
                                     </>
                                 ) : (
                                     <>
                                         <FaUpload />
-                                        نشر المقال
+                                        {t('teacherPublicationCreatePage.submit')}
                                     </>
                                 )}
                             </PrimaryButton>
@@ -239,4 +233,3 @@ export default function CreatePublication({ auth, school }) {
         </DashboardLayout>
     );
 }
-

@@ -1,536 +1,413 @@
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import DashboardLayout from '@/Layouts/DashboardLayout';
-import { useState } from 'react';
-import {
-    FaFilePdf, FaDownload, FaSearch, FaUser, FaIdCard,
-    FaCalendarAlt, FaGraduationCap, FaEdit, FaTimes, FaCheck
-} from 'react-icons/fa';
+import { useMemo, useState } from 'react';
+import { FaCheckCircle, FaClock, FaDownload, FaFileSignature, FaSchool, FaSearch, FaTimesCircle, FaUserGraduate, FaUserTie } from 'react-icons/fa';
 import Modal from '@/Components/Modal';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
-import InputError from '@/Components/InputError';
 import axios from 'axios';
 import { useToast } from '@/Contexts/ToastContext';
-import { useTranslation } from '@/i18n';
 
-export default function Index({ auth, students, description }) {
+const STATUS_STYLES = {
+    approved: 'bg-green-100 text-green-700',
+    pending_school_approval: 'bg-amber-100 text-amber-700',
+    rejected: 'bg-red-100 text-red-700',
+};
+
+export default function SchoolCertificatesIndex({
+    auth,
+    recipients,
+    pendingRequests = [],
+    recentIssuedCertificates = [],
+    membershipSummary = null,
+    description = '',
+}) {
     const { showSuccess, showError } = useToast();
-    const { t, language } = useTranslation();
-    const [selectedStudent, setSelectedStudent] = useState(null);
-    const [showGenerateModal, setShowGenerateModal] = useState(false);
-    const [showPreviewModal, setShowPreviewModal] = useState(false);
-    const [generating, setGenerating] = useState(false);
-    const [previewData, setPreviewData] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
-    const [dateFormat, setDateFormat] = useState('Y-m-d');
-
-    const [certificateType, setCertificateType] = useState('student');
+    const [selectedRecipient, setSelectedRecipient] = useState(null);
+    const [showIssueModal, setShowIssueModal] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [certificateType, setCertificateType] = useState('achievement');
     const [formData, setFormData] = useState({
-        student_name: '',
-        student_id: '',
-        membership_number: '',
-        course_name: t('schoolCertificatesIndexPage.certificateTypes.student'),
-        date: new Date().toISOString().split('T')[0],
-        signature: '',
-        issued_by: auth.user?.name || '',
-        join_date: '',
+        course_name: 'شهادة إنجاز',
         description: '',
-        therapeutic_plan: '',
+        join_date: new Date().toISOString().split('T')[0],
     });
 
-    const getDefaultDescription = (type) => {
-        switch (type) {
-            case 'general_completion':
-                return t('schoolCertificatesIndexPage.defaultDescriptions.generalCompletion');
-            case 'academic_excellence':
-                return t('schoolCertificatesIndexPage.defaultDescriptions.academicExcellence');
-            case 'motivation':
-                return t('schoolCertificatesIndexPage.defaultDescriptions.motivation');
-            case 'innovation':
-                return t('schoolCertificatesIndexPage.defaultDescriptions.innovation');
-            case 'achievement':
-                return t('schoolCertificatesIndexPage.defaultDescriptions.achievement');
-            case 'membership':
-                return t('schoolCertificatesIndexPage.defaultDescriptions.membership');
-            default:
-                return t('schoolCertificatesIndexPage.defaultDescriptions.student');
-        }
-    };
+    const filteredRecipients = useMemo(() => {
+        const rows = recipients?.data || [];
+        const q = searchTerm.trim().toLowerCase();
+        if (!q) return rows;
 
-    const handleSelectStudent = (student) => {
-        setSelectedStudent(student);
-        setCertificateType('student');
+        return rows.filter((recipient) => (
+            recipient.name?.toLowerCase().includes(q) ||
+            recipient.email?.toLowerCase().includes(q) ||
+            recipient.membership_number?.toLowerCase().includes(q)
+        ));
+    }, [recipients, searchTerm]);
+
+    const openIssueModal = (recipient, defaultType = 'achievement') => {
+        setSelectedRecipient(recipient);
+        setCertificateType(defaultType);
         setFormData({
-            student_name: student.name,
-            student_id: student.id.toString(),
-            membership_number: student.membership_number || '',
-            course_name: t('schoolCertificatesIndexPage.certificateTypes.student'),
-            date: new Date().toISOString().split('T')[0],
-            signature: '',
-            issued_by: auth.user?.name || '',
-            join_date: student.created_at ? new Date(student.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+            course_name: defaultType === 'membership' ? 'شهادة عضوية' : recipient.role === 'teacher' ? 'شهادة معلم' : 'شهادة إنجاز',
             description: '',
-            therapeutic_plan: '',
+            join_date: recipient.created_at ? new Date(recipient.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
         });
-        setShowGenerateModal(true);
+        setShowIssueModal(true);
     };
 
-    const handlePreview = () => {
-        const preview = { ...formData, date_format: dateFormat, certificate_type: certificateType };
-        if (certificateType === 'membership') {
-            preview.join_date =
-                formData.join_date ||
-                (selectedStudent?.created_at
-                    ? new Date(selectedStudent.created_at).toISOString().split('T')[0]
-                    : new Date().toISOString().split('T')[0]);
-        }
-        setPreviewData(preview);
-        setShowPreviewModal(true);
-    };
+    const handleIssueCertificate = async () => {
+        if (!selectedRecipient) return;
 
-    const handleGenerate = async () => {
-        if (!selectedStudent) return;
-
-        setGenerating(true);
+        setSubmitting(true);
         try {
             const overrides = {
-                student_name: formData.student_name,
-                student_id: formData.student_id,
-                membership_number: formData.membership_number,
                 course_name: formData.course_name,
-                signature: formData.signature,
-                issued_by: formData.issued_by,
+                description: formData.description,
             };
 
-            // Add membership-specific fields
             if (certificateType === 'membership') {
                 overrides.join_date = formData.join_date;
-                overrides.course_name = t('schoolCertificatesIndexPage.certificateTypes.membership');
-            }
-
-            // Add custom description if provided
-            if (formData.description) {
-                overrides.description = formData.description;
-            } else {
-                // Use default description based on certificate type
-                overrides.description = getDefaultDescription(certificateType);
-            }
-
-            // Add therapeutic plan if provided
-            if (formData.therapeutic_plan) {
-                overrides.therapeutic_plan = formData.therapeutic_plan;
+                overrides.course_name = 'شهادة عضوية';
             }
 
             const response = await axios.post('/api/certificates/generate', {
-                student_id: selectedStudent.id,
-                overrides: overrides,
-                date_format: dateFormat,
+                recipient_id: selectedRecipient.id,
                 certificate_type: certificateType,
+                overrides,
+                date_format: 'Y-m-d',
             });
 
-            if (response.data.success) {
-                showSuccess(t('schoolCertificatesIndexPage.toasts.generateSuccess'));
-                setShowGenerateModal(false);
-                setSelectedStudent(null);
+            if (response.data?.success) {
+                showSuccess('تم إصدار الشهادة بنجاح.');
+                setShowIssueModal(false);
+                setSelectedRecipient(null);
 
-                // Download the certificate
-                if (response.data.certificate.storage_url) {
-                    window.open(response.data.certificate.storage_url, '_blank');
-                } else if (response.data.certificate.download_url) {
-                    window.open(response.data.certificate.download_url, '_blank');
+                const downloadUrl = response.data?.certificate?.storage_url || response.data?.certificate?.download_url;
+                if (downloadUrl) {
+                    window.open(downloadUrl, '_blank');
                 }
 
-                // Refresh the page to update student list
-                router.reload();
-            } else {
-                showError(response.data.message || t('schoolCertificatesIndexPage.toasts.generateError'));
+                router.reload({ only: ['recipients', 'pendingRequests', 'recentIssuedCertificates', 'membershipSummary'] });
+                return;
             }
+
+            showError(response.data?.message || 'تعذر إصدار الشهادة.');
         } catch (error) {
-            showError(error.response?.data?.message || t('schoolCertificatesIndexPage.toasts.generateError'));
+            showError(error.response?.data?.message || 'حدث خطأ أثناء إصدار الشهادة.');
         } finally {
-            setGenerating(false);
+            setSubmitting(false);
         }
     };
 
-    const formatDatePreview = (dateString, format) => {
-        const date = new Date(dateString);
-        if (format === 'long') {
-            const months = [
-                t('common.months.january'),
-                t('common.months.february'),
-                t('common.months.march'),
-                t('common.months.april'),
-                t('common.months.may'),
-                t('common.months.june'),
-                t('common.months.july'),
-                t('common.months.august'),
-                t('common.months.september'),
-                t('common.months.october'),
-                t('common.months.november'),
-                t('common.months.december'),
-            ];
-            return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
-        } else if (format === 'short') {
-            return date.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        } else {
-            return date.toISOString().split('T')[0];
-        }
+    const handleApprove = (certificateId) => {
+        router.post(`/school/certificates/${certificateId}/approve`, {}, {
+            preserveScroll: true,
+            onSuccess: () => showSuccess('تم اعتماد الشهادة بنجاح.'),
+            onError: () => showError('تعذر اعتماد الشهادة.'),
+        });
     };
 
-    const filteredStudents = students?.data?.filter(student =>
-        student.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.membership_number?.toLowerCase().includes(searchTerm.toLowerCase())
-    ) || [];
+    const handleReject = (certificateId) => {
+        const rejectionReason = window.prompt('اكتب سبب رفض الشهادة:');
+        if (!rejectionReason) return;
+
+        router.post(`/school/certificates/${certificateId}/reject`, { rejection_reason: rejectionReason }, {
+            preserveScroll: true,
+            onSuccess: () => showSuccess('تم رفض طلب الشهادة.'),
+            onError: () => showError('تعذر رفض الطلب.'),
+        });
+    };
 
     return (
-        <DashboardLayout header={t('schoolCertificatesIndexPage.title')}>
-            <Head title={t('schoolCertificatesIndexPage.pageTitle', { appName: t('common.appName') })} />
+        <DashboardLayout header="إدارة الشهادات">
+            <Head title="إدارة الشهادات" />
 
-            <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="py-6">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    {/* Description */}
-                    {description && (
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                            <p className="text-blue-800">{description}</p>
+            <div className="space-y-6">
+                <div className="grid gap-4 md:grid-cols-3">
+                    <div className="rounded-2xl border border-blue-100 bg-blue-50 p-5">
+                        <div className="mb-2 flex items-center gap-2 text-blue-700">
+                            <FaSchool />
+                            <span className="font-bold">عضوية المدرسة</span>
                         </div>
-                    )}
+                        <div className="text-lg font-bold text-gray-900">
+                            {membershipSummary?.membership_type === 'subscription' ? 'اشتراك فعّال' : 'عضوية أساسية'}
+                        </div>
+                        <div className="mt-2 text-sm text-gray-600">
+                            {description}
+                        </div>
+                    </div>
 
-                    {/* Search Bar */}
-                    <div className="bg-white rounded-lg shadow mb-6 p-4">
-                        <div className="relative">
-                            <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
+                        <div className="mb-2 flex items-center gap-2 text-emerald-700">
+                            <FaCheckCircle />
+                            <span className="font-bold">صلاحية الشهادات</span>
+                        </div>
+                        <div className="text-lg font-bold text-gray-900">
+                            {membershipSummary?.certificate_access ? 'متاحة الآن' : 'غير متاحة'}
+                        </div>
+                        <div className="mt-2 text-sm text-gray-600">
+                            الباقة: {membershipSummary?.subscription?.package_name || 'لا توجد باقة فعالة'}
+                        </div>
+                    </div>
+
+                    <div className="rounded-2xl border border-amber-100 bg-amber-50 p-5">
+                        <div className="mb-2 flex items-center gap-2 text-amber-700">
+                            <FaClock />
+                            <span className="font-bold">طلبات بانتظار المراجعة</span>
+                        </div>
+                        <div className="text-3xl font-extrabold text-gray-900">{pendingRequests.length}</div>
+                        <div className="mt-2 text-sm text-gray-600">
+                            الطلبات القادمة من المعلمين تحتاج اعتماد المدرسة قبل التوليد النهائي.
+                        </div>
+                    </div>
+                </div>
+
+                <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+                    <div className="mb-4 flex items-center justify-between">
+                        <div>
+                            <h2 className="text-xl font-bold text-gray-900">طلبات المعلمين المعلقة</h2>
+                            <p className="mt-1 text-sm text-gray-600">راجع الطلب ثم اعتمد أو ارفض مع توضيح السبب.</p>
+                        </div>
+                    </div>
+
+                    <div className="space-y-3">
+                        {pendingRequests.length === 0 ? (
+                            <div className="rounded-xl border border-dashed border-gray-200 p-6 text-center text-sm text-gray-500">
+                                لا توجد طلبات معلقة حالياً.
+                            </div>
+                        ) : pendingRequests.map((request) => (
+                            <div key={request.id} className="rounded-xl border border-gray-100 p-4">
+                                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                                    <div>
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <div className="font-bold text-gray-900">{request.title}</div>
+                                            <span className={`rounded-full px-3 py-1 text-xs font-bold ${STATUS_STYLES.pending_school_approval}`}>
+                                                بانتظار الاعتماد
+                                            </span>
+                                        </div>
+                                        <div className="mt-2 text-sm text-gray-600">
+                                            المستفيد: {request.recipient?.name || 'غير محدد'} - مقدم الطلب: {request.requester?.name || 'غير محدد'}
+                                        </div>
+                                        <div className="mt-1 text-xs text-gray-500">
+                                            {request.recipient?.role === 'teacher' ? 'معلم' : 'طالب'} - {request.created_at}
+                                        </div>
+                                        {request.description && (
+                                            <div className="mt-2 rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-700">
+                                                {request.description}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <button
+                                            onClick={() => handleApprove(request.id)}
+                                            className="rounded-xl bg-green-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-green-700"
+                                        >
+                                            اعتماد
+                                        </button>
+                                        <button
+                                            onClick={() => handleReject(request.id)}
+                                            className="rounded-xl bg-red-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-red-700"
+                                        >
+                                            رفض
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+                    <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <h2 className="text-xl font-bold text-gray-900">إصدار مباشر للطلاب والمعلمين</h2>
+                            <p className="mt-1 text-sm text-gray-600">يمكن للمدرسة إصدار شهادة مباشرة بدون انتظار طلب من المعلم.</p>
+                        </div>
+                        <div className="relative w-full md:w-80">
+                            <FaSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
                             <input
-                                type="text"
-                                placeholder={t('schoolCertificatesIndexPage.searchPlaceholder')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                placeholder="ابحث بالاسم أو البريد أو رقم العضوية"
+                                className="w-full rounded-xl border border-gray-300 py-3 ps-10 pe-4 focus:border-[#A3C042] focus:outline-none focus:ring-2 focus:ring-[#A3C042]/20"
                             />
                         </div>
                     </div>
 
-                    {/* Students List */}
-                    <div className="bg-white rounded-lg shadow overflow-hidden">
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
+                                <tr>
+                                    <th className="px-4 py-3 text-right text-xs font-bold text-gray-500">المستفيد</th>
+                                    <th className="px-4 py-3 text-right text-xs font-bold text-gray-500">الدور</th>
+                                    <th className="px-4 py-3 text-right text-xs font-bold text-gray-500">رقم العضوية</th>
+                                    <th className="px-4 py-3 text-right text-xs font-bold text-gray-500">المعتمدة</th>
+                                    <th className="px-4 py-3 text-right text-xs font-bold text-gray-500">المعلقة</th>
+                                    <th className="px-4 py-3 text-right text-xs font-bold text-gray-500">الإجراء</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100 bg-white">
+                                {filteredRecipients.length === 0 ? (
                                     <tr>
-                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            {t('common.name')}
-                                        </th>
-                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            {t('schoolCertificatesIndexPage.table.membershipNumber')}
-                                        </th>
-                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            {t('common.email')}
-                                        </th>
-                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            {t('schoolCertificatesIndexPage.table.certificatesCount')}
-                                        </th>
-                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            {t('common.actions')}
-                                        </th>
+                                        <td colSpan="6" className="px-4 py-8 text-center text-sm text-gray-500">
+                                            لا توجد نتائج مطابقة.
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
-                                    {filteredStudents.length === 0 ? (
-                                        <tr>
-                                            <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
-                                                {t('schoolCertificatesIndexPage.empty')}
-                                            </td>
-                                        </tr>
-                                    ) : (
-                                        filteredStudents.map((student) => (
-                                            <tr key={student.id} className="hover:bg-gray-50">
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="flex items-center">
-                                                        <FaUser className="me-2 text-gray-400" />
-                                                        <span className="text-sm font-medium text-gray-900">
-                                                            {student.name}
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {student.membership_number || t('common.notAvailable')}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {student.email}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {student.certificates_count || 0}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                    <button
-                                                        onClick={() => handleSelectStudent(student)}
-                                                        className="text-blue-600 hover:text-blue-900 flex items-center"
-                                                    >
-                                                        <FaFilePdf className="me-1" />
-                                                        {t('schoolCertificatesIndexPage.actions.createCertificate')}
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
+                                ) : filteredRecipients.map((recipient) => (
+                                    <tr key={recipient.id}>
+                                        <td className="px-4 py-4">
+                                            <div className="font-bold text-gray-900">{recipient.name}</div>
+                                            <div className="text-sm text-gray-500">{recipient.email}</div>
+                                        </td>
+                                        <td className="px-4 py-4 text-sm text-gray-700">
+                                            <span className="inline-flex items-center gap-2">
+                                                {recipient.role === 'teacher' ? <FaUserTie /> : <FaUserGraduate />}
+                                                {recipient.role === 'teacher' ? 'معلم' : 'طالب'}
+                                            </span>
+                                        </td>
+                                        <td className="px-4 py-4 text-sm text-gray-700">{recipient.membership_number || 'غير متوفر'}</td>
+                                        <td className="px-4 py-4 text-sm font-bold text-gray-900">{recipient.approved_certificates_count || 0}</td>
+                                        <td className="px-4 py-4 text-sm font-bold text-amber-700">{recipient.pending_certificates_count || 0}</td>
+                                        <td className="px-4 py-4">
+                                            <button
+                                                onClick={() => openIssueModal(recipient, recipient.role === 'teacher' ? 'teacher' : 'achievement')}
+                                                className="rounded-xl border border-[#A3C042] px-4 py-2 text-sm font-bold text-[#7E9B25] transition hover:bg-[#A3C042] hover:text-white"
+                                            >
+                                                إصدار شهادة
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-                        {/* Pagination */}
-                        {students?.links && (
-                            <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex-1 flex justify-between sm:hidden">
-                                        {students.links.prev && (
-                                            <button
-                                                onClick={() => router.visit(students.links.prev.url)}
-                                                className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                                            >
-                                                {t('common.previous')}
-                                            </button>
-                                        )}
-                                        {students.links.next && (
-                                            <button
-                                                onClick={() => router.visit(students.links.next.url)}
-                                                className="ms-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                                            >
-                                                {t('common.next')}
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
+                <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+                    <h2 className="mb-4 text-xl font-bold text-gray-900">آخر الشهادات المعتمدة</h2>
+                    <div className="space-y-3">
+                        {recentIssuedCertificates.length === 0 ? (
+                            <div className="rounded-xl border border-dashed border-gray-200 p-6 text-center text-sm text-gray-500">
+                                لا توجد شهادات معتمدة حديثاً.
                             </div>
-                        )}
+                        ) : recentIssuedCertificates.map((certificate) => (
+                            <div key={certificate.id} className="flex flex-col gap-3 rounded-xl border border-gray-100 p-4 md:flex-row md:items-center md:justify-between">
+                                <div>
+                                    <div className="font-bold text-gray-900">{certificate.title}</div>
+                                    <div className="mt-1 text-sm text-gray-600">
+                                        {certificate.recipient_name} - {certificate.recipient_role === 'teacher' ? 'معلم' : 'طالب'}
+                                    </div>
+                                    <div className="mt-1 text-xs text-gray-500">{certificate.approved_at}</div>
+                                </div>
+
+                                {certificate.download_url && (
+                                    <a
+                                        href={certificate.download_url}
+                                        className="rounded-xl bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700 transition hover:bg-blue-100"
+                                    >
+                                        <span className="inline-flex items-center gap-2">
+                                            <FaDownload />
+                                            تحميل
+                                        </span>
+                                    </a>
+                                )}
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
 
-            {/* Generate Certificate Modal */}
-            <Modal show={showGenerateModal} onClose={() => setShowGenerateModal(false)}>
+            <Modal show={showIssueModal} onClose={() => setShowIssueModal(false)}>
                 <div className="p-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold">{t('schoolCertificatesIndexPage.modals.generate.title', { name: selectedStudent?.name })}</h3>
-                        <button
-                            onClick={() => setShowGenerateModal(false)}
-                            className="text-gray-400 hover:text-gray-600"
-                        >
-                            <FaTimes />
-                        </button>
-                    </div>
+                    <h3 className="mb-4 text-lg font-bold text-gray-900">
+                        إصدار شهادة لـ {selectedRecipient?.name}
+                    </h3>
 
                     <div className="space-y-4">
-                        {/* Certificate Type */}
                         <div>
-                            <InputLabel htmlFor="certificate_type" value={t('schoolCertificatesIndexPage.form.certificateTypeLabel')} />
+                            <InputLabel htmlFor="certificate_type" value="نوع الشهادة" />
                             <select
                                 id="certificate_type"
                                 value={certificateType}
                                 onChange={(e) => {
-                                    setCertificateType(e.target.value);
-                                    if (e.target.value === 'membership') {
-                                        setFormData({ ...formData, course_name: t('schoolCertificatesIndexPage.certificateTypes.membership') });
-                                    } else if (e.target.value === 'general_completion') {
-                                        setFormData({ ...formData, course_name: t('schoolCertificatesIndexPage.certificateTypes.generalCompletion') });
-                                    } else if (e.target.value === 'academic_excellence') {
-                                        setFormData({ ...formData, course_name: t('schoolCertificatesIndexPage.certificateTypes.academicExcellence') });
-                                    } else if (e.target.value === 'motivation') {
-                                        setFormData({ ...formData, course_name: t('schoolCertificatesIndexPage.certificateTypes.motivation') });
-                                    } else if (e.target.value === 'innovation') {
-                                        setFormData({ ...formData, course_name: t('schoolCertificatesIndexPage.certificateTypes.innovation') });
-                                    } else {
-                                        setFormData({ ...formData, course_name: t('schoolCertificatesIndexPage.certificateTypes.student') });
-                                    }
+                                    const nextType = e.target.value;
+                                    setCertificateType(nextType);
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        course_name: nextType === 'membership'
+                                            ? 'شهادة عضوية'
+                                            : nextType === 'teacher'
+                                                ? 'شهادة معلم'
+                                                : nextType === 'academic_excellence'
+                                                    ? 'شهادة تميز أكاديمي'
+                                                    : 'شهادة إنجاز',
+                                    }));
                                 }}
-                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                             >
-                                <option value="student">{t('schoolCertificatesIndexPage.certificateTypes.student')}</option>
-                                <option value="general_completion">{t('schoolCertificatesIndexPage.certificateTypes.generalCompletion')}</option>
-                                <option value="academic_excellence">{t('schoolCertificatesIndexPage.certificateTypes.academicExcellence')}</option>
-                                <option value="motivation">{t('schoolCertificatesIndexPage.certificateTypes.motivation')}</option>
-                                <option value="innovation">{t('schoolCertificatesIndexPage.certificateTypes.innovation')}</option>
-                                <option value="membership">{t('schoolCertificatesIndexPage.certificateTypes.membership')}</option>
-                                <option value="achievement">{t('schoolCertificatesIndexPage.certificateTypes.achievement')}</option>
+                                {selectedRecipient?.role === 'teacher' && <option value="teacher">شهادة معلم</option>}
+                                <option value="achievement">شهادة إنجاز</option>
+                                <option value="academic_excellence">شهادة تميز أكاديمي</option>
+                                <option value="motivation">شهادة تحفيز</option>
+                                <option value="innovation">شهادة ابتكار</option>
+                                <option value="membership">شهادة عضوية</option>
                             </select>
                         </div>
 
                         <div>
-                            <InputLabel htmlFor="student_name" value={t('schoolCertificatesIndexPage.form.fullNameLabel')} />
+                            <InputLabel htmlFor="course_name" value="عنوان الشهادة" />
                             <TextInput
-                                id="student_name"
-                                type="text"
-                                value={formData.student_name || selectedStudent?.name || ''}
-                                onChange={(e) => setFormData({ ...formData, student_name: e.target.value })}
+                                id="course_name"
+                                value={formData.course_name}
+                                onChange={(e) => setFormData((prev) => ({ ...prev, course_name: e.target.value }))}
                                 className="mt-1 block w-full"
-                                required
                             />
                         </div>
 
-                        <div>
-                            <InputLabel htmlFor="membership_number" value={t('schoolCertificatesIndexPage.form.membershipNumberLabel')} />
-                            <TextInput
-                                id="membership_number"
-                                type="text"
-                                value={formData.membership_number || selectedStudent?.membership_number || ''}
-                                onChange={(e) => setFormData({ ...formData, membership_number: e.target.value })}
-                                className="mt-1 block w-full"
-                                required
-                            />
-                        </div>
-
-                        {/* Show join date only for membership certificates */}
                         {certificateType === 'membership' && (
                             <div>
-                                <InputLabel htmlFor="join_date" value={t('schoolCertificatesIndexPage.form.joinDateLabel')} />
+                                <InputLabel htmlFor="join_date" value="تاريخ بداية العضوية" />
                                 <TextInput
                                     id="join_date"
                                     type="date"
                                     value={formData.join_date}
-                                    onChange={(e) => setFormData({ ...formData, join_date: e.target.value })}
-                                    className="mt-1 block w-full"
-                                    required
-                                />
-                            </div>
-                        )}
-
-                        {/* Show course name only for non-membership certificates */}
-                        {certificateType !== 'membership' && (
-                            <div>
-                                <InputLabel htmlFor="course_name" value={t('schoolCertificatesIndexPage.form.courseNameLabel')} />
-                                <TextInput
-                                    id="course_name"
-                                    type="text"
-                                    value={formData.course_name}
-                                    onChange={(e) => setFormData({ ...formData, course_name: e.target.value })}
+                                    onChange={(e) => setFormData((prev) => ({ ...prev, join_date: e.target.value }))}
                                     className="mt-1 block w-full"
                                 />
                             </div>
                         )}
 
                         <div>
-                            <InputLabel htmlFor="date_format" value={t('schoolCertificatesIndexPage.form.dateFormatLabel')} />
-                            <select
-                                id="date_format"
-                                value={dateFormat}
-                                onChange={(e) => setDateFormat(e.target.value)}
-                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                            >
-                                <option value="Y-m-d">2025-12-09</option>
-                                <option value="d-m-Y">09-12-2025</option>
-                                <option value="short">09/12/2025</option>
-                                <option value="long">{t('schoolCertificatesIndexPage.dateFormatExamples.long')}</option>
-                            </select>
-                        </div>
-
-                        {/* Description Field - Optional */}
-                        <div>
-                            <InputLabel htmlFor="description" value={t('schoolCertificatesIndexPage.form.descriptionLabel')} />
+                            <InputLabel htmlFor="description" value="وصف مختصر" />
                             <textarea
                                 id="description"
+                                rows="4"
                                 value={formData.description}
-                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                rows={3}
-                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                placeholder={t('schoolCertificatesIndexPage.placeholders.description')}
+                                onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
+                                placeholder="يمكنك ترك الوصف فارغاً ليتم استخدام الوصف الافتراضي."
                             />
-                            <p className="text-xs text-gray-500 mt-1">
-                                {!formData.description && certificateType === 'general_completion' && getDefaultDescription('general_completion')}
-                                {!formData.description && certificateType === 'academic_excellence' && getDefaultDescription('academic_excellence')}
-                                {!formData.description && certificateType === 'motivation' && getDefaultDescription('motivation')}
-                                {!formData.description && certificateType === 'innovation' && getDefaultDescription('innovation')}
-                            </p>
                         </div>
 
-                        {/* Therapeutic Support Plan - Optional */}
-                        <div>
-                            <InputLabel htmlFor="therapeutic_plan" value={t('schoolCertificatesIndexPage.form.therapeuticPlanLabel')} />
-                            <textarea
-                                id="therapeutic_plan"
-                                value={formData.therapeutic_plan}
-                                onChange={(e) => setFormData({ ...formData, therapeutic_plan: e.target.value })}
-                                rows={4}
-                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                placeholder={t('schoolCertificatesIndexPage.placeholders.therapeuticPlan')}
-                            />
-                            <p className="text-xs text-gray-500 mt-1">
-                                {t('schoolCertificatesIndexPage.hints.therapeuticPlan')}
-                            </p>
-                        </div>
-
-                        <div className="flex justify-end space-x-3 space-x-reverse mt-6">
+                        <div className="flex justify-end gap-3 pt-4">
                             <button
                                 type="button"
-                                onClick={() => setShowGenerateModal(false)}
-                                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                                onClick={() => setShowIssueModal(false)}
+                                className="rounded-xl border border-gray-300 px-4 py-2 text-sm font-bold text-gray-700 transition hover:bg-gray-50"
                             >
-                                {t('common.cancel')}
+                                إلغاء
                             </button>
-                            <button
-                                type="button"
-                                onClick={handlePreview}
-                                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
-                            >
-                                {t('schoolCertificatesIndexPage.actions.preview')}
-                            </button>
-                            <PrimaryButton
-                                onClick={handleGenerate}
-                                disabled={generating}
-                            >
-                                {generating ? t('schoolCertificatesIndexPage.actions.generating') : t('schoolCertificatesIndexPage.actions.generateAndDownload')}
+                            <PrimaryButton onClick={handleIssueCertificate} disabled={submitting}>
+                                {submitting ? 'جاري الإصدار...' : 'إصدار الآن'}
                             </PrimaryButton>
                         </div>
-                    </div>
-                </div>
-            </Modal>
-
-            {/* Preview Modal */}
-            <Modal show={showPreviewModal} onClose={() => setShowPreviewModal(false)}>
-                <div className="p-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold">{t('schoolCertificatesIndexPage.modals.preview.title')}</h3>
-                        <button
-                            onClick={() => setShowPreviewModal(false)}
-                            className="text-gray-400 hover:text-gray-600"
-                        >
-                            <FaTimes />
-                        </button>
-                    </div>
-
-                    {previewData && (
-                        <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
-                            <div><strong>{t('schoolCertificatesIndexPage.preview.labels.certificateType')}:</strong> {certificateType === 'membership' ? t('schoolCertificatesIndexPage.certificateTypes.membership') : certificateType === 'achievement' ? t('schoolCertificatesIndexPage.certificateTypes.achievement') : t('schoolCertificatesIndexPage.certificateTypes.student')}</div>
-                            <div><strong>{t('schoolCertificatesIndexPage.preview.labels.fullName')}:</strong> {previewData.student_name}</div>
-                            <div><strong>{t('schoolCertificatesIndexPage.preview.labels.membershipNumber')}:</strong> {previewData.membership_number}</div>
-                            {certificateType === 'membership' && previewData.join_date && (
-                                <div><strong>{t('schoolCertificatesIndexPage.preview.labels.joinDate')}:</strong> {formatDatePreview(previewData.join_date, previewData.date_format)}</div>
-                            )}
-                            {certificateType === 'membership' && (
-                                <>
-                                    <div><strong>{t('schoolCertificatesIndexPage.preview.labels.issueTime')}:</strong> {new Date().toLocaleTimeString('en-US')}</div>
-                                    <div><strong>{t('schoolCertificatesIndexPage.preview.labels.todayDate')}:</strong> {formatDatePreview(new Date().toISOString().split('T')[0], previewData.date_format)}</div>
-                                </>
-                            )}
-                            {certificateType !== 'membership' && (
-                                <>
-                                    <div><strong>{t('schoolCertificatesIndexPage.preview.labels.courseName')}:</strong> {previewData.course_name}</div>
-                                    <div><strong>{t('common.date')}:</strong> {formatDatePreview(previewData.date, previewData.date_format)}</div>
-                                </>
-                            )}
-                            <div><strong>{t('schoolCertificatesIndexPage.preview.labels.issuedBy')}:</strong> {previewData.issued_by}</div>
-                        </div>
-                    )}
-
-                    <div className="mt-6 flex justify-end">
-                        <button
-                            onClick={() => setShowPreviewModal(false)}
-                            className="px-4 py-2 bg-[#A3C042] text-white rounded-md hover:bg-blue-700"
-                        >
-                            {t('common.close')}
-                        </button>
                     </div>
                 </div>
             </Modal>
         </DashboardLayout>
     );
 }
-

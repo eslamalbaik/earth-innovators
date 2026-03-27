@@ -67,7 +67,7 @@ class PackageController extends Controller
                     'is_popular' => $package->is_popular,
                     'created_at' => $package->created_at->format('Y-m-d H:i'),
                     'subscribers_count' => UserPackage::where('package_id', $package->id)
-                        ->where('status', 'active')
+                        ->currentActive()
                         ->count(),
                 ];
             })

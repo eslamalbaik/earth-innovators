@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { useForm } from '@inertiajs/react';
 import { FaStar, FaTimes, FaUpload, FaSpinner } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function ReviewModal({ isOpen, onClose, teacherId, auth }) {
+    const { t } = useTranslation();
     const [hoveredRating, setHoveredRating] = useState(0);
     const [imagePreview, setImagePreview] = useState(null);
     const fileInputRef = useRef(null);
@@ -42,11 +44,11 @@ export default function ReviewModal({ isOpen, onClose, teacherId, auth }) {
         const file = e.target.files[0];
         if (file) {
             if (file.size > 2 * 1024 * 1024) {
-                alert('حجم الصورة يجب أن يكون أقل من 2 ميجابايت');
+                alert(t('teacherProfilePage.reviewModal.errors.imageTooLarge'));
                 return;
             }
             if (!file.type.startsWith('image/')) {
-                alert('الملف المحدد ليس صورة');
+                alert(t('teacherProfilePage.reviewModal.errors.invalidImage'));
                 return;
             }
             setData('reviewer_image', file);
@@ -63,19 +65,19 @@ export default function ReviewModal({ isOpen, onClose, teacherId, auth }) {
         const ratingValue = Number(data.rating);
         
         if (!ratingValue || ratingValue < 1 || ratingValue > 5) {
-            alert('الرجاء اختيار تقييم');
+            alert(t('teacherProfilePage.reviewModal.errors.selectRating'));
             return;
         }
         if (!data.comment.trim()) {
-            alert('الرجاء كتابة تعليق');
+            alert(t('teacherProfilePage.reviewModal.errors.writeComment'));
             return;
         }
         if (!data.reviewer_name.trim()) {
-            alert('الرجاء إدخال الاسم');
+            alert(t('teacherProfilePage.reviewModal.errors.enterName'));
             return;
         }
         if (!data.teacher_id) {
-            alert('خطأ: لم يتم تحديد المعلم');
+            alert(t('teacherProfilePage.reviewModal.errors.teacherMissing'));
             return;
         }
 
@@ -110,7 +112,7 @@ export default function ReviewModal({ isOpen, onClose, teacherId, auth }) {
                 <div className="inline-block align-bottom bg-white rounded-lg  overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                     <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-bold text-gray-900">اكتب تقييمك</h3>
+                            <h3 className="text-lg font-bold text-gray-900">{t('teacherProfilePage.reviewModal.title')}</h3>
                             <button
                                 onClick={handleClose}
                                 disabled={processing}
@@ -123,7 +125,7 @@ export default function ReviewModal({ isOpen, onClose, teacherId, auth }) {
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    التقييم <span className="text-red-500">*</span>
+                                    {t('teacherProfilePage.reviewModal.ratingLabel')} <span className="text-red-500">*</span>
                                 </label>
                                 <div className="flex items-center gap-1">
                                     {[1, 2, 3, 4, 5].map((star) => (
@@ -152,14 +154,14 @@ export default function ReviewModal({ isOpen, onClose, teacherId, auth }) {
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    الاسم <span className="text-red-500">*</span>
+                                    {t('teacherProfilePage.reviewModal.nameLabel')} <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="text"
                                     value={data.reviewer_name}
                                     onChange={(e) => setData('reviewer_name', e.target.value)}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                                    placeholder="أدخل اسمك"
+                                    placeholder={t('teacherProfilePage.reviewModal.namePlaceholder')}
                                 />
                                 {errors.reviewer_name && (
                                     <p className="mt-1 text-sm text-red-600">{errors.reviewer_name}</p>
@@ -168,14 +170,14 @@ export default function ReviewModal({ isOpen, onClose, teacherId, auth }) {
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    الموقع
+                                    {t('teacherProfilePage.reviewModal.locationLabel')}
                                 </label>
                                 <input
                                     type="text"
                                     value={data.reviewer_location}
                                     onChange={(e) => setData('reviewer_location', e.target.value)}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                                    placeholder="أدخل موقعك (اختياري)"
+                                    placeholder={t('teacherProfilePage.reviewModal.locationPlaceholder')}
                                 />
                                 {errors.reviewer_location && (
                                     <p className="mt-1 text-sm text-red-600">{errors.reviewer_location}</p>
@@ -184,14 +186,14 @@ export default function ReviewModal({ isOpen, onClose, teacherId, auth }) {
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    التعليق <span className="text-red-500">*</span>
+                                    {t('teacherProfilePage.reviewModal.commentLabel')} <span className="text-red-500">*</span>
                                 </label>
                                 <textarea
                                     value={data.comment}
                                     onChange={(e) => setData('comment', e.target.value)}
                                     rows={4}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                                    placeholder="اكتب تقييمك هنا..."
+                                    placeholder={t('teacherProfilePage.reviewModal.commentPlaceholder')}
                                 />
                                 {errors.comment && (
                                     <p className="mt-1 text-sm text-red-600">{errors.comment}</p>
@@ -200,7 +202,7 @@ export default function ReviewModal({ isOpen, onClose, teacherId, auth }) {
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    الصورة الشخصية
+                                    {t('teacherProfilePage.reviewModal.imageLabel')}
                                 </label>
                                 <div className="flex items-center gap-4">
                                     <button
@@ -209,7 +211,7 @@ export default function ReviewModal({ isOpen, onClose, teacherId, auth }) {
                                         className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                                     >
                                         <FaUpload className="text-sm" />
-                                        اختر صورة
+                                        {t('teacherProfilePage.reviewModal.chooseImage')}
                                     </button>
                                     <input
                                         ref={fileInputRef}
@@ -253,7 +255,7 @@ export default function ReviewModal({ isOpen, onClose, teacherId, auth }) {
                                     disabled={processing}
                                     className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                                 >
-                                    إلغاء
+                                    {t('common.cancel')}
                                 </button>
                                 <button
                                     type="submit"
@@ -263,10 +265,10 @@ export default function ReviewModal({ isOpen, onClose, teacherId, auth }) {
                                     {processing ? (
                                         <>
                                             <FaSpinner className="animate-spin" />
-                                            جاري الحفظ...
+                                            {t('teacherProfilePage.reviewModal.saving')}
                                         </>
                                     ) : (
-                                        'إرسال التقييم'
+                                        t('teacherProfilePage.reviewModal.submit')
                                     )}
                                 </button>
                             </div>
@@ -277,4 +279,3 @@ export default function ReviewModal({ isOpen, onClose, teacherId, auth }) {
         </div>
     );
 }
-

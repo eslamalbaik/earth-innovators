@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class EmailOtp extends Model
 {
+    /**
+     * Plain OTP code available only in memory for the current request.
+     */
+    public ?string $plain_code = null;
+
     protected $fillable = [
         'token',
         'email',
@@ -45,4 +50,3 @@ class EmailOtp extends Model
         $this->update(['used_at' => now()]);
     }
 }
-

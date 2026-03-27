@@ -1,7 +1,8 @@
 import { FaCalendarAlt, FaUsers, FaTrophy, FaClock } from 'react-icons/fa';
 import { Link } from '@inertiajs/react';
+import { useTranslation } from '@/i18n';
 
-function ChallengeCard({ challenge, onJoin }) {
+function ChallengeCard({ challenge, onJoin, t }) {
     if (!challenge) return null;
 
     const deadline = challenge.deadline ? new Date(challenge.deadline) : null;
@@ -25,11 +26,11 @@ function ChallengeCard({ challenge, onJoin }) {
             const diffTime = Math.abs(now - dateObj);
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-            if (diffDays === 0) return 'اليوم';
-            if (diffDays === 1) return 'منذ يوم';
-            if (diffDays < 7) return `منذ ${diffDays} أيام`;
-            if (diffDays < 30) return `منذ ${Math.floor(diffDays / 7)} أسبوع`;
-            return `منذ ${Math.floor(diffDays / 30)} شهر`;
+            if (diffDays === 0) return t('homePage.relativeDates.today');
+            if (diffDays === 1) return t('homePage.relativeDates.oneDayAgo');
+            if (diffDays < 7) return t('homePage.relativeDates.daysAgo', { count: diffDays });
+            if (diffDays < 30) return t('homePage.relativeDates.weeksAgo', { count: Math.floor(diffDays / 7) });
+            return t('homePage.relativeDates.monthsAgo', { count: Math.floor(diffDays / 30) });
         } catch {
             return '';
         }
@@ -40,7 +41,7 @@ function ChallengeCard({ challenge, onJoin }) {
             <div className="relative">
                 <img
                     src={getChallengeImage()}
-                    alt={challenge.title}
+                    alt={challenge.title || t('homePage.challengeAlt')}
                     className="h-40 w-full object-cover"
                     loading="lazy"
                     onError={(e) => {
@@ -49,7 +50,7 @@ function ChallengeCard({ challenge, onJoin }) {
                 />
                 {pointsReward > 0 && (
                     <div className="absolute top-3 right-3 rounded-lg bg-[#A3C042]/20 border border-[#A3C042]/30 px-2 py-1 text-[11px] font-bold text-[#6b7f2c]">
-                        {pointsReward} نقاط
+                        {t('homePage.challengePointsLabel', { points: pointsReward })}
                     </div>
                 )}
             </div>
@@ -68,23 +69,23 @@ function ChallengeCard({ challenge, onJoin }) {
                             <FaCalendarAlt className="text-gray-400" />
                             <span>
                                 {daysRemaining !== null && daysRemaining > 0
-                                    ? `ينتهي خلال ${daysRemaining} ${daysRemaining === 1 ? 'يوم' : 'أيام'}`
+                                    ? t('homePage.challengeEndsIn', { days: daysRemaining })
                                     : deadline < new Date()
-                                        ? 'انتهى'
+                                        ? t('homePage.challengeEnded')
                                         : formatDate(deadline)}
                             </span>
                         </div>
                     )}
                     <div className="flex items-center gap-2">
                         <FaUsers className="text-gray-400" />
-                        <span>{participantsCount} مشارك</span>
+                        <span>{t('homePage.challengeParticipants', { count: participantsCount })}</span>
                     </div>
                 </div>
 
                 {minParticipants > 0 && (
                     <div className="mt-3">
                         <div className="flex items-center justify-between text-[11px] text-gray-400 mb-1">
-                            <span>الحد الأدنى: {minParticipants}</span>
+                            <span>{t('homePage.challengeMinParticipants', { count: minParticipants })}</span>
                             <span>{Math.round(progressPercent)}%</span>
                         </div>
                         <div className="mt-2 h-2 w-full rounded-full bg-gray-100 overflow-hidden">
@@ -106,7 +107,7 @@ function ChallengeCard({ challenge, onJoin }) {
                     }}
                     className="mt-4 w-full block text-center rounded-xl bg-[#A3C042] py-2 text-sm font-bold text-white hover:bg-[#8CA635] transition"
                 >
-                    {challenge.has_submission ? 'عرض التقديم' : 'شارك الآن'}
+                    {challenge.has_submission ? t('homePage.viewSubmissionButton') : t('homePage.challengeJoinNow')}
                 </Link>
             </div>
         </div>
@@ -114,19 +115,20 @@ function ChallengeCard({ challenge, onJoin }) {
 }
 
 export default function StudentCurrentChallengeSection({ challenges = [], onViewAll, onJoin }) {
+    const { t } = useTranslation();
     const activeChallenges = Array.isArray(challenges) ? challenges.slice(0, 2) : [];
 
     if (activeChallenges.length === 0) {
         return (
             <section>
                 <div className="flex items-center justify-between px-1 mb-3">
-                    <div className="text-sm font-bold text-gray-900">التحديات النشطة</div>
+                    <div className="text-sm font-bold text-gray-900">{t('homePage.activeChallengesTitle')}</div>
                     <button
                         type="button"
                         onClick={onViewAll}
                         className="text-xs font-semibold text-[#A3C042] hover:text-[#8CA635]"
                     >
-                        عرض الكل
+                        {t('common.viewAll')}
                     </button>
                 </div>
 
@@ -134,9 +136,9 @@ export default function StudentCurrentChallengeSection({ challenges = [], onView
                     <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <FaTrophy className="text-gray-400 text-2xl" />
                     </div>
-                    <h3 className="text-sm font-bold text-gray-900 mb-2">لا توجد تحديات نشطة</h3>
+                    <h3 className="text-sm font-bold text-gray-900 mb-2">{t('homePage.noActiveChallengesTitle')}</h3>
                     <p className="text-xs text-gray-600 mb-4">
-                        لا توجد تحديات نشطة حالياً. تحقق لاحقاً أو شاهد جميع التحديات المتاحة.
+                        {t('homePage.noActiveChallengesDescription')}
                     </p>
                     <button
                         type="button"
@@ -144,7 +146,7 @@ export default function StudentCurrentChallengeSection({ challenges = [], onView
                         className="inline-flex items-center gap-2 px-4 py-2 bg-[#A3C042] text-white rounded-xl text-xs font-bold hover:bg-[#8CA635] transition"
                     >
                         <FaTrophy className="text-xs" />
-                        عرض جميع التحديات
+                        {t('homePage.viewAllChallengesButton')}
                     </button>
                 </div>
             </section>
@@ -154,13 +156,13 @@ export default function StudentCurrentChallengeSection({ challenges = [], onView
     return (
         <section>
             <div className="flex items-center justify-between px-1 mb-3">
-                <div className="text-sm font-bold text-gray-900">التحديات النشطة</div>
+                <div className="text-sm font-bold text-gray-900">{t('homePage.activeChallengesTitle')}</div>
                 <button
                     type="button"
                     onClick={onViewAll}
                     className="text-xs font-semibold text-[#A3C042] hover:text-[#8CA635]"
                 >
-                    عرض الكل
+                    {t('common.viewAll')}
                 </button>
             </div>
 
@@ -170,6 +172,7 @@ export default function StudentCurrentChallengeSection({ challenges = [], onView
                         key={challenge.id}
                         challenge={challenge}
                         onJoin={onJoin}
+                        t={t}
                     />
                 ))}
             </div>

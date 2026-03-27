@@ -1,10 +1,10 @@
 import { FaEye, FaHeart, FaStar, FaProjectDiagram } from 'react-icons/fa';
-import { Link } from '@inertiajs/react';
+import { useTranslation } from '@/i18n';
 
-function ProjectCard({ project, onOpen }) {
+function ProjectCard({ project, onOpen, t }) {
     if (!project) return null;
 
-    const title = project.title || 'مشروع بدون عنوان';
+    const title = project.title || t('homePage.projectUntitled');
     const views = project.views ?? 0;
     const likes = project.likes ?? 0;
     const rating = project.rating ?? null;
@@ -20,27 +20,27 @@ function ProjectCard({ project, onOpen }) {
             const diffTime = Math.abs(now - date);
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-            if (diffDays === 0) return 'اليوم';
-            if (diffDays === 1) return 'منذ يوم';
-            if (diffDays < 7) return `منذ ${diffDays} أيام`;
-            if (diffDays < 30) return `منذ ${Math.floor(diffDays / 7)} أسبوع`;
-            return `منذ ${Math.floor(diffDays / 30)} شهر`;
+            if (diffDays === 0) return t('homePage.relativeDates.today');
+            if (diffDays === 1) return t('homePage.relativeDates.oneDayAgo');
+            if (diffDays < 7) return t('homePage.relativeDates.daysAgo', { count: diffDays });
+            if (diffDays < 30) return t('homePage.relativeDates.weeksAgo', { count: Math.floor(diffDays / 7) });
+            return t('homePage.relativeDates.monthsAgo', { count: Math.floor(diffDays / 30) });
         } catch {
             return dateString;
         }
     };
 
     const getStatusLabel = () => {
-        if (project.is_submission) return 'ملف تقييمي';
+        if (project.is_submission) return t('homePage.projectStatuses.evaluationFile');
         switch (status) {
             case 'approved':
-                return 'معتمد';
+                return t('homePage.projectStatuses.approved');
             case 'pending':
-                return 'قيد المراجعة';
+                return t('homePage.projectStatuses.underReview');
             case 'rejected':
-                return 'مرفوض';
+                return t('homePage.projectStatuses.rejected');
             default:
-                return 'ملف إبداعي';
+                return t('homePage.projectStatuses.creativeFile');
         }
     };
 
@@ -94,7 +94,7 @@ function ProjectCard({ project, onOpen }) {
                         <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 border border-gray-200 flex items-center justify-center">
                             <FaProjectDiagram className="text-[#A3C042] text-sm" />
                         </div>
-                        <div className="text-xs text-gray-600">مشروعي</div>
+                        <div className="text-xs text-gray-600">{t('homePage.myProjectLabel')}</div>
                     </div>
                     {createdAt && (
                         <div className="text-xs text-gray-400">{formatDate(createdAt)}</div>
@@ -127,19 +127,20 @@ function ProjectCard({ project, onOpen }) {
 }
 
 export default function StudentLatestProjectsSection({ projects = [], onViewAll, onOpenProject }) {
+    const { t } = useTranslation();
     const list = Array.isArray(projects) ? projects.slice(0, 2) : [];
 
     if (list.length === 0) {
         return (
             <section>
                 <div className="flex items-center justify-between px-1 mb-3">
-                    <div className="text-sm font-bold text-gray-900">أحدث المشاريع</div>
+                    <div className="text-sm font-bold text-gray-900">{t('homePage.latestProjectsTitle')}</div>
                     <button
                         type="button"
                         onClick={onViewAll}
                         className="text-xs font-semibold text-[#A3C042] hover:text-[#8CA635]"
                     >
-                        عرض الكل
+                        {t('common.viewAll')}
                     </button>
                 </div>
 
@@ -147,9 +148,9 @@ export default function StudentLatestProjectsSection({ projects = [], onViewAll,
                     <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <FaProjectDiagram className="text-gray-400 text-2xl" />
                     </div>
-                    <h3 className="text-sm font-bold text-gray-900 mb-2">لا توجد مشاريع بعد</h3>
+                    <h3 className="text-sm font-bold text-gray-900 mb-2">{t('homePage.noProjectsTitle')}</h3>
                     <p className="text-xs text-gray-600 mb-4">
-                        ابدأ رحلتك الإبداعية برفع مشروعك الأول!
+                        {t('homePage.noProjectsDescription')}
                     </p>
                     <button
                         type="button"
@@ -157,7 +158,7 @@ export default function StudentLatestProjectsSection({ projects = [], onViewAll,
                         className="inline-flex items-center gap-2 px-4 py-2 bg-[#A3C042] text-white rounded-xl text-xs font-bold hover:bg-[#8CA635] transition"
                     >
                         <FaProjectDiagram className="text-xs" />
-                        رفع مشروع جديد
+                        {t('homePage.uploadProjectButton')}
                     </button>
                 </div>
             </section>
@@ -167,13 +168,13 @@ export default function StudentLatestProjectsSection({ projects = [], onViewAll,
     return (
         <section>
             <div className="flex items-center justify-between px-1 mb-3">
-                <div className="text-sm font-bold text-gray-900">أحدث المشاريع</div>
+                <div className="text-sm font-bold text-gray-900">{t('homePage.latestProjectsTitle')}</div>
                 <button
                     type="button"
                     onClick={onViewAll}
                     className="text-xs font-semibold text-[#A3C042] hover:text-[#8CA635]"
                 >
-                    عرض الكل
+                    {t('common.viewAll')}
                 </button>
             </div>
 
@@ -183,6 +184,7 @@ export default function StudentLatestProjectsSection({ projects = [], onViewAll,
                         key={project.id}
                         project={project}
                         onOpen={onOpenProject}
+                        t={t}
                     />
                 ))}
             </div>

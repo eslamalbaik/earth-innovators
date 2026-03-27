@@ -1,6 +1,8 @@
 import { FaHeart } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function StudentCommunityScoreCard({ percent = 35, points = 0 }) {
+    const { t } = useTranslation();
     const clamped = Math.max(0, Math.min(100, Number(percent) || 0));
 
     return (
@@ -9,8 +11,10 @@ export default function StudentCommunityScoreCard({ percent = 35, points = 0 }) 
                 <div className="text-3xl font-extrabold text-gray-900">{clamped}%</div>
 
                 <div className="flex-1 px-4 text-center">
-                    <div className="text-sm font-bold text-gray-900">إرث في الإبداع المجتمعي</div>
-                    <div className="mt-1 text-xs text-gray-500">{points} من 100 نقطة</div>
+                    <div className="text-sm font-bold text-gray-900">{t('homePage.communityScoreTitle')}</div>
+                    <div className="mt-1 text-xs text-gray-500">
+                        {t('homePage.communityScorePoints', { points, total: 100 })}
+                    </div>
                 </div>
 
                 <div className="relative">

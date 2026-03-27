@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,7 +24,9 @@ class AuthenticatedSessionController extends Controller
 
     public function store(LoginRequest $request): RedirectResponse
     {
-        if ($request->string('role')->value() === 'admin') {
+        $user = User::where('email', $request->string('email')->value())->first();
+
+        if ($user?->isAdmin() || $request->string('role')->value() === 'admin') {
             return redirect()
                 ->route('admin.login')
                 ->withErrors([
@@ -32,21 +35,7 @@ class AuthenticatedSessionController extends Controller
         }
 
         $request->authenticate();
-
         $request->session()->regenerate();
-
-        // إذا كان المعلم، تأكد من أن teacher record نشط ومعتمد
-        $user = Auth::user();
-        if ($user && $user->isTeacher()) {
-            $teacher = $user->teacher;
-            if ($teacher && (!$teacher->is_active || !$teacher->is_verified)) {
-                // تحديث تلقائياً ليكون نشطاً ومعتمداً
-                $teacher->update([
-                    'is_active' => true,
-                    'is_verified' => true,
-                ]);
-            }
-        }
 
         return redirect()->intended(route('dashboard', absolute: false));
     }
@@ -56,7 +45,6 @@ class AuthenticatedSessionController extends Controller
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
         return redirect('/');

@@ -1,12 +1,15 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, useForm, router } from '@inertiajs/react';
-import { FaMedal, FaSave, FaArrowRight } from 'react-icons/fa';
+import { FaMedal, FaSave } from 'react-icons/fa';
 import TextInput from '@/Components/TextInput';
 import SelectInput from '@/Components/SelectInput';
 import PrimaryButton from '@/Components/PrimaryButton';
 import { useState } from 'react';
+import { useForwardIcon, useTranslation } from '@/i18n';
 
 export default function CreateBadge({ schools, auth }) {
+    const { t } = useTranslation();
+    const ForwardIcon = useForwardIcon();
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         name_ar: '',
@@ -39,8 +42,8 @@ export default function CreateBadge({ schools, auth }) {
     };
 
     return (
-        <DashboardLayout header="إرسال شارة جديدة">
-            <Head title="إرسال شارة جديدة - إرث المبتكرين" />
+        <DashboardLayout header={t('teacherBadgeCreatePage.title')}>
+            <Head title={t('teacherBadgeCreatePage.pageTitle', { appName: t('common.appName') })} />
 
             <div className="bg-white rounded-xl shadow-lg p-6">
                 <div className="mb-6 flex items-center gap-3">
@@ -48,8 +51,8 @@ export default function CreateBadge({ schools, auth }) {
                         <FaMedal className="text-white text-2xl" />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-bold text-gray-900">إرسال شارة جديدة</h2>
-                        <p className="text-gray-600">املأ البيانات التالية لإرسال الشارة للمراجعة</p>
+                        <h2 className="text-2xl font-bold text-gray-900">{t('teacherBadgeCreatePage.title')}</h2>
+                        <p className="text-gray-600">{t('teacherBadgeCreatePage.subtitle')}</p>
                     </div>
                 </div>
 
@@ -57,7 +60,7 @@ export default function CreateBadge({ schools, auth }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                اسم الشارة (إنجليزي) *
+                                {t('teacherBadgeCreatePage.nameEnglishLabel')}
                             </label>
                             <TextInput
                                 type="text"
@@ -71,7 +74,7 @@ export default function CreateBadge({ schools, auth }) {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                اسم الشارة (عربي) *
+                                {t('teacherBadgeCreatePage.nameArabicLabel')}
                             </label>
                             <TextInput
                                 type="text"
@@ -86,14 +89,14 @@ export default function CreateBadge({ schools, auth }) {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            وصف الشارة (عربي) <span className="text-gray-500">(اختياري)</span>
+                            {t('teacherBadgeCreatePage.descriptionArabicLabel')} <span className="text-gray-500">({t('teacherBadgeCreatePage.optional')})</span>
                         </label>
                         <textarea
                             value={data.description_ar}
                             onChange={(e) => setData('description_ar', e.target.value)}
                             className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#A3C042] focus:border-transparent"
                             rows="3"
-                            placeholder="أدخل وصف الشارة باللغة العربية..."
+                            placeholder={t('teacherBadgeCreatePage.descriptionArabicPlaceholder')}
                         />
                         {errors.description_ar && <p className="text-red-500 text-sm mt-1">{errors.description_ar}</p>}
                     </div>
@@ -101,31 +104,31 @@ export default function CreateBadge({ schools, auth }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                نوع الشارة *
+                                {t('teacherBadgeCreatePage.typeLabel')}
                             </label>
                             <SelectInput
                                 value={data.type}
                                 onChange={(e) => setData('type', e.target.value)}
                                 required
                             >
-                                <option value="custom">مخصص</option>
-                                <option value="rank_first">المركز الأول</option>
-                                <option value="rank_second">المركز الثاني</option>
-                                <option value="rank_third">المركز الثالث</option>
-                                <option value="excellent_innovator">مبتكر مميز</option>
-                                <option value="active_participant">مشارك نشط</option>
+                                <option value="custom">{t('teacherBadgeCreatePage.types.custom')}</option>
+                                <option value="rank_first">{t('teacherBadgeCreatePage.types.rankFirst')}</option>
+                                <option value="rank_second">{t('teacherBadgeCreatePage.types.rankSecond')}</option>
+                                <option value="rank_third">{t('teacherBadgeCreatePage.types.rankThird')}</option>
+                                <option value="excellent_innovator">{t('teacherBadgeCreatePage.types.excellentInnovator')}</option>
+                                <option value="active_participant">{t('teacherBadgeCreatePage.types.activeParticipant')}</option>
                             </SelectInput>
                             {errors.type && <p className="text-red-500 text-sm mt-1">{errors.type}</p>}
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                النقاط المطلوبة *
+                                {t('teacherBadgeCreatePage.pointsRequiredLabel')}
                             </label>
                             <TextInput
                                 type="number"
                                 value={data.points_required}
-                                onChange={(e) => setData('points_required', parseInt(e.target.value))}
+                                onChange={(e) => setData('points_required', Number.parseInt(e.target.value, 10) || 0)}
                                 className="w-full"
                                 min="0"
                                 required
@@ -136,14 +139,14 @@ export default function CreateBadge({ schools, auth }) {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            المدرسة *
+                            {t('teacherBadgeCreatePage.schoolLabel')}
                         </label>
                         <SelectInput
                             value={data.school_id}
                             onChange={(e) => setData('school_id', e.target.value)}
                             required
                         >
-                            <option value="">اختر المدرسة</option>
+                            <option value="">{t('teacherBadgeCreatePage.schoolPlaceholder')}</option>
                             {schools && schools.map((school) => (
                                 <option key={school.id} value={school.id}>
                                     {school.name}
@@ -155,7 +158,7 @@ export default function CreateBadge({ schools, auth }) {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            الأيقونة <span className="text-gray-500">(اختياري)</span>
+                            {t('teacherBadgeCreatePage.iconLabel')} <span className="text-gray-500">({t('teacherBadgeCreatePage.optional')})</span>
                         </label>
                         <div className="flex gap-2 items-center">
                             <TextInput
@@ -163,19 +166,19 @@ export default function CreateBadge({ schools, auth }) {
                                 value={data.icon}
                                 onChange={(e) => setData('icon', e.target.value)}
                                 className="flex-1"
-                                placeholder="مثال: 🏆 🥇 🌟 ⭐ 💎"
+                                placeholder={t('teacherBadgeCreatePage.iconPlaceholder')}
                             />
                             <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-lg border border-gray-300 text-2xl">
                                 {data.icon || '🎨'}
                             </div>
                         </div>
-                        <p className="mt-1 text-xs text-gray-500">يمكنك استخدام رموز Emoji أو ترك الحقل فارغًا</p>
+                        <p className="mt-1 text-xs text-gray-500">{t('teacherBadgeCreatePage.iconHint')}</p>
                         {errors.icon && <p className="text-red-500 text-sm mt-1">{errors.icon}</p>}
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            صورة الشارة
+                            {t('teacherBadgeCreatePage.imageLabel')}
                         </label>
                         <div className="flex items-center gap-4">
                             <input
@@ -187,7 +190,7 @@ export default function CreateBadge({ schools, auth }) {
                             {imagePreview && (
                                 <img
                                     src={imagePreview}
-                                    alt="Preview"
+                                    alt={t('teacherBadgeCreatePage.previewAlt')}
                                     className="w-24 h-24 rounded-lg object-cover border border-gray-300"
                                 />
                             )}
@@ -201,16 +204,16 @@ export default function CreateBadge({ schools, auth }) {
                             onClick={() => router.visit('/teacher/badges')}
                             className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition"
                         >
-                            إلغاء
+                            {t('teacherBadgeCreatePage.cancel')}
                         </button>
                         <PrimaryButton type="submit" disabled={processing} className="flex items-center gap-2">
                             {processing ? (
-                                'جاري الإرسال...'
+                                t('teacherBadgeCreatePage.submitting')
                             ) : (
                                 <>
                                     <FaSave />
-                                    إرسال للمراجعة
-                                    <FaArrowRight />
+                                    {t('teacherBadgeCreatePage.submit')}
+                                    <ForwardIcon />
                                 </>
                             )}
                         </PrimaryButton>
@@ -220,4 +223,3 @@ export default function CreateBadge({ schools, auth }) {
         </DashboardLayout>
     );
 }
-

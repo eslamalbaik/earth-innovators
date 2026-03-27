@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class UserPackage extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'user_id',
         'package_id',
@@ -36,5 +37,45 @@ class UserPackage extends Model
     public function package(): BelongsTo
     {
         return $this->belongsTo(Package::class);
+    }
+
+    public function scopeCurrentActive($query)
+    {
+        return $query
+            ->where('status', 'active')
+            ->where(function ($statusQuery) {
+                $statusQuery
+                    ->whereNull('end_date')
+                    ->orWhereDate('end_date', '>=', now()->toDateString());
+            });
+    }
+
+    public function scopePastDue($query)
+    {
+        return $query->where(function ($statusQuery) {
+            $statusQuery
+                ->where('status', 'expired')
+                ->orWhere(function ($expiredQuery) {
+                    $expiredQuery
+                        ->where('status', 'active')
+                        ->whereNotNull('end_date')
+                        ->whereDate('end_date', '<', now()->toDateString());
+                });
+        });
+    }
+
+    public function isCurrentActive(): bool
+    {
+        return $this->status === 'active'
+            && (!$this->end_date || $this->end_date->greaterThanOrEqualTo(now()->startOfDay()));
+    }
+
+    public function getEffectiveStatusAttribute(): string
+    {
+        if ($this->status === 'active' && $this->end_date && $this->end_date->lt(now()->startOfDay())) {
+            return 'expired';
+        }
+
+        return $this->status;
     }
 }

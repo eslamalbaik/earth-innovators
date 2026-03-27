@@ -18,7 +18,7 @@ class PackageController extends Controller
         $userPackage = null;
         if ($request->user()) {
             $userPackage = UserPackage::where('user_id', $request->user()->id)
-                ->where('status', 'active')
+                ->currentActive()
                 ->with('package')
                 ->first();
         }
@@ -37,7 +37,7 @@ class PackageController extends Controller
         if (auth()->check()) {
             $userPackage = UserPackage::where('user_id', auth()->id())
                 ->where('package_id', $id)
-                ->where('status', 'active')
+                ->currentActive()
                 ->first();
         }
 

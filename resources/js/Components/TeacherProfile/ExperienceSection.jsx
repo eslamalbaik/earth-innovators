@@ -1,9 +1,12 @@
 import { FaCalendarAlt } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function ExperienceSection({ experiences }) {
+    const { t } = useTranslation();
+
     return (
         <div className="py-4 px-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">الخبرات</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('teacherProfilePage.sections.experiences')}</h2>
 
             <div className="space-y-5">
                 {experiences.map((experience) => (

@@ -52,7 +52,7 @@ class PackageSubscriptionController extends Controller
         $userPackage = null;
         if (Auth::check()) {
             $activeSubscription = UserPackage::where('user_id', Auth::id())
-                ->where('status', 'active')
+                ->currentActive()
                 ->with('package')
                 ->first();
 
@@ -98,7 +98,7 @@ class PackageSubscriptionController extends Controller
         }
 
         $activeSubscription = UserPackage::where('user_id', $user->id)
-            ->where('status', 'active')
+            ->currentActive()
             ->first();
 
         if ($activeSubscription) {
@@ -201,7 +201,6 @@ class PackageSubscriptionController extends Controller
             return redirect()->route('packages.index')->with('error', 'لم يتم تأكيد الدفع. يرجى التواصل مع الدعم الفني.');
 
         } catch (\Exception $e) {
-            DB::rollBack();
             Log::error('Error handling payment success', [
                 'payment_id' => $payment->id,
                 'error' => $e->getMessage(),
@@ -220,12 +219,12 @@ class PackageSubscriptionController extends Controller
             $payment->update(['status' => 'cancelled']);
 
             $metadata = $payment->gateway_response['metadata'] ?? [];
-            $userPackageId = $metadata['user_package_id'] ?? null;
+            $userPackageId = $metadata['user_package_id'] ?? $payment->user_package_id;
 
             if ($userPackageId) {
                 $userPackage = UserPackage::find($userPackageId);
                 if ($userPackage) {
-                    $userPackage->update(['status' => 'cancelled']);
+                    app(\App\Services\PackageService::class)->updateSubscriberStatus($userPackage, 'cancelled');
                 }
             }
 
@@ -253,8 +252,8 @@ class PackageSubscriptionController extends Controller
         }
 
         try {
+            app(\App\Services\PackageService::class)->cancelSubscription($userPackage);
             $userPackage->update([
-                'status' => 'cancelled',
                 'auto_renew' => false,
             ]);
 
@@ -310,4 +309,3 @@ class PackageSubscriptionController extends Controller
         ]);
     }
 }
-

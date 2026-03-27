@@ -12,6 +12,7 @@ class OtpService extends BaseService
 {
     protected int $expiryMinutes = 10;
     protected int $rateLimitMinutes = 1;
+    protected int $maxRequestsPerWindow = 3;
     protected int $maxAttempts = 3;
     protected int $otpLength = 6;
 
@@ -19,6 +20,7 @@ class OtpService extends BaseService
     {
         $this->expiryMinutes = (int) env('OTP_EXPIRY_MINUTES', 10);
         $this->rateLimitMinutes = (int) env('OTP_RATE_LIMIT_MINUTES', 1);
+        $this->maxRequestsPerWindow = (int) env('OTP_RATE_LIMIT_MAX_REQUESTS', 3);
         $this->maxAttempts = (int) env('OTP_MAX_ATTEMPTS', 3);
         $this->otpLength = (int) env('OTP_LENGTH', 6);
     }
@@ -122,12 +124,16 @@ class OtpService extends BaseService
     /**
      * Get OTP by token
      */
-    public function getByToken(string $token): ?EmailOtp
+    public function getByToken(string $token, bool $allowUsed = false): ?EmailOtp
     {
-        return EmailOtp::where('token', $token)
-            ->whereNull('used_at')
-            ->where('expires_at', '>', now())
-            ->first();
+        $query = EmailOtp::where('token', $token)
+            ->where('expires_at', '>', now());
+
+        if (!$allowUsed) {
+            $query->whereNull('used_at');
+        }
+
+        return $query->first();
     }
 
     /**
@@ -161,8 +167,7 @@ class OtpService extends BaseService
      */
     protected function isRateLimited(string $email, string $purpose): bool
     {
-        $key = "otp_rate_limit:{$email}:{$purpose}";
-        return Cache::has($key);
+        return (int) Cache::get($this->getRateLimitKey($email, $purpose), 0) >= $this->maxRequestsPerWindow;
     }
 
     /**
@@ -170,8 +175,15 @@ class OtpService extends BaseService
      */
     protected function setRateLimit(string $email, string $purpose): void
     {
-        $key = "otp_rate_limit:{$email}:{$purpose}";
-        Cache::put($key, true, $this->rateLimitMinutes * 60);
+        $key = $this->getRateLimitKey($email, $purpose);
+        $requestCount = (int) Cache::get($key, 0) + 1;
+
+        Cache::put($key, $requestCount, now()->addMinutes($this->rateLimitMinutes));
+    }
+
+    protected function getRateLimitKey(string $email, string $purpose): string
+    {
+        return "otp_rate_limit:{$email}:{$purpose}";
     }
 
     /**

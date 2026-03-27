@@ -1,23 +1,23 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
+import { useTranslation } from '@/i18n';
 import {
     FaCalendar,
     FaCheckCircle,
     FaClock,
     FaBook,
-    FaUser,
     FaDollarSign,
     FaGraduationCap,
     FaFilter,
     FaTimes,
     FaCreditCard,
-    FaLock,
     FaExclamationTriangle,
 } from 'react-icons/fa';
 
 export default function StudentBookings({ bookings, auth }) {
     const { flash } = usePage().props;
+    const { t, language } = useTranslation();
     const [statusFilter, setStatusFilter] = useState(null);
     const [showError, setShowError] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
@@ -26,7 +26,6 @@ export default function StudentBookings({ bookings, auth }) {
         if (flash?.error) {
             setErrorMessage(flash.error);
             setShowError(true);
-            // إخفاء الرسالة بعد 5 ثوان
             const timer = setTimeout(() => {
                 setShowError(false);
             }, 5000);
@@ -35,12 +34,12 @@ export default function StudentBookings({ bookings, auth }) {
     }, [flash]);
 
     const statusLabels = {
-        pending: 'قيد الانتظار',
-        approved: 'مؤكد',
-        confirmed: 'مؤكد',
-        rejected: 'مرفوض',
-        cancelled: 'ملغي',
-        completed: 'مكتمل',
+        pending: t('bookings.pending'),
+        approved: t('bookings.approved'),
+        confirmed: t('bookings.confirmed'),
+        rejected: t('bookings.rejected'),
+        cancelled: t('bookings.cancelled'),
+        completed: t('bookings.completed'),
     };
 
     const statusColors = {
@@ -62,6 +61,7 @@ export default function StudentBookings({ bookings, auth }) {
     };
 
     const all = bookings?.data || [];
+    const dateLocale = language === 'ar' ? 'ar-EG' : 'en-US';
 
     const getSessionsCount = (booking) => {
         if (Array.isArray(booking.selected_sessions)) return booking.selected_sessions.length;
@@ -73,12 +73,34 @@ export default function StudentBookings({ bookings, auth }) {
         }
     };
 
-    // Filter bookings by status
+    const formatSessionsCount = (count) => `${count} ${t(count === 1 ? 'studentBookingsPage.sessionUnit.one' : 'studentBookingsPage.sessionUnit.other')}`;
+
+    const getPaymentStatusLabel = (booking) => {
+        if (booking.payment?.status === 'completed' || booking.payment_status === 'paid') {
+            return t('studentBookingsPage.paymentStatuses.paid');
+        }
+
+        if (booking.payment?.status === 'failed' || booking.payment_status === 'failed') {
+            return t('studentBookingsPage.paymentStatuses.failed');
+        }
+
+        return t('studentBookingsPage.paymentStatuses.unpaid');
+    };
+
+    const formatBookingDate = (date) => {
+        if (!date) return '-';
+
+        return new Intl.DateTimeFormat(dateLocale, {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        }).format(new Date(date));
+    };
+
     const filteredBookings = statusFilter
         ? all.filter(booking => booking.status === statusFilter)
         : all;
 
-    // Calculate statistics
     const stats = {
         total: all.length,
         pending: all.filter(b => b.status === 'pending').length,
@@ -100,17 +122,16 @@ export default function StudentBookings({ bookings, auth }) {
     };
 
     return (
-        <DashboardLayout header="حجوزاتي">
-            <Head title="حجوزاتي" />
+        <DashboardLayout header={t('studentBookingsPage.title')}>
+            <Head title={t('studentBookingsPage.pageTitle', { appName: t('common.appName') })} />
             
-            {/* عرض رسالة الخطأ */}
             {showError && errorMessage && (
                 <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
                     <div className="flex items-start">
                         <FaExclamationTriangle className="text-red-500 text-xl mt-0.5 me-3 flex-shrink-0" />
                         <div className="flex-1">
                             <h3 className="text-sm font-semibold text-red-800 mb-1">
-                                تنبيه
+                                {t('studentBookingsPage.alertTitle')}
                             </h3>
                             <p className="text-sm text-red-700">{errorMessage}</p>
                         </div>
@@ -129,7 +150,7 @@ export default function StudentBookings({ bookings, auth }) {
                 <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-blue-500 hover:shadow-xl transition-shadow">
                     <div className="flex items-center justify-between mb-4">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">إجمالي الحجوزات</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('studentBookingsPage.stats.totalBookings')}</p>
                             <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
                         </div>
                         <div className="p-3 bg-blue-100 rounded-full">
@@ -141,7 +162,7 @@ export default function StudentBookings({ bookings, auth }) {
                 <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-yellow-500 hover:shadow-xl transition-shadow">
                     <div className="flex items-center justify-between mb-4">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">قيد الانتظار</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('studentBookingsPage.stats.pending')}</p>
                             <p className="text-3xl font-bold text-yellow-600">{stats.pending}</p>
                         </div>
                         <div className="p-3 bg-yellow-100 rounded-full">
@@ -153,7 +174,7 @@ export default function StudentBookings({ bookings, auth }) {
                 <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-green-500 hover:shadow-xl transition-shadow">
                     <div className="flex items-center justify-between mb-4">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">المؤكدة</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('studentBookingsPage.stats.confirmed')}</p>
                             <p className="text-3xl font-bold text-green-600">{stats.confirmed}</p>
                         </div>
                         <div className="p-3 bg-green-100 rounded-full">
@@ -165,11 +186,11 @@ export default function StudentBookings({ bookings, auth }) {
                 <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-purple-500 hover:shadow-xl transition-shadow">
                     <div className="flex items-center justify-between mb-4">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">إجمالي المصروف</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('studentBookingsPage.stats.totalSpent')}</p>
                             <p className="text-3xl font-bold text-purple-600">{stats.totalSpent.toFixed(0)}</p>
                         </div>
                         <div className="p-3 bg-purple-100 rounded-full">
-                            <img src="/images/aed-currency(black).svg" alt="currency" className="w-8 h-8" />
+                            <img src="/images/aed-currency(black).svg" alt={t('studentBookingsPage.currencyAlt')} className="w-8 h-8" />
                         </div>
                     </div>
                 </div>
@@ -179,7 +200,7 @@ export default function StudentBookings({ bookings, auth }) {
                 <div className="flex items-center gap-4 flex-wrap">
                     <div className="flex items-center gap-2 text-gray-700">
                         <FaFilter className="text-lg" />
-                        <span className="font-medium">فلترة حسب الحالة:</span>
+                        <span className="font-medium">{t('studentBookingsPage.statusFilterLabel')}</span>
                     </div>
                     <button
                         onClick={() => handleStatusFilter(null)}
@@ -188,7 +209,7 @@ export default function StudentBookings({ bookings, auth }) {
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                             }`}
                     >
-                        الكل ({stats.total})
+                        {t('studentBookingsPage.allStatuses', { count: stats.total })}
                     </button>
                     {Object.entries(statusLabels).map(([status, label]) => {
                         const count = all.filter(b => b.status === status).length;
@@ -212,9 +233,11 @@ export default function StudentBookings({ bookings, auth }) {
             {filteredBookings.length === 0 ? (
                 <div className="bg-white rounded-xl shadow-lg p-12 text-center">
                     <FaCalendar className="mx-auto text-6xl mb-4 text-gray-300" />
-                    <p className="text-xl text-gray-500 mb-2">لا توجد حجوزات حالياً</p>
+                    <p className="text-xl text-gray-500 mb-2">{t('studentBookingsPage.empty.title')}</p>
                     <p className="text-sm text-gray-400">
-                        {statusFilter ? `لا توجد حجوزات بحالة "${statusLabels[statusFilter]}"` : 'ابدأ بحجز أول حصة لك'}
+                        {statusFilter
+                            ? t('studentBookingsPage.empty.filteredDescription', { status: statusLabels[statusFilter] })
+                            : t('studentBookingsPage.empty.defaultDescription')}
                     </p>
                 </div>
             ) : (
@@ -249,7 +272,7 @@ export default function StudentBookings({ bookings, auth }) {
                                             <FaGraduationCap />
                                         </div>
                                         <div className="flex-1">
-                                            <p className="text-sm text-gray-600">المعلم</p>
+                                            <p className="text-sm text-gray-600">{t('studentBookingsPage.teacherLabel')}</p>
                                             <p className="font-bold text-gray-900">
                                                 {booking?.teacher?.name_ar || booking?.teacher?.user?.name || '—'}
                                             </p>
@@ -259,20 +282,20 @@ export default function StudentBookings({ bookings, auth }) {
                                     <div className="space-y-3 mb-4">
                                         <div className="flex items-center gap-2">
                                             <FaBook className="text-gray-400" />
-                                            <span className="text-sm text-gray-600">المادة:</span>
+                                            <span className="text-sm text-gray-600">{t('studentBookingsPage.subjectLabel')}</span>
                                             <span className="font-semibold text-gray-900">{booking.subject || '—'}</span>
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <FaCalendar className="text-gray-400" />
-                                            <span className="text-sm text-gray-600">عدد الحصص:</span>
-                                            <span className="font-semibold text-gray-900">{getSessionsCount(booking)} حصة</span>
+                                            <span className="text-sm text-gray-600">{t('studentBookingsPage.sessionsLabel')}</span>
+                                            <span className="font-semibold text-gray-900">{formatSessionsCount(getSessionsCount(booking))}</span>
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <FaDollarSign className="text-gray-400" />
-                                            <span className="text-sm text-gray-600">السعر الإجمالي:</span>
+                                            <span className="text-sm text-gray-600">{t('studentBookingsPage.totalPriceLabel')}</span>
                                             <div className="flex items-center">
                                                 <p className="font-bold">{booking.total_price}</p>
-                                                <img src="/images/aed-currency(black).svg" alt="currency" className="w-5 h-5" />
+                                                <img src="/images/aed-currency(black).svg" alt={t('studentBookingsPage.currencyAlt')} className="w-5 h-5" />
                                             </div>
                                         </div>
                                     </div>
@@ -280,18 +303,14 @@ export default function StudentBookings({ bookings, auth }) {
                                     {(booking.payment_status || booking.payment) && (
                                         <div className="pt-4 border-t border-gray-100 mb-3">
                                             <div className="flex items-center justify-between">
-                                                <span className="text-xs text-gray-500">حالة الدفع:</span>
+                                                <span className="text-xs text-gray-500">{t('studentBookingsPage.paymentStatusLabel')}</span>
                                                 <span className={`px-2 py-1 rounded-full text-xs font-semibold ${booking.payment?.status === 'completed' || booking.payment_status === 'paid'
                                                     ? 'bg-green-100 text-green-800'
                                                     : booking.payment?.status === 'failed' || booking.payment_status === 'failed'
                                                         ? 'bg-red-100 text-red-800'
                                                         : 'bg-yellow-100 text-yellow-800'
                                                     }`}>
-                                                    {booking.payment?.status === 'completed' || booking.payment_status === 'paid'
-                                                        ? 'مدفوع'
-                                                        : booking.payment?.status === 'failed' || booking.payment_status === 'failed'
-                                                            ? 'فشل الدفع'
-                                                            : 'لم يتم الدفع'}
+                                                    {getPaymentStatusLabel(booking)}
                                                 </span>
                                             </div>
                                         </div>
@@ -299,11 +318,7 @@ export default function StudentBookings({ bookings, auth }) {
 
                                     <div className="pt-4 border-t border-gray-100">
                                         <p className="text-xs text-gray-500">
-                                            تاريخ الحجز: {new Date(booking.created_at).toLocaleDateString('en-US', {
-                                                year: 'numeric',
-                                                month: 'long',
-                                                day: 'numeric'
-                                            })}
+                                            {t('studentBookingsPage.bookingDateLabel', { date: formatBookingDate(booking.created_at) })}
                                         </p>
                                     </div>
 
@@ -315,7 +330,7 @@ export default function StudentBookings({ bookings, auth }) {
                                                     className="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition"
                                                 >
                                                     <FaCreditCard />
-                                                    الدفع الآن
+                                                    {t('studentBookingsPage.payNow')}
                                                 </Link>
                                             </div>
                                         )}
@@ -330,7 +345,11 @@ export default function StudentBookings({ bookings, auth }) {
                 <div className="mt-6 bg-white rounded-xl shadow-lg p-4">
                     <div className="flex items-center justify-between flex-wrap gap-4">
                         <div className="text-sm text-gray-700">
-                            عرض {bookings.from} إلى {bookings.to} من {bookings.total} حجز
+                            {t('studentBookingsPage.paginationSummary', {
+                                from: bookings.from,
+                                to: bookings.to,
+                                total: bookings.total,
+                            })}
                         </div>
                         <div className="flex gap-2">
                             {bookings.links.map((link, idx) => (
@@ -352,5 +371,4 @@ export default function StudentBookings({ bookings, auth }) {
         </DashboardLayout>
     );
 }
-
 

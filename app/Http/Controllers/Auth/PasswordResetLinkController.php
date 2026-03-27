@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Services\PasswordResetService;
-use App\Services\EmailService;
-use App\Models\User;
 use App\Mail\OtpMail;
+use App\Models\User;
+use App\Services\EmailService;
+use App\Services\PasswordResetService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -38,14 +38,12 @@ class PasswordResetLinkController extends Controller
 
             if (!$user) {
                 throw ValidationException::withMessages([
-                    'email' => ['لا يمكننا العثور على مستخدم بهذا البريد الإلكتروني.'],
+                    'email' => ['We could not find a user with that email address.'],
                 ]);
             }
 
-            // Generate OTP
             $otp = $this->passwordResetService->generateOtp($user, $request->ip());
 
-            // Send OTP email
             $shouldQueue = env('APP_ENV') === 'production';
             $emailSent = $this->emailService->send(
                 $user->email,
@@ -53,7 +51,7 @@ class PasswordResetLinkController extends Controller
                 [
                     $otp->plain_code,
                     'password_reset',
-                    $this->passwordResetService->getExpiryMinutes()
+                    $this->passwordResetService->getExpiryMinutes(),
                 ],
                 $shouldQueue
             );
@@ -62,12 +60,17 @@ class PasswordResetLinkController extends Controller
                 throw new \Exception('Failed to send email');
             }
 
-            // Redirect to OTP verification page with token
             return redirect()->route('password.reset.otp', ['token' => $otp->token])
-                ->with('status', 'تم إرسال رمز التحقق إلى بريدك الإلكتروني.');
+                ->with('status', 'OTP sent to your email successfully.');
+        } catch (ValidationException $e) {
+            throw $e;
         } catch (\Exception $e) {
+            $message = str_contains($e->getMessage(), 'Too many OTP requests')
+                ? 'Too many OTP requests. Please wait a moment and try again.'
+                : 'An error occurred while sending the OTP. Please try again.';
+
             throw ValidationException::withMessages([
-                'email' => ['حدث خطأ أثناء إرسال رمز التحقق. يرجى المحاولة مرة أخرى.'],
+                'email' => [$message],
             ]);
         }
     }

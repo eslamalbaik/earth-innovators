@@ -82,10 +82,9 @@ class PasswordResetService extends BaseService
         $user->password = Hash::make($newPassword);
         $user->save();
 
-        // Delete all unused password reset OTPs for this user
+        // Invalidate all password reset OTPs once the password is changed.
         EmailOtp::where('email', $email)
             ->where('purpose', 'password_reset')
-            ->whereNull('used_at')
             ->delete();
 
         $this->logInfo('Password reset successful', [

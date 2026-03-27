@@ -45,6 +45,7 @@ class MembershipService
         return match($role) {
             'student' => 'STU',
             'teacher' => 'TCH',
+            'school', 'educational_institution' => 'SCH',
             default => 'USR',
         };
     }
@@ -72,4 +73,3 @@ class MembershipService
         return $membershipNumber;
     }
 }
-

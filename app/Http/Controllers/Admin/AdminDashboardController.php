@@ -75,7 +75,7 @@ class AdminDashboardController extends Controller
                     'user_name' => $subscription->user->name ?? 'غير معروف',
                     'user_role' => $subscription->user->role ?? 'غير محدد',
                     'package_name' => $subscription->package->name_ar ?? 'غير محدد',
-                    'status' => $subscription->status,
+                    'status' => $subscription->effective_status,
                     'paid_amount' => $subscription->paid_amount,
                     'start_date' => $subscription->start_date->format('Y-m-d'),
                     'end_date' => $subscription->end_date->format('Y-m-d'),
@@ -92,9 +92,9 @@ class AdminDashboardController extends Controller
 
         $subscriptionStats = [
             'total_subscriptions' => UserPackage::count(),
-            'active_subscriptions' => UserPackage::where('status', 'active')->count(),
-            'expired_subscriptions' => UserPackage::where('status', 'expired')->count(),
-            'subscription_revenue' => UserPackage::where('status', 'active')->sum('paid_amount'),
+            'active_subscriptions' => UserPackage::currentActive()->count(),
+            'expired_subscriptions' => UserPackage::pastDue()->count(),
+            'subscription_revenue' => UserPackage::currentActive()->sum('paid_amount'),
         ];
 
         $selectedYear = $request->get('year', date('Y'));
@@ -135,9 +135,9 @@ class AdminDashboardController extends Controller
             'total_publications' => Publication::count(),
             'approved_publications' => Publication::where('status', 'approved')->count(),
             'total_subscriptions' => UserPackage::count(),
-            'active_subscriptions' => UserPackage::where('status', 'active')->count(),
+            'active_subscriptions' => UserPackage::currentActive()->count(),
             'total_revenue' => Payment::where('status', 'completed')->sum('amount'),
-            'subscription_revenue' => UserPackage::where('status', 'active')->sum('paid_amount'),
+            'subscription_revenue' => UserPackage::currentActive()->sum('paid_amount'),
         ];
     }
 
@@ -453,4 +453,3 @@ class AdminDashboardController extends Controller
         ];
     }
 }
-

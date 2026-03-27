@@ -97,6 +97,7 @@ class DashboardService extends BaseService
                 'approvedProjects' => (int) ($projectStats->approved ?? 0),
                 'rejectedProjects' => (int) ($projectStats->rejected ?? 0),
                 'totalStudents' => (int) ($pointsStats->total_students ?? 0),
+                'students_count' => (int) ($pointsStats->total_students ?? 0),
                 'studentsWithProjects' => (int) ($projectStats->students_with_projects ?? 0),
                 'totalPoints' => (int) ($pointsStats->total_points ?? 0),
                 'avgPointsPerStudent' => round((float) ($pointsStats->avg_points ?? 0), 2),
@@ -480,4 +481,3 @@ class DashboardService extends BaseService
         }
     }
 }
-

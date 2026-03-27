@@ -17,7 +17,8 @@ class PaymentService extends BaseService
     public function __construct(
         private TamaraService $tamaraService,
         private BookingService $bookingService,
-        private ChatService $chatService
+        private ChatService $chatService,
+        private MembershipAccessService $membershipAccessService
     ) {}
 
     public function preparePayment(Booking $booking, $user, float $amount): Payment
@@ -695,6 +696,8 @@ class PaymentService extends BaseService
                     'status' => 'active',
                     'start_date' => now(),
                 ]);
+
+                $this->membershipAccessService->syncMembershipFromUserPackage($userPackage);
 
                 if ($userPackage->package->points_bonus > 0) {
                     $user = $userPackage->user;

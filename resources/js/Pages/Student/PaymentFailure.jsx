@@ -2,8 +2,10 @@ import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { FaTimes, FaRedo } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
+import { useTranslation } from '@/i18n';
 
 export default function PaymentFailure({ payment }) {
+    const { t } = useTranslation();
     const [showToast, setShowToast] = useState(true);
 
     useEffect(() => {
@@ -14,13 +16,13 @@ export default function PaymentFailure({ payment }) {
     }, []);
 
     return (
-        <DashboardLayout header="فشل الدفع">
-            <Head title="فشل الدفع" />
+        <DashboardLayout header={t('studentPaymentPage.failureHeader')}>
+            <Head title={t('studentPaymentPage.failureHeader')} />
 
             {showToast && (
                 <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 z-50">
                     <div className="bg-red-500 text-white rounded-lg shadow-lg p-4 flex items-center justify-between">
-                        <p>فشل الدفع والحجز</p>
+                        <p>{t('studentPaymentPage.failureToast')}</p>
                         <button
                             onClick={() => setShowToast(false)}
                             className="me-4 text-white hover:text-gray-200"
@@ -37,13 +39,13 @@ export default function PaymentFailure({ payment }) {
                         <div className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                             <FaTimes className="text-5xl text-red-500" />
                         </div>
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">فشل الدفع</h1>
-                        <p className="text-gray-600">لم يتم إكمال عملية الدفع بنجاح.</p>
+                        <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('studentPaymentPage.failureTitle')}</h1>
+                        <p className="text-gray-600">{t('studentPaymentPage.failureDescription')}</p>
                     </div>
 
                     {payment.failure_reason && (
                         <div className="bg-red-50 border-r-4 border-red-500 p-4 mb-6  rounded">
-                            <p className="text-sm font-semibold text-red-900 mb-1">سبب الفشل:</p>
+                            <p className="text-sm font-semibold text-red-900 mb-1">{t('studentPaymentPage.failureReasonLabel')}</p>
                             <p className="text-red-700">{payment.failure_reason}</p>
                         </div>
                     )}
@@ -54,13 +56,13 @@ export default function PaymentFailure({ payment }) {
                             className="flex items-center gap-2 px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-medium transition"
                         >
                             <FaRedo />
-                            إعادة المحاولة
+                            {t('studentPaymentPage.retry')}
                         </button>
                         <Link
                             href="/my-bookings"
                             className="flex items-center gap-2 px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-medium transition"
                         >
-                            العودة إلى الحجوزات
+                            {t('studentPaymentPage.backToBookings')}
                         </Link>
                     </div>
                 </div>
@@ -68,4 +70,3 @@ export default function PaymentFailure({ payment }) {
         </DashboardLayout>
     );
 }
-

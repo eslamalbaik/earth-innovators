@@ -1,10 +1,24 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import DashboardLayout from '../../../Layouts/DashboardLayout';
 import { useState, useEffect } from 'react';
-import { FaTrophy, FaUser, FaCalendar, FaStar, FaCheckCircle, FaClock, FaTimesCircle, FaEye, FaArrowLeft, FaTimes } from 'react-icons/fa';
+import {
+    FaTrophy,
+    FaUser,
+    FaCalendar,
+    FaStar,
+    FaCheckCircle,
+    FaClock,
+    FaTimesCircle,
+    FaEye,
+    FaTimes,
+} from 'react-icons/fa';
+import { useBackIcon, useTranslation } from '@/i18n';
+import { toHijriDate } from '@/utils/dateUtils';
 
 export default function TeacherChallengeSubmissionsIndex({ auth, submissions, challenge, filters }) {
     const { flash } = usePage().props;
+    const { t, language } = useTranslation();
+    const BackIcon = useBackIcon();
     const [selectedStatus, setSelectedStatus] = useState(filters?.status || '');
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
@@ -20,19 +34,26 @@ export default function TeacherChallengeSubmissionsIndex({ auth, submissions, ch
         });
     };
 
-    const formatDate = (date) => {
-        if (!date) return '';
-        const d = new Date(date);
-        const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
-        return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+    const formatDate = (value) => {
+        if (!value) return '-';
+
+        if (language === 'ar') {
+            return toHijriDate(value, false, language);
+        }
+
+        return new Intl.DateTimeFormat('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        }).format(new Date(value));
     };
 
     const getStatusBadge = (status) => {
         const badges = {
-            submitted: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'مُسلم', icon: FaClock },
-            reviewed: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'تم المراجعة', icon: FaCheckCircle },
-            approved: { bg: 'bg-green-100', text: 'text-green-800', label: 'مقبول', icon: FaCheckCircle },
-            rejected: { bg: 'bg-red-100', text: 'text-red-800', label: 'مرفوض', icon: FaTimesCircle },
+            submitted: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: t('submissionStatuses.submitted'), icon: FaClock },
+            reviewed: { bg: 'bg-blue-100', text: 'text-blue-800', label: t('submissionStatuses.reviewed'), icon: FaCheckCircle },
+            approved: { bg: 'bg-green-100', text: 'text-green-800', label: t('submissionStatuses.approved'), icon: FaCheckCircle },
+            rejected: { bg: 'bg-red-100', text: 'text-red-800', label: t('submissionStatuses.rejected'), icon: FaTimesCircle },
         };
         return badges[status] || badges.submitted;
     };
@@ -52,15 +73,19 @@ export default function TeacherChallengeSubmissionsIndex({ auth, submissions, ch
 
     return (
         <DashboardLayout auth={auth}>
-            <Head title={`تسليمات: ${challenge.title}`} />
+            <Head title={t('teacherChallengeSubmissionsIndexPage.pageTitle', {
+                title: challenge.title,
+                appName: t('common.appName'),
+            })}
+            />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <Link
                     href="/teacher/challenge-submissions"
                     className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
                 >
-                    <FaArrowLeft />
-                    العودة إلى قائمة التحديات
+                    <BackIcon />
+                    {t('teacherChallengeSubmissionsIndexPage.backToChallenges')}
                 </Link>
 
                 <div className="mb-8">
@@ -68,10 +93,9 @@ export default function TeacherChallengeSubmissionsIndex({ auth, submissions, ch
                         <FaTrophy className="text-yellow-600 text-2xl" />
                         <h1 className="text-3xl font-bold text-gray-900">{challenge.title}</h1>
                     </div>
-                    <p className="text-gray-600">عرض وتقييم تسليمات الطلاب لهذا التحدي</p>
+                    <p className="text-gray-600">{t('teacherChallengeSubmissionsIndexPage.subtitle')}</p>
                 </div>
 
-                {/* Filters */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
                     <div className="flex flex-wrap gap-2">
                         <button
@@ -79,70 +103,69 @@ export default function TeacherChallengeSubmissionsIndex({ auth, submissions, ch
                             className={`px-4 py-2 rounded-lg transition ${!selectedStatus
                                 ? 'bg-[#A3C042] text-white'
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                }`}
+                            }`}
                         >
-                            الكل
+                            {t('common.all')}
                         </button>
                         <button
                             onClick={() => handleStatusFilter('submitted')}
                             className={`px-4 py-2 rounded-lg transition ${selectedStatus === 'submitted'
                                 ? 'bg-yellow-600 text-white'
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                }`}
+                            }`}
                         >
-                            مُسلم
+                            {t('submissionStatuses.submitted')}
                         </button>
                         <button
                             onClick={() => handleStatusFilter('reviewed')}
                             className={`px-4 py-2 rounded-lg transition ${selectedStatus === 'reviewed'
                                 ? 'bg-[#A3C042] text-white'
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                }`}
+                            }`}
                         >
-                            تم المراجعة
+                            {t('submissionStatuses.reviewed')}
                         </button>
                         <button
                             onClick={() => handleStatusFilter('approved')}
                             className={`px-4 py-2 rounded-lg transition ${selectedStatus === 'approved'
                                 ? 'bg-[#A3C042] text-white'
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                }`}
+                            }`}
                         >
-                            مقبول
+                            {t('submissionStatuses.approved')}
                         </button>
                         <button
                             onClick={() => handleStatusFilter('rejected')}
                             className={`px-4 py-2 rounded-lg transition ${selectedStatus === 'rejected'
                                 ? 'bg-red-600 text-white'
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                }`}
+                            }`}
                         >
-                            مرفوض
+                            {t('submissionStatuses.rejected')}
                         </button>
                     </div>
                 </div>
 
-                {/* Submissions List */}
                 {submissions.data && submissions.data.length > 0 ? (
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-50">
                                     <tr>
-                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            الطالب
+                                        <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {t('teacherChallengeSubmissionsIndexPage.table.student')}
                                         </th>
-                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            تاريخ التقديم
+                                        <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {t('teacherChallengeSubmissionsIndexPage.table.submittedAt')}
                                         </th>
-                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            الحالة
+                                        <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {t('teacherChallengeSubmissionsIndexPage.table.status')}
                                         </th>
-                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            التقييم
+                                        <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {t('teacherChallengeSubmissionsIndexPage.table.rating')}
                                         </th>
-                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            الإجراءات
+                                        <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {t('teacherChallengeSubmissionsIndexPage.table.actions')}
                                         </th>
                                     </tr>
                                 </thead>
@@ -156,7 +179,7 @@ export default function TeacherChallengeSubmissionsIndex({ auth, submissions, ch
                                                     <div className="flex items-center">
                                                         <FaUser className="text-gray-400 ms-2" />
                                                         <span className="text-sm font-medium text-gray-900">
-                                                            {submission.student?.name || 'غير معروف'}
+                                                            {submission.student?.name || t('teacherChallengeSubmissionsIndexPage.unknownStudent')}
                                                         </span>
                                                     </div>
                                                 </td>
@@ -176,7 +199,7 @@ export default function TeacherChallengeSubmissionsIndex({ auth, submissions, ch
                                                     {submission.rating ? (
                                                         <div className="flex items-center gap-1">
                                                             <FaStar className="text-yellow-500" />
-                                                            {submission.rating} / 10
+                                                            {t('teacherChallengeSubmissionsIndexPage.ratingValue', { rating: submission.rating })}
                                                         </div>
                                                     ) : (
                                                         <span className="text-gray-400">-</span>
@@ -188,7 +211,7 @@ export default function TeacherChallengeSubmissionsIndex({ auth, submissions, ch
                                                         className="text-blue-600 hover:text-blue-900 flex items-center gap-1"
                                                     >
                                                         <FaEye />
-                                                        عرض
+                                                        {t('teacherChallengeSubmissionsIndexPage.viewAction')}
                                                     </Link>
                                                 </td>
                                             </tr>
@@ -201,11 +224,10 @@ export default function TeacherChallengeSubmissionsIndex({ auth, submissions, ch
                 ) : (
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
                         <FaTrophy className="mx-auto text-6xl text-gray-300 mb-4" />
-                        <p className="text-gray-500 text-lg">لا توجد تسليمات لهذا التحدي</p>
+                        <p className="text-gray-500 text-lg">{t('teacherChallengeSubmissionsIndexPage.noSubmissions')}</p>
                     </div>
                 )}
 
-                {/* Pagination */}
                 {submissions.links && submissions.links.length > 3 && (
                     <div className="mt-6 flex justify-center">
                         <div className="flex gap-2">
@@ -216,7 +238,7 @@ export default function TeacherChallengeSubmissionsIndex({ auth, submissions, ch
                                     className={`px-4 py-2 rounded-lg ${link.active
                                         ? 'bg-[#A3C042] text-white'
                                         : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
-                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                 />
                             ))}
@@ -225,7 +247,6 @@ export default function TeacherChallengeSubmissionsIndex({ auth, submissions, ch
                 )}
             </div>
 
-            {/* Toast Notification */}
             {showToast && (
                 <div className="fixed top-4 left-4 right-4 md:left-4 md:right-auto md:w-96 z-50 animate-slide-up">
                     <div className="bg-green-500 text-white rounded-lg shadow-lg p-4 flex items-center justify-between">
@@ -245,4 +266,3 @@ export default function TeacherChallengeSubmissionsIndex({ auth, submissions, ch
         </DashboardLayout>
     );
 }
-

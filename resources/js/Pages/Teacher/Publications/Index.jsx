@@ -1,35 +1,50 @@
 import DashboardLayout from '../../../Layouts/DashboardLayout';
 import { Head, Link } from '@inertiajs/react';
-import { FaBook, FaPlus, FaEye, FaClock, FaCheckCircle, FaTimesCircle, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaBook, FaPlus, FaEye, FaClock, FaCheckCircle, FaTimesCircle, FaEdit } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
+import { toHijriDate } from '@/utils/dateUtils';
 
 export default function TeacherPublications({ publications, auth }) {
+    const { t, language } = useTranslation();
+
     const statusLabels = {
-        pending: { label: 'قيد المراجعة', color: 'bg-yellow-100 text-yellow-700 border-yellow-300', icon: FaClock },
-        approved: { label: 'منشور', color: 'bg-green-100 text-green-700 border-green-300', icon: FaCheckCircle },
-        rejected: { label: 'مرفوض', color: 'bg-red-100 text-red-700 border-red-300', icon: FaTimesCircle },
+        pending: { label: t('teacherPublicationsPage.statuses.pending'), color: 'bg-yellow-100 text-yellow-700 border-yellow-300', icon: FaClock },
+        approved: { label: t('teacherPublicationsPage.statuses.approved'), color: 'bg-green-100 text-green-700 border-green-300', icon: FaCheckCircle },
+        rejected: { label: t('teacherPublicationsPage.statuses.rejected'), color: 'bg-red-100 text-red-700 border-red-300', icon: FaTimesCircle },
     };
 
-    const typeLabels = {
-        magazine: 'مجلة',
-        booklet: 'كتيب',
-        report: 'تقرير',
-        article: 'مقال',
-        study: 'دراسة',
-        news: 'اخبار',
+    const formatDate = (value) => {
+        if (!value) return '-';
+
+        if (language === 'ar') {
+            return toHijriDate(value, false, language);
+        }
+
+        return new Intl.DateTimeFormat('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        }).format(new Date(value));
+    };
+
+    const getTypeLabel = (type) => {
+        const key = `teacherPublicationsPage.types.${type}`;
+        const translated = t(key);
+        return translated === key ? type : translated;
     };
 
     return (
-        <DashboardLayout header="مقالاتي">
-            <Head title="مقالاتي - لوحة المعلم" />
+        <DashboardLayout header={t('teacherPublicationsPage.title')}>
+            <Head title={t('teacherPublicationsPage.pageTitle', { appName: t('common.appName') })} />
 
             <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">المقالات المنشورة</h2>
+                <h2 className="text-2xl font-bold text-gray-900">{t('teacherPublicationsPage.subtitle')}</h2>
                 <Link
                     href="/teacher/publications/create"
                     className="bg-[#A3C042] text-white px-6 py-3 rounded-lg font-semibold transition duration-300 flex items-center gap-2 shadow-md hover:shadow-xl"
                 >
                     <FaPlus />
-                    إنشاء مقال جديد
+                    {t('teacherPublicationsPage.createAction')}
                 </Link>
             </div>
 
@@ -37,7 +52,7 @@ export default function TeacherPublications({ publications, auth }) {
                 <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-[#A3C042]/10 to-legacy-blue/10">
                     <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                         <FaBook className="text-[#A3C042]" />
-                        المقالات ({publications.total || 0})
+                        {t('teacherPublicationsPage.listTitle', { count: publications?.total || 0 })}
                     </h3>
                 </div>
                 <div className="p-6">
@@ -53,10 +68,10 @@ export default function TeacherPublications({ publications, auth }) {
                                                     <h4 className="text-xl font-bold text-gray-900">{publication.title}</h4>
                                                     <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${statusLabels[publication.status]?.color || statusLabels.pending.color}`}>
                                                         <StatusIcon className="inline text-xs ms-1" />
-                                                        {statusLabels[publication.status]?.label || 'قيد المراجعة'}
+                                                        {statusLabels[publication.status]?.label || t('teacherPublicationsPage.statuses.pending')}
                                                     </span>
                                                     <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 border border-blue-300">
-                                                        {typeLabels[publication.type] || publication.type}
+                                                        {getTypeLabel(publication.type)}
                                                     </span>
                                                 </div>
                                                 {publication.description && (
@@ -65,15 +80,15 @@ export default function TeacherPublications({ publications, auth }) {
                                                 <div className="flex items-center gap-4 text-sm text-gray-600">
                                                     {publication.school && (
                                                         <>
-                                                            <span><strong>المدرسة:</strong> {publication.school.name}</span>
+                                                            <span><strong>{t('teacherPublicationsPage.schoolLabel')}:</strong> {publication.school.name}</span>
                                                             <span>•</span>
                                                         </>
                                                     )}
-                                                    <span>تاريخ الإرسال: {new Date(publication.created_at).toLocaleDateString('en-US')}</span>
+                                                    <span>{t('teacherPublicationsPage.submittedAtLabel')}: {formatDate(publication.created_at)}</span>
                                                     {publication.approved_at && (
                                                         <>
                                                             <span>•</span>
-                                                            <span>تاريخ الموافقة: {new Date(publication.approved_at).toLocaleDateString('en-US')}</span>
+                                                            <span>{t('teacherPublicationsPage.approvalDateLabel')}: {formatDate(publication.approved_at)}</span>
                                                         </>
                                                     )}
                                                 </div>
@@ -84,7 +99,7 @@ export default function TeacherPublications({ publications, auth }) {
                                                     className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition flex items-center gap-2"
                                                 >
                                                     <FaEye />
-                                                    عرض
+                                                    {t('teacherPublicationsPage.viewAction')}
                                                 </Link>
                                                 {publication.status === 'pending' && (
                                                     <Link
@@ -92,7 +107,7 @@ export default function TeacherPublications({ publications, auth }) {
                                                         className="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-lg font-medium transition flex items-center gap-2"
                                                     >
                                                         <FaEdit />
-                                                        تعديل
+                                                        {t('teacherPublicationsPage.editAction')}
                                                     </Link>
                                                 )}
                                             </div>
@@ -104,13 +119,13 @@ export default function TeacherPublications({ publications, auth }) {
                     ) : (
                         <div className="text-center py-12">
                             <FaBook className="text-6xl text-gray-300 mx-auto mb-4" />
-                            <p className="text-gray-600 text-lg mb-4">لا توجد مقالات منشورة</p>
+                            <p className="text-gray-600 text-lg mb-4">{t('teacherPublicationsPage.empty')}</p>
                             <Link
                                 href="/teacher/publications/create"
                                 className="inline-block bg-[#A3C042] text-white px-6 py-3 rounded-lg font-semibold transition"
                             >
                                 <FaPlus className="inline me-2" />
-                                إنشاء مقال جديد
+                                {t('teacherPublicationsPage.createAction')}
                             </Link>
                         </div>
                     )}
@@ -123,9 +138,9 @@ export default function TeacherPublications({ publications, auth }) {
                                         key={index}
                                         href={link.url || '#'}
                                         className={`px-4 py-2 rounded-lg font-medium transition ${link.active
-                                                ? 'bg-[#A3C042] text-white'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                            } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            ? 'bg-[#A3C042] text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
                                 ))}
@@ -137,4 +152,3 @@ export default function TeacherPublications({ publications, auth }) {
         </DashboardLayout>
     );
 }
-

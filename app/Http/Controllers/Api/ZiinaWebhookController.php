@@ -27,7 +27,6 @@ class ZiinaWebhookController extends Controller
         ]);
 
         try {
-            // Verify webhook signature if available
             $signature = $request->header('X-Ziina-Signature');
             if ($signature) {
                 $payload = $request->getContent();
@@ -50,21 +49,20 @@ class ZiinaWebhookController extends Controller
                 case 'payment_request.paid':
                     $this->handlePaymentSuccess($paymentRequest);
                     break;
-                
+
                 case 'payment_request.failed':
                     $this->handlePaymentFailed($paymentRequest);
                     break;
-                
+
                 case 'payment_request.cancelled':
                     $this->handlePaymentCancelled($paymentRequest);
                     break;
-                
+
                 default:
                     Log::info('Unhandled Ziina webhook event type', ['type' => $eventType]);
             }
 
             return response()->json(['success' => true]);
-
         } catch (\Exception $e) {
             Log::error('Error processing Ziina webhook', [
                 'error' => $e->getMessage(),
@@ -82,7 +80,6 @@ class ZiinaWebhookController extends Controller
     {
         try {
             $paymentId = $paymentRequest['id'] ?? null;
-            $metadata = $paymentRequest['metadata'] ?? [];
 
             if (!$paymentId) {
                 Log::error('Payment ID not found in webhook');
@@ -96,64 +93,18 @@ class ZiinaWebhookController extends Controller
                 return;
             }
 
-            // Check if already processed
             if ($payment->status === 'completed') {
                 Log::info('Payment already processed', ['payment_id' => $payment->id]);
                 return;
             }
 
-            DB::beginTransaction();
-
-            // Update payment
-            $payment->update([
-                'status' => 'completed',
-                'paid_at' => now(),
-                'gateway_response' => array_merge($payment->gateway_response ?? [], $paymentRequest),
-            ]);
-
-            // Update user package
-            $userPackageId = $metadata['user_package_id'] ?? null;
-            if ($userPackageId) {
-                $userPackage = UserPackage::find($userPackageId);
-                if ($userPackage && $userPackage->status !== 'active') {
-                    $userPackage->update([
-                        'status' => 'active',
-                        'start_date' => now(),
-                    ]);
-
-                    // Add bonus points using PointsService for proper integration
-                    if ($userPackage->package && $userPackage->package->points_bonus > 0) {
-                        $user = $userPackage->user;
-                        if ($user) {
-                            $pointsService = app(\App\Services\PointsService::class);
-                            $pointsService->awardPoints(
-                                $user->id,
-                                $userPackage->package->points_bonus,
-                                'package_bonus',
-                                $userPackage->package_id,
-                                "Package subscription bonus: {$userPackage->package->name}",
-                                "مكافأة اشتراك الباقة: {$userPackage->package->name_ar}"
-                            );
-                            
-                            Log::info('Added bonus points to user via PointsService', [
-                                'user_id' => $user->id,
-                                'points' => $userPackage->package->points_bonus,
-                                'package_id' => $userPackage->package_id,
-                            ]);
-                        }
-                    }
-                }
-            }
-
-            DB::commit();
+            app(\App\Services\PaymentService::class)->finalizePackageSubscription($payment, $paymentRequest);
 
             Log::info('Payment processed successfully', [
                 'payment_id' => $payment->id,
-                'user_package_id' => $userPackageId,
+                'user_package_id' => $payment->user_package_id,
             ]);
-
         } catch (\Exception $e) {
-            DB::rollBack();
             Log::error('Error handling payment success webhook', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
@@ -198,7 +149,6 @@ class ZiinaWebhookController extends Controller
             DB::commit();
 
             Log::info('Payment failed', ['payment_id' => $payment->id]);
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error handling payment failed webhook', [
@@ -237,14 +187,13 @@ class ZiinaWebhookController extends Controller
             if ($userPackageId) {
                 $userPackage = UserPackage::find($userPackageId);
                 if ($userPackage) {
-                    $userPackage->update(['status' => 'cancelled']);
+                    app(\App\Services\PackageService::class)->updateSubscriberStatus($userPackage, 'cancelled');
                 }
             }
 
             DB::commit();
 
             Log::info('Payment cancelled', ['payment_id' => $payment->id]);
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error handling payment cancelled webhook', [
@@ -253,4 +202,3 @@ class ZiinaWebhookController extends Controller
         }
     }
 }
-

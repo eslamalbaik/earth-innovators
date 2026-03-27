@@ -3,12 +3,10 @@
 namespace App\Services;
 
 use App\Models\Booking;
-use App\Models\Teacher;
 use App\Models\TeacherAvailability;
 use App\Models\User;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class BookingService extends BaseService
@@ -18,7 +16,7 @@ class BookingService extends BaseService
         ?int $teacherId = null,
         int $perPage = 20
     ): LengthAwarePaginator {
-        $cacheKey = "bookings_" . md5(json_encode([$status, $teacherId, $perPage]));
+        $cacheKey = 'bookings_' . md5(json_encode([$status, $teacherId, $perPage]));
         $cacheTag = 'bookings';
 
         return $this->cacheTags($cacheTag, $cacheKey, function () use ($status, $teacherId, $perPage) {
@@ -26,9 +24,8 @@ class BookingService extends BaseService
                 'teacher:id,user_id,name_ar,name_en',
                 'teacher.user:id,name,email,image',
                 'student:id,name,email,image',
-                'availability:id,date,start_time,end_time,status'
-            ])
-            ->select('id', 'teacher_id', 'student_id', 'availability_id', 'status', 'subject', 'date', 'start_time', 'end_time', 'price', 'total_price', 'payment_status', 'created_at');
+                'availability:id,date,start_time,end_time,status',
+            ])->select('id', 'teacher_id', 'student_id', 'availability_id', 'status', 'subject', 'date', 'start_time', 'end_time', 'price', 'total_price', 'payment_status', 'created_at');
 
             if ($status) {
                 $query->where('status', $status);
@@ -39,7 +36,7 @@ class BookingService extends BaseService
             }
 
             return $query->latest()->paginate($perPage);
-        }, 300); // Cache for 5 minutes
+        }, 300);
     }
 
     public function getTeacherBookings(int $teacherId, ?string $status = null, int $perPage = 20): LengthAwarePaginator
@@ -57,7 +54,7 @@ class BookingService extends BaseService
             }
 
             return $query->latest()->paginate($perPage);
-        }, 300); // Cache for 5 minutes
+        }, 300);
     }
 
     public function getStudentBookings(int $studentId, ?string $status = null, int $perPage = 20): LengthAwarePaginator
@@ -70,9 +67,8 @@ class BookingService extends BaseService
                 'teacher:id,user_id,name_ar,name_en',
                 'teacher.user:id,name,email,image',
                 'availability:id,date,start_time,end_time',
-                'payment:id,status,amount'
-            ])
-            ->select('id', 'teacher_id', 'availability_id', 'status', 'subject', 'date', 'start_time', 'end_time', 'price', 'total_price', 'payment_status', 'created_at');
+                'payment:id,status,amount',
+            ])->select('id', 'teacher_id', 'availability_id', 'status', 'subject', 'date', 'start_time', 'end_time', 'price', 'total_price', 'payment_status', 'created_at');
 
             if (Schema::hasColumn('bookings', 'student_id')) {
                 $query->where('student_id', $studentId);
@@ -88,7 +84,7 @@ class BookingService extends BaseService
             }
 
             return $query->latest()->paginate($perPage);
-        }, 300); // Cache for 5 minutes
+        }, 300);
     }
 
     public function getBookingDetails(int $bookingId): ?Booking
@@ -101,18 +97,24 @@ class BookingService extends BaseService
                 'teacher:id,user_id,name_ar,name_en',
                 'teacher.user:id,name,email,image,phone',
                 'student:id,name,email,image,phone',
-                'availability:id,date,start_time,end_time,status'
+                'availability:id,date,start_time,end_time,status',
             ])->find($bookingId);
-        }, 600); // Cache for 10 minutes
+        }, 600);
     }
 
-    public function createBooking(array $data, int $userId): Booking
+    public function createBooking(array $data, ?int $userId = null): Booking
     {
         try {
             DB::beginTransaction();
 
+            $userId ??= isset($data['student_id']) ? (int) $data['student_id'] : null;
+
+            if (!$userId) {
+                throw new \InvalidArgumentException('يجب تحديد الطالب لإتمام الحجز.');
+            }
+
             $sessionsInput = collect($data['sessions'] ?? [])
-                ->filter(fn($session) => isset($session['availability_id']));
+                ->filter(fn ($session) => isset($session['availability_id']));
 
             if ($sessionsInput->isNotEmpty()) {
                 $availabilityIds = $sessionsInput->pluck('availability_id')->unique()->values();
@@ -123,7 +125,7 @@ class BookingService extends BaseService
                 }
 
                 if ($availabilities->pluck('teacher_id')->unique()->count() > 1) {
-                    throw new \Exception('يجب أن تكون جميع المواعيد لنفس المعلم.');
+                    throw new \Exception('يجب أن تكون جميع المواعيد للمعلم نفسه.');
                 }
 
                 $primaryAvailability = $availabilities->first();
@@ -131,6 +133,7 @@ class BookingService extends BaseService
                 if (!isset($data['availability_id'])) {
                     throw new \Exception('يجب تحديد موعد واحد على الأقل.');
                 }
+
                 $primaryAvailability = TeacherAvailability::with('teacher')->findOrFail($data['availability_id']);
                 $sessionsInput = collect([[
                     'availability_id' => $primaryAvailability->id,
@@ -140,7 +143,7 @@ class BookingService extends BaseService
             }
 
             if ($primaryAvailability->status !== 'available') {
-                throw new \Exception('هذا الوقت غير متاح للحجز');
+                throw new \Exception('هذا الموعد غير متاح للحجز.');
             }
 
             $user = User::findOrFail($userId);
@@ -174,7 +177,6 @@ class BookingService extends BaseService
             if (Schema::hasColumn('bookings', 'payment_reference') && isset($data['payment_reference'])) {
                 $createData['payment_reference'] = $data['payment_reference'];
             }
-
             if (Schema::hasColumn('bookings', 'availability_id')) {
                 $createData['availability_id'] = $primaryAvailability->id;
             }
@@ -194,9 +196,7 @@ class BookingService extends BaseService
                         if ($defaultSubject) {
                             $subjectsCollection = collect([$defaultSubject]);
                         } else {
-                            $teacherSubjects = is_array($teacher->subjects ?? null)
-                                ? $teacher->subjects
-                                : [];
+                            $teacherSubjects = is_array($teacher->subjects ?? null) ? $teacher->subjects : [];
                             if (!empty($teacherSubjects)) {
                                 $subjectsCollection = collect([$teacherSubjects[0]]);
                             }
@@ -251,17 +251,14 @@ class BookingService extends BaseService
 
             $booking = Booking::create($createData);
 
-            // Mark availabilities as booked
             foreach ($availabilities as $availability) {
                 $availability->update(['status' => 'booked', 'booking_id' => $booking->id]);
             }
 
             DB::commit();
 
-            // Send notifications (async)
             \App\Jobs\SendBookingNotification::dispatch($booking);
 
-            // Clear cache
             $this->forgetCacheTags(['bookings', "teacher_bookings_{$teacher->id}", "student_bookings_{$userId}"]);
 
             return $booking->load(['teacher', 'student', 'availability']);
@@ -271,17 +268,19 @@ class BookingService extends BaseService
         }
     }
 
-    public function updateBookingStatus(Booking $booking, string $status, ?string $teacherNotes = null, int $teacherId): Booking
+    public function updateBookingStatus(Booking|int $booking, string $status, ?string $teacherNotes = null, ?int $teacherId = null): Booking
     {
         try {
             DB::beginTransaction();
 
-            // Verify teacher owns this booking
-            if ($booking->teacher_id !== $teacherId) {
-                throw new \Exception('غير مصرح لك بتحديث هذا الحجز');
+            if (is_int($booking)) {
+                $booking = Booking::findOrFail($booking);
             }
 
-            $oldStatus = $booking->status;
+            if ($teacherId !== null && $booking->teacher_id !== $teacherId) {
+                throw new \Exception('غير مصرح لك بتحديث هذا الحجز.');
+            }
+
             $updateData = ['status' => $status];
 
             if (Schema::hasColumn('bookings', 'notes') && $teacherNotes) {
@@ -296,11 +295,11 @@ class BookingService extends BaseService
                     if (Schema::hasColumn('bookings', 'approved_at')) {
                         $updateData['approved_at'] = now();
                     }
-                    // Mark availabilities as booked
                     if ($booking->selected_sessions) {
-                        $sessions = is_array($booking->selected_sessions) 
-                            ? $booking->selected_sessions 
+                        $sessions = is_array($booking->selected_sessions)
+                            ? $booking->selected_sessions
                             : json_decode($booking->selected_sessions, true) ?? [];
+
                         $availabilityIds = collect($sessions)
                             ->pluck('availability_id')
                             ->filter()
@@ -315,14 +314,15 @@ class BookingService extends BaseService
                         $booking->availability->update(['status' => 'booked']);
                     }
                     break;
+
                 case 'rejected':
                 case 'cancelled':
                     if (Schema::hasColumn('bookings', $status . '_at')) {
                         $updateData[$status . '_at'] = now();
                     }
-                    // Release availabilities
                     $this->releaseAvailabilities($booking);
                     break;
+
                 case 'completed':
                     if (Schema::hasColumn('bookings', 'completed_at')) {
                         $updateData['completed_at'] = now();
@@ -334,15 +334,13 @@ class BookingService extends BaseService
 
             DB::commit();
 
-            // Send notifications (async)
             \App\Jobs\SendBookingStatusChangeNotification::dispatch($booking);
 
-            // Clear cache
             $this->forgetCacheTags([
                 'bookings',
                 "teacher_bookings_{$booking->teacher_id}",
                 "student_bookings_{$booking->student_id}",
-                "booking_{$booking->id}"
+                "booking_{$booking->id}",
             ]);
 
             return $booking->fresh();

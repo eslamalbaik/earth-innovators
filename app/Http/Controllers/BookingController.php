@@ -33,7 +33,7 @@ class BookingController extends Controller
         if (!Auth::check()) {
             return response()->json([
                 'success' => false,
-                'message' => 'يجب تسجيل الدخول أولاً'
+                'message' => 'يجب تسجيل الدخول أولاً.',
             ], 401);
         }
 
@@ -54,13 +54,13 @@ class BookingController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'تم إرسال طلب الحجز بنجاح. سيتم مراجعة طلبك من قبل المعلم.',
-                'data' => $booking
+                'message' => 'تم إرسال طلب الحجز بنجاح. سيقوم المعلم بمراجعته قريباً.',
+                'data' => $booking,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 422);
         }
     }
@@ -82,7 +82,7 @@ class BookingController extends Controller
     {
         $request->validate([
             'status' => 'required|in:approved,rejected,cancelled,completed',
-            'teacher_notes' => 'nullable|string|max:1000'
+            'teacher_notes' => 'nullable|string|max:1000',
         ]);
 
         $teacher = Teacher::where('user_id', Auth::id())->firstOrFail();
@@ -98,13 +98,13 @@ class BookingController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'تم تحديث حالة الطلب بنجاح',
-                'data' => $booking
+                'message' => 'تم تحديث حالة الطلب بنجاح.',
+                'data' => $booking,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 422);
         }
     }

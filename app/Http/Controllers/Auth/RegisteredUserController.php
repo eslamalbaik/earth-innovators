@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Models\Teacher;
+use App\Models\User;
 use App\Services\MembershipService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -41,6 +41,10 @@ class RegisteredUserController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $request->merge([
+            'role' => $request->input('role', 'student'),
+        ]);
+
         $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
@@ -49,40 +53,37 @@ class RegisteredUserController extends Controller
             'role' => 'required|string|in:student,teacher,school,educational_institution',
         ];
 
-        // إضافة شرط school_id للطلاب والمعلمين
-        if (in_array($request->role, ['student', 'teacher'])) {
+        if ($request->role === 'teacher') {
             $rules['school_id'] = 'required|exists:users,id';
         }
 
         $validated = $request->validate($rules, [
-            'name.required' => 'الاسم الكامل مطلوب',
-            'name.string' => 'الاسم يجب أن يكون نصاً صحيحاً',
-            'name.max' => 'الاسم يجب ألا يتجاوز 255 حرفاً',
-            'email.required' => 'البريد الإلكتروني مطلوب',
-            'email.email' => 'البريد الإلكتروني غير صحيح',
-            'email.unique' => 'هذا البريد الإلكتروني مسجل لمستخدم آخر في نظامنا. يرجى استخدام بريد آخر أو تسجيل الدخول.',
-            'email.max' => 'البريد الإلكتروني يجب ألا يتجاوز 255 حرفاً',
-            'password.required' => 'كلمة المرور مطلوبة',
-            'password.confirmed' => 'كلمة المرور وتأكيدها غير متطابقين',
-            'password.min' => 'كلمة المرور يجب أن تكون على الأقل 8 أحرف',
-            'phone.string' => 'رقم الجوال يجب أن يكون نصاً صحيحاً',
-            'phone.max' => 'رقم الجوال يجب ألا يتجاوز 20 حرفاً',
-            'phone.unique' => '⚠️ هذا الرقم مسجل لمستخدم آخر في نظامنا. يرجى استخدام رقم آخر أو تسجيل الدخول إذا كان هذا حسابك.',
-            'role.required' => 'نوع الحساب مطلوب',
-            'role.in' => 'نوع الحساب غير صحيح',
-            'school_id.required' => 'يجب اختيار المدرسة',
-            'school_id.exists' => 'المدرسة المختارة غير موجودة. يرجى التأكد من اختيار مدرسة صحيحة من القائمة.',
+            'name.required' => 'الاسم الكامل مطلوب.',
+            'name.string' => 'الاسم يجب أن يكون نصاً صحيحاً.',
+            'name.max' => 'الاسم يجب ألا يتجاوز 255 حرفاً.',
+            'email.required' => 'البريد الإلكتروني مطلوب.',
+            'email.email' => 'صيغة البريد الإلكتروني غير صحيحة.',
+            'email.unique' => 'هذا البريد الإلكتروني مستخدم بالفعل. يرجى استخدام بريد آخر أو تسجيل الدخول.',
+            'email.max' => 'البريد الإلكتروني يجب ألا يتجاوز 255 حرفاً.',
+            'password.required' => 'كلمة المرور مطلوبة.',
+            'password.confirmed' => 'تأكيد كلمة المرور غير متطابق.',
+            'phone.string' => 'رقم الجوال يجب أن يكون نصاً صحيحاً.',
+            'phone.max' => 'رقم الجوال يجب ألا يتجاوز 20 حرفاً.',
+            'phone.unique' => 'هذا الرقم مستخدم بالفعل. يرجى استخدام رقم آخر أو تسجيل الدخول.',
+            'role.required' => 'نوع الحساب مطلوب.',
+            'role.in' => 'نوع الحساب غير صالح.',
+            'school_id.required' => 'يجب اختيار المدرسة.',
+            'school_id.exists' => 'المدرسة المختارة غير موجودة أو غير متاحة.',
         ]);
 
-        // التحقق من أن المدرسة موجودة ومفعلة (إذا كانت مدرسة)
-        if (in_array($validated['role'], ['student', 'teacher']) && isset($validated['school_id'])) {
+        if (in_array($validated['role'], ['student', 'teacher'], true) && !empty($validated['school_id'])) {
             $school = User::where('id', $validated['school_id'])
                 ->whereIn('role', ['school', 'educational_institution'])
                 ->first();
 
             if (!$school) {
                 return back()->withErrors([
-                    'school_id' => 'المدرسة المختارة غير موجودة. يرجى التأكد من اختيار مدرسة صحيحة من القائمة.',
+                    'school_id' => 'المدرسة المختارة غير موجودة أو غير متاحة.',
                 ])->withInput();
             }
         }
@@ -95,28 +96,25 @@ class RegisteredUserController extends Controller
             'role' => $validated['role'],
         ];
 
-        // إضافة school_id للطلاب والمعلمين فقط
-        if (in_array($validated['role'], ['student', 'teacher']) && isset($validated['school_id'])) {
+        if (in_array($validated['role'], ['student', 'teacher'], true) && !empty($validated['school_id'])) {
             $userData['school_id'] = $validated['school_id'];
         }
 
         try {
             DB::beginTransaction();
 
-            // Generate membership number for students and teachers
-            if (in_array($validated['role'], ['student', 'teacher'])) {
+            if (in_array($validated['role'], ['student', 'teacher'], true)) {
                 $userData['membership_number'] = $this->membershipService->generateMembershipNumber($validated['role']);
             }
 
             $user = User::create($userData);
 
-            // إنشاء Teacher record إذا كان role = teacher
             if ($validated['role'] === 'teacher') {
                 Teacher::create([
                     'user_id' => $user->id,
                     'name_ar' => $validated['name'],
                     'name_en' => $validated['name'],
-                    'city' => 'غير محدد', // قيمة افتراضية لأن الحقل مطلوب
+                    'city' => 'غير محدد',
                     'bio' => null,
                     'qualifications' => null,
                     'subjects' => json_encode([]),
@@ -126,21 +124,20 @@ class RegisteredUserController extends Controller
                     'nationality' => 'إماراتي',
                     'gender' => null,
                     'neighborhoods' => json_encode([]),
-                    'is_verified' => true, // معتمد تلقائياً
-                    'is_active' => true, // نشط تلقائياً
+                    'is_verified' => false,
+                    'is_active' => false,
                 ]);
             }
 
             DB::commit();
 
             event(new Registered($user));
-
             Auth::login($user);
 
             return redirect(route('dashboard', absolute: false));
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             return back()->withErrors([
                 'error' => 'حدث خطأ أثناء إنشاء الحساب: ' . $e->getMessage(),
             ])->withInput();

@@ -413,7 +413,6 @@ export default function DashboardLayout({ children, header }) {
                 subItems: [
                     { name: t('sidebar.submissions'), href: '/teacher/submissions', icon: FaFile },
                     { name: t('sidebar.reviewProjects'), href: '/teacher/projects', icon: FaBookOpen },
-                    { name: t('sidebar.myProjects'), href: '/teacher/projects', icon: FaProjectDiagram },
                 ]
             },
             {
@@ -455,7 +454,6 @@ export default function DashboardLayout({ children, header }) {
                 href: '/school/badges',
                 icon: FaMedal,
                 subItems: [
-                    { name: t('sidebar.reviewProjects'), href: '/school/badges/pending', icon: FaMedal },
                     { name: t('sidebar.badges'), href: '/school/badges', icon: FaCommentDots },
                     { name: t('sidebar.ranking'), href: '/school/ranking', icon: FaTrophy },
                 ]

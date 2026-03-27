@@ -4,6 +4,7 @@ import Placeholder from '@tiptap/extension-placeholder';
 import TextAlign from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
 import { useEffect } from 'react';
+import { useTranslation } from '@/i18n';
 import { 
     FaBold, 
     FaItalic, 
@@ -19,7 +20,7 @@ import {
     FaRedo
 } from 'react-icons/fa';
 
-const MenuBar = ({ editor }) => {
+const MenuBar = ({ editor, t }) => {
     if (!editor) {
         return null;
     }
@@ -34,7 +35,7 @@ const MenuBar = ({ editor }) => {
                 className={`p-2 rounded hover:bg-gray-200 transition ${
                     editor.isActive('bold') ? 'bg-[#A3C042]/20 text-[#A3C042]' : 'text-gray-700'
                 }`}
-                title="عريض"
+                title={t('editorToolbar.bold')}
             >
                 <FaBold />
             </button>
@@ -47,7 +48,7 @@ const MenuBar = ({ editor }) => {
                 className={`p-2 rounded hover:bg-gray-200 transition ${
                     editor.isActive('italic') ? 'bg-[#A3C042]/20 text-[#A3C042]' : 'text-gray-700'
                 }`}
-                title="مائل"
+                title={t('editorToolbar.italic')}
             >
                 <FaItalic />
             </button>
@@ -59,7 +60,7 @@ const MenuBar = ({ editor }) => {
                 className={`p-2 rounded hover:bg-gray-200 transition ${
                     editor.isActive('underline') ? 'bg-[#A3C042]/20 text-[#A3C042]' : 'text-gray-700'
                 }`}
-                title="تحته خط"
+                title={t('editorToolbar.underline')}
             >
                 <FaUnderline />
             </button>
@@ -74,7 +75,7 @@ const MenuBar = ({ editor }) => {
                 className={`p-2 rounded hover:bg-gray-200 transition ${
                     editor.isActive('heading', { level: 1 }) ? 'bg-[#A3C042]/20 text-[#A3C042]' : 'text-gray-700'
                 }`}
-                title="عنوان رئيسي"
+                title={t('editorToolbar.heading')}
             >
                 <FaHeading className="text-sm" />
             </button>
@@ -89,7 +90,7 @@ const MenuBar = ({ editor }) => {
                 className={`p-2 rounded hover:bg-gray-200 transition ${
                     editor.isActive('bulletList') ? 'bg-[#A3C042]/20 text-[#A3C042]' : 'text-gray-700'
                 }`}
-                title="قائمة نقطية"
+                title={t('editorToolbar.bulletList')}
             >
                 <FaListUl />
             </button>
@@ -101,7 +102,7 @@ const MenuBar = ({ editor }) => {
                 className={`p-2 rounded hover:bg-gray-200 transition ${
                     editor.isActive('orderedList') ? 'bg-[#A3C042]/20 text-[#A3C042]' : 'text-gray-700'
                 }`}
-                title="قائمة مرقمة"
+                title={t('editorToolbar.orderedList')}
             >
                 <FaListOl />
             </button>
@@ -113,7 +114,7 @@ const MenuBar = ({ editor }) => {
                 className={`p-2 rounded hover:bg-gray-200 transition ${
                     editor.isActive('blockquote') ? 'bg-[#A3C042]/20 text-[#A3C042]' : 'text-gray-700'
                 }`}
-                title="اقتباس"
+                title={t('editorToolbar.quote')}
             >
                 <FaQuoteLeft />
             </button>
@@ -128,7 +129,7 @@ const MenuBar = ({ editor }) => {
                 className={`p-2 rounded hover:bg-gray-200 transition ${
                     editor.isActive({ textAlign: 'left' }) ? 'bg-[#A3C042]/20 text-[#A3C042]' : 'text-gray-700'
                 }`}
-                title="محاذاة لليسار"
+                title={t('editorToolbar.alignLeft')}
             >
                 <FaAlignLeft />
             </button>
@@ -140,7 +141,7 @@ const MenuBar = ({ editor }) => {
                 className={`p-2 rounded hover:bg-gray-200 transition ${
                     editor.isActive({ textAlign: 'center' }) ? 'bg-[#A3C042]/20 text-[#A3C042]' : 'text-gray-700'
                 }`}
-                title="محاذاة للوسط"
+                title={t('editorToolbar.alignCenter')}
             >
                 <FaAlignCenter />
             </button>
@@ -152,7 +153,7 @@ const MenuBar = ({ editor }) => {
                 className={`p-2 rounded hover:bg-gray-200 transition ${
                     editor.isActive({ textAlign: 'right' }) ? 'bg-[#A3C042]/20 text-[#A3C042]' : 'text-gray-700'
                 }`}
-                title="محاذاة لليمين"
+                title={t('editorToolbar.alignRight')}
             >
                 <FaAlignRight />
             </button>
@@ -166,7 +167,7 @@ const MenuBar = ({ editor }) => {
                 onClick={() => editor.chain().focus().undo().run()}
                 disabled={!editor.can().chain().focus().undo().run()}
                 className="p-2 rounded hover:bg-gray-200 transition text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                title="تراجع"
+                title={t('editorToolbar.undo')}
             >
                 <FaUndo />
             </button>
@@ -177,7 +178,7 @@ const MenuBar = ({ editor }) => {
                 onClick={() => editor.chain().focus().redo().run()}
                 disabled={!editor.can().chain().focus().redo().run()}
                 className="p-2 rounded hover:bg-gray-200 transition text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                title="إعادة"
+                title={t('editorToolbar.redo')}
             >
                 <FaRedo />
             </button>
@@ -185,7 +186,10 @@ const MenuBar = ({ editor }) => {
     );
 };
 
-export default function TiptapEditor({ content, onChange, placeholder = 'أدخل محتوى المقال...' }) {
+export default function TiptapEditor({ content, onChange, placeholder }) {
+    const { t, language } = useTranslation();
+    const resolvedPlaceholder = placeholder || t('editorToolbar.defaultPlaceholder');
+
     const editor = useEditor({
         extensions: [
             StarterKit.configure({
@@ -195,11 +199,11 @@ export default function TiptapEditor({ content, onChange, placeholder = 'أدخ�
             }),
             Underline,
             Placeholder.configure({
-                placeholder,
+                placeholder: resolvedPlaceholder,
             }),
             TextAlign.configure({
                 types: ['heading', 'paragraph'],
-                defaultAlignment: 'right',
+                defaultAlignment: language === 'ar' ? 'right' : 'left',
             }),
         ],
         content: content || '',
@@ -209,7 +213,7 @@ export default function TiptapEditor({ content, onChange, placeholder = 'أدخ�
         editorProps: {
             attributes: {
                 class: 'ProseMirror focus:outline-none min-h-[300px] p-4',
-                dir: 'rtl',
+                dir: language === 'ar' ? 'rtl' : 'ltr',
             },
         },
     });
@@ -222,7 +226,7 @@ export default function TiptapEditor({ content, onChange, placeholder = 'أدخ�
 
     return (
         <div className="border border-gray-300 rounded-lg overflow-hidden bg-white">
-            <MenuBar editor={editor} />
+            <MenuBar editor={editor} t={t} />
             <EditorContent 
                 editor={editor}
                 className="focus-within:ring-2 focus-within:ring-[#A3C042] focus-within:border-[#A3C042]"
@@ -230,4 +234,3 @@ export default function TiptapEditor({ content, onChange, placeholder = 'أدخ�
         </div>
     );
 }
-

@@ -5,9 +5,8 @@ namespace App\Http\Controllers\Teacher;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\Publication;
-use App\Models\UserBadge;
-use App\Services\DashboardService;
 use App\Services\ActivityService;
+use App\Services\DashboardService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -23,7 +22,6 @@ class TeacherDashboardController extends Controller
         $user = auth()->user();
         $teacher = $user->teacher;
 
-        // إذا لم يكن هناك teacher record، قم بإنشائه تلقائياً
         if (!$teacher) {
             try {
                 $teacher = \App\Models\Teacher::create([
@@ -40,26 +38,23 @@ class TeacherDashboardController extends Controller
                     'nationality' => 'إماراتي',
                     'gender' => null,
                     'neighborhoods' => json_encode([]),
-                    'is_verified' => true,
-                    'is_active' => true,
+                    'is_verified' => false,
+                    'is_active' => false,
                 ]);
 
                 $user->refresh();
                 $user->load('teacher');
                 $teacher = $user->teacher;
             } catch (\Exception $e) {
-                return redirect()->route('dashboard')->with('error', 'حدث خطأ أثناء إنشاء بيانات المعلم: ' . $e->getMessage());
+                return redirect()->route('dashboard')->with('error', 'حدث خطأ أثناء إنشاء ملف المعلم: ' . $e->getMessage());
             }
         }
 
-        // Get optimized dashboard stats from service
         $stats = $this->dashboardService->getTeacherDashboardStats($teacher->id, $user->id);
 
-        // Get recent badges
         $recentBadges = $this->activityService->getRecentBadges($user->id, 5);
         $stats['badges']['recent'] = $recentBadges;
 
-        // Get recent projects
         $recentProjects = Project::where('teacher_id', $teacher->id)
             ->select('id', 'title', 'status', 'views', 'likes', 'points_earned', 'created_at')
             ->latest()
@@ -77,7 +72,6 @@ class TeacherDashboardController extends Controller
                 ];
             });
 
-        // Get recent publications
         $recentPublications = Publication::where('author_id', $user->id)
             ->select('id', 'title', 'type', 'status', 'views', 'likes_count', 'created_at')
             ->latest()
@@ -111,7 +105,7 @@ class TeacherDashboardController extends Controller
             'stats' => $stats,
             'activationBanner' => !$isActive ? [
                 'title' => 'حسابك قيد المراجعة',
-                'message' => 'حسابك غير نشط حالياً ولن يظهر للطلاب حتى يتم تفعيله من قبل فريق الإدارة. سنقوم بإشعارك فور تفعيل الحساب.',
+                'message' => 'حسابك غير نشط حالياً ولن يظهر للطلاب حتى يتم تفعيله من قبل الإدارة. سنقوم بإشعارك فور اعتماد الحساب.',
                 'is_verified' => $isVerified,
             ] : null,
         ]);

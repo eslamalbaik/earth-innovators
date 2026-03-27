@@ -3,45 +3,45 @@
 namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\Certificate;
 use App\Models\Project;
+use App\Models\User;
 use App\Services\CertificateService;
+use App\Services\MembershipAccessService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use Carbon\Carbon;
 
 class TeacherCertificateController extends Controller
 {
-    protected $certificateService;
+    public function __construct(
+        private CertificateService $certificateService,
+        private MembershipAccessService $membershipAccessService
+    ) {}
 
-    public function __construct(CertificateService $certificateService)
-    {
-        $this->certificateService = $certificateService;
-    }
-
-    /**
-     * Display certificate generation page for teacher
-     */
     public function index(Request $request)
     {
-        $teacher = Auth::user();
+        $teacherUser = Auth::user();
+        $teacherId = $teacherUser->teacher?->id;
 
-        // Get students who have projects with this teacher
-        $teacherProjects = Project::where('teacher_id', $teacher->id)
+        $teacherProjects = Project::where('teacher_id', $teacherId)
             ->pluck('user_id')
             ->unique();
 
         $query = User::whereIn('id', $teacherProjects)
             ->where('role', 'student')
-            ->withCount('certificates');
+            ->withCount([
+                'certificates as approved_certificates_count' => function ($certificateQuery) {
+                    $certificateQuery->where('status', 'approved');
+                },
+            ]);
 
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('membership_number', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('membership_number', 'like', "%{$search}%");
             });
         }
 
@@ -52,20 +52,60 @@ class TeacherCertificateController extends Controller
                     'name' => $student->name,
                     'email' => $student->email,
                     'membership_number' => $student->membership_number,
-                    'certificates_count' => $student->certificates_count,
+                    'certificates_count' => (int) ($student->approved_certificates_count ?? 0),
                     'created_at' => $student->created_at ? $student->created_at->toISOString() : null,
+                ];
+            });
+
+        $requestHistory = Certificate::with(['user:id,name,role', 'reviewer:id,name'])
+            ->where('requested_by', $teacherUser->id)
+            ->latest()
+            ->limit(25)
+            ->get()
+            ->map(function ($certificate) {
+                return [
+                    'id' => $certificate->id,
+                    'certificate_number' => $certificate->certificate_number,
+                    'title' => $certificate->title_ar ?? $certificate->title,
+                    'type' => $certificate->type,
+                    'status' => $certificate->status,
+                    'rejection_reason' => $certificate->rejection_reason,
+                    'recipient' => $certificate->user ? [
+                        'id' => $certificate->user->id,
+                        'name' => $certificate->user->name,
+                        'role' => $certificate->user->role,
+                    ] : null,
+                    'reviewer' => $certificate->reviewer ? [
+                        'id' => $certificate->reviewer->id,
+                        'name' => $certificate->reviewer->name,
+                    ] : null,
+                    'download_url' => $certificate->file_path ? route('certificates.download', $certificate->id) : null,
+                    'created_at' => $certificate->created_at?->format('Y-m-d H:i'),
                 ];
             });
 
         return Inertia::render('Teacher/Certificates/Index', [
             'students' => $students,
-            'description' => 'قائمة بطلابك فقط مع إمكانية إنشاء شهادات فردية وتعديل الحقول المسموح بها',
+            'teacherRecipient' => [
+                'id' => $teacherUser->id,
+                'name' => $teacherUser->name,
+                'email' => $teacherUser->email,
+                'membership_number' => $teacherUser->membership_number,
+                'certificates_count' => Certificate::where('user_id', $teacherUser->id)
+                    ->where('status', 'approved')
+                    ->count(),
+                'created_at' => $teacherUser->created_at?->toISOString(),
+            ],
+            'requestHistory' => $requestHistory,
+            'school' => $teacherUser->school ? [
+                'id' => $teacherUser->school->id,
+                'name' => $teacherUser->school->name,
+            ] : null,
+            'membershipSummary' => $this->membershipAccessService->getMembershipSummary($teacherUser),
+            'description' => 'يمكنك طلب شهادة لك أو لطلابك، وسيتم إرسالها إلى المدرسة لاعتمادها قبل إصدار النسخة النهائية.',
         ]);
     }
 
-    /**
-     * Show teacher certificate page
-     */
     public function show()
     {
         $user = Auth::user();
@@ -74,19 +114,22 @@ class TeacherCertificateController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        $teacher = $user->teacher;
-        $joinDate = $user->created_at ? $user->created_at->format('Y-m-d') : now()->format('Y-m-d');
-        $issueDate = now()->format('Y-m-d');
-
-        // Calculate period (from join date to one year later)
-        $periodStart = $joinDate;
-        $periodEnd = $user->created_at 
-            ? Carbon::parse($user->created_at)->addYear()->format('Y-m-d') 
-            : now()->addYear()->format('Y-m-d');
-
-        // Get membership certificate if exists
         $membershipCertificateService = app(\App\Services\MembershipCertificateService::class);
         $membershipCertificate = $membershipCertificateService->getUserMembershipCertificate($user->id, $user->role);
+
+        $latestApprovedCertificates = Certificate::where('user_id', $user->id)
+            ->where('status', 'approved')
+            ->latest()
+            ->limit(5)
+            ->get()
+            ->map(function ($certificate) {
+                return [
+                    'id' => $certificate->id,
+                    'title' => $certificate->title_ar ?? $certificate->title,
+                    'download_url' => $certificate->file_path ? route('certificates.download', $certificate->id) : null,
+                    'approved_at' => optional($certificate->approved_at ?? $certificate->created_at)?->format('Y-m-d'),
+                ];
+            });
 
         return Inertia::render('Teacher/Certificate/Show', [
             'user' => [
@@ -96,12 +139,17 @@ class TeacherCertificateController extends Controller
             ],
             'stats' => [],
             'certificate' => [
-                'issue_date' => $membershipCertificate ? $membershipCertificate->issue_date->format('Y-m-d') : $issueDate,
-                'period_start' => $periodStart,
-                'period_end' => $periodEnd,
+                'issue_date' => $membershipCertificate ? $membershipCertificate->issue_date->format('Y-m-d') : now()->format('Y-m-d'),
+                'period_start' => optional($user->teacher->contract_start_date ?? $user->created_at)?->format('Y-m-d'),
+                'period_end' => optional($user->teacher->contract_end_date ?? now()->addYear())?->format('Y-m-d'),
                 'download_url' => $membershipCertificate ? route('membership-certificates.download', $membershipCertificate->id) : null,
             ],
+            'membershipSummary' => $this->membershipAccessService->getMembershipSummary($user),
+            'school' => $user->school ? [
+                'id' => $user->school->id,
+                'name' => $user->school->name,
+            ] : null,
+            'latestApprovedCertificates' => $latestApprovedCertificates,
         ]);
     }
 }
-

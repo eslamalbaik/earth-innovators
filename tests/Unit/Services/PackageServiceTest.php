@@ -208,9 +208,9 @@ class PackageServiceTest extends TestCase
      */
     public function test_can_get_package_stats(): void
     {
-        Package::factory()->count(5)->create(['is_active' => true]);
-        Package::factory()->count(2)->create(['is_active' => false]);
-        Package::factory()->count(2)->create(['is_popular' => true]);
+        Package::factory()->count(3)->create(['is_active' => true, 'is_popular' => false]);
+        Package::factory()->count(2)->create(['is_active' => false, 'is_popular' => false]);
+        Package::factory()->count(2)->create(['is_active' => true, 'is_popular' => true]);
 
         $stats = $this->packageService->getPackageStats();
 
@@ -308,11 +308,12 @@ class PackageServiceTest extends TestCase
             'status' => 'active',
             'end_date' => now()->addMonth(),
         ]);
+        $originalEndDate = $userPackage->end_date->copy();
 
         $renewed = $this->packageService->renewSubscription($userPackage, 3);
 
         $this->assertEquals('active', $renewed->status);
-        $this->assertTrue($renewed->end_date->isAfter($userPackage->end_date));
+        $this->assertTrue($renewed->end_date->isAfter($originalEndDate));
     }
 
     /**
@@ -354,8 +355,6 @@ class PackageServiceTest extends TestCase
         $this->assertCount(3, $packages);
     }
 }
-
-
 
 
 

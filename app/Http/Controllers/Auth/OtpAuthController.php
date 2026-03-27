@@ -101,8 +101,8 @@ class OtpAuthController extends Controller
             }
 
             // Get OTP payload (contains name)
-            $otp = $this->otpService->getByToken($request->token);
-            $name = $otp->payload['name'] ?? $request->name;
+            $otp = $this->otpService->getByToken($request->token, true);
+            $name = $otp?->payload['name'] ?? $request->name ?? str($request->email)->before('@')->toString();
 
             // Create user
             $user = User::create([

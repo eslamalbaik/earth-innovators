@@ -1,4 +1,4 @@
-import { Link, router } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaTwitter, FaInstagram, FaFacebook, FaLinkedin, FaRocket, FaUsers, FaTrophy, FaBook, FaCompass } from 'react-icons/fa';
 import { useTranslation } from '@/i18n';
 
@@ -6,6 +6,8 @@ export default function DesktopFooter({ auth }) {
     const { t } = useTranslation();
     const user = auth?.user;
     const isAuthed = !!user;
+    const supportEmail = import.meta.env.VITE_SUPPORT_EMAIL || 'info@innovatorslegacy.ae';
+    const supportPhone = import.meta.env.VITE_SUPPORT_PHONE || '';
 
     const quickLinks = [
         { name: t('common.home'), href: '/', icon: FaRocket },
@@ -17,17 +19,17 @@ export default function DesktopFooter({ auth }) {
     ];
 
     const socialLinks = [
-        { name: 'Twitter', icon: FaTwitter, href: '#', color: 'hover:text-blue-400' },
-        { name: 'Instagram', icon: FaInstagram, href: '#', color: 'hover:text-pink-500' },
-        { name: 'Facebook', icon: FaFacebook, href: '#', color: 'hover:text-blue-600' },
-        { name: 'LinkedIn', icon: FaLinkedin, href: '#', color: 'hover:text-blue-700' },
-    ];
+        { name: 'Twitter', icon: FaTwitter, href: import.meta.env.VITE_SOCIAL_TWITTER, color: 'hover:text-blue-400' },
+        { name: 'Instagram', icon: FaInstagram, href: import.meta.env.VITE_SOCIAL_INSTAGRAM, color: 'hover:text-pink-500' },
+        { name: 'Facebook', icon: FaFacebook, href: import.meta.env.VITE_SOCIAL_FACEBOOK, color: 'hover:text-blue-600' },
+        { name: 'LinkedIn', icon: FaLinkedin, href: import.meta.env.VITE_SOCIAL_LINKEDIN, color: 'hover:text-blue-700' },
+    ].filter((link) => Boolean(link.href));
 
     const contactInfo = [
-        { icon: FaEnvelope, text: 'info@innovatorslegacy.ae', href: 'mailto:info@innovatorslegacy.ae' },
-        { icon: FaPhone, text: '+971 4 XXX XXXX', href: 'tel:+9714XXXXXXX' },
-        { icon: FaMapMarkerAlt, text: t('countries.uae'), href: '#' },
-    ];
+        { icon: FaEnvelope, text: supportEmail, href: `mailto:${supportEmail}` },
+        supportPhone ? { icon: FaPhone, text: supportPhone, href: `tel:${supportPhone.replace(/[^\d+]/g, '')}` } : null,
+        { icon: FaMapMarkerAlt, text: t('countries.uae') },
+    ].filter(Boolean);
 
     return (
         <footer className="hidden md:block bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white border-t border-gray-700">
@@ -52,23 +54,25 @@ export default function DesktopFooter({ auth }) {
                             {t('sections.whyChooseSubtitle')}
                         </p>
                         {/* Social Media */}
-                        <div className="flex items-center gap-3">
-                            {socialLinks.map((social) => {
-                                const Icon = social.icon;
-                                return (
-                                    <a
-                                        key={social.name}
-                                        href={social.href}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className={`w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center transition-all ${social.color} hover:bg-gray-700 border border-gray-700`}
-                                        aria-label={social.name}
-                                    >
-                                        <Icon className="text-lg" />
-                                    </a>
-                                );
-                            })}
-                        </div>
+                        {socialLinks.length > 0 && (
+                            <div className="flex items-center gap-3">
+                                {socialLinks.map((social) => {
+                                    const Icon = social.icon;
+                                    return (
+                                        <a
+                                            key={social.name}
+                                            href={social.href}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className={`w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center transition-all ${social.color} hover:bg-gray-700 border border-gray-700`}
+                                            aria-label={social.name}
+                                        >
+                                            <Icon className="text-lg" />
+                                        </a>
+                                    );
+                                })}
+                            </div>
+                        )}
                     </div>
 
                     {/* Quick Links */}
@@ -98,17 +102,29 @@ export default function DesktopFooter({ auth }) {
                         <ul className="space-y-3">
                             {contactInfo.map((contact, index) => {
                                 const Icon = contact.icon;
+                                const content = (
+                                    <>
+                                        <div className="w-8 h-8 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-lg flex items-center justify-center group-hover:from-[#A3C042] group-hover:to-[#8CA635] transition">
+                                            <Icon className="text-sm text-white" />
+                                        </div>
+                                        <span className="text-sm">{contact.text}</span>
+                                    </>
+                                );
+
                                 return (
                                     <li key={index}>
-                                        <a
-                                            href={contact.href}
-                                            className="flex items-center gap-3 text-gray-300 hover:text-[#A3C042] transition group"
-                                        >
-                                            <div className="w-8 h-8 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-lg flex items-center justify-center group-hover:from-[#A3C042] group-hover:to-[#8CA635] transition">
-                                                <Icon className="text-sm text-white" />
+                                        {contact.href ? (
+                                            <a
+                                                href={contact.href}
+                                                className="flex items-center gap-3 text-gray-300 hover:text-[#A3C042] transition group"
+                                            >
+                                                {content}
+                                            </a>
+                                        ) : (
+                                            <div className="flex items-center gap-3 text-gray-300">
+                                                {content}
                                             </div>
-                                            <span className="text-sm">{contact.text}</span>
-                                        </a>
+                                        )}
                                     </li>
                                 );
                             })}

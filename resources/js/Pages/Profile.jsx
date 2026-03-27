@@ -821,6 +821,11 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                                         required
                                         minLength="8"
                                     />
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        {language === 'ar'
+                                            ? 'يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل، مع حرف كبير وصغير ورقم ورمز خاص.'
+                                            : 'Password must be at least 8 characters and include upper/lowercase letters, a number, and a symbol.'}
+                                    </p>
                                     {passwordForm.errors.password && (
                                         <p className="text-red-500 text-sm mt-1">{passwordForm.errors.password}</p>
                                     )}
@@ -929,4 +934,3 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
         </DashboardLayout>
     );
 }
-

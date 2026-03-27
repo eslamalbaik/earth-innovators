@@ -1,9 +1,12 @@
 import { FaCertificate } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function CertificationsSection({ certifications }) {
+    const { t } = useTranslation();
+
     return (
         <div className="py-4 px-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">الشهادات</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('teacherProfilePage.sections.certifications')}</h2>
 
             <div className="space-y-5">
                 {certifications.map((certification) => (

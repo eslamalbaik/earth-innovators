@@ -29,6 +29,16 @@ class AdminSubscriptionController extends Controller
                 });
             })
             ->when($request->filled('status') && $request->status !== 'all', function ($q) use ($request) {
+                if ($request->status === 'active') {
+                    $q->currentActive();
+                    return;
+                }
+
+                if ($request->status === 'expired') {
+                    $q->pastDue();
+                    return;
+                }
+
                 $q->where('status', $request->status);
             })
             ->when($request->filled('date_from'), function ($q) use ($request) {
@@ -50,7 +60,7 @@ class AdminSubscriptionController extends Controller
                     'package_name' => $subscription->package->name_ar ?? 'غير محدد',
                     'start_date' => $subscription->start_date->format('Y-m-d'),
                     'end_date' => $subscription->end_date->format('Y-m-d'),
-                    'status' => $subscription->status,
+                    'status' => $subscription->effective_status,
                     'auto_renew' => $subscription->auto_renew,
                     'paid_amount' => $subscription->paid_amount ?? 0,
                     'currency' => $subscription->package->currency ?? 'AED',
@@ -115,11 +125,11 @@ class AdminSubscriptionController extends Controller
 
         $subscriptionStats = [
             'total' => UserPackage::count(),
-            'active' => UserPackage::where('status', 'active')->count(),
-            'expired' => UserPackage::where('status', 'expired')->count(),
+            'active' => UserPackage::currentActive()->count(),
+            'expired' => UserPackage::pastDue()->count(),
             'cancelled' => UserPackage::where('status', 'cancelled')->count(),
             'total_revenue' => (float) UserPackage::sum('paid_amount'),
-            'auto_renew_count' => UserPackage::where('auto_renew', true)->where('status', 'active')->count(),
+            'auto_renew_count' => UserPackage::currentActive()->where('auto_renew', true)->count(),
         ];
 
         $paymentStats = [
