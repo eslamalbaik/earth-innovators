@@ -102,7 +102,6 @@ class TeacherCertificateController extends Controller
                 'name' => $teacherUser->school->name,
             ] : null,
             'membershipSummary' => $this->membershipAccessService->getMembershipSummary($teacherUser),
-            'description' => 'يمكنك طلب شهادة لك أو لطلابك، وسيتم إرسالها إلى المدرسة لاعتمادها قبل إصدار النسخة النهائية.',
         ]);
     }
 

@@ -1261,8 +1261,9 @@ export const en = {
     },
     teacherDashboardPage: {
         title: 'Teacher Dashboard',
-        activationTitle: 'Complete your activation',
-        activationMessage: 'Finish the remaining steps to unlock every educator tool.',
+        activationTitle: 'Your account is under review',
+        activationMessage:
+            'Your account is not active yet and will not be visible to students until it is activated by the administration. We will notify you as soon as your account is approved.',
         totalPoints: 'Total Points',
         operationsCount: '{count} actions recorded',
         approvedCount: '{count} projects approved',
@@ -5077,6 +5078,8 @@ export const en = {
         pageTitle: 'Certificate Requests - {appName}',
         title: 'Certificate Requests',
         authorityTitle: 'Approval Authority',
+        authorityDescription:
+            'You can request a certificate for yourself or your students. It will be sent to the school for approval before the final version is issued.',
         noLinkedSchool: 'You are not linked to a school',
         membershipStatusTitle: 'Membership Status',
         membershipStatus: {

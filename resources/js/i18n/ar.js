@@ -1932,8 +1932,9 @@ export const ar = {
     },
     teacherDashboardPage: {
         title: 'لوحة تحكم المعلم',
-        activationTitle: 'أكمل التفعيل',
-        activationMessage: 'سجِّل بياناتك النهائية لفتح كل أدوات المعلم.',
+        activationTitle: 'حسابك قيد المراجعة',
+        activationMessage:
+            'حسابك غير نشط حالياً ولن يظهر للطلاب حتى يتم تفعيله من قبل الإدارة. سنقوم بإشعارك فور اعتماد الحساب.',
         totalPoints: 'إجمالي النقاط',
         operationsCount: '{count} عملية مسجلة',
         approvedCount: '{count} مشروع معتمد',
@@ -5113,6 +5114,8 @@ export const ar = {
         pageTitle: 'طلبات الشهادات - {appName}',
         title: 'طلبات الشهادات',
         authorityTitle: 'جهة الاعتماد',
+        authorityDescription:
+            'يمكنك طلب شهادة لك أو لطلابك، وسيتم إرسالها إلى المدرسة لاعتمادها قبل إصدار النسخة النهائية.',
         noLinkedSchool: 'أنت غير مرتبط بمدرسة',
         membershipStatusTitle: 'حالة العضوية',
         membershipStatus: {

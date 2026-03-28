@@ -104,8 +104,6 @@ class TeacherDashboardController extends Controller
             ],
             'stats' => $stats,
             'activationBanner' => !$isActive ? [
-                'title' => 'حسابك قيد المراجعة',
-                'message' => 'حسابك غير نشط حالياً ولن يظهر للطلاب حتى يتم تفعيله من قبل الإدارة. سنقوم بإشعارك فور اعتماد الحساب.',
                 'is_verified' => $isVerified,
             ] : null,
         ]);

@@ -25,7 +25,6 @@ export default function TeacherCertificatesIndex({
     requestHistory = [],
     school = null,
     membershipSummary = null,
-    description = '',
 }) {
     const { showSuccess, showError } = useToast();
     const { t, language } = useTranslation();
@@ -168,7 +167,7 @@ export default function TeacherCertificatesIndex({
                         </div>
                         <div className="text-lg font-bold text-gray-900">{school?.name || t('teacherCertificatesIndexPage.noLinkedSchool')}</div>
                         <div className="mt-2 text-sm text-gray-600">
-                            {description}
+                            {t('teacherCertificatesIndexPage.authorityDescription')}
                         </div>
                     </div>
 
