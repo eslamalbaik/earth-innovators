@@ -1,13 +1,16 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
-import { Head, Link, useForm, router } from '@inertiajs/react';
+import { useTranslation } from '@/i18n';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
-import { FaArrowRight, FaSave, FaTimes, FaUser, FaCheckCircle, FaStar, FaExclamationCircle } from 'react-icons/fa';
+import { FaArrowLeft, FaArrowRight, FaSave, FaTimes, FaUser, FaCheckCircle, FaStar, FaExclamationCircle } from 'react-icons/fa';
 
 export default function AdminChallengesAssignStudents({ challenge, students, assignedStudents }) {
+    const { t, language } = useTranslation();
+    const BackIcon = language === 'ar' ? FaArrowRight : FaArrowLeft;
+
     const [selectedStudents, setSelectedStudents] = useState(() => {
-        // تحميل الطلاب المعينين بالفعل
         const assigned = {};
-        assignedStudents.forEach(student => {
+        assignedStudents.forEach((student) => {
             assigned[student.id] = student.participation_type;
         });
         return assigned;
@@ -18,32 +21,31 @@ export default function AdminChallengesAssignStudents({ challenge, students, ass
     });
 
     const handleStudentToggle = (studentId) => {
-        setSelectedStudents(prev => {
-            const newState = { ...prev };
-            if (newState[studentId]) {
-                // إذا كان الطالب محدداً، احذفه
-                delete newState[studentId];
+        setSelectedStudents((prev) => {
+            const next = { ...prev };
+
+            if (next[studentId]) {
+                delete next[studentId];
             } else {
-                // إذا لم يكن محدداً، أضفه كنوع اختياري افتراضي
-                newState[studentId] = 'optional';
+                next[studentId] = 'optional';
             }
-            return newState;
+
+            return next;
         });
     };
 
     const handleParticipationTypeChange = (studentId, type) => {
-        setSelectedStudents(prev => ({
+        setSelectedStudents((prev) => ({
             ...prev,
             [studentId]: type,
         }));
     };
 
-    const submit = (e) => {
-        e.preventDefault();
+    const submit = (event) => {
+        event.preventDefault();
 
-        // تحويل selectedStudents إلى مصفوفة
         const studentsArray = Object.entries(selectedStudents).map(([user_id, participation_type]) => ({
-            user_id: parseInt(user_id),
+            user_id: parseInt(user_id, 10),
             participation_type,
         }));
 
@@ -56,11 +58,12 @@ export default function AdminChallengesAssignStudents({ challenge, students, ass
 
     const getParticipationTypeLabel = (type) => {
         const labels = {
-            'mandatory': 'إلزامي',
-            'optional': 'اختياري',
-            'favorite': 'مفضل',
+            mandatory: t('adminChallengeAssignStudentsPage.participationTypes.mandatory'),
+            optional: t('adminChallengeAssignStudentsPage.participationTypes.optional'),
+            favorite: t('adminChallengeAssignStudentsPage.participationTypes.favorite'),
         };
-        return labels[type] || 'اختياري';
+
+        return labels[type] || labels.optional;
     };
 
     const getParticipationTypeIcon = (type) => {
@@ -86,39 +89,37 @@ export default function AdminChallengesAssignStudents({ challenge, students, ass
     };
 
     return (
-        <DashboardLayout header="تعيين الطلاب للتحدي">
-            <Head title={`تعيين الطلاب - ${challenge.title}`} />
+        <DashboardLayout header={t('adminChallengeAssignStudentsPage.title')}>
+            <Head title={t('adminChallengeAssignStudentsPage.pageTitle', { title: challenge.title })} />
 
             <div className="mb-6">
                 <Link
                     href={route('admin.challenges.show', challenge.id)}
-                    className="text-blue-600 hover:text-blue-800 flex items-center gap-2"
+                    className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
                 >
-                    <FaArrowRight className="transform rotate-180" />
-                    العودة إلى تفاصيل التحدي
+                    <BackIcon />
+                    {t('adminChallengeAssignStudentsPage.backToChallenge')}
                 </Link>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-2">{challenge.title}</h2>
-                <p className="text-gray-600">المدرسة: {challenge.school_name}</p>
+            <div className="mb-6 rounded-xl bg-white p-6 shadow-lg">
+                <h2 className="mb-2 text-xl font-bold text-gray-900">{challenge.title}</h2>
+                <p className="text-gray-600">{t('adminChallengeAssignStudentsPage.schoolLabel', { school: challenge.school_name })}</p>
             </div>
 
-            <form onSubmit={submit} className="bg-white rounded-xl shadow-lg p-6">
+            <form onSubmit={submit} className="rounded-xl bg-white p-6 shadow-lg">
                 <div className="mb-6">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">اختيار الطلاب</h3>
-                    <p className="text-sm text-gray-600 mb-4">
-                        اختر الطلاب الذين تريد تعيينهم لهذا التحدي وحدد نوع المشاركة لكل طالب.
-                    </p>
+                    <h3 className="mb-4 text-lg font-bold text-gray-900">{t('adminChallengeAssignStudentsPage.selectStudentsTitle')}</h3>
+                    <p className="mb-4 text-sm text-gray-600">{t('adminChallengeAssignStudentsPage.selectStudentsDescription')}</p>
                 </div>
 
                 {students.length === 0 ? (
-                    <div className="text-center py-12">
-                        <FaUser className="text-6xl text-gray-300 mx-auto mb-4" />
-                        <p className="text-gray-600">لا توجد طلاب متاحين في هذه المدرسة</p>
+                    <div className="py-12 text-center">
+                        <FaUser className="mx-auto mb-4 text-6xl text-gray-300" />
+                        <p className="text-gray-600">{t('adminChallengeAssignStudentsPage.noStudents')}</p>
                     </div>
                 ) : (
-                    <div className="space-y-3 max-h-96 overflow-y-auto">
+                    <div className="max-h-96 space-y-3 overflow-y-auto">
                         {students.map((student) => {
                             const isSelected = selectedStudents[student.id] !== undefined;
                             const participationType = selectedStudents[student.id] || 'optional';
@@ -126,25 +127,26 @@ export default function AdminChallengesAssignStudents({ challenge, students, ass
                             return (
                                 <div
                                     key={student.id}
-                                    className={`p-4 rounded-lg border-2 transition ${isSelected
-                                        ? 'border-blue-500 bg-blue-50'
-                                        : 'border-gray-200 bg-white hover:border-gray-300'
-                                        }`}
+                                    className={`rounded-lg border-2 p-4 transition ${
+                                        isSelected
+                                            ? 'border-blue-500 bg-blue-50'
+                                            : 'border-gray-200 bg-white hover:border-gray-300'
+                                    }`}
                                 >
                                     <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-4 flex-1">
+                                        <div className="flex flex-1 items-center gap-4">
                                             <input
                                                 type="checkbox"
                                                 checked={isSelected}
                                                 onChange={() => handleStudentToggle(student.id)}
-                                                className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                                className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                             />
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2">
                                                     <FaUser className="text-gray-400" />
                                                     <span className="font-semibold text-gray-900">{student.name}</span>
                                                 </div>
-                                                <p className="text-sm text-gray-600 mt-1">{student.email}</p>
+                                                <p className="mt-1 text-sm text-gray-600">{student.email}</p>
                                             </div>
                                         </div>
 
@@ -152,13 +154,13 @@ export default function AdminChallengesAssignStudents({ challenge, students, ass
                                             <div className="flex items-center gap-3">
                                                 <select
                                                     value={participationType}
-                                                    onChange={(e) => handleParticipationTypeChange(student.id, e.target.value)}
-                                                    onClick={(e) => e.stopPropagation()}
-                                                    className={`px-3 py-2 rounded-lg border-2 font-semibold text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${getParticipationTypeColor(participationType)}`}
+                                                    onChange={(event) => handleParticipationTypeChange(student.id, event.target.value)}
+                                                    onClick={(event) => event.stopPropagation()}
+                                                    className={`rounded-lg border-2 px-3 py-2 text-sm font-semibold focus:border-transparent focus:ring-2 focus:ring-blue-500 ${getParticipationTypeColor(participationType)}`}
                                                 >
-                                                    <option value="mandatory">إلزامي</option>
-                                                    <option value="optional">اختياري</option>
-                                                    <option value="favorite">مفضل</option>
+                                                    <option value="mandatory">{t('adminChallengeAssignStudentsPage.participationTypes.mandatory')}</option>
+                                                    <option value="optional">{t('adminChallengeAssignStudentsPage.participationTypes.optional')}</option>
+                                                    <option value="favorite">{t('adminChallengeAssignStudentsPage.participationTypes.favorite')}</option>
                                                 </select>
                                                 <div className="flex items-center gap-1">
                                                     {getParticipationTypeIcon(participationType)}
@@ -174,54 +176,63 @@ export default function AdminChallengesAssignStudents({ challenge, students, ass
                 )}
 
                 {errors.students && (
-                    <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3">
                         <p className="text-sm text-red-600">{errors.students}</p>
                     </div>
                 )}
 
-                <div className="mt-6 flex items-center justify-between pt-6 border-t">
+                <div className="mt-6 flex items-center justify-between border-t pt-6">
                     <div className="text-sm text-gray-600">
-                        تم اختيار {Object.keys(selectedStudents).length} طالب
+                        {t('adminChallengeAssignStudentsPage.selectedStudentsCount', {
+                            count: Object.keys(selectedStudents).length,
+                        })}
                     </div>
                     <div className="flex gap-4">
                         <Link
                             href={route('admin.challenges.show', challenge.id)}
-                            className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                            className="flex items-center gap-2 rounded-lg border border-gray-300 px-6 py-2 text-gray-700 hover:bg-gray-50"
                         >
                             <FaTimes />
-                            إلغاء
+                            {t('common.cancel')}
                         </Link>
                         <button
                             type="submit"
                             disabled={processing || Object.keys(selectedStudents).length === 0}
-                            className="px-6 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex items-center gap-2 rounded-lg bg-[#A3C042] px-6 py-2 text-white hover:bg-[#8CA635] disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             <FaSave />
-                            {processing ? 'جاري الحفظ...' : 'حفظ'}
+                            {processing ? t('adminChallengeAssignStudentsPage.saving') : t('common.save')}
                         </button>
                     </div>
                 </div>
             </form>
 
-            {/* Legend */}
-            <div className="mt-6 bg-gray-50 rounded-xl p-4">
-                <h4 className="font-semibold text-gray-900 mb-3">أنواع المشاركة:</h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="mt-6 rounded-xl bg-gray-50 p-4">
+                <h4 className="mb-3 font-semibold text-gray-900">{t('adminChallengeAssignStudentsPage.legendTitle')}</h4>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                     <div className="flex items-center gap-2">
                         <FaExclamationCircle className="text-red-500" />
-                        <span className="text-sm"><strong>إلزامي:</strong> يجب على الطالب المشاركة في التحدي</span>
+                        <span className="text-sm">
+                            <strong>{t('adminChallengeAssignStudentsPage.participationTypes.mandatory')}:</strong>{' '}
+                            {t('adminChallengeAssignStudentsPage.legend.mandatory')}
+                        </span>
                     </div>
                     <div className="flex items-center gap-2">
                         <FaCheckCircle className="text-green-500" />
-                        <span className="text-sm"><strong>اختياري:</strong> الطالب يمكنه اختيار المشاركة</span>
+                        <span className="text-sm">
+                            <strong>{t('adminChallengeAssignStudentsPage.participationTypes.optional')}:</strong>{' '}
+                            {t('adminChallengeAssignStudentsPage.legend.optional')}
+                        </span>
                     </div>
                     <div className="flex items-center gap-2">
                         <FaStar className="text-yellow-500" />
-                        <span className="text-sm"><strong>مفضل:</strong> التحدي موصى به للطالب</span>
+                        <span className="text-sm">
+                            <strong>{t('adminChallengeAssignStudentsPage.participationTypes.favorite')}:</strong>{' '}
+                            {t('adminChallengeAssignStudentsPage.legend.favorite')}
+                        </span>
                     </div>
                 </div>
             </div>
         </DashboardLayout>
     );
 }
-

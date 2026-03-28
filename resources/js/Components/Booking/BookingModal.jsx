@@ -3,32 +3,7 @@ import { FaChevronLeft, FaCheck, FaStar, FaXmark, FaCalendar, FaClock, FaCalenda
 import axios from 'axios';
 import { getInitials, getColorFromName } from '@/utils/imageUtils';
 import { useTranslation } from '@/i18n';
-
-const formatLocation = (location, stageLabels) => {
-    if (!location) return '';
-
-    const generalStages = ['primary', 'middle', 'high', 'university'];
-
-    if (location.includes(' - ')) {
-        const [city, stagesPart] = location.split(' - ');
-        if (!stagesPart) return city;
-
-        const stages = stagesPart.split(' / ').map(s => s.trim());
-        const generalStagesOnly = stages
-            .map((stage) => stageLabels?.toKey?.[stage] || stage)
-            .filter((stage) => generalStages.includes(stage));
-
-        if (generalStagesOnly.length > 0) {
-            const display = generalStagesOnly
-                .map((key) => stageLabels?.toLabel?.[key] || key)
-                .join(' / ');
-            return `${city} - ${display}`;
-        }
-        return city;
-    }
-
-    return location;
-};
+import { formatLocationWithStages, getStageLabels } from '@/utils/stageLocalization';
 
 const getImageUrl = (teacher) => {
     if (teacher.image) {
@@ -149,10 +124,10 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
 
     const stageLabels = useMemo(() => {
         const toKey = {
-            الابتدائية: 'primary',
-            المتوسطة: 'middle',
-            الثانوية: 'high',
-            الجامعية: 'university',
+            '\u0627\u0644\u0627\u0628\u062a\u062f\u0627\u0626\u064a\u0629': 'primary',
+            '\u0627\u0644\u0645\u062a\u0648\u0633\u0637\u0629': 'middle',
+            '\u0627\u0644\u062b\u0627\u0646\u0648\u064a\u0629': 'high',
+            '\u0627\u0644\u062c\u0627\u0645\u0639\u064a\u0629': 'university',
         };
         const toLabel = {
             primary: t('bookingModal.stages.primary'),
@@ -470,7 +445,7 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
                                             <FaCheck className="text-white text-[8px]" />
                                         </div>
                                     </div>
-                                    <p className="text-sm text-gray-600">{formatLocation(teacher.location, stageLabels)}</p>
+                                    <p className="text-sm text-gray-600">{formatLocationWithStages(teacher.location, stageLabels)}</p>
                                     <div className="flex items-center gap-1">
                                         <FaStar className="text-yellow-400 text-sm" />
                                         <span className="text-sm font-medium">{teacher.rating}</span>
@@ -915,7 +890,7 @@ function StudentInfoModal({ open, onClose, studentInfo, setStudentInfo, errors, 
     );
 }
 
-function SummaryView({ teacher, selectedSubject, selectedSessions, totalPrice, removeSession, onAddMore, onBook }) {
+function SummaryView({ teacher, selectedSubject, selectedSessions, totalPrice, removeSession, onAddMore, onBook, stageLabels, imageError = false, setImageError = () => {} }) {
     const { t } = useTranslation();
     return (
         <div className="max-w-4xl mx-auto">
@@ -987,7 +962,7 @@ function SummaryView({ teacher, selectedSubject, selectedSessions, totalPrice, r
                                         <FaCheck className="text-white text-[8px]" />
                                     </div>
                                 </div>
-                                <p className="text-sm text-gray-600">{formatLocation(teacher.location, stageLabels)}</p>
+                                <p className="text-sm text-gray-600">{formatLocationWithStages(teacher.location, stageLabels)}</p>
                                 <div className="flex items-center gap-1">
                                     <FaStar className="text-yellow-400 text-sm" />
                                     <span className="text-sm font-medium">{teacher.rating}</span>

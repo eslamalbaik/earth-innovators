@@ -1,5 +1,18 @@
 import { Link } from '@inertiajs/react';
-import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaTwitter, FaInstagram, FaFacebook, FaLinkedin, FaRocket, FaUsers, FaTrophy, FaBook, FaCompass } from 'react-icons/fa';
+import {
+    FaEnvelope,
+    FaPhone,
+    FaMapMarkerAlt,
+    FaTwitter,
+    FaInstagram,
+    FaFacebook,
+    FaLinkedin,
+    FaRocket,
+    FaUsers,
+    FaTrophy,
+    FaBook,
+    FaCompass,
+} from 'react-icons/fa';
 import { useTranslation } from '@/i18n';
 
 export default function DesktopFooter({ auth }) {
@@ -19,10 +32,10 @@ export default function DesktopFooter({ auth }) {
     ];
 
     const socialLinks = [
-        { name: 'Twitter', icon: FaTwitter, href: import.meta.env.VITE_SOCIAL_TWITTER, color: 'hover:text-blue-400' },
-        { name: 'Instagram', icon: FaInstagram, href: import.meta.env.VITE_SOCIAL_INSTAGRAM, color: 'hover:text-pink-500' },
-        { name: 'Facebook', icon: FaFacebook, href: import.meta.env.VITE_SOCIAL_FACEBOOK, color: 'hover:text-blue-600' },
-        { name: 'LinkedIn', icon: FaLinkedin, href: import.meta.env.VITE_SOCIAL_LINKEDIN, color: 'hover:text-blue-700' },
+        { name: t('footer.social.twitter'), icon: FaTwitter, href: import.meta.env.VITE_SOCIAL_TWITTER, color: 'hover:text-blue-400' },
+        { name: t('footer.social.instagram'), icon: FaInstagram, href: import.meta.env.VITE_SOCIAL_INSTAGRAM, color: 'hover:text-pink-500' },
+        { name: t('footer.social.facebook'), icon: FaFacebook, href: import.meta.env.VITE_SOCIAL_FACEBOOK, color: 'hover:text-blue-600' },
+        { name: t('footer.social.linkedin'), icon: FaLinkedin, href: import.meta.env.VITE_SOCIAL_LINKEDIN, color: 'hover:text-blue-700' },
     ].filter((link) => Boolean(link.href));
 
     const contactInfo = [
@@ -31,40 +44,45 @@ export default function DesktopFooter({ auth }) {
         { icon: FaMapMarkerAlt, text: t('countries.uae') },
     ].filter(Boolean);
 
+    const dashboardHref = user?.role === 'student'
+        ? '/student/dashboard'
+        : user?.role === 'teacher'
+            ? '/teacher/dashboard'
+            : '/school/dashboard';
+
     return (
-        <footer className="hidden md:block bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white border-t border-gray-700">
-            <div className="max-w-7xl mx-auto px-6 py-8 pb-4">
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-8">
-                    {/* Logo & Description */}
+        <footer className="hidden border-t border-gray-700 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white md:block">
+            <div className="mx-auto max-w-7xl px-6 pb-4 pt-8">
+                <div className="mb-8 grid grid-cols-1 gap-8 lg:grid-cols-4">
                     <div className="lg:col-span-1">
-                        <Link href="/" className="flex items-center gap-3 mb-4">
+                        <Link href="/" className="mb-4 flex items-center gap-3">
                             <img
                                 src="/images/logo-modified.png"
                                 alt={t('header.appName')}
                                 className="h-12 w-auto object-contain"
                             />
                             <div>
-                                <div className="text-xl font-extrabold bg-gradient-to-r from-[#A3C042] to-[#8CA635] bg-clip-text text-transparent">
+                                <div className="bg-gradient-to-r from-[#A3C042] to-[#8CA635] bg-clip-text text-xl font-extrabold text-transparent">
                                     {t('header.appName')}
                                 </div>
-                                <div className="text-xs text-gray-400">Innovators Legacy</div>
+                                <div className="text-xs text-gray-400">{t('footer.brandSubtitle')}</div>
                             </div>
                         </Link>
-                        <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                        <p className="mb-4 text-sm leading-relaxed text-gray-400">
                             {t('sections.whyChooseSubtitle')}
                         </p>
-                        {/* Social Media */}
                         {socialLinks.length > 0 && (
                             <div className="flex items-center gap-3">
                                 {socialLinks.map((social) => {
                                     const Icon = social.icon;
+
                                     return (
                                         <a
                                             key={social.name}
                                             href={social.href}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className={`w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center transition-all ${social.color} hover:bg-gray-700 border border-gray-700`}
+                                            className={`flex h-10 w-10 items-center justify-center rounded-xl border border-gray-700 bg-gray-800 transition-all hover:bg-gray-700 ${social.color}`}
                                             aria-label={social.name}
                                         >
                                             <Icon className="text-lg" />
@@ -75,17 +93,17 @@ export default function DesktopFooter({ auth }) {
                         )}
                     </div>
 
-                    {/* Quick Links */}
                     <div className="lg:col-span-1">
-                        <h3 className="text-lg font-bold mb-4 text-[#A3C042]">{t('sections.quickLinks')}</h3>
+                        <h3 className="mb-4 text-lg font-bold text-[#A3C042]">{t('sections.quickLinks')}</h3>
                         <ul className="space-y-2">
                             {quickLinks.map((link) => {
                                 const Icon = link.icon;
+
                                 return (
                                     <li key={link.name}>
                                         <Link
                                             href={link.href}
-                                            className="flex items-center gap-2 text-gray-300 hover:text-[#A3C042] transition group"
+                                            className="group flex items-center gap-2 text-gray-300 transition hover:text-[#A3C042]"
                                         >
                                             <Icon className="text-xs transition-opacity" />
                                             <span>{link.name}</span>
@@ -96,15 +114,14 @@ export default function DesktopFooter({ auth }) {
                         </ul>
                     </div>
 
-                    {/* Contact Info */}
                     <div className="lg:col-span-1">
-                        <h3 className="text-lg font-bold mb-4 text-[#A3C042]">{t('footer.contact')}</h3>
+                        <h3 className="mb-4 text-lg font-bold text-[#A3C042]">{t('footer.contact')}</h3>
                         <ul className="space-y-3">
                             {contactInfo.map((contact, index) => {
                                 const Icon = contact.icon;
                                 const content = (
                                     <>
-                                        <div className="w-8 h-8 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-lg flex items-center justify-center group-hover:from-[#A3C042] group-hover:to-[#8CA635] transition">
+                                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 transition group-hover:from-[#A3C042] group-hover:to-[#8CA635]">
                                             <Icon className="text-sm text-white" />
                                         </div>
                                         <span className="text-sm">{contact.text}</span>
@@ -116,7 +133,7 @@ export default function DesktopFooter({ auth }) {
                                         {contact.href ? (
                                             <a
                                                 href={contact.href}
-                                                className="flex items-center gap-3 text-gray-300 hover:text-[#A3C042] transition group"
+                                                className="group flex items-center gap-3 text-gray-300 transition hover:text-[#A3C042]"
                                             >
                                                 {content}
                                             </a>
@@ -131,33 +148,34 @@ export default function DesktopFooter({ auth }) {
                         </ul>
                     </div>
 
-                    {/* Newsletter / CTA */}
                     <div className="lg:col-span-1">
-                        <h3 className="text-lg font-bold mb-4 text-[#A3C042]">{t('common.join')}</h3>
-                        <p className="text-gray-400 text-sm mb-4">
+                        <h3 className="mb-4 text-lg font-bold text-[#A3C042]">{t('common.join')}</h3>
+                        <p className="mb-4 text-sm text-gray-400">
                             {t('sections.ctaSubtitle')}
                         </p>
                         {!isAuthed ? (
                             <div className="space-y-3">
                                 <Link
                                     href="/register"
-                                    className="block w-full bg-gradient-to-r from-[#A3C042] to-[#8CA635] text-white text-center py-3 rounded-xl font-bold hover:opacity-90 transition shadow-lg"
+                                    className="block w-full rounded-xl bg-gradient-to-r from-[#A3C042] to-[#8CA635] py-3 text-center font-bold text-white shadow-lg transition hover:opacity-90"
                                 >
                                     {t('common.register')}
                                 </Link>
                                 <Link
                                     href="/login"
-                                    className="block w-full bg-gray-800 border border-gray-700 text-white text-center py-3 rounded-xl font-semibold hover:bg-gray-700 transition"
+                                    className="block w-full rounded-xl border border-gray-700 bg-gray-800 py-3 text-center font-semibold text-white transition hover:bg-gray-700"
                                 >
                                     {t('common.login')}
                                 </Link>
                             </div>
                         ) : (
-                            <div className="bg-gradient-to-br from-[#A3C042]/10 to-[#8CA635]/10 border border-[#A3C042]/20 rounded-xl p-4">
-                                <p className="text-sm text-gray-300 mb-2">{t('dashboard.welcomeMessage')}، {user?.name?.split(' ')[0]}!</p>
+                            <div className="rounded-xl border border-[#A3C042]/20 bg-gradient-to-br from-[#A3C042]/10 to-[#8CA635]/10 p-4">
+                                <p className="mb-2 text-sm text-gray-300">
+                                    {t('dashboard.welcomeMessage')}, {user?.name?.split(' ')[0]}!
+                                </p>
                                 <Link
-                                    href={user?.role === 'student' ? '/student/dashboard' : user?.role === 'teacher' ? '/teacher/dashboard' : '/school/dashboard'}
-                                    className="text-[#A3C042] text-sm font-semibold hover:underline"
+                                    href={dashboardHref}
+                                    className="text-sm font-semibold text-[#A3C042] hover:underline"
                                 >
                                     {t('hero.goToDashboard')}
                                 </Link>
@@ -166,20 +184,19 @@ export default function DesktopFooter({ auth }) {
                     </div>
                 </div>
 
-                {/* Bottom Bar */}
                 <div className="border-t border-gray-700 pt-4">
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                        <div className="text-gray-400 text-sm">
+                    <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
+                        <div className="text-sm text-gray-400">
                             {t('footer.copyright')} © {new Date().getFullYear()}
                         </div>
                         <div className="flex items-center gap-6">
-                            <Link href="/privacy" className="text-gray-400 hover:text-[#A3C042] transition text-sm">
+                            <Link href="/privacy" className="text-sm text-gray-400 transition hover:text-[#A3C042]">
                                 {t('common.privacy')}
                             </Link>
-                            <Link href="/terms" className="text-gray-400 hover:text-[#A3C042] transition text-sm">
+                            <Link href="/terms" className="text-sm text-gray-400 transition hover:text-[#A3C042]">
                                 {t('common.terms')}
                             </Link>
-                            <Link href="/about" className="text-gray-400 hover:text-[#A3C042] transition text-sm">
+                            <Link href="/about" className="text-sm text-gray-400 transition hover:text-[#A3C042]">
                                 {t('common.about')}
                             </Link>
                         </div>
@@ -189,4 +206,3 @@ export default function DesktopFooter({ auth }) {
         </footer>
     );
 }
-

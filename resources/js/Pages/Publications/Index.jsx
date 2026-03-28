@@ -3,7 +3,7 @@ import MobileAppLayout from '../../Layouts/MobileAppLayout';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import DesktopFooter from '@/Components/Mobile/DesktopFooter';
-import { FaBook, FaFileAlt, FaCalendar, FaBuilding, FaHeart, FaArrowLeft, FaSearch, FaDownload, FaNewspaper } from 'react-icons/fa';
+import { FaBook, FaFileAlt, FaCalendar, FaBuilding, FaHeart, FaSearch, FaDownload, FaNewspaper } from 'react-icons/fa';
 import { useState } from 'react';
 import axios from 'axios';
 import { getPublicationImageUrl } from '../../utils/imageUtils';
@@ -14,6 +14,19 @@ export default function PublicationsIndex({ auth, publications, filters }) {
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
     const [selectedType, setSelectedType] = useState(filters?.type || '');
     const [likedPublications, setLikedPublications] = useState(new Set());
+
+    const getLocalizedField = (publication, field) => {
+        if (!publication) {
+            return '';
+        }
+
+        const arabicValue = publication[`${field}_ar`];
+        const defaultValue = publication[field];
+
+        return language === 'ar'
+            ? (arabicValue || defaultValue || '')
+            : (defaultValue || arabicValue || '');
+    };
 
     const handleSearch = () => {
         router.get('/publications', {
@@ -33,21 +46,22 @@ export default function PublicationsIndex({ auth, publications, filters }) {
 
         try {
             const response = await axios.post(`/publications/${publication.id}/like`);
+
             if (response.data.success) {
-                // تحديث حالة الإعجاب محلياً
                 if (response.data.liked) {
-                    setLikedPublications(prev => new Set(prev).add(publication.id));
-                    publication.likes_count = response.data.likes_count;
+                    setLikedPublications((prev) => new Set(prev).add(publication.id));
                 } else {
-                    setLikedPublications(prev => {
-                        const newSet = new Set(prev);
-                        newSet.delete(publication.id);
-                        return newSet;
+                    setLikedPublications((prev) => {
+                        const next = new Set(prev);
+                        next.delete(publication.id);
+                        return next;
                     });
-                    publication.likes_count = response.data.likes_count;
                 }
+
+                publication.likes_count = response.data.likes_count;
             }
         } catch (error) {
+            // Keep the current UI state when the request fails.
         }
     };
 
@@ -58,19 +72,22 @@ export default function PublicationsIndex({ auth, publications, filters }) {
             report: t('sections.publications.types.report'),
             article: t('publicationsPage.types.article'),
         };
+
         return labels[type] || type;
     };
 
     const getTypeIcon = (type) => {
         if (type === 'magazine') return FaNewspaper;
         if (type === 'booklet') return FaBook;
-        if (type === 'article') return FaFileAlt;
         return FaFileAlt;
     };
 
     const formatDate = (date) => {
-        if (!date) return '';
-        const d = new Date(date);
+        if (!date) {
+            return '';
+        }
+
+        const parsedDate = new Date(date);
         const months = [
             t('common.months.january'),
             t('common.months.february'),
@@ -85,23 +102,23 @@ export default function PublicationsIndex({ auth, publications, filters }) {
             t('common.months.november'),
             t('common.months.december'),
         ];
-        return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+
+        return `${parsedDate.getDate()} ${months[parsedDate.getMonth()]} ${parsedDate.getFullYear()}`;
     };
 
-    // تجميع الإصدارات حسب النوع
-    const magazines = publications.data?.filter(p => p.type === 'magazine') || [];
-    const booklets = publications.data?.filter(p => p.type === 'booklet') || [];
-    const reports = publications.data?.filter(p => p.type === 'report') || [];
-    const articles = publications.data?.filter(p => p.type === 'article') || [];
+    const magazines = publications.data?.filter((publication) => publication.type === 'magazine') || [];
+    const booklets = publications.data?.filter((publication) => publication.type === 'booklet') || [];
+    const reports = publications.data?.filter((publication) => publication.type === 'report') || [];
+    const articles = publications.data?.filter((publication) => publication.type === 'article') || [];
 
     const renderPublicationCard = (publication) => {
         const TypeIcon = getTypeIcon(publication.type);
         const isLiked = publication.is_liked || likedPublications.has(publication.id);
-
-        // Use utility function for consistent image URL handling
+        const publicationTitle = getLocalizedField(publication, 'title');
+        const publicationDescription = getLocalizedField(publication, 'description');
+        const hasReadableContent = Boolean(getLocalizedField(publication, 'content'));
         const coverImage = getPublicationImageUrl(publication.cover_image);
 
-        // تحديد لون البادج حسب النوع
         const getBadgeColor = (type) => {
             if (type === 'magazine') return 'bg-blue-50 border-blue-200 text-blue-800';
             if (type === 'booklet') return 'bg-amber-50 border-amber-200 text-amber-800';
@@ -110,34 +127,29 @@ export default function PublicationsIndex({ auth, publications, filters }) {
         };
 
         return (
-            <div key={publication.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md transition">
-                {/* Image with tags */}
+            <div key={publication.id} className="overflow-hidden rounded-2xl border border-gray-100 bg-white transition hover:shadow-md">
                 <div className="relative">
                     <img
                         src={coverImage}
-                        alt={publication.title}
-                        className="w-full h-64 object-cover"
-                        onError={(e) => {
-                            e.target.src = '/images/default-publication.jpg';
+                        alt={publicationTitle || t('publicationsPage.sections.articleTitle')}
+                        className="h-64 w-full object-cover"
+                        onError={(event) => {
+                            event.target.src = '/images/default-publication.jpg';
                         }}
                         loading="lazy"
                     />
-                    {/* New tag */}
-                    <div className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                    <div className="absolute top-3 right-3 rounded-full bg-red-500 px-3 py-1 text-xs font-semibold text-white">
                         {t('common.new')}
                     </div>
-                    {/* Type badge */}
-                    <div className={`absolute top-3 left-3 ${getBadgeColor(publication.type)} px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-2 border`}>
+                    <div className={`absolute top-3 left-3 flex items-center gap-2 rounded-lg border px-3 py-1 text-xs font-semibold ${getBadgeColor(publication.type)}`}>
                         <TypeIcon className="text-xs" />
                         {getTypeLabel(publication.type)}
                     </div>
                 </div>
 
-                {/* Content */}
                 <div className="p-4">
-                    {/* Title */}
-                    <h3 className="text-base font-bold text-gray-900 mb-2 line-clamp-2">
-                        {publication.title}
+                    <h3 className="mb-2 line-clamp-2 text-base font-bold text-gray-900">
+                        {publicationTitle}
                         {publication.issue_number && (
                             <span className="text-gray-600">
                                 {' '}
@@ -146,8 +158,7 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                         )}
                     </h3>
 
-                    {/* Meta info */}
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-gray-600 mb-2">
+                    <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-gray-600">
                         {publication.publish_date && (
                             <div className="flex items-center gap-1">
                                 <FaCalendar className="text-[10px]" />
@@ -162,14 +173,12 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                         )}
                     </div>
 
-                    {/* Description */}
-                    {publication.description && (
-                        <p className="text-xs text-gray-700 mb-3 line-clamp-2 leading-relaxed">
-                            {publication.description}
+                    {publicationDescription && (
+                        <p className="mb-3 line-clamp-2 text-xs leading-relaxed text-gray-700">
+                            {publicationDescription}
                         </p>
                     )}
 
-                    {/* Actions */}
                     <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                             {publication.file && (
@@ -178,16 +187,16 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                                         ? publication.file
                                         : `/storage/${publication.file}`}
                                     download
-                                    className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition border border-blue-200 text-xs font-semibold"
+                                    className="flex items-center gap-1 rounded-xl border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600 transition hover:bg-blue-100"
                                 >
                                     <FaDownload className="text-xs" />
                                     <span>{t('common.download')}</span>
                                 </a>
                             )}
-                            {publication.content && (
+                            {hasReadableContent && (
                                 <Link
                                     href={`/publications/${publication.id}`}
-                                    className="flex items-center gap-1 px-3 py-1.5 bg-[#A3C042]/10 text-[#A3C042] rounded-xl hover:bg-[#A3C042]/20 transition border border-[#A3C042]/20 text-xs font-semibold"
+                                    className="flex items-center gap-1 rounded-xl border border-[#A3C042]/20 bg-[#A3C042]/10 px-3 py-1.5 text-xs font-semibold text-[#A3C042] transition hover:bg-[#A3C042]/20"
                                 >
                                     <FaBook className="text-xs" />
                                     <span>{t('common.read')}</span>
@@ -197,10 +206,11 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                         <button
                             type="button"
                             onClick={() => toggleLike(publication)}
-                            className={`flex items-center gap-1 px-2 py-1.5 rounded-xl transition text-xs ${isLiked
-                                ? 'bg-red-100 text-red-600 hover:bg-red-200'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                }`}
+                            className={`flex items-center gap-1 rounded-xl px-2 py-1.5 text-xs transition ${
+                                isLiked
+                                    ? 'bg-red-100 text-red-600 hover:bg-red-200'
+                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            }`}
                             title={isLiked ? t('publicationsPage.unlike') : t('publicationsPage.like')}
                         >
                             <FaHeart className={isLiked ? 'fill-current' : ''} />
@@ -214,121 +224,115 @@ export default function PublicationsIndex({ auth, publications, filters }) {
 
     const PublicationsContent = () => (
         <div className="space-y-4">
-            {/* Search and Filters */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
+            <div className="space-y-3 rounded-2xl border border-gray-100 bg-white p-4">
                 <div className="flex items-center gap-2">
-                    <div className="flex-1 relative">
+                    <div className="relative flex-1">
                         <input
                             type="text"
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                            onChange={(event) => setSearchTerm(event.target.value)}
+                            onKeyDown={(event) => event.key === 'Enter' && handleSearch()}
                             placeholder={t('publicationsPage.searchPlaceholder')}
-                            className="w-full h-10 ps-10 pe-4 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042]"
+                            className="h-10 w-full rounded-xl border border-gray-200 bg-gray-50 ps-10 pe-4 text-sm focus:border-[#A3C042] focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30"
                         />
-                        <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
+                        <FaSearch className="absolute right-3 top-1/2 -translate-y-1/2 transform text-sm text-gray-400" />
                     </div>
                     <select
                         value={selectedType}
-                        onChange={(e) => setSelectedType(e.target.value)}
-                        className="h-10 px-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042]"
+                        onChange={(event) => setSelectedType(event.target.value)}
+                        className="h-10 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm focus:border-[#A3C042] focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30"
                     >
                         <option value="">{t('publicationsPage.allTypes')}</option>
                         <option value="magazine">{t('sections.publications.types.magazine')}</option>
                         <option value="booklet">{t('sections.publications.types.booklet')}</option>
                         <option value="report">{t('sections.publications.types.report')}</option>
+                        <option value="article">{t('publicationsPage.types.article')}</option>
                     </select>
                     <button
                         type="button"
                         onClick={handleSearch}
-                        className="h-10 px-4 bg-[#A3C042] text-white rounded-xl hover:bg-[#8CA635] transition font-bold text-sm"
+                        className="h-10 rounded-xl bg-[#A3C042] px-4 text-sm font-bold text-white transition hover:bg-[#8CA635]"
                     >
                         {t('common.search')}
                     </button>
                 </div>
             </div>
 
-            {/* Publications Content */}
             <div>
                 {publications.data && publications.data.length > 0 ? (
                     <>
-                        {/* Magazines Section */}
                         {magazines.length > 0 && (
                             <div className="mb-6">
-                                <div className="flex items-center gap-2 mb-4">
+                                <div className="mb-4 flex items-center gap-2">
                                     <FaNewspaper className="text-lg text-gray-700" />
                                     <h2 className="text-lg font-bold text-gray-900">{t('publicationsPage.sections.magazineTitle')}</h2>
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                                     {magazines.map(renderPublicationCard)}
                                 </div>
                             </div>
                         )}
 
-                        {/* Booklets Section */}
                         {booklets.length > 0 && (
                             <div className="mb-6">
-                                <div className="flex items-center gap-2 mb-4">
+                                <div className="mb-4 flex items-center gap-2">
                                     <FaBook className="text-lg text-gray-700" />
                                     <h2 className="text-lg font-bold text-gray-900">{t('publicationsPage.sections.bookletTitle')}</h2>
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                                     {booklets.map(renderPublicationCard)}
                                 </div>
                             </div>
                         )}
 
-                        {/* Reports Section */}
                         {reports.length > 0 && (
                             <div className="mb-6">
-                                <div className="flex items-center gap-2 mb-4">
+                                <div className="mb-4 flex items-center gap-2">
                                     <FaFileAlt className="text-lg text-gray-700" />
                                     <h2 className="text-lg font-bold text-gray-900">{t('publicationsPage.sections.reportTitle')}</h2>
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                                     {reports.map(renderPublicationCard)}
                                 </div>
                             </div>
                         )}
 
-                        {/* Articles Section */}
                         {articles.length > 0 && (
                             <div className="mb-6">
-                                <div className="flex items-center gap-2 mb-4">
+                                <div className="mb-4 flex items-center gap-2">
                                     <FaFileAlt className="text-lg text-gray-700" />
                                     <h2 className="text-lg font-bold text-gray-900">{t('publicationsPage.sections.articleTitle')}</h2>
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                                     {articles.map(renderPublicationCard)}
                                 </div>
                             </div>
                         )}
 
-                        {/* If no specific type matches, show all */}
                         {magazines.length === 0 && booklets.length === 0 && reports.length === 0 && articles.length === 0 && (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                                 {publications.data.map(renderPublicationCard)}
                             </div>
                         )}
                     </>
                 ) : (
-                    <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
+                    <div className="rounded-2xl border border-gray-100 bg-white p-12 text-center">
                         <p className="text-sm text-gray-500">{t('publicationsPage.empty')}</p>
                     </div>
                 )}
 
-                {/* Pagination */}
                 {publications.links && publications.links.length > 3 && (
-                    <div className="bg-white rounded-2xl border border-gray-100 p-3">
-                        <div className="flex flex-wrap gap-2 justify-center">
+                    <div className="rounded-2xl border border-gray-100 bg-white p-3">
+                        <div className="flex flex-wrap justify-center gap-2">
                             {publications.links.map((link, index) => (
                                 <Link
                                     key={index}
                                     href={link.url || '#'}
-                                    className={`px-3 py-2 rounded-xl text-sm font-semibold transition ${link.active
-                                        ? 'bg-[#A3C042] text-white'
-                                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    className={`rounded-xl px-3 py-2 text-sm font-semibold transition ${
+                                        link.active
+                                            ? 'bg-[#A3C042] text-white'
+                                            : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                                    } ${!link.url ? 'cursor-not-allowed opacity-50' : ''}`}
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                 />
                             ))}
@@ -343,7 +347,6 @@ export default function PublicationsIndex({ auth, publications, filters }) {
         <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
             <Head title={t('publicationsPage.pageTitle', { appName: t('common.appName') })} />
 
-            {/* Mobile View */}
             <div className="block md:hidden">
                 <MobileAppLayout
                     auth={auth}
@@ -357,7 +360,6 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                 </MobileAppLayout>
             </div>
 
-            {/* Desktop View */}
             <div className="hidden md:block">
                 <MobileTopBar
                     title={t('sections.publications.title')}

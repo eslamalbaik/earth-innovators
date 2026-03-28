@@ -1,18 +1,23 @@
 import { Link } from '@inertiajs/react';
+import { useTranslation } from '@/i18n';
 
 export default function CTABannerSection({
-    title = "انضم إلى منصة إرث المبتكرين وشارك مشاريعك الإبداعية",
-    buttonText = "ابدأ الآن",
+    title,
+    buttonText,
     buttonLink = null,
-    onButtonClick
+    onButtonClick,
 }) {
+    const { t } = useTranslation();
+    const resolvedTitle = title ?? t('sections.cta.title');
+    const resolvedButtonText = buttonText ?? t('sections.cta.registerNow');
+
     return (
-        <section className="py-4 px-2">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="bg-gradient-to-r from-[#A3C042]/10 to-legacy-blue/10 rounded-3xl p-4 flex flex-col sm:flex-row items-center justify-between gap-6 border-2 border-[#A3C042]/20">
-                    <div className="flex-1 text-center sm:">
-                        <h2 className="text-md sm:text-lg lg:text-xl font-semibold text-gray-900 leading-tight">
-                            {title}
+        <section className="px-2 py-4">
+            <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+                <div className="flex flex-col items-center justify-between gap-6 rounded-3xl border-2 border-[#A3C042]/20 bg-gradient-to-r from-[#A3C042]/10 to-legacy-blue/10 p-4 sm:flex-row">
+                    <div className="flex-1 text-center">
+                        <h2 className="text-md font-semibold leading-tight text-gray-900 sm:text-lg lg:text-xl">
+                            {resolvedTitle}
                         </h2>
                     </div>
 
@@ -20,23 +25,16 @@ export default function CTABannerSection({
                         {onButtonClick ? (
                             <button
                                 onClick={onButtonClick}
-                                className="inline-block bg-[#A3C042] hover:bg-primary-600 text-white px-6 py-3 rounded-2xl font-semibold text-lg transition duration-300 transform hover:scale-105 shadow-md"
+                                className="inline-block rounded-2xl bg-[#A3C042] px-6 py-3 text-lg font-semibold text-white shadow-md transition duration-300 hover:scale-105 hover:bg-primary-600"
                             >
-                                {buttonText}
+                                {resolvedButtonText}
                             </button>
-                        ) : buttonLink ? (
-                            <Link
-                                href={buttonLink}
-                                className="inline-block bg-[#A3C042] hover:bg-primary-600 text-white px-6 py-3 rounded-2xl font-semibold text-lg transition duration-300 transform hover:scale-105 shadow-md"
-                            >
-                                {buttonText}
-                            </Link>
                         ) : (
                             <Link
-                                href="/projects"
-                                className="inline-block bg-[#A3C042] hover:bg-primary-600 text-white px-6 py-3 rounded-2xl font-semibold text-lg transition duration-300 transform hover:scale-105 shadow-md"
+                                href={buttonLink || '/projects'}
+                                className="inline-block rounded-2xl bg-[#A3C042] px-6 py-3 text-lg font-semibold text-white shadow-md transition duration-300 hover:scale-105 hover:bg-primary-600"
                             >
-                                {buttonText}
+                                {resolvedButtonText}
                             </Link>
                         )}
                     </div>

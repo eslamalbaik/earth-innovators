@@ -1,10 +1,31 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { useTranslation } from '@/i18n';
+import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
-import { FaSearch, FaFilter, FaEye, FaEdit, FaTrash, FaPlus, FaCertificate, FaDownload, FaToggleOn, FaToggleOff, FaUser } from 'react-icons/fa';
+import {
+    FaSearch,
+    FaFilter,
+    FaEdit,
+    FaTrash,
+    FaPlus,
+    FaCertificate,
+    FaDownload,
+    FaToggleOn,
+    FaToggleOff,
+    FaUser,
+} from 'react-icons/fa';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 
+const certificateTypeKeyMap = {
+    student: 'student',
+    teacher: 'teacher',
+    school: 'school',
+    achievement: 'achievement',
+    membership: 'membership',
+};
+
 export default function AdminCertificatesIndex({ certificates, stats, users, filters = {} }) {
+    const { t, language } = useTranslation();
     const { confirm } = useConfirmDialog();
     const [search, setSearch] = useState(filters?.search || '');
     const [type, setType] = useState(filters?.type || 'all');
@@ -25,10 +46,10 @@ export default function AdminCertificatesIndex({ certificates, stats, users, fil
 
     const handleDelete = async (certificateId, certificateNumber) => {
         const confirmed = await confirm({
-            title: 'تأكيد الحذف',
-            message: `هل أنت متأكد من حذف الشهادة "${certificateNumber}"؟ هذا الإجراء لا يمكن التراجع عنه.`,
-            confirmText: 'حذف',
-            cancelText: 'إلغاء',
+            title: t('adminCertificatesPage.deleteConfirm.title'),
+            message: t('adminCertificatesPage.deleteConfirm.message', { certificateNumber }),
+            confirmText: t('adminCertificatesPage.deleteConfirm.confirmText'),
+            cancelText: t('common.cancel'),
             variant: 'danger',
         });
 
@@ -45,43 +66,55 @@ export default function AdminCertificatesIndex({ certificates, stats, users, fil
         });
     };
 
-    const getTypeLabel = (type) => {
-        const typeMap = {
-            'student': 'طالب',
-            'teacher': 'معلم',
-            'school': 'مدرسة',
-            'achievement': 'إنجاز',
-            'membership': 'عضوية',
-        };
-        return typeMap[type] || type;
+    const getTypeLabel = (certificateType) => {
+        const typeKey = certificateTypeKeyMap[certificateType];
+        return typeKey ? t(`adminCertificatesPage.types.${typeKey}`) : certificateType;
     };
+
+    const getCertificateTitle = (certificate) => (
+        language === 'ar'
+            ? (certificate.title_ar || certificate.title)
+            : (certificate.title || certificate.title_ar)
+    );
+
+    const formatDate = (date) => new Date(date).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US');
 
     const getStatusBadge = (isActive) => {
         if (isActive) {
             return (
                 <span className="px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
-                    نشط
+                    {t('adminCertificatesPage.statuses.active')}
                 </span>
             );
         }
+
         return (
             <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">
-                غير نشط
+                {t('adminCertificatesPage.statuses.inactive')}
             </span>
         );
     };
 
+    const summaryText = t('adminCertificatesPage.summary', {
+        from: certificates.from || 0,
+        to: certificates.to || 0,
+        total: certificates.total || 0,
+    });
+
+    const pageTitle = t('adminCertificatesPage.pageTitle', {
+        appName: t('common.appName'),
+    });
+
     return (
-        <DashboardLayout header="إدارة الشهادات">
-            <Head title="إدارة الشهادات" />
+        <DashboardLayout header={t('adminCertificatesPage.title')}>
+            <Head title={pageTitle} />
 
             <div className="space-y-6">
-                {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div className="bg-white rounded-xl shadow-lg p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-gray-600 text-sm">إجمالي الشهادات</p>
+                                <p className="text-gray-600 text-sm">{t('adminCertificatesPage.stats.total')}</p>
                                 <p className="text-3xl font-bold text-gray-900 mt-2">{stats.total || 0}</p>
                             </div>
                             <FaCertificate className="text-4xl text-blue-500" />
@@ -90,7 +123,7 @@ export default function AdminCertificatesIndex({ certificates, stats, users, fil
                     <div className="bg-white rounded-xl shadow-lg p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-gray-600 text-sm">الشهادات النشطة</p>
+                                <p className="text-gray-600 text-sm">{t('adminCertificatesPage.stats.active')}</p>
                                 <p className="text-3xl font-bold text-green-600 mt-2">{stats.active || 0}</p>
                             </div>
                             <FaToggleOn className="text-4xl text-green-500" />
@@ -99,7 +132,7 @@ export default function AdminCertificatesIndex({ certificates, stats, users, fil
                     <div className="bg-white rounded-xl shadow-lg p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-gray-600 text-sm">الشهادات غير النشطة</p>
+                                <p className="text-gray-600 text-sm">{t('adminCertificatesPage.stats.inactive')}</p>
                                 <p className="text-3xl font-bold text-gray-600 mt-2">{stats.inactive || 0}</p>
                             </div>
                             <FaToggleOff className="text-4xl text-gray-500" />
@@ -108,7 +141,7 @@ export default function AdminCertificatesIndex({ certificates, stats, users, fil
                     <div className="bg-white rounded-xl shadow-lg p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-gray-600 text-sm">أنواع الشهادات</p>
+                                <p className="text-gray-600 text-sm">{t('adminCertificatesPage.stats.types')}</p>
                                 <p className="text-3xl font-bold text-purple-600 mt-2">{Object.keys(stats.by_type || {}).length}</p>
                             </div>
                             <FaCertificate className="text-4xl text-purple-500" />
@@ -116,7 +149,6 @@ export default function AdminCertificatesIndex({ certificates, stats, users, fil
                     </div>
                 </div>
 
-                {/* Filters and Actions */}
                 <div className="bg-white rounded-xl shadow-lg p-6">
                     <div className="flex flex-col md:flex-row gap-4 mb-4">
                         <div className="flex-1">
@@ -126,92 +158,94 @@ export default function AdminCertificatesIndex({ certificates, stats, users, fil
                                     type="text"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
-                                    placeholder="البحث برقم الشهادة، العنوان، أو اسم المستخدم..."
+                                    placeholder={t('adminCertificatesPage.filters.searchPlaceholder')}
                                     className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
                             </div>
                         </div>
+
                         <select
                             value={type}
                             onChange={(e) => setType(e.target.value)}
                             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         >
-                            <option value="all">جميع الأنواع</option>
-                            <option value="student">طالب</option>
-                            <option value="teacher">معلم</option>
-                            <option value="school">مدرسة</option>
-                            <option value="achievement">إنجاز</option>
-                            <option value="membership">عضوية</option>
+                            <option value="all">{t('adminCertificatesPage.filters.allTypes')}</option>
+                            {Object.entries(certificateTypeKeyMap).map(([value, key]) => (
+                                <option key={value} value={value}>
+                                    {t(`adminCertificatesPage.types.${key}`)}
+                                </option>
+                            ))}
                         </select>
+
                         <select
                             value={status}
                             onChange={(e) => setStatus(e.target.value)}
                             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         >
-                            <option value="all">جميع الحالات</option>
-                            <option value="active">نشط</option>
-                            <option value="inactive">غير نشط</option>
+                            <option value="all">{t('adminCertificatesPage.filters.allStatuses')}</option>
+                            <option value="active">{t('adminCertificatesPage.statuses.active')}</option>
+                            <option value="inactive">{t('adminCertificatesPage.statuses.inactive')}</option>
                         </select>
+
                         <select
                             value={userId}
                             onChange={(e) => setUserId(e.target.value)}
                             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         >
-                            <option value="">جميع المستخدمين</option>
+                            <option value="">{t('adminCertificatesPage.filters.allUsers')}</option>
                             {users.map((user) => (
                                 <option key={user.id} value={user.id}>
                                     {user.name} ({user.email})
                                 </option>
                             ))}
                         </select>
+
                         <button
                             onClick={handleFilter}
                             className="px-6 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
                         >
                             <FaFilter />
-                            تصفية
+                            {t('adminCertificatesPage.filters.apply')}
                         </button>
                     </div>
+
                     <div className="flex justify-between items-center">
-                        <div className="text-sm text-gray-600">
-                            عرض {certificates.from || 0} - {certificates.to || 0} من {certificates.total || 0} شهادة
-                        </div>
+                        <div className="text-sm text-gray-600">{summaryText}</div>
                         <Link
                             href={route('admin.certificates.create')}
                             className="px-4 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-[#8CA635] flex items-center gap-2"
                         >
                             <FaPlus />
-                            إضافة شهادة جديدة
+                            {t('adminCertificatesPage.actions.addNew')}
                         </Link>
                     </div>
                 </div>
 
-                {/* Certificates Table */}
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        رقم الشهادة
+                                    <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        {t('adminCertificatesPage.table.certificateNumber')}
                                     </th>
-                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        المستخدم
+                                    <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        {t('adminCertificatesPage.table.user')}
                                     </th>
-                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        العنوان
+                                    <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        {t('adminCertificatesPage.table.title')}
                                     </th>
-                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        النوع
+                                    <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        {t('adminCertificatesPage.table.type')}
                                     </th>
-                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        تاريخ الإصدار
+                                    <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        {t('adminCertificatesPage.table.issueDate')}
                                     </th>
-                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        الحالة
+                                    <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        {t('adminCertificatesPage.table.status')}
                                     </th>
-                                    <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        الإجراءات
+                                    <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        {t('adminCertificatesPage.table.actions')}
                                     </th>
                                 </tr>
                             </thead>
@@ -229,7 +263,7 @@ export default function AdminCertificatesIndex({ certificates, stats, users, fil
                                                     <FaUser className="text-gray-400 ms-2" />
                                                     <div>
                                                         <div className="text-sm font-medium text-gray-900">
-                                                            {certificate.user?.name || 'غير معروف'}
+                                                            {certificate.user?.name || t('adminCertificatesPage.table.unknownUser')}
                                                         </div>
                                                         <div className="text-sm text-gray-500">
                                                             {certificate.user?.email || ''}
@@ -239,7 +273,7 @@ export default function AdminCertificatesIndex({ certificates, stats, users, fil
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="text-sm text-gray-900">
-                                                    {certificate.title_ar || certificate.title}
+                                                    {getCertificateTitle(certificate)}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
@@ -248,7 +282,7 @@ export default function AdminCertificatesIndex({ certificates, stats, users, fil
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {new Date(certificate.issue_date).toLocaleDateString('en-US')}
+                                                {formatDate(certificate.issue_date)}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 {getStatusBadge(certificate.is_active)}
@@ -259,7 +293,7 @@ export default function AdminCertificatesIndex({ certificates, stats, users, fil
                                                         <Link
                                                             href={route('admin.certificates.download', certificate.id)}
                                                             className="text-blue-600 hover:text-blue-900"
-                                                            title="تحميل"
+                                                            title={t('common.download')}
                                                         >
                                                             <FaDownload />
                                                         </Link>
@@ -267,21 +301,23 @@ export default function AdminCertificatesIndex({ certificates, stats, users, fil
                                                     <Link
                                                         href={route('admin.certificates.edit', certificate.id)}
                                                         className="text-green-600 hover:text-green-900"
-                                                        title="تعديل"
+                                                        title={t('common.edit')}
                                                     >
                                                         <FaEdit />
                                                     </Link>
                                                     <button
                                                         onClick={() => handleToggleStatus(certificate.id)}
                                                         className={`${certificate.is_active ? 'text-yellow-600 hover:text-yellow-900' : 'text-gray-600 hover:text-gray-900'}`}
-                                                        title={certificate.is_active ? 'إلغاء التفعيل' : 'تفعيل'}
+                                                        title={certificate.is_active
+                                                            ? t('adminCertificatesPage.actions.deactivate')
+                                                            : t('adminCertificatesPage.actions.activate')}
                                                     >
                                                         {certificate.is_active ? <FaToggleOn /> : <FaToggleOff />}
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(certificate.id, certificate.certificate_number)}
                                                         className="text-red-600 hover:text-red-900"
-                                                        title="حذف"
+                                                        title={t('common.delete')}
                                                     >
                                                         <FaTrash />
                                                     </button>
@@ -292,7 +328,7 @@ export default function AdminCertificatesIndex({ certificates, stats, users, fil
                                 ) : (
                                     <tr>
                                         <td colSpan="7" className="px-6 py-4 text-center text-gray-500">
-                                            لا توجد شهادات
+                                            {t('adminCertificatesPage.table.empty')}
                                         </td>
                                     </tr>
                                 )}
@@ -300,12 +336,9 @@ export default function AdminCertificatesIndex({ certificates, stats, users, fil
                         </table>
                     </div>
 
-                    {/* Pagination */}
                     {certificates.links && certificates.links.length > 3 && (
                         <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-                            <div className="text-sm text-gray-700">
-                                عرض {certificates.from || 0} - {certificates.to || 0} من {certificates.total || 0} شهادة
-                            </div>
+                            <div className="text-sm text-gray-700">{summaryText}</div>
                             <div className="flex gap-2">
                                 {certificates.links.map((link, index) => (
                                     <Link
@@ -326,4 +359,3 @@ export default function AdminCertificatesIndex({ certificates, stats, users, fil
         </DashboardLayout>
     );
 }
-

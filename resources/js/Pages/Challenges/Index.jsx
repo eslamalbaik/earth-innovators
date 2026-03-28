@@ -14,8 +14,31 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
     const [showFilterModal, setShowFilterModal] = useState(false);
     const [filterStatus, setFilterStatus] = useState('');
 
-    // Use categories from database, fallback to default if empty
-    const categoriesList = categories && categories.length > 0 ? categories : [
+    const categoryLabelKeys = {
+        science: 'common.categories.science',
+        technology: 'common.categories.technology',
+        engineering: 'common.categories.engineering',
+        mathematics: 'common.categories.mathematics',
+        arts: 'common.categories.arts',
+        heritage: 'studentChallengesIndexPage.categories.heritage',
+        environmental: 'studentChallengesIndexPage.categories.environmental',
+        other: 'common.categories.other',
+    };
+
+    const resolveCategoryLabel = (value, fallbackLabel = '') => {
+        if (!value) {
+            return t('common.all');
+        }
+
+        return categoryLabelKeys[value]
+            ? t(categoryLabelKeys[value])
+            : (fallbackLabel || value);
+    };
+
+    const categoriesList = categories && categories.length > 0 ? categories.map((item) => ({
+        ...item,
+        label: resolveCategoryLabel(item.value, item.label),
+    })) : [
         { value: '', label: t('common.all') },
         { value: 'science', label: t('challenges.scientific') },
         { value: 'arts', label: t('challenges.technical') },
@@ -50,7 +73,12 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
 
     const handleSearch = (e) => {
         e.preventDefault();
-        router.get('/challenges', { search, category, challenge_type: challengeType }, {
+        router.get('/challenges', {
+            search,
+            category,
+            challenge_type: challengeType,
+            status: filterStatus || undefined,
+        }, {
             preserveState: true,
             preserveScroll: true,
         });
@@ -61,12 +89,8 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
             search,
             category,
             challenge_type: challengeType,
+            status: filterStatus || undefined,
         };
-
-        // Add status filter if user is authenticated (students, teachers, schools can filter by status)
-        if (auth?.user && filterStatus) {
-            params.status = filterStatus;
-        }
 
         router.get('/challenges', params, {
             preserveState: true,
@@ -121,9 +145,39 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
         const startDate = new Date(challenge.start_date);
         const endDate = new Date(challenge.end_date);
 
-        if (now < startDate) return { label: t('challenges.upcoming'), color: 'bg-blue-100 text-blue-700 border-blue-300', icon: FaClock };
-        if (now > endDate) return { label: t('challenges.finished'), color: 'bg-gray-100 text-gray-700 border-gray-300', icon: FaCalendar };
-        return { label: t('challenges.active'), color: 'bg-green-100 text-green-700 border-green-300', icon: FaTrophy };
+        if (now < startDate) return { key: 'upcoming', label: t('challenges.upcoming'), color: 'bg-blue-100 text-blue-700 border-blue-300', icon: FaClock };
+        if (now > endDate) return { key: 'finished', label: t('challenges.finished'), color: 'bg-gray-100 text-gray-700 border-gray-300', icon: FaCalendar };
+        return { key: 'active', label: t('challenges.active'), color: 'bg-green-100 text-green-700 border-green-300', icon: FaTrophy };
+    };
+
+    const conditionTextKeys = {
+        register: 'studentChallengesIndexPage.conditions.items.register',
+        completeProfile: 'studentChallengesIndexPage.conditions.items.completeProfile',
+        registeredSchoolAffiliation: 'studentChallengesIndexPage.conditions.items.registeredSchoolAffiliation',
+        previousParticipation: 'studentChallengesIndexPage.conditions.items.previousParticipation',
+        commitDeadlines: 'studentChallengesIndexPage.conditions.items.commitDeadlines',
+        requiredLevel: 'studentChallengesIndexPage.conditions.items.requiredLevel',
+    };
+
+    const conditionTagKeys = {
+        mandatory: 'studentChallengesIndexPage.tags.mandatory',
+        preferred: 'studentChallengesIndexPage.tags.preferred',
+        required: 'studentChallengesIndexPage.tags.mandatory',
+        favorite: 'studentChallengesIndexPage.tags.preferred',
+    };
+
+    const getConditionText = (condition) => {
+        const translationKey = (condition?.key && conditionTextKeys[condition.key])
+            || condition?.textKey;
+
+        return translationKey ? t(translationKey) : (condition?.text || '');
+    };
+
+    const getConditionTag = (condition) => {
+        const translationKey = (condition?.tag && conditionTagKeys[condition.tag])
+            || condition?.tagKey;
+
+        return translationKey ? t(translationKey) : (condition?.tag || '');
     };
 
     const filteredChallenges = useMemo(() => {
@@ -131,7 +185,7 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
         if (!filterStatus) return list;
         return list.filter((c) => {
             const status = getChallengeStatus(c);
-            return status.label === filterStatus;
+            return status.key === filterStatus;
         });
     }, [challenges?.data, filterStatus]);
 
@@ -169,7 +223,12 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                         type="button"
                         onClick={() => {
                             setCategory(cat.value);
-                            router.get('/challenges', { search, category: cat.value, challenge_type: challengeType }, {
+                            router.get('/challenges', {
+                                search,
+                                category: cat.value,
+                                challenge_type: challengeType,
+                                status: filterStatus || undefined,
+                            }, {
                                 preserveState: true,
                                 preserveScroll: true,
                             });
@@ -287,10 +346,10 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                                     <div key={index} className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <Icon className="text-gray-400 text-sm" />
-                                            <span className="text-xs text-gray-700">{condition.text}</span>
+                                            <span className="text-xs text-gray-700">{getConditionText(condition)}</span>
                                         </div>
                                         <span className={`px-2 py-1 rounded-full text-[10px] font-semibold border ${condition.tagColor}`}>
-                                            {condition.tag}
+                                            {getConditionTag(condition)}
                                         </span>
                                     </div>
                                 );

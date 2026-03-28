@@ -1,43 +1,77 @@
 import { Head, Link, router } from '@inertiajs/react';
-import DashboardLayout from '../../../Layouts/DashboardLayout';
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import { useTranslation } from '@/i18n';
 import { useState } from 'react';
-import { FaSearch, FaFile, FaUser, FaCalendar, FaStar, FaCheckCircle, FaClock, FaTimesCircle } from 'react-icons/fa';
+import { FaSearch, FaFile, FaStar, FaCheckCircle, FaClock, FaTimesCircle } from 'react-icons/fa';
 import { toHijriDate } from '@/utils/dateUtils';
 
+const getInitialQueryValue = (key) => {
+    if (typeof window === 'undefined') {
+        return '';
+    }
+
+    return new URLSearchParams(window.location.search).get(key) || '';
+};
+
 export default function SchoolSubmissionsIndex({ auth, submissions, students = [] }) {
-    const [search, setSearch] = useState('');
-    const [status, setStatus] = useState('');
-    const [studentId, setStudentId] = useState('');
+    const { t, language } = useTranslation();
+    const [search, setSearch] = useState(getInitialQueryValue('search'));
+    const [status, setStatus] = useState(getInitialQueryValue('status'));
+    const [studentId, setStudentId] = useState(getInitialQueryValue('student_id'));
 
     const handleSearch = (e) => {
         e.preventDefault();
-        router.get('/school/submissions', { search, status, student_id: studentId }, {
+        router.get('/school/submissions', {
+            search: search || undefined,
+            status: status || undefined,
+            student_id: studentId || undefined,
+        }, {
             preserveState: true,
             preserveScroll: true,
         });
     };
 
-    const getStatusBadge = (status) => {
+    const getStatusBadge = (submissionStatus) => {
         const badges = {
-            submitted: { color: 'bg-yellow-100 text-yellow-800', label: 'مُسلم', icon: FaClock },
-            reviewed: { color: 'bg-blue-100 text-blue-800', label: 'تم المراجعة', icon: FaCheckCircle },
-            approved: { color: 'bg-green-100 text-green-800', label: 'مقبول', icon: FaCheckCircle },
-            rejected: { color: 'bg-red-100 text-red-800', label: 'مرفوض', icon: FaTimesCircle },
+            submitted: {
+                color: 'bg-yellow-100 text-yellow-800',
+                label: t('schoolSubmissionsPage.statuses.submitted'),
+                icon: FaClock,
+            },
+            reviewed: {
+                color: 'bg-blue-100 text-blue-800',
+                label: t('schoolSubmissionsPage.statuses.reviewed'),
+                icon: FaCheckCircle,
+            },
+            approved: {
+                color: 'bg-green-100 text-green-800',
+                label: t('schoolSubmissionsPage.statuses.approved'),
+                icon: FaCheckCircle,
+            },
+            rejected: {
+                color: 'bg-red-100 text-red-800',
+                label: t('schoolSubmissionsPage.statuses.rejected'),
+                icon: FaTimesCircle,
+            },
         };
-        return badges[status] || badges.submitted;
+
+        return badges[submissionStatus] || badges.submitted;
     };
 
+    const pageTitle = t('schoolSubmissionsPage.pageTitle', {
+        appName: t('common.appName'),
+    });
+
     return (
-        <DashboardLayout auth={auth}>
-            <Head title="تسليمات المشاريع" />
+        <DashboardLayout auth={auth} header={t('schoolSubmissionsPage.title')}>
+            <Head title={pageTitle} />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">تسليمات المشاريع</h1>
-                    <p className="text-gray-600">عرض وتقييم تسليمات الطلاب للمشاريع المعتمدة</p>
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('schoolSubmissionsPage.title')}</h1>
+                    <p className="text-gray-600">{t('schoolSubmissionsPage.subtitle')}</p>
                 </div>
 
-                {/* البحث والفلترة */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
                     <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
                         <div className="flex-1">
@@ -47,7 +81,7 @@ export default function SchoolSubmissionsIndex({ auth, submissions, students = [
                                     type="text"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
-                                    placeholder="ابحث عن طالب أو مشروع..."
+                                    placeholder={t('schoolSubmissionsPage.filters.searchPlaceholder')}
                                     className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                             </div>
@@ -58,21 +92,21 @@ export default function SchoolSubmissionsIndex({ auth, submissions, students = [
                                 onChange={(e) => setStatus(e.target.value)}
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             >
-                                <option value="">جميع الحالات</option>
-                                <option value="submitted">مُسلم</option>
-                                <option value="reviewed">تم المراجعة</option>
-                                <option value="approved">مقبول</option>
-                                <option value="rejected">مرفوض</option>
+                                <option value="">{t('schoolSubmissionsPage.filters.allStatuses')}</option>
+                                <option value="submitted">{t('schoolSubmissionsPage.statuses.submitted')}</option>
+                                <option value="reviewed">{t('schoolSubmissionsPage.statuses.reviewed')}</option>
+                                <option value="approved">{t('schoolSubmissionsPage.statuses.approved')}</option>
+                                <option value="rejected">{t('schoolSubmissionsPage.statuses.rejected')}</option>
                             </select>
                         </div>
-                        {students && students.length > 0 && (
+                        {students.length > 0 && (
                             <div className="md:w-48">
                                 <select
                                     value={studentId}
                                     onChange={(e) => setStudentId(e.target.value)}
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 >
-                                    <option value="">جميع الطلاب</option>
+                                    <option value="">{t('schoolSubmissionsPage.filters.allStudents')}</option>
                                     {students.map((student) => (
                                         <option key={student.id} value={student.id}>
                                             {student.name}
@@ -85,35 +119,34 @@ export default function SchoolSubmissionsIndex({ auth, submissions, students = [
                             type="submit"
                             className="px-6 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-blue-700 transition"
                         >
-                            بحث
+                            {t('schoolSubmissionsPage.filters.search')}
                         </button>
                     </form>
                 </div>
 
-                {/* قائمة التسليمات */}
                 {submissions.data && submissions.data.length > 0 ? (
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-50">
                                     <tr>
-                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            الطالب
+                                        <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {t('schoolSubmissionsPage.table.student')}
                                         </th>
-                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            المشروع
+                                        <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {t('schoolSubmissionsPage.table.project')}
                                         </th>
-                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            التاريخ
+                                        <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {t('schoolSubmissionsPage.table.date')}
                                         </th>
-                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            التقييم
+                                        <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {t('schoolSubmissionsPage.table.rating')}
                                         </th>
-                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            الحالة
+                                        <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {t('schoolSubmissionsPage.table.status')}
                                         </th>
-                                        <th className="px-6 py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            الإجراءات
+                                        <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {t('schoolSubmissionsPage.table.actions')}
                                         </th>
                                     </tr>
                                 </thead>
@@ -121,24 +154,23 @@ export default function SchoolSubmissionsIndex({ auth, submissions, students = [
                                     {submissions.data.map((submission) => {
                                         const statusBadge = getStatusBadge(submission.status);
                                         const StatusIcon = statusBadge.icon;
+
                                         return (
                                             <tr key={submission.id} className="hover:bg-gray-50">
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="flex items-center">
-                                                        <span className="text-sm font-medium text-gray-900">
-                                                            {submission.student?.name || 'غير محدد'}
-                                                        </span>
-                                                    </div>
+                                                    <span className="text-sm font-medium text-gray-900">
+                                                        {submission.student?.name || t('schoolSubmissionsPage.table.unknownStudent')}
+                                                    </span>
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <div className="text-sm text-gray-900">
-                                                        {submission.project?.title || 'غير محدد'}
+                                                        {submission.project?.title || t('schoolSubmissionsPage.table.unknownProject')}
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="flex items-center text-sm text-gray-500">
                                                         {submission.submitted_at
-                                                            ? toHijriDate(submission.submitted_at)
+                                                            ? toHijriDate(submission.submitted_at, false, language)
                                                             : '-'}
                                                     </div>
                                                 </td>
@@ -165,7 +197,7 @@ export default function SchoolSubmissionsIndex({ auth, submissions, students = [
                                                         href={`/school/submissions/${submission.id}`}
                                                         className="text-blue-600 hover:text-blue-900"
                                                     >
-                                                        عرض التفاصيل
+                                                        {t('schoolSubmissionsPage.table.details')}
                                                     </Link>
                                                 </td>
                                             </tr>
@@ -178,11 +210,10 @@ export default function SchoolSubmissionsIndex({ auth, submissions, students = [
                 ) : (
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
                         <FaFile className="mx-auto text-6xl text-gray-300 mb-4" />
-                        <p className="text-gray-500 text-lg">لا توجد تسليمات حالياً</p>
+                        <p className="text-gray-500 text-lg">{t('schoolSubmissionsPage.empty')}</p>
                     </div>
                 )}
 
-                {/* Pagination */}
                 {submissions.links && submissions.links.length > 3 && (
                     <div className="mt-6 flex justify-center">
                         <div className="flex gap-2">
@@ -192,10 +223,10 @@ export default function SchoolSubmissionsIndex({ auth, submissions, students = [
                                     onClick={() => link.url && router.get(link.url)}
                                     disabled={!link.url}
                                     className={`px-4 py-2 rounded-lg ${link.active
-                                            ? 'bg-[#A3C042] text-white'
-                                            : link.url
-                                                ? 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-                                                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                        ? 'bg-[#A3C042] text-white'
+                                        : link.url
+                                            ? 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                                            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                         }`}
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                 />
@@ -207,4 +238,3 @@ export default function SchoolSubmissionsIndex({ auth, submissions, students = [
         </DashboardLayout>
     );
 }
-

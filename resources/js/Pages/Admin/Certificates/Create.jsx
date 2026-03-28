@@ -1,8 +1,18 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
+import { useTranslation } from '@/i18n';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FaArrowRight, FaSave, FaTimes } from 'react-icons/fa';
 
+const certificateTypeOptions = [
+    { value: 'student', key: 'student' },
+    { value: 'teacher', key: 'teacher' },
+    { value: 'school', key: 'school' },
+    { value: 'achievement', key: 'achievement' },
+    { value: 'membership', key: 'membership' },
+];
+
 export default function AdminCertificatesCreate({ users }) {
+    const { t } = useTranslation();
     const { data, setData, post, processing, errors } = useForm({
         user_id: '',
         type: 'student',
@@ -22,9 +32,13 @@ export default function AdminCertificatesCreate({ users }) {
         post(route('admin.certificates.store'));
     };
 
+    const pageTitle = t('adminCertificatesPage.createPageTitle', {
+        appName: t('common.appName'),
+    });
+
     return (
-        <DashboardLayout header="إضافة شهادة جديدة">
-            <Head title="إضافة شهادة جديدة" />
+        <DashboardLayout header={t('adminCertificatesPage.createTitle')}>
+            <Head title={pageTitle} />
 
             <div className="mb-6">
                 <Link
@@ -32,19 +46,20 @@ export default function AdminCertificatesCreate({ users }) {
                     className="text-blue-600 hover:text-blue-800 flex items-center gap-2"
                 >
                     <FaArrowRight className="transform rotate-180" />
-                    العودة إلى قائمة الشهادات
+                    {t('adminCertificatesPage.backToList')}
                 </Link>
             </div>
 
             <div className="bg-white rounded-xl shadow-lg p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">معلومات الشهادة</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                    {t('adminCertificatesPage.form.information')}
+                </h2>
 
                 <form onSubmit={submit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* المستخدم */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                المستخدم <span className="text-red-500">*</span>
+                                {t('adminCertificatesPage.form.userLabel')} <span className="text-red-500">*</span>
                             </label>
                             <select
                                 value={data.user_id}
@@ -53,7 +68,7 @@ export default function AdminCertificatesCreate({ users }) {
                                     }`}
                                 required
                             >
-                                <option value="">اختر المستخدم</option>
+                                <option value="">{t('adminCertificatesPage.form.userPlaceholder')}</option>
                                 {users.map((user) => (
                                     <option key={user.id} value={user.id}>
                                         {user.name} ({user.email}) - {user.role}
@@ -65,10 +80,9 @@ export default function AdminCertificatesCreate({ users }) {
                             )}
                         </div>
 
-                        {/* النوع */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                نوع الشهادة <span className="text-red-500">*</span>
+                                {t('adminCertificatesPage.form.typeLabel')} <span className="text-red-500">*</span>
                             </label>
                             <select
                                 value={data.type}
@@ -77,21 +91,20 @@ export default function AdminCertificatesCreate({ users }) {
                                     }`}
                                 required
                             >
-                                <option value="student">طالب</option>
-                                <option value="teacher">معلم</option>
-                                <option value="school">مدرسة</option>
-                                <option value="achievement">إنجاز</option>
-                                <option value="membership">عضوية</option>
+                                {certificateTypeOptions.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                        {t(`adminCertificatesPage.types.${option.key}`)}
+                                    </option>
+                                ))}
                             </select>
                             {errors.type && (
                                 <p className="mt-1 text-sm text-red-600">{errors.type}</p>
                             )}
                         </div>
 
-                        {/* العنوان (إنجليزي) */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                العنوان (إنجليزي) <span className="text-red-500">*</span>
+                                {t('adminCertificatesPage.form.titleEnLabel')} <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
@@ -106,10 +119,9 @@ export default function AdminCertificatesCreate({ users }) {
                             )}
                         </div>
 
-                        {/* العنوان (عربي) */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                العنوان (عربي) <span className="text-red-500">*</span>
+                                {t('adminCertificatesPage.form.titleArLabel')} <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
@@ -124,10 +136,10 @@ export default function AdminCertificatesCreate({ users }) {
                             )}
                         </div>
 
-                        {/* الوصف (إنجليزي) */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                الوصف (إنجليزي)
+                                {t('adminCertificatesPage.form.descriptionEnLabel')}{' '}
+                                <span className="text-gray-500">({t('common.optional')})</span>
                             </label>
                             <textarea
                                 value={data.description}
@@ -141,10 +153,10 @@ export default function AdminCertificatesCreate({ users }) {
                             )}
                         </div>
 
-                        {/* الوصف (عربي) */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                الوصف (عربي)
+                                {t('adminCertificatesPage.form.descriptionArLabel')}{' '}
+                                <span className="text-gray-500">({t('common.optional')})</span>
                             </label>
                             <textarea
                                 value={data.description_ar}
@@ -158,10 +170,9 @@ export default function AdminCertificatesCreate({ users }) {
                             )}
                         </div>
 
-                        {/* تاريخ الإصدار */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                تاريخ الإصدار <span className="text-red-500">*</span>
+                                {t('adminCertificatesPage.form.issueDateLabel')} <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="date"
@@ -176,10 +187,10 @@ export default function AdminCertificatesCreate({ users }) {
                             )}
                         </div>
 
-                        {/* تاريخ الانتهاء */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                تاريخ الانتهاء (اختياري)
+                                {t('adminCertificatesPage.form.expiryDateLabel')}{' '}
+                                <span className="text-gray-500">({t('common.optional')})</span>
                             </label>
                             <input
                                 type="date"
@@ -193,16 +204,16 @@ export default function AdminCertificatesCreate({ users }) {
                             )}
                         </div>
 
-                        {/* القالب */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                القالب (اختياري)
+                                {t('adminCertificatesPage.form.templateLabel')}{' '}
+                                <span className="text-gray-500">({t('common.optional')})</span>
                             </label>
                             <input
                                 type="text"
                                 value={data.template}
                                 onChange={(e) => setData('template', e.target.value)}
-                                placeholder="مسار القالب"
+                                placeholder={t('adminCertificatesPage.form.templatePlaceholder')}
                                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.template ? 'border-red-500' : 'border-gray-300'
                                     }`}
                             />
@@ -212,7 +223,6 @@ export default function AdminCertificatesCreate({ users }) {
                         </div>
                     </div>
 
-                    {/* Options */}
                     <div className="space-y-4">
                         <div className="flex items-center">
                             <input
@@ -223,9 +233,10 @@ export default function AdminCertificatesCreate({ users }) {
                                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                             />
                             <label htmlFor="is_active" className="ms-2 block text-sm text-gray-900">
-                                تفعيل الشهادة
+                                {t('adminCertificatesPage.form.activateLabel')}
                             </label>
                         </div>
+
                         <div className="flex items-center">
                             <input
                                 type="checkbox"
@@ -235,19 +246,18 @@ export default function AdminCertificatesCreate({ users }) {
                                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                             />
                             <label htmlFor="generate_pdf" className="ms-2 block text-sm text-gray-900">
-                                إنشاء ملف PDF تلقائياً
+                                {t('adminCertificatesPage.form.generatePdfLabel')}
                             </label>
                         </div>
                     </div>
 
-                    {/* Actions */}
                     <div className="flex justify-end gap-4 pt-6 border-t">
                         <Link
                             href={route('admin.certificates.index')}
                             className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                         >
                             <FaTimes />
-                            إلغاء
+                            {t('common.cancel')}
                         </Link>
                         <button
                             type="submit"
@@ -255,7 +265,7 @@ export default function AdminCertificatesCreate({ users }) {
                             className="px-6 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50"
                         >
                             <FaSave />
-                            {processing ? 'جاري الحفظ...' : 'حفظ'}
+                            {processing ? t('common.saving') : t('common.save')}
                         </button>
                     </div>
                 </form>
@@ -263,4 +273,3 @@ export default function AdminCertificatesCreate({ users }) {
         </DashboardLayout>
     );
 }
-

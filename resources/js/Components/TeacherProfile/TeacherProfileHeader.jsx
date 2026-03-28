@@ -1,6 +1,7 @@
 import { FaStar, FaCheck, FaUser, FaBook, FaGraduationCap } from 'react-icons/fa';
 import { getInitials, getColorFromName } from '../../utils/imageUtils';
 import { useTranslation } from '@/i18n';
+import { formatLocationWithStages, getStageLabels } from '@/utils/stageLocalization';
 
 const getImageUrl = (image) => {
     if (!image) return null;
@@ -13,37 +14,12 @@ const getImageUrl = (image) => {
     return `/storage/${image}`;
 };
 
-const formatLocation = (location) => {
-    if (!location) return '';
-
-    const generalStages = ['الابتدائية', 'المتوسطة', 'الثانوية', 'الجامعية'];
-
-    if (location.includes(' - ')) {
-        const [city, stagesPart] = location.split(' - ');
-        if (!stagesPart) return city;
-
-        const stages = stagesPart.split(' / ').map(s => s.trim());
-        const generalStagesOnly = stages.filter(stage => {
-            if (!stage || typeof stage !== 'string') return false;
-            const trimmed = stage.trim();
-            return trimmed.length > 0 && trimmed.length < 50 && generalStages.includes(trimmed);
-        });
-
-        if (generalStagesOnly.length > 0) {
-            return `${city} - ${generalStagesOnly.join(' / ')}`;
-        }
-        return city;
-    }
-
-    return location;
-};
-
 const formatSubject = (subject) => {
     if (!subject) return '';
 
-    const isValidSubjectString = (str) => {
-        if (!str || typeof str !== 'string') return false;
-        const trimmed = str.trim();
+    const isValidSubjectString = (value) => {
+        if (!value || typeof value !== 'string') return false;
+        const trimmed = value.trim();
         if (trimmed.length === 0 || trimmed.length > 100) return false;
         if (trimmed.length < 2) return false;
         if (/^[\[\]\\",\s\u0000-\u001F]+$/.test(trimmed)) return false;
@@ -60,13 +36,11 @@ const formatSubject = (subject) => {
                     const validSubjects = parsed.filter(isValidSubjectString);
                     return validSubjects.length > 0 ? validSubjects[0].trim() : '';
                 }
-            } catch (e) {
+            } catch (error) {
                 return '';
             }
-        } else {
-            if (isValidSubjectString(subject)) {
-                return trimmed;
-            }
+        } else if (isValidSubjectString(subject)) {
+            return trimmed;
         }
     }
 
@@ -80,18 +54,20 @@ const formatSubject = (subject) => {
 
 export default function TeacherProfileHeader({ teacher, onBookClick }) {
     const { t } = useTranslation();
-    
+    const stageLabels = getStageLabels(t);
+    const teacherLocation = formatLocationWithStages(teacher?.location || '', stageLabels);
+
     return (
         <div className="flex flex-col items-start gap-8">
-            <div className="w-full flex items-center justify-between gap-4">
+            <div className="flex w-full items-center justify-between gap-4">
                 <div className="flex items-center justifiy-start gap-4">
                     <div className="flex-shrink-0">
-                        <div className="w-16 h-16 relative">
+                        <div className="relative h-16 w-16">
                             {teacher?.image ? (
                                 <img
                                     src={getImageUrl(teacher.image)}
                                     alt={teacher?.name || ''}
-                                    className="w-full h-full object-cover rounded-full border-4 border-green-200"
+                                    className="h-full w-full rounded-full border-4 border-green-200 object-cover"
                                     onError={(e) => {
                                         e.target.style.display = 'none';
                                         if (e.target.nextElementSibling) {
@@ -101,13 +77,13 @@ export default function TeacherProfileHeader({ teacher, onBookClick }) {
                                 />
                             ) : null}
                             <div
-                                className={`w-full h-full rounded-full border-4 border-green-200 flex items-center justify-center text-white font-bold text-lg ${teacher?.image ? 'hidden' : ''}`}
+                                className={`flex h-full w-full items-center justify-center rounded-full border-4 border-green-200 text-lg font-bold text-white ${teacher?.image ? 'hidden' : ''}`}
                                 style={{
                                     background: (() => {
                                         const colors = getColorFromName(teacher?.name || '');
                                         const colorParts = colors.split(', ');
                                         return `linear-gradient(135deg, ${colorParts[0] || '#fbbf24'}, ${colorParts[1] || '#f59e0b'})`;
-                                    })()
+                                    })(),
                                 }}
                             >
                                 {getInitials(teacher?.name || '')}
@@ -115,26 +91,27 @@ export default function TeacherProfileHeader({ teacher, onBookClick }) {
                         </div>
                     </div>
                     <div>
-                        <div className="flex items-center gap-3 mb-1">
+                        <div className="mb-1 flex items-center gap-3">
                             <h1 className="text-lg font-bold text-gray-900">{teacher?.name || ''}</h1>
                             {teacher?.isVerified && (
-                                <div className="w-3 h-3 bg-blue-500 rounded-full flex items-center justify-center">
-                                    <FaCheck className="text-white text-[8px]" />
+                                <div className="flex h-3 w-3 items-center justify-center rounded-full bg-blue-500">
+                                    <FaCheck className="text-[8px] text-white" />
                                 </div>
                             )}
                         </div>
 
-                        <p className="text-gray-600 mb-2 text-[14px]">{formatLocation(teacher?.location || '')}</p>
+                        <p className="mb-2 text-[14px] text-gray-600">{teacherLocation}</p>
 
                         {(() => {
                             if (!teacher) return null;
                             const displaySubject = formatSubject(
-                                teacher.subject ||
-                                (Array.isArray(teacher.subjects) && teacher.subjects.length > 0 ? teacher.subjects[0] : '') ||
-                                (typeof teacher.subjects === 'string' ? teacher.subjects : '')
+                                teacher.subject
+                                || (Array.isArray(teacher.subjects) && teacher.subjects.length > 0 ? teacher.subjects[0] : '')
+                                || (typeof teacher.subjects === 'string' ? teacher.subjects : ''),
                             );
+
                             return displaySubject ? (
-                                <div className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm font-medium inline-block">
+                                <div className="inline-block rounded-full bg-green-100 px-2 py-1 text-sm font-medium text-green-800">
                                     {displaySubject}
                                 </div>
                             ) : null;
@@ -143,16 +120,16 @@ export default function TeacherProfileHeader({ teacher, onBookClick }) {
                 </div>
                 <div>
                     <div className="bg-white">
-                        <div className="flex justify-start items-center gap-4">
-                            <div className="text-sm font-bold text-gray-900 flex items-center ">
+                        <div className="flex items-center justify-start gap-4">
+                            <div className="flex items-center text-sm font-bold text-gray-900">
                                 <span>{teacher?.price || '0'}</span>
-                                <img src="/images/aed-currency(black).svg" alt={t('common.currencySymbol')} className="w-5 h-5" />
+                                <img src="/images/aed-currency(black).svg" alt={t('common.currencySymbol')} className="h-5 w-5" />
                                 <span> {t('teachers.perHour')}</span>
                             </div>
 
                             <button
                                 onClick={onBookClick}
-                                className="bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-lg font-bold text-md transition duration-300 transform hover:scale-105"
+                                className="rounded-lg bg-yellow-400 px-4 py-2 text-md font-bold text-black transition duration-300 hover:scale-105 hover:bg-yellow-500"
                             >
                                 {t('teachers.bookNow')}
                             </button>
@@ -161,29 +138,29 @@ export default function TeacherProfileHeader({ teacher, onBookClick }) {
                 </div>
             </div>
             <div className="flex-1">
-                <p className="text-gray-700 leading-relaxed mb-4">
+                <p className="mb-4 leading-relaxed text-gray-700">
                     {teacher?.bio || ''}
                 </p>
 
-                <div className="flex flex-wrap items-center gap-2 mb-3">
-                    <div className="flex items-center gap-2 border border-gray-200 rounded-lg py-1 px-2">
+                <div className="mb-3 flex flex-wrap items-center gap-2">
+                    <div className="flex items-center gap-2 rounded-lg border border-gray-200 px-2 py-1">
                         <div className="flex items-center gap-1">
                             <FaStar className="text-sm text-yellow-400" />
                         </div>
-                        <span className="text-gray-700 font-medium">
+                        <span className="font-medium text-gray-700">
                             {teacher?.rating ? Number(teacher.rating).toFixed(1) : '0.0'} ({teacher?.reviewsCount || 0} {t('teachers.reviews')})
                         </span>
                     </div>
-                    <div className="flex items-center gap-2 border border-gray-200 rounded-lg py-1 px-2">
-                        <FaGraduationCap className="text-green-500 text-sm" />
+                    <div className="flex items-center gap-2 rounded-lg border border-gray-200 px-2 py-1">
+                        <FaGraduationCap className="text-sm text-green-500" />
                         <span className="text-gray-700">{t('teachers.experience')} {teacher?.experience || 0} {t('teachers.years')}</span>
                     </div>
-                    <div className="flex items-center gap-2 border border-gray-200 rounded-lg py-1 px-2">
-                        <FaBook className="text-blue-500 text-sm" />
+                    <div className="flex items-center gap-2 rounded-lg border border-gray-200 px-2 py-1">
+                        <FaBook className="text-sm text-blue-500" />
                         <span className="text-gray-700">{teacher?.sessionsCount || 0} {t('teachers.session')}</span>
                     </div>
-                    <div className="flex items-center gap-2 border border-gray-200 rounded-lg py-1 px-2">
-                        <FaUser className="text-purple-900 text-sm" />
+                    <div className="flex items-center gap-2 rounded-lg border border-gray-200 px-2 py-1">
+                        <FaUser className="text-sm text-purple-900" />
                         <span className="text-gray-700">{teacher?.studentsCount || 0} {t('teachers.studentBenefited')}</span>
                     </div>
                 </div>

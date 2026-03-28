@@ -1,70 +1,75 @@
 import { FaSchool, FaUsers, FaTrophy, FaGraduationCap } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function UAESchoolsSection({
-    title = "مؤسسات تعليمية مشاركة من الإمارات",
-    subtitle = "نفتخر بشراكتنا مع مؤسسات تعليمية متميزة من دولة الإمارات العربية المتحدة",
+    title,
+    subtitle,
     schools = [],
-    compact = false
+    compact = false,
 }) {
+    const { t } = useTranslation();
+    const resolvedTitle = title ?? t('sections.uaeSchools');
+    const resolvedSubtitle = subtitle ?? t('sections.uaeSchoolsSubtitle');
+
     return (
         <div className="space-y-4 md:space-y-6">
-            <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-xl flex items-center justify-center">
-                    <FaGraduationCap className="text-[#A3C042] text-xl" />
+            <div className="mb-4 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20">
+                    <FaGraduationCap className="text-xl text-[#A3C042]" />
                 </div>
-                <h2 className="text-xl md:text-2xl font-bold text-gray-900">{title}</h2>
+                <h2 className="text-xl font-bold text-gray-900 md:text-2xl">{resolvedTitle}</h2>
             </div>
 
-            <p className="text-sm md:text-base text-gray-700 leading-relaxed mb-6">
-                {subtitle}
+            <p className="mb-6 text-sm leading-relaxed text-gray-700 md:text-base">
+                {resolvedSubtitle}
             </p>
 
             {schools.length === 0 ? (
-                <div className="bg-white rounded-2xl border border-gray-100 p-8 md:p-12 text-center">
-                    <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <FaSchool className="text-gray-400 text-2xl" />
+                <div className="rounded-2xl border border-gray-100 bg-white p-8 text-center md:p-12">
+                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100">
+                        <FaSchool className="text-2xl text-gray-400" />
                     </div>
-                    <p className="text-gray-600 font-semibold">لا توجد مؤسسات تعليمية متاحة حالياً</p>
+                    <p className="font-semibold text-gray-600">{t('sections.noSchoolsAvailable')}</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3 xl:grid-cols-4">
                     {schools.map((school) => (
                         <div
                             key={school.id}
-                            className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm hover:shadow-md transition"
+                            className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition hover:shadow-md md:p-6"
                         >
-                            <div className="flex items-center justify-center mb-4">
-                                <div className="w-12 h-12 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-xl flex items-center justify-center">
-                                    <FaSchool className="text-[#A3C042] text-xl" />
+                            <div className="mb-4 flex items-center justify-center">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20">
+                                    <FaSchool className="text-xl text-[#A3C042]" />
                                 </div>
                             </div>
 
-                            <h3 className="text-base md:text-lg font-bold text-gray-900 mb-3 text-center">
+                            <h3 className="mb-3 text-center text-base font-bold text-gray-900 md:text-lg">
                                 {school.name}
                             </h3>
 
-                            <div className="space-y-2 mb-4">
+                            <div className="mb-4 space-y-2">
                                 {school.total_students !== undefined && (
                                     <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
                                         <FaUsers className="text-gray-400" />
-                                        <span>{school.total_students || 0} طالب</span>
+                                        <span>{t('sections.uaeSchoolsStudentsCount', { count: school.total_students || 0 })}</span>
                                     </div>
                                 )}
 
                                 {school.projects_count !== undefined && (
                                     <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
                                         <FaTrophy className="text-yellow-500" />
-                                        <span>{school.projects_count || 0} مشروع</span>
+                                        <span>{t('sections.uaeSchoolsProjectsCount', { count: school.projects_count || 0 })}</span>
                                     </div>
                                 )}
                             </div>
 
                             {school.total_points !== undefined && (
-                                <div className="text-center pt-4 border-t border-gray-100">
-                                    <div className="text-2xl font-extrabold text-[#A3C042] mb-1">
+                                <div className="border-t border-gray-100 pt-4 text-center">
+                                    <div className="mb-1 text-2xl font-extrabold text-[#A3C042]">
                                         {school.total_points || 0}
                                     </div>
-                                    <div className="text-xs text-gray-500 font-semibold">نقطة</div>
+                                    <div className="text-xs font-semibold text-gray-500">{t('sections.uaeSchoolsPointsLabel')}</div>
                                 </div>
                             )}
                         </div>

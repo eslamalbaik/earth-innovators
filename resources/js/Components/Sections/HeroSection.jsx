@@ -7,24 +7,22 @@ export default function HeroSection({
     title,
     subtitle,
     cities = [],
-    subjects = []
+    subjects = [],
 }) {
     const { dir } = useSelector((state) => state.language);
     const { t } = useTranslation();
     const resolvedTitle = title ?? t('hero.title');
     const resolvedSubtitle = subtitle ?? t('hero.subtitle');
-    
+
     const handleStartJourney = () => {
         router.visit('/register');
     };
 
     return (
-        <section dir={dir} className="relative min-h-screen px-24 flex items-center overflow-hidden bg-gradient-to-br from-[#A3C042]/10 via-white to-legacy-blue/10">
-            {/* Background decorative elements */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                {/* Dotted lines and arrows */}
-                <div className="absolute top-20 left-10 w-64 h-64 opacity-20">
-                    <svg className="w-full h-full" viewBox="0 0 200 200" fill="none">
+        <section dir={dir} className="relative flex min-h-screen items-center overflow-hidden bg-gradient-to-br from-[#A3C042]/10 via-white to-legacy-blue/10 px-24">
+            <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                <div className="absolute left-10 top-20 h-64 w-64 opacity-20">
+                    <svg className="h-full w-full" viewBox="0 0 200 200" fill="none">
                         <circle cx="100" cy="100" r="80" stroke="url(#gradient)" strokeWidth="2" strokeDasharray="5,5" opacity="0.3" />
                         <path d="M 100 20 L 120 60 L 140 40" stroke="#22c55e" strokeWidth="2" fill="none" opacity="0.3" />
                         <circle cx="150" cy="50" r="4" fill="#22c55e" opacity="0.3" />
@@ -33,8 +31,8 @@ export default function HeroSection({
                     </svg>
                 </div>
 
-                <div className="absolute top-40 right-20 w-48 h-48 opacity-15">
-                    <svg className="w-full h-full" viewBox="0 0 150 150" fill="none">
+                <div className="absolute right-20 top-40 h-48 w-48 opacity-15">
+                    <svg className="h-full w-full" viewBox="0 0 150 150" fill="none">
                         <path d="M 20 75 L 60 45 L 90 75 L 130 55" stroke="#3b82f6" strokeWidth="2" strokeDasharray="3,3" fill="none" />
                         <circle cx="50" cy="60" r="3" fill="#22c55e" />
                         <circle cx="70" cy="75" r="3" fill="#3b82f6" />
@@ -42,104 +40,94 @@ export default function HeroSection({
                     </svg>
                 </div>
 
-                {/* Large green/blue play button/arrow shape */}
-                <div className="absolute top-32 left-32 w-32 h-32 bg-[#A3C042] rounded-full opacity-10 transform rotate-45"></div>
-                <div className="absolute top-36 left-36 w-24 h-24 bg-legacy-blue rounded-full opacity-15 transform rotate-45"></div>
+                <div className="absolute left-32 top-32 h-32 w-32 rotate-45 rounded-full bg-[#A3C042] opacity-10" />
+                <div className="absolute left-36 top-36 h-24 w-24 rotate-45 rounded-full bg-legacy-blue opacity-15" />
 
-                {/* Small decorative dots */}
-                <div className="absolute top-1/4 left-1/3 w-2 h-2 bg-[#A3C042] rounded-full"></div>
-                <div className="absolute top-1/3 left-1/4 w-2 h-2 bg-legacy-blue rounded-full"></div>
-                <div className="absolute top-1/5 right-1/4 w-2 h-2 bg-[#A3C042] rounded-full"></div>
-                <div className="absolute top-2/5 right-1/3 w-2 h-2 bg-legacy-blue rounded-full"></div>
+                <div className="absolute left-1/3 top-1/4 h-2 w-2 rounded-full bg-[#A3C042]" />
+                <div className="absolute left-1/4 top-1/3 h-2 w-2 rounded-full bg-legacy-blue" />
+                <div className="absolute right-1/4 top-1/5 h-2 w-2 rounded-full bg-[#A3C042]" />
+                <div className="absolute right-1/3 top-2/5 h-2 w-2 rounded-full bg-legacy-blue" />
             </div>
 
-            <div className="container mx-auto px-4 lg:px-12 py-24 relative z-10">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-                    {/* Text and CTA Button */}
-                    <div className="space-y-8 order-1">
-                        {/* Top small text */}
-                        <div className="text-[#A3C042] text-lg font-medium">
-                            كل ما عليك هو التعلم
+            <div className="container relative z-10 mx-auto px-4 py-24 lg:px-12">
+                <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-2">
+                    <div className="order-1 space-y-8">
+                        <div className="text-lg font-medium text-[#A3C042]">
+                            {t('hero.learn')}
                         </div>
 
-                        {/* Main headline */}
-                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-[#A3C042] bg-clip-text text-transparent leading-tight">
+                        <h1 className="bg-[#A3C042] bg-clip-text text-4xl font-bold leading-tight text-transparent md:text-5xl lg:text-6xl">
                             {resolvedTitle}
                         </h1>
 
-                        {/* Subtitle */}
-                        <p className="text-xl md:text-2xl text-legacy-blue font-medium">
+                        <p className="text-xl font-medium text-legacy-blue md:text-2xl">
                             {resolvedSubtitle}
                         </p>
 
-                        {/* CTA Button */}
                         <div className="mt-8">
                             <button
                                 onClick={handleStartJourney}
-                                className="bg-[#A3C042] hover:from-primary-600 hover:to-blue-700 text-white px-12 py-4 rounded-xl font-semibold text-lg transition duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                                className="rounded-xl bg-[#A3C042] px-12 py-4 text-lg font-semibold text-white shadow-lg transition duration-300 hover:scale-105 hover:shadow-xl hover:from-primary-600 hover:to-blue-700"
                             >
                                 {t('hero.startJourney')}
                             </button>
                         </div>
                     </div>
 
-                    {/* Hero Image */}
                     <div className="relative order-2">
-                        <div className="relative w-full h-full flex items-center justify-center">
+                        <div className="relative flex h-full w-full items-center justify-center">
                             <img
                                 src="/images/hero.png"
                                 alt={t('hero.imageAlt')}
-                                className="w-full h-auto max-w-xl object-contain"
+                                className="h-auto w-full max-w-xl object-contain"
                             />
                         </div>
                     </div>
                 </div>
 
-                {/* Statistics at the bottom */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16 pt-12 border-t border-[#A3C042]/20">
+                <div className="mt-16 grid grid-cols-2 gap-6 border-t border-[#A3C042]/20 pt-12 md:grid-cols-4">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-[#A3C042]/20 to-legacy-blue/20 rounded-full flex items-center justify-center">
-                            <FaProjectDiagram className="text-[#A3C042] text-xl" />
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#A3C042]/20 to-legacy-blue/20">
+                            <FaProjectDiagram className="text-xl text-[#A3C042]" />
                         </div>
                         <div>
-                            <div className="text-2xl md:text-3xl font-bold bg-[#A3C042] bg-clip-text text-transparent">٣٢ ألف</div>
+                            <div className="bg-[#A3C042] bg-clip-text text-2xl font-bold text-transparent md:text-3xl">32K</div>
                             <div className="text-sm text-gray-700">{t('stats.hours')}</div>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-[#A3C042]/20 to-legacy-blue/20 rounded-full flex items-center justify-center">
-                            <FaTrophy className="text-legacy-blue text-xl" />
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#A3C042]/20 to-legacy-blue/20">
+                            <FaTrophy className="text-xl text-legacy-blue" />
                         </div>
                         <div>
-                            <div className="text-2xl md:text-3xl font-bold bg-[#A3C042] bg-clip-text text-transparent">٣.٤ ألف</div>
+                            <div className="bg-[#A3C042] bg-clip-text text-2xl font-bold text-transparent md:text-3xl">3.4K</div>
                             <div className="text-sm text-gray-700">{t('common.lessons')}</div>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-[#A3C042]/20 to-legacy-blue/20 rounded-full flex items-center justify-center">
-                            <FaUsers className="text-[#A3C042] text-xl" />
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#A3C042]/20 to-legacy-blue/20">
+                            <FaUsers className="text-xl text-[#A3C042]" />
                         </div>
                         <div>
-                            <div className="text-2xl md:text-3xl font-bold bg-[#A3C042] bg-clip-text text-transparent">١٣٥.١ ألف</div>
+                            <div className="bg-[#A3C042] bg-clip-text text-2xl font-bold text-transparent md:text-3xl">135.1K</div>
                             <div className="text-sm text-gray-700">{t('common.students')}</div>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-[#A3C042]/20 to-legacy-blue/20 rounded-full flex items-center justify-center">
-                            <FaProjectDiagram className="text-legacy-blue text-xl" />
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#A3C042]/20 to-legacy-blue/20">
+                            <FaProjectDiagram className="text-xl text-legacy-blue" />
                         </div>
                         <div>
-                            <div className="text-2xl md:text-3xl font-bold bg-[#A3C042] bg-clip-text text-transparent">٣١٧</div>
+                            <div className="bg-[#A3C042] bg-clip-text text-2xl font-bold text-transparent md:text-3xl">317</div>
                             <div className="text-sm text-gray-700">{t('common.courses')}</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* SVG gradient definition */}
             <svg className="hidden">
                 <defs>
                     <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">

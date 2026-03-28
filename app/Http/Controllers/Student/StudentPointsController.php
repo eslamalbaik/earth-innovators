@@ -38,7 +38,8 @@ class StudentPointsController extends Controller
                     'type' => $p->type,
                     'source' => $p->source,
                     'source_id' => $p->source_id,
-                    'description' => $p->description_ar ?: $p->description,
+                    'description' => $p->description,
+                    'description_ar' => $p->description_ar,
                     'created_at' => $p->created_at?->format('Y-m-d'),
                 ];
             });

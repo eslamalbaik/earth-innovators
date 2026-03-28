@@ -1,17 +1,23 @@
-import DashboardLayout from '../../../Layouts/DashboardLayout';
-import { Head, useForm, Link } from '@inertiajs/react';
-import { useState, useEffect } from 'react';
-import { FaBook, FaUpload, FaSpinner, FaArrowLeft } from 'react-icons/fa';
-import TextInput from '../../../Components/TextInput';
-import InputLabel from '../../../Components/InputLabel';
-import InputError from '../../../Components/InputError';
-import PrimaryButton from '../../../Components/PrimaryButton';
-import { getPublicationImageUrl } from '../../../utils/imageUtils';
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import { useTranslation } from '@/i18n';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
+import { FaArrowLeft, FaArrowRight, FaSpinner, FaUpload } from 'react-icons/fa';
+import TextInput from '@/Components/TextInput';
+import InputLabel from '@/Components/InputLabel';
+import InputError from '@/Components/InputError';
+import PrimaryButton from '@/Components/PrimaryButton';
+import TiptapEditor from '@/Components/TiptapEditor';
+import { getPublicationFileUrl, getPublicationImageUrl } from '@/utils/imageUtils';
+
+const publicationTypeOptions = ['magazine', 'booklet', 'report', 'article'];
 
 export default function SchoolPublicationEdit({ auth, publication }) {
+    const { t, language } = useTranslation();
+    const BackIcon = language === 'ar' ? FaArrowRight : FaArrowLeft;
+
     const { data, setData, post, processing, errors } = useForm({
         type: publication?.type || 'magazine',
-        category: publication?.category || '',
         title: publication?.title || '',
         description: publication?.description || '',
         content: publication?.content || '',
@@ -23,287 +29,244 @@ export default function SchoolPublicationEdit({ auth, publication }) {
         _method: 'PUT',
     });
 
-    const getImageUrl = (imagePath) => {
-        if (!imagePath) return null;
-        // Use utility function for consistency, but allow null for preview state
-        return getPublicationImageUrl(imagePath, null);
+    const [coverPreview, setCoverPreview] = useState(() => getPublicationImageUrl(publication?.cover_image, null));
+    const [fileName, setFileName] = useState('');
+    const [imageLoadError, setImageLoadError] = useState(false);
+
+    useEffect(() => () => {
+        if (coverPreview?.startsWith('blob:')) {
+            URL.revokeObjectURL(coverPreview);
+        }
+    }, [coverPreview]);
+
+    const handleCoverImageChange = (event) => {
+        const file = event.target.files[0];
+        if (!file) {
+            return;
+        }
+
+        if (coverPreview?.startsWith('blob:')) {
+            URL.revokeObjectURL(coverPreview);
+        }
+
+        setData('cover_image', file);
+        setCoverPreview(URL.createObjectURL(file));
+        setImageLoadError(false);
     };
 
-    const [coverPreview, setCoverPreview] = useState(() => {
-        return getImageUrl(publication?.cover_image);
-    });
-    const [fileName, setFileName] = useState(publication?.file ? 'ملف موجود' : '');
-
-    // Update preview when publication changes (but not if user selected a new file)
-    useEffect(() => {
-        if (publication?.cover_image) {
-            const imageUrl = getImageUrl(publication.cover_image);
-            // Only update if current preview is not a blob URL (user-selected file)
-            setCoverPreview(prev => {
-                if (prev && prev.startsWith('blob:')) {
-                    return prev; // Keep user-selected file preview
-                }
-                return imageUrl;
-            });
-        } else {
-            // If no image in publication and no user-selected file, clear preview
-            setCoverPreview(prev => {
-                if (prev && prev.startsWith('blob:')) {
-                    return prev; // Keep user-selected file preview
-                }
-                return null;
-            });
+    const handleFileChange = (event) => {
+        const file = event.target.files[0];
+        if (!file) {
+            return;
         }
-    }, [publication?.cover_image]);
 
-    const handleCoverImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setData('cover_image', file);
-            setCoverPreview(URL.createObjectURL(file));
-        }
+        setData('file', file);
+        setFileName(file.name);
     };
 
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setData('file', file);
-            setFileName(file.name);
-        }
-    };
+    const submit = (event) => {
+        event.preventDefault();
 
-    const submit = (e) => {
-        e.preventDefault();
         post(`/school/publications/${publication.id}`, {
             forceFormData: true,
             preserveScroll: true,
-            onSuccess: (page) => {
-                if (coverPreview && coverPreview.startsWith('blob:')) {
-                    URL.revokeObjectURL(coverPreview);
-                }
-                if (page?.props?.publication?.cover_image) {
-                    setCoverPreview(getImageUrl(page.props.publication.cover_image));
-                }
-            },
-            onError: (errors) => {
-            },
         });
     };
 
+    const pageTitle = t('schoolPublicationsPage.editPageTitle', {
+        appName: t('common.appName'),
+    });
+
     return (
-        <DashboardLayout
-            auth={auth}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">تعديل المقال</h2>}
-        >
-            <Head title="تعديل المقال - لوحة المدرسة" />
+        <DashboardLayout auth={auth} header={t('schoolPublicationsPage.editTitle')}>
+            <Head title={pageTitle} />
 
             <div className="py-6">
-                <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-4xl space-y-6 sm:px-6 lg:px-8">
                     <Link
                         href="/school/publications"
-                        className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
+                        className="inline-flex items-center gap-2 text-gray-600 transition hover:text-gray-900"
                     >
-                        <FaArrowLeft />
-                        <span>العودة إلى المقالات</span>
+                        <BackIcon />
+                        <span>{t('schoolPublicationsPage.backToList')}</span>
                     </Link>
 
-                    <form onSubmit={submit} className="bg-white shadow-sm rounded-lg p-6 space-y-6">
-                        {/* Type */}
+                    <form onSubmit={submit} className="space-y-6 rounded-lg bg-white p-6 shadow-sm">
                         <div>
-                            <InputLabel htmlFor="type" value="نوع الإصدار" />
+                            <InputLabel htmlFor="type" value={t('schoolPublicationsPage.form.typeLabel')} />
                             <select
                                 id="type"
                                 value={data.type}
-                                onChange={(e) => setData('type', e.target.value)}
+                                onChange={(event) => setData('type', event.target.value)}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                             >
-                                <option value="magazine">مجلة</option>
-                                <option value="article">مقال</option>
-                                <option value="study">دراسة</option>
-                                <option value="report">تقرير</option>
-                                <option value="news">اخبار</option>
-                                <option value="booklet">كتيب</option>
+                                {publicationTypeOptions.map((type) => (
+                                    <option key={type} value={type}>
+                                        {t(`schoolPublicationsPage.types.${type}`)}
+                                    </option>
+                                ))}
                             </select>
                             <InputError message={errors.type} className="mt-2" />
                         </div>
 
-                        {/* Category */}
                         <div>
-                            <InputLabel htmlFor="category" value="فئة المجلة" />
-                            <select
-                                id="category"
-                                value={data.category}
-                                onChange={(e) => setData('category', e.target.value)}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
-                            >
-                                <option value="">اختر الفئة</option>
-                                <option value="educational">تربوية</option>
-                                <option value="instructional">تعليمية</option>
-                                <option value="research">بحثية</option>
-                                <option value="guidance">إرشادية</option>
-                                <option value="project_based">متخصصة بالمشاريع</option>
-                                <option value="assessment">جلسات التقييم</option>
-                                <option value="academic_guidance">التوجيه الأكاديمي</option>
-                            </select>
-                            <InputError message={errors.category} className="mt-2" />
-                        </div>
-
-                        {/* Title */}
-                        <div>
-                            <InputLabel htmlFor="title" value="العنوان" />
+                            <InputLabel htmlFor="title" value={t('schoolPublicationsPage.form.titleLabel')} />
                             <TextInput
                                 id="title"
                                 type="text"
                                 value={data.title}
-                                onChange={(e) => setData('title', e.target.value)}
+                                onChange={(event) => setData('title', event.target.value)}
                                 className="mt-1 block w-full"
                                 required
                             />
                             <InputError message={errors.title} className="mt-2" />
                         </div>
 
-                        {/* Description */}
                         <div>
-                            <InputLabel htmlFor="description" value="الوصف" />
+                            <InputLabel htmlFor="description" value={t('schoolPublicationsPage.form.descriptionLabel')} />
                             <textarea
                                 id="description"
                                 value={data.description}
-                                onChange={(e) => setData('description', e.target.value)}
+                                onChange={(event) => setData('description', event.target.value)}
                                 rows={4}
+                                placeholder={t('schoolPublicationsPage.placeholders.description')}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                             />
                             <InputError message={errors.description} className="mt-2" />
                         </div>
 
-                        {/* Content */}
                         <div>
-                            <InputLabel htmlFor="content" value="المحتوى (HTML)" />
-                            <textarea
-                                id="content"
-                                value={data.content}
-                                onChange={(e) => setData('content', e.target.value)}
-                                rows={15}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042] font-mono text-sm"
-                                placeholder="يمكنك استخدام HTML هنا"
-                            />
+                            <InputLabel htmlFor="content" value={t('schoolPublicationsPage.form.contentLabel')} />
+                            <div className="mt-1">
+                                <TiptapEditor
+                                    content={data.content}
+                                    onChange={(html) => setData('content', html)}
+                                    placeholder={t('schoolPublicationsPage.placeholders.content')}
+                                />
+                            </div>
                             <InputError message={errors.content} className="mt-2" />
                         </div>
 
-                        {/* Cover Image */}
                         <div>
-                            <InputLabel htmlFor="cover_image" value="صورة الغلاف" />
+                            <InputLabel htmlFor="cover_image" value={t('schoolPublicationsPage.form.coverImageLabel')} />
                             <div className="mt-1">
                                 <input
                                     id="cover_image"
                                     type="file"
                                     accept="image/*"
                                     onChange={handleCoverImageChange}
-                                    className="block w-full text-sm text-gray-500 file:ms-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#A3C042]/10 file:text-[#A3C042] hover:file:bg-[#A3C042]/20"
+                                    className="block w-full text-sm text-gray-500 file:ms-4 file:rounded-md file:border-0 file:bg-[#A3C042]/10 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-[#A3C042] hover:file:bg-[#A3C042]/20"
                                 />
-                                {coverPreview ? (
+
+                                {coverPreview && !imageLoadError && (
                                     <div className="mt-4">
                                         <img
                                             src={coverPreview}
-                                            alt="Preview"
-                                            className="w-48 h-48 object-cover rounded-lg border border-gray-300"
-                                            onError={(e) => {
-                                                e.target.style.display = 'none';
-                                                const errorDiv = document.createElement('div');
-                                                errorDiv.className = 'mt-2 text-sm text-red-600';
-                                                errorDiv.textContent = 'فشل تحميل الصورة';
-                                                e.target.parentElement.appendChild(errorDiv);
-                                            }}
+                                            alt={t('schoolPublicationsPage.form.imagePreviewAlt')}
+                                            className="h-48 w-48 rounded-lg border border-gray-300 object-cover"
+                                            onError={() => setImageLoadError(true)}
                                         />
                                     </div>
-                                ) : publication?.cover_image ? (
-                                    <p className="mt-2 text-sm text-gray-500">جاري تحميل الصورة...</p>
-                                ) : null}
+                                )}
+
+                                {imageLoadError && (
+                                    <p className="mt-2 text-sm text-red-600">
+                                        {t('schoolPublicationsPage.form.imageLoadError')}
+                                    </p>
+                                )}
                             </div>
                             <InputError message={errors.cover_image} className="mt-2" />
                         </div>
 
-                        {/* File PDF */}
                         <div>
-                            <InputLabel htmlFor="file" value="ملف PDF (اختياري)" />
+                            <InputLabel htmlFor="file" value={t('schoolPublicationsPage.form.pdfLabel')} />
                             <div className="mt-1">
                                 <input
                                     id="file"
                                     type="file"
                                     accept=".pdf"
                                     onChange={handleFileChange}
-                                    className="block w-full text-sm text-gray-500 file:ms-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-legacy-blue/10 file:text-legacy-blue hover:file:bg-legacy-blue/20"
+                                    className="block w-full text-sm text-gray-500 file:ms-4 file:rounded-md file:border-0 file:bg-legacy-blue/10 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-legacy-blue hover:file:bg-legacy-blue/20"
                                 />
+
+                                {publication?.file && !fileName && (
+                                    <div className="mt-2 rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-600">
+                                        <p>{t('schoolPublicationsPage.currentFileAvailable')}</p>
+                                        <a
+                                            href={getPublicationFileUrl(publication.file) || '#'}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="mt-1 inline-flex font-medium text-legacy-blue hover:underline"
+                                        >
+                                            {t('schoolPublicationsPage.form.currentFileLabel')}: {t('common.download')}
+                                        </a>
+                                    </div>
+                                )}
+
                                 {fileName && (
                                     <p className="mt-2 text-sm text-gray-600">
-                                        {fileName}
+                                        {t('schoolPublicationsPage.selectedFile', { name: fileName })}
                                     </p>
                                 )}
                             </div>
                             <InputError message={errors.file} className="mt-2" />
                         </div>
 
-                        {/* Issue Number */}
                         <div>
-                            <InputLabel htmlFor="issue_number" value="رقم العدد (للمجلات)" />
+                            <InputLabel htmlFor="issue_number" value={t('schoolPublicationsPage.form.issueNumberLabel')} />
                             <TextInput
                                 id="issue_number"
                                 type="number"
                                 min="1"
                                 value={data.issue_number}
-                                onChange={(e) => setData('issue_number', e.target.value)}
+                                onChange={(event) => setData('issue_number', event.target.value)}
                                 className="mt-1 block w-full"
                             />
                             <InputError message={errors.issue_number} className="mt-2" />
                         </div>
 
-                        {/* Publish Date */}
                         <div>
-                            <InputLabel htmlFor="publish_date" value="تاريخ النشر" />
+                            <InputLabel htmlFor="publish_date" value={t('schoolPublicationsPage.form.publishDateLabel')} />
                             <TextInput
                                 id="publish_date"
                                 type="date"
                                 value={data.publish_date}
-                                onChange={(e) => setData('publish_date', e.target.value)}
+                                onChange={(event) => setData('publish_date', event.target.value)}
                                 className="mt-1 block w-full"
                             />
                             <InputError message={errors.publish_date} className="mt-2" />
                         </div>
 
-                        {/* Publisher Name */}
                         <div>
-                            <InputLabel htmlFor="publisher_name" value="اسم الناشر" />
+                            <InputLabel htmlFor="publisher_name" value={t('schoolPublicationsPage.form.publisherNameLabel')} />
                             <TextInput
                                 id="publisher_name"
                                 type="text"
                                 value={data.publisher_name}
-                                onChange={(e) => setData('publisher_name', e.target.value)}
+                                onChange={(event) => setData('publisher_name', event.target.value)}
+                                placeholder={t('schoolPublicationsPage.placeholders.publisherName')}
                                 className="mt-1 block w-full"
-                                placeholder="مثال: مجلس المؤسسات تعليمية المبتكرة"
                             />
                             <InputError message={errors.publisher_name} className="mt-2" />
                         </div>
 
-                        {/* Submit Button */}
-                        <div className="flex items-center justify-end gap-4 pt-4">
+                        <div className="flex items-center justify-end gap-4 border-t border-gray-200 pt-4">
                             <Link
                                 href="/school/publications"
-                                className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
+                                className="rounded-lg border border-gray-300 px-6 py-2 text-gray-700 transition hover:bg-gray-50"
                             >
-                                إلغاء
+                                {t('common.cancel')}
                             </Link>
-                            <PrimaryButton
-                                disabled={processing}
-                                className="bg-[#A3C042]"
-                            >
+                            <PrimaryButton disabled={processing} className="bg-[#A3C042]">
                                 {processing ? (
                                     <>
-                                        <FaSpinner className="animate-spin inline-block me-2" />
-                                        جاري الحفظ...
+                                        <FaSpinner className="me-2 inline-block animate-spin" />
+                                        {t('schoolPublicationsPage.buttons.saving')}
                                     </>
                                 ) : (
                                     <>
-                                        <FaUpload className="inline-block me-2" />
-                                        حفظ التغييرات
+                                        <FaUpload className="me-2 inline-block" />
+                                        {t('schoolPublicationsPage.buttons.save')}
                                     </>
                                 )}
                             </PrimaryButton>
@@ -314,4 +277,3 @@ export default function SchoolPublicationEdit({ auth, publication }) {
         </DashboardLayout>
     );
 }
-

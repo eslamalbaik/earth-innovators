@@ -1,160 +1,224 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
-import { Head, Link, router, useForm } from '@inertiajs/react';
-import { FaMedal, FaSearch, FaEye, FaClock, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { FaCheckCircle, FaClock, FaEye, FaMedal, FaSearch, FaTimesCircle } from 'react-icons/fa';
 import TextInput from '@/Components/TextInput';
 import SelectInput from '@/Components/SelectInput';
 import PrimaryButton from '@/Components/PrimaryButton';
+import { toHijriDate } from '@/utils/dateUtils';
+
+const getInitialQueryValue = (key) => {
+    if (typeof window === 'undefined') {
+        return '';
+    }
+
+    return new URLSearchParams(window.location.search).get(key) || '';
+};
 
 export default function SchoolBadges({ badges, auth }) {
+    const { t, language } = useTranslation();
     const { data, setData, get } = useForm({
-        search: '',
-        status: '',
+        search: getInitialQueryValue('search'),
+        status: getInitialQueryValue('status'),
+    });
+
+    const pageTitle = t('schoolBadgesPage.pageTitle', {
+        appName: t('common.appName'),
     });
 
     const statusLabels = {
-        pending: { label: 'قيد المراجعة', color: 'bg-yellow-100 text-yellow-700 border-yellow-300', icon: FaClock },
-        approved: { label: 'موافق', color: 'bg-green-100 text-green-700 border-green-300', icon: FaCheckCircle },
-        rejected: { label: 'مرفوض', color: 'bg-red-100 text-red-700 border-red-300', icon: FaTimesCircle },
+        pending: {
+            label: t('schoolBadgesPage.statuses.pending'),
+            color: 'bg-yellow-100 text-yellow-700 border-yellow-300',
+            icon: FaClock,
+        },
+        approved: {
+            label: t('schoolBadgesPage.statuses.approved'),
+            color: 'bg-green-100 text-green-700 border-green-300',
+            icon: FaCheckCircle,
+        },
+        rejected: {
+            label: t('schoolBadgesPage.statuses.rejected'),
+            color: 'bg-red-100 text-red-700 border-red-300',
+            icon: FaTimesCircle,
+        },
     };
 
-    const handleSearch = (e) => {
-        e.preventDefault();
+    const getBadgeName = (badge) => (
+        language === 'ar'
+            ? (badge.name_ar || badge.name)
+            : (badge.name || badge.name_ar)
+    );
+
+    const getBadgeDescription = (badge) => (
+        language === 'ar'
+            ? (badge.description_ar || badge.description)
+            : (badge.description || badge.description_ar)
+    );
+
+    const handleSearch = (event) => {
+        event.preventDefault();
+
         get('/school/badges', {
             preserveScroll: true,
             preserveState: true,
+            replace: true,
         });
     };
 
     return (
-        <DashboardLayout header="الشارات المرسلة">
-            <Head title="الشارات المرسلة - إرث المبتكرين" />
+        <DashboardLayout auth={auth} header={t('schoolBadgesPage.title')}>
+            <Head title={pageTitle} />
 
-            <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">الشارات المرسلة للمدرسة</h2>
+            <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <h2 className="text-2xl font-bold text-gray-900">
+                    {t('schoolBadgesPage.cardsTitle', {
+                        count: badges?.total || badges?.data?.length || 0,
+                    })}
+                </h2>
                 <Link
                     href="/school/badges/pending"
-                    className="bg-[#A3C042] text-white px-6 py-3 rounded-lg font-semibold transition duration-300 flex items-center gap-2 shadow-md hover:shadow-xl"
+                    className="inline-flex items-center gap-2 rounded-lg bg-[#A3C042] px-6 py-3 font-semibold text-white shadow-md transition duration-300 hover:shadow-xl"
                 >
                     <FaClock />
-                    الشارات المعلقة
+                    {t('schoolBadgesPage.pendingLink')}
                 </Link>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-                <form onSubmit={handleSearch} className="flex gap-4">
+            <div className="mb-6 rounded-xl bg-white p-6 shadow-lg">
+                <form onSubmit={handleSearch} className="flex flex-col gap-4 md:flex-row">
                     <div className="flex-1">
                         <TextInput
                             type="text"
-                            placeholder="ابحث عن الشارات..."
+                            placeholder={t('schoolBadgesPage.searchPlaceholder')}
                             value={data.search}
-                            onChange={(e) => setData('search', e.target.value)}
+                            onChange={(event) => setData('search', event.target.value)}
                             className="w-full"
                         />
                     </div>
-                    <div className="w-48">
+                    <div className="md:w-56">
                         <SelectInput
                             value={data.status}
-                            onChange={(e) => setData('status', e.target.value)}
+                            onChange={(event) => setData('status', event.target.value)}
                         >
-                            <option value="">جميع الحالات</option>
-                            <option value="pending">قيد المراجعة</option>
-                            <option value="approved">موافق</option>
-                            <option value="rejected">مرفوض</option>
+                            <option value="">{t('schoolBadgesPage.filters.allStatuses')}</option>
+                            <option value="pending">{t('schoolBadgesPage.statuses.pending')}</option>
+                            <option value="approved">{t('schoolBadgesPage.statuses.approved')}</option>
+                            <option value="rejected">{t('schoolBadgesPage.statuses.rejected')}</option>
                         </SelectInput>
                     </div>
                     <PrimaryButton type="submit">
                         <FaSearch className="inline me-2" />
-                        بحث
+                        {t('common.search')}
                     </PrimaryButton>
                 </form>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-[#A3C042]/10 to-legacy-blue/10">
-                    <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+            <div className="overflow-hidden rounded-xl bg-white shadow-lg">
+                <div className="border-b border-gray-200 bg-gradient-to-r from-[#A3C042]/10 to-legacy-blue/10 px-6 py-4">
+                    <h3 className="flex items-center gap-2 text-xl font-bold text-gray-900">
                         <FaMedal className="text-[#A3C042]" />
-                        الشارات ({badges.total || 0})
+                        {t('schoolBadgesPage.cardsTitle', {
+                            count: badges?.total || badges?.data?.length || 0,
+                        })}
                     </h3>
                 </div>
+
                 <div className="p-6">
-                    {badges.data && badges.data.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {badges?.data?.length > 0 ? (
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                             {badges.data.map((badge) => {
-                                const StatusIcon = statusLabels[badge.status]?.icon || FaClock;
+                                const status = statusLabels[badge.status] || statusLabels.pending;
+                                const StatusIcon = status.icon;
+                                const badgeName = getBadgeName(badge);
+                                const badgeDescription = getBadgeDescription(badge);
+
                                 return (
-                                    <div key={badge.id} className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition">
-                                        <div className="flex items-start justify-between mb-4">
+                                    <div key={badge.id} className="rounded-xl border border-gray-200 p-6 transition hover:shadow-lg">
+                                        <div className="mb-4 flex items-start justify-between gap-4">
                                             <div className="flex-1">
-                                                <div className="flex items-center gap-2 mb-2">
+                                                <div className="mb-2 flex items-center gap-2">
                                                     {badge.icon && (
                                                         <span className="text-2xl">{badge.icon}</span>
                                                     )}
-                                                    <h4 className="text-lg font-bold text-gray-900">{badge.name_ar || badge.name}</h4>
+                                                    <h4 className="text-lg font-bold text-gray-900">{badgeName}</h4>
                                                 </div>
-                                                {badge.description_ar && (
-                                                    <p className="text-sm text-gray-600 line-clamp-2">{badge.description_ar}</p>
+                                                {badgeDescription && (
+                                                    <p className="line-clamp-2 text-sm text-gray-600">{badgeDescription}</p>
                                                 )}
                                             </div>
                                             {badge.image && (
                                                 <img
                                                     src={badge.image.startsWith('http') ? badge.image : `/storage/${badge.image}`}
-                                                    alt={badge.name_ar || badge.name}
-                                                    className="w-16 h-16 rounded-lg object-cover"
+                                                    alt={badgeName}
+                                                    className="h-16 w-16 rounded-lg object-cover"
                                                 />
                                             )}
                                         </div>
 
-                                        <div className="flex items-center justify-between mb-4">
-                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold border flex items-center gap-1 ${statusLabels[badge.status]?.color || statusLabels.pending.color}`}>
+                                        <div className="mb-4 flex items-center justify-between gap-4">
+                                            <span className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold ${status.color}`}>
                                                 <StatusIcon className="text-xs" />
-                                                {statusLabels[badge.status]?.label || 'قيد المراجعة'}
+                                                {status.label}
                                             </span>
                                             <span className="text-sm text-gray-600">
-                                                {badge.points_required} نقطة
+                                                {t('schoolBadgesPage.pointsRequired', {
+                                                    count: badge.points_required || 0,
+                                                })}
                                             </span>
                                         </div>
 
-                                        <div className="text-sm text-gray-500 mb-4">
+                                        <div className="mb-4 space-y-2 text-sm text-gray-500">
                                             {badge.creator && (
-                                                <p><strong>المعلم:</strong> {badge.creator.name}</p>
+                                                <p>
+                                                    <strong>{t('schoolBadgesPage.labels.teacher')}:</strong>{' '}
+                                                    {badge.creator.name}
+                                                </p>
                                             )}
                                             {badge.approved_at && (
-                                                <p><strong>تاريخ الموافقة:</strong> {new Date(badge.approved_at).toLocaleDateString('en-US')}</p>
+                                                <p>
+                                                    <strong>{t('schoolBadgesPage.labels.approvalDate')}:</strong>{' '}
+                                                    {toHijriDate(badge.approved_at, false, language)}
+                                                </p>
                                             )}
                                             {badge.rejection_reason && (
-                                                <p className="text-red-600 mt-2"><strong>سبب الرفض:</strong> {badge.rejection_reason}</p>
+                                                <p className="text-red-600">
+                                                    <strong>{t('schoolBadgesPage.labels.rejectionReason')}:</strong>{' '}
+                                                    {badge.rejection_reason}
+                                                </p>
                                             )}
                                         </div>
 
                                         <Link
                                             href={`/school/badges/${badge.id}`}
-                                            className="block w-full text-center bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition"
+                                            className="block w-full rounded-lg bg-gray-100 px-4 py-2 text-center font-medium text-gray-700 transition hover:bg-gray-200"
                                         >
                                             <FaEye className="inline me-2" />
-                                            عرض التفاصيل
+                                            {t('schoolBadgesPage.actions.details')}
                                         </Link>
                                     </div>
                                 );
                             })}
                         </div>
                     ) : (
-                        <div className="text-center py-12">
-                            <FaMedal className="text-6xl text-gray-300 mx-auto mb-4" />
-                            <p className="text-gray-600 text-lg">لا توجد شارات</p>
+                        <div className="py-12 text-center">
+                            <FaMedal className="mx-auto mb-4 text-6xl text-gray-300" />
+                            <p className="text-lg text-gray-600">{t('schoolBadgesPage.empty')}</p>
                         </div>
                     )}
 
-                    {badges.links && badges.links.length > 3 && (
+                    {badges?.links?.length > 3 && (
                         <div className="mt-6 flex justify-center">
                             <div className="flex gap-2">
                                 {badges.links.map((link, index) => (
                                     <Link
                                         key={index}
                                         href={link.url || '#'}
-                                        className={`px-4 py-2 rounded-lg font-medium transition ${link.active
+                                        className={`rounded-lg px-4 py-2 font-medium transition ${
+                                            link.active
                                                 ? 'bg-[#A3C042] text-white'
                                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                            } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        } ${!link.url ? 'cursor-not-allowed opacity-50' : ''}`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
                                 ))}
@@ -166,4 +230,3 @@ export default function SchoolBadges({ badges, auth }) {
         </DashboardLayout>
     );
 }
-

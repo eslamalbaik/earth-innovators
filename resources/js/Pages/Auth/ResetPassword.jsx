@@ -46,8 +46,8 @@ export default function ResetPassword({ token, email, status }) {
 
 <div className="relative min-h-screen overflow-hidden bg-white shadow-lg sm:rounded-2xl px-4 py-10 w-[100vw] sm:w-[400px] md:w-[450px] max-w-5xl sm:mx-auto">
 <form onSubmit={submit} className="space-y-6">
-                            <img src="/images/avatar.svg" alt={t('common.avatar')} className="absolute -top-24 -start-24 w-48 h-48" />
-                            <img src="/images/avatar1.svg" alt={t('common.avatar')} className="absolute -bottom-8 end-0 w-28 h-28" />
+                            <img src="/images/avatar.svg" alt={t('common.avatar')} className="absolute -top-24 -left-24 w-48 h-48" />
+                            <img src="/images/avatar1.svg" alt={t('common.avatar')} className="absolute -bottom-8 right-0 w-28 h-28" />
                             <div className="flex flex-col items-center">
                                 <div>
                                     <img

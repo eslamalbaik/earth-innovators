@@ -1,4 +1,5 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
+import { useTranslation } from '@/i18n';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { FaClock, FaCheckCircle, FaTimesCircle, FaEye, FaSearch } from 'react-icons/fa';
 import TextInput from '@/Components/TextInput';
@@ -7,30 +8,46 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import { toHijriDate } from '@/utils/dateUtils';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 
+const getInitialQueryValue = (key) => {
+    if (typeof window === 'undefined') {
+        return '';
+    }
+
+    return new URLSearchParams(window.location.search).get(key) || '';
+};
+
+const categoryColors = {
+    science: 'bg-blue-100 text-blue-700 border-blue-300',
+    technology: 'bg-purple-100 text-purple-700 border-purple-300',
+    engineering: 'bg-orange-100 text-orange-700 border-orange-300',
+    mathematics: 'bg-green-100 text-green-700 border-green-300',
+    arts: 'bg-pink-100 text-pink-700 border-pink-300',
+    other: 'bg-gray-100 text-gray-700 border-gray-300',
+};
+
+const categoryKeys = ['science', 'technology', 'engineering', 'mathematics', 'arts', 'other'];
+
 export default function PendingProjects({ projects, auth }) {
+    const { t, language } = useTranslation();
     const { confirm } = useConfirmDialog();
     const { data, setData, get } = useForm({
-        search: '',
-        category: '',
+        search: getInitialQueryValue('search'),
+        category: getInitialQueryValue('category'),
     });
 
-    const categoryColors = {
-        science: 'bg-blue-100 text-blue-700 border-blue-300',
-        technology: 'bg-purple-100 text-purple-700 border-purple-300',
-        engineering: 'bg-orange-100 text-orange-700 border-orange-300',
-        mathematics: 'bg-green-100 text-green-700 border-green-300',
-        arts: 'bg-pink-100 text-pink-700 border-pink-300',
-        other: 'bg-gray-100 text-gray-700 border-gray-300',
-    };
+    const getCategoryLabel = (category) => t(`schoolPendingProjectsPage.categories.${category || 'other'}`);
 
-    const categoryLabels = {
-        science: 'علوم',
-        technology: 'تقني',
-        engineering: 'هندسة',
-        mathematics: 'رياضيات',
-        arts: 'فنون',
-        other: 'أخرى',
-    };
+    const getProjectTitle = (project) => (
+        language === 'ar'
+            ? (project.title_ar || project.title)
+            : (project.title || project.title_ar)
+    );
+
+    const getProjectDescription = (project) => (
+        language === 'ar'
+            ? (project.description_ar || project.description)
+            : (project.description || project.description_ar)
+    );
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -42,10 +59,10 @@ export default function PendingProjects({ projects, auth }) {
 
     const handleApprove = async (projectId, projectTitle) => {
         const confirmed = await confirm({
-            title: 'تأكيد القبول',
-            message: `هل أنت متأكد من قبول المشروع "${projectTitle}"؟`,
-            confirmText: 'قبول',
-            cancelText: 'إلغاء',
+            title: t('schoolPendingProjectsPage.approveConfirm.title'),
+            message: t('schoolPendingProjectsPage.approveConfirm.message', { title: projectTitle }),
+            confirmText: t('schoolPendingProjectsPage.approveConfirm.confirmText'),
+            cancelText: t('common.cancel'),
             variant: 'info',
         });
 
@@ -58,10 +75,10 @@ export default function PendingProjects({ projects, auth }) {
 
     const handleReject = async (projectId, projectTitle) => {
         const confirmed = await confirm({
-            title: 'تأكيد الرفض',
-            message: `هل أنت متأكد من رفض المشروع "${projectTitle}"؟`,
-            confirmText: 'رفض',
-            cancelText: 'إلغاء',
+            title: t('schoolPendingProjectsPage.rejectConfirm.title'),
+            message: t('schoolPendingProjectsPage.rejectConfirm.message', { title: projectTitle }),
+            confirmText: t('schoolPendingProjectsPage.rejectConfirm.confirmText'),
+            cancelText: t('common.cancel'),
             variant: 'warning',
         });
 
@@ -72,16 +89,20 @@ export default function PendingProjects({ projects, auth }) {
         }
     };
 
+    const pageTitle = t('schoolPendingProjectsPage.pageTitle', {
+        appName: t('common.appName'),
+    });
+
     return (
-        <DashboardLayout header="المشاريع المعلقة للمراجعة">
-            <Head title="المشاريع المعلقة - إرث المبتكرين" />
+        <DashboardLayout auth={auth} header={t('schoolPendingProjectsPage.title')}>
+            <Head title={pageTitle} />
 
             <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
                 <form onSubmit={handleSearch} className="flex gap-4">
                     <div className="flex-1">
                         <TextInput
                             type="text"
-                            placeholder="ابحث عن المشاريع..."
+                            placeholder={t('schoolPendingProjectsPage.searchPlaceholder')}
                             value={data.search}
                             onChange={(e) => setData('search', e.target.value)}
                             className="w-full"
@@ -92,18 +113,17 @@ export default function PendingProjects({ projects, auth }) {
                             value={data.category}
                             onChange={(e) => setData('category', e.target.value)}
                         >
-                            <option value="">جميع الفئات</option>
-                            <option value="science">علوم</option>
-                            <option value="technology">تقني</option>
-                            <option value="engineering">هندسة</option>
-                            <option value="mathematics">رياضيات</option>
-                            <option value="arts">فنون</option>
-                            <option value="other">أخرى</option>
+                            <option value="">{t('schoolPendingProjectsPage.filters.allCategories')}</option>
+                            {categoryKeys.map((category) => (
+                                <option key={category} value={category}>
+                                    {getCategoryLabel(category)}
+                                </option>
+                            ))}
                         </SelectInput>
                     </div>
                     <PrimaryButton type="submit">
                         <FaSearch className="inline me-2" />
-                        بحث
+                        {t('schoolPendingProjectsPage.actions.search')}
                     </PrimaryButton>
                 </form>
             </div>
@@ -112,75 +132,90 @@ export default function PendingProjects({ projects, auth }) {
                 <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-[#A3C042]/10 to-legacy-blue/10">
                     <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                         <FaClock className="text-[#A3C042]" />
-                        المشاريع المعلقة للمراجعة ({projects.total || 0})
+                        {t('schoolPendingProjectsPage.listTitle', { count: projects.total || 0 })}
                     </h3>
                 </div>
                 <div className="p-6">
                     {projects.data && projects.data.length > 0 ? (
                         <div className="space-y-4">
-                            {projects.data.map((project) => (
-                                <div key={project.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition">
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-3 mb-3">
-                                                <h4 className="text-xl font-bold text-gray-900">{project.title}</h4>
-                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${categoryColors[project.category] || categoryColors.other}`}>
-                                                    {categoryLabels[project.category] || 'أخرى'}
-                                                </span>
+                            {projects.data.map((project) => {
+                                const title = getProjectTitle(project);
+                                const description = getProjectDescription(project);
+
+                                return (
+                                    <div key={project.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition">
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-3 mb-3">
+                                                    <h4 className="text-xl font-bold text-gray-900">{title}</h4>
+                                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${categoryColors[project.category] || categoryColors.other}`}>
+                                                        {getCategoryLabel(project.category || 'other')}
+                                                    </span>
+                                                </div>
+                                                <p className="text-gray-700 mb-2 line-clamp-2">{description}</p>
+                                                <div className="flex items-center gap-4 text-sm text-gray-600">
+                                                    {project.school && (
+                                                        <>
+                                                            <span>
+                                                                <strong>{t('schoolPendingProjectsPage.details.school')}:</strong> {project.school.name}
+                                                            </span>
+                                                            <span>•</span>
+                                                        </>
+                                                    )}
+                                                    {project.teacher ? (
+                                                        <>
+                                                            <span>
+                                                                <strong>{t('schoolPendingProjectsPage.details.teacher')}:</strong>{' '}
+                                                                {project.teacher.name_ar || project.teacher.user?.name || t('schoolPendingProjectsPage.unknown')}
+                                                            </span>
+                                                            <span>•</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <span>
+                                                                <strong>{t('schoolPendingProjectsPage.details.student')}:</strong>{' '}
+                                                                {project.user?.name || project.student_name || t('schoolPendingProjectsPage.unknown')}
+                                                            </span>
+                                                            <span>•</span>
+                                                        </>
+                                                    )}
+                                                    <span>
+                                                        {t('schoolPendingProjectsPage.details.submissionDate')}: {toHijriDate(project.created_at, false, language)}
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <p className="text-gray-700 mb-2 line-clamp-2">{project.description}</p>
-                                            <div className="flex items-center gap-4 text-sm text-gray-600">
-                                                {project.school && (
-                                                    <>
-                                                        <span><strong>المدرسة:</strong> {project.school.name}</span>
-                                                        <span>•</span>
-                                                    </>
-                                                )}
-                                                {project.teacher ? (
-                                                    <>
-                                                        <span><strong>المعلم:</strong> {project.teacher.name_ar || project.teacher.user?.name || 'غير محدد'}</span>
-                                                        <span>•</span>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <span><strong>الطالب:</strong> {project.user?.name || project.student_name}</span>
-                                                        <span>•</span>
-                                                    </>
-                                                )}
-                                                <span>تاريخ الإرسال: {toHijriDate(project.created_at)}</span>
+                                            <div className="flex items-center gap-2 ms-6">
+                                                <Link
+                                                    href={`/school/projects/${project.id}`}
+                                                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center gap-2"
+                                                >
+                                                    <FaEye />
+                                                    {t('schoolPendingProjectsPage.actions.view')}
+                                                </Link>
+                                                <button
+                                                    onClick={() => handleApprove(project.id, title)}
+                                                    className="bg-[#A3C042] hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center gap-2 shadow-md"
+                                                >
+                                                    <FaCheckCircle />
+                                                    {t('schoolPendingProjectsPage.actions.approve')}
+                                                </button>
+                                                <button
+                                                    onClick={() => handleReject(project.id, title)}
+                                                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center gap-2 shadow-md"
+                                                >
+                                                    <FaTimesCircle />
+                                                    {t('schoolPendingProjectsPage.actions.reject')}
+                                                </button>
                                             </div>
-                                        </div>
-                                        <div className="flex items-center gap-2 ms-6">
-                                            <Link
-                                                href={`/school/projects/${project.id}`}
-                                                className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center gap-2"
-                                            >
-                                                <FaEye />
-                                                عرض
-                                            </Link>
-                                            <button
-                                                onClick={() => handleApprove(project.id, project.title)}
-                                                className="bg-[#A3C042] hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center gap-2 shadow-md"
-                                            >
-                                                <FaCheckCircle />
-                                                قبول
-                                            </button>
-                                            <button
-                                                onClick={() => handleReject(project.id, project.title)}
-                                                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center gap-2 shadow-md"
-                                            >
-                                                <FaTimesCircle />
-                                                رفض
-                                            </button>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     ) : (
                         <div className="text-center py-12">
                             <FaClock className="text-6xl text-gray-300 mx-auto mb-4" />
-                            <p className="text-gray-600 text-lg">لا توجد مشاريع معلقة للمراجعة</p>
+                            <p className="text-gray-600 text-lg">{t('schoolPendingProjectsPage.empty')}</p>
                         </div>
                     )}
 
@@ -192,8 +227,8 @@ export default function PendingProjects({ projects, auth }) {
                                         key={index}
                                         href={link.url || '#'}
                                         className={`px-4 py-2 rounded-lg font-medium transition ${link.active
-                                                ? 'bg-[#A3C042] text-white'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            ? 'bg-[#A3C042] text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                             } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
@@ -206,4 +241,3 @@ export default function PendingProjects({ projects, auth }) {
         </DashboardLayout>
     );
 }
-

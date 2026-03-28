@@ -1,34 +1,63 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
+import { useTranslation } from '@/i18n';
 import { Head, Link, router, useForm } from '@inertiajs/react';
-import { FaMedal, FaSearch, FaEye, FaCheckCircle, FaTimesCircle, FaClock } from 'react-icons/fa';
+import { FaCheckCircle, FaClock, FaEye, FaMedal, FaSearch, FaTimesCircle } from 'react-icons/fa';
 import TextInput from '@/Components/TextInput';
 import PrimaryButton from '@/Components/PrimaryButton';
 import { useState } from 'react';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
+import { toHijriDate } from '@/utils/dateUtils';
+
+const getInitialQueryValue = (key) => {
+    if (typeof window === 'undefined') {
+        return '';
+    }
+
+    return new URLSearchParams(window.location.search).get(key) || '';
+};
 
 export default function PendingBadges({ badges, auth }) {
+    const { t, language } = useTranslation();
     const { confirm } = useConfirmDialog();
     const { data, setData, get } = useForm({
-        search: '',
+        search: getInitialQueryValue('search'),
     });
 
     const [rejectReason, setRejectReason] = useState('');
     const [rejectingBadgeId, setRejectingBadgeId] = useState(null);
 
-    const handleSearch = (e) => {
-        e.preventDefault();
+    const pageTitle = t('schoolPendingBadgesPage.pageTitle', {
+        appName: t('common.appName'),
+    });
+
+    const getBadgeName = (badge) => (
+        language === 'ar'
+            ? (badge.name_ar || badge.name)
+            : (badge.name || badge.name_ar)
+    );
+
+    const getBadgeDescription = (badge) => (
+        language === 'ar'
+            ? (badge.description_ar || badge.description)
+            : (badge.description || badge.description_ar)
+    );
+
+    const handleSearch = (event) => {
+        event.preventDefault();
+
         get('/school/badges/pending', {
             preserveScroll: true,
             preserveState: true,
+            replace: true,
         });
     };
 
     const handleApprove = async (badgeId, badgeName) => {
         const confirmed = await confirm({
-            title: 'تأكيد القبول',
-            message: `هل أنت متأكد من قبول الشارة "${badgeName}"؟`,
-            confirmText: 'قبول',
-            cancelText: 'إلغاء',
+            title: t('schoolPendingBadgesPage.confirm.approveTitle'),
+            message: t('schoolPendingBadgesPage.confirm.approveMessage', { name: badgeName }),
+            confirmText: t('schoolPendingBadgesPage.confirm.approveButton'),
+            cancelText: t('common.cancel'),
             variant: 'info',
         });
 
@@ -41,15 +70,15 @@ export default function PendingBadges({ badges, auth }) {
 
     const handleReject = async (badgeId, badgeName) => {
         if (rejectReason.trim() === '') {
-            alert('يرجى إدخال سبب الرفض');
+            window.alert(t('schoolPendingBadgesPage.validation.rejectionReasonRequired'));
             return;
         }
 
         const confirmed = await confirm({
-            title: 'تأكيد الرفض',
-            message: `هل أنت متأكد من رفض الشارة "${badgeName}"؟`,
-            confirmText: 'رفض',
-            cancelText: 'إلغاء',
+            title: t('schoolPendingBadgesPage.confirm.rejectTitle'),
+            message: t('schoolPendingBadgesPage.confirm.rejectMessage', { name: badgeName }),
+            confirmText: t('schoolPendingBadgesPage.confirm.rejectButton'),
+            cancelText: t('common.cancel'),
             variant: 'warning',
         });
 
@@ -66,145 +95,183 @@ export default function PendingBadges({ badges, auth }) {
         }
     };
 
-    return (
-        <DashboardLayout header="الشارات المعلقة للمراجعة">
-            <Head title="الشارات المعلقة - إرث المبتكرين" />
+    const startRejecting = (badgeId) => {
+        setRejectReason('');
+        setRejectingBadgeId(badgeId);
+    };
 
-            <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-                <form onSubmit={handleSearch} className="flex gap-4">
+    const cancelRejecting = () => {
+        setRejectReason('');
+        setRejectingBadgeId(null);
+    };
+
+    return (
+        <DashboardLayout auth={auth} header={t('schoolPendingBadgesPage.title')}>
+            <Head title={pageTitle} />
+
+            <div className="mb-6 rounded-xl bg-white p-6 shadow-lg">
+                <form onSubmit={handleSearch} className="flex flex-col gap-4 md:flex-row">
                     <div className="flex-1">
                         <TextInput
                             type="text"
-                            placeholder="ابحث عن الشارات..."
+                            placeholder={t('schoolPendingBadgesPage.searchPlaceholder')}
                             value={data.search}
-                            onChange={(e) => setData('search', e.target.value)}
+                            onChange={(event) => setData('search', event.target.value)}
                             className="w-full"
                         />
                     </div>
                     <PrimaryButton type="submit">
                         <FaSearch className="inline me-2" />
-                        بحث
+                        {t('common.search')}
                     </PrimaryButton>
                 </form>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-[#A3C042]/10 to-legacy-blue/10">
-                    <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+            <div className="overflow-hidden rounded-xl bg-white shadow-lg">
+                <div className="border-b border-gray-200 bg-gradient-to-r from-[#A3C042]/10 to-legacy-blue/10 px-6 py-4">
+                    <h3 className="flex items-center gap-2 text-xl font-bold text-gray-900">
                         <FaClock className="text-[#A3C042]" />
-                        الشارات المعلقة للمراجعة ({badges.total || 0})
+                        {t('schoolPendingBadgesPage.cardsTitle', {
+                            count: badges?.total || badges?.data?.length || 0,
+                        })}
                     </h3>
                 </div>
+
                 <div className="p-6">
-                    {badges.data && badges.data.length > 0 ? (
+                    {badges?.data?.length > 0 ? (
                         <div className="space-y-4">
-                            {badges.data.map((badge) => (
-                                <div key={badge.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition">
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-3 mb-3">
-                                                {badge.image && (
-                                                    <img
-                                                        src={badge.image.startsWith('http') ? badge.image : `/storage/${badge.image}`}
-                                                        alt={badge.name_ar || badge.name}
-                                                        className="w-16 h-16 rounded-lg object-cover"
-                                                    />
-                                                )}
-                                                <div>
-                                                    <h4 className="text-xl font-bold text-gray-900">{badge.name_ar || badge.name}</h4>
-                                                    <p className="text-sm text-gray-600">{badge.description_ar || badge.description}</p>
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                                                {badge.creator && (
-                                                    <>
-                                                        <span><strong>المعلم:</strong> {badge.creator.name}</span>
-                                                        <span>•</span>
-                                                    </>
-                                                )}
-                                                <span>النقاط المطلوبة: {badge.points_required}</span>
-                                                <span>•</span>
-                                                <span>تاريخ الإرسال: {new Date(badge.created_at).toLocaleDateString('en-US')}</span>
-                                            </div>
-                                            <div className="text-sm">
-                                                <p><strong>النوع:</strong> {badge.type}</p>
-                                                {badge.icon && <p><strong>الأيقونة:</strong> {badge.icon}</p>}
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-col items-center gap-2 ms-6">
-                                            <Link
-                                                href={`/school/badges/${badge.id}`}
-                                                className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center gap-2"
-                                            >
-                                                <FaEye />
-                                                عرض
-                                            </Link>
-                                            <button
-                                                onClick={() => handleApprove(badge.id, badge.name_ar || badge.name)}
-                                                className="bg-[#A3C042] hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center gap-2 shadow-md"
-                                            >
-                                                <FaCheckCircle />
-                                                قبول
-                                            </button>
-                                            {rejectingBadgeId === badge.id ? (
-                                                <div className="flex flex-col gap-2 w-64">
-                                                    <textarea
-                                                        value={rejectReason}
-                                                        onChange={(e) => setRejectReason(e.target.value)}
-                                                        placeholder="سبب الرفض..."
-                                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-                                                        rows="3"
-                                                    />
-                                                    <div className="flex gap-2">
-                                                        <button
-                                                            onClick={() => handleReject(badge.id, badge.name_ar || badge.name)}
-                                                            className="flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm font-medium transition"
-                                                        >
-                                                            تأكيد الرفض
-                                                        </button>
-                                                        <button
-                                                            onClick={() => {
-                                                                setRejectingBadgeId(null);
-                                                                setRejectReason('');
-                                                            }}
-                                                            className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded-lg text-sm font-medium transition"
-                                                        >
-                                                            إلغاء
-                                                        </button>
+                            {badges.data.map((badge) => {
+                                const badgeName = getBadgeName(badge);
+                                const badgeDescription = getBadgeDescription(badge);
+
+                                return (
+                                    <div key={badge.id} className="rounded-lg border border-gray-200 p-6 transition hover:shadow-md">
+                                        <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
+                                            <div className="flex-1">
+                                                <div className="mb-3 flex items-center gap-3">
+                                                    {badge.image && (
+                                                        <img
+                                                            src={badge.image.startsWith('http') ? badge.image : `/storage/${badge.image}`}
+                                                            alt={badgeName}
+                                                            className="h-16 w-16 rounded-lg object-cover"
+                                                        />
+                                                    )}
+                                                    <div>
+                                                        <h4 className="text-xl font-bold text-gray-900">{badgeName}</h4>
+                                                        {badgeDescription && (
+                                                            <p className="text-sm text-gray-600">{badgeDescription}</p>
+                                                        )}
                                                     </div>
                                                 </div>
-                                            ) : (
-                                                <button
-                                                    onClick={() => setRejectingBadgeId(badge.id)}
-                                                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center gap-2 shadow-md"
+
+                                                <div className="mb-3 flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                                                    {badge.creator && (
+                                                        <span>
+                                                            <strong>{t('schoolPendingBadgesPage.labels.teacher')}:</strong>{' '}
+                                                            {badge.creator.name}
+                                                        </span>
+                                                    )}
+                                                    <span>
+                                                        <strong>{t('schoolPendingBadgesPage.labels.pointsRequired')}:</strong>{' '}
+                                                        {badge.points_required}
+                                                    </span>
+                                                    <span>
+                                                        <strong>{t('schoolPendingBadgesPage.labels.submittedAt')}:</strong>{' '}
+                                                        {toHijriDate(badge.created_at, false, language)}
+                                                    </span>
+                                                </div>
+
+                                                <div className="space-y-1 text-sm text-gray-600">
+                                                    <p>
+                                                        <strong>{t('schoolPendingBadgesPage.labels.type')}:</strong> {badge.type}
+                                                    </p>
+                                                    {badge.icon && (
+                                                        <p>
+                                                            <strong>{t('schoolPendingBadgesPage.labels.icon')}:</strong> {badge.icon}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <div className="flex w-full flex-col gap-2 xl:ms-6 xl:w-72">
+                                                <Link
+                                                    href={`/school/badges/${badge.id}`}
+                                                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-100 px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-200"
                                                 >
-                                                    <FaTimesCircle />
-                                                    رفض
+                                                    <FaEye />
+                                                    {t('schoolPendingBadgesPage.actions.view')}
+                                                </Link>
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleApprove(badge.id, badgeName)}
+                                                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#A3C042] px-4 py-2 font-medium text-white shadow-md transition duration-300 hover:bg-primary-600"
+                                                >
+                                                    <FaCheckCircle />
+                                                    {t('schoolPendingBadgesPage.actions.approve')}
                                                 </button>
-                                            )}
+
+                                                {rejectingBadgeId === badge.id ? (
+                                                    <div className="space-y-2">
+                                                        <textarea
+                                                            value={rejectReason}
+                                                            onChange={(event) => setRejectReason(event.target.value)}
+                                                            placeholder={t('schoolPendingBadgesPage.rejectionReasonPlaceholder')}
+                                                            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                                                            rows="3"
+                                                        />
+                                                        <div className="flex gap-2">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleReject(badge.id, badgeName)}
+                                                                className="flex-1 rounded-lg bg-red-500 px-3 py-2 text-sm font-medium text-white transition hover:bg-red-600"
+                                                            >
+                                                                {t('schoolPendingBadgesPage.actions.confirmReject')}
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                onClick={cancelRejecting}
+                                                                className="flex-1 rounded-lg bg-gray-200 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-300"
+                                                            >
+                                                                {t('schoolPendingBadgesPage.actions.cancel')}
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => startRejecting(badge.id)}
+                                                        className="inline-flex items-center justify-center gap-2 rounded-lg bg-red-500 px-4 py-2 font-medium text-white shadow-md transition duration-300 hover:bg-red-600"
+                                                    >
+                                                        <FaTimesCircle />
+                                                        {t('schoolPendingBadgesPage.actions.reject')}
+                                                    </button>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     ) : (
-                        <div className="text-center py-12">
-                            <FaMedal className="text-6xl text-gray-300 mx-auto mb-4" />
-                            <p className="text-gray-600 text-lg">لا توجد شارات معلقة للمراجعة</p>
+                        <div className="py-12 text-center">
+                            <FaMedal className="mx-auto mb-4 text-6xl text-gray-300" />
+                            <p className="text-lg text-gray-600">{t('schoolPendingBadgesPage.empty')}</p>
                         </div>
                     )}
 
-                    {badges.links && badges.links.length > 3 && (
+                    {badges?.links?.length > 3 && (
                         <div className="mt-6 flex justify-center">
                             <div className="flex gap-2">
                                 {badges.links.map((link, index) => (
                                     <Link
                                         key={index}
                                         href={link.url || '#'}
-                                        className={`px-4 py-2 rounded-lg font-medium transition ${link.active
-                                            ? 'bg-[#A3C042] text-white'
-                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                            } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        className={`rounded-lg px-4 py-2 font-medium transition ${
+                                            link.active
+                                                ? 'bg-[#A3C042] text-white'
+                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        } ${!link.url ? 'cursor-not-allowed opacity-50' : ''}`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
                                 ))}
@@ -216,4 +283,3 @@ export default function PendingBadges({ badges, auth }) {
         </DashboardLayout>
     );
 }
-

@@ -378,33 +378,33 @@ class ChallengeController extends Controller
     {
         return [
             [
-                'text' => 'التسجيل في الموقع',
+                'key' => 'register',
                 'icon' => 'required',
-                'tag' => 'إلزامي',
+                'tag' => 'mandatory',
                 'tagColor' => 'bg-red-100 text-red-700 border-red-300',
             ],
             [
-                'text' => 'إكمال الملف الشخصي',
+                'key' => 'completeProfile',
                 'icon' => 'required',
-                'tag' => 'إلزامي',
+                'tag' => 'mandatory',
                 'tagColor' => 'bg-red-100 text-red-700 border-red-300',
             ],
             [
-                'text' => 'الانتماء لمدرسة مسجلة',
+                'key' => 'registeredSchoolAffiliation',
                 'icon' => 'preferred',
-                'tag' => 'مفضل',
+                'tag' => 'preferred',
                 'tagColor' => 'bg-blue-100 text-blue-700 border-blue-300',
             ],
             [
-                'text' => 'المشاركة السابقة في التحديات',
+                'key' => 'previousParticipation',
                 'icon' => 'preferred',
-                'tag' => 'مفضل',
+                'tag' => 'preferred',
                 'tagColor' => 'bg-blue-100 text-blue-700 border-blue-300',
             ],
             [
-                'text' => 'الالتزام بالمواعيد النهائية',
+                'key' => 'commitDeadlines',
                 'icon' => 'required',
-                'tag' => 'إلزامي',
+                'tag' => 'mandatory',
                 'tagColor' => 'bg-red-100 text-red-700 border-red-300',
             ],
         ];

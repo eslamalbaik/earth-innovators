@@ -1,21 +1,43 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
+import { useTranslation } from '@/i18n';
 import { Head, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
-import { FaCreditCard, FaToggleOn, FaToggleOff, FaSave, FaSpinner, FaCheckCircle, FaTimesCircle, FaEdit, FaPlug } from 'react-icons/fa';
+import { FaCreditCard, FaToggleOn, FaToggleOff, FaSave, FaSpinner, FaEdit, FaPlug } from 'react-icons/fa';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 
 export default function AdminPaymentGatewaysIndex({ gateways }) {
+    const { t, language } = useTranslation();
     const { confirm } = useConfirmDialog();
     const [editingGateway, setEditingGateway] = useState(null);
     const [testingGateway, setTestingGateway] = useState(null);
 
+    const getGatewayDisplayName = (gateway) => (
+        language === 'ar'
+            ? (gateway.display_name_ar || gateway.display_name)
+            : (gateway.display_name || gateway.display_name_ar)
+    );
+
+    const getGatewayDescription = (gateway) => (
+        language === 'ar'
+            ? (gateway.description_ar || gateway.description)
+            : (gateway.description || gateway.description_ar)
+    );
+
     const handleToggleStatus = async (gateway) => {
+        const isEnabled = gateway.is_enabled;
         const confirmed = await confirm({
-            title: gateway.is_enabled ? 'إلغاء تفعيل بوابة الدفع' : 'تفعيل بوابة الدفع',
-            message: `هل أنت متأكد من ${gateway.is_enabled ? 'إلغاء تفعيل' : 'تفعيل'} بوابة الدفع "${gateway.display_name_ar}"؟`,
-            confirmText: gateway.is_enabled ? 'إلغاء التفعيل' : 'تفعيل',
-            cancelText: 'إلغاء',
-            variant: gateway.is_enabled ? 'warning' : 'success',
+            title: isEnabled
+                ? t('adminPaymentGatewaysPage.confirm.disableTitle')
+                : t('adminPaymentGatewaysPage.confirm.enableTitle'),
+            message: t('adminPaymentGatewaysPage.confirm.message', {
+                action: t(`adminPaymentGatewaysPage.confirm.${isEnabled ? 'disableAction' : 'enableAction'}`),
+                name: getGatewayDisplayName(gateway),
+            }),
+            confirmText: isEnabled
+                ? t('adminPaymentGatewaysPage.actions.deactivate')
+                : t('adminPaymentGatewaysPage.actions.activate'),
+            cancelText: t('common.cancel'),
+            variant: isEnabled ? 'warning' : 'success',
         });
 
         if (confirmed) {
@@ -27,6 +49,7 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
 
     const handleTestConnection = async (gateway) => {
         setTestingGateway(gateway.id);
+
         try {
             const response = await fetch(route('admin.payment-gateways.test-connection', gateway.id), {
                 method: 'POST',
@@ -38,12 +61,12 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
             const data = await response.json();
 
             if (data.success) {
-                alert('✓ ' + data.message);
+                window.alert(`${t('common.success')}: ${data.message}`);
             } else {
-                alert('✗ ' + data.message);
+                window.alert(`${t('common.error')}: ${data.message}`);
             }
         } catch (error) {
-            alert('حدث خطأ أثناء اختبار الاتصال');
+            window.alert(t('adminPaymentGatewaysPage.connection.failed'));
         } finally {
             setTestingGateway(null);
         }
@@ -85,7 +108,7 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            الاسم المعروض (إنجليزي) <span className="text-red-500">*</span>
+                            {t('adminPaymentGatewaysPage.form.displayNameEnLabel')} <span className="text-red-500">*</span>
                         </label>
                         <input
                             type="text"
@@ -102,7 +125,7 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            الاسم المعروض (عربي) <span className="text-red-500">*</span>
+                            {t('adminPaymentGatewaysPage.form.displayNameArLabel')} <span className="text-red-500">*</span>
                         </label>
                         <input
                             type="text"
@@ -119,7 +142,7 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            API Key
+                            {t('adminPaymentGatewaysPage.form.apiKeyLabel')}
                         </label>
                         <input
                             type="password"
@@ -127,7 +150,7 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                             onChange={(e) => setData('api_key', e.target.value)}
                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.api_key ? 'border-red-500' : 'border-gray-300'
                                 }`}
-                            placeholder="أدخل API Key"
+                            placeholder={t('adminPaymentGatewaysPage.form.apiKeyPlaceholder')}
                         />
                         {errors.api_key && (
                             <p className="mt-1 text-sm text-red-600">{errors.api_key}</p>
@@ -136,7 +159,7 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            API Secret
+                            {t('adminPaymentGatewaysPage.form.apiSecretLabel')}
                         </label>
                         <input
                             type="password"
@@ -144,7 +167,7 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                             onChange={(e) => setData('api_secret', e.target.value)}
                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.api_secret ? 'border-red-500' : 'border-gray-300'
                                 }`}
-                            placeholder="أدخل API Secret"
+                            placeholder={t('adminPaymentGatewaysPage.form.apiSecretPlaceholder')}
                         />
                         {errors.api_secret && (
                             <p className="mt-1 text-sm text-red-600">{errors.api_secret}</p>
@@ -153,7 +176,7 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Public Key
+                            {t('adminPaymentGatewaysPage.form.publicKeyLabel')}
                         </label>
                         <input
                             type="password"
@@ -161,7 +184,7 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                             onChange={(e) => setData('public_key', e.target.value)}
                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.public_key ? 'border-red-500' : 'border-gray-300'
                                 }`}
-                            placeholder="أدخل Public Key"
+                            placeholder={t('adminPaymentGatewaysPage.form.publicKeyPlaceholder')}
                         />
                         {errors.public_key && (
                             <p className="mt-1 text-sm text-red-600">{errors.public_key}</p>
@@ -170,7 +193,7 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Webhook Secret
+                            {t('adminPaymentGatewaysPage.form.webhookSecretLabel')}
                         </label>
                         <input
                             type="password"
@@ -178,7 +201,7 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                             onChange={(e) => setData('webhook_secret', e.target.value)}
                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.webhook_secret ? 'border-red-500' : 'border-gray-300'
                                 }`}
-                            placeholder="أدخل Webhook Secret"
+                            placeholder={t('adminPaymentGatewaysPage.form.webhookSecretPlaceholder')}
                         />
                         {errors.webhook_secret && (
                             <p className="mt-1 text-sm text-red-600">{errors.webhook_secret}</p>
@@ -187,7 +210,7 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Base URL
+                            {t('adminPaymentGatewaysPage.form.baseUrlLabel')}
                         </label>
                         <input
                             type="url"
@@ -204,12 +227,12 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            ترتيب العرض
+                            {t('adminPaymentGatewaysPage.form.sortOrderLabel')}
                         </label>
                         <input
                             type="number"
                             value={data.sort_order}
-                            onChange={(e) => setData('sort_order', parseInt(e.target.value))}
+                            onChange={(e) => setData('sort_order', Number.parseInt(e.target.value, 10) || 0)}
                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.sort_order ? 'border-red-500' : 'border-gray-300'
                                 }`}
                             min="0"
@@ -221,7 +244,7 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            الوصف (إنجليزي)
+                            {t('adminPaymentGatewaysPage.form.descriptionEnLabel')}
                         </label>
                         <textarea
                             value={data.description}
@@ -234,7 +257,7 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            الوصف (عربي)
+                            {t('adminPaymentGatewaysPage.form.descriptionArLabel')}
                         </label>
                         <textarea
                             value={data.description_ar}
@@ -256,7 +279,7 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                         />
                         <label htmlFor={`enabled_${gateway.id}`} className="ms-2 block text-sm text-gray-900">
-                            مفعّل
+                            {t('adminPaymentGatewaysPage.form.enabledLabel')}
                         </label>
                     </div>
                     <div className="flex items-center">
@@ -268,7 +291,7 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                         />
                         <label htmlFor={`test_mode_${gateway.id}`} className="ms-2 block text-sm text-gray-900">
-                            وضع الاختبار
+                            {t('adminPaymentGatewaysPage.form.testModeLabel')}
                         </label>
                     </div>
                 </div>
@@ -279,7 +302,7 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                         onClick={cancel}
                         className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
                     >
-                        إلغاء
+                        {t('common.cancel')}
                     </button>
                     <button
                         type="submit"
@@ -289,12 +312,12 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                         {processing ? (
                             <>
                                 <FaSpinner className="animate-spin" />
-                                جاري الحفظ...
+                                {t('common.saving')}
                             </>
                         ) : (
                             <>
                                 <FaSave />
-                                حفظ
+                                {t('common.save')}
                             </>
                         )}
                     </button>
@@ -303,16 +326,22 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
         );
     };
 
+    const pageTitle = t('adminPaymentGatewaysPage.pageTitle', {
+        appName: t('common.appName'),
+    });
+
     return (
-        <DashboardLayout header="إعدادات بوابات الدفع">
-            <Head title="إعدادات بوابات الدفع" />
+        <DashboardLayout header={t('adminPaymentGatewaysPage.title')}>
+            <Head title={pageTitle} />
 
             <div className="space-y-6">
                 <div className="bg-white rounded-xl shadow-lg p-6">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-bold text-gray-900">بوابات الدفع المتاحة</h2>
+                        <h2 className="text-2xl font-bold text-gray-900">
+                            {t('adminPaymentGatewaysPage.availableGateways')}
+                        </h2>
                         <div className="text-sm text-gray-600">
-                            إجمالي البوابات: {gateways.length}
+                            {t('adminPaymentGatewaysPage.totalGateways', { count: gateways.length })}
                         </div>
                     </div>
 
@@ -335,55 +364,62 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                                                 </div>
                                                 <div>
                                                     <h3 className="text-xl font-bold text-gray-900">
-                                                        {gateway.display_name_ar} ({gateway.display_name})
+                                                        {getGatewayDisplayName(gateway)}
                                                     </h3>
                                                     <p className="text-sm text-gray-600 mt-1">
-                                                        {gateway.description_ar || gateway.description}
+                                                        {getGatewayDescription(gateway)}
                                                     </p>
                                                     <div className="flex items-center gap-4 mt-2">
                                                         <span className={`px-2 py-1 rounded-full text-xs font-semibold ${gateway.is_enabled
-                                                                ? 'bg-green-100 text-green-800'
-                                                                : 'bg-gray-100 text-gray-800'
+                                                            ? 'bg-green-100 text-green-800'
+                                                            : 'bg-gray-100 text-gray-800'
                                                             }`}>
-                                                            {gateway.is_enabled ? 'مفعّل' : 'غير مفعّل'}
+                                                            {gateway.is_enabled
+                                                                ? t('adminPaymentGatewaysPage.badges.enabled')
+                                                                : t('adminPaymentGatewaysPage.badges.disabled')}
                                                         </span>
                                                         <span className={`px-2 py-1 rounded-full text-xs font-semibold ${gateway.is_test_mode
-                                                                ? 'bg-yellow-100 text-yellow-800'
-                                                                : 'bg-blue-100 text-blue-800'
+                                                            ? 'bg-yellow-100 text-yellow-800'
+                                                            : 'bg-blue-100 text-blue-800'
                                                             }`}>
-                                                            {gateway.is_test_mode ? 'وضع الاختبار' : 'وضع الإنتاج'}
+                                                            {gateway.is_test_mode
+                                                                ? t('adminPaymentGatewaysPage.badges.testMode')
+                                                                : t('adminPaymentGatewaysPage.badges.liveMode')}
                                                         </span>
                                                     </div>
                                                 </div>
                                             </div>
+
                                             <div className="flex items-center gap-2">
                                                 <button
                                                     onClick={() => handleTestConnection(gateway)}
                                                     disabled={testingGateway === gateway.id}
                                                     className="px-4 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50"
-                                                    title="اختبار الاتصال"
+                                                    title={t('adminPaymentGatewaysPage.actions.test')}
                                                 >
                                                     {testingGateway === gateway.id ? (
                                                         <FaSpinner className="animate-spin" />
                                                     ) : (
                                                         <FaPlug />
                                                     )}
-                                                    اختبار
+                                                    {t('adminPaymentGatewaysPage.actions.test')}
                                                 </button>
                                                 <button
                                                     onClick={() => setEditingGateway(gateway.id)}
                                                     className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
-                                                    title="تعديل"
+                                                    title={t('adminPaymentGatewaysPage.actions.edit')}
                                                 >
                                                     <FaEdit />
                                                 </button>
                                                 <button
                                                     onClick={() => handleToggleStatus(gateway)}
                                                     className={`p-2 rounded-lg ${gateway.is_enabled
-                                                            ? 'text-yellow-600 hover:bg-yellow-50'
-                                                            : 'text-green-600 hover:bg-green-50'
+                                                        ? 'text-yellow-600 hover:bg-yellow-50'
+                                                        : 'text-green-600 hover:bg-green-50'
                                                         }`}
-                                                    title={gateway.is_enabled ? 'إلغاء التفعيل' : 'تفعيل'}
+                                                    title={gateway.is_enabled
+                                                        ? t('adminPaymentGatewaysPage.actions.deactivate')
+                                                        : t('adminPaymentGatewaysPage.actions.activate')}
                                                 >
                                                     {gateway.is_enabled ? <FaToggleOn className="text-2xl" /> : <FaToggleOff className="text-2xl" />}
                                                 </button>
@@ -393,11 +429,13 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                                         {gateway.api_key && (
                                             <div className="mt-4 p-3 bg-gray-50 rounded-lg">
                                                 <p className="text-sm text-gray-600">
-                                                    <strong>API Key:</strong> {gateway.api_key.substring(0, 10)}...
+                                                    <strong>{t('adminPaymentGatewaysPage.details.apiKey')}:</strong>{' '}
+                                                    {gateway.api_key.substring(0, 10)}...
                                                 </p>
                                                 {gateway.base_url && (
                                                     <p className="text-sm text-gray-600 mt-1">
-                                                        <strong>Base URL:</strong> {gateway.base_url}
+                                                        <strong>{t('adminPaymentGatewaysPage.details.baseUrl')}:</strong>{' '}
+                                                        {gateway.base_url}
                                                     </p>
                                                 )}
                                             </div>
@@ -411,7 +449,7 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                     {gateways.length === 0 && (
                         <div className="text-center py-12">
                             <FaCreditCard className="text-6xl text-gray-300 mx-auto mb-4" />
-                            <p className="text-gray-600">لا توجد بوابات دفع متاحة</p>
+                            <p className="text-gray-600">{t('adminPaymentGatewaysPage.empty')}</p>
                         </div>
                     )}
                 </div>
@@ -419,4 +457,3 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
         </DashboardLayout>
     );
 }
-

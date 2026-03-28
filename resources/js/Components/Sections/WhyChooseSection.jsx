@@ -1,36 +1,41 @@
 import { FaCheck, FaRocket } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function WhyChooseSection({
-    title = "لماذا منصة إرث المبتكرين؟",
-    subtitle = "منصة تعليمية شاملة تهدف إلى بناء مجتمع من المبتكرين والموهوبين في المؤسسات تعليمية. نوفر بيئة محفزة للإبداع والابتكار.",
+    title,
+    subtitle,
     benefits = [],
-    imageSrc = "/images/erth-img.jpg",
-    imageAlt = "منصة إرث المبتكرين",
-    compact = false
+    imageSrc = '/images/erth-img.jpg',
+    imageAlt = 'Innovators Legacy',
+    compact = false,
 }) {
+    const { t } = useTranslation();
+    const resolvedTitle = title ?? t('sections.whyChoose');
+    const resolvedSubtitle = subtitle ?? t('sections.whyChooseSubtitle');
+
     return (
         <div className="space-y-4 md:space-y-6">
-            <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-xl flex items-center justify-center">
-                    <FaRocket className="text-[#A3C042] text-xl" />
+            <div className="mb-4 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20">
+                    <FaRocket className="text-xl text-[#A3C042]" />
                 </div>
-                <h2 className="text-xl md:text-2xl font-bold text-gray-900">{title}</h2>
+                <h2 className="text-xl font-bold text-gray-900 md:text-2xl">{resolvedTitle}</h2>
             </div>
 
-            <p className="text-sm md:text-base text-gray-700 leading-relaxed mb-6">
-                {subtitle}
+            <p className="mb-6 text-sm leading-relaxed text-gray-700 md:text-base">
+                {resolvedSubtitle}
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
                 {benefits.map((benefit, index) => (
-                    <div key={index} className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6 shadow-sm hover:shadow-md transition">
+                    <div key={index} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition hover:shadow-md md:p-6">
                         <div className="flex items-start gap-3">
-                            <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-xl flex items-center justify-center mt-1">
-                                <FaCheck className="text-[#A3C042] text-sm" />
+                            <div className="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20">
+                                <FaCheck className="text-sm text-[#A3C042]" />
                             </div>
                             <div className="flex-1">
-                                <h3 className="text-base md:text-lg font-bold text-gray-900 mb-2">{benefit.title}</h3>
-                                <p className="text-sm md:text-base text-gray-700 leading-relaxed">
+                                <h3 className="mb-2 text-base font-bold text-gray-900 md:text-lg">{benefit.title}</h3>
+                                <p className="text-sm leading-relaxed text-gray-700 md:text-base">
                                     {benefit.description}
                                 </p>
                             </div>
