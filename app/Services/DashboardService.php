@@ -199,7 +199,9 @@ class DashboardService extends BaseService
                         'rating' => $submission ? ($submission->rating ?? $project->rating) : $project->rating,
                         'likes' => $project->likes ?? 0,
                         'views' => $project->views ?? 0,
-                        'created_at' => $submission ? $submission->submitted_at->format('Y-m-d') : $project->created_at->format('Y-m-d'),
+                        'created_at' => ($submission && $submission->submitted_at)
+                            ? $submission->submitted_at->format('Y-m-d')
+                            : $project->created_at->format('Y-m-d'),
                         'is_submission' => !$isOwned && $submission !== null,
                         'image_url' => $imageUrl,
                     ];

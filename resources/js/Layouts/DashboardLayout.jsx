@@ -525,10 +525,10 @@ export default function DashboardLayout({ children, header }) {
             { name: t('sidebar.profile'), href: '/profile', icon: FaUser },
         ],
         student: [
-            { name: t('sidebar.dashboard'), href: '/student/dashboard', icon: FaTachometerAlt },
+            { name: t('sidebar.dashboard'), href: '/dashboard', icon: FaTachometerAlt },
             { name: t('sidebar.myProjects'), href: '/student/projects', icon: FaBook },
             { name: t('sidebar.challenges'), href: '/student/challenges', icon: FaCalendar },
-            { name: t('sidebar.badges'), href: '/student/badges', icon: FaCommentDots },
+            { name: t('sidebar.badges'), href: '/badges', icon: FaCommentDots },
             { name: t('sidebar.points'), href: '/student/points', icon: FaChartLine },
             { name: t('sidebar.packages'), href: '/packages', icon: FaCreditCard },
             { name: t('sidebar.profile'), href: '/student/profile', icon: FaUser },
@@ -922,7 +922,7 @@ export default function DashboardLayout({ children, header }) {
                                                                         ? '/teacher/dashboard'
                                                                         : auth?.user?.role === 'school'
                                                                             ? '/school/dashboard'
-                                                                            : '/student/dashboard'
+                                                                            : '/dashboard'
                                                             }
                                                             className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#A3C042] hover:bg-[#A3C042]/10 transition font-semibold"
                                                             onClick={() => setUserDropdownOpen(false)}

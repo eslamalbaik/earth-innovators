@@ -3,6 +3,7 @@ import DashboardLayout from '@/Layouts/DashboardLayout';
 import { useState, useEffect } from 'react';
 import { FaTrophy, FaUser, FaCalendar, FaStar, FaCheckCircle, FaClock, FaTimesCircle, FaEye, FaArrowLeft, FaTimes } from 'react-icons/fa';
 import { useTranslation } from '@/i18n';
+import resolveLocalizedMessage from '@/utils/resolveLocalizedMessage';
 
 export default function AdminChallengeSubmissionsIndex({ auth, submissions, challenge, filters }) {
     const { flash } = usePage().props;
@@ -43,18 +44,18 @@ export default function AdminChallengeSubmissionsIndex({ auth, submissions, chal
 
     useEffect(() => {
         if (flash?.success) {
-            setToastMessage(flash.success);
+            setToastMessage(resolveLocalizedMessage(flash.success, language));
             setToastType('success');
             setShowToast(true);
             setTimeout(() => setShowToast(false), 5000);
         }
         if (flash?.error) {
-            setToastMessage(flash.error);
+            setToastMessage(resolveLocalizedMessage(flash.error, language));
             setToastType('error');
             setShowToast(true);
             setTimeout(() => setShowToast(false), 5000);
         }
-    }, [flash]);
+    }, [flash, language]);
 
     return (
         <DashboardLayout header={t('adminChallengeSubmissionsPage.title')}>

@@ -10,6 +10,7 @@ import axios from 'axios';
 import { useToast } from '@/Contexts/ToastContext';
 import { useTranslation } from '@/i18n';
 import { toHijriDate } from '@/utils/dateUtils';
+import { downloadFile } from '@/utils/downloadFile';
 
 const STATUS_STYLES = {
     approved: 'bg-green-100 text-green-700',
@@ -131,9 +132,12 @@ export default function TeacherCertificatesIndex({
                     showSuccess(response.data.message || t('teacherCertificatesIndexPage.toasts.requestSentToSchool'));
                 } else {
                     showSuccess(t('teacherCertificatesIndexPage.toasts.issuedSuccessfully'));
-                    const downloadUrl = response.data?.certificate?.storage_url || response.data?.certificate?.download_url;
+                    const downloadUrl = response.data?.certificate?.download_url;
                     if (downloadUrl) {
-                        window.open(downloadUrl, '_blank');
+                        await downloadFile(
+                            downloadUrl,
+                            `certificate_${response.data?.certificate?.certificate_number || 'issued'}.pdf`
+                        );
                     }
                 }
 
@@ -323,6 +327,7 @@ export default function TeacherCertificatesIndex({
                                         {item.status === 'approved' && item.download_url ? (
                                             <a
                                                 href={item.download_url}
+                                                download
                                                 className="rounded-xl bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700 transition hover:bg-blue-100"
                                             >
                                                 <span className="inline-flex items-center gap-2">

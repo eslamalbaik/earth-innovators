@@ -4,21 +4,18 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
-use App\Models\UserPackage;
+use App\Services\PackagePaymentService;
 use App\Services\ZiinaService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ZiinaWebhookController extends Controller
 {
     public function __construct(
-        private ZiinaService $ziinaService
+        private ZiinaService $ziinaService,
+        private PackagePaymentService $packagePaymentService
     ) {}
 
-    /**
-     * Handle Ziina webhook
-     */
     public function handle(Request $request)
     {
         Log::info('Ziina webhook received', [
@@ -37,168 +34,50 @@ class ZiinaWebhookController extends Controller
             }
 
             $event = $request->all();
-            $eventType = $event['type'] ?? null;
             $paymentRequest = $event['data'] ?? null;
+            $gatewayPaymentId = $paymentRequest['id'] ?? null;
 
-            if (!$eventType || !$paymentRequest) {
+            if (!$gatewayPaymentId) {
                 Log::error('Invalid Ziina webhook format');
                 return response()->json(['error' => 'Invalid webhook format'], 400);
             }
 
-            switch ($eventType) {
+            $payment = Payment::where('gateway_payment_id', $gatewayPaymentId)->first();
+            if (!$payment) {
+                Log::warning('Package payment not found for Ziina webhook', [
+                    'gateway_payment_id' => $gatewayPaymentId,
+                ]);
+
+                return response()->json(['success' => true]);
+            }
+
+            switch ($event['type'] ?? null) {
                 case 'payment_request.paid':
-                    $this->handlePaymentSuccess($paymentRequest);
+                    $this->packagePaymentService->finalizePayment($payment, $paymentRequest);
                     break;
 
                 case 'payment_request.failed':
-                    $this->handlePaymentFailed($paymentRequest);
+                    $this->packagePaymentService->markPaymentFailed($payment, $paymentRequest);
                     break;
 
                 case 'payment_request.cancelled':
-                    $this->handlePaymentCancelled($paymentRequest);
+                    $this->packagePaymentService->markPaymentCancelled($payment, $paymentRequest);
                     break;
 
                 default:
-                    Log::info('Unhandled Ziina webhook event type', ['type' => $eventType]);
+                    Log::info('Unhandled Ziina webhook event type', [
+                        'type' => $event['type'] ?? null,
+                    ]);
             }
 
             return response()->json(['success' => true]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $exception) {
             Log::error('Error processing Ziina webhook', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+                'error' => $exception->getMessage(),
+                'trace' => $exception->getTraceAsString(),
             ]);
 
             return response()->json(['error' => 'Webhook processing failed'], 500);
-        }
-    }
-
-    /**
-     * Handle successful payment
-     */
-    private function handlePaymentSuccess(array $paymentRequest)
-    {
-        try {
-            $paymentId = $paymentRequest['id'] ?? null;
-
-            if (!$paymentId) {
-                Log::error('Payment ID not found in webhook');
-                return;
-            }
-
-            $payment = Payment::where('gateway_payment_id', $paymentId)->first();
-
-            if (!$payment) {
-                Log::error('Payment not found', ['payment_id' => $paymentId]);
-                return;
-            }
-
-            if ($payment->status === 'completed') {
-                Log::info('Payment already processed', ['payment_id' => $payment->id]);
-                return;
-            }
-
-            app(\App\Services\PaymentService::class)->finalizePackageSubscription($payment, $paymentRequest);
-
-            Log::info('Payment processed successfully', [
-                'payment_id' => $payment->id,
-                'user_package_id' => $payment->user_package_id,
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error handling payment success webhook', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-        }
-    }
-
-    /**
-     * Handle failed payment
-     */
-    private function handlePaymentFailed(array $paymentRequest)
-    {
-        try {
-            $paymentId = $paymentRequest['id'] ?? null;
-            $metadata = $paymentRequest['metadata'] ?? [];
-
-            if (!$paymentId) {
-                return;
-            }
-
-            $payment = Payment::where('gateway_payment_id', $paymentId)->first();
-
-            if (!$payment) {
-                return;
-            }
-
-            DB::beginTransaction();
-
-            $payment->update([
-                'status' => 'failed',
-                'gateway_response' => array_merge($payment->gateway_response ?? [], $paymentRequest),
-            ]);
-
-            $userPackageId = $metadata['user_package_id'] ?? null;
-            if ($userPackageId) {
-                $userPackage = UserPackage::find($userPackageId);
-                if ($userPackage) {
-                    $userPackage->update(['status' => 'failed']);
-                }
-            }
-
-            DB::commit();
-
-            Log::info('Payment failed', ['payment_id' => $payment->id]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error handling payment failed webhook', [
-                'error' => $e->getMessage(),
-            ]);
-        }
-    }
-
-    /**
-     * Handle cancelled payment
-     */
-    private function handlePaymentCancelled(array $paymentRequest)
-    {
-        try {
-            $paymentId = $paymentRequest['id'] ?? null;
-            $metadata = $paymentRequest['metadata'] ?? [];
-
-            if (!$paymentId) {
-                return;
-            }
-
-            $payment = Payment::where('gateway_payment_id', $paymentId)->first();
-
-            if (!$payment) {
-                return;
-            }
-
-            DB::beginTransaction();
-
-            $payment->update([
-                'status' => 'cancelled',
-                'gateway_response' => array_merge($payment->gateway_response ?? [], $paymentRequest),
-            ]);
-
-            $userPackageId = $metadata['user_package_id'] ?? null;
-            if ($userPackageId) {
-                $userPackage = UserPackage::find($userPackageId);
-                if ($userPackage) {
-                    app(\App\Services\PackageService::class)->updateSubscriberStatus($userPackage, 'cancelled');
-                }
-            }
-
-            DB::commit();
-
-            Log::info('Payment cancelled', ['payment_id' => $payment->id]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error handling payment cancelled webhook', [
-                'error' => $e->getMessage(),
-            ]);
         }
     }
 }

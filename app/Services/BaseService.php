@@ -12,18 +12,34 @@ abstract class BaseService
         return Cache::remember($key, $ttl, $callback);
     }
 
+    /**
+     * كاش مرتبط بتاق. مع Redis/Memcached يُستخدم tagging الحقيقي.
+     * مع file/database/array يُضاف إصدار لكل تاق؛ عند forgetCacheTags يزداد الإصدار فتُهمل المفاتيح القديمة فوراً.
+     */
     protected function cacheTags(string $tag, string $key, callable $callback, int $ttl = 3600)
     {
-        // Only use tags if the cache driver supports it (Redis, Memcached)
         $cacheDriver = config('cache.default');
-        $supportsTags = in_array($cacheDriver, ['redis', 'memcached']);
-        
+        $supportsTags = in_array($cacheDriver, ['redis', 'memcached'], true);
+
         if ($supportsTags) {
             return Cache::tags([$tag])->remember($key, $ttl, $callback);
         }
-        
-        // Fallback to regular cache without tags
-        return Cache::remember($key, $ttl, $callback);
+
+        $storageKey = $this->taggedStorageKey($tag, $key);
+
+        return Cache::remember($storageKey, $ttl, $callback);
+    }
+
+    protected function tagRevisionCacheKey(string $tag): string
+    {
+        return '__cache_tag_rev__.'.$tag;
+    }
+
+    protected function taggedStorageKey(string $tag, string $key): string
+    {
+        $revision = (int) Cache::get($this->tagRevisionCacheKey($tag), 0);
+
+        return 'tagged.'.$tag.'.r'.$revision.'.'.$key;
     }
 
     protected function forgetCache(string $key): void
@@ -51,14 +67,18 @@ abstract class BaseService
     protected function forgetCacheTags(array $tags): void
     {
         $cacheDriver = config('cache.default');
-        $supportsTags = in_array($cacheDriver, ['redis', 'memcached']);
-        
+        $supportsTags = in_array($cacheDriver, ['redis', 'memcached'], true);
+
         if ($supportsTags) {
-            Cache::tags($tags)->flush();
-        } else {
-            // For non-tagging drivers, we can't flush by tags
-            // Log a warning but don't throw an error
-            Log::warning("Cache tags not supported for driver: {$cacheDriver}. Cache tags: " . implode(', ', $tags));
+            Cache::tags(array_values(array_unique($tags)))->flush();
+
+            return;
+        }
+
+        foreach (array_values(array_unique($tags)) as $tag) {
+            $revKey = $this->tagRevisionCacheKey($tag);
+            $next = ((int) Cache::get($revKey, 0)) + 1;
+            Cache::forever($revKey, $next);
         }
     }
 

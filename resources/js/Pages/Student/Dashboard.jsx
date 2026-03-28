@@ -30,7 +30,7 @@ export default function StudentDashboard({ auth, stats = {}, communityScorePerce
                         <div className="space-y-4 lg:col-span-5">
                             <StudentWelcomeCard
                                 userName={user?.name}
-                                onUploadProject={() => router.visit('/student/projects')}
+                                onUploadProject={() => router.visit('/student/projects/create')}
                             />
                             <StudentCommunityScoreCard
                                 percent={communityScorePercent || 0}

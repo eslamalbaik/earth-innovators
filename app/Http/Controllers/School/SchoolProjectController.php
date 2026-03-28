@@ -110,7 +110,9 @@ class SchoolProjectController extends Controller
         \App\Jobs\SendNewProjectNotification::dispatch($project);
 
         return redirect()->route('school.projects.index')
-            ->with('success', 'تم إنشاء المشروع بنجاح');
+            ->with('success', [
+                'key' => 'toastMessages.schoolProjectCreatedSuccess',
+            ]);
     }
 
     // قبول مشروع
@@ -235,7 +237,9 @@ class SchoolProjectController extends Controller
             }
         }
 
-        return redirect()->back()->with('success', 'تم قبول المشروع بنجاح');
+        return redirect()->back()->with('success', [
+            'key' => 'toastMessages.schoolProjectApprovedSuccess',
+        ]);
     }
 
     // رفض مشروع
@@ -261,7 +265,9 @@ class SchoolProjectController extends Controller
         // إرسال حدث رفض المشروع
         \App\Events\ProjectRejected::dispatch($project);
 
-        return redirect()->back()->with('success', 'تم رفض المشروع');
+        return redirect()->back()->with('success', [
+            'key' => 'toastMessages.schoolProjectRejectedSuccess',
+        ]);
     }
 
     // عرض تفاصيل المشروع
@@ -392,7 +398,9 @@ class SchoolProjectController extends Controller
         $project->save();
 
         return redirect()->route('school.projects.index')
-            ->with('success', 'تم تحديث المشروع بنجاح');
+            ->with('success', [
+                'key' => 'toastMessages.schoolProjectUpdatedSuccess',
+            ]);
     }
 
     // حذف مشروع
@@ -426,6 +434,8 @@ class SchoolProjectController extends Controller
         $project->delete();
 
         return redirect()->route('school.projects.index')
-            ->with('success', 'تم حذف المشروع بنجاح');
+            ->with('success', [
+                'key' => 'toastMessages.schoolProjectDeletedSuccess',
+            ]);
     }
 }

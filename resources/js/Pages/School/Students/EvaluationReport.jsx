@@ -1,12 +1,19 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { useState } from 'react';
-import {
-    FaUsers, FaChartBar, FaCheckCircle, FaExclamationTriangle, FaInfoCircle
-} from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
+import { FaChartBar, FaInfoCircle } from 'react-icons/fa';
 
-export default function EvaluationReport({ auth, report, source, categories }) {
+export default function EvaluationReport({ report, source }) {
+    const { t, language } = useTranslation();
     const [selectedSource, setSelectedSource] = useState(source || 'projects');
+
+    const categoryKeyMap = {
+        outstanding: 'outstanding',
+        excellent: 'excellent',
+        average: 'average',
+        follow_up: 'followUp',
+    };
 
     const handleSourceChange = (newSource) => {
         setSelectedSource(newSource);
@@ -43,24 +50,45 @@ export default function EvaluationReport({ auth, report, source, categories }) {
                 badge: 'bg-red-100 text-red-700',
             },
         };
+
         return colors[color] || colors.gray;
     };
 
+    const getCategoryText = (category, field) => {
+        const categoryKey = categoryKeyMap[category?.id];
+
+        if (categoryKey) {
+            const translated = t(`studentEvaluationReportPage.categories.${categoryKey}.${field}`);
+            if (translated !== `studentEvaluationReportPage.categories.${categoryKey}.${field}`) {
+                return translated;
+            }
+        }
+
+        if (field === 'title') {
+            return language === 'en' ? (category?.name_en || category?.name) : (category?.name || category?.name_en);
+        }
+
+        if (field === 'action') {
+            return language === 'en' ? (category?.action_en || category?.action) : (category?.action || category?.action_en);
+        }
+
+        return category?.[field] || '';
+    };
+
     return (
-        <DashboardLayout header="تقرير تقييم الطلاب">
-            <Head title="تقرير تقييم الطلاب - إرث المبتكرين" />
+        <DashboardLayout header={t('studentEvaluationReportPage.title')}>
+            <Head title={t('studentEvaluationReportPage.pageTitle', { appName: t('common.appName') })} />
 
             <div className="space-y-6">
-                {/* رأس الصفحة */}
                 <div className="bg-white rounded-xl shadow-lg p-6">
                     <div className="flex items-center justify-between mb-6">
                         <div>
                             <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
                                 <FaChartBar className="text-[#A3C042]" />
-                                تقرير تقييم الطلاب
+                                {t('studentEvaluationReportPage.title')}
                             </h2>
                             <p className="text-gray-600 mt-1">
-                                إجمالي الطلاب: {report.total_students || 0}
+                                {t('studentEvaluationReportPage.totalStudents', { count: report.total_students || 0 })}
                             </p>
                         </div>
                         <div className="flex gap-2">
@@ -72,7 +100,7 @@ export default function EvaluationReport({ auth, report, source, categories }) {
                                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                 }`}
                             >
-                                المشاريع
+                                {t('studentEvaluationReportPage.sources.projects')}
                             </button>
                             <button
                                 onClick={() => handleSourceChange('challenges')}
@@ -82,16 +110,16 @@ export default function EvaluationReport({ auth, report, source, categories }) {
                                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                 }`}
                             >
-                                التحديات
+                                {t('studentEvaluationReportPage.sources.challenges')}
                             </button>
                         </div>
                     </div>
                 </div>
 
-                {/* إحصائيات سريعة */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     {report.categories?.map((categoryData) => {
                         const colorClasses = getColorClasses(categoryData.category.color);
+
                         return (
                             <div
                                 key={categoryData.category.id}
@@ -104,17 +132,16 @@ export default function EvaluationReport({ auth, report, source, categories }) {
                                     </span>
                                 </div>
                                 <h3 className={`${colorClasses.text} font-bold text-lg mb-1`}>
-                                    {categoryData.category.name}
+                                    {getCategoryText(categoryData.category, 'title')}
                                 </h3>
                                 <p className="text-sm text-gray-600">
-                                    {categoryData.category.range}
+                                    {getCategoryText(categoryData.category, 'range')}
                                 </p>
                             </div>
                         );
                     })}
                 </div>
 
-                {/* جداول الطلاب حسب الفئة */}
                 {report.categories?.map((categoryData) => {
                     const colorClasses = getColorClasses(categoryData.category.color);
                     if (categoryData.count === 0) return null;
@@ -130,50 +157,48 @@ export default function EvaluationReport({ auth, report, source, categories }) {
                                         <span className="text-2xl">{categoryData.category.icon}</span>
                                         <div>
                                             <h3 className={`${colorClasses.text} font-bold text-xl`}>
-                                                {categoryData.category.name} ({categoryData.category.range})
+                                                {getCategoryText(categoryData.category, 'title')} ({getCategoryText(categoryData.category, 'range')})
                                             </h3>
                                             <p className="text-sm text-gray-600 mt-1">
-                                                {categoryData.count} طالب
+                                                {t('studentEvaluationReportPage.studentsCount', { count: categoryData.count })}
                                             </p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* معلومات الفئة */}
                             <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                                     <div>
-                                        <span className="font-semibold text-gray-700">المستوى:</span>
-                                        <p className="text-gray-600 mt-1">{categoryData.category.level}</p>
+                                        <span className="font-semibold text-gray-700">{t('studentEvaluationReportPage.labels.level')}</span>
+                                        <p className="text-gray-600 mt-1">{getCategoryText(categoryData.category, 'level')}</p>
                                     </div>
                                     <div>
-                                        <span className="font-semibold text-gray-700">المهارة:</span>
-                                        <p className="text-gray-600 mt-1">{categoryData.category.skill}</p>
+                                        <span className="font-semibold text-gray-700">{t('studentEvaluationReportPage.labels.skill')}</span>
+                                        <p className="text-gray-600 mt-1">{getCategoryText(categoryData.category, 'skill')}</p>
                                     </div>
                                     <div>
-                                        <span className="font-semibold text-gray-700">الإجراء المطلوب:</span>
-                                        <p className="text-gray-600 mt-1">{categoryData.category.action}</p>
+                                        <span className="font-semibold text-gray-700">{t('studentEvaluationReportPage.labels.requiredAction')}</span>
+                                        <p className="text-gray-600 mt-1">{getCategoryText(categoryData.category, 'action')}</p>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* جدول الطلاب */}
                             <div className="overflow-x-auto">
                                 <table className="min-w-full divide-y divide-gray-200">
                                     <thead className="bg-gray-50">
                                         <tr>
-                                            <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                                الاسم
+                                            <th className="px-6 py-3 text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                                {t('studentEvaluationReportPage.table.name')}
                                             </th>
-                                            <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                                البريد الإلكتروني
+                                            <th className="px-6 py-3 text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                                {t('studentEvaluationReportPage.table.email')}
                                             </th>
-                                            <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                                الدرجة
+                                            <th className="px-6 py-3 text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                                {t('studentEvaluationReportPage.table.score')}
                                             </th>
-                                            <th className="px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
-                                                الإجراء المطلوب
+                                            <th className="px-6 py-3 text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                                {t('studentEvaluationReportPage.table.requiredAction')}
                                             </th>
                                         </tr>
                                     </thead>
@@ -181,9 +206,7 @@ export default function EvaluationReport({ auth, report, source, categories }) {
                                         {categoryData.students.map((student) => (
                                             <tr key={student.id} className="hover:bg-gray-50">
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm font-medium text-gray-900">
-                                                        {student.name}
-                                                    </div>
+                                                    <div className="text-sm font-medium text-gray-900">{student.name}</div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="text-sm text-gray-600">{student.email}</div>
@@ -195,7 +218,7 @@ export default function EvaluationReport({ auth, report, source, categories }) {
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <div className="text-sm text-gray-600">
-                                                        {categoryData.category.action}
+                                                        {getCategoryText(categoryData.category, 'action')}
                                                     </div>
                                                 </td>
                                             </tr>
@@ -207,15 +230,18 @@ export default function EvaluationReport({ auth, report, source, categories }) {
                     );
                 })}
 
-                {/* رسالة إذا لم يكن هناك طلاب */}
                 {report.total_students === 0 && (
                     <div className="bg-white rounded-xl shadow-lg p-12 text-center">
                         <FaInfoCircle className="mx-auto text-gray-400 text-5xl mb-4" />
                         <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                            لا توجد تقييمات متاحة
+                            {t('studentEvaluationReportPage.empty.title')}
                         </h3>
                         <p className="text-gray-500">
-                            لا يوجد طلاب لديهم تقييمات {selectedSource === 'projects' ? 'للمشاريع' : 'للتحديات'} بعد.
+                            {t(
+                                selectedSource === 'projects'
+                                    ? 'studentEvaluationReportPage.empty.projects'
+                                    : 'studentEvaluationReportPage.empty.challenges',
+                            )}
                         </p>
                     </div>
                 )}
@@ -223,4 +249,3 @@ export default function EvaluationReport({ auth, report, source, categories }) {
         </DashboardLayout>
     );
 }
-

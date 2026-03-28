@@ -3,19 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Services\ChallengeService;
+use App\Services\ChallengeWinnerService;
 use App\Models\Challenge;
-use App\Models\ChallengeSubmission;
-use App\Models\ChallengeParticipation;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class ChallengeController extends Controller
 {
     public function __construct(
-        private ChallengeService $challengeService
+        private ChallengeService $challengeService,
+        private ChallengeWinnerService $winnerService
     ) {}
 
     public function index(Request $request)
@@ -184,7 +183,7 @@ class ChallengeController extends Controller
             )->withQueryString();
         }
 
-        $previousWinners = $this->getPreviousWinners(3);
+        $previousWinners = $this->winnerService->getPreviousWinnersUnscoped(3);
         $participationConditions = $this->getParticipationConditions();
         
         // Get categories from database
@@ -260,118 +259,15 @@ class ChallengeController extends Controller
     public function winners()
     {
         $user = Auth::user();
-        $winners = $this->getAllWinners();
+        $winners = $this->winnerService->getAllWinnersUnscoped();
 
         return Inertia::render('Challenges/Winners', [
             'winners' => $winners,
+            'backHref' => '/challenges',
             'auth' => [
                 'user' => $user,
             ],
         ]);
-    }
-
-    private function getAllWinners(): array
-    {
-        $winners = ChallengeSubmission::where('status', 'approved')
-            ->where('rating', '>=', 4)
-            ->with(['student:id,name,image', 'challenge:id,title'])
-            ->orderBy('rating', 'desc')
-            ->orderBy('points_earned', 'desc')
-            ->orderBy('reviewed_at', 'desc')
-            ->get()
-            ->map(function ($submission) {
-                return [
-                    'id' => $submission->id,
-                    'name' => $submission->student->name ?? 'مشارك',
-                    'project' => $submission->challenge->title ?? 'تحدي',
-                    'date' => $submission->reviewed_at?->format('F Y') ?? $submission->created_at->format('F Y'),
-                    'rating' => $submission->rating ?? 0,
-                    'points' => $submission->points_earned ?? 0,
-                    'avatar' => $submission->student->image ?? null,
-                ];
-            })
-            ->toArray();
-
-        $participationWinners = ChallengeParticipation::where('status', 'completed')
-            ->where('points_earned', '>', 0)
-            ->with(['user:id,name,image', 'challenge:id,title'])
-            ->orderBy('points_earned', 'desc')
-            ->orderBy('completed_at', 'desc')
-            ->get()
-            ->map(function ($participation) {
-                return [
-                    'id' => $participation->id,
-                    'name' => $participation->user->name ?? 'مشارك',
-                    'project' => $participation->challenge->title ?? 'تحدي',
-                    'date' => $participation->completed_at?->format('F Y') ?? $participation->created_at->format('F Y'),
-                    'rating' => 0,
-                    'points' => $participation->points_earned ?? 0,
-                    'avatar' => $participation->user->image ?? null,
-                ];
-            })
-            ->toArray();
-
-        $allWinners = array_merge($winners, $participationWinners);
-        
-        // Sort by points and rating
-        usort($allWinners, function ($a, $b) {
-            if ($b['points'] !== $a['points']) {
-                return $b['points'] <=> $a['points'];
-            }
-            return $b['rating'] <=> $a['rating'];
-        });
-
-        return $allWinners;
-    }
-
-    private function getPreviousWinners(int $limit = 3): array
-    {
-        $winners = ChallengeSubmission::where('status', 'approved')
-            ->where('rating', '>=', 4)
-            ->with(['student:id,name,image', 'challenge:id,title'])
-            ->orderBy('rating', 'desc')
-            ->orderBy('points_earned', 'desc')
-            ->orderBy('reviewed_at', 'desc')
-            ->limit($limit)
-            ->get()
-            ->map(function ($submission) {
-                return [
-                    'id' => $submission->id,
-                    'name' => $submission->student->name ?? 'مشارك',
-                    'project' => $submission->challenge->title ?? 'تحدي',
-                    'date' => $submission->reviewed_at?->format('F Y') ?? $submission->created_at->format('F Y'),
-                    'rating' => $submission->rating ?? 0,
-                    'points' => $submission->points_earned ?? 0,
-                    'avatar' => $submission->student->image ?? null,
-                ];
-            })
-            ->toArray();
-
-        if (count($winners) < $limit) {
-            $participationWinners = ChallengeParticipation::where('status', 'completed')
-                ->where('points_earned', '>', 0)
-                ->with(['user:id,name,image', 'challenge:id,title'])
-                ->orderBy('points_earned', 'desc')
-                ->orderBy('completed_at', 'desc')
-                ->limit($limit - count($winners))
-                ->get()
-                ->map(function ($participation) {
-                    return [
-                        'id' => $participation->id,
-                        'name' => $participation->user->name ?? 'مشارك',
-                        'project' => $participation->challenge->title ?? 'تحدي',
-                        'date' => $participation->completed_at?->format('F Y') ?? $participation->created_at->format('F Y'),
-                        'rating' => 0,
-                        'points' => $participation->points_earned ?? 0,
-                        'avatar' => $participation->user->image ?? null,
-                    ];
-                })
-                ->toArray();
-
-            $winners = array_merge($winners, $participationWinners);
-        }
-
-        return array_slice($winners, 0, $limit);
     }
 
     private function getParticipationConditions(): array

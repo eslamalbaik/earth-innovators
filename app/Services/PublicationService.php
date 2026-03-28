@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Publication;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -179,7 +178,7 @@ class PublicationService extends BaseService
         $publication = Publication::create($data);
 
         // Clear cache
-        $this->clearPublicationCache($publication->school_id, $publication->author_id);
+        $this->clearPublicationCache($publication->school_id, $publication->author_id, $publication->id);
 
         return $publication;
     }
@@ -206,7 +205,7 @@ class PublicationService extends BaseService
         $publication->update($data);
 
         // Clear cache
-        $this->clearPublicationCache($publication->school_id, $publication->author_id);
+        $this->clearPublicationCache($publication->school_id, $publication->author_id, $publication->id);
 
         return $publication->fresh();
     }
@@ -278,7 +277,7 @@ class PublicationService extends BaseService
         }
 
         // Clear cache
-        $this->clearPublicationCache($publication->school_id, $publication->author_id);
+        $this->clearPublicationCache($publication->school_id, $publication->author_id, $publication->id);
 
         return $publication->fresh();
     }
@@ -292,7 +291,7 @@ class PublicationService extends BaseService
         ]);
 
         // Clear cache
-        $this->clearPublicationCache($publication->school_id, $publication->author_id);
+        $this->clearPublicationCache($publication->school_id, $publication->author_id, $publication->id);
 
         return $publication->fresh();
     }
@@ -309,46 +308,30 @@ class PublicationService extends BaseService
 
         $schoolId = $publication->school_id;
         $authorId = $publication->author_id;
+        $publicationId = $publication->id;
 
         $deleted = $publication->delete();
 
-        // Clear cache
-        $this->clearPublicationCache($schoolId, $authorId);
+        // Clear cache (يشمل تفاصيل المقال وقوائم المدارس/المعلمين/المعتمدة)
+        $this->clearPublicationCache($schoolId, $authorId, $publicationId);
 
         return $deleted;
     }
 
-    public function clearPublicationCache(?int $schoolId = null, ?int $authorId = null): void
+    public function clearPublicationCache(?int $schoolId = null, ?int $authorId = null, ?int $publicationId = null): void
     {
-        $cacheDriver = config('cache.default');
-        $supportsTags = in_array($cacheDriver, ['redis', 'memcached']);
-        
         $this->forgetCacheTags(['approved_publications']);
+
+        if ($publicationId !== null) {
+            $this->forgetCacheTags(["publication_{$publicationId}"]);
+        }
 
         if ($schoolId) {
             $this->forgetCacheTags(["school_publications_{$schoolId}"]);
-            // مسح مباشر للكاش بدون tags
-            if (!$supportsTags) {
-                for ($page = 1; $page <= 20; $page++) {
-                    \Cache::forget("school_publications_{$schoolId}_" . md5('') . "_{$page}");
-                    \Cache::forget("school_pending_publications_{$schoolId}_{$page}");
-                }
-            }
         }
 
         if ($authorId) {
             $this->forgetCacheTags(["teacher_publications_{$authorId}"]);
-            // مسح مباشر للكاش بدون tags
-            if (!$supportsTags) {
-                for ($page = 1; $page <= 20; $page++) {
-                    \Cache::forget("teacher_publications_{$authorId}_{$page}");
-                }
-            }
-        }
-        
-        // مسح كاش المقالات المعتمدة العامة
-        if (!$supportsTags) {
-            \Cache::forget('approved_publications_' . md5(json_encode([null, null, 12])));
         }
     }
 }

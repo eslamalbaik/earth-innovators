@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useCallback } from 'react';
+import { useSelector } from 'react-redux';
 import ToastContainer from '@/Components/Toast/ToastContainer';
+import { resolveLocalizedMessage } from '@/utils/resolveLocalizedMessage';
 
 const ToastContext = createContext(null);
 
@@ -7,6 +9,7 @@ let toastIdCounter = 0;
 
 export const ToastProvider = ({ children }) => {
     const [toasts, setToasts] = useState([]);
+    const { currentLanguage } = useSelector((state) => state.language);
 
     const generateId = () => {
         return `toast-${Date.now()}-${++toastIdCounter}`;
@@ -14,13 +17,24 @@ export const ToastProvider = ({ children }) => {
 
     const addToast = useCallback((toast) => {
         const id = generateId();
+        const resolvedMessage = resolveLocalizedMessage(toast.message, currentLanguage);
+        const resolvedTitle = toast.title
+            ? resolveLocalizedMessage(toast.title, currentLanguage)
+            : null;
+        const {
+            message: _originalMessage,
+            title: _originalTitle,
+            type,
+            autoDismiss,
+            ...restToast
+        } = toast;
         const newToast = {
+            ...restToast,
             id,
-            type: 'info',
-            title: null,
-            message: '',
-            autoDismiss: 3000, // Default shorter duration (3 seconds instead of 5)
-            ...toast,
+            type: type || 'info',
+            title: resolvedTitle,
+            message: resolvedMessage,
+            autoDismiss: autoDismiss ?? 3000, // Default shorter duration (3 seconds instead of 5)
         };
 
         // Prevent duplicates based on message and type
@@ -38,50 +52,58 @@ export const ToastProvider = ({ children }) => {
         });
 
         return id;
-    }, []);
+    }, [currentLanguage]);
 
     const removeToast = useCallback((id) => {
         setToasts((prev) => prev.filter((toast) => toast.id !== id));
     }, []);
 
+    const normalizeOptions = useCallback((options) => {
+        if (typeof options === 'string') {
+            return { type: options };
+        }
+
+        return options || {};
+    }, []);
+
     const showToast = useCallback((message, options = {}) => {
         return addToast({
+            ...normalizeOptions(options),
             message,
-            ...options,
         });
-    }, [addToast]);
+    }, [addToast, normalizeOptions]);
 
     const showSuccess = useCallback((message, options = {}) => {
         return addToast({
+            ...normalizeOptions(options),
             message,
             type: 'success',
-            ...options,
         });
-    }, [addToast]);
+    }, [addToast, normalizeOptions]);
 
     const showError = useCallback((message, options = {}) => {
         return addToast({
+            ...normalizeOptions(options),
             message,
             type: 'error',
-            ...options,
         });
-    }, [addToast]);
+    }, [addToast, normalizeOptions]);
 
     const showWarning = useCallback((message, options = {}) => {
         return addToast({
+            ...normalizeOptions(options),
             message,
             type: 'warning',
-            ...options,
         });
-    }, [addToast]);
+    }, [addToast, normalizeOptions]);
 
     const showInfo = useCallback((message, options = {}) => {
         return addToast({
+            ...normalizeOptions(options),
             message,
             type: 'info',
-            ...options,
         });
-    }, [addToast]);
+    }, [addToast, normalizeOptions]);
 
     const clearAll = useCallback(() => {
         setToasts([]);
@@ -114,4 +136,3 @@ export const useToast = () => {
     }
     return context;
 };
-

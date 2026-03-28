@@ -2,6 +2,7 @@ import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import { useTranslation } from '@/i18n';
+import resolveLocalizedMessage from '@/utils/resolveLocalizedMessage';
 import {
     FaCalendar,
     FaCheckCircle,
@@ -24,14 +25,14 @@ export default function StudentBookings({ bookings, auth }) {
 
     useEffect(() => {
         if (flash?.error) {
-            setErrorMessage(flash.error);
+            setErrorMessage(resolveLocalizedMessage(flash.error, language));
             setShowError(true);
             const timer = setTimeout(() => {
                 setShowError(false);
             }, 5000);
             return () => clearTimeout(timer);
         }
-    }, [flash]);
+    }, [flash, language]);
 
     const statusLabels = {
         pending: t('bookings.pending'),
@@ -371,4 +372,3 @@ export default function StudentBookings({ bookings, auth }) {
         </DashboardLayout>
     );
 }
-

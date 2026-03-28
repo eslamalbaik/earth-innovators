@@ -2,9 +2,12 @@ import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import DashboardLayout from '../../Layouts/DashboardLayout';
 import { FaPlus, FaTrash, FaEdit, FaCheck, FaTimes, FaClock } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
+import resolveLocalizedMessage from '@/utils/resolveLocalizedMessage';
 
 export default function Availability({ auth, availabilities, subjects = [], filters = {} }) {
     const { flash } = usePage().props;
+    const { language } = useTranslation();
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [editingAvailability, setEditingAvailability] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -12,9 +15,11 @@ export default function Availability({ auth, availabilities, subjects = [], filt
     const [toast, setToast] = useState({ show: false, message: '', type: 'error' });
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [availabilityToDelete, setAvailabilityToDelete] = useState(null);
+    const resolvedFlashSuccess = resolveLocalizedMessage(flash?.success, language);
+    const resolvedFlashError = resolveLocalizedMessage(flash?.error, language);
 
     const showToast = (message, type = 'error') => {
-        setToast({ show: true, message, type });
+        setToast({ show: true, message: resolveLocalizedMessage(message, language), type });
         setTimeout(() => {
             setToast({ show: false, message: '', type: 'error' });
         }, 5000);
@@ -27,7 +32,7 @@ export default function Availability({ auth, availabilities, subjects = [], filt
         if (flash?.success) {
             showToast(flash.success, 'success');
         }
-    }, [flash]);
+    }, [flash, language]);
 
     const { data: addData, setData: setAddData, post: addPost, processing: isAdding, reset: resetAddForm, errors: addErrors } = useForm({
         date: new Date().toISOString().split('T')[0],
@@ -150,14 +155,14 @@ export default function Availability({ auth, availabilities, subjects = [], filt
             <Head title="إدارة المواعيد" />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {flash?.success && (
+                {resolvedFlashSuccess && (
                     <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
-                        {flash.success}
+                        {resolvedFlashSuccess}
                     </div>
                 )}
-                {flash?.error && (
+                {resolvedFlashError && (
                     <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-                        {flash.error}
+                        {resolvedFlashError}
                     </div>
                 )}
                 {/* Header */}

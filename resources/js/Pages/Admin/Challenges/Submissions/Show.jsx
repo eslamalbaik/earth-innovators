@@ -21,6 +21,7 @@ import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
 import { useTranslation } from '@/i18n';
+import resolveLocalizedMessage from '@/utils/resolveLocalizedMessage';
 
 export default function AdminChallengeSubmissionShow({ auth, submission, availableBadges }) {
     const { flash } = usePage().props;
@@ -64,18 +65,18 @@ export default function AdminChallengeSubmissionShow({ auth, submission, availab
 
     useEffect(() => {
         if (flash?.success) {
-            setToastMessage(flash.success);
+            setToastMessage(resolveLocalizedMessage(flash.success, language));
             setToastType('success');
             setShowToast(true);
             setTimeout(() => setShowToast(false), 5000);
         }
         if (flash?.error) {
-            setToastMessage(flash.error);
+            setToastMessage(resolveLocalizedMessage(flash.error, language));
             setToastType('error');
             setShowToast(true);
             setTimeout(() => setShowToast(false), 5000);
         }
-    }, [flash]);
+    }, [flash, language]);
 
     const getFileUrl = (filePath) => {
         if (filePath.startsWith('http')) return filePath;

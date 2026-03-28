@@ -1,12 +1,13 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { useState, useMemo } from 'react';
-import { FaFilter, FaChevronDown, FaImage, FaEye, FaStar, FaTrophy, FaTrash } from 'react-icons/fa';
+import { FaFilter, FaChevronDown, FaImage, FaEye, FaStar, FaTrophy, FaPlus } from 'react-icons/fa';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
-import { useToast } from '@/Contexts/ToastContext';
 import { useDirection, getDropdownPosition } from '@/utils/directionUtils';
+import { useTranslation } from '@/i18n';
 
-export default function StudentProjectsIndex({ auth, projects, message }) {
+export default function StudentProjectsIndex({ auth, projects, message, noticeKey, canStartNewSubmission = false }) {
+    const { t } = useTranslation();
     const { dir } = useDirection();
     const isRtl = dir === 'rtl';
     const [filter, setFilter] = useState('all'); // all | pending | evaluated | winners
@@ -41,30 +42,32 @@ export default function StudentProjectsIndex({ auth, projects, message }) {
 
     const getStatusLabel = (project) => {
         const status = getProjectStatus(project);
-        if (status === 'pending') return { label: 'تحت التقييم', color: 'bg-yellow-100 text-yellow-700 border-yellow-300' };
-        if (status === 'evaluated') return { label: 'تم التقييم', color: 'bg-blue-100 text-blue-700 border-blue-300' };
-        if (status === 'winners') return { label: 'فائز', color: 'bg-green-100 text-green-700 border-green-300' };
-        return { label: 'تم التقييم', color: 'bg-blue-100 text-blue-700 border-blue-300' };
+        if (status === 'pending') {
+            return { label: t('studentProjects.statusUnderReview'), color: 'bg-yellow-100 text-yellow-700 border-yellow-300' };
+        }
+        if (status === 'evaluated') {
+            return { label: t('studentProjects.statusEvaluated'), color: 'bg-blue-100 text-blue-700 border-blue-300' };
+        }
+        if (status === 'winners') {
+            return { label: t('studentProjects.statusWinner'), color: 'bg-green-100 text-green-700 border-green-300' };
+        }
+        return { label: t('studentProjects.statusEvaluated'), color: 'bg-blue-100 text-blue-700 border-blue-300' };
     };
 
     const getCategoryLabel = (category) => {
-        const labels = {
-            science: 'علوم',
-            technology: 'تقنية',
-            engineering: 'هندسة',
-            mathematics: 'رياضيات',
-            arts: 'فنون',
-            mobile: 'تطبيقات الجوال',
-            other: 'أخرى',
-        };
-        return labels[category] || 'أخرى';
+        if (!category) return t('categories.other');
+        const key = `categories.${category}`;
+        const translated = t(key);
+        if (translated === key) return t('categories.other');
+        return translated;
     };
 
     const formatDate = (date) => {
         if (!date) return '';
         const d = new Date(date);
-        const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
-        return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+        const months = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+        const monthLabel = t(`common.${months[d.getMonth()]}`);
+        return `${d.getDate()} ${monthLabel} ${d.getFullYear()}`;
     };
 
     const handleViewProject = (projectId) => {
@@ -74,16 +77,24 @@ export default function StudentProjectsIndex({ auth, projects, message }) {
     const ProjectsContent = () => (
         <div className="space-y-4">
             {/* Header */}
-            <div className="flex items-center justify-between mb-3">
-                <div className="text-lg font-extrabold text-gray-900">المشاريع</div>
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                <div className="text-lg font-extrabold text-gray-900">{t('studentProjects.heading')}</div>
                 <div className="flex items-center gap-2 text-gray-400 relative">
+                    <button
+                        type="button"
+                        onClick={() => router.visit('/student/projects/create')}
+                        className="flex items-center gap-1.5 rounded-xl bg-[#A3C042] px-3 py-2 text-sm font-semibold text-white hover:bg-[#8CA635] transition"
+                    >
+                        <FaPlus className="text-xs" />
+                        {t('studentProjects.actions.newSubmission')}
+                    </button>
                     <button
                         type="button"
                         onClick={() => setShowFilterDropdown(!showFilterDropdown)}
                         className="flex items-center gap-1 text-sm"
                     >
                         <FaFilter />
-                        <span>فلترة</span>
+                        <span>{t('common.filter')}</span>
                         <FaChevronDown className="text-xs" />
                     </button>
                     {showFilterDropdown && (
@@ -92,11 +103,10 @@ export default function StudentProjectsIndex({ auth, projects, message }) {
                                 type="button"
                                 onClick={() => {
                                     setShowFilterDropdown(false);
-                                    // يمكن إضافة فلترة إضافية هنا
                                 }}
                                 className="w-full  px-3 py-2 text-sm hover:bg-gray-50 rounded-lg"
                             >
-                                فلترة متقدمة
+                                {t('studentProjects.advancedFilter')}
                             </button>
                         </div>
                     )}
@@ -111,7 +121,7 @@ export default function StudentProjectsIndex({ auth, projects, message }) {
                     className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${filter === 'all' ? 'bg-[#A3C042] text-white' : 'bg-white text-gray-700'
                         }`}
                 >
-                    الكل
+                    {t('common.all')}
                 </button>
                 <button
                     type="button"
@@ -119,7 +129,7 @@ export default function StudentProjectsIndex({ auth, projects, message }) {
                     className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${filter === 'pending' ? 'bg-[#A3C042] text-white' : 'bg-white text-gray-700'
                         }`}
                 >
-                    تحت التقييم
+                    {t('studentProjects.filterPending')}
                 </button>
                 <button
                     type="button"
@@ -127,7 +137,7 @@ export default function StudentProjectsIndex({ auth, projects, message }) {
                     className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${filter === 'evaluated' ? 'bg-[#A3C042] text-white' : 'bg-white text-gray-700'
                         }`}
                 >
-                    تم التقييم
+                    {t('studentProjects.filterEvaluated')}
                 </button>
                 <button
                     type="button"
@@ -135,14 +145,20 @@ export default function StudentProjectsIndex({ auth, projects, message }) {
                     className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${filter === 'winners' ? 'bg-[#A3C042] text-white' : 'bg-white text-gray-700'
                         }`}
                 >
-                    الفائزيين
+                    {t('studentProjects.filterWinners')}
                 </button>
             </div>
 
             {/* Projects List */}
-            {message && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 text-sm text-yellow-800">
-                    {message}
+            {(noticeKey || message) && (
+                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm text-amber-900">
+                    {noticeKey ? t(noticeKey) : message}
+                </div>
+            )}
+
+            {!canStartNewSubmission && (
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm text-slate-700">
+                    {t('studentProjects.upload.cannotStartHint')}
                 </div>
             )}
 
@@ -164,7 +180,7 @@ export default function StudentProjectsIndex({ auth, projects, message }) {
                                     {project.image || project.thumbnail ? (
                                         <img
                                             src={project.image || project.thumbnail || '/images/hero.png'}
-                                            alt={project.title}
+                                            alt={project.title || t('studentProjects.imageAlt')}
                                             className="w-20 h-20 rounded-xl object-cover"
                                         />
                                     ) : (
@@ -179,9 +195,9 @@ export default function StudentProjectsIndex({ auth, projects, message }) {
                                     <div className="flex items-start justify-between gap-2 mb-2">
                                         <div className="flex-1">
                                             <h3 className="text-sm font-bold text-gray-900 mb-1 line-clamp-1">
-                                                {project.title || 'تطبيق إدارة المهام'}
+                                                {project.title || t('studentProjects.defaultProjectTitle')}
                                             </h3>
-                                            <p className="text-xs text-gray-500">{projectDate || '2 أغسطس 2025'}</p>
+                                            <p className="text-xs text-gray-500">{projectDate}</p>
                                         </div>
                                         <FaEye className="text-gray-400 text-sm flex-shrink-0" />
                                     </div>
@@ -207,7 +223,7 @@ export default function StudentProjectsIndex({ auth, projects, message }) {
                                             {project.points_earned > 0 && (
                                                 <div className="flex items-center gap-1 text-xs text-blue-600">
                                                     <FaTrophy className="text-blue-500" />
-                                                    <span className="font-semibold">{project.points_earned} نقطة</span>
+                                                    <span className="font-semibold">{t('studentProjects.pointsCount', { count: project.points_earned })}</span>
                                                 </div>
                                             )}
                                         </div>
@@ -219,7 +235,7 @@ export default function StudentProjectsIndex({ auth, projects, message }) {
                 </div>
             ) : (
                 <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-                    <p className="text-gray-500 text-sm">لا توجد مشاريع</p>
+                    <p className="text-gray-500 text-sm">{t('studentProjects.empty')}</p>
                 </div>
             )}
 
@@ -245,16 +261,16 @@ export default function StudentProjectsIndex({ auth, projects, message }) {
     );
 
     return (
-        <div dir="rtl" className="min-h-screen bg-gray-50">
-            <Head title="مشاريعي - إرث المبتكرين" />
+        <div dir={dir} className="min-h-screen bg-gray-50">
+            <Head title={t('studentProjects.pageTitle')} />
 
             {/* Mobile View */}
             <div className="block md:hidden">
                 <MobileTopBar
-                    title="إرث المبتكرين"
+                    title={t('common.appName')}
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
-                    onBack={() => router.visit('/')}
+                    onBack={() => router.visit('/dashboard')}
                 />
                 <main className="px-4 pb-24 pt-4">
                     <ProjectsContent />
@@ -265,10 +281,10 @@ export default function StudentProjectsIndex({ auth, projects, message }) {
             {/* Desktop View */}
             <div className="hidden md:block">
                 <MobileTopBar
-                    title="إرث المبتكرين"
+                    title={t('common.appName')}
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
-                    onBack={() => router.visit('/')}
+                    onBack={() => router.visit('/dashboard')}
                 />
                 <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-4">
                     <div className="mx-auto w-full max-w-3xl">

@@ -14,6 +14,7 @@ import {
 } from 'react-icons/fa';
 import { useBackIcon, useTranslation } from '@/i18n';
 import { toHijriDate } from '@/utils/dateUtils';
+import resolveLocalizedMessage from '@/utils/resolveLocalizedMessage';
 
 export default function TeacherChallengeSubmissionsIndex({ auth, submissions, challenge, filters }) {
     const { flash } = usePage().props;
@@ -60,16 +61,16 @@ export default function TeacherChallengeSubmissionsIndex({ auth, submissions, ch
 
     useEffect(() => {
         if (flash?.success) {
-            setToastMessage(flash.success);
+            setToastMessage(resolveLocalizedMessage(flash.success, language));
             setShowToast(true);
             setTimeout(() => setShowToast(false), 5000);
         }
         if (flash?.error) {
-            setToastMessage(flash.error);
+            setToastMessage(resolveLocalizedMessage(flash.error, language));
             setShowToast(true);
             setTimeout(() => setShowToast(false), 5000);
         }
-    }, [flash]);
+    }, [flash, language]);
 
     return (
         <DashboardLayout auth={auth}>

@@ -369,7 +369,7 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
             <div className="bg-white rounded-3xl shadow-sm p-4 border border-gray-100">
                 <div className="flex items-center justify-between mb-3">
                     <div className=" font-bold text-gray-900">{t('studentProfilePage.sections.myBadges')}</div>
-                    <Link href="/student/badges" className="text-[#A3C042] text-sm font-semibold">{t('common.viewAll')}</Link>
+                    <Link href="/badges" className="text-[#A3C042] text-sm font-semibold">{t('common.viewAll')}</Link>
                 </div>
 
                 {displayBadges.length > 0 ? (
@@ -608,7 +608,7 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
                     activeNav="profile"
                     unreadCount={0}
                     onNotifications={() => router.visit('/profile')}
-                    onBack={() => router.visit('/student/dashboard')}
+                    onBack={() => router.visit('/dashboard')}
                 >
                     <StudentProfileContent
                         user={user}
@@ -648,7 +648,7 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
                     title={t('studentProfilePage.title')}
                     unreadCount={0}
                     onNotifications={() => router.visit('/profile')}
-                    onBack={() => router.visit('/student/dashboard')}
+                    onBack={() => router.visit('/dashboard')}
                     rightIcon={FaCog}
                     leftIcon={FaArrowRight}
                     reverseOrder={true}

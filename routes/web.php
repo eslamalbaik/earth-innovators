@@ -398,14 +398,15 @@ Route::get('/teachers/{teacherId}/availabilities', [AvailabilityController::clas
 
 Route::get('/subjects', [SubjectController::class, 'index'])->name('subjects');
 
-// المشاريع المعتمدة (عام - متاح لجميع المستخدمين)
-Route::get('/projects', [App\Http\Controllers\ProjectController::class, 'index'])->name('projects.index');
-Route::get('/projects/{project}', [App\Http\Controllers\ProjectController::class, 'show'])->name('projects.show');
+// المشاريع المعتمدة والتحديات العامة (للجميع؛ الطالب المسجّل يُوجَّه إلى /student/…)
+Route::middleware(['redirect_student_explore'])->group(function () {
+    Route::get('/projects', [App\Http\Controllers\ProjectController::class, 'index'])->name('projects.index');
+    Route::get('/projects/{project}', [App\Http\Controllers\ProjectController::class, 'show'])->name('projects.show');
 
-// التحديات النشطة (عام - متاح لجميع المستخدمين)
-Route::get('/challenges', [App\Http\Controllers\ChallengeController::class, 'index'])->name('challenges.index');
-Route::get('/challenges/winners', [App\Http\Controllers\ChallengeController::class, 'winners'])->name('challenges.winners');
-Route::get('/challenges/{challenge}', [App\Http\Controllers\ChallengeController::class, 'show'])->name('challenges.show');
+    Route::get('/challenges', [App\Http\Controllers\ChallengeController::class, 'index'])->name('challenges.index');
+    Route::get('/challenges/winners', [App\Http\Controllers\ChallengeController::class, 'winners'])->name('challenges.winners');
+    Route::get('/challenges/{challenge}', [App\Http\Controllers\ChallengeController::class, 'show'])->name('challenges.show');
+});
 
 // API Routes for Challenges
 Route::prefix('api')->group(function () {
@@ -545,6 +546,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/chats/{chat}', [ChatController::class, 'show'])->name('chats.show');
     Route::post('/chats/{chat}/messages', [ChatController::class, 'storeMessage'])->name('chats.messages.store');
 
+    // Student home alias (same as GET /dashboard for students; keeps legacy /student/dashboard working)
+    Route::get('/student/dashboard', [StudentDashboardController::class, 'index'])->name('student.dashboard');
+
     Route::get('/student/reviews', [\App\Http\Controllers\Student\StudentReviewController::class, 'index'])->name('student.reviews');
     Route::post('/student/reviews', [\App\Http\Controllers\Student\StudentReviewController::class, 'store'])->name('student.reviews.store');
     Route::put('/student/reviews/{review}', [\App\Http\Controllers\Student\StudentReviewController::class, 'update'])->name('student.reviews.update');
@@ -574,6 +578,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Student Challenges
     Route::get('/student/challenges', [\App\Http\Controllers\Student\StudentChallengeController::class, 'index'])->name('student.challenges.index');
+    Route::get('/student/challenges/winners', [\App\Http\Controllers\Student\StudentChallengeController::class, 'winners'])->name('student.challenges.winners');
     Route::get('/student/challenges/{challenge}', [\App\Http\Controllers\Student\StudentChallengeController::class, 'show'])->name('student.challenges.show');
     Route::post('/student/challenges/{challenge}/join', [\App\Http\Controllers\Student\StudentChallengeController::class, 'join'])->name('student.challenges.join');
     Route::post('/student/challenges/{challenge}/submit', [\App\Http\Controllers\Student\StudentChallengeController::class, 'submit'])->name('student.challenges.submit');
@@ -582,7 +587,8 @@ Route::middleware(['auth'])->group(function () {
 
     // تسليمات المشاريع
     Route::post('/projects/{project}/submissions', [\App\Http\Controllers\ProjectSubmissionController::class, 'store'])->name('project.submissions.store');
-    Route::put('/project-submissions/{submission}', [\App\Http\Controllers\ProjectSubmissionController::class, 'update'])->name('project.submissions.update');
+    // POST + PUT: رفع الملفات يعتمد على POST حتى تُعبأ $_FILES في PHP؛ الواجهة تستخدم POST مع forceFormData
+    Route::match(['post', 'put'], '/project-submissions/{submission}', [\App\Http\Controllers\ProjectSubmissionController::class, 'update'])->name('project.submissions.update');
 
     // شهادة عضوية الطالب
     Route::get('/student/certificate', [\App\Http\Controllers\Student\StudentCertificateController::class, 'show'])->name('student.certificate.show');

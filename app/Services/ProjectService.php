@@ -19,12 +19,13 @@ class ProjectService extends BaseService
         ?string $search = null,
         ?string $category = null,
         ?int $schoolId = null,
-        int $perPage = 12
+        int $perPage = 12,
+        bool $globalOnly = false
     ): LengthAwarePaginator {
-        $cacheKey = "approved_projects_" . md5(json_encode([$search, $category, $schoolId, $perPage]));
+        $cacheKey = 'approved_projects_'.md5(json_encode([$search, $category, $schoolId, $perPage, $globalOnly]));
         $cacheTag = 'approved_projects';
 
-        return $this->cacheTags($cacheTag, $cacheKey, function () use ($search, $category, $schoolId, $perPage) {
+        return $this->cacheTags($cacheTag, $cacheKey, function () use ($search, $category, $schoolId, $perPage, $globalOnly) {
             $query = Project::where('status', 'approved')
                 ->with([
                     'teacher:id,name_ar,user_id',
@@ -33,7 +34,7 @@ class ProjectService extends BaseService
                     'school:id,name',
                     'approver:id,name'
                 ])
-                ->select('id', 'title', 'description', 'category', 'status', 'teacher_id', 'user_id', 'school_id', 'approved_by', 'views', 'likes', 'rating', 'created_at');
+                ->select('id', 'title', 'description', 'category', 'status', 'teacher_id', 'user_id', 'school_id', 'approved_by', 'views', 'likes', 'rating', 'points_earned', 'images', 'created_at');
 
             if ($search) {
                 $query->where(function ($q) use ($search) {
@@ -46,16 +47,16 @@ class ProjectService extends BaseService
                 $query->where('category', $category);
             }
 
-            if ($schoolId) {
+            if ($globalOnly) {
+                $query->whereNull('school_id');
+            } elseif ($schoolId) {
                 // إظهار المشاريع المتاحة لمدرسة محددة أو المتاحة لجميع المؤسسات تعليمية
                 $query->where(function ($q) use ($schoolId) {
                     $q->where('school_id', $schoolId)
                       ->orWhereNull('school_id');
                 });
-            } else {
-                // إذا لم يتم تحديد مدرسة، عرض جميع المشاريع المعتمدة (بما في ذلك المتاحة لجميع المؤسسات تعليمية)
-                // لا حاجة لفلترة إضافية - جميع المشاريع المعتمدة ستظهر
             }
+            // بدون schoolId وبدون globalOnly: جميع المشاريع المعتمدة (استكشاف عام/إداري)
 
             return $query->latest()->paginate($perPage);
         }, 300); // Cache for 5 minutes

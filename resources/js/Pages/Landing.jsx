@@ -138,6 +138,7 @@ export default function Landing({
                                             <span className="text-gray-300">|</span>
                                             <a
                                                 href={membershipCertificate.download_url}
+                                                download
                                                 className="text-xs font-bold text-[#A3C042] hover:text-[#8CA635] flex items-center gap-1"
                                             >
                                                 <FaDownload className="text-xs" />
@@ -427,6 +428,7 @@ export default function Landing({
                                             <span className="text-gray-300">|</span>
                                             <a
                                                 href={membershipCertificate.download_url}
+                                                download
                                                 className="text-sm font-bold text-[#A3C042] hover:text-[#8CA635] flex items-center gap-1"
                                             >
                                                 <FaDownload />
@@ -682,4 +684,3 @@ export default function Landing({
         </div>
     );
 }
-

@@ -51,6 +51,7 @@ class StudentCertificateController extends Controller
                 'join_date' => $joinDate,
             ],
             'certificate' => [
+                'certificate_number' => $membershipCertificate?->certificate_number,
                 'issue_date' => $membershipCertificate ? $membershipCertificate->issue_date->format('Y-m-d') : $issueDate,
                 'achievement_period_start' => $joinDate,
                 'achievement_period_end' => now()->format('Y-m-d'),

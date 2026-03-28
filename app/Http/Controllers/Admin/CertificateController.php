@@ -127,10 +127,11 @@ class CertificateController extends Controller
                     $user,
                     auth()->user(),
                     [
-                        'title' => $validated['title_ar'] ?? $validated['title'],
+                        'course_name' => $validated['title_ar'] ?? $validated['title'],
                         'description' => $validated['description_ar'] ?? $validated['description'],
                         'certificate_number' => $validated['certificate_number'],
                         'issue_date' => $validated['issue_date'],
+                        'template' => $validated['template'] ?? 'default',
                     ],
                     $validated['template'] ?? null,
                     'Y-m-d',
@@ -207,10 +208,11 @@ class CertificateController extends Controller
                     $user,
                     auth()->user(),
                     [
-                        'title' => $validated['title_ar'] ?? $validated['title'],
+                        'course_name' => $validated['title_ar'] ?? $validated['title'],
                         'description' => $validated['description_ar'] ?? $validated['description'],
                         'certificate_number' => $certificate->certificate_number,
                         'issue_date' => $validated['issue_date'],
+                        'template' => $validated['template'] ?? 'default',
                     ],
                     $validated['template'] ?? null,
                     'Y-m-d',
@@ -244,12 +246,12 @@ class CertificateController extends Controller
 
     public function download(Certificate $certificate)
     {
-        if (!$certificate->file_path || !Storage::disk('public')->exists($certificate->file_path)) {
+        if (false && (!$certificate->file_path || !Storage::disk('public')->exists($certificate->file_path))) {
             abort(404, 'ملف الشهادة غير موجود');
         }
 
         return Storage::disk('public')->download(
-            $certificate->file_path,
+            $this->certificateService->rebuildCertificateFile($certificate),
             "certificate_{$certificate->certificate_number}.pdf"
         );
     }

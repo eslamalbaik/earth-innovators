@@ -278,7 +278,7 @@ class SchoolPublicationController extends Controller
             $publication->update($validated);
 
             // Clear cache
-            $this->publicationService->clearPublicationCache($publication->school_id, $publication->author_id);
+            $this->publicationService->clearPublicationCache($publication->school_id, $publication->author_id, $publication->id);
 
             return redirect()
                 ->route('school.publications.index')

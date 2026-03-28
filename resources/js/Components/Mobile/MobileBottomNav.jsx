@@ -25,8 +25,8 @@ const getRoleLinks = (role) => {
     }
     if (role === 'student') {
         return {
-            home: '/student/dashboard',
-            dashboard: '/student/dashboard',
+            home: '/dashboard',
+            dashboard: '/dashboard',
             projects: '/student/projects',
             challenges: '/student/challenges',
             profile: '/student/profile',
@@ -57,6 +57,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
     const dropdownRef = useRef(null);
     const userDropdownRef = useRef(null);
     const links = getRoleLinks(role);
+    const exploreHref = role === 'student' ? '/student/projects' : '/projects';
 
     // Close dropdowns when clicking outside
     useEffect(() => {
@@ -85,7 +86,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
     const items = [
         { key: 'home', label: t('common.home'), icon: FaHome, href: links.home },
         { key: 'projects', label: t('dashboard.myProjects'), icon: FaFolderOpen, href: links.projects },
-        { key: 'explore', label: t('common.projects'), icon: FaCompass, href: '/projects' },
+        { key: 'explore', label: t('common.projects'), icon: FaCompass, href: exploreHref },
         { key: 'challenges', label: t('common.challenges'), icon: FaTrophy, href: links.challenges },
     ];
 
@@ -100,7 +101,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
         const sidebarItems = [
             { key: 'home', label: t('common.home'), icon: FaHome, href: links.home },
             { key: 'projects', label: t('dashboard.myProjects'), icon: FaFolderOpen, href: links.projects },
-            { key: 'explore', label: t('common.projects'), icon: FaCompass, href: '/projects' },
+            { key: 'explore', label: t('common.projects'), icon: FaCompass, href: exploreHref },
             { key: 'challenges', label: t('common.challenges'), icon: FaTrophy, href: links.challenges },
         ];
 

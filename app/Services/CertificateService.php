@@ -14,7 +14,9 @@ class CertificateService
 {
     protected $fieldMap;
 
-    public function __construct()
+    public function __construct(
+        private MembershipService $membershipService
+    )
     {
         $fieldMapPath = config_path('certificate_fields.json');
         if (file_exists($fieldMapPath)) {
@@ -61,13 +63,18 @@ class CertificateService
         string $dateFormat,
         string $certificateType = 'student'
     ): array {
-        $issueDate = Carbon::now();
+        $issueDate = $this->resolveDateOverride(
+            $overrides['issue_date'] ?? $overrides['date'] ?? null
+        ) ?? Carbon::now();
         $now = Carbon::now();
+        $membershipNumber = $overrides['membership_number']
+            ?? $student->membership_number
+            ?? $this->membershipService->ensureMembershipNumber($student);
         
         $data = [
             'student_name' => $overrides['student_name'] ?? $student->name,
             'student_id' => $overrides['student_id'] ?? (string)$student->id,
-            'membership_number' => $overrides['membership_number'] ?? $student->membership_number ?? 'N/A',
+            'membership_number' => $membershipNumber,
             'course_name' => $overrides['course_name'] ?? 'دورة تدريبية',
             'date' => $this->formatDate($issueDate, $dateFormat),
             'issue_date' => $this->formatDate($issueDate, $dateFormat),
@@ -84,14 +91,10 @@ class CertificateService
                 : ($student->created_at ? Carbon::parse($student->created_at) : $now);
             
             // Issue time: current time
-            $issueTime = isset($overrides['issue_time']) 
-                ? Carbon::parse($overrides['issue_time']) 
-                : $now;
+            $issueTime = $this->resolveDateOverride($overrides['issue_time'] ?? null) ?? $issueDate;
             
             // Today's date: current date
-            $todayDate = isset($overrides['today_date']) 
-                ? Carbon::parse($overrides['today_date']) 
-                : $now;
+            $todayDate = $this->resolveDateOverride($overrides['today_date'] ?? null) ?? $issueDate;
 
             $data['join_date'] = $this->formatDate($joinDate, $dateFormat);
             $data['issue_time'] = $issueTime->format('H:i:s'); // Time format: HH:MM:SS
@@ -130,8 +133,8 @@ class CertificateService
             throw new \Exception('FPDI library is required. Please run: composer require setasign/fpdi');
         }
 
-        // Create FPDI instance (extends TCPDF)
-        $pdf = new Fpdi('L', 'mm', 'A4', true, 'UTF-8', false);
+        // The field map coordinates are stored in points to match the PDF template.
+        $pdf = new Fpdi('P', 'pt', 'A4', true, 'UTF-8', false);
         
         // Remove default header/footer
         $pdf->setPrintHeader(false);
@@ -144,11 +147,13 @@ class CertificateService
         // Import existing PDF page
         $pageCount = $pdf->setSourceFile($templatePath);
         $tplId = $pdf->importPage(1);
-        $pdf->AddPage();
-        $pdf->useTemplate($tplId, 0, 0, null, null, true);
+        $templateSize = $pdf->getTemplateSize($tplId);
+        $pdf->AddPage($templateSize['orientation'], [$templateSize['width'], $templateSize['height']]);
+        $pdf->useTemplate($tplId, 0, 0, $templateSize['width'], $templateSize['height'], true);
         
         // Set font for Arabic text (DejaVu Sans supports Arabic)
         $pdf->SetFont('dejavusans', '', 12);
+        $pdf->SetTextColor(34, 34, 34);
         
         // Fill fields based on field map
         foreach ($this->fieldMap as $fieldName => $fieldConfig) {
@@ -160,9 +165,13 @@ class CertificateService
             $y = $fieldConfig['y'] ?? 0;
             $fontSize = $fieldConfig['font_size'] ?? 12;
             $align = $fieldConfig['align'] ?? 'left';
+            $fontFamily = $fieldConfig['font_family'] ?? 'dejavusans';
+            $width = $fieldConfig['width'] ?? $this->resolveFieldWidth($fieldConfig, $templateSize['width']);
+            $height = $fieldConfig['height'] ?? max($fontSize * 1.4, 18);
+            $value = (string) $data[$fieldName];
             
             // Set font size
-            $pdf->SetFont('dejavusans', '', $fontSize);
+            $pdf->SetFont(strtolower($fontFamily), '', $fontSize);
             
             // Set alignment
             $alignMap = [
@@ -172,10 +181,14 @@ class CertificateService
             ];
             $textAlign = $alignMap[$align] ?? 'L';
             
+            $pdf->setRTL($this->containsArabicCharacters($value));
+
             // Write text
             $pdf->SetXY($x, $y);
-            $pdf->Cell(0, 0, $data[$fieldName], 0, 0, $textAlign, false, '', 0, false, 'T', 'C');
+            $pdf->Cell($width, $height, $value, 0, 0, $textAlign, false, '', 0, false, 'M', 'M');
         }
+
+        $pdf->setRTL(false);
         
         // Generate unique filename
         $year = date('Y');
@@ -221,7 +234,7 @@ class CertificateService
     /**
      * Generate unique certificate number
      */
-    protected function generateCertificateNumber(User $student): string
+    public function generateCertificateNumber(User $student): string
     {
         $year = date('Y');
         $baseNumber = str_pad($student->id, 4, '0', STR_PAD_LEFT);
@@ -259,6 +272,64 @@ class CertificateService
         return $certificateNumber;
     }
 
+    public function rebuildCertificateFile(Certificate $certificate): string
+    {
+        $recipient = $certificate->user;
+
+        if (!$recipient && $certificate->school_id) {
+            $recipient = User::findOrFail($certificate->school_id);
+        }
+
+        if (!$recipient) {
+            throw new \RuntimeException('Certificate recipient could not be resolved.');
+        }
+
+        $issuer = $certificate->issuer ?? $recipient;
+        $issueDate = $certificate->approved_at ?? $certificate->issue_date ?? $certificate->created_at ?? now();
+        $certificateNumber = str_starts_with((string) $certificate->certificate_number, 'REQ-')
+            ? $this->generateCertificateNumber($recipient)
+            : $certificate->certificate_number;
+
+        $overrides = [
+            'course_name' => $certificate->title_ar ?? $certificate->title,
+            'description' => $certificate->description_ar ?? $certificate->description,
+            'description_ar' => $certificate->description_ar ?? $certificate->description,
+            'certificate_number' => $certificateNumber,
+            'issue_date' => $issueDate->toDateString(),
+            'date' => $issueDate->toDateString(),
+            'membership_number' => $recipient->membership_number,
+        ];
+
+        if ($certificate->type === 'membership') {
+            $overrides['join_date'] = optional($recipient->created_at)->toDateString() ?? $issueDate->toDateString();
+            $overrides['today_date'] = $issueDate->toDateString();
+            $overrides['issue_time'] = $issueDate->format('H:i:s');
+        }
+
+        $templatePath = $this->resolveTemplatePath($certificate->template);
+
+        if ($certificate->file_path && Storage::disk('public')->exists($certificate->file_path)) {
+            Storage::disk('public')->delete($certificate->file_path);
+        }
+
+        $filePath = $this->generateCertificate(
+            $recipient,
+            $issuer,
+            $overrides,
+            $templatePath,
+            $certificate->type === 'membership' ? 'long' : 'Y-m-d',
+            $certificate->type
+        );
+
+        $certificate->update([
+            'certificate_number' => $certificateNumber,
+            'issue_date' => $issueDate,
+            'file_path' => $filePath,
+        ]);
+
+        return $filePath;
+    }
+
     /**
      * Save certificate record to database
      */
@@ -282,9 +353,9 @@ class CertificateService
             'description' => $data['description'] ?? null,
             'description_ar' => $data['description_ar'] ?? null,
             'certificate_number' => $data['certificate_number'] ?? $this->generateCertificateNumber($student),
-            'issue_date' => Carbon::now(),
+            'issue_date' => isset($data['issue_date']) ? Carbon::parse($data['issue_date']) : Carbon::now(),
             'expiry_date' => isset($data['expiry_date']) ? Carbon::parse($data['expiry_date']) : null,
-            'template' => 'default',
+            'template' => $data['template'] ?? 'default',
             'file_path' => $filePath,
             'issued_by' => $issuer->id,
             'is_active' => true,
@@ -293,5 +364,56 @@ class CertificateService
 
         return $certificate;
     }
-}
 
+    protected function resolveDateOverride(mixed $value): ?Carbon
+    {
+        if ($value instanceof Carbon) {
+            return $value;
+        }
+
+        if (!$value) {
+            return null;
+        }
+
+        try {
+            return Carbon::parse($value);
+        } catch (\Throwable $exception) {
+            return null;
+        }
+    }
+
+    protected function resolveFieldWidth(array $fieldConfig, float $pageWidth): float
+    {
+        $x = (float) ($fieldConfig['x'] ?? 0);
+        $align = $fieldConfig['align'] ?? 'left';
+
+        if ($align === 'center') {
+            return max($pageWidth - ($x * 2), 120);
+        }
+
+        return max($pageWidth - $x - 40, 120);
+    }
+
+    protected function containsArabicCharacters(string $value): bool
+    {
+        return preg_match('/\p{Arabic}/u', $value) === 1;
+    }
+
+    protected function resolveTemplatePath(?string $template): ?string
+    {
+        if (!$template || $template === 'default') {
+            return null;
+        }
+
+        if (file_exists($template)) {
+            return $template;
+        }
+
+        $publicCandidate = public_path(ltrim($template, '/'));
+        if (file_exists($publicCandidate)) {
+            return $publicCandidate;
+        }
+
+        return null;
+    }
+}

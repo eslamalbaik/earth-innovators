@@ -53,7 +53,8 @@ class RegisteredUserController extends Controller
             'role' => 'required|string|in:student,teacher,school,educational_institution',
         ];
 
-        if ($request->role === 'teacher') {
+        // يجب تضمين school_id في القواعد حتى يُمرَّر إلى $validated ويُحفظ عند التسجيل (الطالب/المعلم)
+        if (in_array($request->role, ['student', 'teacher'], true)) {
             $rules['school_id'] = 'required|exists:users,id';
         }
 
@@ -76,7 +77,7 @@ class RegisteredUserController extends Controller
             'school_id.exists' => 'المدرسة المختارة غير موجودة أو غير متاحة.',
         ]);
 
-        if (in_array($validated['role'], ['student', 'teacher'], true) && !empty($validated['school_id'])) {
+        if (in_array($validated['role'], ['student', 'teacher'], true)) {
             $school = User::where('id', $validated['school_id'])
                 ->whereIn('role', ['school', 'educational_institution'])
                 ->first();
@@ -96,7 +97,7 @@ class RegisteredUserController extends Controller
             'role' => $validated['role'],
         ];
 
-        if (in_array($validated['role'], ['student', 'teacher'], true) && !empty($validated['school_id'])) {
+        if (in_array($validated['role'], ['student', 'teacher'], true)) {
             $userData['school_id'] = $validated['school_id'];
         }
 

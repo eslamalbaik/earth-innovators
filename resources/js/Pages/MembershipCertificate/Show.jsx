@@ -5,11 +5,29 @@ import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import DesktopFooter from '@/Components/Mobile/DesktopFooter';
 import { useTranslation } from '@/i18n';
+import { useToast } from '@/Contexts/ToastContext';
+import { downloadFile } from '@/utils/downloadFile';
 
 export default function MembershipCertificateShow({ auth, certificate, eligibility, user }) {
     const { t, language } = useTranslation();
+    const { showError } = useToast();
     const isAuthed = !!auth?.user;
     const currentUser = auth?.user;
+
+    const handleDownload = async () => {
+        if (!certificate?.download_url) {
+            return;
+        }
+
+        try {
+            await downloadFile(
+                certificate.download_url,
+                `certificate_${certificate.certificate_number || user?.membership_number || 'membership'}.pdf`
+            );
+        } catch (error) {
+            showError(t('errors.somethingWentWrong'));
+        }
+    };
 
     const handleCheckEligibility = async () => {
         try {
@@ -154,13 +172,14 @@ export default function MembershipCertificateShow({ auth, certificate, eligibili
                                     </div>
                                 </div>
 
-                                <a
-                                    href={certificate.download_url}
+                                <button
+                                    type="button"
+                                    onClick={handleDownload}
                                     className="w-full flex items-center justify-center gap-2 bg-[#A3C042] text-white rounded-xl py-3 font-bold hover:bg-[#8CA635] transition shadow-lg"
                                 >
                                     <FaDownload />
                                     {t('membershipCertificatePage.downloadCertificate')}
-                                </a>
+                                </button>
                             </>
                         ) : (
                             <>
@@ -256,13 +275,14 @@ export default function MembershipCertificateShow({ auth, certificate, eligibili
                                     </div>
                                 </div>
 
-                                <a
-                                    href={certificate.download_url}
+                                <button
+                                    type="button"
+                                    onClick={handleDownload}
                                     className="w-full flex items-center justify-center gap-2 bg-[#A3C042] text-white rounded-xl py-4 font-bold hover:bg-[#8CA635] transition shadow-lg text-lg"
                                 >
                                     <FaDownload />
                                     {t('membershipCertificatePage.downloadCertificate')}
-                                </a>
+                                </button>
                             </>
                         ) : (
                             <>

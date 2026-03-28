@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Student;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\ProjectSubmission;
+use App\Models\User;
 use App\Services\ProjectService;
 use App\Services\SubmissionService;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -19,29 +21,35 @@ class StudentProjectController extends Controller
     ) {}
 
     /**
-     * عرض المشاريع المعتمدة للطالب
+     * عرض المشاريع المعتمدة المتاحة للطالب (مشاريع مدرسته + المشاريع العامة)، مع حالة التسليم
      */
     public function index(Request $request)
     {
         $student = Auth::user();
-
-        if (!$student->school_id) {
-            return Inertia::render('Student/Projects/Index', [
-                'projects' => [],
-                'message' => 'أنت غير مرتبط بمدرسة',
-            ]);
+        if (!$student || !$student->isStudent()) {
+            abort(403);
         }
 
-        $projects = $this->projectService->getSchoolProjects(
-            $student->school_id,
-            $request->get('search'),
-            'approved',
-            $request->get('category'),
-            12
+        $student->refresh();
+        $hasSchool = filled($student->school_id);
+
+        $projects = $this->hydrateApprovedProjectsForStudent(
+            $student,
+            $this->projectService->getApprovedProjects(
+                $request->get('search'),
+                $request->get('category'),
+                $hasSchool ? (int) $student->school_id : null,
+                12,
+                ! $hasSchool
+            )
         )->withQueryString();
+
+        $canStartNewSubmission = $this->studentCanStartNewProjectSubmission($student);
 
         return Inertia::render('Student/Projects/Index', [
             'projects' => $projects,
+            'noticeKey' => $hasSchool ? null : 'studentProjects.noSchoolLinked',
+            'canStartNewSubmission' => $canStartNewSubmission,
         ]);
     }
 
@@ -51,24 +59,40 @@ class StudentProjectController extends Controller
     public function create()
     {
         $student = Auth::user();
-
-        if (!$student->school_id) {
-            return Inertia::render('Student/Projects/Create', [
-                'projects' => [],
-                'message' => 'أنت غير مرتبط بمدرسة',
-            ]);
+        if (!$student || !$student->isStudent()) {
+            abort(403);
         }
 
-        // Get available projects for student
-        $projects = $this->projectService->getSchoolProjects(
-            $student->school_id,
-            null,
-            'approved',
-            null,
-            100
+        $student->refresh();
+        $hasSchool = filled($student->school_id);
+
+        $projectsPaginator = $this->hydrateApprovedProjectsForStudent(
+            $student,
+            $this->projectService->getApprovedProjects(
+                null,
+                null,
+                $hasSchool ? (int) $student->school_id : null,
+                100,
+                ! $hasSchool
+            )
         );
 
-        // Get student submissions for evaluation view
+        $allVisible = $projectsPaginator->getCollection();
+        $submittedIds = ProjectSubmission::where('student_id', $student->id)
+            ->whereIn('project_id', $allVisible->pluck('id'))
+            ->pluck('project_id');
+        $eligibleProjects = $allVisible
+            ->filter(fn (Project $p) => ! $submittedIds->contains($p->id))
+            ->values()
+            ->all();
+
+        $uploadBlockedKey = null;
+        if ($eligibleProjects === []) {
+            $uploadBlockedKey = Project::approvedVisibleToStudent($student)->exists()
+                ? 'studentProjects.upload.allSubmitted'
+                : 'studentProjects.upload.noProjectsInCatalog';
+        }
+
         $submissions = $this->submissionService->getStudentSubmissions(
             $student->id,
             null,
@@ -76,9 +100,64 @@ class StudentProjectController extends Controller
         );
 
         return Inertia::render('Student/Projects/Create', [
-            'projects' => $projects->items(),
+            'projects' => $eligibleProjects,
             'submissions' => $submissions->items(),
+            'noticeKey' => $hasSchool ? null : 'studentProjects.noSchoolLinked',
+            'uploadBlockedKey' => $uploadBlockedKey,
         ]);
+    }
+
+    /**
+     * يوجد مشروع معتمد يمكن تسليم عمل جديد عليه (لم يُسلَّم بعد).
+     */
+    private function studentCanStartNewProjectSubmission(User $student): bool
+    {
+        $submittedIds = ProjectSubmission::where('student_id', $student->id)->pluck('project_id');
+
+        return Project::approvedVisibleToStudent($student)
+            ->whereNotIn('id', $submittedIds)
+            ->exists();
+    }
+
+    /**
+     * يربط كل مشروع بحالة تسليم الطالب وصورة مصغرة للقائمة
+     */
+    private function hydrateApprovedProjectsForStudent(User $student, LengthAwarePaginator $projects): LengthAwarePaginator
+    {
+        $items = $projects->getCollection();
+        $projectIds = $items->pluck('id')->filter()->values();
+        $submissions = collect();
+        if ($projectIds->isNotEmpty()) {
+            $submissions = ProjectSubmission::where('student_id', $student->id)
+                ->whereIn('project_id', $projectIds)
+                ->get()
+                ->keyBy('project_id');
+        }
+
+        $projects->setCollection(
+            $items->map(function (Project $project) use ($submissions) {
+                $sub = $submissions->get($project->id);
+                if ($sub) {
+                    $project->submission_status = $sub->status;
+                    $project->submitted_at = $sub->submitted_at;
+                    if ($sub->rating !== null) {
+                        $project->rating = (float) $sub->rating;
+                    }
+                }
+
+                $images = $project->images ?? [];
+                if (is_array($images) && count($images) > 0) {
+                    $first = $images[0];
+                    $project->thumbnail = (is_string($first) && (str_starts_with($first, 'http://') || str_starts_with($first, 'https://')))
+                        ? $first
+                        : '/storage/' . ltrim((string) $first, '/');
+                }
+
+                return $project;
+            })
+        );
+
+        return $projects;
     }
 
     /**

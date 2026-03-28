@@ -176,7 +176,7 @@ class SubmissionService extends BaseService
                 'student:id,name,email'
             ])
                 ->where('student_id', $studentId)
-                ->select('id', 'project_id', 'student_id', 'files', 'comment', 'status', 'submitted_at', 'reviewed_at', 'grade', 'feedback', 'created_at');
+                ->select('id', 'project_id', 'student_id', 'files', 'comment', 'status', 'submitted_at', 'reviewed_at', 'rating', 'badges', 'feedback', 'reviewed_by', 'created_at');
 
             if ($projectId) {
                 $query->where('project_id', $projectId);
@@ -198,7 +198,7 @@ class SubmissionService extends BaseService
                 'project:id,title'
             ])
                 ->where('project_id', $projectId)
-                ->select('id', 'project_id', 'student_id', 'files', 'comment', 'status', 'submitted_at', 'reviewed_at', 'grade', 'feedback', 'created_at');
+                ->select('id', 'project_id', 'student_id', 'files', 'comment', 'status', 'submitted_at', 'reviewed_at', 'rating', 'badges', 'feedback', 'reviewed_by', 'created_at');
 
             if ($status) {
                 $query->where('status', $status);

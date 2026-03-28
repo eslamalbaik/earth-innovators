@@ -1,13 +1,35 @@
-import { Head, Link, router } from '@inertiajs/react';
-import { useState, useMemo } from 'react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { FaSearch, FaFilter, FaHeart, FaComment, FaTimes } from 'react-icons/fa';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import DesktopFooter from '@/Components/Mobile/DesktopFooter';
 import { useTranslation } from '@/i18n';
 
+function parseQueryFromUrl(url) {
+    if (!url || typeof url !== 'string') return { search: '', category: '' };
+    const q = url.includes('?') ? url.split('?')[1] : '';
+    const p = new URLSearchParams(q);
+    return {
+        search: p.get('search') || '',
+        category: p.get('category') || '',
+    };
+}
+
+/** لا نرسل category عند "الكل"، ونعيد page فقط عند الحاجة لتفادي بقاء رقم صفحة من فلتر سابق */
+function buildProjectsQuery({ search, category, page = 1 }) {
+    const params = {};
+    const s = typeof search === 'string' ? search.trim() : '';
+    const c = typeof category === 'string' ? category.trim() : '';
+    if (s) params.search = s;
+    if (c) params.category = c;
+    if (page > 1) params.page = page;
+    return params;
+}
+
 export default function ProjectsIndex({ auth, projects, userRole, categories = [] }) {
     const { t, language } = useTranslation();
+    const page = usePage();
     const [search, setSearch] = useState('');
     const [category, setCategory] = useState('');
     const [showFilterModal, setShowFilterModal] = useState(false);
@@ -27,6 +49,24 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
     ];
 
     const categoriesList = categories && categories.length > 0 ? categories : defaultCategories;
+
+    useEffect(() => {
+        const { search: s, category: c } = parseQueryFromUrl(page.url);
+        setSearch(s);
+        setCategory(c);
+    }, [page.url]);
+
+    const visitProjects = useCallback((overrides = {}) => {
+        const next = {
+            search: overrides.search !== undefined ? overrides.search : search,
+            category: overrides.category !== undefined ? overrides.category : category,
+            page: overrides.page !== undefined ? overrides.page : 1,
+        };
+        router.get('/projects', buildProjectsQuery(next), {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    }, [search, category]);
 
     const ageGroups = [
         { value: '6-9', label: t('projects.age6_9') },
@@ -50,20 +90,17 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
 
     const handleSearch = (e) => {
         e.preventDefault();
-        router.get('/projects', { search, category }, {
-            preserveState: true,
-            preserveScroll: true,
-        });
+        visitProjects({ search, category, page: 1 });
     };
 
     const handleApplyFilters = () => {
-        router.get('/projects', {
+        const subj = filterSubject || category;
+        setCategory(subj);
+        router.get('/projects', buildProjectsQuery({
             search,
-            category,
-            age_group: filterAgeGroup,
-            school: filterSchool,
-            subject: filterSubject,
-        }, {
+            category: subj,
+            page: 1,
+        }), {
             preserveState: true,
             preserveScroll: true,
         });
@@ -74,10 +111,7 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
         setFilterAgeGroup('');
         setFilterSchool('');
         setFilterSubject('');
-        router.get('/projects', { search, category }, {
-            preserveState: true,
-            preserveScroll: true,
-        });
+        visitProjects({ page: 1 });
     };
 
     const getCategoryLabel = (cat) => {
@@ -139,14 +173,11 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                 {categoriesList.map((cat) => (
                     <button
-                        key={cat.value}
+                        key={cat.value === '' ? 'all' : cat.value}
                         type="button"
                         onClick={() => {
                             setCategory(cat.value);
-                            router.get('/projects', { search, category: cat.value }, {
-                                preserveState: true,
-                                preserveScroll: true,
-                            });
+                            visitProjects({ category: cat.value, page: 1 });
                         }}
                         className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition ${category === cat.value
                                 ? 'bg-[#A3C042] text-white'
@@ -228,7 +259,17 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
                     <p className="text-gray-400 text-sm mb-2">{t('projects.noProjects')}</p>
                     <button
                         type="button"
-                        onClick={handleClearFilters}
+                        onClick={() => {
+                            setFilterAgeGroup('');
+                            setFilterSchool('');
+                            setFilterSubject('');
+                            setSearch('');
+                            setCategory('');
+                            router.get('/projects', buildProjectsQuery({ search: '', category: '', page: 1 }), {
+                                preserveState: true,
+                                preserveScroll: true,
+                            });
+                        }}
                         className="text-[#A3C042] text-sm font-semibold hover:text-[#8CA635]"
                     >
                         {t('projects.viewAll')}

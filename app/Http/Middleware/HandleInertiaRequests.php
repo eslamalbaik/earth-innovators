@@ -39,6 +39,7 @@ class HandleInertiaRequests extends Middleware
                     'name' => $user->name,
                     'email' => $user->email,
                     'role' => $user->role,
+                    'school_id' => $user->school_id,
                     // Only include image if it exists - avoid unnecessary data
                     'image' => $user->image ? (
                         str_starts_with($user->image, 'http') 
@@ -51,6 +52,8 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),
+                'warning' => $request->session()->get('warning'),
+                'info' => $request->session()->get('info'),
             ],
             // PERFORMANCE: Add ziggy route helper only in development to reduce payload
             'ziggy' => fn () => [

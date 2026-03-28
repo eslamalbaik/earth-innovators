@@ -5,15 +5,25 @@ import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import DesktopFooter from '@/Components/Mobile/DesktopFooter';
 import { useTranslation } from '@/i18n';
+import { useToast } from '@/Contexts/ToastContext';
+import { downloadFile } from '@/utils/downloadFile';
 
 export default function TeacherCertificateShow({ auth, user, stats, certificate, membershipSummary = null, school = null, latestApprovedCertificates = [] }) {
     const { t, language } = useTranslation();
+    const { showError } = useToast();
     const isAuthed = !!auth?.user;
     const currentUser = auth?.user;
 
-    const handleDownload = () => {
+    const handleDownload = async () => {
         if (certificate?.download_url) {
-            window.open(certificate.download_url, '_blank');
+            try {
+                await downloadFile(
+                    certificate.download_url,
+                    `certificate_${certificate?.certificate_number || user?.membership_number || 'teacher'}.pdf`
+                );
+            } catch (error) {
+                showError(t('errors.somethingWentWrong'));
+            }
         }
     };
 
@@ -41,7 +51,7 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate,
         if (!dateString) return '';
         try {
             const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', {
+            return date.toLocaleDateString(language === 'ar' ? 'ar-EG' : 'en-US', {
                 year: 'numeric',
                 month: '2-digit',
                 day: '2-digit'
@@ -103,12 +113,16 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate,
                                         <div className="text-sm font-bold text-gray-900">{user?.membership_number || t('common.notAvailable')}</div>
                                     </div>
                                     <div>
-                                        <label className="text-xs text-gray-600 mb-1 block">المدرسة</label>
+                                        <label className="text-xs text-gray-600 mb-1 block">{t('teacherCertificateShowPage.teacherInfo.school')}</label>
                                         <div className="text-sm font-bold text-gray-900">{school?.name || t('common.notAvailable')}</div>
                                     </div>
                                     <div>
-                                        <label className="text-xs text-gray-600 mb-1 block">صلاحية الشهادات</label>
-                                        <div className="text-sm font-bold text-gray-900">{membershipSummary?.certificate_access ? 'متاحة' : 'غير متاحة'}</div>
+                                        <label className="text-xs text-gray-600 mb-1 block">{t('teacherCertificateShowPage.teacherInfo.certificateAccess')}</label>
+                                        <div className="text-sm font-bold text-gray-900">
+                                            {membershipSummary?.certificate_access
+                                                ? t('teacherCertificatesIndexPage.certificateAccess.available')
+                                                : t('teacherCertificatesIndexPage.certificateAccess.unavailable')}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -129,7 +143,7 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate,
                                             <div className="flex-1 flex justify-end">
                                                 <img
                                                     src="/images/logo-modified.png"
-                                                    alt="إرث المبتكرين - Innovators Legacy"
+                                                    alt={t('common.appName')}
                                                     className="w-16 h-16 object-contain"
                                                 />
                                             </div>
@@ -252,24 +266,28 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate,
                                             <div className="text-base font-bold text-gray-900">{user?.membership_number || t('common.notAvailable')}</div>
                                         </div>
                                         <div>
-                                            <label className="text-sm text-gray-600 mb-2 block">المدرسة</label>
+                                            <label className="text-sm text-gray-600 mb-2 block">{t('teacherCertificateShowPage.teacherInfo.school')}</label>
                                             <div className="text-base font-bold text-gray-900">{school?.name || t('common.notAvailable')}</div>
                                         </div>
                                         <div>
-                                            <label className="text-sm text-gray-600 mb-2 block">نوع العضوية</label>
+                                            <label className="text-sm text-gray-600 mb-2 block">{t('teacherCertificateShowPage.teacherInfo.membershipType')}</label>
                                             <div className="text-base font-bold text-gray-900">
-                                                {membershipSummary?.membership_type === 'subscription' ? 'اشتراك فعّال' : 'عضوية أساسية'}
+                                                {membershipSummary?.membership_type === 'subscription'
+                                                    ? t('teacherCertificatesIndexPage.membershipStatus.subscription')
+                                                    : t('teacherCertificatesIndexPage.membershipStatus.basic')}
                                             </div>
                                         </div>
                                         <div>
-                                            <label className="text-sm text-gray-600 mb-2 block">صلاحية الشهادات</label>
+                                            <label className="text-sm text-gray-600 mb-2 block">{t('teacherCertificateShowPage.teacherInfo.certificateAccess')}</label>
                                             <div className="text-base font-bold text-gray-900">
-                                                {membershipSummary?.certificate_access ? 'متاحة' : 'غير متاحة'}
+                                                {membershipSummary?.certificate_access
+                                                    ? t('teacherCertificatesIndexPage.certificateAccess.available')
+                                                    : t('teacherCertificatesIndexPage.certificateAccess.unavailable')}
                                             </div>
                                         </div>
                                         {membershipSummary?.subscription?.package_name && (
                                             <div>
-                                                <label className="text-sm text-gray-600 mb-2 block">الباقة الحالية</label>
+                                                <label className="text-sm text-gray-600 mb-2 block">{t('teacherCertificateShowPage.teacherInfo.currentPackage')}</label>
                                                 <div className="text-base font-bold text-gray-900">{membershipSummary.subscription.package_name}</div>
                                             </div>
                                         )}
@@ -294,7 +312,7 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate,
                                                 <div className="flex-1 flex justify-end">
                                                     <img
                                                         src="/images/logo-modified.png"
-                                                        alt="إرث المبتكرين - Innovators Legacy"
+                                                        alt={t('common.appName')}
                                                         className="w-24 h-24 object-contain"
                                                     />
                                                 </div>
@@ -388,7 +406,7 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate,
 
                                     {latestApprovedCertificates.length > 0 && (
                                         <div className="no-print mt-6 rounded-2xl border border-gray-100 bg-gray-50 p-4">
-                                            <h3 className="mb-3 text-lg font-bold text-gray-900">آخر الشهادات المعتمدة</h3>
+                                            <h3 className="mb-3 text-lg font-bold text-gray-900">{t('teacherCertificateShowPage.latestApprovedTitle')}</h3>
                                             <div className="space-y-2">
                                                 {latestApprovedCertificates.map((item) => (
                                                     <div key={item.id} className="flex items-center justify-between rounded-xl bg-white px-4 py-3">
@@ -397,8 +415,8 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate,
                                                             <div className="text-xs text-gray-500">{item.approved_at}</div>
                                                         </div>
                                                         {item.download_url && (
-                                                            <a href={item.download_url} className="text-sm font-bold text-blue-600 hover:text-blue-700">
-                                                                تحميل
+                                                            <a href={item.download_url} download className="text-sm font-bold text-blue-600 hover:text-blue-700">
+                                                                {t('common.download')}
                                                             </a>
                                                         )}
                                                     </div>

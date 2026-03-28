@@ -57,6 +57,16 @@ class MembershipCertificateService extends BaseService
 
         try {
             DB::beginTransaction();
+            $issueDate = now()->toDateString();
+            $certificateNumber = $this->certificateService->generateCertificateNumber($user);
+
+            $certificateData = [
+                'course_name' => 'ط´ظ‡ط§ط¯ط© ط¹ط¶ظˆظٹط© ط·ط§ظ„ط¨',
+                'description' => $this->generateStudentCertificateDescription($eligibility),
+                'description_ar' => $this->generateStudentCertificateDescription($eligibility),
+                'certificate_number' => $certificateNumber,
+                'issue_date' => $issueDate,
+            ];
 
             // Generate certificate PDF
             $filePath = $this->certificateService->generateCertificate(
@@ -66,6 +76,8 @@ class MembershipCertificateService extends BaseService
                     'course_name' => 'شهادة عضوية طالب',
                     'description' => $this->generateStudentCertificateDescription($eligibility),
                     'description_ar' => $this->generateStudentCertificateDescription($eligibility),
+                    'certificate_number' => $certificateNumber,
+                    'issue_date' => $issueDate,
                 ],
                 null,
                 'long',
@@ -81,6 +93,8 @@ class MembershipCertificateService extends BaseService
                     'course_name' => 'شهادة عضوية طالب',
                     'description' => $this->generateStudentCertificateDescription($eligibility),
                     'description_ar' => $this->generateStudentCertificateDescription($eligibility),
+                    'certificate_number' => $certificateNumber,
+                    'issue_date' => $issueDate,
                 ],
                 'membership'
             );
@@ -199,6 +213,8 @@ class MembershipCertificateService extends BaseService
             $description = $force 
                 ? 'تم منح هذه الشهادة بناءً على إنجازات المستخدم في المنصة.'
                 : $this->generateTeacherCertificateDescription($eligibility);
+            $issueDate = now()->toDateString();
+            $certificateNumber = $this->certificateService->generateCertificateNumber($user);
             
             $filePath = $this->certificateService->generateCertificate(
                 $user,
@@ -207,6 +223,8 @@ class MembershipCertificateService extends BaseService
                     'course_name' => 'شهادة عضوية معلم',
                     'description' => $description,
                     'description_ar' => $description,
+                    'certificate_number' => $certificateNumber,
+                    'issue_date' => $issueDate,
                 ],
                 null,
                 'long',
@@ -222,6 +240,8 @@ class MembershipCertificateService extends BaseService
                     'course_name' => 'شهادة عضوية معلم',
                     'description' => $description,
                     'description_ar' => $description,
+                    'certificate_number' => $certificateNumber,
+                    'issue_date' => $issueDate,
                 ],
                 'membership'
             );
@@ -336,6 +356,8 @@ class MembershipCertificateService extends BaseService
             $description = $force 
                 ? 'تم منح هذه الشهادة بناءً على إنجازات المدرسة في المنصة.'
                 : $this->generateSchoolCertificateDescription($eligibility);
+            $issueDate = now()->toDateString();
+            $certificateNumber = $this->certificateService->generateCertificateNumber($school);
             
             $filePath = $this->certificateService->generateCertificate(
                 $school,
@@ -344,6 +366,8 @@ class MembershipCertificateService extends BaseService
                     'course_name' => 'شهادة عضوية مدرسة',
                     'description' => $description,
                     'description_ar' => $description,
+                    'certificate_number' => $certificateNumber,
+                    'issue_date' => $issueDate,
                 ],
                 null,
                 'long',
@@ -358,8 +382,8 @@ class MembershipCertificateService extends BaseService
                 'title_ar' => 'شهادة عضوية مدرسة',
                 'description' => $description,
                 'description_ar' => $description,
-                'certificate_number' => $this->certificateService->generateCertificateNumber($school),
-                'issue_date' => Carbon::now(),
+                'certificate_number' => $certificateNumber,
+                'issue_date' => Carbon::parse($issueDate),
                 'expiry_date' => null,
                 'template' => 'default',
                 'file_path' => $filePath,

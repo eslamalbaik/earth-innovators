@@ -10,6 +10,7 @@ import InputLabel from '@/Components/InputLabel';
 import axios from 'axios';
 import { useToast } from '@/Contexts/ToastContext';
 import { toHijriDate } from '@/utils/dateUtils';
+import { downloadFile } from '@/utils/downloadFile';
 
 const STATUS_STYLES = {
     approved: 'bg-green-100 text-green-700',
@@ -32,7 +33,6 @@ export default function SchoolCertificatesIndex({
     pendingRequests = [],
     recentIssuedCertificates = [],
     membershipSummary = null,
-    description = '',
 }) {
     const { t, language } = useTranslation();
     const { showSuccess, showError } = useToast();
@@ -141,9 +141,12 @@ export default function SchoolCertificatesIndex({
                 setShowIssueModal(false);
                 setSelectedRecipient(null);
 
-                const downloadUrl = response.data?.certificate?.storage_url || response.data?.certificate?.download_url;
+                const downloadUrl = response.data?.certificate?.download_url;
                 if (downloadUrl) {
-                    window.open(downloadUrl, '_blank');
+                    await downloadFile(
+                        downloadUrl,
+                        `certificate_${response.data?.certificate?.certificate_number || 'issued'}.pdf`
+                    );
                 }
 
                 router.reload({ only: ['recipients', 'pendingRequests', 'recentIssuedCertificates', 'membershipSummary'] });
@@ -199,7 +202,9 @@ export default function SchoolCertificatesIndex({
                                 ? t('schoolCertificatesIndexPage.summary.subscriptionActive')
                                 : t('schoolCertificatesIndexPage.summary.basicMembership')}
                         </div>
-                        <div className="mt-2 text-sm text-gray-600">{description}</div>
+                        <div className="mt-2 text-sm text-gray-600">
+                            {t('schoolCertificatesIndexPage.summary.workflowDescription')}
+                        </div>
                     </div>
 
                     <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
@@ -392,6 +397,7 @@ export default function SchoolCertificatesIndex({
                                 {certificate.download_url && (
                                     <a
                                         href={certificate.download_url}
+                                        download
                                         className="rounded-xl bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700 transition hover:bg-blue-100"
                                     >
                                         <span className="inline-flex items-center gap-2">

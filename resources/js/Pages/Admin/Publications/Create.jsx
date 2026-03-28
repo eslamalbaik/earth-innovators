@@ -1,14 +1,16 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, useForm, Link } from '@inertiajs/react';
 import { useState } from 'react';
-import { FaBook, FaUpload, FaSpinner } from 'react-icons/fa';
+import { FaUpload, FaSpinner } from 'react-icons/fa';
 import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TiptapEditor from '@/Components/TiptapEditor';
+import { useTranslation } from '@/i18n';
 
-export default function AdminPublicationCreate({ auth, schools }) {
+export default function AdminPublicationCreate({ schools }) {
+    const { t } = useTranslation();
     const { data, setData, post, processing, errors } = useForm({
         type: 'magazine',
         title: '',
@@ -44,7 +46,6 @@ export default function AdminPublicationCreate({ auth, schools }) {
         post(route('admin.publications.store'), {
             forceFormData: true,
             onSuccess: () => {
-                // Clear previews after successful submission
                 if (coverPreview) {
                     URL.revokeObjectURL(coverPreview);
                 }
@@ -53,32 +54,30 @@ export default function AdminPublicationCreate({ auth, schools }) {
     };
 
     return (
-        <DashboardLayout header="إنشاء مقال جديد">
-            <Head title="إنشاء مقال جديد - لوحة الإدارة" />
+        <DashboardLayout header={t('adminPublicationCreatePage.title')}>
+            <Head title={t('adminPublicationCreatePage.pageTitle', { appName: t('common.appName') })} />
 
             <div className="py-6">
                 <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
                     <form onSubmit={submit} className="bg-white shadow-sm rounded-lg p-6 space-y-6">
-                        {/* Type */}
                         <div>
-                            <InputLabel htmlFor="type" value="نوع الإصدار" />
+                            <InputLabel htmlFor="type" value={t('adminPublicationCreatePage.form.typeLabel')} />
                             <select
                                 id="type"
                                 value={data.type}
                                 onChange={(e) => setData('type', e.target.value)}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                             >
-                                <option value="magazine">مجلة</option>
-                                <option value="booklet">كتيب</option>
-                                <option value="report">تقرير</option>
-                                <option value="article">مقال</option>
+                                <option value="magazine">{t('common.publicationTypes.magazine')}</option>
+                                <option value="booklet">{t('common.publicationTypes.booklet')}</option>
+                                <option value="report">{t('common.publicationTypes.report')}</option>
+                                <option value="article">{t('common.publicationTypes.article')}</option>
                             </select>
                             <InputError message={errors.type} className="mt-2" />
                         </div>
 
-                        {/* Title */}
                         <div>
-                            <InputLabel htmlFor="title" value="العنوان" />
+                            <InputLabel htmlFor="title" value={t('adminPublicationCreatePage.form.titleLabel')} />
                             <TextInput
                                 id="title"
                                 type="text"
@@ -90,9 +89,8 @@ export default function AdminPublicationCreate({ auth, schools }) {
                             <InputError message={errors.title} className="mt-2" />
                         </div>
 
-                        {/* Description */}
                         <div>
-                            <InputLabel htmlFor="description" value="الوصف" />
+                            <InputLabel htmlFor="description" value={t('adminPublicationCreatePage.form.descriptionLabel')} />
                             <textarea
                                 id="description"
                                 value={data.description}
@@ -103,30 +101,28 @@ export default function AdminPublicationCreate({ auth, schools }) {
                             <InputError message={errors.description} className="mt-2" />
                         </div>
 
-                        {/* Content */}
                         <div>
-                            <InputLabel htmlFor="content" value="المحتوى" />
+                            <InputLabel htmlFor="content" value={t('adminPublicationCreatePage.form.contentLabel')} />
                             <div className="mt-1">
                                 <TiptapEditor
                                     content={data.content}
                                     onChange={(html) => setData('content', html)}
-                                    placeholder="أدخل محتوى المقال..."
+                                    placeholder={t('adminPublicationCreatePage.form.contentPlaceholder')}
                                 />
                             </div>
                             <InputError message={errors.content} className="mt-2" />
                         </div>
 
-                        {/* School Selection (Optional) */}
                         {schools && schools.length > 0 && (
                             <div>
-                                <InputLabel htmlFor="school_id" value="المدرسة (اختياري)" />
+                                <InputLabel htmlFor="school_id" value={t('adminPublicationCreatePage.form.schoolLabel')} />
                                 <select
                                     id="school_id"
                                     value={data.school_id}
                                     onChange={(e) => setData('school_id', e.target.value)}
                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                 >
-                                    <option value="">-- لا شيء (مقال عام من الأدمن) --</option>
+                                    <option value="">{t('adminPublicationCreatePage.form.schoolPlaceholder')}</option>
                                     {schools.map((school) => (
                                         <option key={school.id} value={school.id}>
                                             {school.name}
@@ -137,9 +133,8 @@ export default function AdminPublicationCreate({ auth, schools }) {
                             </div>
                         )}
 
-                        {/* Cover Image */}
                         <div>
-                            <InputLabel htmlFor="cover_image" value="صورة الغلاف" />
+                            <InputLabel htmlFor="cover_image" value={t('adminPublicationCreatePage.form.coverImageLabel')} />
                             <div className="mt-1">
                                 <input
                                     id="cover_image"
@@ -148,20 +143,19 @@ export default function AdminPublicationCreate({ auth, schools }) {
                                     onChange={handleCoverImageChange}
                                     className="block w-full text-sm text-gray-500 file:ms-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
                                 />
-                                {coverPreview && (
+                                {coverPreview ? (
                                     <img
                                         src={coverPreview}
-                                        alt="Preview"
+                                        alt={t('adminPublicationCreatePage.form.coverPreviewAlt')}
                                         className="mt-4 w-48 h-48 object-cover rounded-lg border border-gray-300"
                                     />
-                                )}
+                                ) : null}
                             </div>
                             <InputError message={errors.cover_image} className="mt-2" />
                         </div>
 
-                        {/* File PDF */}
                         <div>
-                            <InputLabel htmlFor="file" value="ملف PDF (اختياري)" />
+                            <InputLabel htmlFor="file" value={t('adminPublicationCreatePage.form.fileLabel')} />
                             <div className="mt-1">
                                 <input
                                     id="file"
@@ -170,18 +164,17 @@ export default function AdminPublicationCreate({ auth, schools }) {
                                     onChange={handleFileChange}
                                     className="block w-full text-sm text-gray-500 file:ms-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
                                 />
-                                {fileName && (
+                                {fileName ? (
                                     <p className="mt-2 text-sm text-gray-600">
-                                        الملف المختار: {fileName}
+                                        {t('adminPublicationCreatePage.form.selectedFile', { name: fileName })}
                                     </p>
-                                )}
+                                ) : null}
                             </div>
                             <InputError message={errors.file} className="mt-2" />
                         </div>
 
-                        {/* Issue Number */}
                         <div>
-                            <InputLabel htmlFor="issue_number" value="رقم العدد (للمجلات)" />
+                            <InputLabel htmlFor="issue_number" value={t('adminPublicationCreatePage.form.issueNumberLabel')} />
                             <TextInput
                                 id="issue_number"
                                 type="number"
@@ -193,13 +186,12 @@ export default function AdminPublicationCreate({ auth, schools }) {
                             <InputError message={errors.issue_number} className="mt-2" />
                         </div>
 
-                        {/* Submit Button */}
                         <div className="flex items-center justify-end gap-4 pt-4">
                             <Link
                                 href={route('admin.publications.index')}
                                 className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
                             >
-                                إلغاء
+                                {t('common.cancel')}
                             </Link>
                             <PrimaryButton
                                 disabled={processing}
@@ -208,12 +200,12 @@ export default function AdminPublicationCreate({ auth, schools }) {
                                 {processing ? (
                                     <>
                                         <FaSpinner className="animate-spin inline-block me-2" />
-                                        جاري الحفظ...
+                                        {t('adminPublicationCreatePage.actions.saving')}
                                     </>
                                 ) : (
                                     <>
                                         <FaUpload className="inline-block me-2" />
-                                        نشر المقال
+                                        {t('adminPublicationCreatePage.actions.publish')}
                                     </>
                                 )}
                             </PrimaryButton>
@@ -224,4 +216,3 @@ export default function AdminPublicationCreate({ auth, schools }) {
         </DashboardLayout>
     );
 }
-

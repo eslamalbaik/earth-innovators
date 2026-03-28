@@ -13,10 +13,15 @@ use Inertia\Inertia;
 class MembershipCertificateController extends Controller
 {
     protected $membershipCertificateService;
+    protected $certificateService;
 
-    public function __construct(MembershipCertificateService $membershipCertificateService)
+    public function __construct(
+        MembershipCertificateService $membershipCertificateService,
+        \App\Services\CertificateService $certificateService
+    )
     {
         $this->membershipCertificateService = $membershipCertificateService;
+        $this->certificateService = $certificateService;
     }
 
     /**
@@ -77,11 +82,9 @@ class MembershipCertificateController extends Controller
             abort(403, 'You do not have permission to download this certificate');
         }
 
-        if (!$certificate->file_path || !Storage::disk('public')->exists($certificate->file_path)) {
-            abort(404, 'Certificate file not found');
-        }
-
-        $filePath = Storage::disk('public')->path($certificate->file_path);
+        $filePath = Storage::disk('public')->path(
+            $this->certificateService->rebuildCertificateFile($certificate)
+        );
         
         return response()->download(
             $filePath, 
@@ -111,6 +114,7 @@ class MembershipCertificateController extends Controller
             $user->id,
             $user->role
         );
+        $certificate = null;
 
         if ($eligibility['eligible']) {
             if ($user->role === 'student') {

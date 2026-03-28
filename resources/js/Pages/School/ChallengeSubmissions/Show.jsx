@@ -21,6 +21,7 @@ import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
 import PrimaryButton from '../../../Components/PrimaryButton';
 import { useTranslation } from '@/i18n';
+import resolveLocalizedMessage from '@/utils/resolveLocalizedMessage';
 
 export default function SchoolChallengeSubmissionShow({ auth, submission, availableBadges }) {
     const { t, language } = useTranslation();
@@ -63,16 +64,16 @@ export default function SchoolChallengeSubmissionShow({ auth, submission, availa
 
     useEffect(() => {
         if (flash?.success) {
-            setToastMessage(flash.success);
+            setToastMessage(resolveLocalizedMessage(flash.success, language));
             setShowToast(true);
             setTimeout(() => setShowToast(false), 5000);
         }
         if (flash?.error) {
-            setToastMessage(flash.error);
+            setToastMessage(resolveLocalizedMessage(flash.error, language));
             setShowToast(true);
             setTimeout(() => setShowToast(false), 5000);
         }
-    }, [flash]);
+    }, [flash, language]);
 
     const getFileUrl = (filePath) => {
         if (filePath.startsWith('http')) return filePath;

@@ -45,7 +45,7 @@ export default function DesktopFooter({ auth }) {
     ].filter(Boolean);
 
     const dashboardHref = user?.role === 'student'
-        ? '/student/dashboard'
+        ? '/dashboard'
         : user?.role === 'teacher'
             ? '/teacher/dashboard'
             : '/school/dashboard';

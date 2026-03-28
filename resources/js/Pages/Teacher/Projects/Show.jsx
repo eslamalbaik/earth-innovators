@@ -1,6 +1,5 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import { useState } from 'react';
 import {
     FaArrowRight,
     FaCheckCircle,
@@ -8,10 +7,8 @@ import {
     FaClock,
     FaUser,
     FaSchool,
-    FaChalkboardTeacher,
     FaEye,
     FaHeart,
-    FaStar,
     FaFileAlt,
     FaCalendar,
     FaEdit,
@@ -24,15 +21,17 @@ import {
     FaTrophy,
 } from 'react-icons/fa';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
+import { useTranslation } from '@/i18n';
 
-export default function TeacherProjectShow({ project, auth }) {
+export default function TeacherProjectShow({ project }) {
+    const { t, language } = useTranslation();
     const { confirm } = useConfirmDialog();
 
     const getStatusBadge = (status) => {
         const statusMap = {
-            'approved': { bg: 'bg-green-100', text: 'text-green-800', label: 'موافق', icon: FaCheckCircle },
-            'pending': { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'قيد المراجعة', icon: FaClock },
-            'rejected': { bg: 'bg-red-100', text: 'text-red-800', label: 'مرفوض', icon: FaTimesCircle },
+            approved: { bg: 'bg-green-100', text: 'text-green-800', label: t('teacherProjectsPage.statuses.approved'), icon: FaCheckCircle },
+            pending: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: t('teacherProjectsPage.statuses.pending'), icon: FaClock },
+            rejected: { bg: 'bg-red-100', text: 'text-red-800', label: t('teacherProjectsPage.statuses.rejected'), icon: FaTimesCircle },
         };
         const statusConfig = statusMap[status] || statusMap.pending;
         const StatusIcon = statusConfig.icon;
@@ -46,21 +45,16 @@ export default function TeacherProjectShow({ project, auth }) {
     };
 
     const getCategoryLabel = (category) => {
-        const categoryMap = {
-            'science': 'علوم',
-            'technology': 'تقنية',
-            'engineering': 'هندسة',
-            'mathematics': 'رياضيات',
-            'arts': 'فنون',
-            'other': 'أخرى',
-        };
-        return categoryMap[category] || 'أخرى';
+        const translation = t(`teacherProjectsPage.categories.${category}`);
+        return translation === `teacherProjectsPage.categories.${category}`
+            ? t('teacherProjectsPage.categories.other')
+            : translation;
     };
 
     const formatDate = (dateString) => {
-        if (!dateString) return 'غير محدد';
+        if (!dateString) return t('common.notAvailable');
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', {
+        return date.toLocaleDateString(language === 'ar' ? 'ar-EG' : 'en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
@@ -71,7 +65,8 @@ export default function TeacherProjectShow({ project, auth }) {
         const extension = filePath.split('.').pop()?.toLowerCase();
         if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension)) {
             return FaImage;
-        } else if (['mp4', 'avi', 'mov', 'wmv'].includes(extension)) {
+        }
+        if (['mp4', 'avi', 'mov', 'wmv'].includes(extension)) {
             return FaVideo;
         }
         return FaFile;
@@ -79,10 +74,10 @@ export default function TeacherProjectShow({ project, auth }) {
 
     const handleDelete = async () => {
         const confirmed = await confirm({
-            title: 'تأكيد الحذف',
-            message: `هل أنت متأكد من حذف المشروع "${project.title}"؟ هذا الإجراء لا يمكن التراجع عنه.`,
-            confirmText: 'حذف',
-            cancelText: 'إلغاء',
+            title: t('teacherProjectsPage.deleteConfirm.title'),
+            message: t('teacherProjectsPage.deleteConfirm.message', { title: project.title }),
+            confirmText: t('common.delete'),
+            cancelText: t('common.cancel'),
             variant: 'danger',
         });
 
@@ -92,8 +87,8 @@ export default function TeacherProjectShow({ project, auth }) {
     };
 
     return (
-        <DashboardLayout header="تفاصيل المشروع">
-            <Head title={`${project.title} - تفاصيل المشروع`} />
+        <DashboardLayout header={t('teacherProjectShowPage.title')}>
+            <Head title={t('teacherProjectShowPage.pageTitle', { title: project.title, appName: t('common.appName') })} />
 
             <div className="mb-6">
                 <Link
@@ -101,14 +96,12 @@ export default function TeacherProjectShow({ project, auth }) {
                     className="text-blue-600 hover:text-blue-800 flex items-center gap-2"
                 >
                     <FaArrowRight className="transform rotate-180" />
-                    العودة إلى قائمة المشاريع
+                    {t('teacherProjectShowPage.backToProjects')}
                 </Link>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Main Content */}
                 <div className="lg:col-span-2 space-y-6">
-                    {/* Project Info */}
                     <div className="bg-white rounded-xl shadow-lg p-6">
                         <div className="flex items-start justify-between mb-4">
                             <div className="flex-1">
@@ -118,18 +111,18 @@ export default function TeacherProjectShow({ project, auth }) {
                                     <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-semibold">
                                         {getCategoryLabel(project.category)}
                                     </span>
-                                    {project.views && (
+                                    {project.views ? (
                                         <div className="flex items-center gap-1 text-gray-600 text-sm">
                                             <FaEye />
-                                            <span>{project.views} مشاهدة</span>
+                                            <span>{t('teacherProjectShowPage.viewsCount', { count: project.views })}</span>
                                         </div>
-                                    )}
-                                    {project.likes && (
+                                    ) : null}
+                                    {project.likes ? (
                                         <div className="flex items-center gap-1 text-gray-600 text-sm">
                                             <FaHeart className="text-red-500" />
-                                            <span>{project.likes} إعجاب</span>
+                                            <span>{t('teacherProjectShowPage.likesCount', { count: project.likes })}</span>
                                         </div>
-                                    )}
+                                    ) : null}
                                 </div>
                             </div>
                             {project.status === 'pending' && (
@@ -138,7 +131,7 @@ export default function TeacherProjectShow({ project, auth }) {
                                     className="px-4 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
                                 >
                                     <FaEdit />
-                                    تعديل
+                                    {t('common.edit')}
                                 </Link>
                             )}
                         </div>
@@ -147,29 +140,27 @@ export default function TeacherProjectShow({ project, auth }) {
                             <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">{project.description}</p>
                         </div>
 
-                        {/* Stats */}
                         <div className="grid grid-cols-3 gap-4 pt-6 border-t border-gray-200">
                             <div className="text-center">
                                 <div className="text-2xl font-bold text-gray-900">{project.views || 0}</div>
-                                <div className="text-sm text-gray-600">مشاهدة</div>
+                                <div className="text-sm text-gray-600">{t('teacherProjectShowPage.stats.views')}</div>
                             </div>
                             <div className="text-center">
                                 <div className="text-2xl font-bold text-gray-900">{project.likes || 0}</div>
-                                <div className="text-sm text-gray-600">إعجاب</div>
+                                <div className="text-sm text-gray-600">{t('teacherProjectShowPage.stats.likes')}</div>
                             </div>
                             <div className="text-center">
                                 <div className="text-2xl font-bold text-green-600">{project.rating || 0}</div>
-                                <div className="text-sm text-gray-600">تقييم</div>
+                                <div className="text-sm text-gray-600">{t('teacherProjectShowPage.stats.rating')}</div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Files Section */}
-                    {(project.files && project.files.length > 0) && (
+                    {project.files && project.files.length > 0 && (
                         <div className="bg-white rounded-xl shadow-lg p-6">
                             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                                 <FaFileAlt />
-                                الملفات المرفقة
+                                {t('teacherProjectShowPage.attachmentsTitle')}
                             </h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {project.files.map((file, index) => {
@@ -191,7 +182,7 @@ export default function TeacherProjectShow({ project, auth }) {
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="text-blue-600 hover:text-blue-800"
-                                                title="تحميل"
+                                                title={t('common.download')}
                                             >
                                                 <FaDownload />
                                             </a>
@@ -202,21 +193,21 @@ export default function TeacherProjectShow({ project, auth }) {
                         </div>
                     )}
 
-                    {/* Images Section */}
-                    {(project.images && project.images.length > 0) && (
+                    {project.images && project.images.length > 0 && (
                         <div className="bg-white rounded-xl shadow-lg p-6">
                             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                                 <FaImage />
-                                الصور
+                                {t('teacherProjectShowPage.imagesTitle')}
                             </h2>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                 {project.images.map((image, index) => {
                                     const imageUrl = image.startsWith('http') ? image : `/storage/${image}`;
+
                                     return (
                                         <div key={index} className="relative group">
                                             <img
                                                 src={imageUrl}
-                                                alt={`${project.title} - صورة ${index + 1}`}
+                                                alt={t('teacherProjectShowPage.imageAlt', { title: project.title, index: index + 1 })}
                                                 className="w-full h-48 object-cover rounded-lg border border-gray-200"
                                             />
                                             <a
@@ -234,12 +225,11 @@ export default function TeacherProjectShow({ project, auth }) {
                         </div>
                     )}
 
-                    {/* Submissions Section */}
                     {project.submissions && project.submissions.length > 0 && (
                         <div className="bg-white rounded-xl shadow-lg p-6">
                             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                                 <FaUsers />
-                                التسليمات ({project.submissions.length})
+                                {t('teacherProjectShowPage.submissionsTitle', { count: project.submissions.length })}
                             </h2>
                             <div className="space-y-3">
                                 {project.submissions.map((submission) => (
@@ -251,26 +241,32 @@ export default function TeacherProjectShow({ project, auth }) {
                                             <div className="flex items-center gap-2">
                                                 <FaUser className="text-gray-400" />
                                                 <span className="font-medium text-gray-900">
-                                                    {submission.student?.name || 'طالب'}
+                                                    {submission.student?.name || t('common.student')}
                                                 </span>
                                             </div>
-                                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${submission.status === 'evaluated' ? 'bg-green-100 text-green-800' :
-                                                    submission.status === 'submitted' ? 'bg-blue-100 text-blue-800' :
-                                                        'bg-gray-100 text-gray-800'
-                                                }`}>
-                                                {submission.status === 'evaluated' ? 'تم التقييم' :
-                                                    submission.status === 'submitted' ? 'تم التسليم' : 'قيد المراجعة'}
+                                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                                                submission.status === 'evaluated'
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : submission.status === 'submitted'
+                                                        ? 'bg-blue-100 text-blue-800'
+                                                        : 'bg-gray-100 text-gray-800'
+                                            }`}>
+                                                {submission.status === 'evaluated'
+                                                    ? t('teacherProjectShowPage.submissionStatuses.evaluated')
+                                                    : submission.status === 'submitted'
+                                                        ? t('teacherProjectShowPage.submissionStatuses.submitted')
+                                                        : t('teacherProjectShowPage.submissionStatuses.pending')}
                                             </span>
                                         </div>
-                                        {submission.comment && (
+                                        {submission.comment ? (
                                             <p className="text-sm text-gray-600 mb-2">{submission.comment}</p>
-                                        )}
-                                        {submission.submitted_at && (
+                                        ) : null}
+                                        {submission.submitted_at ? (
                                             <div className="flex items-center gap-1 text-xs text-gray-500">
                                                 <FaCalendar />
                                                 {formatDate(submission.submitted_at)}
                                             </div>
-                                        )}
+                                        ) : null}
                                     </div>
                                 ))}
                             </div>
@@ -278,45 +274,42 @@ export default function TeacherProjectShow({ project, auth }) {
                     )}
                 </div>
 
-                {/* Sidebar */}
                 <div className="space-y-6">
-                    {/* Project Details */}
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                        <h2 className="text-xl font-bold text-gray-900 mb-4">معلومات المشروع</h2>
+                        <h2 className="text-xl font-bold text-gray-900 mb-4">{t('teacherProjectShowPage.projectInfoTitle')}</h2>
 
                         <div className="space-y-4">
                             <div>
                                 <p className="text-sm text-gray-600 mb-1 flex items-center gap-2">
                                     <FaCalendar />
-                                    تاريخ الإنشاء
+                                    {t('teacherProjectShowPage.projectInfo.createdAt')}
                                 </p>
                                 <p className="font-semibold text-gray-900">{formatDate(project.created_at)}</p>
                             </div>
-                            {project.approved_at && (
+                            {project.approved_at ? (
                                 <div>
                                     <p className="text-sm text-gray-600 mb-1 flex items-center gap-2">
                                         <FaCheckCircle />
-                                        تاريخ الموافقة
+                                        {t('teacherProjectShowPage.projectInfo.approvedAt')}
                                     </p>
                                     <p className="font-semibold text-gray-900">{formatDate(project.approved_at)}</p>
                                 </div>
-                            )}
-                            {project.points_earned > 0 && (
+                            ) : null}
+                            {project.points_earned > 0 ? (
                                 <div>
                                     <p className="text-sm text-gray-600 mb-1 flex items-center gap-2">
                                         <FaTrophy />
-                                        النقاط المكتسبة
+                                        {t('teacherProjectShowPage.projectInfo.pointsEarned')}
                                     </p>
                                     <p className="font-semibold text-green-600">{project.points_earned}</p>
                                 </div>
-                            )}
+                            ) : null}
                         </div>
                     </div>
 
-                    {/* Student/Publisher Info */}
                     {project.user && (
                         <div className="bg-white rounded-xl shadow-lg p-6">
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">معلومات الطالب</h2>
+                            <h2 className="text-xl font-bold text-gray-900 mb-4">{t('teacherProjectShowPage.studentInfoTitle')}</h2>
                             <div className="flex items-center gap-3">
                                 <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
                                     <FaUser className="text-gray-600" />
@@ -329,20 +322,18 @@ export default function TeacherProjectShow({ project, auth }) {
                         </div>
                     )}
 
-                    {/* School Info */}
                     {project.school && (
                         <div className="bg-white rounded-xl shadow-lg p-6">
                             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                                 <FaSchool />
-                                المدرسة
+                                {t('teacherProjectShowPage.schoolTitle')}
                             </h2>
                             <p className="font-semibold text-gray-900">{project.school.name}</p>
                         </div>
                     )}
 
-                    {/* Actions */}
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                        <h2 className="text-xl font-bold text-gray-900 mb-4">الإجراءات</h2>
+                        <h2 className="text-xl font-bold text-gray-900 mb-4">{t('common.actions')}</h2>
                         <div className="space-y-2">
                             {project.status === 'pending' && (
                                 <Link
@@ -350,7 +341,7 @@ export default function TeacherProjectShow({ project, auth }) {
                                     className="w-full px-4 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
                                 >
                                     <FaEdit />
-                                    تعديل المشروع
+                                    {t('teacherProjectShowPage.actions.editProject')}
                                 </Link>
                             )}
                             {project.status === 'pending' && (
@@ -359,7 +350,7 @@ export default function TeacherProjectShow({ project, auth }) {
                                     className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center justify-center gap-2"
                                 >
                                     <FaTrash />
-                                    حذف المشروع
+                                    {t('teacherProjectShowPage.actions.deleteProject')}
                                 </button>
                             )}
                         </div>
@@ -369,4 +360,3 @@ export default function TeacherProjectShow({ project, auth }) {
         </DashboardLayout>
     );
 }
-

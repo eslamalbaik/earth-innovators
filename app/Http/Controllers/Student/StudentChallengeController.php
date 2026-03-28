@@ -8,6 +8,7 @@ use App\Models\ChallengeSubmission;
 use App\Models\Category;
 use App\Services\ChallengeSubmissionService;
 use App\Services\ChallengeParticipationService;
+use App\Services\ChallengeWinnerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -19,7 +20,8 @@ class StudentChallengeController extends Controller
 {
     public function __construct(
         private ChallengeSubmissionService $submissionService,
-        private ChallengeParticipationService $participationService
+        private ChallengeParticipationService $participationService,
+        private ChallengeWinnerService $winnerService
     ) {}
 
     /**
@@ -33,6 +35,7 @@ class StudentChallengeController extends Controller
             return Inertia::render('Student/Challenges/Index', [
                 'challenges' => [],
                 'message' => 'أنت غير مرتبط بمدرسة',
+                'previousWinners' => [],
             ]);
         }
 
@@ -102,12 +105,43 @@ class StudentChallengeController extends Controller
             })
             ->toArray();
 
+        $previousWinners = $this->winnerService->getPreviousWinnersForSchool((int) $student->school_id, 3);
+
         return Inertia::render('Student/Challenges/Index', [
             'challenges' => $challenges,
             'filters' => [
                 'status' => $status,
             ],
             'categories' => $categories,
+            'previousWinners' => $previousWinners,
+            'auth' => [
+                'user' => $student,
+            ],
+        ]);
+    }
+
+    /**
+     * قائمة الفائزين (نطاق تحديات المدرسة والعامة).
+     */
+    public function winners(): Response
+    {
+        $student = Auth::user();
+
+        if (! $student->school_id) {
+            return Inertia::render('Challenges/Winners', [
+                'winners' => [],
+                'backHref' => '/student/challenges',
+                'auth' => [
+                    'user' => $student,
+                ],
+            ]);
+        }
+
+        $winners = $this->winnerService->getAllWinnersForSchool((int) $student->school_id);
+
+        return Inertia::render('Challenges/Winners', [
+            'winners' => $winners,
+            'backHref' => '/student/challenges',
             'auth' => [
                 'user' => $student,
             ],

@@ -1,14 +1,16 @@
 import DashboardLayout from '../../../Layouts/DashboardLayout';
-import { Head, useForm, Link, router } from '@inertiajs/react';
+import { Head, useForm, Link } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
-import { FaBook, FaUpload, FaSpinner, FaArrowLeft } from 'react-icons/fa';
+import { FaUpload, FaSpinner, FaArrowLeft } from 'react-icons/fa';
 import TextInput from '../../../Components/TextInput';
 import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
 import PrimaryButton from '../../../Components/PrimaryButton';
 import { getPublicationImageUrl } from '../../../utils/imageUtils';
+import { useTranslation } from '@/i18n';
 
 export default function TeacherPublicationEdit({ auth, publication }) {
+    const { t } = useTranslation();
     const { data, setData, post, processing, errors } = useForm({
         type: publication?.type || 'magazine',
         title: publication?.title || '',
@@ -24,32 +26,28 @@ export default function TeacherPublicationEdit({ auth, publication }) {
 
     const getImageUrl = (imagePath) => {
         if (!imagePath) return null;
-        // Use utility function for consistency, but allow null for preview state
         return getPublicationImageUrl(imagePath, null);
     };
 
-    const [coverPreview, setCoverPreview] = useState(() => {
-        return getImageUrl(publication?.cover_image);
-    });
-    const [fileName, setFileName] = useState(publication?.file ? 'ملف موجود' : '');
+    const [coverPreview, setCoverPreview] = useState(() => getImageUrl(publication?.cover_image));
+    const [fileName, setFileName] = useState(publication?.file ? t('teacherPublicationEditPage.existingFile') : '');
 
-    // Update preview when publication changes (but not if user selected a new file)
     useEffect(() => {
         if (publication?.cover_image) {
             const imageUrl = getImageUrl(publication.cover_image);
-            // Only update if current preview is not a blob URL (user-selected file)
-            setCoverPreview(prev => {
+            setCoverPreview((prev) => {
                 if (prev && prev.startsWith('blob:')) {
-                    return prev; // Keep user-selected file preview
+                    return prev;
                 }
+
                 return imageUrl;
             });
         } else {
-            // If no image in publication and no user-selected file, clear preview
-            setCoverPreview(prev => {
+            setCoverPreview((prev) => {
                 if (prev && prev.startsWith('blob:')) {
-                    return prev; // Keep user-selected file preview
+                    return prev;
                 }
+
                 return null;
             });
         }
@@ -80,11 +78,10 @@ export default function TeacherPublicationEdit({ auth, publication }) {
                 if (coverPreview && coverPreview.startsWith('blob:')) {
                     URL.revokeObjectURL(coverPreview);
                 }
+
                 if (page?.props?.publication?.cover_image) {
                     setCoverPreview(getImageUrl(page.props.publication.cover_image));
                 }
-            },
-            onError: (errors) => {
             },
         });
     };
@@ -92,9 +89,9 @@ export default function TeacherPublicationEdit({ auth, publication }) {
     return (
         <DashboardLayout
             auth={auth}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">تعديل المقال</h2>}
+            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">{t('teacherPublicationEditPage.title')}</h2>}
         >
-            <Head title="تعديل المقال - لوحة المعلم" />
+            <Head title={t('teacherPublicationEditPage.pageTitle', { appName: t('common.appName') })} />
 
             <div className="py-6">
                 <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
@@ -103,30 +100,28 @@ export default function TeacherPublicationEdit({ auth, publication }) {
                         className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
                     >
                         <FaArrowLeft />
-                        <span>العودة إلى المقالات</span>
+                        <span>{t('teacherPublicationEditPage.backToPublications')}</span>
                     </Link>
 
                     <form onSubmit={submit} className="bg-white shadow-sm rounded-lg p-6 space-y-6">
-                        {/* Type */}
                         <div>
-                            <InputLabel htmlFor="type" value="نوع الإصدار" />
+                            <InputLabel htmlFor="type" value={t('teacherPublicationEditPage.form.typeLabel')} />
                             <select
                                 id="type"
                                 value={data.type}
                                 onChange={(e) => setData('type', e.target.value)}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                             >
-                                <option value="magazine">مجلة</option>
-                                <option value="booklet">كتيب</option>
-                                <option value="report">تقرير</option>
-                                <option value="article">مقال</option>
+                                <option value="magazine">{t('common.publicationTypes.magazine')}</option>
+                                <option value="booklet">{t('common.publicationTypes.booklet')}</option>
+                                <option value="report">{t('common.publicationTypes.report')}</option>
+                                <option value="article">{t('common.publicationTypes.article')}</option>
                             </select>
                             <InputError message={errors.type} className="mt-2" />
                         </div>
 
-                        {/* Title */}
                         <div>
-                            <InputLabel htmlFor="title" value="العنوان" />
+                            <InputLabel htmlFor="title" value={t('teacherPublicationEditPage.form.titleLabel')} />
                             <TextInput
                                 id="title"
                                 type="text"
@@ -138,9 +133,8 @@ export default function TeacherPublicationEdit({ auth, publication }) {
                             <InputError message={errors.title} className="mt-2" />
                         </div>
 
-                        {/* Description */}
                         <div>
-                            <InputLabel htmlFor="description" value="الوصف" />
+                            <InputLabel htmlFor="description" value={t('teacherPublicationEditPage.form.descriptionLabel')} />
                             <textarea
                                 id="description"
                                 value={data.description}
@@ -151,23 +145,21 @@ export default function TeacherPublicationEdit({ auth, publication }) {
                             <InputError message={errors.description} className="mt-2" />
                         </div>
 
-                        {/* Content */}
                         <div>
-                            <InputLabel htmlFor="content" value="المحتوى (HTML)" />
+                            <InputLabel htmlFor="content" value={t('teacherPublicationEditPage.form.contentLabel')} />
                             <textarea
                                 id="content"
                                 value={data.content}
                                 onChange={(e) => setData('content', e.target.value)}
                                 rows={15}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042] font-mono text-sm"
-                                placeholder="يمكنك استخدام HTML هنا"
+                                placeholder={t('teacherPublicationEditPage.form.contentPlaceholder')}
                             />
                             <InputError message={errors.content} className="mt-2" />
                         </div>
 
-                        {/* Cover Image */}
                         <div>
-                            <InputLabel htmlFor="cover_image" value="صورة الغلاف" />
+                            <InputLabel htmlFor="cover_image" value={t('teacherPublicationEditPage.form.coverImageLabel')} />
                             <div className="mt-1">
                                 <input
                                     id="cover_image"
@@ -180,27 +172,26 @@ export default function TeacherPublicationEdit({ auth, publication }) {
                                     <div className="mt-4">
                                         <img
                                             src={coverPreview}
-                                            alt="Preview"
+                                            alt={t('teacherPublicationEditPage.form.coverPreviewAlt')}
                                             className="w-48 h-48 object-cover rounded-lg border border-gray-300"
                                             onError={(e) => {
                                                 e.target.style.display = 'none';
                                                 const errorDiv = document.createElement('div');
                                                 errorDiv.className = 'mt-2 text-sm text-red-600';
-                                                errorDiv.textContent = 'فشل تحميل الصورة';
+                                                errorDiv.textContent = t('teacherPublicationEditPage.form.coverLoadError');
                                                 e.target.parentElement.appendChild(errorDiv);
                                             }}
                                         />
                                     </div>
                                 ) : publication?.cover_image ? (
-                                    <p className="mt-2 text-sm text-gray-500">جاري تحميل الصورة...</p>
+                                    <p className="mt-2 text-sm text-gray-500">{t('teacherPublicationEditPage.form.loadingImage')}</p>
                                 ) : null}
                             </div>
                             <InputError message={errors.cover_image} className="mt-2" />
                         </div>
 
-                        {/* File PDF */}
                         <div>
-                            <InputLabel htmlFor="file" value="ملف PDF (اختياري)" />
+                            <InputLabel htmlFor="file" value={t('teacherPublicationEditPage.form.fileLabel')} />
                             <div className="mt-1">
                                 <input
                                     id="file"
@@ -218,9 +209,8 @@ export default function TeacherPublicationEdit({ auth, publication }) {
                             <InputError message={errors.file} className="mt-2" />
                         </div>
 
-                        {/* Issue Number */}
                         <div>
-                            <InputLabel htmlFor="issue_number" value="رقم العدد (للمجلات)" />
+                            <InputLabel htmlFor="issue_number" value={t('teacherPublicationEditPage.form.issueNumberLabel')} />
                             <TextInput
                                 id="issue_number"
                                 type="number"
@@ -232,9 +222,8 @@ export default function TeacherPublicationEdit({ auth, publication }) {
                             <InputError message={errors.issue_number} className="mt-2" />
                         </div>
 
-                        {/* Publish Date */}
                         <div>
-                            <InputLabel htmlFor="publish_date" value="تاريخ النشر" />
+                            <InputLabel htmlFor="publish_date" value={t('teacherPublicationEditPage.form.publishDateLabel')} />
                             <TextInput
                                 id="publish_date"
                                 type="date"
@@ -245,27 +234,25 @@ export default function TeacherPublicationEdit({ auth, publication }) {
                             <InputError message={errors.publish_date} className="mt-2" />
                         </div>
 
-                        {/* Publisher Name */}
                         <div>
-                            <InputLabel htmlFor="publisher_name" value="اسم الناشر" />
+                            <InputLabel htmlFor="publisher_name" value={t('teacherPublicationEditPage.form.publisherNameLabel')} />
                             <TextInput
                                 id="publisher_name"
                                 type="text"
                                 value={data.publisher_name}
                                 onChange={(e) => setData('publisher_name', e.target.value)}
                                 className="mt-1 block w-full"
-                                placeholder="مثال: مجلس المؤسسات تعليمية المبتكرة"
+                                placeholder={t('teacherPublicationEditPage.form.publisherNamePlaceholder')}
                             />
                             <InputError message={errors.publisher_name} className="mt-2" />
                         </div>
 
-                        {/* Submit Button */}
                         <div className="flex items-center justify-end gap-4 pt-4">
                             <Link
                                 href="/teacher/publications"
                                 className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
                             >
-                                إلغاء
+                                {t('common.cancel')}
                             </Link>
                             <PrimaryButton
                                 disabled={processing}
@@ -274,12 +261,12 @@ export default function TeacherPublicationEdit({ auth, publication }) {
                                 {processing ? (
                                     <>
                                         <FaSpinner className="animate-spin inline-block me-2" />
-                                        جاري الحفظ...
+                                        {t('teacherPublicationEditPage.actions.saving')}
                                     </>
                                 ) : (
                                     <>
                                         <FaUpload className="inline-block me-2" />
-                                        حفظ التغييرات
+                                        {t('teacherPublicationEditPage.actions.saveChanges')}
                                     </>
                                 )}
                             </PrimaryButton>
@@ -290,4 +277,3 @@ export default function TeacherPublicationEdit({ auth, publication }) {
         </DashboardLayout>
     );
 }
-

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -77,6 +78,23 @@ class Project extends Model
     public function submissions(): HasMany
     {
         return $this->hasMany(ProjectSubmission::class);
+    }
+
+    /**
+     * مشاريع معتمدة يمكن للطالب عرضها أو تسليم أعمال عليها (عامة أو مرتبطة بمدرسة الطالب).
+     */
+    public function scopeApprovedVisibleToStudent(Builder $query, User $student): Builder
+    {
+        $query->where('status', 'approved');
+        if (filled($student->school_id)) {
+            $query->where(function ($q) use ($student) {
+                $q->whereNull('school_id')->orWhere('school_id', $student->school_id);
+            });
+        } else {
+            $query->whereNull('school_id');
+        }
+
+        return $query;
     }
 
     public function comments(): HasMany

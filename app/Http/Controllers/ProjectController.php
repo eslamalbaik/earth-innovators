@@ -27,15 +27,20 @@ class ProjectController extends Controller
             }
         }
 
+        $search = $request->filled('search') ? trim((string) $request->input('search')) : null;
+        $category = $request->filled('category') ? trim((string) $request->input('category')) : null;
+
         $projects = $this->projectService->getApprovedProjects(
-            $request->get('search'),
-            $request->get('category'),
+            $search,
+            $category,
             $schoolId,
             12
         )->withQueryString();
 
-        // الحصول على الفئات الفريدة من المشاريع المعتمدة
+        // الحصول على الفئات الفريدة من المشاريع المعتمدة (بدون قيم فارغة حتى لا يتكرر تبويب "الكل")
         $categories = Project::where('status', 'approved')
+            ->whereNotNull('category')
+            ->where('category', '!=', '')
             ->select('category')
             ->distinct()
             ->orderBy('category')

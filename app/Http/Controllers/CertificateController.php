@@ -148,11 +148,13 @@ class CertificateController extends Controller
             abort(403, 'غير مصرح لك بتحميل هذه الشهادة');
         }
 
-        if (!$certificate->file_path || !Storage::disk('public')->exists($certificate->file_path)) {
+        if (false && (!$certificate->file_path || !Storage::disk('public')->exists($certificate->file_path))) {
             abort(404, 'ملف الشهادة غير موجود');
         }
 
-        return Storage::disk('public')->download($certificate->file_path, "certificate_{$certificate->certificate_number}.pdf");
+        $filePath = $this->certificateService->rebuildCertificateFile($certificate);
+
+        return Storage::disk('public')->download($filePath, "certificate_{$certificate->certificate_number}.pdf");
     }
 
     protected function resolveRecipientId(Request $request): ?int
@@ -229,11 +231,16 @@ class CertificateController extends Controller
         string $source
     ): Certificate {
         $this->membershipService->ensureMembershipNumber($recipient);
+        $issueDate = now()->toDateString();
+        $certificateNumber = $overrides['certificate_number'] ?? $this->certificateService->generateCertificateNumber($recipient);
 
         $preparedData = array_merge($overrides, [
             'course_name' => $overrides['course_name'] ?? $this->getCertificateCourseName($certificateType),
             'description' => $overrides['description'] ?? $this->getDefaultDescription($certificateType, $recipient),
             'description_ar' => $overrides['description_ar'] ?? ($overrides['description'] ?? $this->getDefaultDescription($certificateType, $recipient)),
+            'certificate_number' => $certificateNumber,
+            'issue_date' => $overrides['issue_date'] ?? $issueDate,
+            'template' => $templatePath ?? 'default',
         ]);
 
         $filePath = $this->certificateService->generateCertificate(

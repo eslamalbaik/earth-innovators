@@ -53,15 +53,13 @@ class StudentDashboardController extends Controller
                 })->toArray();
             }
         } catch (\Exception $e) {
-            // Fallback if services fail
+            // Align with DashboardService::getStudentDashboardStats keys + frontend (camelCase)
             $stats = [
-                'total_projects' => 0,
-                'approved_projects' => 0,
-                'pending_projects' => 0,
-                'winning_projects' => 0,
-                'total_points' => $user->points ?? 0,
-                'total_badges' => 0,
-                'recent_projects' => [],
+                'totalPoints' => (int) ($user->points ?? 0),
+                'totalProjects' => 0,
+                'totalBadges' => 0,
+                'winningProjects' => 0,
+                'recentProjects' => [],
             ];
             $activities = collect([]);
             $recentBadges = collect([]);

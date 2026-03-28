@@ -139,6 +139,7 @@ class TeacherCertificateController extends Controller
             ],
             'stats' => [],
             'certificate' => [
+                'certificate_number' => $membershipCertificate?->certificate_number,
                 'issue_date' => $membershipCertificate ? $membershipCertificate->issue_date->format('Y-m-d') : now()->format('Y-m-d'),
                 'period_start' => optional($user->teacher->contract_start_date ?? $user->created_at)?->format('Y-m-d'),
                 'period_end' => optional($user->teacher->contract_end_date ?? now()->addYear())?->format('Y-m-d'),

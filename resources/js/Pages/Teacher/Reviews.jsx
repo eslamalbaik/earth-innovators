@@ -6,29 +6,33 @@ import {
     FaStar,
     FaCheckCircle,
     FaClock,
-    FaUser,
-    FaGraduationCap,
     FaChartLine,
     FaReply,
-    FaEdit,
 } from 'react-icons/fa';
-import { getUserImageUrl, getInitials, getColorFromName } from '@/utils/imageUtils';
+import { getInitials, getColorFromName } from '@/utils/imageUtils';
 
 export default function TeacherReviews({ reviews, stats, teacher }) {
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
     const [replyingTo, setReplyingTo] = useState(null);
     const { data: replyData, setData: setReplyData, post: postReply, processing: isReplying, reset: resetReply } = useForm({
-        teacher_response: ''
+        teacher_response: '',
     });
 
-    const renderStars = (rating) => {
-        return Array.from({ length: 5 }).map((_, index) => (
-            <FaStar
-                key={index}
-                className={`text-lg ${index < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
-            />
-        ));
-    };
+    const renderStars = (rating) => Array.from({ length: 5 }).map((_, index) => (
+        <FaStar
+            key={index}
+            className={`text-lg ${index < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+        />
+    ));
+
+    const formatDate = (dateString) => new Date(dateString).toLocaleDateString(
+        language === 'ar' ? 'ar-EG' : 'en-US',
+        {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        },
+    );
 
     const handleReply = (review) => {
         setReplyingTo(review);
@@ -42,13 +46,13 @@ export default function TeacherReviews({ reviews, stats, teacher }) {
             onSuccess: () => {
                 setReplyingTo(null);
                 resetReply();
-            }
+            },
         });
     };
 
     return (
-        <DashboardLayout header="التقييمات">
-            <Head title="التقييمات" />
+        <DashboardLayout header={t('teacherReviewsPage.title')}>
+            <Head title={t('teacherReviewsPage.pageTitle', { appName: t('common.appName') })} />
 
             <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-lg shadow-lg p-6 mb-6">
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -56,7 +60,7 @@ export default function TeacherReviews({ reviews, stats, teacher }) {
                         <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">
                             {t('common.welcomeBack')} {teacher.name}
                         </h2>
-                        <p className="text-gray-800 text-base">{t('dashboard.manageReviews') || 'إدارة تقييمات الطلاب'}</p>
+                        <p className="text-gray-800 text-base">{t('teacherReviewsPage.subtitle')}</p>
                     </div>
                     <div className="bg-white bg-opacity-20 rounded-full p-3 md:p-4 self-center md:self-auto">
                         <FaStar className="text-4xl md:text-5xl text-white" />
@@ -68,7 +72,7 @@ export default function TeacherReviews({ reviews, stats, teacher }) {
                 <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-blue-500">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">إجمالي التقييمات</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('teacherReviewsPage.stats.totalReviews')}</p>
                             <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
                         </div>
                         <div className="p-3 bg-blue-100 rounded-full">
@@ -80,7 +84,7 @@ export default function TeacherReviews({ reviews, stats, teacher }) {
                 <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-green-500">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">متوسط التقييم</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('teacherReviewsPage.stats.averageRating')}</p>
                             <p className="text-3xl font-bold text-green-600">
                                 {(parseFloat(stats.average_rating) || 0).toFixed(1)}
                             </p>
@@ -94,7 +98,7 @@ export default function TeacherReviews({ reviews, stats, teacher }) {
                 <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-yellow-500">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">تقييمك العام</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('teacherReviewsPage.stats.overallRating')}</p>
                             <p className="text-3xl font-bold text-yellow-600">
                                 {(parseFloat(stats.teacher_rating) || 0).toFixed(1)}
                             </p>
@@ -108,7 +112,7 @@ export default function TeacherReviews({ reviews, stats, teacher }) {
                 <div className="bg-white rounded-xl shadow-lg p-6 border-r-4 border-purple-500">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">منشور</p>
+                            <p className="text-sm text-gray-600 mb-1">{t('teacherReviewsPage.stats.published')}</p>
                             <p className="text-3xl font-bold text-purple-600">{stats.published}</p>
                         </div>
                         <div className="p-3 bg-purple-100 rounded-full">
@@ -120,13 +124,13 @@ export default function TeacherReviews({ reviews, stats, teacher }) {
 
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-yellow-50 to-yellow-100">
-                    <h3 className="text-lg font-bold text-gray-900">تقييمات الطلاب</h3>
+                    <h3 className="text-lg font-bold text-gray-900">{t('teacherReviewsPage.listTitle')}</h3>
                 </div>
                 <div className="divide-y divide-gray-200">
                     {reviews?.data?.length === 0 ? (
                         <div className="p-12 text-center text-gray-500">
                             <FaStar className="mx-auto text-4xl mb-4 text-gray-300" />
-                            <p>لا توجد تقييمات حالياً</p>
+                            <p>{t('teacherReviewsPage.empty')}</p>
                         </div>
                     ) : (
                         reviews?.data?.map((review) => (
@@ -147,7 +151,7 @@ export default function TeacherReviews({ reviews, stats, teacher }) {
                                     <div
                                         className={`w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-xl ${review.student_image ? 'hidden' : ''}`}
                                         style={{
-                                            background: `linear-gradient(135deg, ${getColorFromName(review.student_name || 'User')})`
+                                            background: `linear-gradient(135deg, ${getColorFromName(review.student_name || 'User')})`,
                                         }}
                                     >
                                         {getInitials(review.student_name || 'User')}
@@ -160,18 +164,18 @@ export default function TeacherReviews({ reviews, stats, teacher }) {
                                             {review.is_published ? (
                                                 <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 flex items-center gap-1">
                                                     <FaCheckCircle className="text-xs" />
-                                                    منشور
+                                                    {t('teacherReviewsPage.statuses.published')}
                                                 </span>
                                             ) : (
                                                 <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 flex items-center gap-1">
                                                     <FaClock className="text-xs" />
-                                                    قيد المراجعة
+                                                    {t('teacherReviewsPage.statuses.pending')}
                                                 </span>
                                             )}
                                         </div>
                                         {review.subject && (
                                             <p className="text-sm text-gray-600 mb-2">
-                                                المادة: {review.subject} {review.booking_id && ` • #${review.booking_id}`}
+                                                {t('teacherReviewsPage.subjectLabel', { subject: review.subject })} {review.booking_id && ` • #${review.booking_id}`}
                                             </p>
                                         )}
                                         <div className="flex items-center gap-1 mb-3">
@@ -183,21 +187,23 @@ export default function TeacherReviews({ reviews, stats, teacher }) {
                                         <p className="text-gray-700 leading-relaxed mb-3">{review.comment}</p>
                                         {review.teacher_response && replyingTo?.id !== review.id && (
                                             <div className="bg-yellow-50 border-r-4 border-yellow-400 p-4 rounded-lg mb-3">
-                                                <p className="text-sm font-semibold text-gray-900 mb-1">ردك:</p>
+                                                <p className="text-sm font-semibold text-gray-900 mb-1">{t('teacherReviewsPage.yourReply')}</p>
                                                 <p className="text-gray-700">{review.teacher_response}</p>
                                             </div>
                                         )}
                                         {replyingTo?.id === review.id && (
                                             <form onSubmit={(e) => handleReplySubmit(e, review.id)} className="bg-blue-50 border-r-4 border-blue-400 p-4 rounded-lg mb-3">
                                                 <label className="block text-sm font-semibold text-gray-900 mb-2">
-                                                    {review.teacher_response ? 'تعديل الرد:' : 'رد على التقييم:'}
+                                                    {review.teacher_response
+                                                        ? t('teacherReviewsPage.replyForm.editLabel')
+                                                        : t('teacherReviewsPage.replyForm.replyLabel')}
                                                 </label>
                                                 <textarea
                                                     value={replyData.teacher_response}
                                                     onChange={(e) => setReplyData('teacher_response', e.target.value)}
                                                     rows="3"
                                                     className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-2 focus:ring-2 focus:ring-blue-400"
-                                                    placeholder="اكتب ردك هنا..."
+                                                    placeholder={t('teacherReviewsPage.replyForm.placeholder')}
                                                     required
                                                 />
                                                 <div className="flex gap-2">
@@ -206,7 +212,7 @@ export default function TeacherReviews({ reviews, stats, teacher }) {
                                                         disabled={isReplying}
                                                         className="bg-blue-500 hover:bg-[#A3C042] text-white px-4 py-2 rounded-lg text-sm font-medium transition disabled:opacity-50"
                                                     >
-                                                        {isReplying ? 'جاري الإرسال...' : 'إرسال'}
+                                                        {isReplying ? t('teacherReviewsPage.replyForm.submitting') : t('teacherReviewsPage.replyForm.submit')}
                                                     </button>
                                                     <button
                                                         type="button"
@@ -216,17 +222,13 @@ export default function TeacherReviews({ reviews, stats, teacher }) {
                                                         }}
                                                         className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium transition"
                                                     >
-                                                        إلغاء
+                                                        {t('common.cancel')}
                                                     </button>
                                                 </div>
                                             </form>
                                         )}
                                         <p className="text-xs text-gray-500">
-                                            {new Date(review.created_at).toLocaleDateString('en-US', {
-                                                year: 'numeric',
-                                                month: 'long',
-                                                day: 'numeric',
-                                            })}
+                                            {formatDate(review.created_at)}
                                         </p>
                                     </div>
                                     <div>
@@ -236,7 +238,9 @@ export default function TeacherReviews({ reviews, stats, teacher }) {
                                                 className="px-4 py-2 bg-blue-500 hover:bg-[#A3C042] text-white font-medium rounded-lg flex items-center gap-2 transition"
                                             >
                                                 <FaReply />
-                                                {review.teacher_response ? 'تعديل الرد' : 'رد'}
+                                                {review.teacher_response
+                                                    ? t('teacherReviewsPage.actions.editReply')
+                                                    : t('teacherReviewsPage.actions.reply')}
                                             </button>
                                         )}
                                     </div>
@@ -249,7 +253,11 @@ export default function TeacherReviews({ reviews, stats, teacher }) {
                 {reviews?.links && reviews.links.length > 3 && (
                     <div className="bg-white px-4 py-3 border-t border-gray-200 flex items-center justify-between">
                         <div className="text-sm text-gray-700">
-                            عرض {reviews.from} إلى {reviews.to} من {reviews.total} تقييم
+                            {t('teacherReviewsPage.pagination.showing', {
+                                from: reviews.from,
+                                to: reviews.to,
+                                total: reviews.total,
+                            })}
                         </div>
                         <div className="flex gap-2">
                             {reviews.links.map((link, idx) => (
@@ -271,4 +279,3 @@ export default function TeacherReviews({ reviews, stats, teacher }) {
         </DashboardLayout>
     );
 }
-

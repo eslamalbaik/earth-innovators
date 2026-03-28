@@ -1,11 +1,11 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { useState, useMemo } from 'react';
-import { FaSearch, FaFilter, FaTrophy, FaTimes, FaUsers, FaCalendar, FaClock, FaCheckCircle, FaTimesCircle, FaExclamationCircle, FaQuestionCircle, FaRocket, FaBrain } from 'react-icons/fa';
+import { FaSearch, FaFilter, FaTrophy, FaTimes, FaUsers, FaCalendar, FaClock, FaCheckCircle, FaTimesCircle, FaExclamationCircle, FaQuestionCircle } from 'react-icons/fa';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import { useTranslation } from '@/i18n';
 
-export default function StudentChallengesIndex({ auth, challenges, filters, message, categories = [] }) {
+export default function StudentChallengesIndex({ auth, challenges, filters, message, categories = [], previousWinners = [] }) {
     const { t, language } = useTranslation();
     const [search, setSearch] = useState('');
     const [selectedStatus, setSelectedStatus] = useState(filters?.status || '');
@@ -73,6 +73,13 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
             preserveState: true,
             preserveScroll: true,
         });
+    };
+
+    const getAvatarUrl = (avatar) => {
+        if (!avatar) return '/images/hero.png';
+        if (avatar.startsWith('http://') || avatar.startsWith('https://')) return avatar;
+        if (avatar.startsWith('/storage/')) return avatar;
+        return `/storage/${avatar}`;
     };
 
     const formatDate = (date) => {
@@ -375,29 +382,16 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
                         <h3 className="text-sm font-extrabold text-gray-900">{t('studentChallengesIndexPage.winners.title')}</h3>
                     </div>
                     <div className="space-y-4">
-                        {[
-                            {
-                                name: t('studentChallengesIndexPage.winners.items.1.name'),
-                                project: t('studentChallengesIndexPage.winners.items.1.project'),
-                                date: t('studentChallengesIndexPage.winners.items.1.date'),
-                                badge: { text: t('studentChallengesIndexPage.winners.items.1.badge'), icon: FaRocket, color: 'bg-green-100 text-green-700 border-green-300' },
-                                avatar: '/images/hero.png',
-                            },
-                            {
-                                name: t('studentChallengesIndexPage.winners.items.2.name'),
-                                project: t('studentChallengesIndexPage.winners.items.2.project'),
-                                date: t('studentChallengesIndexPage.winners.items.2.date'),
-                                badge: { text: t('studentChallengesIndexPage.winners.items.2.badge'), icon: FaBrain, color: 'bg-green-100 text-green-700 border-green-300' },
-                                avatar: '/images/hero.png',
-                            },
-                        ].map((winner, index) => {
-                            const BadgeIcon = winner.badge.icon;
-                            return (
-                                <div key={index} className="flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
+                        {previousWinners.length > 0 ? (
+                            previousWinners.map((winner, index) => (
+                                <div key={winner.id ?? index} className="flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
                                     <img
-                                        src={winner.avatar}
+                                        src={getAvatarUrl(winner.avatar)}
                                         alt={winner.name}
                                         className="w-12 h-12 rounded-full object-cover border border-gray-200"
+                                        onError={(e) => {
+                                            e.target.src = '/images/hero.png';
+                                        }}
                                     />
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2 mb-1">
@@ -407,19 +401,27 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
                                         <p className="text-xs text-gray-600 mb-1">{winner.project}</p>
                                         <div className="flex items-center gap-2 flex-wrap">
                                             <span className="text-[10px] text-gray-500">{winner.date}</span>
-                                            <span className={`px-2 py-1 rounded-full text-[10px] font-semibold border flex items-center gap-1 ${winner.badge.color}`}>
-                                                <BadgeIcon className="text-xs" />
-                                                {winner.badge.text}
-                                            </span>
+                                            {Number(winner.rating) > 0 && (
+                                                <span className="px-2 py-1 rounded-full text-[10px] font-semibold border bg-green-100 text-green-700 border-green-300">
+                                                    {t('challengeWinnersPage.ratingLabel', { rating: Number(winner.rating).toFixed(1) })}
+                                                </span>
+                                            )}
+                                            {Number(winner.points) > 0 && (
+                                                <span className="px-2 py-1 rounded-full text-[10px] font-semibold border bg-blue-100 text-blue-700 border-blue-300">
+                                                    {t('challengeWinnersPage.pointsLabel', { points: winner.points })}
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
-                            );
-                        })}
+                            ))
+                        ) : (
+                            <p className="text-xs text-gray-500">{t('studentChallengesIndexPage.winners.empty')}</p>
+                        )}
                     </div>
                     <button
                         type="button"
-                        onClick={() => router.visit('/challenges/winners')}
+                        onClick={() => router.visit('/student/challenges/winners')}
                         className="mt-4 w-full text-center text-xs font-semibold text-[#A3C042] hover:text-[#8CA635] transition"
                     >
                         {t('studentChallengesIndexPage.actions.viewAllWinners')}

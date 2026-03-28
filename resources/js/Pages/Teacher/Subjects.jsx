@@ -1,9 +1,13 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, useForm } from '@inertiajs/react';
-import { FaBook, FaPlus, FaTrash, FaEdit, FaCheck, FaTimes } from 'react-icons/fa';
+import { FaBook, FaPlus, FaTrash, FaEdit, FaTimes } from 'react-icons/fa';
 import { useState } from 'react';
+import { useTranslation } from '@/i18n';
+import { getStageLabels } from '@/utils/stageLocalization';
 
 export default function Subjects({ teacher, teacherSubjects, availableSubjects, stages }) {
+    const { t, language } = useTranslation();
+    const stageLabels = getStageLabels(t);
     const [isAdding, setIsAdding] = useState(false);
     const [editingSubject, setEditingSubject] = useState(null);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -17,14 +21,14 @@ export default function Subjects({ teacher, teacherSubjects, availableSubjects, 
 
             const generalStages = ['الابتدائية', 'المتوسطة', 'الثانوية', 'الجامعية'];
             const validStages = stagesArray
-                .filter(stage => {
+                .filter((stage) => {
                     if (!stage) return false;
                     const stageStr = String(stage).trim();
                     if (stageStr.length === 0) return false;
                     if (stageStr.length > 50) return false;
                     return generalStages.includes(stageStr) || stageStr.match(/^[\u0600-\u06FF\s]+$/);
                 })
-                .map(stage => String(stage).trim());
+                .map((stage) => String(stage).trim());
 
             return [...new Set(validStages)];
         };
@@ -47,22 +51,31 @@ export default function Subjects({ teacher, teacherSubjects, availableSubjects, 
         return [];
     };
 
-    const formatStages = (stagesArray) => {
-        if (!stagesArray || stagesArray.length === 0) return 'غير محدد';
+    const formatStageLabel = (stage) => {
+        const stageKey = stageLabels?.toKey?.[stage] || stageLabels?.toKey?.[stage?.toLowerCase?.()];
 
-        const generalStages = ['الابتدائية', 'المتوسطة', 'الثانوية', 'الجامعية'];
-        const filtered = stagesArray.filter(stage => generalStages.includes(stage));
-
-        if (filtered.length > 0) {
-            return filtered.join(', ');
+        if (stageKey) {
+            return stageLabels.toLabel[stageKey] || stage;
         }
 
-        return stagesArray.join(', ');
+        return stage;
     };
+
+    const formatStages = (stagesArray) => {
+        if (!stagesArray || stagesArray.length === 0) return t('common.notAvailable');
+
+        return stagesArray.map(formatStageLabel).join(', ');
+    };
+
+    const getSubjectName = (subject) => (
+        language === 'en'
+            ? (subject?.name_en || subject?.name_ar || t('common.notAvailable'))
+            : (subject?.name_ar || subject?.name_en || t('common.notAvailable'))
+    );
 
     const { data, setData, post, put, delete: destroy, processing, errors, reset } = useForm({
         subject_id: '',
-        stages: []
+        stages: [],
     });
 
     const handleAddSubmit = (e) => {
@@ -71,7 +84,7 @@ export default function Subjects({ teacher, teacherSubjects, availableSubjects, 
             onSuccess: () => {
                 setIsAdding(false);
                 reset();
-            }
+            },
         });
     };
 
@@ -81,7 +94,7 @@ export default function Subjects({ teacher, teacherSubjects, availableSubjects, 
             onSuccess: () => {
                 setEditingSubject(null);
                 reset();
-            }
+            },
         });
     };
 
@@ -105,43 +118,43 @@ export default function Subjects({ teacher, teacherSubjects, availableSubjects, 
         setEditingSubject(subject);
         setData({
             subject_id: subject.id,
-            stages: teacher?.stages || []
+            stages: teacher?.stages || [],
         });
     };
 
     const handleStageChange = (stage) => {
         const currentStages = data.stages;
         if (currentStages.includes(stage)) {
-            setData('stages', currentStages.filter(s => s !== stage));
+            setData('stages', currentStages.filter((item) => item !== stage));
         } else {
             setData('stages', [...currentStages, stage]);
         }
     };
 
     return (
-        <DashboardLayout header="إدارة المواد">
-            <Head title="إدارة المواد" />
+        <DashboardLayout header={t('teacherSubjectsPage.title')}>
+            <Head title={t('teacherSubjectsPage.pageTitle', { appName: t('common.appName') })} />
 
             <div className="max-w-6xl mx-auto">
                 <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-900">إدارة المواد</h1>
-                            <p className="text-gray-600 mt-1">أضف أو عدّل المواد التي تدرسها والمراحل الدراسية</p>
+                            <h1 className="text-2xl font-bold text-gray-900">{t('teacherSubjectsPage.title')}</h1>
+                            <p className="text-gray-600 mt-1">{t('teacherSubjectsPage.subtitle')}</p>
                         </div>
                         <button
                             onClick={() => setIsAdding(true)}
                             className="flex items-center gap-2 px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-black font-medium rounded-lg transition"
                         >
                             <FaPlus />
-                            إضافة مادة
+                            {t('teacherSubjectsPage.actions.add')}
                         </button>
                     </div>
                 </div>
 
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                     <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-yellow-50 to-yellow-100">
-                        <h2 className="text-lg font-bold text-gray-900">المواد المضافة</h2>
+                        <h2 className="text-lg font-bold text-gray-900">{t('teacherSubjectsPage.addedSubjectsTitle')}</h2>
                     </div>
                     <div className="divide-y divide-gray-200">
                         {teacherSubjects && teacherSubjects.length > 0 ? (
@@ -149,13 +162,13 @@ export default function Subjects({ teacher, teacherSubjects, availableSubjects, 
                                 <div key={subject.id} className="p-6 hover:bg-gray-50 transition">
                                     <div className="flex items-center justify-between">
                                         <div className="flex-1">
-                                            <h3 className="text-lg font-semibold text-gray-900 mb-2">{subject.name_ar}</h3>
+                                            <h3 className="text-lg font-semibold text-gray-900 mb-2">{getSubjectName(subject)}</h3>
                                             <div className="flex items-center gap-4">
                                                 <span className="text-sm text-gray-600">
-                                                    المراحل: {formatStages(getStages())}
+                                                    {t('teacherSubjectsPage.stagesLabel')}: {formatStages(getStages())}
                                                 </span>
                                                 <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
-                                                    نشط
+                                                    {t('common.active')}
                                                 </span>
                                             </div>
                                         </div>
@@ -163,14 +176,14 @@ export default function Subjects({ teacher, teacherSubjects, availableSubjects, 
                                             <button
                                                 onClick={() => handleEdit(subject)}
                                                 className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
-                                                title="تعديل"
+                                                title={t('common.edit')}
                                             >
                                                 <FaEdit />
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(subject)}
                                                 className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
-                                                title="حذف"
+                                                title={t('common.delete')}
                                             >
                                                 <FaTrash />
                                             </button>
@@ -181,8 +194,8 @@ export default function Subjects({ teacher, teacherSubjects, availableSubjects, 
                         ) : (
                             <div className="p-12 text-center text-gray-500">
                                 <FaBook className="mx-auto text-4xl mb-4 text-gray-300" />
-                                <p>لم تقم بإضافة أي مواد بعد</p>
-                                <p className="text-sm">اضغط على "إضافة مادة" لبدء إضافة المواد التي تدرسها</p>
+                                <p>{t('teacherSubjectsPage.empty.title')}</p>
+                                <p className="text-sm">{t('teacherSubjectsPage.empty.description')}</p>
                             </div>
                         )}
                     </div>
@@ -192,7 +205,7 @@ export default function Subjects({ teacher, teacherSubjects, availableSubjects, 
                     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
                         <div className="bg-white rounded-lg shadow-2xl w-full max-w-2xl">
                             <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                                <h2 className="text-xl font-bold text-gray-900">إضافة مادة جديدة</h2>
+                                <h2 className="text-xl font-bold text-gray-900">{t('teacherSubjectsPage.modals.addTitle')}</h2>
                                 <button
                                     onClick={() => setIsAdding(false)}
                                     className="text-gray-400 hover:text-gray-600"
@@ -203,7 +216,7 @@ export default function Subjects({ teacher, teacherSubjects, availableSubjects, 
                             <form onSubmit={handleAddSubmit} className="p-6">
                                 <div className="mb-4">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        اختر المادة *
+                                        {t('teacherSubjectsPage.form.subjectLabel')}
                                     </label>
                                     <select
                                         value={data.subject_id}
@@ -211,10 +224,10 @@ export default function Subjects({ teacher, teacherSubjects, availableSubjects, 
                                         className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
                                         required
                                     >
-                                        <option value="">-- اختر المادة --</option>
+                                        <option value="">{t('teacherSubjectsPage.form.subjectPlaceholder')}</option>
                                         {availableSubjects?.map((subject) => (
                                             <option key={subject.id} value={subject.id}>
-                                                {subject.name_ar}
+                                                {getSubjectName(subject)}
                                             </option>
                                         ))}
                                     </select>
@@ -222,7 +235,7 @@ export default function Subjects({ teacher, teacherSubjects, availableSubjects, 
                                 </div>
                                 <div className="mb-6">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        المراحل الدراسية *
+                                        {t('teacherSubjectsPage.form.stagesLabel')}
                                     </label>
                                     <div className="grid grid-cols-2 gap-3">
                                         {stages?.map((stage) => (
@@ -233,7 +246,7 @@ export default function Subjects({ teacher, teacherSubjects, availableSubjects, 
                                                     onChange={() => handleStageChange(stage)}
                                                     className="rounded border-gray-300 text-yellow-400 focus:ring-yellow-400"
                                                 />
-                                                <span className="text-sm text-gray-700">{stage}</span>
+                                                <span className="text-sm text-gray-700">{formatStageLabel(stage)}</span>
                                             </label>
                                         ))}
                                     </div>
@@ -245,14 +258,14 @@ export default function Subjects({ teacher, teacherSubjects, availableSubjects, 
                                         disabled={processing}
                                         className="flex-1 bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-3 rounded-lg transition duration-300"
                                     >
-                                        {processing ? 'جاري الإضافة...' : 'إضافة المادة'}
+                                        {processing ? t('teacherSubjectsPage.actions.adding') : t('teacherSubjectsPage.actions.add')}
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setIsAdding(false)}
                                         className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 rounded-lg transition duration-300"
                                     >
-                                        إلغاء
+                                        {t('common.cancel')}
                                     </button>
                                 </div>
                             </form>
@@ -264,7 +277,7 @@ export default function Subjects({ teacher, teacherSubjects, availableSubjects, 
                     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
                         <div className="bg-white rounded-lg shadow-2xl w-full max-w-2xl">
                             <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                                <h2 className="text-xl font-bold text-gray-900">تعديل المادة</h2>
+                                <h2 className="text-xl font-bold text-gray-900">{t('teacherSubjectsPage.modals.editTitle')}</h2>
                                 <button
                                     onClick={() => setEditingSubject(null)}
                                     className="text-gray-400 hover:text-gray-600"
@@ -275,7 +288,7 @@ export default function Subjects({ teacher, teacherSubjects, availableSubjects, 
                             <form onSubmit={handleEditSubmit} className="p-6">
                                 <div className="mb-4">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        اختر المادة *
+                                        {t('teacherSubjectsPage.form.subjectLabel')}
                                     </label>
                                     <select
                                         value={data.subject_id}
@@ -283,10 +296,10 @@ export default function Subjects({ teacher, teacherSubjects, availableSubjects, 
                                         className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
                                         required
                                     >
-                                        <option value="">-- اختر المادة --</option>
+                                        <option value="">{t('teacherSubjectsPage.form.subjectPlaceholder')}</option>
                                         {availableSubjects?.map((subject) => (
                                             <option key={subject.id} value={subject.id}>
-                                                {subject.name_ar}
+                                                {getSubjectName(subject)}
                                             </option>
                                         ))}
                                     </select>
@@ -294,7 +307,7 @@ export default function Subjects({ teacher, teacherSubjects, availableSubjects, 
                                 </div>
                                 <div className="mb-6">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        المراحل الدراسية *
+                                        {t('teacherSubjectsPage.form.stagesLabel')}
                                     </label>
                                     <div className="grid grid-cols-2 gap-3">
                                         {stages?.map((stage) => (
@@ -305,7 +318,7 @@ export default function Subjects({ teacher, teacherSubjects, availableSubjects, 
                                                     onChange={() => handleStageChange(stage)}
                                                     className="rounded border-gray-300 text-yellow-400 focus:ring-yellow-400"
                                                 />
-                                                <span className="text-sm text-gray-700">{stage}</span>
+                                                <span className="text-sm text-gray-700">{formatStageLabel(stage)}</span>
                                             </label>
                                         ))}
                                     </div>
@@ -317,14 +330,14 @@ export default function Subjects({ teacher, teacherSubjects, availableSubjects, 
                                         disabled={processing}
                                         className="flex-1 bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-3 rounded-lg transition duration-300"
                                     >
-                                        {processing ? 'جاري التحديث...' : 'تحديث المادة'}
+                                        {processing ? t('teacherSubjectsPage.actions.updating') : t('teacherSubjectsPage.actions.update')}
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setEditingSubject(null)}
                                         className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 rounded-lg transition duration-300"
                                     >
-                                        إلغاء
+                                        {t('common.cancel')}
                                     </button>
                                 </div>
                             </form>
@@ -340,16 +353,16 @@ export default function Subjects({ teacher, teacherSubjects, availableSubjects, 
                             <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full">
                                 <FaTrash className="text-2xl text-red-600" />
                             </div>
-                            <h2 className="text-xl font-bold text-gray-900 text-center mb-2">تأكيد الحذف</h2>
+                            <h2 className="text-xl font-bold text-gray-900 text-center mb-2">{t('teacherSubjectsPage.deleteConfirm.title')}</h2>
                             <p className="text-gray-600 text-center mb-6">
-                                هل أنت متأكد من حذف مادة <strong>{subjectToDelete.name_ar}</strong>؟ لا يمكن التراجع عن هذه العملية.
+                                {t('teacherSubjectsPage.deleteConfirm.message', { name: getSubjectName(subjectToDelete) })}
                             </p>
                             <div className="flex items-center gap-4">
                                 <button
                                     onClick={handleDeleteConfirm}
                                     className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-lg transition"
                                 >
-                                    حذف
+                                    {t('common.delete')}
                                 </button>
                                 <button
                                     onClick={() => {
@@ -358,7 +371,7 @@ export default function Subjects({ teacher, teacherSubjects, availableSubjects, 
                                     }}
                                     className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 rounded-lg transition"
                                 >
-                                    إلغاء
+                                    {t('common.cancel')}
                                 </button>
                             </div>
                         </div>

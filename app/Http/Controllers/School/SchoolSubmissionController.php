@@ -141,7 +141,9 @@ class SchoolSubmissionController extends Controller
                 null
             );
 
-            return redirect()->back()->with('success', 'تم تقييم التسليم بنجاح!');
+            return redirect()->back()->with('success', [
+                'key' => 'toastMessages.submissionEvaluatedSuccess',
+            ]);
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }

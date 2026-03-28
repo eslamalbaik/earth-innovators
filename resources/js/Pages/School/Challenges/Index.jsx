@@ -9,6 +9,7 @@ import ModernChallengeCardGrid from '@/Components/Challenges/ModernChallengeCard
 import InnovationChallengeCard from '@/Components/Challenges/InnovationChallengeCard';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 import { useTranslation } from '@/i18n';
+import resolveLocalizedMessage from '@/utils/resolveLocalizedMessage';
 
 export default function SchoolChallengesIndex({ auth, challenges, stats, filters, submissions = null, selectedChallenge = null }) {
     const { flash } = usePage().props;
@@ -158,16 +159,16 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
 
     useEffect(() => {
         if (flash?.success) {
-            setToastMessage(flash.success);
+            setToastMessage(resolveLocalizedMessage(flash.success, language));
             setShowToast(true);
             setTimeout(() => setShowToast(false), 5000);
         }
         if (flash?.error) {
-            setToastMessage(flash.error);
+            setToastMessage(resolveLocalizedMessage(flash.error, language));
             setShowToast(true);
             setTimeout(() => setShowToast(false), 5000);
         }
-    }, [flash]);
+    }, [flash, language]);
 
     // Set active tab based on selectedChallenge
     useEffect(() => {

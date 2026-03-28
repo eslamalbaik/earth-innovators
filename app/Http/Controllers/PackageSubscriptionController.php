@@ -3,25 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\Package;
-use App\Models\UserPackage;
 use App\Models\Payment;
-use App\Services\ZiinaService;
+use App\Models\UserPackage;
+use App\Services\PackagePaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class PackageSubscriptionController extends Controller
 {
     public function __construct(
-        private ZiinaService $ziinaService
+        private PackagePaymentService $packagePaymentService
     ) {}
 
-    /**
-     * Display packages page for users
-     */
     public function index()
     {
         $packages = Package::where('is_active', true)
@@ -51,10 +45,7 @@ class PackageSubscriptionController extends Controller
 
         $userPackage = null;
         if (Auth::check()) {
-            $activeSubscription = UserPackage::where('user_id', Auth::id())
-                ->currentActive()
-                ->with('package')
-                ->first();
+            $activeSubscription = $this->packagePaymentService->getActiveSubscription(Auth::user());
 
             if ($activeSubscription) {
                 $userPackage = [
@@ -82,9 +73,6 @@ class PackageSubscriptionController extends Controller
         ]);
     }
 
-    /**
-     * Subscribe to a package
-     */
     public function subscribe(Request $request, Package $package)
     {
         $request->validate([
@@ -92,157 +80,47 @@ class PackageSubscriptionController extends Controller
         ]);
 
         $user = Auth::user();
-
         if (!$user) {
-            return redirect()->route('login')->with('error', 'يرجى تسجيل الدخول أولاً');
+            return redirect()->route('login')->with('error', [
+                'key' => 'toastMessages.authLoginFirst',
+            ]);
         }
 
-        $activeSubscription = UserPackage::where('user_id', $user->id)
-            ->currentActive()
-            ->first();
+        $result = $this->packagePaymentService->createSubscriptionCheckout($user, $package);
 
-        if ($activeSubscription) {
-            return redirect()->back()->with('error', 'لديك اشتراك نشط بالفعل. يرجى إلغاء الاشتراك الحالي أولاً.');
+        if (!$result['success']) {
+            return redirect()->back()->with('error', $result['message']);
         }
 
-        try {
-            DB::beginTransaction();
-
-            $userPackage = UserPackage::create([
-                'user_id' => $user->id,
-                'package_id' => $package->id,
-                'start_date' => now(),
-                'end_date' => now()->addMonths($package->duration_months ?? 1),
-                'status' => 'pending',
-                'auto_renew' => false,
-                'paid_amount' => $package->price,
-                'payment_method' => 'ziina',
-                'transaction_id' => 'TXN-' . Str::upper(Str::random(12)),
-            ]);
-
-            $payment = Payment::create([
-                'student_id' => $user->id,
-                'package_id' => $package->id,
-                'user_package_id' => $userPackage->id,
-                'amount' => $package->price,
-                'currency' => $package->currency,
-                'status' => 'pending',
-                'payment_method' => 'ziina',
-                'payment_gateway' => 'Ziina',
-                'transaction_id' => $userPackage->transaction_id,
-                'payment_reference' => 'PKG-' . $package->id . '-' . $user->id . '-' . time(),
-            ]);
-
-            $paymentData = [
-                'amount' => $package->price,
-                'currency' => $package->currency,
-                'description' => app()->getLocale() === 'ar' 
-                    ? "اشتراك في باقة: {$package->name_ar}"
-                    : "Subscription to package: {$package->name}",
-                'metadata' => [
-                    'user_id' => $user->id,
-                    'package_id' => $package->id,
-                    'user_package_id' => $userPackage->id,
-                    'payment_id' => $payment->id,
-                ],
-                'success_url' => route('packages.payment.success', $payment->id),
-                'cancel_url' => route('packages.payment.cancel', $payment->id),
-            ];
-
-            $ziinaResponse = $this->ziinaService->createPaymentRequest($paymentData);
-
-            if (isset($ziinaResponse['error']) && $ziinaResponse['error']) {
-                DB::rollBack();
-                return redirect()->back()->with('error', $ziinaResponse['message'] ?? 'فشل في إنشاء طلب الدفع');
-            }
-
-            $payment->update([
-                'gateway_payment_id' => $ziinaResponse['id'] ?? null,
-                'gateway_response' => $ziinaResponse,
-            ]);
-
-            DB::commit();
-
-            // Ziina v2 API returns 'redirect_url' for payment page
-            if (isset($ziinaResponse['redirect_url'])) {
-                return redirect($ziinaResponse['redirect_url']);
-            }
-
-            return redirect()->back()->with('error', 'لم يتم الحصول على رابط الدفع');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error subscribing to package', [
-                'user_id' => $user->id,
-                'package_id' => $package->id,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-
-            return redirect()->back()->with('error', 'حدث خطأ أثناء الاشتراك. يرجى المحاولة مرة أخرى.');
+        if (!empty($result['redirect_url'])) {
+            return redirect($result['redirect_url']);
         }
+
+        return redirect()->back()->with('error', [
+            'key' => 'toastMessages.packagePaymentLinkMissing',
+        ]);
     }
-
 
     public function paymentSuccess(Payment $payment)
     {
-        try {
-                $this->ziinaService = app(ZiinaService::class);
-                $paymentRequest = $this->ziinaService->getPaymentRequest($payment->gateway_payment_id);
+        $result = $this->packagePaymentService->confirmPayment($payment);
 
-                if ($paymentRequest && isset($paymentRequest['status']) && $paymentRequest['status'] === 'paid') {
-                    // Use PaymentService to finalize subscription (centralized logic)
-                    $paymentService = app(\App\Services\PaymentService::class);
-                    $paymentService->finalizePackageSubscription($payment, $paymentRequest);
-
-                return redirect()->route('packages.index')->with('success', 'تم الاشتراك بنجاح! تم تفعيل باقتك.');
-            }
-
-            return redirect()->route('packages.index')->with('error', 'لم يتم تأكيد الدفع. يرجى التواصل مع الدعم الفني.');
-
-        } catch (\Exception $e) {
-            Log::error('Error handling payment success', [
-                'payment_id' => $payment->id,
-                'error' => $e->getMessage(),
-            ]);
-
-            return redirect()->route('packages.index')->with('error', 'حدث خطأ أثناء تأكيد الدفع.');
+        if ($result['success']) {
+            return redirect()->route('packages.index')->with('success', $result['message']);
         }
+
+        return redirect()->route('packages.index')->with('error', $result['message']);
     }
 
-    /**
-     * Handle cancelled payment
-     */
     public function paymentCancel(Payment $payment)
     {
-        try {
-            $payment->update(['status' => 'cancelled']);
+        $this->packagePaymentService->markPaymentCancelled($payment, $payment->gateway_response ?? []);
 
-            $metadata = $payment->gateway_response['metadata'] ?? [];
-            $userPackageId = $metadata['user_package_id'] ?? $payment->user_package_id;
-
-            if ($userPackageId) {
-                $userPackage = UserPackage::find($userPackageId);
-                if ($userPackage) {
-                    app(\App\Services\PackageService::class)->updateSubscriberStatus($userPackage, 'cancelled');
-                }
-            }
-
-            return redirect()->route('packages.index')->with('info', 'تم إلغاء عملية الدفع.');
-
-        } catch (\Exception $e) {
-            Log::error('Error handling payment cancellation', [
-                'payment_id' => $payment->id,
-                'error' => $e->getMessage(),
-            ]);
-
-            return redirect()->route('packages.index')->with('error', 'حدث خطأ.');
-        }
+        return redirect()->route('packages.index')->with('info', [
+            'key' => 'toastMessages.packagePaymentCancelled',
+        ]);
     }
 
-    /**
-     * Cancel user subscription
-     */
     public function cancelSubscription(UserPackage $userPackage)
     {
         $user = Auth::user();
@@ -252,26 +130,19 @@ class PackageSubscriptionController extends Controller
         }
 
         try {
-            app(\App\Services\PackageService::class)->cancelSubscription($userPackage);
-            $userPackage->update([
-                'auto_renew' => false,
+            $this->packagePaymentService->cancelSubscription($userPackage);
+            $userPackage->update(['auto_renew' => false]);
+
+            return redirect()->route('packages.index')->with('success', [
+                'key' => 'toastMessages.packageSubscriptionCancelledSuccess',
             ]);
-
-            return redirect()->route('packages.index')->with('success', 'تم إلغاء الاشتراك بنجاح.');
-
-        } catch (\Exception $e) {
-            Log::error('Error cancelling subscription', [
-                'user_package_id' => $userPackage->id,
-                'error' => $e->getMessage(),
+        } catch (\Throwable $exception) {
+            return redirect()->route('packages.index')->with('error', [
+                'key' => 'toastMessages.packageSubscriptionCancelError',
             ]);
-
-            return redirect()->back()->with('error', 'حدث خطأ أثناء إلغاء الاشتراك.');
         }
     }
 
-    /**
-     * View user subscriptions
-     */
     public function mySubscriptions()
     {
         $user = Auth::user();
@@ -292,7 +163,8 @@ class PackageSubscriptionController extends Controller
                     ],
                     'start_date' => $subscription->start_date->format('Y-m-d'),
                     'end_date' => $subscription->end_date->format('Y-m-d'),
-                    'status' => $subscription->status,
+                    'status' => $subscription->effective_status,
+                    'raw_status' => $subscription->status,
                     'paid_amount' => $subscription->paid_amount,
                     'payment_method' => $subscription->payment_method,
                     'transaction_id' => $subscription->transaction_id,

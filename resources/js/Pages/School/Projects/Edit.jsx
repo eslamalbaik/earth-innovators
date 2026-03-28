@@ -1,26 +1,39 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
-import { Head, useForm, router, Link } from '@inertiajs/react';
-import { useState, useRef, useEffect } from 'react';
-import { FaArrowLeft, FaUpload, FaCloudUploadAlt, FaFile, FaSpinner, FaTrash } from 'react-icons/fa';
-import TextInput from '@/Components/TextInput';
-import InputLabel from '@/Components/InputLabel';
+import { Head, Link, router, useForm } from '@inertiajs/react';
+import { useRef, useState } from 'react';
+import {
+    FaCloudUploadAlt,
+    FaFile,
+    FaSpinner,
+    FaTrash,
+} from 'react-icons/fa';
 import InputError from '@/Components/InputError';
+import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
+import TextInput from '@/Components/TextInput';
 import { useToast } from '@/Contexts/ToastContext';
+import { useBackIcon, useTranslation } from '@/i18n';
+
+const FILE_MAX_SIZE = 10 * 1024 * 1024;
+const IMAGE_MAX_SIZE = 5 * 1024 * 1024;
+
+const FILE_TYPES = [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'video/mp4',
+    'video/avi',
+    'video/mov',
+    'application/zip',
+    'application/x-rar-compressed',
+];
+
+const IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
 
 export default function EditSchoolProject({ auth, project }) {
-    const { showSuccess } = useToast();
-    const { data, setData, put, processing, errors, transform } = useForm({
-        title: project?.title || '',
-        description: project?.description || '',
-        category: project?.category || 'other',
-        files: [],
-        images: [],
-        report: project?.report || '',
-        existing_files: [],
-        existing_images: [],
-    });
-
+    const { t, language } = useTranslation();
+    const BackIcon = useBackIcon();
+    const { showError, showSuccess } = useToast();
     const [fileList, setFileList] = useState([]);
     const [imageList, setImageList] = useState([]);
     const [existingFiles, setExistingFiles] = useState(project?.files || []);
@@ -28,195 +41,161 @@ export default function EditSchoolProject({ auth, project }) {
     const [dragActive, setDragActive] = useState(false);
     const fileInputRef = useRef(null);
     const imageInputRef = useRef(null);
-    const submitDataRef = useRef(null);
 
-    useEffect(() => {
-        // تحميل الصور والملفات الموجودة
-        if (project?.images) {
-            setExistingImages(project.images);
+    const { data, setData, processing, errors } = useForm({
+        title: project?.title || '',
+        description: project?.description || '',
+        category: project?.category || 'other',
+        files: [],
+        images: [],
+        report: project?.report || '',
+        existing_files: project?.files || [],
+        existing_images: project?.images || [],
+    });
+
+    const validateFiles = (files) => Array.from(files).filter((file) => {
+        if (file.size > FILE_MAX_SIZE) {
+            showError(t('schoolProjectEditPage.errors.fileTooLarge', { name: file.name, maxMb: 10 }));
+            return false;
         }
-        if (project?.files) {
-            setExistingFiles(project.files);
+
+        if (!FILE_TYPES.includes(file.type)) {
+            showError(t('schoolProjectEditPage.errors.fileTypeNotSupported', { name: file.name }));
+            return false;
         }
-    }, [project]);
+
+        return true;
+    });
+
+    const validateImages = (files) => Array.from(files).filter((file) => {
+        if (file.size > IMAGE_MAX_SIZE) {
+            showError(t('schoolProjectEditPage.errors.imageTooLarge', { name: file.name, maxMb: 5 }));
+            return false;
+        }
+
+        if (!IMAGE_TYPES.includes(file.type)) {
+            showError(t('schoolProjectEditPage.errors.imageTypeNotSupported', { name: file.name }));
+            return false;
+        }
+
+        return true;
+    });
 
     const handleFiles = (files) => {
-        const fileArray = Array.from(files);
-        const validFiles = fileArray.filter(file => {
-            const maxSize = 10 * 1024 * 1024;
-            const validTypes = [
-                'application/pdf', 'application/msword',
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                'video/mp4', 'video/avi', 'video/mov',
-                'application/zip', 'application/x-rar-compressed'
-            ];
+        const validFiles = validateFiles(files);
 
-            if (file.size > maxSize) {
-                alert(`الملف ${file.name} أكبر من 10 ميجابايت`);
-                return false;
-            }
+        if (validFiles.length === 0) {
+            return;
+        }
 
-            if (!validTypes.includes(file.type)) {
-                alert(`نوع الملف ${file.name} غير مدعوم`);
-                return false;
-            }
-
-            return true;
-        });
-
-        if (validFiles.length === 0) return;
-
-        setFileList(prev => {
-            const newItems = validFiles.map(file => ({
+        setFileList((previous) => [
+            ...previous,
+            ...validFiles.map((file) => ({
                 file,
                 id: Date.now() + Math.random(),
                 name: file.name,
                 size: file.size,
-            }));
-            return [...prev, ...newItems];
-        });
+            })),
+        ]);
 
-        setData('files', prev => [...prev, ...validFiles]);
+        setData('files', [...data.files, ...validFiles]);
     };
 
     const handleImages = (files) => {
-        const fileArray = Array.from(files);
-        const validFiles = fileArray.filter(file => {
-            const maxSize = 5 * 1024 * 1024;
-            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+        const validImages = validateImages(files);
 
-            if (file.size > maxSize) {
-                alert(`الصورة ${file.name} أكبر من 5 ميجابايت`);
-                return false;
-            }
+        if (validImages.length === 0) {
+            return;
+        }
 
-            if (!validTypes.includes(file.type)) {
-                alert(`نوع الصورة ${file.name} غير مدعوم`);
-                return false;
-            }
-
-            return true;
-        });
-
-        if (validFiles.length === 0) return;
-
-        setImageList(prev => {
-            const newItems = validFiles.map(file => ({
+        setImageList((previous) => [
+            ...previous,
+            ...validImages.map((file) => ({
                 file,
                 id: Date.now() + Math.random(),
                 name: file.name,
                 size: file.size,
                 preview: URL.createObjectURL(file),
-            }));
-            return [...prev, ...newItems];
-        });
+            })),
+        ]);
 
-        setData('images', prev => [...prev, ...validFiles]);
+        setData('images', [...data.images, ...validImages]);
     };
 
-    const removeFile = (e, id) => {
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        setFileList(prev => {
-            const newList = prev.filter(item => item.id !== id);
-            const filesToKeep = newList.map(item => item.file);
-            setData('files', filesToKeep);
-            return newList;
+    const removeFile = (id) => {
+        setFileList((previous) => {
+            const nextList = previous.filter((item) => item.id !== id);
+            setData('files', nextList.map((item) => item.file));
+            return nextList;
         });
     };
 
-    const removeImage = (e, id) => {
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        setImageList(prev => {
-            const item = prev.find(i => i.id === id);
-            if (item && item.preview) {
-                URL.revokeObjectURL(item.preview);
+    const removeImage = (id) => {
+        setImageList((previous) => {
+            const imageItem = previous.find((item) => item.id === id);
+
+            if (imageItem?.preview) {
+                URL.revokeObjectURL(imageItem.preview);
             }
-            const newList = prev.filter(item => item.id !== id);
-            const imagesToKeep = newList.map(item => item.file);
-            setData('images', imagesToKeep);
-            return newList;
+
+            const nextList = previous.filter((item) => item.id !== id);
+            setData('images', nextList.map((item) => item.file));
+            return nextList;
         });
     };
 
     const removeExistingFile = (index) => {
-        setExistingFiles(prev => {
-            const newFiles = prev.filter((_, i) => i !== index);
-            // تحديث form data أيضاً
-            setData('existing_files', newFiles);
-            return newFiles;
+        setExistingFiles((previous) => {
+            const nextFiles = previous.filter((_, itemIndex) => itemIndex !== index);
+            setData('existing_files', nextFiles);
+            return nextFiles;
         });
     };
 
     const removeExistingImage = (index) => {
-        setExistingImages(prev => {
-            const newImages = prev.filter((_, i) => i !== index);
-            // تحديث form data أيضاً
-            setData('existing_images', newImages);
-            return newImages;
+        setExistingImages((previous) => {
+            const nextImages = previous.filter((_, itemIndex) => itemIndex !== index);
+            setData('existing_images', nextImages);
+            return nextImages;
         });
     };
 
-    const handleRemoveExistingFile = (e, index) => {
-        e.preventDefault();
-        e.stopPropagation();
-        removeExistingFile(index);
-    };
-
-    const handleRemoveExistingImage = (e, index) => {
-        e.preventDefault();
-        e.stopPropagation();
-        removeExistingImage(index);
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const handleSubmit = (event) => {
+        event.preventDefault();
 
         if (!data.title || !data.description || !data.category) {
-            alert('يرجى ملء جميع الحقول المطلوبة');
+            showError(t('schoolProjectEditPage.alerts.requiredFields'));
             return;
         }
 
         const formData = new FormData();
-                formData.append('title', data.title || '');
+        formData.append('title', data.title || '');
         formData.append('description', data.description || '');
         formData.append('category', data.category || 'other');
+
         if (data.report) {
             formData.append('report', data.report);
         }
 
-        if (existingFiles && existingFiles.length > 0) {
-            existingFiles.forEach((file, index) => {
-                formData.append(`existing_files[${index}]`, file);
-            });
-        }
+        existingFiles.forEach((file, index) => {
+            formData.append(`existing_files[${index}]`, file);
+        });
 
-        if (existingImages && existingImages.length > 0) {
-            existingImages.forEach((image, index) => {
-                formData.append(`existing_images[${index}]`, image);
-            });
-        }
+        existingImages.forEach((image, index) => {
+            formData.append(`existing_images[${index}]`, image);
+        });
 
-        if (data.files && data.files.length > 0) {
-            data.files.forEach((file) => {
-                if (file instanceof File) {
-                    formData.append('files[]', file);
-                }
-            });
-        }
+        data.files.forEach((file) => {
+            if (file instanceof File) {
+                formData.append('files[]', file);
+            }
+        });
 
-        if (data.images && data.images.length > 0) {
-            data.images.forEach((image) => {
-                if (image instanceof File) {
-                    formData.append('images[]', image);
-                }
-            });
-        }
+        data.images.forEach((image) => {
+            if (image instanceof File) {
+                formData.append('images[]', image);
+            }
+        });
 
         formData.append('_method', 'PUT');
 
@@ -224,70 +203,59 @@ export default function EditSchoolProject({ auth, project }) {
             forceFormData: true,
             preserveScroll: false,
             onSuccess: () => {
-                showSuccess('تم تحديث المشروع بنجاح');
+                showSuccess(t('toastMessages.schoolProjectUpdatedSuccess'));
                 router.visit('/school/projects');
             },
-            onError: (errors) => {
-                let errorMessage = 'حدث خطأ أثناء حفظ التعديلات';
-                if (errors.message) {
-                    errorMessage = errors.message;
-                } else if (typeof errors === 'object' && Object.keys(errors).length > 0) {
-                    const firstError = Object.values(errors)[0];
-                    if (Array.isArray(firstError)) {
-                        errorMessage = firstError[0];
-                    } else if (typeof firstError === 'string') {
-                        errorMessage = firstError;
-                    }
-                }
-                alert('خطأ: ' + errorMessage);
+            onError: (formErrors) => {
+                const errorMessage = formErrors.message || Object.values(formErrors)[0] || t('toastMessages.schoolProjectUpdateError');
+                showError(Array.isArray(errorMessage) ? errorMessage[0] : errorMessage);
             },
         });
     };
 
     const categoryOptions = [
-        { value: 'science', label: 'علوم' },
-        { value: 'technology', label: 'تقني' },
-        { value: 'engineering', label: 'هندسة' },
-        { value: 'mathematics', label: 'رياضيات' },
-        { value: 'arts', label: 'فنون' },
-        { value: 'other', label: 'أخرى' },
+        { value: 'science', label: t('common.categories.science') },
+        { value: 'technology', label: t('common.categories.technology') },
+        { value: 'engineering', label: t('common.categories.engineering') },
+        { value: 'mathematics', label: t('common.categories.mathematics') },
+        { value: 'arts', label: t('common.categories.arts') },
+        { value: 'other', label: t('common.categories.other') },
     ];
 
     return (
-        <DashboardLayout header="تعديل المشروع">
-            <Head title="تعديل المشروع - إرث المبتكرين" />
+        <DashboardLayout auth={auth} header={t('schoolProjectEditPage.title')}>
+            <Head title={t('schoolProjectEditPage.pageTitle', { appName: t('common.appName') })} />
 
-            <div className="max-w-4xl mx-auto">
+            <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="mx-auto max-w-4xl">
                 <Link
                     href="/school/projects"
-                    className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
+                    className="mb-6 inline-flex items-center gap-2 text-gray-600 hover:text-gray-900"
                 >
-                    <FaArrowLeft />
-                    <span>العودة إلى المشاريع</span>
+                    <BackIcon />
+                    <span>{t('schoolProjectEditPage.actions.backToProjects')}</span>
                 </Link>
 
-                <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg p-6">
+                <form onSubmit={handleSubmit} className="rounded-xl bg-white p-6 shadow-lg">
                     <div className="space-y-6">
                         <div>
-                            <InputLabel htmlFor="title" value="عنوان المشروع *" />
+                            <InputLabel htmlFor="title" value={t('schoolProjectsCreatePage.form.titleLabel')} />
                             <TextInput
                                 id="title"
                                 type="text"
                                 value={data.title}
-                                onChange={(e) => setData('title', e.target.value)}
+                                onChange={(event) => setData('title', event.target.value)}
                                 className="mt-1 block w-full"
                                 required
                             />
                             <InputError message={errors.title} className="mt-2" />
                         </div>
 
-                        {/* الوصف */}
                         <div>
-                            <InputLabel htmlFor="description" value="وصف المشروع *" />
+                            <InputLabel htmlFor="description" value={t('schoolProjectsCreatePage.form.descriptionLabel')} />
                             <textarea
                                 id="description"
                                 value={data.description}
-                                onChange={(e) => setData('description', e.target.value)}
+                                onChange={(event) => setData('description', event.target.value)}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring focus:ring-[#A3C042] focus:ring-opacity-50"
                                 rows="6"
                                 required
@@ -295,17 +263,16 @@ export default function EditSchoolProject({ auth, project }) {
                             <InputError message={errors.description} className="mt-2" />
                         </div>
 
-                        {/* الفئة */}
                         <div>
-                            <InputLabel htmlFor="category" value="فئة المشروع *" />
+                            <InputLabel htmlFor="category" value={t('schoolProjectsCreatePage.form.categoryLabel')} />
                             <select
                                 id="category"
                                 value={data.category}
-                                onChange={(e) => setData('category', e.target.value)}
+                                onChange={(event) => setData('category', event.target.value)}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring focus:ring-[#A3C042] focus:ring-opacity-50"
                                 required
                             >
-                                {categoryOptions.map(option => (
+                                {categoryOptions.map((option) => (
                                     <option key={option.value} value={option.value}>
                                         {option.label}
                                     </option>
@@ -314,22 +281,21 @@ export default function EditSchoolProject({ auth, project }) {
                             <InputError message={errors.category} className="mt-2" />
                         </div>
 
-                        {/* الصور الموجودة */}
                         {existingImages.length > 0 && (
                             <div>
-                                <InputLabel value="الصور الحالية" />
-                                <div className="mt-2 grid grid-cols-4 gap-4">
+                                <InputLabel value={t('schoolProjectEditPage.form.existingImagesLabel')} />
+                                <div className="mt-2 grid grid-cols-2 gap-4 md:grid-cols-4">
                                     {existingImages.map((image, index) => (
-                                        <div key={index} className="relative">
+                                        <div key={`${image}-${index}`} className="relative">
                                             <img
                                                 src={image.startsWith('http') ? image : `/storage/${image}`}
-                                                alt={`Existing ${index + 1}`}
-                                                className="w-full h-32 object-cover rounded-lg"
+                                                alt={t('schoolProjectEditPage.imageAlt', { number: index + 1 })}
+                                                className="h-32 w-full rounded-lg object-cover"
                                             />
                                             <button
                                                 type="button"
-                                                onClick={(e) => handleRemoveExistingImage(e, index)}
-                                                className="absolute top-2 left-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                                                onClick={() => removeExistingImage(index)}
+                                                className="absolute left-2 top-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
                                             >
                                                 <FaTrash className="text-xs" />
                                             </button>
@@ -339,59 +305,63 @@ export default function EditSchoolProject({ auth, project }) {
                             </div>
                         )}
 
-                        {/* رفع الصور */}
                         <div>
-                            <InputLabel value="إضافة صور جديدة" />
+                            <InputLabel value={t('schoolProjectEditPage.form.newImagesLabel')} />
                             <div
-                                className={`mt-2 border-2 border-dashed rounded-lg p-6 text-center transition ${
+                                className={`mt-2 rounded-lg border-2 border-dashed p-6 text-center transition ${
                                     dragActive ? 'border-[#A3C042] bg-green-50' : 'border-gray-300'
                                 }`}
-                                onDragEnter={(e) => {
-                                    e.preventDefault();
+                                onDragEnter={(event) => {
+                                    event.preventDefault();
                                     setDragActive(true);
                                 }}
-                                onDragLeave={(e) => {
-                                    e.preventDefault();
+                                onDragLeave={(event) => {
+                                    event.preventDefault();
                                     setDragActive(false);
                                 }}
-                                onDragOver={(e) => e.preventDefault()}
-                                onDrop={(e) => {
-                                    e.preventDefault();
+                                onDragOver={(event) => event.preventDefault()}
+                                onDrop={(event) => {
+                                    event.preventDefault();
                                     setDragActive(false);
-                                    handleImages(e.dataTransfer.files);
+                                    handleImages(event.dataTransfer.files);
                                 }}
                             >
-                                <FaCloudUploadAlt className="mx-auto text-4xl text-gray-400 mb-2" />
-                                <p className="text-gray-600 mb-2">اسحب وأفلت الصور هنا أو</p>
+                                <FaCloudUploadAlt className="mx-auto mb-2 text-4xl text-gray-400" />
+                                <p className="mb-2 text-gray-600">{t('schoolProjectEditPage.placeholders.imageDropzone')}</p>
                                 <button
                                     type="button"
                                     onClick={() => imageInputRef.current?.click()}
-                                    className="text-[#A3C042] hover:text-legacy-blue font-medium"
+                                    className="font-medium text-[#A3C042] hover:text-legacy-blue"
                                 >
-                                    اختر الصور
+                                    {t('schoolProjectEditPage.actions.chooseImages')}
                                 </button>
                                 <input
                                     ref={imageInputRef}
                                     type="file"
                                     multiple
                                     accept="image/*"
-                                    onChange={(e) => handleImages(e.target.files)}
+                                    onChange={(event) => {
+                                        if (event.target.files) {
+                                            handleImages(event.target.files);
+                                        }
+                                    }}
                                     className="hidden"
                                 />
                             </div>
+
                             {imageList.length > 0 && (
-                                <div className="mt-4 grid grid-cols-4 gap-4">
+                                <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
                                     {imageList.map((item) => (
                                         <div key={item.id} className="relative">
                                             <img
                                                 src={item.preview}
                                                 alt={item.name}
-                                                className="w-full h-32 object-cover rounded-lg"
+                                                className="h-32 w-full rounded-lg object-cover"
                                             />
                                             <button
                                                 type="button"
-                                                onClick={(e) => removeImage(e, item.id)}
-                                                className="absolute top-2 left-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                                                onClick={() => removeImage(item.id)}
+                                                className="absolute left-2 top-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
                                             >
                                                 <FaTrash className="text-xs" />
                                             </button>
@@ -401,13 +371,12 @@ export default function EditSchoolProject({ auth, project }) {
                             )}
                         </div>
 
-                        {/* الملفات الموجودة */}
                         {existingFiles.length > 0 && (
                             <div>
-                                <InputLabel value="الملفات الحالية" />
+                                <InputLabel value={t('schoolProjectEditPage.form.existingFilesLabel')} />
                                 <div className="mt-2 space-y-2">
                                     {existingFiles.map((file, index) => (
-                                        <div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                                        <div key={`${file}-${index}`} className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
                                             <div className="flex items-center gap-2">
                                                 <FaFile className="text-gray-400" />
                                                 <span className="text-sm text-gray-700">
@@ -416,7 +385,7 @@ export default function EditSchoolProject({ auth, project }) {
                                             </div>
                                             <button
                                                 type="button"
-                                                onClick={(e) => handleRemoveExistingFile(e, index)}
+                                                onClick={() => removeExistingFile(index)}
                                                 className="text-red-500 hover:text-red-700"
                                             >
                                                 <FaTrash />
@@ -427,49 +396,53 @@ export default function EditSchoolProject({ auth, project }) {
                             </div>
                         )}
 
-                        {/* رفع الملفات */}
                         <div>
-                            <InputLabel value="إضافة ملفات جديدة" />
+                            <InputLabel value={t('schoolProjectEditPage.form.newFilesLabel')} />
                             <div
-                                className={`mt-2 border-2 border-dashed rounded-lg p-6 text-center transition ${
+                                className={`mt-2 rounded-lg border-2 border-dashed p-6 text-center transition ${
                                     dragActive ? 'border-[#A3C042] bg-green-50' : 'border-gray-300'
                                 }`}
-                                onDragEnter={(e) => {
-                                    e.preventDefault();
+                                onDragEnter={(event) => {
+                                    event.preventDefault();
                                     setDragActive(true);
                                 }}
-                                onDragLeave={(e) => {
-                                    e.preventDefault();
+                                onDragLeave={(event) => {
+                                    event.preventDefault();
                                     setDragActive(false);
                                 }}
-                                onDragOver={(e) => e.preventDefault()}
-                                onDrop={(e) => {
-                                    e.preventDefault();
+                                onDragOver={(event) => event.preventDefault()}
+                                onDrop={(event) => {
+                                    event.preventDefault();
                                     setDragActive(false);
-                                    handleFiles(e.dataTransfer.files);
+                                    handleFiles(event.dataTransfer.files);
                                 }}
                             >
-                                <FaCloudUploadAlt className="mx-auto text-4xl text-gray-400 mb-2" />
-                                <p className="text-gray-600 mb-2">اسحب وأفلت الملفات هنا أو</p>
+                                <FaCloudUploadAlt className="mx-auto mb-2 text-4xl text-gray-400" />
+                                <p className="mb-2 text-gray-600">{t('schoolProjectEditPage.placeholders.fileDropzone')}</p>
                                 <button
                                     type="button"
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="text-[#A3C042] hover:text-legacy-blue font-medium"
+                                    className="font-medium text-[#A3C042] hover:text-legacy-blue"
                                 >
-                                    اختر الملفات
+                                    {t('schoolProjectEditPage.actions.chooseFiles')}
                                 </button>
                                 <input
                                     ref={fileInputRef}
                                     type="file"
                                     multiple
-                                    onChange={(e) => handleFiles(e.target.files)}
+                                    onChange={(event) => {
+                                        if (event.target.files) {
+                                            handleFiles(event.target.files);
+                                        }
+                                    }}
                                     className="hidden"
                                 />
                             </div>
+
                             {fileList.length > 0 && (
                                 <div className="mt-4 space-y-2">
                                     {fileList.map((item) => (
-                                        <div key={item.id} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                                        <div key={item.id} className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
                                             <div className="flex items-center gap-2">
                                                 <FaFile className="text-gray-400" />
                                                 <span className="text-sm text-gray-700">{item.name}</span>
@@ -479,7 +452,7 @@ export default function EditSchoolProject({ auth, project }) {
                                             </div>
                                             <button
                                                 type="button"
-                                                onClick={(e) => removeFile(e, item.id)}
+                                                onClick={() => removeFile(item.id)}
                                                 className="text-red-500 hover:text-red-700"
                                             >
                                                 <FaTrash />
@@ -490,35 +463,33 @@ export default function EditSchoolProject({ auth, project }) {
                             )}
                         </div>
 
-                        {/* التقرير */}
                         <div>
-                            <InputLabel htmlFor="report" value="تقرير المشروع (اختياري)" />
+                            <InputLabel htmlFor="report" value={t('schoolProjectsCreatePage.form.reportLabel')} />
                             <textarea
                                 id="report"
                                 value={data.report}
-                                onChange={(e) => setData('report', e.target.value)}
+                                onChange={(event) => setData('report', event.target.value)}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring focus:ring-[#A3C042] focus:ring-opacity-50"
                                 rows="4"
                             />
                             <InputError message={errors.report} className="mt-2" />
                         </div>
 
-                        {/* أزرار */}
                         <div className="flex items-center justify-end gap-4 pt-4">
                             <Link
                                 href="/school/projects"
-                                className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                                className="rounded-lg border border-gray-300 px-6 py-2 text-gray-700 hover:bg-gray-50"
                             >
-                                إلغاء
+                                {t('common.cancel')}
                             </Link>
                             <PrimaryButton type="submit" disabled={processing}>
                                 {processing ? (
                                     <>
-                                        <FaSpinner className="animate-spin ms-2" />
-                                        جاري الحفظ...
+                                        <FaSpinner className="ms-2 animate-spin" />
+                                        {t('schoolProjectEditPage.actions.saving')}
                                     </>
                                 ) : (
-                                    'حفظ التغييرات'
+                                    t('schoolProjectEditPage.actions.saveChanges')
                                 )}
                             </PrimaryButton>
                         </div>
@@ -528,4 +499,3 @@ export default function EditSchoolProject({ auth, project }) {
         </DashboardLayout>
     );
 }
-

@@ -13,9 +13,12 @@ import {
     FaTrash,
 } from 'react-icons/fa';
 import { getUserImageUrl, getInitials, getColorFromName } from '@/utils/imageUtils';
+import { useTranslation } from '@/i18n';
+import resolveLocalizedMessage from '@/utils/resolveLocalizedMessage';
 
 export default function StudentReviews({ reviews, reviewableBookings, stats }) {
     const { flash } = usePage().props;
+    const { language } = useTranslation();
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [selectedBooking, setSelectedBooking] = useState(null);
@@ -128,7 +131,7 @@ export default function StudentReviews({ reviews, reviewableBookings, stats }) {
                 },
                 onError: () => {
                     if (flash?.error) {
-                        setToastMessage(flash.error);
+                        setToastMessage(resolveLocalizedMessage(flash.error, language));
                         setToastType('error');
                         setShowToast(true);
                         setTimeout(() => setShowToast(false), 3000);
@@ -140,18 +143,18 @@ export default function StudentReviews({ reviews, reviewableBookings, stats }) {
 
     useEffect(() => {
         if (flash?.success) {
-            setToastMessage(flash.success);
+            setToastMessage(resolveLocalizedMessage(flash.success, language));
             setToastType('success');
             setShowToast(true);
             setTimeout(() => setShowToast(false), 3000);
         }
         if (flash?.error) {
-            setToastMessage(flash.error);
+            setToastMessage(resolveLocalizedMessage(flash.error, language));
             setToastType('error');
             setShowToast(true);
             setTimeout(() => setShowToast(false), 3000);
         }
-    }, [flash]);
+    }, [flash, language]);
 
     return (
         <DashboardLayout header="تقييماتي">
@@ -627,4 +630,3 @@ export default function StudentReviews({ reviews, reviewableBookings, stats }) {
         </DashboardLayout>
     );
 }
-

@@ -1,11 +1,13 @@
 import { Head, useForm, router } from '@inertiajs/react';
 import { useState, useRef } from 'react';
-import { FaCloudUploadAlt, FaTrash, FaUpload, FaArrowRight, FaStar, FaUser, FaCalendar, FaFilePdf, FaImage, FaFile, FaDownload, FaPaperPlane } from 'react-icons/fa';
+import { FaCloudUploadAlt, FaTrash, FaUpload, FaStar, FaCalendar, FaFilePdf, FaImage, FaFile, FaDownload } from 'react-icons/fa';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import { useToast } from '@/Contexts/ToastContext';
+import { useTranslation } from '@/i18n';
 
-export default function StudentProjectCreate({ auth, projects = [], message, submissions = [] }) {
+export default function StudentProjectCreate({ auth, projects = [], message, noticeKey, uploadBlockedKey, submissions = [] }) {
+    const { t, language } = useTranslation();
     const { showError, showSuccess } = useToast();
     const { data, setData, post, processing, errors } = useForm({
         project_id: '',
@@ -19,7 +21,12 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
     const [activeTab, setActiveTab] = useState('upload'); // 'upload' or 'evaluation'
     const [selectedSubmission, setSelectedSubmission] = useState(null);
 
+    const uploadDisabled = !!uploadBlockedKey || projects.length === 0;
+
     const handleFiles = (files) => {
+        if (uploadDisabled) {
+            return;
+        }
         const fileArray = Array.from(files);
         const maxSize = 10 * 1024 * 1024; // 10 MB
         const validTypes = [
@@ -30,11 +37,11 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
 
         const validFiles = fileArray.filter(file => {
             if (file.size > maxSize) {
-                showError(`الملف ${file.name} أكبر من 10 ميجابايت`);
+                showError(t('studentProjects.create.errors.fileTooLarge', { name: file.name }));
                 return false;
             }
             if (!validTypes.includes(file.type)) {
-                showError(`نوع الملف ${file.name} غير مدعوم`);
+                showError(t('studentProjects.create.errors.fileTypeUnsupported', { name: file.name }));
                 return false;
             }
             return true;
@@ -88,35 +95,42 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
     };
 
     const formatFileSize = (bytes) => {
-        if (bytes < 1024) return bytes + ' B';
-        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
-        return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        if (bytes < 1024) return t('studentProjects.create.fileSize.bytes', { n: bytes });
+        if (bytes < 1024 * 1024) {
+            return t('studentProjects.create.fileSize.kb', { n: (bytes / 1024).toFixed(2) });
+        }
+        return t('studentProjects.create.fileSize.mb', { n: (bytes / (1024 * 1024)).toFixed(2) });
     };
 
     const submit = (e) => {
         e.preventDefault();
 
+        if (uploadDisabled) {
+            showError(t('studentProjects.create.blockedToast'));
+            return;
+        }
+
         if (!data.project_id) {
-            showError('يرجى اختيار المشروع');
+            showError(t('studentProjects.create.errors.selectProject'));
             return;
         }
 
         if (data.files.length === 0) {
-            showError('يرجى إرفاق ملف واحد على الأقل');
+            showError(t('studentProjects.create.errors.filesRequired'));
             return;
         }
 
         post(`/projects/${data.project_id}/submissions`, {
             forceFormData: true,
             onSuccess: () => {
-                showSuccess('تم رفع المشروع بنجاح');
+                showSuccess(t('studentProjects.create.success'));
                 router.visit('/student/projects');
             },
-            onError: (errors) => {
-                if (errors.error) {
-                    showError(errors.error);
+            onError: (errs) => {
+                if (errs.error) {
+                    showError(errs.error);
                 } else {
-                    showError('حدث خطأ أثناء رفع المشروع');
+                    showError(t('studentProjects.create.errors.generic'));
                 }
             },
         });
@@ -124,26 +138,33 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
 
     const ProjectUploadContent = () => (
         <form onSubmit={submit} className="space-y-4">
-            {message && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 text-sm text-yellow-800">
-                    {message}
+            {(noticeKey || message) && (
+                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm text-amber-900">
+                    {noticeKey ? t(noticeKey) : message}
+                </div>
+            )}
+
+            {uploadBlockedKey && (
+                <div className="bg-rose-50 border border-rose-200 rounded-2xl p-4 text-sm text-rose-900">
+                    {t(uploadBlockedKey)}
                 </div>
             )}
 
             {/* Project Selection */}
             {projects.length > 0 && (
                 <div>
-                    <label className="block text-sm font-bold text-gray-900 mb-2">اختر المشروع</label>
+                    <label className="block text-sm font-bold text-gray-900 mb-2">{t('studentProjects.create.fields.selectProject')}</label>
                     <select
                         value={data.project_id}
                         onChange={(e) => setData('project_id', e.target.value)}
-                        className="w-full h-12 px-4 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042] text-sm"
+                        disabled={uploadDisabled}
+                        className="w-full h-12 px-4 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042] text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                         required
                     >
-                        <option value="">-- اختر المشروع --</option>
+                        <option value="">{t('studentProjects.create.fields.selectProjectPlaceholder')}</option>
                         {projects.map((project) => (
                             <option key={project.id} value={project.id}>
-                                {project.title || `مشروع #${project.id}`}
+                                {project.title || t('studentProjects.create.fields.projectOption', { id: project.id })}
                             </option>
                         ))}
                     </select>
@@ -155,13 +176,14 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
 
             {/* Comment */}
             <div>
-                <label className="block text-sm font-bold text-gray-900 mb-2">ملاحظات / تعليق</label>
+                <label className="block text-sm font-bold text-gray-900 mb-2">{t('studentProjects.create.fields.comment')}</label>
                 <textarea
                     value={data.comment}
                     onChange={(e) => setData('comment', e.target.value)}
-                    placeholder="أضف أي ملاحظات حول تسليمك..."
+                    placeholder={t('studentProjects.create.fields.commentPlaceholder')}
                     rows={4}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042] text-sm resize-none"
+                    disabled={uploadDisabled}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042] text-sm resize-none disabled:opacity-50 disabled:cursor-not-allowed"
                 />
                 {errors.comment && (
                     <p className="mt-1 text-xs text-red-500">{errors.comment}</p>
@@ -170,17 +192,19 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
 
             {/* File Upload */}
             <div>
-                <label className="block text-sm font-bold text-gray-900 mb-2">الملفات</label>
+                <label className="block text-sm font-bold text-gray-900 mb-2">{t('studentProjects.create.fields.files')}</label>
                 <div
                     onDragEnter={handleDrag}
                     onDragLeave={handleDrag}
                     onDragOver={handleDrag}
-                    onDrop={handleDrop}
-                    onClick={() => fileInputRef.current?.click()}
-                    className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition ${dragActive
-                        ? 'border-[#A3C042] bg-[#A3C042]/5'
-                        : 'border-gray-200 bg-gray-50 hover:bg-gray-100'
-                        }`}
+                    onDrop={uploadDisabled ? undefined : handleDrop}
+                    onClick={() => !uploadDisabled && fileInputRef.current?.click()}
+                    className={`border-2 border-dashed rounded-2xl p-8 text-center transition ${uploadDisabled
+                        ? 'border-gray-100 bg-gray-100 cursor-not-allowed opacity-70'
+                        : `cursor-pointer ${dragActive
+                            ? 'border-[#A3C042] bg-[#A3C042]/5'
+                            : 'border-gray-200 bg-gray-50 hover:bg-gray-100'
+                        }`}`}
                 >
                     <input
                         ref={fileInputRef}
@@ -189,13 +213,14 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
                         onChange={handleFileInputChange}
                         className="hidden"
                         accept="image/*,video/*,.pdf"
+                        disabled={uploadDisabled}
                     />
                     <FaCloudUploadAlt className="mx-auto text-4xl text-gray-400 mb-3" />
                     <p className="text-sm text-gray-700 mb-1">
-                        اسحب وأفلت الملفات هنا أو انقر للاختيار
+                        {t('studentProjects.create.dropzoneHint')}
                     </p>
                     <p className="text-xs text-gray-500">
-                        صور، فيديو، PDF (الحد الأقصى: 10 ميجابايت لكل ملف)
+                        {t('studentProjects.create.dropzoneTypes')}
                     </p>
                 </div>
 
@@ -225,6 +250,7 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
                                     type="button"
                                     onClick={() => removeFile(fileItem.id)}
                                     className="text-red-500 hover:text-red-700 p-1"
+                                    aria-label={t('studentProjects.create.removeFileAria')}
                                 >
                                     <FaTrash className="text-sm" />
                                 </button>
@@ -240,18 +266,18 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
             {/* Submit Button */}
             <button
                 type="submit"
-                disabled={processing}
+                disabled={processing || uploadDisabled}
                 className="w-full h-12 rounded-xl bg-[#A3C042] text-white font-bold text-sm hover:bg-[#8CA635] transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 {processing ? (
                     <>
                         <span className="animate-spin">⏳</span>
-                        جاري الرفع...
+                        {t('studentProjects.create.uploading')}
                     </>
                 ) : (
                     <>
                         <FaUpload />
-                        رفع المشروع
+                        {t('studentProjects.create.submit')}
                     </>
                 )}
             </button>
@@ -285,7 +311,7 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
         if (submissions.length === 0) {
             return (
                 <div className="text-center py-12">
-                    <p className="text-gray-600 text-sm">لا توجد مشاريع مقدمة بعد</p>
+                    <p className="text-gray-600 text-sm">{t('studentProjects.evaluation.empty')}</p>
                 </div>
             );
         }
@@ -294,14 +320,14 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
             <div className="space-y-4">
                 {/* Header */}
                 <div className="rounded-2xl bg-[#eef8d6] px-4 py-3">
-                    <h1 className="text-xl font-extrabold text-gray-900 text-center">تقييم المشاريع</h1>
+                    <h1 className="text-xl font-extrabold text-gray-900 text-center">{t('studentProjects.evaluation.title')}</h1>
                 </div>
 
                 {/* Selected Submission Details */}
                 {currentSubmission && (
                     <div className="bg-white rounded-2xl border border-gray-100 p-4">
                         <div className="text-lg font-extrabold text-gray-900">
-                            {currentSubmission.project?.title || 'مشروع غير محدد'}
+                            {currentSubmission.project?.title || t('studentProjects.evaluation.unnamedProject')}
                         </div>
                         {currentSubmission.project?.description && (
                             <div className="mt-1 text-sm text-gray-600">
@@ -315,14 +341,18 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
                                 <span>{formatDate(currentSubmission.submitted_at)}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <span>الطالب: {auth?.user?.name || 'غير محدد'}</span>
+                                <span>
+                                    {t('studentProjects.evaluation.studentLabel', {
+                                        name: auth?.user?.name || t('studentProjects.evaluation.unknownUser'),
+                                    })}
+                                </span>
                             </div>
                         </div>
 
                         {/* Attached Files */}
                         {currentSubmission.files && currentSubmission.files.length > 0 && (
                             <div className="mt-4">
-                                <div className="text-sm font-bold text-gray-900 mb-2">الملفات المرفقة:</div>
+                                <div className="text-sm font-bold text-gray-900 mb-2">{t('studentProjects.evaluation.attachedFiles')}</div>
                                 <div className="space-y-2">
                                     {currentSubmission.files.map((file, index) => {
                                         const fileName = typeof file === 'string' ? file.split('/').pop() : file;
@@ -348,7 +378,7 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
                         {/* Rating */}
                         {currentSubmission.rating !== null && currentSubmission.rating !== undefined && (
                             <div className="mt-4">
-                                <div className="text-sm font-bold text-gray-900 mb-2">التقييم</div>
+                                <div className="text-sm font-bold text-gray-900 mb-2">{t('studentProjects.evaluation.rating')}</div>
                                 <div className="flex items-center gap-2" dir="ltr">
                                     {[1, 2, 3, 4, 5].map((star) => (
                                         <FaStar
@@ -365,16 +395,16 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
 
                         {/* Comments */}
                         <div className="mt-4">
-                            <div className="text-sm font-bold text-gray-900 mb-2">التعليقات</div>
+                            <div className="text-sm font-bold text-gray-900 mb-2">{t('studentProjects.evaluation.comments')}</div>
                             <div className="bg-gray-50 rounded-xl p-4 mb-3 text-center text-gray-500 text-sm">
-                                {currentSubmission.feedback ? currentSubmission.feedback : 'لا توجد تعليقات بعد'}
+                                {currentSubmission.feedback ? currentSubmission.feedback : t('studentProjects.evaluation.noCommentsYet')}
                             </div>
                         </div>
 
                         {/* Evaluation Notes */}
                         {currentSubmission.feedback && (
                             <div className="mt-4">
-                                <div className="text-sm font-bold text-gray-900 mb-2">ملاحظات تقييمية</div>
+                                <div className="text-sm font-bold text-gray-900 mb-2">{t('studentProjects.evaluation.evaluationNotes')}</div>
                                 <div className="bg-gray-50 rounded-xl p-4 text-sm text-gray-700">
                                     {currentSubmission.feedback}
                                 </div>
@@ -386,7 +416,7 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
                 {/* Submitted Projects List - Mobile Only */}
                 {submissions.length > 0 && (
                     <div className="bg-white rounded-2xl border border-gray-100 p-4 md:hidden">
-                        <div className="text-sm font-bold text-gray-900 mb-3">المشاريع المقدمة</div>
+                        <div className="text-sm font-bold text-gray-900 mb-3">{t('studentProjects.evaluation.submittedList')}</div>
                         <div className="space-y-2">
                             {submissions.map((sub) => (
                                 <button
@@ -399,7 +429,7 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
                                         }`}
                                 >
                                     <div className="text-sm font-semibold text-gray-900 line-clamp-1">
-                                        {sub.project?.title || 'مشروع غير محدد'}
+                                        {sub.project?.title || t('studentProjects.evaluation.unnamedProject')}
                                     </div>
                                     <div className="text-xs text-gray-500 mt-1">
                                         {formatDate(sub.submitted_at)}
@@ -414,16 +444,16 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
     };
 
     return (
-        <div dir="rtl" className="min-h-screen bg-gray-50">
-            <Head title="رفع مشروع - إرث المبتكرين" />
+        <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
+            <Head title={t('studentProjects.create.pageTitle')} />
 
             {/* Mobile View */}
             <div className="block md:hidden">
                 <MobileTopBar
-                    title="إرث المبتكرين"
+                    title={t('studentProjects.create.topBarTitle')}
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
-                    onBack={() => router.visit('/')}
+                    onBack={() => router.visit('/student/projects')}
                     reverseOrder={false}
                 />
                 <main className="px-4 pb-24 pt-4 space-y-4">
@@ -438,7 +468,7 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
                                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                     }`}
                             >
-                                صفحة التقييم
+                                {t('studentProjects.create.tabs.evaluation')}
                             </button>
                             <button
                                 type="button"
@@ -448,7 +478,7 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
                                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                     }`}
                             >
-                                رفع المشروع
+                                {t('studentProjects.create.tabs.upload')}
                             </button>
                         </div>
                     </div>
@@ -462,16 +492,16 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
                         )}
                     </div>
                 </main>
-                <MobileBottomNav active="explore" role={auth?.user?.role} isAuthed={!!auth?.user} user={auth?.user} />
+                <MobileBottomNav active="projects" role={auth?.user?.role} isAuthed={!!auth?.user} user={auth?.user} />
             </div>
 
             {/* Desktop View */}
             <div className="hidden md:block">
                 <MobileTopBar
-                    title="إرث المبتكرين"
+                    title={t('studentProjects.create.topBarTitle')}
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
-                    onBack={() => router.visit('/')}
+                    onBack={() => router.visit('/student/projects')}
                     reverseOrder={false}
                 />
                 <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-4">
@@ -489,7 +519,7 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
                                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                             }`}
                                     >
-                                        رفع المشروع
+                                        {t('studentProjects.create.tabs.upload')}
                                     </button>
                                     <button
                                         type="button"
@@ -499,7 +529,7 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
                                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                             }`}
                                     >
-                                        صفحة التقييم
+                                        {t('studentProjects.create.tabs.evaluation')}
                                     </button>
                                 </div>
                             </div>
@@ -518,7 +548,7 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
                         {activeTab === 'evaluation' && submissions.length > 0 && (
                             <div className="lg:col-span-4">
                                 <div className="bg-white rounded-2xl border border-gray-100 p-4 sticky top-24">
-                                    <div className="text-sm font-bold text-gray-900 mb-3">المشاريع المقدمة</div>
+                                    <div className="text-sm font-bold text-gray-900 mb-3">{t('studentProjects.evaluation.submittedList')}</div>
                                     <div className="space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto">
                                         {submissions.map((sub) => {
                                             const currentSubmission = selectedSubmission || (submissions.length > 0 ? submissions[0] : null);
@@ -533,7 +563,7 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
                                                         }`}
                                                 >
                                                     <div className="text-sm font-semibold text-gray-900 line-clamp-1">
-                                                        {sub.project?.title || 'مشروع غير محدد'}
+                                                        {sub.project?.title || t('studentProjects.evaluation.unnamedProject')}
                                                     </div>
                                                     <div className="text-xs text-gray-500 mt-1">
                                                         {formatDate(sub.submitted_at)}
@@ -547,7 +577,7 @@ export default function StudentProjectCreate({ auth, projects = [], message, sub
                         )}
                     </div>
                 </main>
-                <MobileBottomNav active="explore" role={auth?.user?.role} isAuthed={!!auth?.user} user={auth?.user} />
+                <MobileBottomNav active="projects" role={auth?.user?.role} isAuthed={!!auth?.user} user={auth?.user} />
             </div>
         </div>
     );

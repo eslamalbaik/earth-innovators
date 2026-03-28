@@ -4,7 +4,7 @@ import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import { useTranslation } from '@/i18n';
 
-export default function Winners({ auth, winners = [] }) {
+export default function Winners({ auth, winners = [], backHref = '/challenges' }) {
     const { t, language } = useTranslation();
     const isArabic = language === 'ar';
 
@@ -107,7 +107,7 @@ export default function Winners({ auth, winners = [] }) {
                     title={t('challengeWinnersPage.title')}
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
-                    onBack={() => router.visit('/challenges')}
+                    onBack={() => router.visit(backHref)}
                 />
                 <main className="px-4 pb-24 pt-4">
                     <WinnersContent />
@@ -120,7 +120,7 @@ export default function Winners({ auth, winners = [] }) {
                     title={t('challengeWinnersPage.title')}
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
-                    onBack={() => router.visit('/challenges')}
+                    onBack={() => router.visit(backHref)}
                 />
                 <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-4">
                     <div className="mx-auto w-full max-w-4xl">

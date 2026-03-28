@@ -41,15 +41,24 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
     const [isSubmittingComment, setIsSubmittingComment] = useState(false);
     const fileInputRef = useRef(null);
     const commentTextareaRef = useRef(null);
-    const { showSuccess } = useToast();
+    const { showSuccess, showError } = useToast();
 
 
     const submissionForm = useForm({
         files: [],
-        comment: '',
+        comment: existingSubmission?.comment ?? '',
     });
 
+    const canEditSubmission = !existingSubmission || existingSubmission.status === 'submitted';
+
+    useEffect(() => {
+        submissionForm.setData('comment', existingSubmission?.comment ?? '');
+    }, [existingSubmission?.id, existingSubmission?.comment]);
+
     const handleFiles = (files) => {
+        if (!canEditSubmission) {
+            return;
+        }
         const fileArray = Array.from(files);
         const validFiles = fileArray.filter(file => {
             const maxSize = 10 * 1024 * 1024; // 10 MB
@@ -123,28 +132,68 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
 
     const submitProject = (e) => {
         e.preventDefault();
-        submissionForm.post(`/projects/${project.id}/submissions`, {
-            forceFormData: true,
-            onSuccess: () => {
-                submissionForm.reset();
-                setFileList([]);
-                // Show success notification on the left
-                showSuccess(t('studentProjectShowPage.toasts.submitSuccess'), {
+        if (!canEditSubmission) {
+            showError(t('studentProjectShowPage.messages.cannotEditAfterReview'), {
+                title: t('common.error'),
+            });
+            return;
+        }
+
+        const isUpdate = Boolean(existingSubmission);
+
+        const onSuccess = () => {
+            setFileList([]);
+            submissionForm.setData('files', []);
+            showSuccess(
+                isUpdate
+                    ? t('studentProjectShowPage.toasts.updateSuccess')
+                    : t('studentProjectShowPage.toasts.submitSuccess'),
+                {
                     title: t('common.success'),
                     autoDismiss: 5000,
-                });
-                // Switch to details tab
-                setActiveTab('details');
-                // Reload to get updated submission data
-                router.reload({
-                    preserveScroll: true,
-                    onFinish: () => {
-                        // Scroll to top to see the submission status
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }
-                });
-            },
-        });
+                }
+            );
+            setActiveTab('details');
+            router.reload({
+                preserveScroll: true,
+                onFinish: () => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                },
+            });
+        };
+
+        const onError = (errs) => {
+            if (!errs) return;
+            const bag = errs.error;
+            if (bag) {
+                const msg = Array.isArray(bag) ? bag[0] : bag;
+                showError(msg, { title: t('common.error') });
+                return;
+            }
+            const firstKey = Object.keys(errs)[0];
+            if (firstKey && errs[firstKey]) {
+                const v = errs[firstKey];
+                const msg = Array.isArray(v) ? v[0] : v;
+                showError(msg, { title: t('common.error') });
+            }
+        };
+
+        if (existingSubmission) {
+            // POST + multipart: طلب PUT الصريح لا يملأ $_FILES في PHP؛ المسار يقبل post|put
+            submissionForm.post(`/project-submissions/${existingSubmission.id}`, {
+                forceFormData: true,
+                preserveScroll: true,
+                onSuccess,
+                onError,
+            });
+        } else {
+            submissionForm.post(`/projects/${project.id}/submissions`, {
+                forceFormData: true,
+                preserveScroll: true,
+                onSuccess,
+                onError,
+            });
+        }
     };
 
     const submitComment = (e) => {
@@ -400,6 +449,11 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
             {/* Submit Tab */}
             {activeTab === 'submit' && (
                 <div className="bg-white rounded-2xl border border-gray-100 p-4">
+                    {!canEditSubmission && (
+                        <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                            {t('studentProjectShowPage.messages.cannotEditAfterReview')}
+                        </div>
+                    )}
                     <form onSubmit={submitProject}>
                         <div className="mb-4">
                             <InputLabel htmlFor="comment" value={t('studentProjectShowPage.form.commentLabel')} className="text-sm" />
@@ -408,7 +462,8 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                 value={submissionForm.data.comment}
                                 onChange={(e) => submissionForm.setData('comment', e.target.value)}
                                 rows={4}
-                                className="block w-full mt-2 rounded-xl border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042] text-sm"
+                                disabled={!canEditSubmission}
+                                className="block w-full mt-2 rounded-xl border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042] text-sm disabled:cursor-not-allowed disabled:opacity-60"
                                 placeholder={t('studentProjectShowPage.form.commentPlaceholder')}
                             />
                             <InputError message={submissionForm.errors.comment} />
@@ -420,10 +475,12 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                 onDragEnter={handleDrag}
                                 onDragLeave={handleDrag}
                                 onDragOver={handleDrag}
-                                onDrop={handleDrop}
-                                className={`border-2 border-dashed rounded-2xl p-6 text-center transition ${dragActive
-                                    ? 'border-[#A3C042] bg-green-50'
-                                    : 'border-gray-300'
+                                onDrop={canEditSubmission ? handleDrop : undefined}
+                                className={`border-2 border-dashed rounded-2xl p-6 text-center transition ${!canEditSubmission
+                                    ? 'cursor-not-allowed border-gray-200 bg-gray-100 opacity-70'
+                                    : dragActive
+                                        ? 'border-[#A3C042] bg-green-50'
+                                        : 'border-gray-300'
                                     }`}
                             >
                                 <input
@@ -433,6 +490,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                     onChange={(e) => e.target.files && handleFiles(e.target.files)}
                                     accept="image/*,video/*,.pdf,.doc,.docx,.zip,.rar"
                                     className="hidden"
+                                    disabled={!canEditSubmission}
                                 />
                                 <FaCloudUploadAlt className="mx-auto text-3xl text-gray-400 mb-3" />
                                 <p className="text-sm text-gray-700 mb-2">
@@ -443,8 +501,9 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                 </p>
                                 <button
                                     type="button"
-                                    onClick={() => fileInputRef.current?.click()}
-                                    className="px-4 py-2 bg-[#A3C042] text-white rounded-xl hover:bg-[#8CA635] transition text-sm font-semibold"
+                                    onClick={() => canEditSubmission && fileInputRef.current?.click()}
+                                    disabled={!canEditSubmission}
+                                    className="px-4 py-2 bg-[#A3C042] text-white rounded-xl hover:bg-[#8CA635] transition text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     {t('studentProjectShowPage.actions.chooseFiles')}
                                 </button>
@@ -481,7 +540,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                         <div className="flex justify-end">
                             <PrimaryButton
                                 type="submit"
-                                disabled={submissionForm.processing}
+                                disabled={submissionForm.processing || !canEditSubmission}
                                 className="bg-[#A3C042] hover:bg-[#8CA635] text-sm"
                             >
                                 {submissionForm.processing ? (
@@ -577,8 +636,15 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                         </div>
                                         {comment.user_id === auth.user.id && (
                                             <button
-                                                onClick={() => router.delete(`/project-comments/${comment.id}`)}
+                                                type="button"
+                                                onClick={() => {
+                                                    if (comment.id == null) return;
+                                                    router.delete(`/project-comments/${comment.id}`, {
+                                                        preserveScroll: true,
+                                                    });
+                                                }}
                                                 className="text-red-500 hover:text-red-700"
+                                                aria-label={t('studentProjectShowPage.comments.deleteComment')}
                                             >
                                                 <FaTimes className="text-xs" />
                                             </button>
@@ -610,8 +676,15 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                                             </p>
                                                             {reply.user_id === auth.user.id && (
                                                                 <button
-                                                                    onClick={() => router.delete(`/project-comments/${reply.id}`)}
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        if (reply.id == null) return;
+                                                                        router.delete(`/project-comments/${reply.id}`, {
+                                                                            preserveScroll: true,
+                                                                        });
+                                                                    }}
                                                                     className="text-red-500 hover:text-red-700"
+                                                                    aria-label={t('studentProjectShowPage.comments.deleteReply')}
                                                                 >
                                                                     <FaTimes className="text-[10px]" />
                                                                 </button>

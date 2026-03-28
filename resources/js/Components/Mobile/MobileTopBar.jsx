@@ -85,8 +85,8 @@ export default function MobileTopBar({
         }
         if (role === 'student') {
             return {
-                home: '/student/dashboard',
-                dashboard: '/student/dashboard',
+                home: '/dashboard',
+                dashboard: '/dashboard',
                 projects: '/student/projects',
                 challenges: '/student/challenges',
                 profile: '/student/profile',

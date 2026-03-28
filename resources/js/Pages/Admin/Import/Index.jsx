@@ -2,6 +2,7 @@ import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { useTranslation } from '@/i18n';
+import resolveLocalizedMessage from '@/utils/resolveLocalizedMessage';
 
 export default function ImportIndex({ auth }) {
     const [files, setFiles] = useState({ students: null, teachers: null, bookings: null });
@@ -20,10 +21,10 @@ export default function ImportIndex({ auth }) {
             <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="max-w-4xl mx-auto p-6 bg-white rounded shadow">
                 <h1 className="text-xl font-bold mb-6">{t('adminImportPage.title')}</h1>
                 {props.flash?.success && (
-                    <div className="mb-4 p-3 rounded bg-green-100 text-green-800">{props.flash.success}</div>
+                    <div className="mb-4 p-3 rounded bg-green-100 text-green-800">{resolveLocalizedMessage(props.flash.success, language)}</div>
                 )}
                 {props.flash?.error && (
-                    <div className="mb-4 p-3 rounded bg-red-100 text-red-800">{props.flash.error}</div>
+                    <div className="mb-4 p-3 rounded bg-red-100 text-red-800">{resolveLocalizedMessage(props.flash.error, language)}</div>
                 )}
                 {props.import_errors && props.import_errors.length > 0 && (
                     <div className="mb-4 p-3 rounded bg-yellow-50 text-yellow-900">
@@ -62,5 +63,4 @@ export default function ImportIndex({ auth }) {
         </DashboardLayout>
     );
 }
-
 

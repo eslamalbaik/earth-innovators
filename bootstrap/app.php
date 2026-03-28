@@ -37,6 +37,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'school' => \App\Http\Middleware\EnsureUserIsSchool::class,
             'system_supervisor' => EnsureUserIsSystemSupervisor::class,
             'school_support_coordinator' => EnsureUserIsSchoolSupportCoordinator::class,
+            'redirect_student_explore' => \App\Http\Middleware\RedirectStudentFromPublicExploreRoutes::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

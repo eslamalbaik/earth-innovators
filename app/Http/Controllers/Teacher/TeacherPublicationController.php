@@ -95,7 +95,7 @@ class TeacherPublicationController extends Controller
             $publication = $this->publicationService->createPublication($data);
 
             // Clear cache explicitly to ensure the new publication appears
-            $this->publicationService->clearPublicationCache($publication->school_id, $publication->author_id);
+            $this->publicationService->clearPublicationCache($publication->school_id, $publication->author_id, $publication->id);
 
             return redirect()
                 ->route('teacher.publications.index')

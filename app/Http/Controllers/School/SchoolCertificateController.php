@@ -100,7 +100,6 @@ class SchoolCertificateController extends Controller
             'pendingRequests' => $pendingRequests,
             'recentIssuedCertificates' => $recentIssuedCertificates,
             'membershipSummary' => $this->membershipAccessService->getMembershipSummary($school),
-            'description' => 'يمكن للمدرسة إصدار الشهادات مباشرة للطلبة والمعلمين، واعتماد الطلبات المرسلة من المعلمين قبل توليد ملف الشهادة النهائي.',
         ]);
     }
 
@@ -121,10 +120,18 @@ class SchoolCertificateController extends Controller
             return redirect()->back()->with('error', 'تعذر العثور على صاحب الشهادة.');
         }
 
+        $issueDate = now()->toDateString();
+        $certificateNumber = str_starts_with((string) $certificate->certificate_number, 'REQ-')
+            ? $this->certificateService->generateCertificateNumber($recipient)
+            : $certificate->certificate_number;
+
         $preparedData = [
             'course_name' => $certificate->title_ar ?? $certificate->title,
             'description' => $certificate->description_ar ?? $certificate->description,
             'description_ar' => $certificate->description_ar ?? $certificate->description,
+            'certificate_number' => $certificateNumber,
+            'issue_date' => $issueDate,
+            'template' => $certificate->template ?? 'default',
             'therapeutic_plan' => $certificate->therapeutic_plan,
         ];
 
@@ -142,9 +149,11 @@ class SchoolCertificateController extends Controller
         );
 
         $certificate->update([
+            'certificate_number' => $certificateNumber,
             'issued_by' => $school->id,
             'reviewed_by' => $school->id,
             'status' => 'approved',
+            'issue_date' => $issueDate,
             'approved_at' => now(),
             'rejected_at' => null,
             'rejection_reason' => null,
@@ -154,7 +163,9 @@ class SchoolCertificateController extends Controller
 
         event(new \App\Events\CertificateIssued($certificate->fresh(), $recipient));
 
-        return redirect()->back()->with('success', 'تم اعتماد الشهادة وإصدار ملفها بنجاح.');
+        return redirect()->back()->with('success', [
+            'key' => 'schoolCertificatesIndexPage.toasts.approveSuccess',
+        ]);
     }
 
     public function reject(Request $request, Certificate $certificate)
@@ -178,7 +189,9 @@ class SchoolCertificateController extends Controller
             'is_active' => false,
         ]);
 
-        return redirect()->back()->with('success', 'تم رفض طلب الشهادة وتسجيل سبب الرفض.');
+        return redirect()->back()->with('success', [
+            'key' => 'schoolCertificatesIndexPage.toasts.rejectSuccess',
+        ]);
     }
 
     public function show()
@@ -201,6 +214,7 @@ class SchoolCertificateController extends Controller
             ],
             'stats' => [],
             'certificate' => [
+                'certificate_number' => $membershipCertificate?->certificate_number,
                 'issue_date' => $membershipCertificate ? $membershipCertificate->issue_date->format('Y-m-d') : now()->format('Y-m-d'),
                 'download_url' => $membershipCertificate ? route('membership-certificates.download', $membershipCertificate->id) : null,
             ],
