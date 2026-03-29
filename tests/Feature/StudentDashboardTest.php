@@ -39,6 +39,7 @@ class StudentDashboardTest extends TestCase
             ->component('Student/Dashboard')
             ->has('stats')
             ->has('communityScorePercent')
+            ->has('engagement')
             ->where('stats.totalPoints', fn ($v) => is_numeric($v))
             ->has('stats.recentProjects')
             ->has('stats.activeChallenges')

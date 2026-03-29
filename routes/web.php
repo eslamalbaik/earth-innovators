@@ -7,6 +7,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\AvailabilityController;
 use App\Http\Controllers\Teacher\TeacherDashboardController;
 use App\Http\Controllers\Student\StudentDashboardController;
+use App\Http\Controllers\Student\StudentSubmissionController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\JoinTeacherController;
 use App\Http\Controllers\TeacherAvailabilityController;
@@ -440,6 +441,9 @@ Route::get('/badges', [App\Http\Controllers\BadgeController::class, 'index'])->n
 Route::get('/badges/{id}', [App\Http\Controllers\BadgeController::class, 'show'])->name('badges.show');
 Route::get('/achievements', [App\Http\Controllers\BadgeController::class, 'achievements'])->name('achievements');
 Route::get('/store-membership', [App\Http\Controllers\BadgeController::class, 'storeMembership'])->name('store-membership');
+Route::post('/store-membership/redeem', [App\Http\Controllers\BadgeController::class, 'redeemStore'])
+    ->middleware('auth')
+    ->name('store-membership.redeem');
 
 // Package subscription routes (public)
 Route::get('/packages', [\App\Http\Controllers\PackageSubscriptionController::class, 'index'])->name('packages.index');
@@ -572,6 +576,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/student/points', [\App\Http\Controllers\Student\StudentPointsController::class, 'index'])->name('student.points');
 
     // مشاريع الطلاب
+    Route::get('/student/submissions', [StudentSubmissionController::class, 'index'])->name('student.submissions.index');
     Route::get('/student/projects', [\App\Http\Controllers\Student\StudentProjectController::class, 'index'])->name('student.projects.index');
     Route::get('/student/projects/create', [\App\Http\Controllers\Student\StudentProjectController::class, 'create'])->name('student.projects.create');
     Route::get('/student/projects/{project}', [\App\Http\Controllers\Student\StudentProjectController::class, 'show'])->name('student.projects.show');
@@ -584,6 +589,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/student/challenges/{challenge}/submit', [\App\Http\Controllers\Student\StudentChallengeController::class, 'submit'])->name('student.challenges.submit');
     Route::get('/student/challenges/{challenge}/submissions/{submission}', [\App\Http\Controllers\Student\StudentChallengeController::class, 'showSubmission'])->name('student.challenges.submissions.show');
     Route::put('/student/challenges/{challenge}/submissions/{submission}', [\App\Http\Controllers\Student\StudentChallengeController::class, 'updateSubmission'])->name('student.challenges.submissions.update');
+    Route::get('/student/challenge-suggestions/create', [\App\Http\Controllers\Student\StudentChallengeSuggestionController::class, 'create'])->name('student.challenge-suggestions.create');
+    Route::post('/student/challenge-suggestions', [\App\Http\Controllers\Student\StudentChallengeSuggestionController::class, 'store'])->name('student.challenge-suggestions.store');
 
     // تسليمات المشاريع
     Route::post('/projects/{project}/submissions', [\App\Http\Controllers\ProjectSubmissionController::class, 'store'])->name('project.submissions.store');
@@ -657,6 +664,8 @@ Route::middleware(['auth', 'school'])->prefix('school')->name('school.')->group(
     Route::get('/challenge-submissions', [\App\Http\Controllers\School\SchoolChallengeSubmissionController::class, 'index'])->name('challenge-submissions.index');
     Route::get('/challenge-submissions/{submission}', [\App\Http\Controllers\School\SchoolChallengeSubmissionController::class, 'show'])->name('challenge-submissions.show');
     Route::post('/challenge-submissions/{submission}/evaluate', [\App\Http\Controllers\School\SchoolChallengeSubmissionController::class, 'evaluate'])->name('challenge-submissions.evaluate');
+    Route::get('/challenge-suggestions', [\App\Http\Controllers\School\SchoolChallengeSuggestionController::class, 'index'])->name('challenge-suggestions.index');
+    Route::patch('/challenge-suggestions/{challengeSuggestion}/status', [\App\Http\Controllers\School\SchoolChallengeSuggestionController::class, 'updateStatus'])->name('challenge-suggestions.update-status');
 
     // إدارة الشارات من المعلمين
     Route::get('/badges/pending', [\App\Http\Controllers\School\SchoolBadgeController::class, 'pending'])->name('badges.pending');
@@ -733,6 +742,8 @@ Route::middleware(['auth', 'teacher'])->group(function () {
     Route::get('/teacher/challenge-submissions', [\App\Http\Controllers\Teacher\TeacherChallengeSubmissionController::class, 'index'])->name('teacher.challenge-submissions.index');
     Route::get('/teacher/challenge-submissions/{submission}', [\App\Http\Controllers\Teacher\TeacherChallengeSubmissionController::class, 'show'])->name('teacher.challenge-submissions.show');
     Route::post('/teacher/challenge-submissions/{submission}/evaluate', [\App\Http\Controllers\Teacher\TeacherChallengeSubmissionController::class, 'evaluate'])->name('teacher.challenge-submissions.evaluate');
+    Route::get('/teacher/challenge-suggestions', [\App\Http\Controllers\Teacher\TeacherChallengeSuggestionController::class, 'index'])->name('teacher.challenge-suggestions.index');
+    Route::patch('/teacher/challenge-suggestions/{challengeSuggestion}/status', [\App\Http\Controllers\Teacher\TeacherChallengeSuggestionController::class, 'updateStatus'])->name('teacher.challenge-suggestions.update-status');
 
     // إدارة الشارات من المعلمين
     Route::prefix('teacher')->group(function () {
@@ -835,6 +846,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/payment-gateways/{paymentGateway}/toggle-status', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'toggleStatus'])->name('payment-gateways.toggle-status');
     Route::post('/payment-gateways/{paymentGateway}/test-connection', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'testConnection'])->name('payment-gateways.test-connection');
 
+    // Point store rewards (CRUD + approval queue)
+    Route::resource('store-rewards', \App\Http\Controllers\Admin\StoreRewardController::class)->except(['show']);
+    Route::get('/store-reward-requests', [\App\Http\Controllers\Admin\StoreRewardRequestController::class, 'index'])->name('store-reward-requests.index');
+    Route::post('/store-reward-requests/{store_reward_request}/approve', [\App\Http\Controllers\Admin\StoreRewardRequestController::class, 'approve'])->name('store-reward-requests.approve');
+    Route::post('/store-reward-requests/{store_reward_request}/reject', [\App\Http\Controllers\Admin\StoreRewardRequestController::class, 'reject'])->name('store-reward-requests.reject');
+
     // Packages Management
     Route::resource('packages', \App\Http\Controllers\Admin\PackageController::class);
     Route::post('/packages/{package}/toggle-status', [\App\Http\Controllers\Admin\PackageController::class, 'toggleStatus'])->name('packages.toggle-status');
@@ -854,6 +871,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // إدارة التحديات - CRUD كامل
     Route::resource('challenges', \App\Http\Controllers\Admin\AdminChallengeController::class);
+    Route::get('/challenge-suggestions', [\App\Http\Controllers\Admin\AdminChallengeSuggestionController::class, 'index'])->name('challenge-suggestions.index');
+    Route::patch('/challenge-suggestions/{challengeSuggestion}/status', [\App\Http\Controllers\Admin\AdminChallengeSuggestionController::class, 'updateStatus'])->name('challenge-suggestions.update-status');
     Route::get('/challenges/{challenge}/assign-students', [\App\Http\Controllers\Admin\ChallengeStudentController::class, 'show'])->name('challenges.assign-students');
     Route::post('/challenges/{challenge}/assign-students', [\App\Http\Controllers\Admin\ChallengeStudentController::class, 'assign'])->name('challenges.assign-students.store');
 

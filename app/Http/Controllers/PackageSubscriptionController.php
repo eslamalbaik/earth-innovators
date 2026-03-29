@@ -60,6 +60,28 @@ class PackageSubscriptionController extends Controller
                     'end_date' => $activeSubscription->end_date->format('Y-m-d'),
                     'status' => $activeSubscription->status,
                 ];
+            } else {
+                // Show the latest pending subscription to avoid "processing..." without feedback
+                $pending = UserPackage::where('user_id', Auth::id())
+                    ->where('status', 'pending')
+                    ->with('package')
+                    ->latest()
+                    ->first();
+
+                if ($pending) {
+                    $userPackage = [
+                        'id' => $pending->id,
+                        'package_id' => $pending->package->id,
+                        'package' => [
+                            'id' => $pending->package->id,
+                            'name' => $pending->package->name,
+                            'name_ar' => $pending->package->name_ar,
+                        ],
+                        'start_date' => $pending->start_date?->format('Y-m-d'),
+                        'end_date' => $pending->end_date?->format('Y-m-d'),
+                        'status' => $pending->status,
+                    ];
+                }
             }
         }
 
@@ -86,14 +108,30 @@ class PackageSubscriptionController extends Controller
             ]);
         }
 
+        if ($user->status === 'inactive') {
+            return redirect()->back()->with('error', [
+                'key' => 'toastMessages.inactiveUserCannotSubscribe',
+            ]);
+        }
+
         $result = $this->packagePaymentService->createSubscriptionCheckout($user, $package);
 
         if (!$result['success']) {
-            return redirect()->back()->with('error', $result['message']);
+            $message = $result['message'];
+            if (is_string($message) && str_contains(strtolower($message), 'inactive')) {
+                $message = ['key' => 'toastMessages.inactiveUserCannotSubscribe'];
+            }
+            return redirect()->back()->with('error', $message);
         }
 
         if (!empty($result['redirect_url'])) {
             return redirect($result['redirect_url']);
+        }
+
+        if (!empty($result['bypass'])) {
+            return redirect()->route('packages.index')->with('success', $result['message'] ?? [
+                'key' => 'toastMessages.packageSubscriptionActivatedSuccess',
+            ]);
         }
 
         return redirect()->back()->with('error', [

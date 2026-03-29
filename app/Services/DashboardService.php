@@ -118,7 +118,7 @@ class DashboardService extends BaseService
 
     public function getStudentDashboardStats(int $userId): array
     {
-        $cacheKey = "student_dashboard_stats_{$userId}";
+        $cacheKey = "student_dashboard_stats_v2_{$userId}";
         $cacheTag = "student_dashboard_{$userId}";
 
         return $this->cacheTags($cacheTag, $cacheKey, function () use ($userId) {
@@ -128,7 +128,27 @@ class DashboardService extends BaseService
                 ->selectRaw('
                     COUNT(*) as total,
                     SUM(CASE WHEN status = "approved" THEN 1 ELSE 0 END) as approved,
-                    SUM(CASE WHEN status = "pending" THEN 1 ELSE 0 END) as pending
+                    SUM(CASE WHEN status = "pending" THEN 1 ELSE 0 END) as pending,
+                    SUM(CASE WHEN status = "rejected" THEN 1 ELSE 0 END) as rejected
+                ')
+                ->first();
+
+            $submissionStats = DB::table('project_submissions')
+                ->where('student_id', $userId)
+                ->selectRaw('
+                    COUNT(*) as total,
+                    SUM(CASE WHEN status = "submitted" THEN 1 ELSE 0 END) as awaiting_review,
+                    SUM(CASE WHEN status = "reviewed" THEN 1 ELSE 0 END) as reviewed,
+                    SUM(CASE WHEN status = "approved" THEN 1 ELSE 0 END) as approved,
+                    SUM(CASE WHEN status = "rejected" THEN 1 ELSE 0 END) as rejected
+                ')
+                ->first();
+
+            $certificateStats = DB::table('certificates')
+                ->where('user_id', $userId)
+                ->selectRaw('
+                    SUM(CASE WHEN status = "approved" THEN 1 ELSE 0 END) as approved,
+                    SUM(CASE WHEN status = "pending_school_approval" THEN 1 ELSE 0 END) as pending
                 ')
                 ->first();
 
@@ -210,9 +230,23 @@ class DashboardService extends BaseService
             return [
                 'totalPoints' => $totalPoints,
                 'totalProjects' => (int) ($projectStats->total ?? 0),
+                'approvedProjects' => (int) ($projectStats->approved ?? 0),
+                'pendingProjects' => (int) ($projectStats->pending ?? 0),
+                'rejectedProjects' => (int) ($projectStats->rejected ?? 0),
                 'totalBadges' => $totalBadges,
                 'winningProjects' => $winningProjects,
                 'recentProjects' => $recentProjects,
+                'submissions' => [
+                    'total' => (int) ($submissionStats?->total ?? 0),
+                    'awaitingReview' => (int) ($submissionStats?->awaiting_review ?? 0),
+                    'reviewed' => (int) ($submissionStats?->reviewed ?? 0),
+                    'approved' => (int) ($submissionStats?->approved ?? 0),
+                    'rejected' => (int) ($submissionStats?->rejected ?? 0),
+                ],
+                'certificates' => [
+                    'approved' => (int) ($certificateStats?->approved ?? 0),
+                    'pendingSchoolApproval' => (int) ($certificateStats?->pending ?? 0),
+                ],
             ];
         }, 300); // Cache for 5 minutes
     }

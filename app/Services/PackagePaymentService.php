@@ -96,11 +96,28 @@ class PackagePaymentService extends BaseService
             $ziinaResponse = $this->ziinaService->createPaymentRequest($paymentData);
 
             if (($ziinaResponse['error'] ?? false) === true) {
+                if ($this->shouldBypassPayment()) {
+                    DB::commit();
+                    $this->finalizePayment($payment->fresh(), [
+                        'status' => 'paid',
+                        'bypass' => true,
+                        'source' => 'test_mode',
+                    ]);
+
+                    return [
+                        'success' => true,
+                        'bypass' => true,
+                        'message' => ['key' => 'toastMessages.packageSubscriptionActivatedSuccess'],
+                    ];
+                }
+
                 DB::rollBack();
 
                 return [
                     'success' => false,
-                    'message' => $ziinaResponse['message'] ?? ['key' => 'toastMessages.packagePaymentRequestFailed'],
+                    'message' => $this->normalizeErrorMessage(
+                        $ziinaResponse['message'] ?? ['key' => 'toastMessages.packagePaymentRequestFailed']
+                    ),
                 ];
             }
 
@@ -111,6 +128,21 @@ class PackagePaymentService extends BaseService
 
             $redirectUrl = $ziinaResponse['redirect_url'] ?? $ziinaResponse['redirectUrl'] ?? null;
             if (!$redirectUrl) {
+                if ($this->shouldBypassPayment()) {
+                    DB::commit();
+                    $this->finalizePayment($payment->fresh(), [
+                        'status' => 'paid',
+                        'bypass' => true,
+                        'source' => 'test_mode',
+                    ]);
+
+                    return [
+                        'success' => true,
+                        'bypass' => true,
+                        'message' => ['key' => 'toastMessages.packageSubscriptionActivatedSuccess'],
+                    ];
+                }
+
                 DB::rollBack();
 
                 return [
@@ -138,9 +170,16 @@ class PackagePaymentService extends BaseService
 
             return [
                 'success' => false,
-                'message' => ['key' => 'toastMessages.packageSubscriptionStartError'],
+                'message' => $this->normalizeErrorMessage(['key' => 'toastMessages.packageSubscriptionStartError']),
             ];
         }
+    }
+
+    private function shouldBypassPayment(): bool
+    {
+        return app()->environment('local')
+            && (bool) config('services.ziina.test_mode', true)
+            && (bool) config('services.ziina.test_bypass', false);
     }
 
     public function confirmPayment(Payment $payment): array
@@ -267,5 +306,23 @@ class PackagePaymentService extends BaseService
         }
 
         $this->packageService->cancelSubscription($userPackage);
+    }
+
+    /**
+        * Normalize known gateway error messages into translatable keys.
+        */
+    private function normalizeErrorMessage($message)
+    {
+        if (is_string($message)) {
+            $lower = strtolower($message);
+            if (str_contains($lower, 'attempting to transfer') && str_contains($lower, 'inactive')) {
+                return ['key' => 'toastMessages.inactiveUserCannotSubscribe'];
+            }
+            if (str_contains($lower, 'inactive user')) {
+                return ['key' => 'toastMessages.inactiveUserCannotSubscribe'];
+            }
+        }
+
+        return $message;
     }
 }

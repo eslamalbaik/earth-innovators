@@ -1,6 +1,7 @@
 import MobileFrame from '@/Components/Mobile/MobileFrame';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
+import { useFlashNotifications } from '@/Hooks/useFlashNotifications';
 
 export default function MobileAppLayout({
     auth,
@@ -11,6 +12,7 @@ export default function MobileAppLayout({
     onBack,
     children,
 }) {
+    useFlashNotifications();
     const user = auth?.user;
     const isAuthed = !!user;
 
@@ -28,5 +30,4 @@ export default function MobileAppLayout({
         </MobileFrame>
     );
 }
-
 

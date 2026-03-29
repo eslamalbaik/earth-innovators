@@ -66,7 +66,27 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
         if (color === 'blue') return 'bg-blue-500';
         if (color === 'orange') return 'bg-yellow-500';
         if (color === 'green') return 'bg-green-500';
+        if (color === 'red') return 'bg-red-500';
+        if (color === 'yellow') return 'bg-amber-500';
+        if (color === 'purple') return 'bg-purple-500';
         return 'bg-gray-400';
+    };
+
+    const formatActivityRelative = (isoString) => {
+        if (!isoString) return '';
+        try {
+            const date = new Date(isoString);
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            if (diffDays === 0) return t('homePage.relativeDates.today');
+            if (diffDays === 1) return t('homePage.relativeDates.oneDayAgo');
+            if (diffDays < 7) return t('homePage.relativeDates.daysAgo', { count: diffDays });
+            if (diffDays < 30) return t('homePage.relativeDates.weeksAgo', { count: Math.floor(diffDays / 7) });
+            return t('homePage.relativeDates.monthsAgo', { count: Math.floor(diffDays / 30) });
+        } catch {
+            return '';
+        }
     };
 
     const schoolName = school?.name || user?.school?.name || t('studentProfilePage.school.notSet');
@@ -437,8 +457,14 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                             <div key={a.id} className="flex items-start gap-3">
                                 <div className={`${getDot(a.color || 'blue')} w-2.5 h-2.5 rounded-full mt-2 flex-shrink-0`} />
                                 <div className="flex-1">
-                                    <div className="text-sm font-semibold text-gray-900">{a.text}</div>
-                                    <div className="text-xs text-gray-500 mt-1">{a.time}</div>
+                                    <div className="text-sm font-semibold text-gray-900">
+                                        {a.kind
+                                            ? t(`activityFeed.${a.kind}`, { title: a.title })
+                                            : a.text}
+                                    </div>
+                                    <div className="text-xs text-gray-500 mt-1">
+                                        {a.occurred_at ? formatActivityRelative(a.occurred_at) : a.time}
+                                    </div>
                                 </div>
                             </div>
                         ))}
@@ -473,7 +499,8 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
 
 export default function StudentProfile({ auth, stats = {}, badges = [], projects = [], activities = [], school = null, availableSchools = [], tags = [] }) {
     const user = auth?.user;
-    const { flash } = usePage().props;
+    const page = usePage();
+    const { flash } = page.props;
     const { showSuccess, showError } = useToast();
     const { t, language } = useTranslation();
     const [imagePreview, setImagePreview] = useState(null);
@@ -492,6 +519,21 @@ export default function StudentProfile({ auth, stats = {}, badges = [], projects
             showError(flash.error);
         }
     }, [flash, showSuccess, showError]);
+
+    // Open school modal when linked from dashboard (?editSchool=1) and strip query from URL
+    useEffect(() => {
+        if (typeof window === 'undefined') {
+            return;
+        }
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('editSchool') !== '1') {
+            return;
+        }
+        setShowSchoolModal(true);
+        params.delete('editSchool');
+        const qs = params.toString();
+        window.history.replaceState({}, '', window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash);
+    }, [page.url]);
 
     const imageForm = useForm({
         image: null,

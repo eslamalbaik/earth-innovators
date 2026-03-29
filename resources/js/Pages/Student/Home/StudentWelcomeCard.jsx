@@ -4,7 +4,7 @@ export default function StudentWelcomeCard({ userName, onUploadProject }) {
     const { t } = useTranslation();
 
     return (
-        <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+        <section className="flex h-full min-h-[140px] flex-col justify-center bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
             <div className="text-center">
                 <div className="text-sm font-bold text-gray-900">
                     {userName

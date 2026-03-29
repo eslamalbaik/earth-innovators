@@ -3,17 +3,19 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Certificate;
+use App\Models\ChallengeSuggestion;
+use App\Models\Payment;
 use App\Models\Project;
 use App\Models\Publication;
+use App\Models\StoreRewardRequest;
 use App\Models\User;
 use App\Models\UserPackage;
-use App\Models\Payment;
-use App\Models\Package;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 
 class AdminDashboardController extends Controller
@@ -27,6 +29,7 @@ class AdminDashboardController extends Controller
         $user = Auth::user();
         $kpis = $this->getKPIs();
         $usersByRole = $this->getUsersByRole();
+
         $publishedProjects = Project::with(['user:id,name,email', 'school:id,name', 'teacher:id,name_ar'])
             ->where('status', 'approved')
             ->select('id', 'title', 'user_id', 'school_id', 'teacher_id', 'status', 'views', 'likes', 'created_at', 'approved_at')
@@ -37,9 +40,9 @@ class AdminDashboardController extends Controller
                 return [
                     'id' => $project->id,
                     'title' => $project->title,
-                    'student_name' => $project->user->name ?? 'غير معروف',
-                    'school_name' => $project->school->name ?? 'غير محدد',
-                    'teacher_name' => $project->teacher->name_ar ?? 'غير محدد',
+                    'student_name' => $project->user->name ?? 'Unknown',
+                    'school_name' => $project->school->name ?? 'Unassigned',
+                    'teacher_name' => $project->teacher->name_ar ?? 'Unassigned',
                     'views' => $project->views ?? 0,
                     'likes' => $project->likes ?? 0,
                     'created_at' => $project->created_at->format('Y-m-d'),
@@ -56,10 +59,11 @@ class AdminDashboardController extends Controller
             ->map(function ($payment) {
                 return [
                     'id' => $payment->id,
-                    'user_name' => $payment->student->name ?? 'غير معروف',
+                    'user_name' => $payment->student->name ?? 'Unknown',
                     'amount' => $payment->amount,
                     'currency' => $payment->currency ?? 'AED',
-                    'payment_method' => $payment->payment_method ?? 'غير محدد',
+                    'status' => $payment->status,
+                    'payment_method' => $payment->payment_method ?? 'Unspecified',
                     'paid_at' => $payment->paid_at?->format('Y-m-d H:i') ?? $payment->created_at->format('Y-m-d H:i'),
                 ];
             });
@@ -72,9 +76,9 @@ class AdminDashboardController extends Controller
             ->map(function ($subscription) {
                 return [
                     'id' => $subscription->id,
-                    'user_name' => $subscription->user->name ?? 'غير معروف',
-                    'user_role' => $subscription->user->role ?? 'غير محدد',
-                    'package_name' => $subscription->package->name_ar ?? 'غير محدد',
+                    'user_name' => $subscription->user->name ?? 'Unknown',
+                    'user_role' => $subscription->user->role ?? 'Unassigned',
+                    'package_name' => $subscription->package->name_ar ?? 'Unassigned',
                     'status' => $subscription->effective_status,
                     'paid_amount' => $subscription->paid_amount,
                     'start_date' => $subscription->start_date->format('Y-m-d'),
@@ -97,12 +101,25 @@ class AdminDashboardController extends Controller
             'subscription_revenue' => UserPackage::currentActive()->sum('paid_amount'),
         ];
 
-        $selectedYear = $request->get('year', date('Y'));
+        $selectedYear = (int) $request->get('year', date('Y'));
         $chartData = $this->getChartData($selectedYear);
         $availableYears = $this->getAvailableYears();
         $engagementData = $this->getStudentEngagementData();
         $notifications = $this->notificationService->getUserNotifications($user->id, 10);
         $unreadCount = $this->notificationService->getUnreadCount($user->id);
+
+        $workflow = [
+            'pending_projects' => Project::where('status', 'pending')->count(),
+            'pending_publications' => Publication::where('status', 'pending')->count(),
+            'pending_certificates' => Certificate::whereIn('status', ['pending', 'pending_school_approval'])->count(),
+            'pending_reward_requests' => Schema::hasTable('store_reward_requests')
+                ? StoreRewardRequest::where('status', 'pending')->count()
+                : 0,
+            'pending_payments' => Payment::where('status', 'pending')->count(),
+            'pending_challenge_suggestions' => Schema::hasTable('challenge_suggestions')
+                ? ChallengeSuggestion::whereIn('status', ['pending', 'under_review'])->count()
+                : 0,
+        ];
 
         return Inertia::render('Admin/Dashboard', [
             'user' => $user,
@@ -114,11 +131,12 @@ class AdminDashboardController extends Controller
             'paymentStats' => $paymentStats,
             'subscriptionStats' => $subscriptionStats,
             'chartData' => $chartData,
-            'selectedYear' => (int)$selectedYear,
+            'selectedYear' => $selectedYear,
             'availableYears' => $availableYears,
             'engagementData' => $engagementData,
             'notifications' => $notifications,
             'unread_count' => $unreadCount,
+            'workflow' => $workflow,
         ]);
     }
 
@@ -174,11 +192,11 @@ class AdminDashboardController extends Controller
         rsort($years);
 
         if (empty($years)) {
-            $currentYear = (int)date('Y');
+            $currentYear = (int) date('Y');
             return range($currentYear, $currentYear - 3);
         }
 
-        $currentYear = (int)date('Y');
+        $currentYear = (int) date('Y');
         if (!in_array($currentYear, $years)) {
             array_unshift($years, $currentYear);
         }
@@ -186,20 +204,15 @@ class AdminDashboardController extends Controller
         return $years;
     }
 
-    /**
-     * Get chart data for platform activity (users and projects per month)
-     * 
-     * @param int $year
-     * @return array
-     */
     private function getChartData(int $year = null): array
     {
         if ($year === null) {
-            $year = (int)date('Y');
+            $year = (int) date('Y');
         }
+
         $months = [
-            'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-            'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December',
         ];
 
         $usersData = [];
@@ -236,27 +249,18 @@ class AdminDashboardController extends Controller
         ];
     }
 
-    /**
-     * Get chart data via API endpoint for AJAX requests
-     * 
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function getChartDataApi(Request $request)
     {
         try {
-            $year = $request->get('year', date('Y'));
-            $year = (int)$year;
-            
+            $year = (int) $request->get('year', date('Y'));
+
             if ($year < 2000 || $year > 2100) {
                 return response()->json([
                     'error' => 'Invalid year. Year must be between 2000 and 2100.',
                 ], 400);
             }
-            
-            $chartData = $this->getChartData($year);
-            
-            return response()->json($chartData);
+
+            return response()->json($this->getChartData($year));
         } catch (\Exception $e) {
             \Log::error('Error fetching chart data: ' . $e->getMessage());
             return response()->json([
@@ -266,12 +270,6 @@ class AdminDashboardController extends Controller
         }
     }
 
-    /**
-     * Format user image URL with proper path handling
-     * 
-     * @param string|null $imagePath
-     * @return string|null
-     */
     private function formatUserImageUrl(?string $imagePath): ?string
     {
         if (!$imagePath) {
@@ -299,7 +297,7 @@ class AdminDashboardController extends Controller
                 'userBadges as badges_count',
                 'challengeParticipations as challenges_participated' => function ($query) {
                     $query->where('status', 'completed');
-                }
+                },
             ])
             ->with(['projects' => function ($query) {
                 $query->where('status', 'approved')
@@ -313,43 +311,44 @@ class AdminDashboardController extends Controller
                 $badges = $student->badges_count ?? 0;
                 $points = $student->points ?? 0;
                 $challengesCompleted = $student->challenges_participated ?? 0;
+
                 $projectStats = DB::table('projects')
                     ->where('user_id', $student->id)
                     ->where('status', 'approved')
                     ->selectRaw('SUM(views) as total_views, SUM(likes) as total_likes')
                     ->first();
-                
+
                 $totalViews = $projectStats->total_views ?? 0;
                 $totalLikes = $projectStats->total_likes ?? 0;
-                
+
                 $projectScore = min(100, ($approvedProjects / 5) * 100);
                 $badgeScore = min(100, ($badges / 10) * 100);
                 $pointScore = min(100, ($points / 500) * 100);
                 $viewScore = min(100, ($totalViews / 1000) * 100);
                 $likeScore = min(100, ($totalLikes / 100) * 100);
                 $challengeScore = min(100, ($challengesCompleted / 5) * 100);
-                
-                $engagementScore = 
-                    ($projectScore * 0.30) + 
-                    ($badgeScore * 0.25) + 
-                    ($pointScore * 0.20) + 
-                    ($viewScore * 0.15) + 
-                    ($likeScore * 0.10) + 
+
+                $engagementScore =
+                    ($projectScore * 0.30) +
+                    ($badgeScore * 0.25) +
+                    ($pointScore * 0.20) +
+                    ($viewScore * 0.15) +
+                    ($likeScore * 0.10) +
                     ($challengeScore * 0.10);
-                
+
                 $latestProject = $student->projects->first();
                 $totalBadges = $student->badges_count ?? 0;
-                
+
                 return [
                     'id' => $student->id,
                     'name' => $student->name,
                     'nameEn' => $student->name,
                     'activity' => max(0, min(100, round($engagementScore))),
-                    'project' => $latestProject ? "مشروع {$latestProject->id} أوسمة" : ($totalBadges > 0 ? "مشروع {$totalBadges} أوسمة" : 'لا يوجد مشاريع'),
+                    'project' => $latestProject ? "Project {$latestProject->id} badges" : ($totalBadges > 0 ? "Project {$totalBadges} badges" : 'No projects'),
                     'projectEn' => $latestProject ? "Project {$latestProject->id} badges" : ($totalBadges > 0 ? "Project {$totalBadges} badges" : 'No projects'),
-                    'date' => $latestProject && $latestProject->approved_at 
-                        ? 'منشور في ' . $latestProject->approved_at->format('d | n | Y')
-                        : ($student->created_at ? 'منشور في ' . $student->created_at->format('d | n | Y') : 'لا يوجد منشورات'),
+                    'date' => $latestProject && $latestProject->approved_at
+                        ? 'Published on ' . $latestProject->approved_at->format('d | n | Y')
+                        : ($student->created_at ? 'Published on ' . $student->created_at->format('d | n | Y') : 'No publications'),
                     'image' => $this->formatUserImageUrl($student->image),
                     'badge' => null,
                     'approved_projects' => $approvedProjects,
@@ -369,81 +368,82 @@ class AdminDashboardController extends Controller
             });
 
         $monthlyData = [];
-        $months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'];
-        
+        $months = ['January', 'February', 'March', 'April', 'May', 'June'];
+
         for ($i = 5; $i >= 0; $i--) {
             $date = now()->subMonths($i);
             $startDate = $date->copy()->startOfMonth();
             $endDate = $date->copy()->endOfMonth();
             $students = User::where('role', 'student')->get();
-            
+
             if ($students->isEmpty()) {
                 $monthlyData[] = [
                     'month' => $months[5 - $i],
-                    'value' => 0
+                    'value' => 0,
                 ];
                 continue;
             }
-            
+
             $engagementScores = [];
             foreach ($students as $student) {
                 $approvedProjects = Project::where('user_id', $student->id)
                     ->where('status', 'approved')
                     ->whereBetween('approved_at', [$startDate, $endDate])
                     ->count();
-                
+
                 $badges = DB::table('user_badges')
                     ->where('user_id', $student->id)
                     ->whereBetween('created_at', [$startDate, $endDate])
                     ->count();
-                
+
                 $points = $student->points ?? 0;
-                
+
                 $projectStats = DB::table('projects')
                     ->where('user_id', $student->id)
                     ->where('status', 'approved')
                     ->whereBetween('approved_at', [$startDate, $endDate])
                     ->selectRaw('COALESCE(SUM(views), 0) as total_views, COALESCE(SUM(likes), 0) as total_likes')
                     ->first();
-                
+
                 $totalViews = $projectStats->total_views ?? 0;
                 $totalLikes = $projectStats->total_likes ?? 0;
-                
+
                 $projectScore = min(100, ($approvedProjects / 5) * 100);
                 $badgeScore = min(100, ($badges / 10) * 100);
                 $pointScore = min(100, ($points / 500) * 100);
                 $viewScore = min(100, ($totalViews / 1000) * 100);
                 $likeScore = min(100, ($totalLikes / 100) * 100);
-                
-                $score = 
-                    ($projectScore * 0.30) + 
-                    ($badgeScore * 0.25) + 
-                    ($pointScore * 0.20) + 
-                    ($viewScore * 0.15) + 
+
+                $score =
+                    ($projectScore * 0.30) +
+                    ($badgeScore * 0.25) +
+                    ($pointScore * 0.20) +
+                    ($viewScore * 0.15) +
                     ($likeScore * 0.10);
+
                 if ($score > 0) {
                     $engagementScores[] = $score;
                 }
             }
-            
-            $monthlyEngagement = !empty($engagementScores) 
+
+            $monthlyEngagement = !empty($engagementScores)
                 ? array_sum($engagementScores) / count($engagementScores)
                 : 0;
-            
+
             $monthlyData[] = [
                 'month' => $months[5 - $i],
-                'value' => round($monthlyEngagement)
+                'value' => round($monthlyEngagement),
             ];
         }
 
         $currentMonthValue = $monthlyData[count($monthlyData) - 1]['value'] ?? 0;
         $previousMonthValue = count($monthlyData) > 1 ? $monthlyData[count($monthlyData) - 2]['value'] : 0;
-        
+
         $trendPercentage = 0;
         if ($previousMonthValue > 0) {
             $trendPercentage = round((($currentMonthValue - $previousMonthValue) / $previousMonthValue) * 100);
-        } else if ($currentMonthValue > 0) {
-            $trendPercentage = 100; // New data
+        } elseif ($currentMonthValue > 0) {
+            $trendPercentage = 100;
         }
 
         return [

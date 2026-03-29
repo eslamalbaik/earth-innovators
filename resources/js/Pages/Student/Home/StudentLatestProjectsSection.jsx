@@ -128,7 +128,7 @@ function ProjectCard({ project, onOpen, t }) {
 
 export default function StudentLatestProjectsSection({ projects = [], onViewAll, onOpenProject }) {
     const { t } = useTranslation();
-    const list = Array.isArray(projects) ? projects.slice(0, 2) : [];
+    const list = Array.isArray(projects) ? projects.slice(0, 5) : [];
 
     if (list.length === 0) {
         return (

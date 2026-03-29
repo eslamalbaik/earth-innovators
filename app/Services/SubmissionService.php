@@ -187,6 +187,27 @@ class SubmissionService extends BaseService
         }, 300); // Cache for 5 minutes
     }
 
+    /**
+     * قائمة تسليمات الطالب مع ترقيم — بدون كاش حتى تبقى روابط الصفحات ومعاملات التصفية صحيحة.
+     */
+    public function paginateStudentSubmissionsForList(int $studentId, int $perPage = 12, ?string $status = null): LengthAwarePaginator
+    {
+        $query = ProjectSubmission::with([
+            'project:id,title,description,status',
+            'student:id,name,email',
+        ])
+            ->where('student_id', $studentId)
+            ->select('id', 'project_id', 'student_id', 'files', 'comment', 'status', 'submitted_at', 'reviewed_at', 'rating', 'badges', 'feedback', 'reviewed_by', 'created_at');
+
+        if ($status && in_array($status, ['submitted', 'reviewed', 'approved', 'rejected'], true)) {
+            $query->where('status', $status);
+        }
+
+        return $query->latest('submitted_at')
+            ->paginate($perPage)
+            ->withQueryString();
+    }
+
     public function getProjectSubmissions(int $projectId, ?string $status = null, int $perPage = 15)
     {
         $cacheKey = "project_submissions_{$projectId}_" . md5($status ?? '') . "_{$perPage}";

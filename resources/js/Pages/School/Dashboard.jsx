@@ -9,10 +9,11 @@ import {
 } from 'react-icons/fa';
 import { toHijriDate } from '@/utils/dateUtils';
 
-export default function SchoolDashboard({ auth, stats = {}, pendingProjects = [], recentApprovedProjects = [] }) {
+export default function SchoolDashboard({ auth, stats = {}, pendingProjects = [], recentApprovedProjects = [], membershipSummary = null }) {
     const { t } = useTranslation();
     const user = auth.user;
     const { confirm } = useConfirmDialog();
+    const workflow = stats.workflow || {};
 
     const categoryColors = {
         science: 'bg-blue-100 text-blue-700 border-blue-300',
@@ -98,6 +99,70 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div className="md:col-span-2 lg:col-span-4 rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-6 shadow-sm">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                            <h2 className="text-lg font-bold text-gray-900">{t('schoolDashboardPage.membershipTitle')}</h2>
+                            <p className="mt-1 text-sm text-gray-600">
+                                {membershipSummary?.subscription
+                                    ? t('schoolDashboardPage.membershipActive', {
+                                        package: membershipSummary.subscription.package_name,
+                                        until: membershipSummary.subscription.end_date,
+                                    })
+                                    : t('schoolDashboardPage.membershipInactive')}
+                            </p>
+                            <p className="mt-1 text-sm font-medium">
+                                {membershipSummary?.certificate_access
+                                    ? t('schoolDashboardPage.certificateAccessEnabled')
+                                    : t('schoolDashboardPage.certificateAccessDisabled')}
+                            </p>
+                            {!membershipSummary?.subscription && (
+                                <div className="mt-3">
+                                    <Link
+                                        href="/packages"
+                                        className="inline-flex rounded-xl bg-[#A3C042] px-3 py-2 text-xs font-bold text-white hover:bg-[#8CA635]"
+                                    >
+                                        {t('schoolDashboardPage.openPackages')}
+                                    </Link>
+                                </div>
+                            )}
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                            <Link href="/school/certificates" className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-800 hover:border-[#A3C042]/40">
+                                {t('schoolDashboardPage.openCertificates')}
+                            </Link>
+                            <Link href="/school/publications" className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-800 hover:border-[#A3C042]/40">
+                                {t('schoolDashboardPage.openPublications')}
+                            </Link>
+                            <Link href="/school/challenge-suggestions" className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-800 hover:border-[#A3C042]/40">
+                                {t('schoolDashboardPage.openChallengeSuggestions')}
+                            </Link>
+                        </div>
+                    </div>
+                    <div className="mt-4 grid grid-cols-2 gap-3 text-sm md:grid-cols-3 lg:grid-cols-5">
+                        <Link href="/school/publications" className="rounded-xl border border-gray-200 bg-white p-3 transition hover:border-[#A3C042]/40">
+                            <div className="text-gray-500">{t('schoolDashboardPage.workflow.publications')}</div>
+                            <div className="font-bold text-gray-900">{workflow.pending_publications || 0}</div>
+                        </Link>
+                        <Link href="/school/certificates" className="rounded-xl border border-gray-200 bg-white p-3 transition hover:border-[#A3C042]/40">
+                            <div className="text-gray-500">{t('schoolDashboardPage.workflow.certificates')}</div>
+                            <div className="font-bold text-gray-900">{workflow.pending_certificates || 0}</div>
+                        </Link>
+                        <Link href="/school/challenge-submissions" className="rounded-xl border border-gray-200 bg-white p-3 transition hover:border-[#A3C042]/40">
+                            <div className="text-gray-500">{t('schoolDashboardPage.workflow.challengeSubmissions')}</div>
+                            <div className="font-bold text-gray-900">{workflow.pending_challenge_submissions || 0}</div>
+                        </Link>
+                        <div className="rounded-xl border border-gray-200 bg-white p-3">
+                            <div className="text-gray-500">{t('schoolDashboardPage.workflow.rewardRequests')}</div>
+                            <div className="font-bold text-gray-900">{workflow.pending_reward_requests || 0}</div>
+                        </div>
+                        <Link href="/school/challenge-suggestions" className="rounded-xl border border-gray-200 bg-white p-3 transition hover:border-[#A3C042]/40">
+                            <div className="text-gray-500">{t('schoolDashboardPage.workflow.challengeSuggestions')}</div>
+                            <div className="font-bold text-gray-900">{workflow.pending_challenge_suggestions || 0}</div>
+                        </Link>
+                    </div>
+                </div>
+
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
                     <div className="flex items-center justify-between mb-4">
                         <div>

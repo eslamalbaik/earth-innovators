@@ -21,6 +21,7 @@ import {
     FaInfoCircle
 } from 'react-icons/fa';
 import { useToast } from '@/Contexts/ToastContext';
+import { useFlashNotifications } from '@/Hooks/useFlashNotifications';
 import { toHijriDate } from '@/utils/dateUtils';
 import { useTranslation } from '@/i18n';
 
@@ -28,6 +29,7 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
     const { showSuccess, showError } = useToast();
     const { t, language } = useTranslation();
     const [subscribingPackageId, setSubscribingPackageId] = useState(null);
+    useFlashNotifications();
 
     const IconMap = {
         monthly: FaBox,
@@ -65,6 +67,9 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
                     setSubscribingPackageId(null);
                     const errorMessage = errors.error || Object.values(errors)[0] || t('packagesIndexPage.errors.subscribeFailed');
                     showError(Array.isArray(errorMessage) ? errorMessage[0] : errorMessage);
+                },
+                onFinish: () => {
+                    setSubscribingPackageId(null);
                 },
             });
         } catch (error) {
@@ -114,6 +119,44 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
                 </div>
             )}
 
+            {/* Pending Subscription Card */}
+            {auth?.user && userPackage && userPackage.status === 'pending' && (
+                <div className={`bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-yellow-300 rounded-2xl ${isDesktop ? 'p-6 mb-6' : 'p-4 mb-4'}`}>
+                    <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                            <h3 className={`${isDesktop ? 'text-base' : 'text-sm'} font-bold text-yellow-900 mb-1 flex items-center gap-2`}>
+                                <FaSpinner className="text-yellow-600 animate-spin" />
+                                {t('packagesIndexPage.pending.title')}
+                            </h3>
+                            <p className={`${isDesktop ? 'text-sm' : 'text-xs'} text-yellow-800`}>
+                                {t('packagesIndexPage.pending.subtitle')}
+                            </p>
+                            <p className={`${isDesktop ? 'text-xs' : 'text-[11px]'} text-yellow-700 mt-2`}>
+                                {t('packagesIndexPage.pending.packageName', { name: userPackage.package?.name_ar || userPackage.package?.name })}
+                            </p>
+                        </div>
+                        <span className={`px-3 py-1 bg-yellow-200 text-yellow-800 ${isDesktop ? 'text-sm' : 'text-xs'} font-semibold rounded-full`}>
+                            {t('packagesIndexPage.pending.badge')}
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <Link
+                            href="/my-subscriptions"
+                            className={`${isDesktop ? 'text-sm' : 'text-xs'} text-yellow-800 hover:text-yellow-900 font-medium`}
+                        >
+                            {t('packagesIndexPage.pending.viewAll')}
+                        </Link>
+                        <button
+                            type="button"
+                            onClick={() => router.reload({ only: ['packages', 'userPackage'] })}
+                            className={`${isDesktop ? 'text-sm' : 'text-xs'} text-yellow-800 hover:text-yellow-900 font-medium`}
+                        >
+                            {t('packagesIndexPage.pending.refresh')}
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* Packages Grid */}
             {packages.length > 0 ? (
                 <div className={isDesktop ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-4"}>
@@ -122,6 +165,7 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
                         const features = pkg.features_ar || pkg.features || [];
                         const isPopular = pkg.is_popular;
                         const isCurrentPackage = userPackage?.package_id === pkg.id && userPackage?.status === 'active';
+                        const hasPending = userPackage?.package_id === pkg.id && userPackage?.status === 'pending';
                         const isSubscribing = subscribingPackageId === pkg.id;
 
                         return (
@@ -225,12 +269,14 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
                                     {auth?.user ? (
                                         <button
                                             onClick={() => handleSubscribe(pkg.id)}
-                                            disabled={isSubscribing || isCurrentPackage}
+                                            disabled={isSubscribing || isCurrentPackage || hasPending}
                                             className={`w-full text-center ${isDesktop ? 'px-6 py-4' : 'px-4 py-3'} rounded-xl font-semibold ${isDesktop ? 'text-base' : 'text-sm'} transition ${isCurrentPackage
                                                 ? 'bg-green-100 text-green-700 cursor-not-allowed'
-                                                : isPopular
-                                                    ? 'bg-gradient-to-r from-[#A3C042] to-[#8CA635] text-white hover:shadow-lg'
-                                                    : 'bg-[#A3C042] text-white hover:bg-[#8CA635]'
+                                                : hasPending
+                                                    ? 'bg-yellow-100 text-yellow-800 cursor-not-allowed'
+                                                    : isPopular
+                                                        ? 'bg-gradient-to-r from-[#A3C042] to-[#8CA635] text-white hover:shadow-lg'
+                                                        : 'bg-[#A3C042] text-white hover:bg-[#8CA635]'
                                                 } ${isSubscribing ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         >
                                             {isSubscribing ? (
@@ -240,6 +286,8 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
                                                 </>
                                             ) : isCurrentPackage ? (
                                                 t('packagesIndexPage.badges.currentPackage')
+                                            ) : hasPending ? (
+                                                t('packagesIndexPage.pending.badge')
                                             ) : (
                                                 <>
                                                     <FaCreditCard className="inline me-2" />

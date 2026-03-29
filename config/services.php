@@ -52,5 +52,6 @@ return [
         'api_key' => env('ZIINA_API_KEY'),
         'webhook_secret' => env('ZIINA_WEBHOOK_SECRET'),
         'test_mode' => env('ZIINA_TEST_MODE', true),
+        'test_bypass' => env('ZIINA_TEST_BYPASS', false),
     ],
 ];

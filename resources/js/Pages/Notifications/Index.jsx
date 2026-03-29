@@ -1,9 +1,8 @@
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { useState, useEffect, useCallback } from 'react';
 import {
-    FaBell, FaCheck, FaCheckCircle, FaMedal, FaAward, FaTimes, FaCircle,
-    FaBellSlash, FaRocket, FaTrophy, FaProjectDiagram, FaBook, FaEnvelope,
-    FaTrash, FaEye, FaEyeSlash
+    FaBell, FaCheck, FaCheckCircle, FaMedal,
+    FaBellSlash, FaRocket, FaTrophy, FaProjectDiagram, FaBook
 } from 'react-icons/fa';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
@@ -15,7 +14,6 @@ export default function Index({ auth, notifications, unread_count }) {
     const { t, language } = useTranslation();
     const user = auth?.user;
     const isAuthed = !!user;
-    const [selectedNotification, setSelectedNotification] = useState(null);
     const [notificationsList, setNotificationsList] = useState(notifications?.data || []);
     const [unreadCount, setUnreadCount] = useState(unread_count || 0);
     const [isLoading, setIsLoading] = useState(false);
@@ -147,6 +145,9 @@ export default function Index({ auth, notifications, unread_count }) {
                 return <FaTrophy className={`${iconClass} text-yellow-500`} />;
             case 'App\\Notifications\\NewPublicationNotification':
                 return <FaBook className={`${iconClass} text-purple-500`} />;
+            case 'store_reward_pending':
+            case 'App\\Notifications\\StoreRewardPendingApprovalNotification':
+                return <FaTrophy className={`${iconClass} text-amber-600`} />;
             default:
                 return <FaBell className={`${iconClass} text-blue-500`} />;
         }
@@ -171,6 +172,9 @@ export default function Index({ auth, notifications, unread_count }) {
                 return 'bg-yellow-50 border-yellow-200';
             case 'App\\Notifications\\NewPublicationNotification':
                 return 'bg-purple-50 border-purple-200';
+            case 'store_reward_pending':
+            case 'App\\Notifications\\StoreRewardPendingApprovalNotification':
+                return 'bg-amber-50 border-amber-200';
             default:
                 return 'bg-blue-50 border-blue-200';
         }
@@ -250,6 +254,10 @@ export default function Index({ auth, notifications, unread_count }) {
                         const data = notification.data || {};
                         const isRead = notification.read_at !== null;
                         const link = getNotificationLink(notification);
+                        const headline =
+                            language === 'ar'
+                                ? (data.message_ar || data.message_en || data.message || data.title)
+                                : (data.message_en || data.message || data.title);
                         const NotificationComponent = (
                             <div
                                 className={`rounded-2xl border p-4 transition ${getNotificationColor(notification.type, isRead)} ${!isRead ? 'shadow-sm' : ''} ${link ? 'cursor-pointer hover:shadow-md' : ''}`}
@@ -269,7 +277,7 @@ export default function Index({ auth, notifications, unread_count }) {
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-start justify-between gap-2 mb-1">
                                             <h3 className="text-sm md:text-base font-bold text-gray-900 line-clamp-2">
-                                                {data.title || data.message || t('notificationsPage.defaultTitle')}
+                                                {headline || t('notificationsPage.defaultTitle')}
                                             </h3>
                                             {!isRead && (
                                                 <button
@@ -286,9 +294,9 @@ export default function Index({ auth, notifications, unread_count }) {
                                                 </button>
                                             )}
                                         </div>
-                                        {data.message && data.message !== data.title && (
+                                        {data.message_en && data.message_ar && headline && data.message_en !== data.message_ar && (
                                             <p className="text-xs md:text-sm text-gray-600 mb-2 line-clamp-2">
-                                                {data.message}
+                                                {language === 'ar' ? data.message_en : data.message_ar}
                                             </p>
                                         )}
                                         <div className="flex items-center justify-between gap-2">
@@ -381,4 +389,3 @@ export default function Index({ auth, notifications, unread_count }) {
         </div>
     );
 }
-

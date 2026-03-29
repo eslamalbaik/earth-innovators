@@ -19,6 +19,8 @@ const getStoredLanguage = () => {
         const dir = lang === 'ar' ? 'rtl' : 'ltr';
         document.documentElement.dir = dir;
         document.documentElement.lang = lang;
+        // Sync cookie so the next Inertia request uses the same locale for server-rendered strings
+        document.cookie = `locale=${lang};path=/;max-age=31536000;SameSite=Lax`;
         return lang;
     }
     return 'ar';

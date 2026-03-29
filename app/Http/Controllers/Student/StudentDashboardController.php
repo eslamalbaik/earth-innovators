@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Services\DashboardService;
 use App\Services\ActivityService;
+use App\Services\DashboardService;
+use App\Services\StudentEngagementService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -57,9 +57,23 @@ class StudentDashboardController extends Controller
             $stats = [
                 'totalPoints' => (int) ($user->points ?? 0),
                 'totalProjects' => 0,
+                'approvedProjects' => 0,
+                'pendingProjects' => 0,
+                'rejectedProjects' => 0,
                 'totalBadges' => 0,
                 'winningProjects' => 0,
                 'recentProjects' => [],
+                'submissions' => [
+                    'total' => 0,
+                    'awaitingReview' => 0,
+                    'reviewed' => 0,
+                    'approved' => 0,
+                    'rejected' => 0,
+                ],
+                'certificates' => [
+                    'approved' => 0,
+                    'pendingSchoolApproval' => 0,
+                ],
             ];
             $activities = collect([]);
             $recentBadges = collect([]);
@@ -97,13 +111,13 @@ class StudentDashboardController extends Controller
         ] : null;
         $stats['activeChallenges'] = $activeChallenges;
 
-        // Calculate community score percentage (based on points, max 100 points = 100%)
-        $maxPoints = 100;
-        $communityScorePercent = min(100, max(0, round(($stats['totalPoints'] ?? 0) / $maxPoints * 100)));
+        $engagement = app(StudentEngagementService::class)->getSummary($user);
+        $communityScorePercent = (int) ($engagement['engagement_score'] ?? 0);
 
         return Inertia::render('Student/Dashboard', [
             'stats' => $stats,
             'communityScorePercent' => $communityScorePercent,
+            'engagement' => $engagement,
         ]);
     }
 }

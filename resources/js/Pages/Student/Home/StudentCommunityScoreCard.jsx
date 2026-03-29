@@ -6,7 +6,7 @@ export default function StudentCommunityScoreCard({ percent = 35, points = 0 }) 
     const clamped = Math.max(0, Math.min(100, Number(percent) || 0));
 
     return (
-        <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+        <section className="h-full min-h-[140px] bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
             <div className="flex items-center justify-between">
                 <div className="text-3xl font-extrabold text-gray-900">{clamped}%</div>
 

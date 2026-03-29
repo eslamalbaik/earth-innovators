@@ -6,7 +6,7 @@ import {
     FaCalendar, FaChartLine, FaUser, FaSignOutAlt,
     FaGraduationCap, FaCommentDots, FaTachometerAlt, FaBell, FaBook,
     FaChevronDown, FaCreditCard, FaTrophy, FaProjectDiagram, FaMedal, FaFile,
-    FaCheckCircle
+    FaCheckCircle, FaGift, FaLightbulb
 } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import ApplicationLogo from '@/Components/ApplicationLogo';
@@ -394,10 +394,19 @@ export default function DashboardLayout({ children, header }) {
                     { name: t('sidebar.schoolPublications'), href: '/admin/publications', icon: FaBook },
                 ]
             },
-            { name: t('sidebar.challenges'), href: '/admin/challenges', icon: FaCalendar },
+            {
+                name: t('sidebar.challenges'),
+                href: '/admin/challenges',
+                icon: FaCalendar,
+                subItems: [
+                    { name: t('sidebar.challengeSuggestions'), href: '/admin/challenge-suggestions', icon: FaLightbulb },
+                ]
+            },
             { name: t('sidebar.users'), href: '/admin/users', icon: FaUsers },
             { name: t('sidebar.badges'), href: '/admin/badges', icon: FaCommentDots },
             { name: t('sidebar.packages'), href: '/admin/packages', icon: FaCreditCard },
+            { name: t('sidebar.storeRewards'), href: '/admin/store-rewards', icon: FaGift },
+            { name: t('sidebar.storeRewardRequests'), href: '/admin/store-reward-requests', icon: FaGift },
             { name: t('sidebar.subscriptions'), href: '/admin/subscriptions', icon: FaCreditCard },
             { name: t('sidebar.certificates'), href: '/admin/certificates', icon: FaGraduationCap },
             { name: t('sidebar.paymentGateways'), href: '/admin/payment-gateways', icon: FaCreditCard },
@@ -429,6 +438,7 @@ export default function DashboardLayout({ children, header }) {
                 icon: FaCalendar,
                 subItems: [
                     { name: t('sidebar.challengeSubmissions'), href: '/teacher/challenge-submissions', icon: FaFile },
+                    { name: t('sidebar.challengeSuggestions'), href: '/teacher/challenge-suggestions', icon: FaLightbulb },
                     { name: t('sidebar.myChallenges'), href: '/teacher/challenges', icon: FaCalendar },
                 ]
             },
@@ -472,6 +482,7 @@ export default function DashboardLayout({ children, header }) {
                 icon: FaCalendar,
                 subItems: [
                     { name: t('sidebar.challengeSubmissions'), href: '/school/challenge-submissions', icon: FaFile },
+                    { name: t('sidebar.challengeSuggestions'), href: '/school/challenge-suggestions', icon: FaLightbulb },
                     { name: t('sidebar.challenges'), href: '/school/challenges', icon: FaCalendar },
                 ]
             },
@@ -516,6 +527,7 @@ export default function DashboardLayout({ children, header }) {
                 icon: FaCalendar,
                 subItems: [
                     { name: t('sidebar.challengeSubmissions'), href: '/school/challenge-submissions', icon: FaFile },
+                    { name: t('sidebar.challengeSuggestions'), href: '/school/challenge-suggestions', icon: FaLightbulb },
                     { name: t('sidebar.challenges'), href: '/school/challenges', icon: FaCalendar },
                 ]
             },
@@ -528,6 +540,7 @@ export default function DashboardLayout({ children, header }) {
             { name: t('sidebar.dashboard'), href: '/dashboard', icon: FaTachometerAlt },
             { name: t('sidebar.myProjects'), href: '/student/projects', icon: FaBook },
             { name: t('sidebar.challenges'), href: '/student/challenges', icon: FaCalendar },
+            { name: t('sidebar.challengeSuggestions'), href: '/student/challenge-suggestions/create', icon: FaLightbulb },
             { name: t('sidebar.badges'), href: '/badges', icon: FaCommentDots },
             { name: t('sidebar.points'), href: '/student/points', icon: FaChartLine },
             { name: t('sidebar.packages'), href: '/packages', icon: FaCreditCard },
@@ -535,7 +548,25 @@ export default function DashboardLayout({ children, header }) {
         ]
     };
 
-    const currentNavigation = navigation[auth.user?.role];
+    const normalizeLabel = (label, fallbackKey = 'sidebar.dashboard') => {
+        if (typeof label === 'string') {
+            return label;
+        }
+
+        // Guard against accidentally rendering translation objects in React.
+        return t(fallbackKey);
+    };
+
+    const currentNavigation = (navigation[auth.user?.role] || []).map((item) => ({
+        ...item,
+        name: normalizeLabel(item.name),
+        subItems: Array.isArray(item.subItems)
+            ? item.subItems.map((subItem) => ({
+                ...subItem,
+                name: normalizeLabel(subItem.name),
+            }))
+            : item.subItems,
+    }));
 
     const sidebarPosition = dir === 'rtl' ? 'right-4' : 'left-4';
     const sidebarClosePosition = dir === 'rtl' ? 'left-4' : 'right-4';

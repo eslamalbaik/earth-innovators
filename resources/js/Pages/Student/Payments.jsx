@@ -5,10 +5,8 @@ import {
     FaCreditCard,
     FaCheckCircle,
     FaClock,
-    FaTimes,
     FaFilter,
     FaDollarSign,
-    FaEye,
     FaGraduationCap,
     FaBan,
 } from 'react-icons/fa';
@@ -290,7 +288,7 @@ export default function StudentPayments({ payments, stats, filters }) {
                         <tbody className="divide-y divide-gray-200">
                             {payments?.data?.length === 0 ? (
                                 <tr>
-                                    <td colSpan="8" className="px-6 py-12 text-center text-gray-500">
+                                    <td colSpan="9" className="px-6 py-12 text-center text-gray-500">
                                         <FaCreditCard className="mx-auto text-4xl mb-4 text-gray-300" />
                                         <p>{t('studentPaymentsPage.empty')}</p>
                                     </td>
@@ -398,4 +396,3 @@ export default function StudentPayments({ payments, stats, filters }) {
         </DashboardLayout>
     );
 }
-

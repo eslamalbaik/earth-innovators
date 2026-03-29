@@ -3,11 +3,18 @@
 namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
+use App\Models\Certificate;
+use App\Models\ChallengeSuggestion;
+use App\Models\ChallengeSubmission;
 use App\Models\Project;
+use App\Models\ProjectSubmission;
 use App\Models\Publication;
+use App\Models\StoreRewardRequest;
 use App\Services\ActivityService;
 use App\Services\DashboardService;
+use App\Services\MembershipAccessService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 
 class TeacherDashboardController extends Controller
@@ -51,6 +58,7 @@ class TeacherDashboardController extends Controller
         }
 
         $stats = $this->dashboardService->getTeacherDashboardStats($teacher->id, $user->id);
+        $membershipSummary = app(MembershipAccessService::class)->getMembershipSummary($user);
 
         $recentBadges = $this->activityService->getRecentBadges($user->id, 5);
         $stats['badges']['recent'] = $recentBadges;
@@ -92,6 +100,62 @@ class TeacherDashboardController extends Controller
         $stats['recentProjects'] = $recentProjects;
         $stats['recentPublications'] = $recentPublications;
 
+        $pendingProjectSubmissions = ProjectSubmission::query()
+            ->where('status', 'submitted')
+            ->whereHas('project', function ($query) use ($teacher) {
+                $query->where('teacher_id', $teacher->id);
+            })
+            ->count();
+
+        $pendingChallengeSubmissions = ChallengeSubmission::query()
+            ->where('status', 'submitted')
+            ->whereHas('challenge', function ($query) use ($user) {
+                $query->where('created_by', $user->id);
+            })
+            ->count();
+
+        $pendingPublicationApprovals = Publication::query()
+            ->where('author_id', $user->id)
+            ->where('status', 'pending')
+            ->count();
+
+        $pendingCertificateRequests = Certificate::query()
+            ->where('requested_by', $user->id)
+            ->where('status', 'pending_school_approval')
+            ->count();
+
+        $pendingRewardRequests = 0;
+        if (Schema::hasTable('store_reward_requests')) {
+            $linkedStudentIds = Project::query()
+                ->where('teacher_id', $teacher->id)
+                ->distinct()
+                ->pluck('user_id');
+
+            if ($linkedStudentIds->isNotEmpty()) {
+                $pendingRewardRequests = StoreRewardRequest::query()
+                    ->whereIn('user_id', $linkedStudentIds)
+                    ->where('status', 'pending')
+                    ->count();
+            }
+        }
+
+        $pendingChallengeSuggestions = 0;
+        if (Schema::hasTable('challenge_suggestions') && $user->school_id) {
+            $pendingChallengeSuggestions = ChallengeSuggestion::query()
+                ->where('school_id', $user->school_id)
+                ->where('status', 'pending')
+                ->count();
+        }
+
+        $stats['workflow'] = [
+            'pending_project_submissions' => $pendingProjectSubmissions,
+            'pending_challenge_submissions' => $pendingChallengeSubmissions,
+            'pending_challenge_suggestions' => $pendingChallengeSuggestions,
+            'pending_publication_approvals' => $pendingPublicationApprovals,
+            'pending_certificate_requests' => $pendingCertificateRequests,
+            'pending_reward_requests' => $pendingRewardRequests,
+        ];
+
         $isActive = (bool) $teacher->is_active;
         $isVerified = (bool) $teacher->is_verified;
 
@@ -103,6 +167,7 @@ class TeacherDashboardController extends Controller
                 'is_verified' => $isVerified,
             ],
             'stats' => $stats,
+            'membershipSummary' => $membershipSummary,
             'activationBanner' => !$isActive ? [
                 'is_verified' => $isVerified,
             ] : null,

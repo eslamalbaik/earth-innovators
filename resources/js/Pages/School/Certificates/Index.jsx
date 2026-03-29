@@ -101,6 +101,11 @@ export default function SchoolCertificatesIndex({
     }, [recipients, searchTerm]);
 
     const openIssueModal = (recipient, defaultType = 'achievement') => {
+        if (!membershipSummary?.certificate_access) {
+            showError(t('schoolCertificatesIndexPage.toasts.accessDenied'));
+            return;
+        }
+
         setSelectedRecipient(recipient);
         setCertificateType(defaultType);
         setFormData({

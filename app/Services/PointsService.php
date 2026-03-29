@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Challenge;
 use App\Models\ChallengeParticipation;
 use Illuminate\Support\Facades\DB;
+use App\Services\DashboardService;
 use Illuminate\Support\Facades\Log;
 
 class PointsService extends BaseService
@@ -64,6 +65,53 @@ class PointsService extends BaseService
                 'source' => $source,
                 'error' => $e->getMessage(),
             ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * خصم نقاط لاسترداد مكافأة من متجر النقاط (يسجّل type=redeemed ويخصم رصيد المستخدم).
+     */
+    public function redeemStorePoints(
+        int $userId,
+        int $cost,
+        string $rewardId,
+        string $labelEn,
+        string $labelAr,
+        ?int $sourceId = null
+    ): Point {
+        DB::beginTransaction();
+        try {
+            $user = User::lockForUpdate()->findOrFail($userId);
+            if ((int) ($user->points ?? 0) < $cost) {
+                throw new \RuntimeException('INSUFFICIENT_POINTS');
+            }
+
+            $point = Point::create([
+                'user_id' => $userId,
+                'points' => $cost,
+                'type' => 'redeemed',
+                'source' => 'store_reward',
+                'source_id' => $sourceId,
+                'description' => 'Store reward: '.$labelEn.' ('.$rewardId.')',
+                'description_ar' => 'مكافأة المتجر: '.$labelAr.' ('.$rewardId.')',
+            ]);
+
+            $user->decrement('points', $cost);
+
+            DB::commit();
+
+            $this->forgetCacheTags([
+                "user_points_{$userId}",
+                "user_{$userId}",
+                'leaderboard',
+            ]);
+
+            app(DashboardService::class)->clearDashboardCache($userId, 'student');
+
+            return $point->fresh();
+        } catch (\Exception $e) {
+            DB::rollBack();
             throw $e;
         }
     }

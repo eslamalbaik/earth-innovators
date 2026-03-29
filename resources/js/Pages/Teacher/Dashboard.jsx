@@ -11,11 +11,10 @@ import {
     FaAward,
     FaExclamationTriangle,
     FaPlus,
-    FaGraduationCap,
-    FaFile
+    FaGraduationCap
 } from 'react-icons/fa';
 
-export default function TeacherDashboard({ auth, teacher, stats, activationBanner }) {
+export default function TeacherDashboard({ auth, teacher, stats, membershipSummary = null, activationBanner }) {
     const { t } = useTranslation();
     const {
         projects = {},
@@ -23,6 +22,7 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
         challenges = {},
         points = {},
         badges = {},
+        workflow = {},
         recentProjects = [],
         recentPublications = []
     } = stats || {};
@@ -64,9 +64,8 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
     };
 
     const renderStatusBadge = (status, type = 'project') => (
-        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-            statusBadgeClasses[status] || 'bg-gray-100 text-gray-800'
-        }`}>
+        <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusBadgeClasses[status] || 'bg-gray-100 text-gray-800'
+            }`}>
             {t(getStatusKeys(status, type))}
         </span>
     );
@@ -75,99 +74,169 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
         <DashboardLayout auth={auth}>
             <Head title={t('teacherDashboardPage.title')} />
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 mb-8">
-                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                        <div>
-                            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-                                {t('common.welcomeBack')} {teacher?.name || t('common.teacher')}
-                            </h1>
-                            <p className="text-gray-600 text-base md:text-lg">{t('common.appName')} - {t('dashboard.manageProjects')}</p>
-                        </div>
-                        <div className="bg-gray-50 rounded-2xl p-4 md:p-6 border border-gray-100 self-center md:self-auto">
-                            <FaGraduationCap className="text-4xl md:text-6xl text-gray-400" />
-                        </div>
-                    </div>
-                </div>
+            <div className="max-w-7xl mx-auto px-3 py-6 sm:px-4 lg:px-8 lg:py-8">
 
-                {(activationBanner || teacher?.is_active === false) && (
-                    <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-xl p-5 shadow-sm">
-                        <div className="flex items-start gap-4">
-                            <div className="mt-1">
-                                <FaExclamationTriangle className="text-yellow-600 text-2xl" />
-                            </div>
-                            <div>
-                                <h2 className="text-lg font-bold text-yellow-700 mb-1">
-                                    {activationBanner?.title || t('teacherDashboardPage.activationTitle')}
-                                </h2>
-                                <p className="text-sm text-yellow-700 leading-6">
-                                    {activationBanner?.message || t('teacherDashboardPage.activationMessage')}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                <div className="grid grid-cols-1 gap-6 lg:gap-8">
+                    <div className="space-y-6 lg:col-span-8  mb-6">
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
-                        <div className="flex items-center justify-between mb-4">
-                            <div>
-                                <p className="text-gray-500 text-sm font-medium mb-2">{t('teacherDashboardPage.totalPoints')}</p>
-                                <p className="text-3xl font-bold text-gray-900">{points.total || 0}</p>
-                            </div>
-                            <div className="p-3 bg-purple-50 rounded-2xl">
-                                <FaStar className="text-2xl text-purple-600" />
+                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
+                            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                                <div>
+                                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                                        {t('common.welcomeBack')} {teacher?.name || t('common.teacher')}
+                                    </h1>
+                                    <p className="text-gray-600 text-base md:text-lg">{t('common.appName')} - {t('dashboard.manageProjects')}</p>
+                                </div>
+                                <div className="bg-gray-50 rounded-2xl p-4 md:p-6 border border-gray-100 self-center md:self-auto">
+                                    <FaGraduationCap className="text-4xl md:text-6xl text-gray-400" />
+                                </div>
                             </div>
                         </div>
-                        <div className="pt-3 border-t border-gray-100">
-                            <p className="text-sm text-gray-600">{t('teacherDashboardPage.operationsCount', { count: points.count || 0 })}</p>
+
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-4 lg:grid-cols-4 lg:gap-5 lg:content-start">
+                            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div>
+                                        <p className="text-gray-500 text-sm font-medium mb-2">{t('teacherDashboardPage.totalPoints')}</p>
+                                        <p className="text-3xl font-bold text-gray-900">{points.total || 0}</p>
+                                    </div>
+                                    <div className="p-3 bg-purple-50 rounded-2xl">
+                                        <FaStar className="text-2xl text-purple-600" />
+                                    </div>
+                                </div>
+                                <div className="pt-3 border-t border-gray-100">
+                                    <p className="text-sm text-gray-600">{t('teacherDashboardPage.operationsCount', { count: points.count || 0 })}</p>
+                                </div>
+                            </div>
+
+                            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div>
+                                        <p className="text-gray-500 text-sm font-medium mb-2">{t('common.projects')}</p>
+                                        <p className="text-3xl font-bold text-gray-900">{projects.total || 0}</p>
+                                    </div>
+                                    <div className="p-3 bg-blue-50 rounded-2xl">
+                                        <FaProjectDiagram className="text-2xl text-blue-600" />
+                                    </div>
+                                </div>
+                                <div className="pt-3 border-t border-gray-100">
+                                    <p className="text-sm text-gray-600">{t('teacherDashboardPage.approvedCount', { count: projects.approved || 0 })}</p>
+                                </div>
+                            </div>
+
+                            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div>
+                                        <p className="text-gray-500 text-sm font-medium mb-2">{t('teacherDashboardPage.publications')}</p>
+                                        <p className="text-3xl font-bold text-gray-900">{publications.total || 0}</p>
+                                    </div>
+                                    <div className="p-3 bg-green-50 rounded-2xl">
+                                        <FaBook className="text-2xl text-green-600" />
+                                    </div>
+                                </div>
+                                <div className="pt-3 border-t border-gray-100">
+                                    <p className="text-sm text-gray-600">{t('teacherDashboardPage.publishedCount', { count: publications.approved || 0 })}</p>
+                                </div>
+                            </div>
+
+                            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div>
+                                        <p className="text-gray-500 text-sm font-medium mb-2">{t('common.badges')}</p>
+                                        <p className="text-3xl font-bold text-gray-900">{badges.total || 0}</p>
+                                    </div>
+                                    <div className="p-3 bg-orange-50 rounded-2xl">
+                                        <FaAward className="text-2xl text-orange-600" />
+                                    </div>
+                                </div>
+                                <div className="pt-3 border-t border-gray-100">
+                                    <p className="text-sm text-gray-600">{t('teacherDashboardPage.achievements')}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {(activationBanner || teacher?.is_active === false) && (
+                            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-5 shadow-sm">
+                                <div className="flex items-start gap-4">
+                                    <div className="mt-1">
+                                        <FaExclamationTriangle className="text-yellow-600 text-2xl" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-lg font-bold text-yellow-700 mb-1">
+                                            {activationBanner?.title || t('teacherDashboardPage.activationTitle')}
+                                        </h2>
+                                        <p className="text-sm text-yellow-700 leading-6">
+                                            {activationBanner?.message || t('teacherDashboardPage.activationMessage')}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-6 shadow-sm">
+                            <div className="flex flex-wrap items-start justify-between gap-3">
+                                <div>
+                                    <h2 className="text-lg font-bold text-gray-900">{t('teacherDashboardPage.membershipTitle')}</h2>
+                                    <p className="mt-1 text-sm text-gray-600">
+                                        {membershipSummary?.subscription
+                                            ? t('teacherDashboardPage.membershipActive', {
+                                                package: membershipSummary.subscription.package_name,
+                                                until: membershipSummary.subscription.end_date,
+                                            })
+                                            : t('teacherDashboardPage.membershipInactive')}
+                                    </p>
+                                    <p className="mt-1 text-sm font-medium">
+                                        {membershipSummary?.certificate_access
+                                            ? t('teacherDashboardPage.certificateAccessEnabled')
+                                            : t('teacherDashboardPage.certificateAccessDisabled')}
+                                    </p>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                    <Link
+                                        href="/teacher/certificates"
+                                        className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-800 hover:border-[#A3C042]/40"
+                                    >
+                                        {t('teacherDashboardPage.openCertificates')}
+                                    </Link>
+                                    <Link
+                                        href="/packages"
+                                        className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-800 hover:border-[#A3C042]/40"
+                                    >
+                                        {t('teacherDashboardPage.openPackages')}
+                                    </Link>
+                                </div>
+                            </div>
+
+                            <div className="mt-4 grid grid-cols-2 gap-3 text-sm md:grid-cols-6">
+                                <Link href="/teacher/projects" className="rounded-xl border border-gray-200 bg-white p-3 hover:border-[#A3C042]/40">
+                                    <div className="text-gray-500">{t('teacherDashboardPage.workflow.projectSubmissions')}</div>
+                                    <div className="font-bold text-gray-900">{workflow.pending_project_submissions || 0}</div>
+                                </Link>
+                                <Link href="/teacher/challenge-submissions" className="rounded-xl border border-gray-200 bg-white p-3 hover:border-[#A3C042]/40">
+                                    <div className="text-gray-500">{t('teacherDashboardPage.workflow.challengeSubmissions')}</div>
+                                    <div className="font-bold text-gray-900">{workflow.pending_challenge_submissions || 0}</div>
+                                </Link>
+                                <Link href="/teacher/challenge-suggestions" className="rounded-xl border border-gray-200 bg-white p-3 hover:border-[#A3C042]/40">
+                                    <div className="text-gray-500">{t('teacherDashboardPage.workflow.challengeSuggestions')}</div>
+                                    <div className="font-bold text-gray-900">{workflow.pending_challenge_suggestions || 0}</div>
+                                </Link>
+                                <Link href="/teacher/publications" className="rounded-xl border border-gray-200 bg-white p-3 hover:border-[#A3C042]/40">
+                                    <div className="text-gray-500">{t('teacherDashboardPage.workflow.publications')}</div>
+                                    <div className="font-bold text-gray-900">{workflow.pending_publication_approvals || 0}</div>
+                                </Link>
+                                <Link href="/teacher/certificates" className="rounded-xl border border-gray-200 bg-white p-3 hover:border-[#A3C042]/40">
+                                    <div className="text-gray-500">{t('teacherDashboardPage.workflow.certificates')}</div>
+                                    <div className="font-bold text-gray-900">{workflow.pending_certificate_requests || 0}</div>
+                                </Link>
+                                <Link href="/notifications" className="rounded-xl border border-gray-200 bg-white p-3 hover:border-[#A3C042]/40">
+                                    <div className="text-gray-500">{t('teacherDashboardPage.workflow.rewardRequests')}</div>
+                                    <div className="font-bold text-gray-900">{workflow.pending_reward_requests || 0}</div>
+                                </Link>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
-                        <div className="flex items-center justify-between mb-4">
-                            <div>
-                                <p className="text-gray-500 text-sm font-medium mb-2">{t('common.projects')}</p>
-                                <p className="text-3xl font-bold text-gray-900">{projects.total || 0}</p>
-                            </div>
-                            <div className="p-3 bg-blue-50 rounded-2xl">
-                                <FaProjectDiagram className="text-2xl text-blue-600" />
-                            </div>
-                        </div>
-                        <div className="pt-3 border-t border-gray-100">
-                            <p className="text-sm text-gray-600">{t('teacherDashboardPage.approvedCount', { count: projects.approved || 0 })}</p>
-                        </div>
-                    </div>
 
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
-                        <div className="flex items-center justify-between mb-4">
-                            <div>
-                                <p className="text-gray-500 text-sm font-medium mb-2">{t('teacherDashboardPage.publications')}</p>
-                                <p className="text-3xl font-bold text-gray-900">{publications.total || 0}</p>
-                            </div>
-                            <div className="p-3 bg-green-50 rounded-2xl">
-                                <FaBook className="text-2xl text-green-600" />
-                            </div>
-                        </div>
-                        <div className="pt-3 border-t border-gray-100">
-                            <p className="text-sm text-gray-600">{t('teacherDashboardPage.publishedCount', { count: publications.approved || 0 })}</p>
-                        </div>
-                    </div>
-
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
-                        <div className="flex items-center justify-between mb-4">
-                            <div>
-                                <p className="text-gray-500 text-sm font-medium mb-2">{t('common.badges')}</p>
-                                <p className="text-3xl font-bold text-gray-900">{badges.total || 0}</p>
-                            </div>
-                            <div className="p-3 bg-orange-50 rounded-2xl">
-                                <FaAward className="text-2xl text-orange-600" />
-                            </div>
-                        </div>
-                        <div className="pt-3 border-t border-gray-100">
-                            <p className="text-sm text-gray-600">{t('teacherDashboardPage.achievements')}</p>
-                        </div>
-                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -369,13 +438,13 @@ export default function TeacherDashboard({ auth, teacher, stats, activationBanne
                             {recentProjects.length === 0 ? (
                                 <div className="text-center py-8">
                                     <FaProjectDiagram className="mx-auto text-4xl text-gray-300 mb-4" />
-                                <p className="text-gray-500 mb-4">{t('teacherDashboardPage.noRecentProjects')}</p>
-                                <Link
-                                    href="/teacher/projects/create"
-                                    className="inline-block text-blue-600 hover:text-blue-700 font-medium"
-                                >
-                                    {t('teacherDashboardPage.createProjectAction')}
-                                </Link>
+                                    <p className="text-gray-500 mb-4">{t('teacherDashboardPage.noRecentProjects')}</p>
+                                    <Link
+                                        href="/teacher/projects/create"
+                                        className="inline-block text-blue-600 hover:text-blue-700 font-medium"
+                                    >
+                                        {t('teacherDashboardPage.createProjectAction')}
+                                    </Link>
                                 </div>
                             ) : (
                                 <div className="space-y-3">

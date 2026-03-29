@@ -136,7 +136,43 @@ export default function StudentProjectCreate({ auth, projects = [], message, not
         });
     };
 
-    const ProjectUploadContent = () => (
+    const ProjectSelectionList = () => (
+        <div>
+            <label className="block text-sm font-bold text-gray-900 mb-2">{t('studentProjects.create.fields.selectProject')}</label>
+            <div className="space-y-2 max-h-64 overflow-y-auto rounded-xl border border-gray-100 p-2 bg-gray-50/60">
+                {projects.map((project) => {
+                    const isSelected = String(data.project_id) === String(project.id);
+                    return (
+                        <button
+                            key={project.id}
+                            type="button"
+                            disabled={uploadDisabled}
+                            onClick={() => setData('project_id', String(project.id))}
+                            className={`w-full p-3 rounded-xl border transition text-start ${
+                                isSelected
+                                    ? 'border-[#A3C042] bg-[#A3C042]/10'
+                                    : 'border-gray-200 bg-white hover:bg-gray-50'
+                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                        >
+                            <div className="text-sm font-semibold text-gray-900 line-clamp-1">
+                                {project.title || t('studentProjects.create.fields.projectOption', { id: project.id })}
+                            </div>
+                            {project.description && (
+                                <div className="text-xs text-gray-500 mt-1 line-clamp-2">
+                                    {project.description}
+                                </div>
+                            )}
+                        </button>
+                    );
+                })}
+            </div>
+            {errors.project_id && (
+                <p className="mt-1 text-xs text-red-500">{errors.project_id}</p>
+            )}
+        </div>
+    );
+
+    const ProjectUploadContent = ({ showProjectSelection = true } = {}) => (
         <form onSubmit={submit} className="space-y-4">
             {(noticeKey || message) && (
                 <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm text-amber-900">
@@ -151,28 +187,7 @@ export default function StudentProjectCreate({ auth, projects = [], message, not
             )}
 
             {/* Project Selection */}
-            {projects.length > 0 && (
-                <div>
-                    <label className="block text-sm font-bold text-gray-900 mb-2">{t('studentProjects.create.fields.selectProject')}</label>
-                    <select
-                        value={data.project_id}
-                        onChange={(e) => setData('project_id', e.target.value)}
-                        disabled={uploadDisabled}
-                        className="w-full h-12 px-4 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30 focus:border-[#A3C042] text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                        required
-                    >
-                        <option value="">{t('studentProjects.create.fields.selectProjectPlaceholder')}</option>
-                        {projects.map((project) => (
-                            <option key={project.id} value={project.id}>
-                                {project.title || t('studentProjects.create.fields.projectOption', { id: project.id })}
-                            </option>
-                        ))}
-                    </select>
-                    {errors.project_id && (
-                        <p className="mt-1 text-xs text-red-500">{errors.project_id}</p>
-                    )}
-                </div>
-            )}
+            {showProjectSelection && projects.length > 0 && <ProjectSelectionList />}
 
             {/* Comment */}
             <div>
@@ -294,19 +309,58 @@ export default function StudentProjectCreate({ auth, projects = [], message, not
     };
 
     const getFileUrl = (filePath) => {
-        if (filePath.startsWith('http')) return filePath;
+        if (!filePath) return '#';
+        if (typeof filePath === 'string' && filePath.startsWith('http')) return filePath;
+        if (typeof filePath === 'object') {
+            if (filePath.url) return filePath.url;
+            if (filePath.path) return filePath.path.startsWith('http') ? filePath.path : `/storage/${filePath.path}`;
+            return '#';
+        }
         return `/storage/${filePath}`;
     };
 
     const getFileIcon = (fileName) => {
-        const ext = fileName.split('.').pop()?.toLowerCase();
+        const ext = (fileName || '').split('.').pop()?.toLowerCase();
         if (ext === 'pdf') return <FaFilePdf className="text-red-500 text-xl" />;
         if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) return <FaImage className="text-blue-500 text-xl" />;
         return <FaFile className="text-gray-500 text-xl" />;
     };
 
+    const normalizeSubmissionFiles = (filesValue) => {
+        if (!filesValue) return [];
+        if (Array.isArray(filesValue)) return filesValue;
+
+        if (typeof filesValue === 'string') {
+            try {
+                const parsed = JSON.parse(filesValue);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch {
+                return filesValue.trim() ? [filesValue] : [];
+            }
+        }
+
+        if (typeof filesValue === 'object') {
+            return [filesValue];
+        }
+
+        return [];
+    };
+
+    const getSubmissionFileName = (file) => {
+        if (!file) return t('studentProjects.evaluation.unnamedProject');
+        if (typeof file === 'string') return file.split('/').pop() || file;
+        if (typeof file === 'object') {
+            if (file.name) return file.name;
+            if (file.filename) return file.filename;
+            if (file.path) return file.path.split('/').pop() || file.path;
+            if (file.url) return file.url.split('/').pop() || file.url;
+        }
+        return String(file);
+    };
+
     const EvaluationContent = () => {
         const currentSubmission = selectedSubmission || (submissions.length > 0 ? submissions[0] : null);
+        const submissionFiles = normalizeSubmissionFiles(currentSubmission?.files);
 
         if (submissions.length === 0) {
             return (
@@ -350,12 +404,12 @@ export default function StudentProjectCreate({ auth, projects = [], message, not
                         </div>
 
                         {/* Attached Files */}
-                        {currentSubmission.files && currentSubmission.files.length > 0 && (
+                        {submissionFiles.length > 0 && (
                             <div className="mt-4">
                                 <div className="text-sm font-bold text-gray-900 mb-2">{t('studentProjects.evaluation.attachedFiles')}</div>
                                 <div className="space-y-2">
-                                    {currentSubmission.files.map((file, index) => {
-                                        const fileName = typeof file === 'string' ? file.split('/').pop() : file;
+                                    {submissionFiles.map((file, index) => {
+                                        const fileName = getSubmissionFileName(file);
                                         return (
                                             <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
                                                 {getFileIcon(fileName)}
@@ -486,7 +540,7 @@ export default function StudentProjectCreate({ auth, projects = [], message, not
                     {/* Content */}
                     <div className="bg-white rounded-2xl border border-gray-100 p-4">
                         {activeTab === 'upload' ? (
-                            ProjectUploadContent()
+                            ProjectUploadContent({ showProjectSelection: true })
                         ) : (
                             EvaluationContent()
                         )}
@@ -537,41 +591,47 @@ export default function StudentProjectCreate({ auth, projects = [], message, not
                             {/* Content */}
                             <div className="bg-white rounded-2xl border border-gray-100 p-6">
                                 {activeTab === 'upload' ? (
-                                    ProjectUploadContent()
+                                    ProjectUploadContent({ showProjectSelection: false })
                                 ) : (
                                     EvaluationContent()
                                 )}
                             </div>
                         </div>
 
-                        {/* Right Column - Submitted Projects List (for evaluation tab) */}
-                        {activeTab === 'evaluation' && submissions.length > 0 && (
+                        {/* Right Column - Context Lists (evaluation/upload) */}
+                        {((activeTab === 'evaluation' && submissions.length > 0) || (activeTab === 'upload' && projects.length > 0)) && (
                             <div className="lg:col-span-4">
                                 <div className="bg-white rounded-2xl border border-gray-100 p-4 sticky top-24">
-                                    <div className="text-sm font-bold text-gray-900 mb-3">{t('studentProjects.evaluation.submittedList')}</div>
-                                    <div className="space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto">
-                                        {submissions.map((sub) => {
-                                            const currentSubmission = selectedSubmission || (submissions.length > 0 ? submissions[0] : null);
-                                            return (
-                                                <button
-                                                    key={sub.id}
-                                                    type="button"
-                                                    onClick={() => setSelectedSubmission(sub)}
-                                                    className={`w-full  p-3 rounded-xl border transition ${currentSubmission?.id === sub.id
-                                                        ? 'border-blue-500 bg-blue-50'
-                                                        : 'border-gray-100 bg-white hover:bg-gray-50'
-                                                        }`}
-                                                >
-                                                    <div className="text-sm font-semibold text-gray-900 line-clamp-1">
-                                                        {sub.project?.title || t('studentProjects.evaluation.unnamedProject')}
-                                                    </div>
-                                                    <div className="text-xs text-gray-500 mt-1">
-                                                        {formatDate(sub.submitted_at)}
-                                                    </div>
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
+                                    {activeTab === 'upload' ? (
+                                        <ProjectSelectionList />
+                                    ) : (
+                                        <>
+                                            <div className="text-sm font-bold text-gray-900 mb-3">{t('studentProjects.evaluation.submittedList')}</div>
+                                            <div className="space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto">
+                                                {submissions.map((sub) => {
+                                                    const currentSubmission = selectedSubmission || (submissions.length > 0 ? submissions[0] : null);
+                                                    return (
+                                                        <button
+                                                            key={sub.id}
+                                                            type="button"
+                                                            onClick={() => setSelectedSubmission(sub)}
+                                                            className={`w-full  p-3 rounded-xl border transition ${currentSubmission?.id === sub.id
+                                                                ? 'border-blue-500 bg-blue-50'
+                                                                : 'border-gray-100 bg-white hover:bg-gray-50'
+                                                                }`}
+                                                        >
+                                                            <div className="text-sm font-semibold text-gray-900 line-clamp-1">
+                                                                {sub.project?.title || t('studentProjects.evaluation.unnamedProject')}
+                                                            </div>
+                                                            <div className="text-xs text-gray-500 mt-1">
+                                                                {formatDate(sub.submitted_at)}
+                                                            </div>
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         )}

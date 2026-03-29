@@ -1,7 +1,7 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
-import { FaSearch, FaFilter, FaEye, FaCreditCard, FaCalendar, FaDollarSign, FaUsers, FaCheckCircle, FaTimesCircle, FaClock, FaExclamationCircle } from 'react-icons/fa';
+import { FaSearch, FaFilter, FaEye, FaCreditCard, FaUsers, FaCheckCircle, FaTimesCircle, FaClock, FaExclamationCircle } from 'react-icons/fa';
 import { useTranslation } from '@/i18n';
 
 export default function AdminSubscriptionsIndex({
@@ -9,7 +9,6 @@ export default function AdminSubscriptionsIndex({
     payments,
     subscriptionStats,
     paymentStats,
-    totalStats,
     filters
 }) {
     const { t, language } = useTranslation();
@@ -71,10 +70,22 @@ export default function AdminSubscriptionsIndex({
     };
 
     const formatCurrency = (amount, currency = 'AED') => {
-        return new Intl.NumberFormat('ar-AE', {
+        return new Intl.NumberFormat(language === 'ar' ? 'ar-AE' : 'en-US', {
             style: 'currency',
             currency: currency,
         }).format(amount);
+    };
+
+    const paymentMethodLabels = {
+        credit_card: t('adminSubscriptionsIndexPage.paymentMethods.creditCard'),
+        debit_card: t('adminSubscriptionsIndexPage.paymentMethods.debitCard'),
+        bank_transfer: t('adminSubscriptionsIndexPage.paymentMethods.bankTransfer'),
+        cash: t('adminSubscriptionsIndexPage.paymentMethods.cash'),
+        stripe: t('adminPaymentsPage.methods.stripe'),
+        paypal: t('adminPaymentsPage.methods.paypal'),
+        mada: t('adminPaymentsPage.methods.mada'),
+        ziina: t('adminPaymentsPage.methods.ziina'),
+        tamara: t('adminPaymentsPage.methods.tamara'),
     };
 
     return (
@@ -255,7 +266,7 @@ export default function AdminSubscriptionsIndex({
                     <div className="flex items-end">
                         <button
                             onClick={handleFilter}
-                            className="w-full bg-[#A3C042] hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
+                            className="w-full bg-[#A3C042] hover:bg-[#8CA635] text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
                         >
                             <FaFilter />
                             {t('common.filter')}
@@ -355,7 +366,9 @@ export default function AdminSubscriptionsIndex({
                                                 </span>
                                             </td>
                                             <td className="py-4 px-6">{getPaymentStatusBadge(payment.status)}</td>
-                                            <td className="py-4 px-6 text-sm text-gray-700">{payment.payment_method}</td>
+                                            <td className="py-4 px-6 text-sm text-gray-700">
+                                                {paymentMethodLabels[payment.payment_method] || payment.payment_method || t('common.notAvailable')}
+                                            </td>
                                             <td className="py-4 px-6 text-sm text-gray-700">{payment.transaction_id}</td>
                                             <td className="py-4 px-6 text-sm text-gray-700">
                                                 {payment.paid_at || payment.created_at}

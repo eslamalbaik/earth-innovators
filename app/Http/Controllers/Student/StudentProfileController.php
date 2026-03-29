@@ -88,11 +88,13 @@ class StudentProfileController extends Controller
 
         // Get activities
         $activities = $this->activityService->getStudentActivities($user->id, 5)
-            ->map(function ($activity) {
+            ->values()
+            ->map(function ($activity, $index) {
                 return [
-                    'id' => uniqid(),
-                    'text' => $activity['action'],
-                    'time' => $activity['timeAgo'],
+                    'id' => 'activity-' . $index . '-' . md5(($activity['occurred_at'] ?? '') . ($activity['title'] ?? '')),
+                    'kind' => $activity['kind'],
+                    'title' => $activity['title'],
+                    'occurred_at' => $activity['occurred_at'],
                     'color' => $activity['color'] ?? 'blue',
                 ];
             });

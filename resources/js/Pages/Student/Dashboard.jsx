@@ -2,64 +2,50 @@ import { Head, router } from '@inertiajs/react';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import StudentCommunityScoreCard from '@/Pages/Student/Home/StudentCommunityScoreCard';
-import StudentCurrentChallengeSection from '@/Pages/Student/Home/StudentCurrentChallengeSection';
-import StudentLatestProjectsSection from '@/Pages/Student/Home/StudentLatestProjectsSection';
-import StudentSuggestChallengeCard from '@/Pages/Student/Home/StudentSuggestChallengeCard';
 import StudentWelcomeCard from '@/Pages/Student/Home/StudentWelcomeCard';
+import StudentDashboardOverview from '@/Pages/Student/Dashboard/StudentDashboardOverview';
 import { useTranslation } from '@/i18n';
 
-export default function StudentDashboard({ auth, stats = {}, communityScorePercent = 0 }) {
+export default function StudentDashboard({ auth, stats = {}, communityScorePercent = 0, engagement = null }) {
     const user = auth?.user;
     const { t, language } = useTranslation();
 
     return (
         <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
-            <Head title={t('homePage.pageTitle')} />
+            <Head title={t('studentDashboardPage.pageTitle', { appName: t('common.appName') })} />
 
             <MobileTopBar
-                title={t('common.home')}
+                title={t('studentDashboardPage.topBarTitle')}
                 unreadCount={stats.unreadCount || 0}
                 onNotifications={() => router.visit('/notifications')}
                 onBack={() => router.visit('/')}
                 reverseOrder={false}
             />
 
-            <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-4">
-                <div className="mx-auto w-full max-w-4xl">
-                    <div className="space-y-4 lg:grid lg:grid-cols-12 lg:gap-6 lg:space-y-0">
-                        <div className="space-y-4 lg:col-span-5">
+            <main className="mx-auto w-full max-w-5xl px-3 pb-24 pt-5 sm:px-4 lg:px-6">
+                <div className="space-y-6">
+                    <section className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-6" aria-label={t('studentDashboardPage.sections.hero')}>
+                        <div className="lg:col-span-8">
                             <StudentWelcomeCard
                                 userName={user?.name}
                                 onUploadProject={() => router.visit('/student/projects/create')}
                             />
+                        </div>
+                        <div className="h-fit lg:sticky lg:top-24 lg:col-span-4">
                             <StudentCommunityScoreCard
                                 percent={communityScorePercent || 0}
                                 points={stats.totalPoints || 0}
                             />
                         </div>
+                    </section>
 
-                        <div className="space-y-4 lg:col-span-7">
-                            <StudentLatestProjectsSection
-                                projects={stats.recentProjects || []}
-                                onViewAll={() => router.visit('/student/projects')}
-                                onOpenProject={(projectId) => router.visit(`/student/projects/${projectId}`)}
-                            />
-
-                            <StudentCurrentChallengeSection
-                                challenges={stats.activeChallenges || []}
-                                onViewAll={() => router.visit('/student/challenges')}
-                                onJoin={(challengeId) => router.visit(`/student/challenges/${challengeId}`)}
-                            />
-
-                            <StudentSuggestChallengeCard
-                                onSuggest={() => router.visit('/student/challenges')}
-                            />
-                        </div>
-                    </div>
+                    <section aria-label={t('studentDashboardPage.sections.overview')}>
+                        <StudentDashboardOverview stats={stats} engagement={engagement} />
+                    </section>
                 </div>
             </main>
 
             <MobileBottomNav active="home" role={user?.role} isAuthed={!!user} user={user} />
-                </div>
+        </div>
     );
 }

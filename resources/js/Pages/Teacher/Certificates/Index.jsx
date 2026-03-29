@@ -92,6 +92,15 @@ export default function TeacherCertificatesIndex({
     const openRequestModal = (recipient, defaultType = 'achievement') => {
         if (!recipient) return;
 
+        if (!school) {
+            showError(t('teacherCertificatesIndexPage.toasts.noSchool'));
+            return;
+        }
+        if (!membershipSummary?.certificate_access) {
+            showError(t('teacherCertificatesIndexPage.toasts.certificateAccessDenied'));
+            return;
+        }
+
         setSelectedRecipient(recipient);
         setCertificateType(defaultType);
         setFormData({

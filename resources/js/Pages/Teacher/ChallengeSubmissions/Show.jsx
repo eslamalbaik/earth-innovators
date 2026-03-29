@@ -1,4 +1,4 @@
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage, router } from '@inertiajs/react';
 import DashboardLayout from '../../../Layouts/DashboardLayout';
 import { useState, useEffect } from 'react';
 import {
@@ -20,12 +20,14 @@ import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
 import PrimaryButton from '../../../Components/PrimaryButton';
 import { useBackIcon, useTranslation } from '@/i18n';
+import { useToast } from '@/Contexts/ToastContext';
 import { toHijriDate } from '@/utils/dateUtils';
 import resolveLocalizedMessage from '@/utils/resolveLocalizedMessage';
 
 export default function TeacherChallengeSubmissionShow({ auth, submission, availableBadges }) {
     const { flash } = usePage().props;
     const { t, language } = useTranslation();
+    const { showSuccess, showError } = useToast();
     const BackIcon = useBackIcon();
     const initialBadges = Array.isArray(submission.badges)
         ? submission.badges.map((badge) => (typeof badge === 'object' ? badge.id : badge))
@@ -61,7 +63,14 @@ export default function TeacherChallengeSubmissionShow({ auth, submission, avail
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(`/teacher/challenge-submissions/${submission.id}/evaluate`);
+        post(`/teacher/challenge-submissions/${submission.id}/evaluate`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                showSuccess(t('teacherChallengeSubmissionShowPage.toasts.statusUpdated'));
+                router.reload({ only: ['submission'] });
+            },
+            onError: () => showError(t('teacherChallengeSubmissionShowPage.toasts.statusUpdateFailed')),
+        });
     };
 
     useEffect(() => {

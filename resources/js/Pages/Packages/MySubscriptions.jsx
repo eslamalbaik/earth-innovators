@@ -11,33 +11,35 @@ import {
     FaCreditCard,
     FaBox,
     FaSpinner,
-    FaTrash
+    FaTrash,
 } from 'react-icons/fa';
 import { useToast } from '@/Contexts/ToastContext';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 import { toHijriDate } from '@/utils/dateUtils';
+import { useTranslation } from '@/i18n';
 
 export default function MySubscriptions({ auth, subscriptions = [] }) {
+    const { t, language } = useTranslation();
     const { showSuccess, showError } = useToast();
     const { confirm } = useConfirmDialog();
     const [cancellingId, setCancellingId] = useState(null);
 
     const getStatusBadge = (status) => {
         const badges = {
-            active: { bg: 'bg-green-100', text: 'text-green-700', label: 'نشط', icon: FaCheckCircle },
-            pending: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'قيد المعالجة', icon: FaClock },
-            expired: { bg: 'bg-red-100', text: 'text-red-700', label: 'منتهي', icon: FaTimesCircle },
-            cancelled: { bg: 'bg-gray-100', text: 'text-gray-700', label: 'ملغى', icon: FaTimesCircle },
+            active: { bg: 'bg-green-100', text: 'text-green-700', label: t('mySubscriptionsPage.status.active'), icon: FaCheckCircle },
+            pending: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: t('mySubscriptionsPage.status.pending'), icon: FaClock },
+            expired: { bg: 'bg-red-100', text: 'text-red-700', label: t('mySubscriptionsPage.status.expired'), icon: FaTimesCircle },
+            cancelled: { bg: 'bg-gray-100', text: 'text-gray-700', label: t('mySubscriptionsPage.status.cancelled'), icon: FaTimesCircle },
         };
         return badges[status] || badges.cancelled;
     };
 
     const handleCancelSubscription = async (subscriptionId) => {
         const confirmed = await confirm({
-            title: 'تأكيد الإلغاء',
-            message: 'هل أنت متأكد من إلغاء هذا الاشتراك؟ لن تتمكن من استخدام ميزات الباقة بعد الإلغاء.',
-            confirmText: 'إلغاء الاشتراك',
-            cancelText: 'تراجع',
+            title: t('mySubscriptionsPage.confirm.cancelTitle'),
+            message: t('mySubscriptionsPage.confirm.cancelMessage'),
+            confirmText: t('mySubscriptionsPage.actions.cancelSubscription'),
+            cancelText: t('common.cancel'),
             variant: 'danger',
         });
 
@@ -48,32 +50,28 @@ export default function MySubscriptions({ auth, subscriptions = [] }) {
             router.post(`/packages/subscriptions/${subscriptionId}/cancel`, {}, {
                 preserveScroll: true,
                 onSuccess: () => {
-                    showSuccess('تم إلغاء الاشتراك بنجاح');
+                    showSuccess(t('mySubscriptionsPage.toasts.cancelSuccess'));
                     setCancellingId(null);
                 },
                 onError: (errors) => {
                     setCancellingId(null);
-                    const errorMessage = errors.error || Object.values(errors)[0] || 'حدث خطأ أثناء إلغاء الاشتراك';
+                    const errorMessage = errors.error || Object.values(errors)[0] || t('mySubscriptionsPage.toasts.cancelError');
                     showError(Array.isArray(errorMessage) ? errorMessage[0] : errorMessage);
                 },
             });
         } catch (error) {
             setCancellingId(null);
-            showError('حدث خطأ أثناء إلغاء الاشتراك');
+            showError(t('mySubscriptionsPage.toasts.cancelError'));
         }
     };
 
     const SubscriptionsContent = () => (
         <div className="space-y-4">
-            {/* Header */}
             <div className="mb-4">
-                <h1 className="text-lg font-extrabold text-gray-900 mb-2">اشتراكاتي</h1>
-                <p className="text-sm text-gray-600">
-                    عرض وإدارة جميع اشتراكاتك في الباقات
-                </p>
+                <h1 className="text-lg font-extrabold text-gray-900 mb-2">{t('mySubscriptionsPage.title')}</h1>
+                <p className="text-sm text-gray-600">{t('mySubscriptionsPage.subtitle')}</p>
             </div>
 
-            {/* Subscriptions List */}
             {subscriptions.length > 0 ? (
                 <div className="space-y-4">
                     {subscriptions.map((subscription) => {
@@ -85,26 +83,26 @@ export default function MySubscriptions({ auth, subscriptions = [] }) {
                         return (
                             <div
                                 key={subscription.id}
-                                className={`bg-white rounded-2xl border-2 p-4 ${isActive ? 'border-green-300 bg-green-50' : 'border-gray-200'
-                                    }`}
+                                className={`bg-white rounded-2xl border-2 p-4 ${isActive ? 'border-green-300 bg-green-50' : 'border-gray-200'}`}
                             >
-                                {/* Package Info */}
                                 <div className="flex items-start justify-between mb-3">
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2 mb-2">
                                             <FaBox className="text-gray-400 text-sm" />
                                             <h3 className="text-sm font-bold text-gray-900">
-                                                {subscription.package?.name_ar || subscription.package?.name}
+                                                {language === 'ar'
+                                                    ? (subscription.package?.name_ar || subscription.package?.name || t('common.notAvailable'))
+                                                    : (subscription.package?.name || subscription.package?.name_ar || t('common.notAvailable'))}
                                             </h3>
                                         </div>
                                         <div className="flex items-center gap-4 text-xs text-gray-600 mb-2">
                                             <div className="flex items-center gap-1">
                                                 <FaCalendar className="text-gray-400" />
-                                                <span>من: {toHijriDate(subscription.start_date)}</span>
+                                                <span>{t('mySubscriptionsPage.labels.from')}: {toHijriDate(subscription.start_date)}</span>
                                             </div>
                                             <div className="flex items-center gap-1">
                                                 <FaCalendar className="text-gray-400" />
-                                                <span>إلى: {toHijriDate(subscription.end_date)}</span>
+                                                <span>{t('mySubscriptionsPage.labels.to')}: {toHijriDate(subscription.end_date)}</span>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-4 text-xs text-gray-600">
@@ -114,7 +112,7 @@ export default function MySubscriptions({ auth, subscriptions = [] }) {
                                             </div>
                                             {subscription.transaction_id && (
                                                 <span className="text-gray-500">
-                                                    رقم المعاملة: {subscription.transaction_id}
+                                                    {t('mySubscriptionsPage.labels.transactionId')}: {subscription.transaction_id}
                                                 </span>
                                             )}
                                         </div>
@@ -125,7 +123,6 @@ export default function MySubscriptions({ auth, subscriptions = [] }) {
                                     </span>
                                 </div>
 
-                                {/* Actions */}
                                 {isActive && (
                                     <div className="pt-3 border-t border-gray-200">
                                         <button
@@ -136,12 +133,12 @@ export default function MySubscriptions({ auth, subscriptions = [] }) {
                                             {isCancelling ? (
                                                 <>
                                                     <FaSpinner className="animate-spin" />
-                                                    جاري الإلغاء...
+                                                    {t('mySubscriptionsPage.actions.cancelling')}
                                                 </>
                                             ) : (
                                                 <>
                                                     <FaTrash />
-                                                    إلغاء الاشتراك
+                                                    {t('mySubscriptionsPage.actions.cancelSubscription')}
                                                 </>
                                             )}
                                         </button>
@@ -154,37 +151,35 @@ export default function MySubscriptions({ auth, subscriptions = [] }) {
             ) : (
                 <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
                     <FaBox className="mx-auto text-4xl text-gray-300 mb-3" />
-                    <p className="text-sm text-gray-500 mb-4">لا توجد اشتراكات حالياً</p>
+                    <p className="text-sm text-gray-500 mb-4">{t('mySubscriptionsPage.empty')}</p>
                     <button
                         onClick={() => router.visit('/packages')}
                         className="px-4 py-2 bg-[#A3C042] text-white rounded-xl hover:bg-[#8CA635] transition text-sm font-semibold"
                     >
-                        تصفح الباقات
+                        {t('mySubscriptionsPage.actions.browsePackages')}
                     </button>
                 </div>
             )}
 
-            {/* Back to Packages */}
             <div className="pt-4">
                 <button
                     onClick={() => router.visit('/packages')}
                     className="w-full px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition text-sm font-semibold"
                 >
-                    ← العودة إلى الباقات
+                    {t('mySubscriptionsPage.actions.backToPackages')}
                 </button>
             </div>
         </div>
     );
 
     return (
-        <div dir="rtl" className="min-h-screen bg-gray-50">
-            <Head title="اشتراكاتي - إرث المبتكرين" />
+        <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
+            <Head title={t('mySubscriptionsPage.pageTitle', { appName: t('common.appName') })} />
 
-            {/* Mobile View */}
             <div className="block md:hidden">
                 <MobileAppLayout
                     auth={auth}
-                    title="اشتراكاتي"
+                    title={t('mySubscriptionsPage.title')}
                     activeNav="packages"
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
@@ -194,10 +189,9 @@ export default function MySubscriptions({ auth, subscriptions = [] }) {
                 </MobileAppLayout>
             </div>
 
-            {/* Desktop View */}
             <div className="hidden md:block">
                 <MobileTopBar
-                    title="اشتراكاتي"
+                    title={t('mySubscriptionsPage.title')}
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
                     onBack={() => router.visit('/packages')}

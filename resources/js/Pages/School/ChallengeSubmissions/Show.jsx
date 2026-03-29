@@ -1,4 +1,4 @@
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage, router } from '@inertiajs/react';
 import DashboardLayout from '../../../Layouts/DashboardLayout';
 import { useState, useEffect } from 'react';
 import {
@@ -21,11 +21,13 @@ import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
 import PrimaryButton from '../../../Components/PrimaryButton';
 import { useTranslation } from '@/i18n';
+import { useToast } from '@/Contexts/ToastContext';
 import resolveLocalizedMessage from '@/utils/resolveLocalizedMessage';
 
 export default function SchoolChallengeSubmissionShow({ auth, submission, availableBadges }) {
     const { t, language } = useTranslation();
     const { flash } = usePage().props;
+    const { showSuccess, showError } = useToast();
     const [rating, setRating] = useState(submission.rating || 0);
     const [hoveredRating, setHoveredRating] = useState(0);
     const [selectedBadges, setSelectedBadges] = useState(submission.badges || []);
@@ -56,9 +58,12 @@ export default function SchoolChallengeSubmissionShow({ auth, submission, availa
     const handleSubmit = (e) => {
         e.preventDefault();
         post(`/school/challenge-submissions/${submission.id}/evaluate`, {
+            preserveScroll: true,
             onSuccess: () => {
-                // Toast will be shown on redirect page
+                showSuccess(t('schoolChallengeSubmissionShowPage.toasts.statusUpdated'));
+                router.reload({ only: ['submission'] });
             },
+            onError: () => showError(t('schoolChallengeSubmissionShowPage.toasts.statusUpdateFailed')),
         });
     };
 

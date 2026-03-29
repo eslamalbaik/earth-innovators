@@ -25,6 +25,8 @@ const languageSlice = createSlice({
                 localStorage.setItem('language', language);
                 document.documentElement.dir = state.dir;
                 document.documentElement.lang = language;
+                // Laravel SetLocale middleware reads this cookie for trans() / __() on the server
+                document.cookie = `locale=${language};path=/;max-age=31536000;SameSite=Lax`;
             }
         },
     },

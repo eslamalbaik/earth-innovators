@@ -1,83 +1,104 @@
 import { Head, router } from '@inertiajs/react';
+import { useMemo } from 'react';
 import { FaTrophy, FaHeart, FaBug, FaRocket, FaBrain, FaCheckCircle, FaLock, FaMedal, FaStar, FaAward, FaChartLine } from 'react-icons/fa';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import { useTranslation } from '@/i18n';
 
-export default function Achievements({ auth, user, badges = [], points = 0, recentAchievements = [] }) {
+const LEFT_ICON_MAP = {
+    heart: FaHeart,
+    bug: FaBug,
+    rocket: FaRocket,
+    brain: FaBrain,
+};
+
+export default function Achievements({ auth, user, badges = [], points = 0, recentAchievements = [], learnerLevels: learnerLevelsFromServer = [], pointsDistribution: pointsDistributionFromServer = [] }) {
     const { t, language } = useTranslation();
     const isArabic = language === 'ar';
     const totalPoints = user?.points || points || 0;
 
-    const learnerLevels = [
-        {
-            title: t('achievementsPage.levels.communityPioneer.title'),
-            points: t('achievementsPage.levels.communityPioneer.points'),
-            gradient: 'from-pink-500 to-green-500',
-            leftIcon: FaHeart,
-            rightIcon: '❤️',
-        },
-        {
-            title: t('achievementsPage.levels.inspiringInProgress.title'),
-            points: t('achievementsPage.levels.inspiringInProgress.points'),
-            gradient: 'from-green-500 to-purple-500',
-            leftIcon: FaBug,
-            rightIcon: '🧭',
-        },
-        {
-            title: t('achievementsPage.levels.creativeChangeMaker.title'),
-            points: t('achievementsPage.levels.creativeChangeMaker.points'),
-            gradient: 'from-yellow-500 to-blue-500',
-            leftIcon: FaRocket,
-            rightIcon: '🚀',
-        },
-        {
-            title: t('achievementsPage.levels.creativeLeader.title'),
-            points: t('achievementsPage.levels.creativeLeader.points'),
-            gradient: 'from-purple-500 to-purple-700',
-            leftIcon: FaBrain,
-            rightIcon: '🧠',
-        },
-    ];
+    const learnerLevels = useMemo(() => {
+        if (learnerLevelsFromServer?.length) {
+            return learnerLevelsFromServer.map((level) => ({
+                ...level,
+                leftIcon: LEFT_ICON_MAP[level.leftIconKey] || FaStar,
+            }));
+        }
+        return [
+            {
+                title: t('achievementsPage.levels.communityPioneer.title'),
+                points: t('achievementsPage.levels.communityPioneer.points'),
+                gradient: 'from-pink-500 to-green-500',
+                leftIcon: FaHeart,
+                rightIcon: '❤️',
+            },
+            {
+                title: t('achievementsPage.levels.inspiringInProgress.title'),
+                points: t('achievementsPage.levels.inspiringInProgress.points'),
+                gradient: 'from-green-500 to-purple-500',
+                leftIcon: FaBug,
+                rightIcon: '🧭',
+            },
+            {
+                title: t('achievementsPage.levels.creativeChangeMaker.title'),
+                points: t('achievementsPage.levels.creativeChangeMaker.points'),
+                gradient: 'from-yellow-500 to-blue-500',
+                leftIcon: FaRocket,
+                rightIcon: '🚀',
+            },
+            {
+                title: t('achievementsPage.levels.creativeLeader.title'),
+                points: t('achievementsPage.levels.creativeLeader.points'),
+                gradient: 'from-purple-500 to-purple-700',
+                leftIcon: FaBrain,
+                rightIcon: '🧠',
+            },
+        ];
+    }, [learnerLevelsFromServer, t]);
 
-    const pointsDistribution = [
-        {
-            type: t('achievementsPage.pointsDistribution.simpleParticipation'),
-            icon: '✏️',
-            points: t('achievementsPage.pointsDistribution.simpleParticipationPoints'),
-            multiplier: t('achievementsPage.pointsDistribution.multiplier', { count: 10 }),
-            total: t('achievementsPage.pointsDistribution.total', { total: 20 }),
-            color: 'bg-green-100',
-            iconBg: 'bg-green-100'
-        },
-        {
-            type: t('achievementsPage.pointsDistribution.moderateTask'),
-            icon: '🔧',
-            points: t('achievementsPage.pointsDistribution.moderateTaskPoints'),
-            multiplier: t('achievementsPage.pointsDistribution.multiplier', { count: 8 }),
-            total: t('achievementsPage.pointsDistribution.total', { total: 48 }),
-            color: 'bg-blue-100',
-            iconBg: 'bg-blue-100'
-        },
-        {
-            type: t('achievementsPage.pointsDistribution.communityInitiative'),
-            icon: '▼',
-            points: t('achievementsPage.pointsDistribution.communityInitiativePoints'),
-            multiplier: t('achievementsPage.pointsDistribution.multiplier', { count: 5 }),
-            total: t('achievementsPage.pointsDistribution.total', { total: 40 }),
-            color: 'bg-purple-100',
-            iconBg: 'bg-purple-100'
-        },
-        {
-            type: t('achievementsPage.pointsDistribution.impactfulProject'),
-            icon: '🚀',
-            points: t('achievementsPage.pointsDistribution.impactfulProjectPoints'),
-            multiplier: t('achievementsPage.pointsDistribution.multiplier', { count: 3 }),
-            total: t('achievementsPage.pointsDistribution.total', { total: 30 }),
-            color: 'bg-orange-100',
-            iconBg: 'bg-orange-100'
-        },
-    ];
+    const pointsDistribution = useMemo(() => {
+        if (pointsDistributionFromServer?.length) {
+            return pointsDistributionFromServer;
+        }
+        return [
+            {
+                type: t('achievementsPage.pointsDistribution.simpleParticipation'),
+                icon: '✏️',
+                points: t('achievementsPage.pointsDistribution.simpleParticipationPoints'),
+                multiplier: t('achievementsPage.pointsDistribution.multiplier', { count: 10 }),
+                total: t('achievementsPage.pointsDistribution.total', { total: 20 }),
+                color: 'bg-green-100',
+                iconBg: 'bg-green-100',
+            },
+            {
+                type: t('achievementsPage.pointsDistribution.moderateTask'),
+                icon: '🔧',
+                points: t('achievementsPage.pointsDistribution.moderateTaskPoints'),
+                multiplier: t('achievementsPage.pointsDistribution.multiplier', { count: 8 }),
+                total: t('achievementsPage.pointsDistribution.total', { total: 48 }),
+                color: 'bg-blue-100',
+                iconBg: 'bg-blue-100',
+            },
+            {
+                type: t('achievementsPage.pointsDistribution.communityInitiative'),
+                icon: '▼',
+                points: t('achievementsPage.pointsDistribution.communityInitiativePoints'),
+                multiplier: t('achievementsPage.pointsDistribution.multiplier', { count: 5 }),
+                total: t('achievementsPage.pointsDistribution.total', { total: 40 }),
+                color: 'bg-purple-100',
+                iconBg: 'bg-purple-100',
+            },
+            {
+                type: t('achievementsPage.pointsDistribution.impactfulProject'),
+                icon: '🚀',
+                points: t('achievementsPage.pointsDistribution.impactfulProjectPoints'),
+                multiplier: t('achievementsPage.pointsDistribution.multiplier', { count: 3 }),
+                total: t('achievementsPage.pointsDistribution.total', { total: 30 }),
+                color: 'bg-orange-100',
+                iconBg: 'bg-orange-100',
+            },
+        ];
+    }, [pointsDistributionFromServer, t]);
 
     const allBadges = badges.length > 0 ? badges.map((badge, index) => ({
         id: badge.id || index + 1,

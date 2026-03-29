@@ -1,3 +1,4 @@
+import { router } from '@inertiajs/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setLanguage } from '../store/slices/languageSlice';
 import { useTranslation } from '@/i18n';
@@ -11,6 +12,8 @@ export default function LanguageSwitcher({ showText = false }) {
     const handleLanguageChange = () => {
         const newLanguage = isArabic ? 'en' : 'ar';
         dispatch(setLanguage(newLanguage));
+        // Reload so Laravel trans() / Inertia props match the new locale (cookie set in setLanguage)
+        router.reload({ preserveScroll: true });
     };
 
     return (

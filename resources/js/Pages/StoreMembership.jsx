@@ -1,69 +1,30 @@
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
+import axios from 'axios';
 import { FaGift, FaCheckCircle, FaTimes, FaClock, FaPaperPlane, FaCalendar } from 'react-icons/fa';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import { useToast } from '@/Contexts/ToastContext';
 import { useTranslation } from '@/i18n';
 
-export default function StoreMembership({ auth, user, currentBalance = 1190, redeemableItems = [] }) {
+export default function StoreMembership({ auth, user, currentBalance = 0, redeemableItems = [] }) {
     const { showSuccess, showError } = useToast();
     const { t, language } = useTranslation();
     const [selectedItem, setSelectedItem] = useState(null);
+    const [submitting, setSubmitting] = useState(false);
 
-    const defaultItems = [
-        {
-            id: 1,
-            name: t('storeMembershipPage.items.digitalCard.name'),
-            icon: '🃏',
-            points: 1000,
-            status: 'available',
-            statusText: '',
-        },
-        {
-            id: 2,
-            name: t('storeMembershipPage.items.creativeTools.name'),
-            icon: '🎨',
-            points: 1500,
-            status: 'insufficient',
-            statusText: t('storeMembershipPage.itemStatuses.almostThere'),
-        },
-        {
-            id: 3,
-            name: t('storeMembershipPage.items.snackVoucher.name'),
-            icon: '🍕',
-            points: 800,
-            status: 'available',
-            statusText: '',
-        },
-        {
-            id: 4,
-            name: t('storeMembershipPage.items.workshopAccess.name'),
-            icon: '🎫',
-            points: 1200,
-            status: 'pending',
-            statusText: t('storeMembershipPage.itemStatuses.bookNow'),
-        },
-        {
-            id: 5,
-            name: t('storeMembershipPage.items.smartBox.name'),
-            icon: '🎁',
-            points: 900,
-            status: 'ready',
-            statusText: t('storeMembershipPage.itemStatuses.readyForTransfer'),
-        },
-    ];
+    const items = Array.isArray(redeemableItems) ? redeemableItems : [];
+    const balance = user?.points ?? currentBalance ?? 0;
+    const selected = items.find((i) => i.id === selectedItem);
+    const manualHint = selected?.requires_manual_approval;
 
-    const items = redeemableItems.length > 0 ? redeemableItems : defaultItems;
-    const balance = user?.points || currentBalance;
-
-    const handleRedeem = () => {
+    const handleRedeem = async () => {
         if (!selectedItem) {
             showError(t('storeMembershipPage.messages.selectGiftFirst'));
             return;
         }
 
-        const item = items.find(i => i.id === selectedItem);
+        const item = items.find((i) => i.id === selectedItem);
         if (!item) return;
 
         if (item.status === 'insufficient') {
@@ -76,9 +37,32 @@ export default function StoreMembership({ auth, user, currentBalance = 1190, red
             return;
         }
 
-        showSuccess(t('storeMembershipPage.messages.redeemSuccess', { points: item.points }));
-        setSelectedItem(null);
-        router.reload();
+        setSubmitting(true);
+        try {
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const { data } = await axios.post(
+                '/store-membership/redeem',
+                { reward_id: selectedItem },
+                { headers: { 'X-CSRF-TOKEN': token || '', 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' } }
+            );
+            if (data.success) {
+                const msgKey = data.message_key || 'toastMessages.storeRewardSuccess';
+                if (data.pending_approval) {
+                    showSuccess(t(msgKey));
+                } else {
+                    showSuccess(t(msgKey, { points: data.points_spent ?? item.points }));
+                }
+                setSelectedItem(null);
+                router.reload();
+            } else {
+                showError(t(data.message_key || 'toastMessages.storeRewardError'));
+            }
+        } catch (err) {
+            const key = err.response?.data?.message_key;
+            showError(key ? t(key) : t('toastMessages.storeRewardError'));
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     const getStatusIcon = (status) => {
@@ -140,6 +124,9 @@ export default function StoreMembership({ auth, user, currentBalance = 1190, red
                         <h3 className="text-sm font-extrabold text-gray-900">{t('storeMembershipPage.chooseGiftTitle')}</h3>
                     </div>
                     <div className="space-y-3">
+                        {items.length === 0 && (
+                            <p className="text-center text-sm text-gray-500 py-4">{t('storeMembershipPage.emptyRewards')}</p>
+                        )}
                         {items.map((item) => {
                             const canSelect = item.status === 'available' || item.status === 'ready';
                             const isSelected = selectedItem === item.id;
@@ -176,14 +163,15 @@ export default function StoreMembership({ auth, user, currentBalance = 1190, red
                 {/* Redeem Button */}
                 <button
                     type="button"
+                    disabled={submitting || items.length === 0}
                     onClick={handleRedeem}
-                    className="w-full bg-[#A3C042] text-white rounded-xl py-3 font-bold text-sm flex items-center justify-center gap-2 hover:bg-[#8CA635] transition"
+                    className="w-full bg-[#A3C042] text-white rounded-xl py-3 font-bold text-sm flex items-center justify-center gap-2 hover:bg-[#8CA635] transition disabled:opacity-50"
                 >
                     <FaGift />
-                    {t('storeMembershipPage.redeemButton')}
+                    {submitting ? t('common.saving') : t('storeMembershipPage.redeemButton')}
                 </button>
                 <p className="text-[10px] text-gray-500 text-center">
-                    {t('storeMembershipPage.redeemHint')}
+                    {manualHint ? t('storeMembershipPage.redeemHintManual') : t('storeMembershipPage.redeemHint')}
                 </p>
             </div>
 

@@ -51,13 +51,14 @@ ChartJS.register(
 
 export default function AdminDashboard({
     auth,
-    kpis,
-    usersByRole,
-    publishedProjects,
-    recentPayments,
-    subscriptions,
-    paymentStats,
-    subscriptionStats,
+    kpis = {},
+    workflow = {},
+    usersByRole = {},
+    publishedProjects = [],
+    recentPayments = [],
+    subscriptions = [],
+    paymentStats = {},
+    subscriptionStats = {},
     chartData,
     selectedYear = new Date().getFullYear(),
     availableYears = [],
@@ -268,6 +269,12 @@ export default function AdminDashboard({
         };
     }, [chartDataState]);
 
+    const maxProjects = Math.max(...(chartDataState?.projects || [0]));
+    const maxUsers = Math.max(...(chartDataState?.users || [0]));
+    const chartMaxValue = Math.max(maxProjects, maxUsers, 40);
+    const yAxisMax = Math.ceil(chartMaxValue / 40) * 40;
+    const yStepSize = Math.max(10, Math.ceil(yAxisMax / 4));
+
     const chartOptions = useMemo(() => ({
         responsive: true,
         maintainAspectRatio: false,
@@ -326,7 +333,7 @@ export default function AdminDashboard({
             },
             y: {
                 beginAtZero: true,
-                max: 160,
+                max: yAxisMax,
                 grid: {
                     display: false,
                 },
@@ -335,7 +342,7 @@ export default function AdminDashboard({
                     color: '#E5E7EB',
                 },
                 ticks: {
-                    stepSize: 40,
+                    stepSize: yStepSize,
                     font: {
                         size: 12,
                         family: "'Cairo', sans-serif",
@@ -348,7 +355,7 @@ export default function AdminDashboard({
             intersect: false,
             mode: 'index',
         },
-    }), [currentYear]);
+    }), [currentYear, yAxisMax, yStepSize]);
 
     return (
         <DashboardLayout header={t('dashboard.adminDashboard')}>
@@ -425,6 +432,55 @@ export default function AdminDashboard({
                         chartData={engagementData?.chartData || []}
                         trendPercentage={engagementData?.trendPercentage || "+0%"}
                     />
+                </div>
+
+                <div className="mb-8 rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-6 shadow-sm">
+                    <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <h3 className="text-lg font-bold text-gray-900">{t('adminDashboardPage.workflowTitle')}</h3>
+                            <p className="text-sm text-gray-600">{t('adminDashboardPage.workflowSubtitle')}</p>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                            <Link href="/admin/projects" className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-800 hover:border-[#A3C042]/40">
+                                {t('adminDashboardPage.openProjects')}
+                            </Link>
+                            <Link href="/admin/publications" className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-800 hover:border-[#A3C042]/40">
+                                {t('adminDashboardPage.openPublications')}
+                            </Link>
+                            <Link href="/admin/certificates" className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-800 hover:border-[#A3C042]/40">
+                                {t('adminDashboardPage.openCertificates')}
+                            </Link>
+                            <Link href="/admin/challenge-suggestions" className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-800 hover:border-[#A3C042]/40">
+                                {t('adminDashboardPage.openChallengeSuggestions')}
+                            </Link>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 text-sm md:grid-cols-3 lg:grid-cols-6">
+                        <Link href="/admin/projects" className="rounded-xl border border-gray-200 bg-white p-3 transition hover:border-[#A3C042]/40">
+                            <div className="text-gray-500">{t('adminDashboardPage.workflow.pendingProjects')}</div>
+                            <div className="font-bold text-gray-900">{workflow.pending_projects || 0}</div>
+                        </Link>
+                        <Link href="/admin/publications" className="rounded-xl border border-gray-200 bg-white p-3 transition hover:border-[#A3C042]/40">
+                            <div className="text-gray-500">{t('adminDashboardPage.workflow.pendingPublications')}</div>
+                            <div className="font-bold text-gray-900">{workflow.pending_publications || 0}</div>
+                        </Link>
+                        <Link href="/admin/certificates" className="rounded-xl border border-gray-200 bg-white p-3 transition hover:border-[#A3C042]/40">
+                            <div className="text-gray-500">{t('adminDashboardPage.workflow.pendingCertificates')}</div>
+                            <div className="font-bold text-gray-900">{workflow.pending_certificates || 0}</div>
+                        </Link>
+                        <Link href="/admin/store-reward-requests" className="rounded-xl border border-gray-200 bg-white p-3 transition hover:border-[#A3C042]/40">
+                            <div className="text-gray-500">{t('adminDashboardPage.workflow.pendingRewardRequests')}</div>
+                            <div className="font-bold text-gray-900">{workflow.pending_reward_requests || 0}</div>
+                        </Link>
+                        <Link href="/admin/payments" className="rounded-xl border border-gray-200 bg-white p-3 transition hover:border-[#A3C042]/40">
+                            <div className="text-gray-500">{t('adminDashboardPage.workflow.pendingPayments')}</div>
+                            <div className="font-bold text-gray-900">{workflow.pending_payments || 0}</div>
+                        </Link>
+                        <Link href="/admin/challenge-suggestions" className="rounded-xl border border-gray-200 bg-white p-3 transition hover:border-[#A3C042]/40">
+                            <div className="text-gray-500">{t('adminDashboardPage.workflow.pendingChallengeSuggestions')}</div>
+                            <div className="font-bold text-gray-900">{workflow.pending_challenge_suggestions || 0}</div>
+                        </Link>
+                    </div>
                 </div>
 
                 {/* KPIs Cards - Modern SaaS Style */}
@@ -562,7 +618,7 @@ export default function AdminDashboard({
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-xl font-bold text-gray-900">{t('adminDashboardPage.recentPaymentsTitle')}</h3>
                         <Link
-                            href={route('payments.index')}
+                            href="/admin/payments"
                             className="text-blue-600 hover:text-blue-700 text-sm font-semibold"
                         >
                             {t('common.viewAll')}

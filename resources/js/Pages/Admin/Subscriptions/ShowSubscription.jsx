@@ -5,6 +5,7 @@ import { useTranslation } from '@/i18n';
 
 export default function AdminSubscriptionsShowSubscription({ subscription }) {
     const { t, language } = useTranslation();
+    const notAvailable = t('common.notAvailable');
 
     const getStatusBadge = (status) => {
         const statusMap = {
@@ -27,6 +28,18 @@ export default function AdminSubscriptionsShowSubscription({ subscription }) {
         style: 'currency',
         currency,
     }).format(amount);
+
+    const paymentMethodLabels = {
+        credit_card: t('adminSubscriptionsIndexPage.paymentMethods.creditCard'),
+        debit_card: t('adminSubscriptionsIndexPage.paymentMethods.debitCard'),
+        bank_transfer: t('adminSubscriptionsIndexPage.paymentMethods.bankTransfer'),
+        cash: t('adminSubscriptionsIndexPage.paymentMethods.cash'),
+        stripe: t('adminPaymentsPage.methods.stripe'),
+        paypal: t('adminPaymentsPage.methods.paypal'),
+        mada: t('adminPaymentsPage.methods.mada'),
+        ziina: t('adminPaymentsPage.methods.ziina'),
+        tamara: t('adminPaymentsPage.methods.tamara'),
+    };
 
     return (
         <DashboardLayout header={t('adminSubscriptionShowPage.title')}>
@@ -72,7 +85,7 @@ export default function AdminSubscriptionsShowSubscription({ subscription }) {
                                 <div className="flex items-center gap-2 text-gray-900">
                                     <FaDollarSign className="text-green-500" />
                                     <span className="font-bold text-green-600 text-lg">
-                                        {formatCurrency(subscription.paid_amount, subscription.package.currency)}
+                                        {formatCurrency(subscription.paid_amount, subscription.package?.currency || 'AED')}
                                     </span>
                                 </div>
                             </div>
@@ -99,12 +112,14 @@ export default function AdminSubscriptionsShowSubscription({ subscription }) {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label className="block text-sm font-medium text-gray-600 mb-2">{t('adminSubscriptionShowPage.fields.paymentMethod')}</label>
-                                <p className="text-gray-900">{subscription.payment_method || '—'}</p>
+                                <p className="text-gray-900">
+                                    {paymentMethodLabels[subscription.payment_method] || subscription.payment_method || notAvailable}
+                                </p>
                             </div>
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-600 mb-2">{t('adminSubscriptionShowPage.fields.transactionId')}</label>
-                                <p className="text-gray-900 font-mono">{subscription.transaction_id || '—'}</p>
+                                <p className="text-gray-900 font-mono">{subscription.transaction_id || notAvailable}</p>
                             </div>
                         </div>
                     </div>
@@ -118,7 +133,7 @@ export default function AdminSubscriptionsShowSubscription({ subscription }) {
                                 <FaUser className="text-blue-500" />
                                 <div>
                                     <p className="text-sm text-gray-600">{t('common.name')}</p>
-                                    <p className="font-semibold text-gray-900">{subscription.user.name}</p>
+                                    <p className="font-semibold text-gray-900">{subscription.user?.name || notAvailable}</p>
                                 </div>
                             </div>
 
@@ -126,7 +141,7 @@ export default function AdminSubscriptionsShowSubscription({ subscription }) {
                                 <FaUser className="text-gray-400" />
                                 <div>
                                     <p className="text-sm text-gray-600">{t('common.email')}</p>
-                                    <p className="font-semibold text-gray-900">{subscription.user.email}</p>
+                                    <p className="font-semibold text-gray-900">{subscription.user?.email || notAvailable}</p>
                                 </div>
                             </div>
                         </div>
@@ -139,7 +154,7 @@ export default function AdminSubscriptionsShowSubscription({ subscription }) {
                                 <FaBox className="text-purple-500" />
                                 <div>
                                     <p className="text-sm text-gray-600">{t('adminSubscriptionShowPage.fields.packageName')}</p>
-                                    <p className="font-semibold text-gray-900">{subscription.package.name}</p>
+                                    <p className="font-semibold text-gray-900">{subscription.package?.name || notAvailable}</p>
                                 </div>
                             </div>
 
@@ -148,7 +163,7 @@ export default function AdminSubscriptionsShowSubscription({ subscription }) {
                                 <div>
                                     <p className="text-sm text-gray-600">{t('adminSubscriptionShowPage.fields.originalPrice')}</p>
                                     <p className="font-semibold text-gray-900">
-                                        {formatCurrency(subscription.package.price, subscription.package.currency)}
+                                        {formatCurrency(subscription.package?.price || 0, subscription.package?.currency || 'AED')}
                                     </p>
                                 </div>
                             </div>
