@@ -8,6 +8,7 @@ import {
     FaCreditCard,
     FaGraduationCap,
     FaMedal,
+    FaExclamationTriangle,
     FaProjectDiagram,
     FaSchool,
     FaStar,
@@ -78,6 +79,8 @@ export default function StudentDashboardOverview({ stats = {}, engagement = null
     const notifications = Array.isArray(stats.notifications) ? stats.notifications : [];
     const school = stats.school;
     const rewardStats = engagement?.rewards || {};
+    const activeSubscription = engagement?.subscription;
+    const pendingSubscription = engagement?.pending_subscription;
 
     const showSubmissionRow = (submissions.total || 0) > 0;
 
@@ -134,12 +137,21 @@ export default function StudentDashboardOverview({ stats = {}, engagement = null
                 <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-4 shadow-sm">
                     <h3 className="text-sm font-bold text-gray-900">{t('studentDashboardPage.engagementTitle')}</h3>
                     <p className="mt-1 text-xs text-gray-600">
-                        {engagement.subscription
-                            ? t('studentDashboardPage.engagementSubscriptionActive', {
-                                name: engagement.subscription.package_name,
-                                until: engagement.subscription.end_date,
-                            })
-                            : t('studentDashboardPage.engagementNoSubscription')}
+                        {activeSubscription
+                            ? activeSubscription.is_trial
+                                ? t('studentDashboardPage.engagementTrialActive', {
+                                    name: activeSubscription.package_name,
+                                    until: activeSubscription.end_date,
+                                })
+                                : t('studentDashboardPage.engagementSubscriptionActive', {
+                                    name: activeSubscription.package_name,
+                                    until: activeSubscription.end_date,
+                                })
+                            : pendingSubscription
+                                ? t('studentDashboardPage.engagementSubscriptionPending', {
+                                    name: pendingSubscription.package_name,
+                                })
+                                : t('studentDashboardPage.engagementNoSubscription')}
                     </p>
                     <div className="mt-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
                         <div className="rounded-xl border border-gray-200 bg-white px-3 py-2">
@@ -175,6 +187,16 @@ export default function StudentDashboardOverview({ stats = {}, engagement = null
                                 {t('studentDashboardPage.engagementPackages')}
                             </button>
                         )}
+                        {!engagement.can_subscribe && (
+                            <button
+                                type="button"
+                                onClick={() => router.visit('/my-subscriptions')}
+                                className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-800 shadow-sm hover:border-[#A3C042]/50"
+                            >
+                                <FaCreditCard className="text-[#A3C042]" />
+                                {t('studentDashboardPage.engagementSubscriptionsCta')}
+                            </button>
+                        )}
                         <button
                             type="button"
                             onClick={() => router.visit('/achievements')}
@@ -200,6 +222,32 @@ export default function StudentDashboardOverview({ stats = {}, engagement = null
                             {t('studentDashboardPage.engagementPointsDetail')}
                         </button>
                     </div>
+
+                    {engagement.is_expiring_soon && activeSubscription && (
+                        <div className="mt-3 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                            <FaExclamationTriangle className="mt-0.5 flex-shrink-0" />
+                            <span>
+                                {t('studentDashboardPage.engagementExpiringSoon', {
+                                    days: activeSubscription.days_remaining ?? 0,
+                                    until: activeSubscription.end_date,
+                                })}
+                            </span>
+                        </div>
+                    )}
+
+                    {engagement.needs_renewal && (
+                        <div className="mt-3 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800">
+                            <FaExclamationTriangle className="mt-0.5 flex-shrink-0" />
+                            <span>{t('studentDashboardPage.engagementRenewalRequired')}</span>
+                        </div>
+                    )}
+
+                    {engagement.trial_available && engagement.can_subscribe && (
+                        <div className="mt-3 flex items-start gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-800">
+                            <FaExclamationTriangle className="mt-0.5 flex-shrink-0" />
+                            <span>{t('studentDashboardPage.engagementTrialAvailable')}</span>
+                        </div>
+                    )}
                 </div>
             )}
 

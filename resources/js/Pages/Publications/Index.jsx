@@ -325,14 +325,24 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                     <div className="rounded-2xl border border-gray-100 bg-white p-3">
                         <div className="flex flex-wrap justify-center gap-2">
                             {publications.links.map((link, index) => (
-                                <Link
+                                <button
                                     key={index}
-                                    href={link.url || '#'}
+                                    type="button"
+                                    onClick={() => {
+                                        if (!link.url) {
+                                            return;
+                                        }
+                                        router.visit(link.url, {
+                                            preserveScroll: true,
+                                            preserveState: true,
+                                        });
+                                    }}
                                     className={`rounded-xl px-3 py-2 text-sm font-semibold transition ${
                                         link.active
                                             ? 'bg-[#A3C042] text-white'
                                             : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
                                     } ${!link.url ? 'cursor-not-allowed opacity-50' : ''}`}
+                                    disabled={!link.url}
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                 />
                             ))}

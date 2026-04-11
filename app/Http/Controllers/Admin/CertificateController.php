@@ -74,6 +74,7 @@ class CertificateController extends Controller
             'certificates' => $certificates,
             'stats' => $stats,
             'users' => $users,
+            'certificateSystemHealth' => $this->certificateService->getGenerationHealth(),
             'filters' => [
                 'search' => $request->get('search'),
                 'type' => $request->get('type', 'all'),
@@ -250,10 +251,23 @@ class CertificateController extends Controller
             abort(404, 'ملف الشهادة غير موجود');
         }
 
-        return Storage::disk('public')->download(
-            $this->certificateService->rebuildCertificateFile($certificate),
-            "certificate_{$certificate->certificate_number}.pdf"
-        );
+        try {
+            return Storage::disk('public')->download(
+                $this->certificateService->rebuildCertificateFile($certificate),
+                "certificate_{$certificate->certificate_number}.pdf"
+            );
+        } catch (\Throwable $e) {
+            $messageKey = 'toastMessages.certificateDownloadFailed';
+            if (str_contains($e->getMessage(), 'TCPDF') || str_contains($e->getMessage(), 'FPDI')) {
+                $messageKey = 'toastMessages.certificatePdfLibraryMissing';
+            } elseif (str_contains($e->getMessage(), 'template') || str_contains($e->getMessage(), 'field mapping')) {
+                $messageKey = 'toastMessages.certificateTemplateMissing';
+            }
+
+            return redirect()->back()->with('error', [
+                'key' => $messageKey,
+            ]);
+        }
     }
 
     public function toggleStatus(Certificate $certificate)

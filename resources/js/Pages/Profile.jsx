@@ -72,6 +72,7 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
         if (file) {
             basicForm.setData('image', file);
             setImagePreview(URL.createObjectURL(file));
+            setActiveTab('basic');
         }
     };
 
@@ -80,6 +81,7 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
         if (file) {
             teacherForm.setData('teacher_image', file);
             setTeacherImagePreview(URL.createObjectURL(file));
+            setActiveTab('teacher');
         }
     };
 
@@ -239,6 +241,10 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
 
     const getDisplayImage = () => {
         if (user.role === 'teacher') {
+            if (teacherImagePreview) {
+                return teacherImagePreview;
+            }
+
             if (teacher?.image) {
                 if (teacher.image.startsWith('http://') || teacher.image.startsWith('https://')) {
                     return teacher.image;
@@ -257,9 +263,8 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                 }
                 return `/storage/${user.teacher.image}`;
             }
-            if (teacherImagePreview) {
-                return teacherImagePreview;
-            }
+        } else if (imagePreview) {
+            return imagePreview;
         }
 
         if (user.image) {
@@ -273,10 +278,6 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                 ? `/${user.image}`
                 : `/storage/${user.image}`;
             return imagePath;
-        }
-
-        if (imagePreview) {
-            return imagePreview;
         }
 
         return null;

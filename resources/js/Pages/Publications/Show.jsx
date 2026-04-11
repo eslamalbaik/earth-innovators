@@ -1,8 +1,8 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import MobileAppLayout from '@/Layouts/MobileAppLayout';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
-import { FaBuilding, FaCalendar, FaEye, FaFileAlt, FaHeart } from 'react-icons/fa';
+import { FaBook, FaBuilding, FaCalendar, FaEye, FaFileAlt, FaHeart } from 'react-icons/fa';
 import { useState } from 'react';
 import axios from 'axios';
 import { getPublicationFileUrl, getPublicationImageUrl } from '@/utils/imageUtils';
@@ -23,7 +23,31 @@ const monthKeys = [
     'common.months.december',
 ];
 
-export default function PublicationShow({ auth, publication, isLiked: initialIsLiked }) {
+const stripDuplicateCoverImage = (html, coverImagePath) => {
+    if (!html || !coverImagePath) {
+        return html;
+    }
+
+    const coverFileName = coverImagePath.split('?')[0].split('/').pop();
+
+    if (!coverFileName) {
+        return html;
+    }
+
+    const escapedFileName = coverFileName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    return html.replace(
+        new RegExp(`<img[^>]*src=["'][^"']*${escapedFileName}[^"']*["'][^>]*>`, 'i'),
+        ''
+    );
+};
+
+export default function PublicationShow({
+    auth,
+    publication,
+    isLiked: initialIsLiked,
+    relatedPublications = [],
+}) {
     const { t, language } = useTranslation();
     const [isLiked, setIsLiked] = useState(initialIsLiked || false);
     const [likesCount, setLikesCount] = useState(publication?.likes_count || 0);
@@ -43,10 +67,23 @@ export default function PublicationShow({ auth, publication, isLiked: initialIsL
             : (defaultValue || arabicValue || '');
     };
 
+    const coverImage = getPublicationImageUrl(publication?.cover_image);
     const publicationTitle = getLocalizedField('title');
     const publicationDescription = getLocalizedField('description');
-    const publicationContent = getLocalizedField('content');
-    const coverImage = getPublicationImageUrl(publication?.cover_image);
+    const publicationContent = stripDuplicateCoverImage(getLocalizedField('content'), coverImage);
+
+    const getRelatedTitle = (item) => item?.title_ar || item?.title || '';
+    const getRelatedDescription = (item) => item?.description_ar || item?.description || '';
+    const getTypeLabel = (type) => {
+        const labels = {
+            magazine: t('sections.publications.types.magazine'),
+            booklet: t('sections.publications.types.booklet'),
+            report: t('sections.publications.types.report'),
+            article: t('publicationsPage.types.article'),
+        };
+
+        return labels[type] || type;
+    };
 
     const toggleLike = async () => {
         if (!auth?.user) {
@@ -190,6 +227,58 @@ export default function PublicationShow({ auth, publication, isLiked: initialIsL
                             className="prose prose-sm max-w-none leading-relaxed text-gray-700"
                             dangerouslySetInnerHTML={{ __html: publicationContent }}
                         />
+                    </div>
+                )}
+
+                {relatedPublications.length > 0 && (
+                    <div className="rounded-2xl border border-gray-100 bg-white p-4">
+                        <div className="mb-4">
+                            <h2 className="text-sm font-bold text-gray-900">
+                                {t('publicationShowPage.relatedTitle')}
+                            </h2>
+                            <p className="mt-1 text-xs text-gray-500">
+                                {t('publicationShowPage.relatedSubtitle')}
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                            {relatedPublications.map((item) => (
+                                <Link
+                                    key={item.id}
+                                    href={`/publications/${item.id}`}
+                                    className="overflow-hidden rounded-2xl border border-gray-100 bg-gray-50 transition hover:border-[#A3C042]/30 hover:bg-white"
+                                >
+                                    <div className="aspect-[4/3] overflow-hidden bg-gray-100">
+                                        <img
+                                            src={getPublicationImageUrl(item.cover_image) || '/images/default-publication.jpg'}
+                                            alt={getRelatedTitle(item)}
+                                            className="h-full w-full object-cover"
+                                            loading="lazy"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-3 p-4">
+                                        <div className="flex items-center gap-2 text-xs font-semibold text-[#A3C042]">
+                                            <FaBook />
+                                            <span>{getTypeLabel(item.type)}</span>
+                                        </div>
+
+                                        <h3 className="line-clamp-2 text-sm font-bold text-gray-900">
+                                            {getRelatedTitle(item)}
+                                        </h3>
+
+                                        <p className="line-clamp-3 text-xs leading-6 text-gray-600">
+                                            {getRelatedDescription(item) || t('publicationShowPage.noDescription')}
+                                        </p>
+
+                                        <div className="flex items-center justify-between text-xs text-gray-500">
+                                            <span>{item.publisher_name || item.school?.name || t('common.appName')}</span>
+                                            <span>{t('common.read')}</span>
+                                        </div>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
                     </div>
                 )}
             </div>

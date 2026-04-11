@@ -25,6 +25,7 @@ export default function TeacherCertificatesIndex({
     requestHistory = [],
     school = null,
     membershipSummary = null,
+    certificateSystemHealth = null,
 }) {
     const { showSuccess, showError } = useToast();
     const { t, language } = useTranslation();
@@ -75,6 +76,23 @@ export default function TeacherCertificatesIndex({
         pending_school_approval: t('teacherCertificatesIndexPage.statuses.pendingSchoolApproval'),
         rejected: t('teacherCertificatesIndexPage.statuses.rejected'),
     };
+    const certificateSystemReady = certificateSystemHealth?.ready !== false;
+    const certificateWorkflowEnabled = Boolean(membershipSummary?.certificate_access) && certificateSystemReady;
+    const healthIssues = Array.from(new Set((certificateSystemHealth?.issues || []).map((issue) => {
+        if (issue === 'template_missing') {
+            return 'templateMissing';
+        }
+
+        if (issue === 'field_map_missing') {
+            return 'fieldMapMissing';
+        }
+
+        if (issue === 'tcpdf_missing' || issue === 'fpdi_missing') {
+            return 'pdfEngineMissing';
+        }
+
+        return issue;
+    })));
 
     const recipients = useMemo(() => {
         const studentRows = students?.data || [];
@@ -98,6 +116,10 @@ export default function TeacherCertificatesIndex({
         }
         if (!membershipSummary?.certificate_access) {
             showError(t('teacherCertificatesIndexPage.toasts.certificateAccessDenied'));
+            return;
+        }
+        if (!certificateSystemReady) {
+            showError(t('teacherCertificatesIndexPage.toasts.systemNotReady'));
             return;
         }
 
@@ -211,6 +233,24 @@ export default function TeacherCertificatesIndex({
                     </div>
                 </div>
 
+                {!certificateSystemReady && (
+                    <div className="rounded-2xl border border-red-200 bg-red-50 p-5">
+                        <h2 className="text-lg font-bold text-red-800">
+                            {t('teacherCertificatesIndexPage.alerts.systemNotReadyTitle')}
+                        </h2>
+                        <p className="mt-2 text-sm text-red-700">
+                            {t('teacherCertificatesIndexPage.alerts.systemNotReadyDescription')}
+                        </p>
+                        {healthIssues.length > 0 && (
+                            <ul className="mt-3 space-y-2 text-sm text-red-700">
+                                {healthIssues.map((issue) => (
+                                    <li key={issue}>- {t(`teacherCertificatesIndexPage.alerts.issues.${issue}`)}</li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                )}
+
                 <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
                     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                         <div>
@@ -221,9 +261,9 @@ export default function TeacherCertificatesIndex({
                         </div>
                         <button
                             onClick={() => openRequestModal(teacherRecipient, 'membership')}
-                            disabled={!teacherRecipient}
+                            disabled={!teacherRecipient || !certificateWorkflowEnabled}
                             className={`rounded-xl px-4 py-3 text-sm font-bold text-white transition ${
-                                teacherRecipient
+                                teacherRecipient && certificateWorkflowEnabled
                                     ? 'bg-[#A3C042] hover:bg-[#8CA635]'
                                     : 'cursor-not-allowed bg-gray-300'
                             }`}
@@ -278,7 +318,12 @@ export default function TeacherCertificatesIndex({
                                         <td className="px-4 py-4">
                                             <button
                                                 onClick={() => openRequestModal(student, 'achievement')}
-                                                className="rounded-xl border border-[#A3C042] px-4 py-2 text-sm font-bold text-[#7E9B25] transition hover:bg-[#A3C042] hover:text-white"
+                                                disabled={!certificateWorkflowEnabled}
+                                                className={`rounded-xl border px-4 py-2 text-sm font-bold transition ${
+                                                    certificateWorkflowEnabled
+                                                        ? 'border-[#A3C042] text-[#7E9B25] hover:bg-[#A3C042] hover:text-white'
+                                                        : 'cursor-not-allowed border-gray-200 text-gray-400'
+                                                }`}
                                             >
                                                 {t('teacherCertificatesIndexPage.requestCertificate')}
                                             </button>

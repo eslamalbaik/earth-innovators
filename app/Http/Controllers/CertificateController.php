@@ -148,13 +148,28 @@ class CertificateController extends Controller
             abort(403, 'غير مصرح لك بتحميل هذه الشهادة');
         }
 
-        if (false && (!$certificate->file_path || !Storage::disk('public')->exists($certificate->file_path))) {
-            abort(404, 'ملف الشهادة غير موجود');
+        try {
+            if ($certificate->file_path && Storage::disk('public')->exists($certificate->file_path)) {
+                return Storage::disk('public')->download(
+                    $certificate->file_path,
+                    "certificate_{$certificate->certificate_number}.pdf"
+                );
+            }
+
+            $filePath = $this->certificateService->rebuildCertificateFile($certificate);
+            return Storage::disk('public')->download($filePath, "certificate_{$certificate->certificate_number}.pdf");
+        } catch (\Throwable $e) {
+            $messageKey = 'toastMessages.certificateDownloadFailed';
+            if (str_contains($e->getMessage(), 'TCPDF') || str_contains($e->getMessage(), 'FPDI')) {
+                $messageKey = 'toastMessages.certificatePdfLibraryMissing';
+            } elseif (str_contains($e->getMessage(), 'template') || str_contains($e->getMessage(), 'field mapping')) {
+                $messageKey = 'toastMessages.certificateTemplateMissing';
+            }
+
+            return redirect()->back()->with('error', [
+                'key' => $messageKey,
+            ]);
         }
-
-        $filePath = $this->certificateService->rebuildCertificateFile($certificate);
-
-        return Storage::disk('public')->download($filePath, "certificate_{$certificate->certificate_number}.pdf");
     }
 
     protected function resolveRecipientId(Request $request): ?int

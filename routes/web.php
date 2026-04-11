@@ -686,6 +686,8 @@ Route::middleware(['auth', 'school'])->prefix('school')->name('school.')->group(
 
     // التقارير
     Route::get('/reports', [\App\Http\Controllers\School\SchoolReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/export/pdf', [\App\Http\Controllers\School\SchoolReportController::class, 'exportPdf'])->name('reports.export.pdf');
+    Route::get('/reports/export/excel', [\App\Http\Controllers\School\SchoolReportController::class, 'exportExcel'])->name('reports.export.excel');
     Route::get('/reports/create', [\App\Http\Controllers\School\SchoolReportController::class, 'create'])->name('reports.create');
     Route::post('/reports', [\App\Http\Controllers\School\SchoolReportController::class, 'store'])->name('reports.store');
 });

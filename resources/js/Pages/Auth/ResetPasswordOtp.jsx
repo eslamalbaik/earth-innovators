@@ -12,6 +12,7 @@ export default function ResetPasswordOtp({ token, email, status }) {
     const { t } = useTranslation();
     const [otpValues, setOtpValues] = useState(['', '', '', '', '', '']);
     const [activeIndex, setActiveIndex] = useState(0);
+    const [isResending, setIsResending] = useState(false);
     const inputRefs = [
         useRef(null),
         useRef(null),
@@ -165,6 +166,21 @@ export default function ResetPasswordOtp({ token, email, status }) {
         });
     };
 
+    const handleResend = () => {
+        if (!email || isResending) {
+            return;
+        }
+
+        setIsResending(true);
+
+        router.post(route('password.email.resend'), {
+            email,
+        }, {
+            preserveScroll: true,
+            onFinish: () => setIsResending(false),
+        });
+    };
+
     return (
         <GuestLayout>
             <Head title={t('auth.otpVerificationTitle')} />
@@ -303,12 +319,14 @@ export default function ResetPasswordOtp({ token, email, status }) {
                             <div className="text-center space-y-2">
                                 <p className="text-sm text-gray-600">
                                     {t('auth.didntReceiveCode')}{' '}
-                                    <Link
-                                        href={route('password.request')}
+                                    <button
+                                        type="button"
+                                        onClick={handleResend}
+                                        disabled={isResending}
                                         className="font-medium text-[#A3C042] hover:text-[#F9D536]"
                                     >
-                                        {t('auth.resendCode')}
-                                    </Link>
+                                        {isResending ? t('auth.sending') : t('auth.resendCode')}
+                                    </button>
                                 </p>
                                 <p className="text-sm text-gray-600">
                                     <Link

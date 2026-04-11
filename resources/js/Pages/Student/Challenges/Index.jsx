@@ -4,6 +4,7 @@ import { FaSearch, FaFilter, FaTrophy, FaTimes, FaUsers, FaCalendar, FaClock, Fa
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import { useTranslation } from '@/i18n';
+import { getChallengeImageUrl } from '@/utils/imageUtils';
 
 export default function StudentChallengesIndex({ auth, challenges, filters, message, categories = [], previousWinners = [] }) {
     const { t, language } = useTranslation();
@@ -236,8 +237,8 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
                         const StatusIcon = statusBadge.icon;
                         const submissionBadge = challenge.submission_status ? getSubmissionStatusBadge(challenge.submission_status) : null;
                         const categoryLabel = getCategoryLabel(challenge.category);
-                        const challengeImage = challenge.image || challenge.thumbnail || '/images/hero.png';
-                        const participants = challenge.current_participants || 0;
+                        const challengeImage = getChallengeImageUrl(challenge.image_url || challenge.image || challenge.thumbnail);
+                        const participants = challenge.current_participants || challenge.participants_count || 0;
                         const maxParticipants = challenge.max_participants || null;
                         const deadline = formatDate(challenge.deadline);
 

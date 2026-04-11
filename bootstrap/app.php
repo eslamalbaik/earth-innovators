@@ -3,6 +3,9 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
+use Illuminate\Session\TokenMismatchException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\EnsureUserIsTeacher;
@@ -24,6 +27,12 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->encryptCookies(except: ['locale']);
 
+        // Exempt external webhook endpoints from CSRF verification
+        $middleware->validateCsrfTokens(except: [
+            'webhook/ziina',
+            'api/webhooks/payment/*',
+        ]);
+
         $middleware->web(append: [
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\HandleInertiaRequests::class,
@@ -40,6 +49,41 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        $handleExpiredRequest = function (Request $request) {
+            if ($request->hasSession()) {
+                $request->session()->regenerateToken();
+            }
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Session expired. Please refresh and try again.',
+                    'message_key' => 'toastMessages.sessionExpired',
+                ], 419);
+            }
+
+            $redirect = redirect()->back(303);
+
+            if (in_array($request->method(), ['POST', 'PUT', 'PATCH', 'DELETE'], true)) {
+                $redirect = $redirect->withInput(
+                    $request->except(['password', 'password_confirmation', 'current_password'])
+                );
+            }
+
+            return $redirect->with('error', [
+                'key' => 'toastMessages.sessionExpired',
+            ]);
+        };
+
+        $exceptions->render(function (TokenMismatchException $e, Request $request) use ($handleExpiredRequest) {
+            return $handleExpiredRequest($request);
+        });
+
+        $exceptions->render(function (HttpException $e, Request $request) use ($handleExpiredRequest) {
+            if ($e->getStatusCode() === 419) {
+                return $handleExpiredRequest($request);
+            }
+        });
+
         $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e, \Illuminate\Http\Request $request) {
             return redirect('/');
         });

@@ -69,7 +69,7 @@ class PackageService extends BaseService
                 'id', 'name', 'name_ar', 'description', 'description_ar',
                 'price', 'currency', 'duration_type', 'duration_months',
                 'points_bonus', 'projects_limit', 'challenges_limit',
-                'certificate_access', 'badge_access', 'features', 'features_ar',
+                'certificate_access', 'badge_access', 'is_trial', 'trial_days', 'features', 'features_ar',
                 'is_active', 'is_popular', 'created_at'
             )->get();
         }, 3600); // Cache for 1 hour
@@ -91,6 +91,7 @@ class PackageService extends BaseService
             $totalPackages = Package::count();
             $activePackages = Package::where('is_active', true)->count();
             $popularPackages = Package::where('is_popular', true)->count();
+            $trialPackages = Package::where('is_trial', true)->count();
             $totalSubscribers = UserPackage::currentActive()->count();
 
             // Revenue statistics
@@ -117,6 +118,7 @@ class PackageService extends BaseService
                 'total' => $totalPackages,
                 'active' => $activePackages,
                 'popular' => $popularPackages,
+                'trial' => $trialPackages,
                 'totalSubscribers' => $totalSubscribers,
                 'totalRevenue' => $totalRevenue,
                 'monthlyRevenue' => $monthlyRevenue,
@@ -137,6 +139,8 @@ class PackageService extends BaseService
      */
     public function createPackage(array $data): Package
     {
+        $data = $this->normalizePackageData($data);
+
         // Clean features arrays (remove empty values)
         if (isset($data['features']) && is_array($data['features'])) {
             $data['features'] = array_values(array_filter($data['features'], fn($f) => !empty(trim($f))));
@@ -169,6 +173,8 @@ class PackageService extends BaseService
      */
     public function updatePackage(Package $package, array $data): Package
     {
+        $data = $this->normalizePackageData($data);
+
         // Clean features arrays (remove empty values)
         if (isset($data['features']) && is_array($data['features'])) {
             $data['features'] = array_values(array_filter($data['features'], fn($f) => !empty(trim($f))));
@@ -390,5 +396,21 @@ class PackageService extends BaseService
         // Update cache version to invalidate all cached package data
         // This works for all cache drivers (including file cache)
         Cache::forever('packages_cache_version', time());
+    }
+
+    protected function normalizePackageData(array $data): array
+    {
+        $isTrial = (bool) ($data['is_trial'] ?? false);
+
+        if ($isTrial) {
+            $trialDays = max(1, (int) ($data['trial_days'] ?? 14));
+            $data['price'] = 0;
+            $data['trial_days'] = $trialDays;
+            $data['duration_months'] = max(1, (int) ceil($trialDays / 30));
+        } else {
+            $data['trial_days'] = null;
+        }
+
+        return $data;
     }
 }

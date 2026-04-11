@@ -66,7 +66,7 @@ export default function AdminPackagesIndex({ packages, stats }) {
             <Head title={t('adminPackagesPage.pageTitle', { appName: t('common.appName') })} />
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
                 <div className="bg-white rounded-xl shadow-lg p-6">
                     <p className="text-sm text-gray-600 mb-2">{t('adminPackagesPage.stats.total')}</p>
                     <p className="text-3xl font-bold text-gray-900">{stats?.total || 0}</p>
@@ -82,6 +82,10 @@ export default function AdminPackagesIndex({ packages, stats }) {
                 <div className="bg-white rounded-xl shadow-lg p-6">
                     <p className="text-sm text-gray-600 mb-2">{t('adminPackagesPage.stats.totalSubscribers')}</p>
                     <p className="text-3xl font-bold text-purple-600">{stats?.totalSubscribers || 0}</p>
+                </div>
+                <div className="bg-white rounded-xl shadow-lg p-6">
+                    <p className="text-sm text-gray-600 mb-2">{t('adminPackagesPage.stats.trial')}</p>
+                    <p className="text-3xl font-bold text-emerald-600">{stats?.trial || 0}</p>
                 </div>
             </div>
 
@@ -149,6 +153,11 @@ export default function AdminPackagesIndex({ packages, stats }) {
                                                         {t('common.popular')}
                                                     </span>
                                                 )}
+                                                {pkg.is_trial && (
+                                                    <span className="px-2 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-semibold">
+                                                        {t('adminPackagesPage.badges.trial')}
+                                                    </span>
+                                                )}
                                                 {pkg.is_active ? (
                                                     <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
                                                         {t('common.active')}
@@ -165,13 +174,16 @@ export default function AdminPackagesIndex({ packages, stats }) {
 
                                     <div className="mb-4">
                                         <p className="text-3xl font-bold text-green-600 mb-1">
-                                            {formatCurrency(pkg.price, pkg.currency)}
+                                            {pkg.is_trial ? t('adminPackagesPage.badges.freeTrial') : formatCurrency(pkg.price, pkg.currency)}
                                         </p>
                                         <p className="text-sm text-gray-600">
-                                            {pkg.duration_type === 'monthly' && t('adminPackagesPage.duration.monthly')}
-                                            {pkg.duration_type === 'quarterly' && t('adminPackagesPage.duration.quarterly')}
-                                            {pkg.duration_type === 'yearly' && t('adminPackagesPage.duration.yearly')}
-                                            {pkg.duration_type === 'lifetime' && t('adminPackagesPage.duration.lifetime')}
+                                            {pkg.is_trial && pkg.trial_days
+                                                ? t('adminPackagesPage.badges.trialDuration', { days: pkg.trial_days })
+                                                : null}
+                                            {!pkg.is_trial && pkg.duration_type === 'monthly' && t('adminPackagesPage.duration.monthly')}
+                                            {!pkg.is_trial && pkg.duration_type === 'quarterly' && t('adminPackagesPage.duration.quarterly')}
+                                            {!pkg.is_trial && pkg.duration_type === 'yearly' && t('adminPackagesPage.duration.yearly')}
+                                            {!pkg.is_trial && pkg.duration_type === 'lifetime' && t('adminPackagesPage.duration.lifetime')}
                                         </p>
                                     </div>
 

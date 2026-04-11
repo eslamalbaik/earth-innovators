@@ -5,6 +5,7 @@ import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import DesktopFooter from '@/Components/Mobile/DesktopFooter';
 import { useTranslation } from '@/i18n';
+import { getChallengeImageUrl } from '@/utils/imageUtils';
 
 export default function ChallengesIndex({ auth, challenges, userRole, previousWinners = [], participationConditions = [], categories = [] }) {
     const { t, language } = useTranslation();
@@ -15,14 +16,14 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
     const [filterStatus, setFilterStatus] = useState('');
 
     const categoryLabelKeys = {
-        science: 'common.categories.science',
-        technology: 'common.categories.technology',
-        engineering: 'common.categories.engineering',
-        mathematics: 'common.categories.mathematics',
-        arts: 'common.categories.arts',
+        science: 'categories.science',
+        technology: 'categories.technology',
+        engineering: 'categories.engineering',
+        mathematics: 'categories.mathematics',
+        arts: 'categories.arts',
         heritage: 'studentChallengesIndexPage.categories.heritage',
         environmental: 'studentChallengesIndexPage.categories.environmental',
-        other: 'common.categories.other',
+        other: 'categories.other',
     };
 
     const resolveCategoryLabel = (value, fallbackLabel = '') => {
@@ -143,10 +144,10 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
     const getChallengeStatus = (challenge) => {
         const now = new Date();
         const startDate = new Date(challenge.start_date);
-        const endDate = new Date(challenge.end_date);
+        const deadline = new Date(challenge.deadline || challenge.end_date);
 
         if (now < startDate) return { key: 'upcoming', label: t('challenges.upcoming'), color: 'bg-blue-100 text-blue-700 border-blue-300', icon: FaClock };
-        if (now > endDate) return { key: 'finished', label: t('challenges.finished'), color: 'bg-gray-100 text-gray-700 border-gray-300', icon: FaCalendar };
+        if (now > deadline) return { key: 'finished', label: t('challenges.finished'), color: 'bg-gray-100 text-gray-700 border-gray-300', icon: FaCalendar };
         return { key: 'active', label: t('challenges.active'), color: 'bg-green-100 text-green-700 border-green-300', icon: FaTrophy };
     };
 
@@ -255,10 +256,10 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                         const statusInfo = getChallengeStatus(challenge);
                         const StatusIcon = statusInfo.icon;
                         const categoryLabel = getCategoryLabel(challenge.category);
-                        const challengeImage = challenge.image || challenge.thumbnail || '/images/hero.png';
-                        const participants = challenge.participants_count || 0;
+                        const challengeImage = getChallengeImageUrl(challenge.image_url || challenge.image || challenge.thumbnail);
+                        const participants = challenge.participants_count || challenge.current_participants || 0;
                         const startDate = formatDate(challenge.start_date);
-                        const endDate = formatDate(challenge.end_date);
+                        const endDate = formatDate(challenge.deadline || challenge.end_date);
 
                         return (
                             <Link

@@ -2,7 +2,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import MobileAppLayout from '@/Layouts/MobileAppLayout';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
     FaCheck,
     FaStar,
@@ -25,11 +25,25 @@ import { useFlashNotifications } from '@/Hooks/useFlashNotifications';
 import { toHijriDate } from '@/utils/dateUtils';
 import { useTranslation } from '@/i18n';
 
-export default function PackagesIndex({ auth, packages = [], userPackage = null }) {
+export default function PackagesIndex({ auth, packages = [], userPackage = null, trialStatus = null, membershipSummary = null }) {
     const { showSuccess, showError } = useToast();
     const { t, language } = useTranslation();
     const [subscribingPackageId, setSubscribingPackageId] = useState(null);
     useFlashNotifications();
+    const hasPendingSubscription = userPackage?.status === 'pending';
+    const isSchoolManaged = !!membershipSummary?.is_school_owned;
+
+    const roleLabel = useMemo(() => {
+        const role = auth?.user?.role;
+        const labels = {
+            student: t('packagesIndexPage.roles.student'),
+            teacher: t('packagesIndexPage.roles.teacher'),
+            school: t('packagesIndexPage.roles.school'),
+            educational_institution: t('packagesIndexPage.roles.educationalInstitution'),
+        };
+
+        return labels[role] || t('packagesIndexPage.roles.general');
+    }, [auth?.user?.role, t]);
 
     const IconMap = {
         monthly: FaBox,
@@ -48,6 +62,8 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
         return labels[durationType] || t('packagesIndexPage.duration.months', { count: durationMonths });
     };
 
+    const getPackageName = (pkg) => pkg?.name_ar || pkg?.name;
+
     const handleSubscribe = async (packageId) => {
         if (!auth?.user) {
             router.visit('/login');
@@ -56,6 +72,11 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
 
         if (userPackage && userPackage.status === 'active') {
             showError(t('packagesIndexPage.errors.activeSubscriptionExists'));
+            return;
+        }
+
+        if (isSchoolManaged) {
+            showError(t('packagesIndexPage.errors.managedBySchool'));
             return;
         }
 
@@ -88,7 +109,51 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
                 <p className={isDesktop ? "text-lg text-gray-600 max-w-2xl mx-auto" : "text-sm text-gray-600"}>
                     {t('packagesIndexPage.subtitle')}
                 </p>
+                {auth?.user && (
+                    <p className={isDesktop ? "mt-2 text-sm text-gray-500" : "mt-1 text-xs text-gray-500"}>
+                        {t('packagesIndexPage.personalizedFor', { role: roleLabel })}
+                    </p>
+                )}
             </div>
+
+            {auth?.user && membershipSummary?.is_school_owned && membershipSummary?.subscription && (
+                <div className={`rounded-2xl border border-blue-200 bg-blue-50 ${isDesktop ? 'p-6 mb-6' : 'p-4 mb-4'}`}>
+                    <h3 className={`${isDesktop ? 'text-base' : 'text-sm'} font-bold text-blue-900`}>
+                        {t('packagesIndexPage.management.schoolManagedTitle')}
+                    </h3>
+                    <p className={`${isDesktop ? 'text-sm' : 'text-xs'} mt-2 text-blue-800`}>
+                        {t('packagesIndexPage.management.schoolManagedDescription', {
+                            school: membershipSummary.owner_name,
+                            package: membershipSummary.subscription.package_name,
+                        })}
+                    </p>
+                </div>
+            )}
+
+            {auth?.user && membershipSummary?.needs_renewal && membershipSummary?.latest_subscription && (
+                <div className={`rounded-2xl border border-red-200 bg-red-50 ${isDesktop ? 'p-6 mb-6' : 'p-4 mb-4'}`}>
+                    <h3 className={`${isDesktop ? 'text-base' : 'text-sm'} font-bold text-red-900`}>
+                        {t('packagesIndexPage.membershipAlerts.renewalTitle')}
+                    </h3>
+                    <p className={`${isDesktop ? 'text-sm' : 'text-xs'} mt-2 text-red-800`}>
+                        {t('packagesIndexPage.membershipAlerts.renewalDescription', {
+                            package: membershipSummary.latest_subscription.package_name,
+                            date: toHijriDate(membershipSummary.latest_subscription.end_date),
+                        })}
+                    </p>
+                </div>
+            )}
+
+            {auth?.user && !membershipSummary?.subscription && !membershipSummary?.pending_subscription && membershipSummary?.trial_available && !membershipSummary?.is_school_owned && (
+                <div className={`rounded-2xl border border-emerald-200 bg-emerald-50 ${isDesktop ? 'p-6 mb-6' : 'p-4 mb-4'}`}>
+                    <h3 className={`${isDesktop ? 'text-base' : 'text-sm'} font-bold text-emerald-900`}>
+                        {t('packagesIndexPage.membershipAlerts.trialTitle')}
+                    </h3>
+                    <p className={`${isDesktop ? 'text-sm' : 'text-xs'} mt-2 text-emerald-800`}>
+                        {t('packagesIndexPage.membershipAlerts.trialDescription')}
+                    </p>
+                </div>
+            )}
 
             {/* Current Subscription Card */}
             {auth?.user && userPackage && userPackage.status === 'active' && (
@@ -100,14 +165,16 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
                                 {t('packagesIndexPage.currentPackage.title')}
                             </h3>
                             <p className={`${isDesktop ? 'text-base' : 'text-sm'} text-green-800 mb-1`}>
-                                {userPackage.package?.name_ar || userPackage.package?.name}
+                                {getPackageName(userPackage.package)}
                             </p>
                             <p className={`${isDesktop ? 'text-sm' : 'text-xs'} text-green-700`}>
-                                {t('packagesIndexPage.currentPackage.endsAt')}: {toHijriDate(userPackage.end_date)}
+                                {userPackage.is_trial
+                                    ? t('packagesIndexPage.currentPackage.trialEndsAt', { date: toHijriDate(userPackage.end_date) })
+                                    : `${t('packagesIndexPage.currentPackage.endsAt')}: ${toHijriDate(userPackage.end_date)}`}
                             </p>
                         </div>
                         <span className={`px-3 py-1 bg-[#A3C042] text-white ${isDesktop ? 'text-sm' : 'text-xs'} font-semibold rounded-full`}>
-                            {t('packagesIndexPage.currentPackage.active')}
+                            {userPackage.is_trial ? t('packagesIndexPage.badges.trial') : t('packagesIndexPage.currentPackage.active')}
                         </span>
                     </div>
                     <Link
@@ -132,7 +199,7 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
                                 {t('packagesIndexPage.pending.subtitle')}
                             </p>
                             <p className={`${isDesktop ? 'text-xs' : 'text-[11px]'} text-yellow-700 mt-2`}>
-                                {t('packagesIndexPage.pending.packageName', { name: userPackage.package?.name_ar || userPackage.package?.name })}
+                                {t('packagesIndexPage.pending.packageName', { name: getPackageName(userPackage.package) })}
                             </p>
                         </div>
                         <span className={`px-3 py-1 bg-yellow-200 text-yellow-800 ${isDesktop ? 'text-sm' : 'text-xs'} font-semibold rounded-full`}>
@@ -165,8 +232,10 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
                         const features = pkg.features_ar || pkg.features || [];
                         const isPopular = pkg.is_popular;
                         const isCurrentPackage = userPackage?.package_id === pkg.id && userPackage?.status === 'active';
-                        const hasPending = userPackage?.package_id === pkg.id && userPackage?.status === 'pending';
+                        const hasPending = userPackage?.package_id === pkg.id && hasPendingSubscription;
+                        const isTrialUsed = pkg.is_trial && trialStatus?.used && !isCurrentPackage && !hasPending;
                         const isSubscribing = subscribingPackageId === pkg.id;
+                        const disableSubscription = isSubscribing || isCurrentPackage || hasPendingSubscription || isTrialUsed || isSchoolManaged;
 
                         return (
                             <div
@@ -188,6 +257,11 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
                                         {t('packagesIndexPage.badges.currentPackage')}
                                     </div>
                                 )}
+                                {pkg.is_trial && !isCurrentPackage && (
+                                    <div className="absolute start-4 top-4 rounded-full bg-emerald-500 px-3 py-1 text-[11px] font-bold text-white shadow-sm">
+                                        {t('packagesIndexPage.badges.trial')}
+                                    </div>
+                                )}
                                 <div className={`${isDesktop ? 'p-6' : 'p-4'} ${isPopular || isCurrentPackage ? isDesktop ? 'pt-16' : 'pt-12' : ''}`}>
                                     {/* Package Header */}
                                     <div className="text-center mb-4">
@@ -196,14 +270,25 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
                                             <Icon className={`${isDesktop ? 'text-4xl' : 'text-2xl'} ${isPopular ? 'text-white' : 'text-gray-600'}`} />
                                         </div>
                                         <h3 className={`${isDesktop ? 'text-xl' : 'text-base'} font-extrabold text-gray-900 mb-2`}>
-                                            {pkg.name_ar || pkg.name}
+                                            {getPackageName(pkg)}
                                         </h3>
                                         <div className="mb-2">
-                                            <span className={`${isDesktop ? 'text-4xl' : 'text-3xl'} font-bold text-gray-900`}>{pkg.price}</span>
-                                            <span className={`text-gray-600 ${isDesktop ? 'text-base' : 'text-sm'}`}> {pkg.currency}</span>
-                                            {pkg.duration_type !== 'lifetime' && (
-                                                <span className={`text-gray-500 ${isDesktop ? 'text-sm' : 'text-xs'}`}> / {getDurationLabel(pkg.duration_type, pkg.duration_months)}</span>
+                                            {pkg.is_trial ? (
+                                                <span className={`${isDesktop ? 'text-3xl' : 'text-2xl'} font-bold text-emerald-600`}>
+                                                    {t('packagesIndexPage.badges.freeTrial')}
+                                                </span>
+                                            ) : (
+                                                <>
+                                                    <span className={`${isDesktop ? 'text-4xl' : 'text-3xl'} font-bold text-gray-900`}>{pkg.price}</span>
+                                                    <span className={`text-gray-600 ${isDesktop ? 'text-base' : 'text-sm'}`}> {pkg.currency}</span>
+                                                </>
                                             )}
+                                            <span className={`text-gray-500 ${isDesktop ? 'text-sm' : 'text-xs'}`}>
+                                                {' / '}
+                                                {pkg.is_trial
+                                                    ? t('packagesIndexPage.duration.trialDays', { count: pkg.trial_days || 14 })
+                                                    : getDurationLabel(pkg.duration_type, pkg.duration_months)}
+                                            </span>
                                         </div>
                                         {pkg.description_ar || pkg.description ? (
                                             <p className={`${isDesktop ? 'text-sm' : 'text-xs'} text-gray-600`}>
@@ -269,11 +354,17 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
                                     {auth?.user ? (
                                         <button
                                             onClick={() => handleSubscribe(pkg.id)}
-                                            disabled={isSubscribing || isCurrentPackage || hasPending}
+                                            disabled={disableSubscription}
                                             className={`w-full text-center ${isDesktop ? 'px-6 py-4' : 'px-4 py-3'} rounded-xl font-semibold ${isDesktop ? 'text-base' : 'text-sm'} transition ${isCurrentPackage
                                                 ? 'bg-green-100 text-green-700 cursor-not-allowed'
-                                                : hasPending
+                                            : isTrialUsed
+                                                    ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                                                : isSchoolManaged
+                                                    ? 'bg-blue-100 text-blue-800 cursor-not-allowed'
+                                                : hasPendingSubscription
                                                     ? 'bg-yellow-100 text-yellow-800 cursor-not-allowed'
+                                                    : pkg.is_trial
+                                                        ? 'bg-emerald-500 text-white hover:bg-emerald-600'
                                                     : isPopular
                                                         ? 'bg-gradient-to-r from-[#A3C042] to-[#8CA635] text-white hover:shadow-lg'
                                                         : 'bg-[#A3C042] text-white hover:bg-[#8CA635]'
@@ -286,8 +377,17 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null 
                                                 </>
                                             ) : isCurrentPackage ? (
                                                 t('packagesIndexPage.badges.currentPackage')
-                                            ) : hasPending ? (
-                                                t('packagesIndexPage.pending.badge')
+                                            ) : isTrialUsed ? (
+                                                t('packagesIndexPage.actions.trialUsed')
+                                            ) : isSchoolManaged ? (
+                                                t('packagesIndexPage.actions.managedBySchool')
+                                            ) : hasPendingSubscription ? (
+                                                t('packagesIndexPage.actions.subscriptionPending')
+                                            ) : pkg.is_trial ? (
+                                                <>
+                                                    <FaGift className="inline me-2" />
+                                                    {t('packagesIndexPage.actions.activateTrial')}
+                                                </>
                                             ) : (
                                                 <>
                                                     <FaCreditCard className="inline me-2" />

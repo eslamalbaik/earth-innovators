@@ -3,8 +3,7 @@ import { FaPlus, FaTrash, FaEye, FaEyeSlash, FaSpinner, FaCheck, FaExclamationTr
 import axios from 'axios';
 import { router } from '@inertiajs/react';
 import { useTranslation } from '@/i18n';
-
-const DEFAULT_DIAL_CODE = '+971';
+import { DEFAULT_DIAL_CODE, getDialCodeOptions } from '@/utils/dialCodeOptions';
 
 const getSubjectLabel = (subject, language) => {
     if (language === 'ar') {
@@ -63,9 +62,7 @@ export default function JoinTeacherForm({ subjects = [], cities = [] }) {
         description: '',
     });
 
-    const dialCodeOptions = useMemo(() => [
-        { value: '+971', label: t('joinTeacherPage.form.dialCodes.uae') },
-    ], [t]);
+    const dialCodeOptions = useMemo(() => getDialCodeOptions(t), [t]);
 
     const stageOptions = useMemo(() => [
         { value: '\u0627\u0644\u0627\u0628\u062a\u062f\u0627\u0626\u064a\u0629', label: t('joinTeacherPage.form.stageOptions.primary') },

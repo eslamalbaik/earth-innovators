@@ -31,9 +31,8 @@ class LoginRequest extends FormRequest
 
         $remember = $this->boolean('remember');
         $baseCredentials = $this->only('email', 'password');
+        $selectedRole = $this->string('role')->value();
 
-        // Check if user exists and get their actual role from database
-        // Role should always match the email, not the request
         $user = \App\Models\User::where('email', $baseCredentials['email'])->first();
 
         if (!$user) {
@@ -43,12 +42,13 @@ class LoginRequest extends FormRequest
             ]);
         }
 
-        // Use the user's actual role from database, not from request
-        // This ensures role is always correct and matches the email
-        $userRole = $user->role;
+        if ($selectedRole && !$this->selectedRoleMatchesUserRole($selectedRole, $user->role)) {
+            throw ValidationException::withMessages([
+                'role' => ['نوع الحساب المختار لا يطابق هذا البريد الإلكتروني. يرجى اختيار نوع الحساب الصحيح.'],
+            ]);
+        }
 
-        // Authenticate using the user's actual role from database
-        $authenticated = Auth::attempt(array_merge($baseCredentials, ['role' => $userRole]), $remember);
+        $authenticated = Auth::attempt(array_merge($baseCredentials, ['role' => $user->role]), $remember);
 
         if (! $authenticated) {
             RateLimiter::hit($this->throttleKey());
@@ -59,6 +59,15 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($this->throttleKey());
+    }
+
+    private function selectedRoleMatchesUserRole(string $selectedRole, string $userRole): bool
+    {
+        if (in_array($selectedRole, ['school', 'educational_institution'], true)) {
+            return in_array($userRole, ['school', 'educational_institution'], true);
+        }
+
+        return $selectedRole === $userRole;
     }
 
     public function ensureIsNotRateLimited(): void

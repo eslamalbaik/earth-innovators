@@ -17,16 +17,22 @@ export default function CreateSchoolProject({ auth }) {
         instructional_approach: '',
         grade: '',
         subject: '',
+        thumbnail: null,
+        project_document: null,
         files: [],
         images: [],
         report: '',
     });
 
+    const [thumbnailFile, setThumbnailFile] = useState(null);
+    const [projectDocumentFile, setProjectDocumentFile] = useState(null);
     const [fileList, setFileList] = useState([]);
     const [imageList, setImageList] = useState([]);
     const [dragActive, setDragActive] = useState(false);
     const fileInputRef = useRef(null);
     const imageInputRef = useRef(null);
+    const thumbnailInputRef = useRef(null);
+    const projectDocumentInputRef = useRef(null);
 
     const handleFiles = (files) => {
         const fileArray = Array.from(files);
@@ -92,6 +98,50 @@ export default function CreateSchoolProject({ auth }) {
         setData('images', [...data.images, ...validFiles]);
     };
 
+    const handleThumbnail = (file) => {
+        if (!file) return;
+
+        const maxSize = 5 * 1024 * 1024;
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+
+        if (file.size > maxSize) {
+            alert(t('schoolProjectsCreatePage.errors.imageTooLarge', { name: file.name, maxMb: 5 }));
+            return;
+        }
+
+        if (!validTypes.includes(file.type)) {
+            alert(t('schoolProjectsCreatePage.errors.imageTypeNotSupported', { name: file.name }));
+            return;
+        }
+
+        setThumbnailFile(file);
+        setData('thumbnail', file);
+    };
+
+    const handleProjectDocument = (file) => {
+        if (!file) return;
+
+        const maxSize = 10 * 1024 * 1024;
+        const validTypes = [
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        ];
+
+        if (file.size > maxSize) {
+            alert(t('schoolProjectsCreatePage.errors.fileTooLarge', { name: file.name, maxMb: 10 }));
+            return;
+        }
+
+        if (!validTypes.includes(file.type)) {
+            alert(t('schoolProjectsCreatePage.errors.fileTypeNotSupported', { name: file.name }));
+            return;
+        }
+
+        setProjectDocumentFile(file);
+        setData('project_document', file);
+    };
+
     const removeFile = (id) => {
         setFileList(prev => {
             const newList = prev.filter(item => item.id !== id);
@@ -115,6 +165,7 @@ export default function CreateSchoolProject({ auth }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         post('/school/projects', {
+            forceFormData: true,
             preserveScroll: true,
             onSuccess: () => {
                 router.visit('/school/projects');
@@ -291,6 +342,80 @@ export default function CreateSchoolProject({ auth }) {
                             <InputError message={errors.instructional_approach} className="mt-2" />
                         </div>
 
+                        <div>
+                            <InputLabel value={t('schoolProjectsCreatePage.form.imagesLabel')} />
+                            <div className="mt-2 flex items-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => thumbnailInputRef.current?.click()}
+                                    className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                >
+                                    {t('schoolProjectsCreatePage.actions.chooseImages')}
+                                </button>
+                                {thumbnailFile && (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setThumbnailFile(null);
+                                            setData('thumbnail', null);
+                                            if (thumbnailInputRef.current) thumbnailInputRef.current.value = '';
+                                        }}
+                                        className="text-red-500 hover:text-red-700"
+                                        aria-label={t('common.remove')}
+                                    >
+                                        <FaTrash />
+                                    </button>
+                                )}
+                            </div>
+                            <input
+                                ref={thumbnailInputRef}
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => handleThumbnail(e.target.files?.[0])}
+                                className="hidden"
+                            />
+                            <p className="mt-1 text-xs text-gray-500">{t('schoolProjectsCreatePage.dropzone.imagesTitle')}</p>
+                            {thumbnailFile && <p className="mt-1 text-sm text-gray-700">{thumbnailFile.name}</p>}
+                            <InputError message={errors.thumbnail} className="mt-2" />
+                        </div>
+
+                        <div>
+                            <InputLabel value={t('schoolProjectsCreatePage.form.filesLabel')} />
+                            <div className="mt-2 flex items-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => projectDocumentInputRef.current?.click()}
+                                    className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                >
+                                    {t('schoolProjectsCreatePage.actions.chooseFiles')}
+                                </button>
+                                {projectDocumentFile && (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setProjectDocumentFile(null);
+                                            setData('project_document', null);
+                                            if (projectDocumentInputRef.current) projectDocumentInputRef.current.value = '';
+                                        }}
+                                        className="text-red-500 hover:text-red-700"
+                                        aria-label={t('common.remove')}
+                                    >
+                                        <FaTrash />
+                                    </button>
+                                )}
+                            </div>
+                            <input
+                                ref={projectDocumentInputRef}
+                                type="file"
+                                accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                onChange={(e) => handleProjectDocument(e.target.files?.[0])}
+                                className="hidden"
+                            />
+                            <p className="mt-1 text-xs text-gray-500">{t('schoolProjectsCreatePage.dropzone.filesTitle')}</p>
+                            {projectDocumentFile && <p className="mt-1 text-sm text-gray-700">{projectDocumentFile.name}</p>}
+                            <InputError message={errors.project_document} className="mt-2" />
+                        </div>
+
                         {/* رفع الصور */}
                         <div>
                             <InputLabel value={t('schoolProjectsCreatePage.form.imagesLabel')} />
@@ -454,4 +579,3 @@ export default function CreateSchoolProject({ auth }) {
         </DashboardLayout>
     );
 }
-

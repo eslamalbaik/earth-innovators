@@ -49,6 +49,11 @@ class PublicationController extends Controller
         return Inertia::render('Publications/Show', [
             'publication' => $publication,
             'isLiked' => $publication->is_liked ?? false,
+            'relatedPublications' => $this->publicationService->getRelatedApprovedPublications(
+                $publication->id,
+                $publication->type,
+                3
+            ),
         ]);
     }
 

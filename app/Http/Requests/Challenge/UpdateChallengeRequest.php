@@ -27,7 +27,7 @@ class UpdateChallengeRequest extends FormRequest
             'description' => 'sometimes|required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'instructions' => 'sometimes|required|string',
-            'challenge_type' => 'sometimes|required|in:60_seconds,mental_math,conversions,team_fastest,build_problem,custom',
+            'challenge_type' => 'sometimes|required|in:cognitive,applied,creative,artistic_creative,collaborative,analytical,technological,behavioral,60_seconds,mental_math,conversions,team_fastest,build_problem,custom',
             'category' => 'sometimes|required|in:science,technology,engineering,mathematics,arts,other',
             'age_group' => 'sometimes|required|in:6-9,10-13,14-17,18+',
             'school_id' => 'nullable|exists:users,id',

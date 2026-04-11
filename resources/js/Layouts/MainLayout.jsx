@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import { getUserImageUrl, getInitials, getColorFromName } from '../utils/imageUtils';
 import LanguageSwitcher from '../Components/LanguageSwitcher';
 import { useTranslation } from '../i18n';
+import WhatsAppSupportButton from '@/Components/Support/WhatsAppSupportButton';
 
 export default function MainLayout({ children, auth }) {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -228,6 +229,8 @@ export default function MainLayout({ children, auth }) {
             <main className="flex-1">
                 {children}
             </main>
+
+            <WhatsAppSupportButton />
 
             <footer className="bg-[#A3C042] py-6 mt-auto">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

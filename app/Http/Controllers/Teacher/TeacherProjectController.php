@@ -91,6 +91,8 @@ class TeacherProjectController extends Controller
             'school_id' => 'nullable|exists:users,id',
             'files' => 'nullable|array',
             'files.*' => 'file|max:10240|mimes:pdf,doc,docx,jpg,jpeg,png,gif,mp4,avi,mov',
+            'thumbnail' => 'nullable|image|max:5120',
+            'project_document' => 'nullable|file|max:10240|mimes:pdf,doc,docx',
             'evaluation' => 'nullable|array',
         ], [
             'title.required' => 'عنوان المشروع مطلوب',
@@ -134,21 +136,50 @@ class TeacherProjectController extends Controller
         // رفع الملفات
         if ($request->hasFile('files')) {
             $uploadedFiles = [];
+            $firstImagePath = null;
+            $firstDocumentPath = null;
             foreach ($request->file('files') as $file) {
                 // تحديد نوع الملف (صورة أو فيديو أو PDF)
                 $mimeType = $file->getMimeType();
                 if (str_starts_with($mimeType, 'image/')) {
                     $path = $file->store('projects/images', 'public');
+                    if (!$firstImagePath) {
+                        $firstImagePath = $path;
+                    }
                 } elseif (str_starts_with($mimeType, 'video/')) {
                     $path = $file->store('projects/videos', 'public');
                 } else {
                     $path = $file->store('projects/files', 'public');
+                    if (!$firstDocumentPath) {
+                        $firstDocumentPath = $path;
+                    }
                 }
                 $uploadedFiles[] = $path;
             }
             $project->files = $uploadedFiles;
-            $project->save();
+            if (!$project->thumbnail && $firstImagePath) {
+                $project->thumbnail = $firstImagePath;
+            }
+            if (!$project->project_document && $firstDocumentPath) {
+                $project->project_document = $firstDocumentPath;
+            }
         }
+
+        if ($request->hasFile('thumbnail')) {
+            if ($project->thumbnail) {
+                Storage::disk('public')->delete($project->thumbnail);
+            }
+            $project->thumbnail = $request->file('thumbnail')->store('projects/thumbnails', 'public');
+        }
+
+        if ($request->hasFile('project_document')) {
+            if ($project->project_document) {
+                Storage::disk('public')->delete($project->project_document);
+            }
+            $project->project_document = $request->file('project_document')->store('projects/documents', 'public');
+        }
+
+        $project->save();
 
         // إرسال حدث إنشاء مشروع من معلم (دائماً إذا كان هناك school_id)
         if ($project->school_id) {
@@ -254,6 +285,8 @@ class TeacherProjectController extends Controller
                 'likes' => $project->likes ?? 0,
                 'rating' => $project->rating ?? 0,
                 'points_earned' => $project->points_earned ?? 0,
+                'thumbnail' => $project->thumbnail,
+                'project_document' => $project->project_document,
                 'user' => $project->user ? [
                     'id' => $project->user->id,
                     'name' => $project->user->name,
@@ -345,6 +378,8 @@ class TeacherProjectController extends Controller
             'school_id' => 'nullable|exists:users,id',
             'files' => 'nullable|array',
             'files.*' => 'file|max:10240',
+            'thumbnail' => 'nullable|image|max:5120',
+            'project_document' => 'nullable|file|max:10240|mimes:pdf,doc,docx',
             'remove_files' => 'nullable|array',
             'remove_files.*' => 'string',
             'evaluation' => 'nullable|array',
@@ -389,6 +424,8 @@ class TeacherProjectController extends Controller
         if ($request->hasFile('files')) {
             $uploadedFiles = $project->files ?? [];
             $files = $request->file('files');
+            $firstImagePath = null;
+            $firstDocumentPath = null;
             
             // التأكد من أن files هو array
             if (!is_array($files)) {
@@ -401,15 +438,41 @@ class TeacherProjectController extends Controller
                     $mimeType = $file->getMimeType();
                     if (str_starts_with($mimeType, 'image/')) {
                         $path = $file->store('projects/images', 'public');
+                        if (!$firstImagePath) {
+                            $firstImagePath = $path;
+                        }
                     } elseif (str_starts_with($mimeType, 'video/')) {
                         $path = $file->store('projects/videos', 'public');
                     } else {
                         $path = $file->store('projects/files', 'public');
+                        if (!$firstDocumentPath) {
+                            $firstDocumentPath = $path;
+                        }
                     }
                     $uploadedFiles[] = $path;
                 }
             }
             $project->files = $uploadedFiles;
+            if (!$project->thumbnail && $firstImagePath) {
+                $project->thumbnail = $firstImagePath;
+            }
+            if (!$project->project_document && $firstDocumentPath) {
+                $project->project_document = $firstDocumentPath;
+            }
+        }
+
+        if ($request->hasFile('thumbnail')) {
+            if ($project->thumbnail) {
+                Storage::disk('public')->delete($project->thumbnail);
+            }
+            $project->thumbnail = $request->file('thumbnail')->store('projects/thumbnails', 'public');
+        }
+
+        if ($request->hasFile('project_document')) {
+            if ($project->project_document) {
+                Storage::disk('public')->delete($project->project_document);
+            }
+            $project->project_document = $request->file('project_document')->store('projects/documents', 'public');
         }
 
         // تحديث بيانات المشروع
@@ -423,6 +486,7 @@ class TeacherProjectController extends Controller
         if (isset($validated['evaluation'])) {
             $project->update(['self_evaluation' => $validated['evaluation']]);
         }
+        $project->save();
 
         // مسح الكاش
         $this->projectService->clearProjectCache($project->id, null, $teacher->id, $schoolId);
@@ -473,6 +537,12 @@ class TeacherProjectController extends Controller
                     }
                 }
             }
+            if ($project->thumbnail) {
+                Storage::disk('public')->delete($project->thumbnail);
+            }
+            if ($project->project_document) {
+                Storage::disk('public')->delete($project->project_document);
+            }
 
             $schoolId = $project->school_id;
             $projectId = $project->id;
@@ -505,4 +575,3 @@ class TeacherProjectController extends Controller
         }
     }
 }
-

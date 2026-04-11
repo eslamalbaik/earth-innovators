@@ -69,6 +69,8 @@ class SchoolProjectController extends Controller
             'files.*' => 'file|max:10240',
             'images' => 'nullable|array',
             'images.*' => 'image|max:5120',
+            'thumbnail' => 'nullable|image|max:5120',
+            'project_document' => 'nullable|file|max:10240|mimes:pdf,doc,docx',
             'report' => 'nullable|string',
         ]);
 
@@ -89,19 +91,49 @@ class SchoolProjectController extends Controller
         // رفع الملفات
         if ($request->hasFile('files')) {
             $files = [];
+            $firstDocumentPath = null;
             foreach ($request->file('files') as $file) {
-                $files[] = $file->store('projects/files', 'public');
+                $path = $file->store('projects/files', 'public');
+                if (!$firstDocumentPath) {
+                    $firstDocumentPath = $path;
+                }
+                $files[] = $path;
             }
             $project->files = $files;
+            if (!$project->project_document && $firstDocumentPath) {
+                $project->project_document = $firstDocumentPath;
+            }
         }
 
         // رفع الصور
         if ($request->hasFile('images')) {
             $images = [];
+            $firstImagePath = null;
             foreach ($request->file('images') as $image) {
-                $images[] = $image->store('projects/images', 'public');
+                $path = $image->store('projects/images', 'public');
+                if (!$firstImagePath) {
+                    $firstImagePath = $path;
+                }
+                $images[] = $path;
             }
             $project->images = $images;
+            if (!$project->thumbnail && $firstImagePath) {
+                $project->thumbnail = $firstImagePath;
+            }
+        }
+
+        if ($request->hasFile('thumbnail')) {
+            if ($project->thumbnail) {
+                Storage::disk('public')->delete($project->thumbnail);
+            }
+            $project->thumbnail = $request->file('thumbnail')->store('projects/thumbnails', 'public');
+        }
+
+        if ($request->hasFile('project_document')) {
+            if ($project->project_document) {
+                Storage::disk('public')->delete($project->project_document);
+            }
+            $project->project_document = $request->file('project_document')->store('projects/documents', 'public');
         }
 
         $project->save();
@@ -329,6 +361,10 @@ class SchoolProjectController extends Controller
             'files.*' => 'file|max:10240',
             'images' => 'nullable|array',
             'images.*' => 'image|max:5120',
+            'thumbnail' => 'nullable|image|max:5120',
+            'project_document' => 'nullable|file|max:10240|mimes:pdf,doc,docx',
+            'remove_thumbnail' => 'nullable|boolean',
+            'remove_project_document' => 'nullable|boolean',
             'report' => 'nullable|string',
             'existing_files' => 'nullable|array',
             'existing_files.*' => 'string',
@@ -368,6 +404,9 @@ class SchoolProjectController extends Controller
         }
 
         $project->files = $allFiles;
+        if (!$project->project_document && !empty($allFiles)) {
+            $project->project_document = $allFiles[0];
+        }
 
         // تحديث الصور - دمج الصور المتبقية مع الجديدة
         $allImages = [];
@@ -394,6 +433,33 @@ class SchoolProjectController extends Controller
         }
 
         $project->images = $allImages;
+        if (!$project->thumbnail && !empty($allImages)) {
+            $project->thumbnail = $allImages[0];
+        }
+
+        if ($request->boolean('remove_thumbnail') && !$request->hasFile('thumbnail') && $project->thumbnail) {
+            Storage::disk('public')->delete($project->thumbnail);
+            $project->thumbnail = null;
+        }
+
+        if ($request->boolean('remove_project_document') && !$request->hasFile('project_document') && $project->project_document) {
+            Storage::disk('public')->delete($project->project_document);
+            $project->project_document = null;
+        }
+
+        if ($request->hasFile('thumbnail')) {
+            if ($project->thumbnail) {
+                Storage::disk('public')->delete($project->thumbnail);
+            }
+            $project->thumbnail = $request->file('thumbnail')->store('projects/thumbnails', 'public');
+        }
+
+        if ($request->hasFile('project_document')) {
+            if ($project->project_document) {
+                Storage::disk('public')->delete($project->project_document);
+            }
+            $project->project_document = $request->file('project_document')->store('projects/documents', 'public');
+        }
 
         $project->save();
 
@@ -429,6 +495,12 @@ class SchoolProjectController extends Controller
             foreach ($project->images as $image) {
                 Storage::disk('public')->delete($image);
             }
+        }
+        if ($project->thumbnail) {
+            Storage::disk('public')->delete($project->thumbnail);
+        }
+        if ($project->project_document) {
+            Storage::disk('public')->delete($project->project_document);
         }
 
         $project->delete();

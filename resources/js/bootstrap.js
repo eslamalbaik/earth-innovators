@@ -2,6 +2,26 @@ import axios from 'axios';
 window.axios = axios;
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+window.axios.defaults.withCredentials = true;
+window.axios.defaults.withXSRFToken = true;
+
+const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+if (csrfToken) {
+    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;
+}
+
+window.axios.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error?.response?.status === 419) {
+            if (!window.__earthSessionRefreshed) {
+                window.__earthSessionRefreshed = true;
+                window.location.reload();
+            }
+        }
+        return Promise.reject(error);
+    }
+);
 
 // Laravel Echo setup for real-time notifications
 // Supports both Pusher and Socket.IO (Laravel Echo Server / Reverb)

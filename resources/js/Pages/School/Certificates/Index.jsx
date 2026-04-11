@@ -33,6 +33,7 @@ export default function SchoolCertificatesIndex({
     pendingRequests = [],
     recentIssuedCertificates = [],
     membershipSummary = null,
+    certificateSystemHealth = null,
 }) {
     const { t, language } = useTranslation();
     const { showSuccess, showError } = useToast();
@@ -46,6 +47,23 @@ export default function SchoolCertificatesIndex({
         description: '',
         join_date: new Date().toISOString().split('T')[0],
     });
+    const certificateSystemReady = certificateSystemHealth?.ready !== false;
+    const canIssueCertificates = Boolean(membershipSummary?.certificate_access) && certificateSystemReady;
+    const healthIssues = Array.from(new Set((certificateSystemHealth?.issues || []).map((issue) => {
+        if (issue === 'template_missing') {
+            return 'templateMissing';
+        }
+
+        if (issue === 'field_map_missing') {
+            return 'fieldMapMissing';
+        }
+
+        if (issue === 'tcpdf_missing' || issue === 'fpdi_missing') {
+            return 'pdfEngineMissing';
+        }
+
+        return issue;
+    })));
 
     const getRecipientRoleLabel = (role) => {
         if (role === 'teacher') {
@@ -103,6 +121,10 @@ export default function SchoolCertificatesIndex({
     const openIssueModal = (recipient, defaultType = 'achievement') => {
         if (!membershipSummary?.certificate_access) {
             showError(t('schoolCertificatesIndexPage.toasts.accessDenied'));
+            return;
+        }
+        if (!certificateSystemReady) {
+            showError(t('schoolCertificatesIndexPage.toasts.systemNotReady'));
             return;
         }
 
@@ -167,6 +189,11 @@ export default function SchoolCertificatesIndex({
     };
 
     const handleApprove = (certificateId) => {
+        if (!certificateSystemReady) {
+            showError(t('schoolCertificatesIndexPage.toasts.systemNotReady'));
+            return;
+        }
+
         router.post(`/school/certificates/${certificateId}/approve`, {}, {
             preserveScroll: true,
             onSuccess: () => showSuccess(t('schoolCertificatesIndexPage.toasts.approveSuccess')),
@@ -239,6 +266,24 @@ export default function SchoolCertificatesIndex({
                     </div>
                 </div>
 
+                {!certificateSystemReady && (
+                    <div className="rounded-2xl border border-red-200 bg-red-50 p-5">
+                        <h2 className="text-lg font-bold text-red-800">
+                            {t('schoolCertificatesIndexPage.alerts.systemNotReadyTitle')}
+                        </h2>
+                        <p className="mt-2 text-sm text-red-700">
+                            {t('schoolCertificatesIndexPage.alerts.systemNotReadyDescription')}
+                        </p>
+                        {healthIssues.length > 0 && (
+                            <ul className="mt-3 space-y-2 text-sm text-red-700">
+                                {healthIssues.map((issue) => (
+                                    <li key={issue}>- {t(`schoolCertificatesIndexPage.alerts.issues.${issue}`)}</li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                )}
+
                 <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
                     <div className="mb-4 flex items-center justify-between">
                         <div>
@@ -279,7 +324,12 @@ export default function SchoolCertificatesIndex({
                                     <div className="flex flex-wrap items-center gap-2">
                                         <button
                                             onClick={() => handleApprove(request.id)}
-                                            className="rounded-xl bg-green-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-green-700"
+                                            disabled={!certificateSystemReady}
+                                            className={`rounded-xl px-4 py-2 text-sm font-bold text-white transition ${
+                                                certificateSystemReady
+                                                    ? 'bg-green-600 hover:bg-green-700'
+                                                    : 'cursor-not-allowed bg-gray-300'
+                                            }`}
                                         >
                                             {t('schoolCertificatesIndexPage.actions.approve')}
                                         </button>
@@ -368,7 +418,12 @@ export default function SchoolCertificatesIndex({
                                         <td className="px-4 py-4">
                                             <button
                                                 onClick={() => openIssueModal(recipient, recipient.role === 'teacher' ? 'teacher' : 'achievement')}
-                                                className="rounded-xl border border-[#A3C042] px-4 py-2 text-sm font-bold text-[#7E9B25] transition hover:bg-[#A3C042] hover:text-white"
+                                                disabled={!canIssueCertificates}
+                                                className={`rounded-xl border px-4 py-2 text-sm font-bold transition ${
+                                                    canIssueCertificates
+                                                        ? 'border-[#A3C042] text-[#7E9B25] hover:bg-[#A3C042] hover:text-white'
+                                                        : 'cursor-not-allowed border-gray-200 text-gray-400'
+                                                }`}
                                             >
                                                 {t('schoolCertificatesIndexPage.actions.issueNow')}
                                             </button>

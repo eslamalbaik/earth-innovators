@@ -1,6 +1,6 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { useTranslation } from '@/i18n';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import { FaCheckCircle, FaClock, FaEye, FaMedal, FaSearch, FaTimesCircle } from 'react-icons/fa';
 import TextInput from '@/Components/TextInput';
 import SelectInput from '@/Components/SelectInput';
@@ -211,14 +211,24 @@ export default function SchoolBadges({ badges, auth }) {
                         <div className="mt-6 flex justify-center">
                             <div className="flex gap-2">
                                 {badges.links.map((link, index) => (
-                                    <Link
+                                    <button
                                         key={index}
-                                        href={link.url || '#'}
+                                        type="button"
+                                        onClick={() => {
+                                            if (!link.url) {
+                                                return;
+                                            }
+                                            router.visit(link.url, {
+                                                preserveScroll: true,
+                                                preserveState: true,
+                                            });
+                                        }}
                                         className={`rounded-lg px-4 py-2 font-medium transition ${
                                             link.active
                                                 ? 'bg-[#A3C042] text-white'
                                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                         } ${!link.url ? 'cursor-not-allowed opacity-50' : ''}`}
+                                        disabled={!link.url}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
                                 ))}

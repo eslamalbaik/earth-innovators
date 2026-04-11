@@ -16,12 +16,14 @@ use Illuminate\Support\Facades\Schema;
 class StudentEngagementService
 {
     public function __construct(
-        private PackagePaymentService $packagePaymentService
+        private MembershipAccessService $membershipAccessService
     ) {}
 
     public function getSummary(User $user): array
     {
-        $subscription = $this->packagePaymentService->getActiveSubscription($user);
+        $membershipSummary = $this->membershipAccessService->getMembershipSummary($user);
+        $subscription = $membershipSummary['subscription'] ?? null;
+        $pendingSubscription = $membershipSummary['pending_subscription'] ?? null;
         $points = (int) ($user->points ?? 0);
         $userId = (int) $user->id;
 
@@ -80,13 +82,13 @@ class StudentEngagementService
             'points' => $points,
             'membership_type' => $user->membership_type,
             'engagement_score' => $engagementScore,
-            'subscription' => $subscription ? [
-                'package_id' => $subscription->package_id,
-                'package_name' => $subscription->package->name_ar ?? $subscription->package->name,
-                'end_date' => $subscription->end_date->format('Y-m-d'),
-                'status' => $subscription->status,
-            ] : null,
-            'can_subscribe' => $subscription === null,
+            'subscription' => $subscription,
+            'pending_subscription' => $pendingSubscription,
+            'is_school_owned' => (bool) ($membershipSummary['is_school_owned'] ?? false),
+            'is_expiring_soon' => (bool) ($membershipSummary['is_expiring_soon'] ?? false),
+            'needs_renewal' => (bool) ($membershipSummary['needs_renewal'] ?? false),
+            'trial_available' => (bool) ($membershipSummary['trial_available'] ?? false),
+            'can_subscribe' => $subscription === null && $pendingSubscription === null,
             'rewards' => [
                 'active_count' => $activeRewardsCount,
                 'redeemable_count' => $redeemableRewardsCount,

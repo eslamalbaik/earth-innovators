@@ -24,6 +24,8 @@ class Project extends Model
         'status',
         'files',
         'images',
+        'thumbnail',
+        'project_document',
         'report',
         'views',
         'likes',
@@ -111,4 +113,5 @@ class Project extends Model
     {
         return $this->hasMany(AcceptanceCriterion::class)->ordered();
     }
+
 }

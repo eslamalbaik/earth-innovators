@@ -9,19 +9,15 @@ import { Head, Link, useForm, usePage, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaPhone, FaChevronDown, FaExclamationTriangle, FaTimes, FaSchool, FaUserGraduate, FaChalkboardTeacher, FaUniversity } from 'react-icons/fa';
 import { getTranslation, useTranslation } from '@/i18n';
+import { DEFAULT_DIAL_CODE, getDialCodeOptions } from '@/utils/dialCodeOptions';
 
-const DEFAULT_DIAL_CODE = '+971';
-
-// Country dialing codes
+const getCsrfToken = () => document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
 export default function Register({ schools = [] }) {
     const { t, language } = useTranslation();
     const { props } = usePage();
     const phoneInUseMessage = getTranslation('ar', 'auth.phoneInUseMessage');
-
-    const dialCodeOptions = [
-        { value: '+971', label: `+971 (${t('countries.uae')})`, flag: '🇦🇪' },
-    ];
+    const dialCodeOptions = getDialCodeOptions(t);
 
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -96,6 +92,8 @@ export default function Register({ schools = [] }) {
         } else {
             dataToSend.phone = null;
         }
+
+        dataToSend._token = getCsrfToken();
 
         router.post(route('register'), dataToSend, {
             preserveScroll: true,

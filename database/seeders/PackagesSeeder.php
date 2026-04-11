@@ -27,6 +27,8 @@ class PackagesSeeder extends Seeder
                 'challenges_limit' => 5,
                 'certificate_access' => true,
                 'badge_access' => true,
+                'is_trial' => false,
+                'trial_days' => null,
                 'features' => [
                     'Access to all learning materials',
                     'Submit up to 10 projects per month',
@@ -60,6 +62,8 @@ class PackagesSeeder extends Seeder
                 'challenges_limit' => null, // Unlimited
                 'certificate_access' => true,
                 'badge_access' => true,
+                'is_trial' => false,
+                'trial_days' => null,
                 'features' => [
                     'Create unlimited courses',
                     'Manage unlimited students',
@@ -97,6 +101,8 @@ class PackagesSeeder extends Seeder
                 'challenges_limit' => null, // Unlimited
                 'certificate_access' => true,
                 'badge_access' => true,
+                'is_trial' => false,
+                'trial_days' => null,
                 'features' => [
                     'Up to 50 teachers',
                     'Up to 500 students',
@@ -138,6 +144,8 @@ class PackagesSeeder extends Seeder
                 'challenges_limit' => null, // Unlimited
                 'certificate_access' => true,
                 'badge_access' => true,
+                'is_trial' => false,
+                'trial_days' => null,
                 'features' => [
                     'Unlimited teachers',
                     'Unlimited students',
@@ -165,6 +173,37 @@ class PackagesSeeder extends Seeder
                     'مراجعات أعمال ربع سنوية',
                     'طلبات ميزات ذات أولوية',
                     'دعم مميز على مدار الساعة',
+                ],
+                'is_active' => true,
+                'is_popular' => false,
+            ],
+            [
+                'name' => 'Starter Trial',
+                'name_ar' => 'الباقة التجريبية',
+                'description' => 'Free trial access to explore the platform before subscribing to a paid package.',
+                'description_ar' => 'وصول تجريبي مجاني لاستكشاف المنصة قبل الاشتراك في باقة مدفوعة.',
+                'price' => 0,
+                'currency' => 'AED',
+                'duration_type' => 'monthly',
+                'duration_months' => 1,
+                'points_bonus' => 25,
+                'projects_limit' => 2,
+                'challenges_limit' => 2,
+                'certificate_access' => false,
+                'badge_access' => true,
+                'is_trial' => true,
+                'trial_days' => 14,
+                'features' => [
+                    '2 project submissions',
+                    '2 challenge participations',
+                    'Starter points bonus',
+                    'Explore the platform before upgrading',
+                ],
+                'features_ar' => [
+                    'رفع مشروعين تجريبيين',
+                    'المشاركة في تحديين',
+                    'نقاط ترحيبية للبداية',
+                    'استكشاف المنصة قبل الترقية',
                 ],
                 'is_active' => true,
                 'is_popular' => false,

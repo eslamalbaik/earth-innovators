@@ -13,14 +13,15 @@ use Carbon\Carbon;
 class CertificateService
 {
     protected $fieldMap;
+    protected string $fieldMapPath;
 
     public function __construct(
         private MembershipService $membershipService
     )
     {
-        $fieldMapPath = config_path('certificate_fields.json');
-        if (file_exists($fieldMapPath)) {
-            $this->fieldMap = json_decode(file_get_contents($fieldMapPath), true);
+        $this->fieldMapPath = config_path('certificate_fields.json');
+        if (file_exists($this->fieldMapPath)) {
+            $this->fieldMap = json_decode(file_get_contents($this->fieldMapPath), true);
         } else {
             $this->fieldMap = [];
         }
@@ -39,10 +40,8 @@ class CertificateService
     ): string {
         // Use default template if not provided
         $templatePath = $templatePath ?? public_path('Certificate.pdf');
-        
-        if (!file_exists($templatePath)) {
-            throw new \Exception("Certificate template not found at: {$templatePath}");
-        }
+
+        $this->assertGenerationReady($templatePath);
 
         // Get student data
         $data = $this->prepareCertificateData($student, $issuer, $overrides, $dateFormat, $certificateType);
@@ -51,6 +50,63 @@ class CertificateService
         $pdfPath = $this->fillPdfTemplate($templatePath, $data);
 
         return $pdfPath;
+    }
+
+    public function getGenerationHealth(?string $templatePath = null): array
+    {
+        $resolvedTemplatePath = $templatePath ?? public_path('Certificate.pdf');
+        $tcpdfPath = base_path('vendor/tecnickcom/tcpdf/tcpdf.php');
+        $fieldMapLoaded = is_array($this->fieldMap) && !empty($this->fieldMap);
+
+        $checks = [
+            'template_exists' => file_exists($resolvedTemplatePath),
+            'field_map_exists' => file_exists($this->fieldMapPath),
+            'field_map_loaded' => $fieldMapLoaded,
+            'tcpdf_available' => file_exists($tcpdfPath),
+            'fpdi_available' => class_exists(Fpdi::class),
+        ];
+
+        $issues = [];
+        if (!$checks['template_exists']) {
+            $issues[] = 'template_missing';
+        }
+        if (!$checks['field_map_exists'] || !$checks['field_map_loaded']) {
+            $issues[] = 'field_map_missing';
+        }
+        if (!$checks['tcpdf_available']) {
+            $issues[] = 'tcpdf_missing';
+        }
+        if (!$checks['fpdi_available']) {
+            $issues[] = 'fpdi_missing';
+        }
+
+        return [
+            'ready' => empty($issues),
+            'issues' => $issues,
+            'template_path' => $resolvedTemplatePath,
+            'checks' => $checks,
+        ];
+    }
+
+    public function assertGenerationReady(?string $templatePath = null): void
+    {
+        $health = $this->getGenerationHealth($templatePath);
+
+        if (!$health['checks']['template_exists']) {
+            throw new \RuntimeException("Certificate template not found at: {$health['template_path']}");
+        }
+
+        if (!$health['checks']['field_map_exists'] || !$health['checks']['field_map_loaded']) {
+            throw new \RuntimeException('Certificate field mapping is missing or empty.');
+        }
+
+        if (!$health['checks']['tcpdf_available']) {
+            throw new \RuntimeException('TCPDF library is required. Please run: composer require tecnickcom/tcpdf');
+        }
+
+        if (!$health['checks']['fpdi_available']) {
+            throw new \RuntimeException('FPDI library is required. Please run: composer require setasign/fpdi');
+        }
     }
 
     /**

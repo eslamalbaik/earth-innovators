@@ -4,7 +4,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { FaFileAlt, FaProjectDiagram, FaTrophy, FaGraduationCap, FaFilter } from 'react-icons/fa';
 
-export default function SchoolReportsIndex({ auth, stats, filters, availableYears }) {
+export default function SchoolReportsIndex({ auth, stats, filters, availableYears, reportMeta = null }) {
     const { t } = useTranslation();
     const [selectedYear, setSelectedYear] = useState(filters?.year || new Date().getFullYear());
     const [selectedMonth, setSelectedMonth] = useState(filters?.month || '');
@@ -122,12 +122,54 @@ export default function SchoolReportsIndex({ auth, stats, filters, availableYear
         appName: t('common.appName'),
     });
 
+    const buildExportUrl = (format) => {
+        const params = new URLSearchParams();
+
+        if (selectedYear) {
+            params.set('year', selectedYear);
+        }
+
+        if (selectedMonth) {
+            params.set('month', selectedMonth);
+        }
+
+        return `/school/reports/export/${format}?${params.toString()}`;
+    };
+
     return (
         <DashboardLayout auth={auth} header={t('schoolReportsPage.title')}>
             <Head title={pageTitle} />
 
             <div className="py-6">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                    <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+                        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                            <div>
+                                <h2 className="text-2xl font-bold text-gray-900">{reportMeta?.schoolName || t('schoolReportsPage.title')}</h2>
+                                <p className="mt-2 text-sm text-gray-600">
+                                    {t('schoolReportsPage.generatedAt', { value: reportMeta?.generatedAt || '-' })}
+                                </p>
+                            </div>
+
+                            <div className="flex flex-wrap gap-3">
+                                <a
+                                    href={buildExportUrl('pdf')}
+                                    className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2 font-semibold text-red-700 transition hover:bg-red-100"
+                                >
+                                    <FaFileAlt />
+                                    {t('schoolReportsPage.actions.exportPdf')}
+                                </a>
+                                <a
+                                    href={buildExportUrl('excel')}
+                                    className="inline-flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-2 font-semibold text-green-700 transition hover:bg-green-100"
+                                >
+                                    <FaFileAlt />
+                                    {t('schoolReportsPage.actions.exportExcel')}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
                         <div className="flex items-center gap-2 mb-4">
                             <FaFilter className="text-gray-600" />

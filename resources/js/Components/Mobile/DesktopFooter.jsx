@@ -14,6 +14,7 @@ import {
     FaCompass,
 } from 'react-icons/fa';
 import { useTranslation } from '@/i18n';
+import WhatsAppSupportButton from '@/Components/Support/WhatsAppSupportButton';
 
 export default function DesktopFooter({ auth }) {
     const { t } = useTranslation();
@@ -51,7 +52,9 @@ export default function DesktopFooter({ auth }) {
             : '/school/dashboard';
 
     return (
-        <footer className="hidden border-t border-gray-700 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white md:block">
+        <>
+            <WhatsAppSupportButton />
+            <footer className="hidden border-t border-gray-700 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white md:block">
             <div className="mx-auto max-w-7xl px-6 pb-4 pt-8">
                 <div className="mb-8 grid grid-cols-1 gap-8 lg:grid-cols-4">
                     <div className="lg:col-span-1">
@@ -203,6 +206,7 @@ export default function DesktopFooter({ auth }) {
                     </div>
                 </div>
             </div>
-        </footer>
+            </footer>
+        </>
     );
 }

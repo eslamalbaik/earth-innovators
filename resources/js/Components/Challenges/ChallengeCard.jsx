@@ -3,6 +3,7 @@ import { FaTrophy, FaUsers, FaClock, FaGraduationCap, FaCheckCircle } from 'reac
 import PrimaryButton from '../PrimaryButton';
 import { useState } from 'react';
 import { useTranslation } from '@/i18n';
+import { getChallengeImageUrl } from '@/utils/imageUtils';
 
 export default function ChallengeCard({ challenge, user, participation = null, onJoin = null }) {
     const { t } = useTranslation();
@@ -10,20 +11,6 @@ export default function ChallengeCard({ challenge, user, participation = null, o
     const isCompleted = participation?.status === 'completed';
     const canJoin = user?.role === 'student' && !isParticipating && challenge.status === 'active';
     const [imageError, setImageError] = useState(false);
-
-    const getImageUrl = () => {
-        const imagePath = challenge.image_url || challenge.image;
-
-        if (!imagePath) return null;
-
-        if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-            return imagePath;
-        }
-        if (imagePath.startsWith('/storage/')) {
-            return imagePath;
-        }
-        return `/storage/${imagePath}`;
-    };
 
     const getRemainingTime = () => {
         if (!challenge.deadline) return null;
@@ -57,36 +44,25 @@ export default function ChallengeCard({ challenge, user, participation = null, o
     const handleJoin = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'ChallengeCard.jsx:59', message: 'handleJoin called', data: { challengeId: challenge.id, userId: user?.id, userRole: user?.role }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'A' }) }).catch(() => { });
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
         if (onJoin) {
             onJoin(challenge.id);
         } else {
             if (user?.role === 'student') {
-                fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'ChallengeCard.jsx:69', message: 'Posting to student join route', data: { url: `/student/challenges/${challenge.id}/join` }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'B' }) }).catch(() => { });
-
-                router.post(`/student/challenges/${challenge.id}/join`, {}, {
+                router.post(`/student/challenges/${challenge.id}/join`, { _token: csrfToken }, {
                     preserveScroll: false,
                     preserveState: false,
-                    onSuccess: (page) => {
-                        fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'ChallengeCard.jsx:78', message: 'Join success callback', data: { pageUrl: page?.url, challengeId: challenge.id }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run2', hypothesisId: 'C' }) }).catch(() => { });
+                    onSuccess: () => {
                         const targetUrl = `/student/challenges/${challenge.id}`;
                         const currentUrl = window.location.pathname;
-                        fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'ChallengeCard.jsx:85', message: 'Before redirect', data: { targetUrl, currentUrl, willRedirect: currentUrl !== targetUrl }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run2', hypothesisId: 'E' }) }).catch(() => { });
 
                         if (currentUrl !== targetUrl) {
-                            fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'ChallengeCard.jsx:91', message: 'Calling router.visit', data: { targetUrl }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run2', hypothesisId: 'F' }) }).catch(() => { });
                             router.visit(targetUrl);
                         }
                     },
-                    onError: (errors) => {
-                        fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'ChallengeCard.jsx:95', message: 'Join error callback', data: { errors: JSON.stringify(errors) }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run2', hypothesisId: 'D' }) }).catch(() => { });
-                    },
-                    onFinish: () => {
-                        fetch('http://127.0.0.1:7242/ingest/cb079044-789c-411c-8e05-52ec32393947', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'ChallengeCard.jsx:101', message: 'Join request finished', data: {}, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run2', hypothesisId: 'G' }) }).catch(() => { });
-                    },
                 });
             } else {
-                router.post(`/api/challenges/${challenge.id}/join`, {}, {
+                router.post(`/api/challenges/${challenge.id}/join`, { _token: csrfToken }, {
                     preserveScroll: true,
                     onSuccess: () => {
                         router.visit(`/challenges/${challenge.id}`);
@@ -131,7 +107,7 @@ export default function ChallengeCard({ challenge, user, participation = null, o
         );
     };
 
-    const imageUrl = getImageUrl();
+    const imageUrl = getChallengeImageUrl(challenge.image_url || challenge.image, null);
 
     return (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition duration-300 overflow-hidden group">

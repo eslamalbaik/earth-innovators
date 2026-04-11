@@ -70,6 +70,23 @@ export default function TeacherDashboard({ auth, teacher, stats, membershipSumma
         </span>
     );
 
+    const membershipMessage = membershipSummary?.subscription
+        ? membershipSummary.subscription.is_trial
+            ? t('teacherDashboardPage.membershipTrialActive', {
+                package: membershipSummary.subscription.package_name,
+                until: membershipSummary.subscription.end_date,
+            })
+            : t('teacherDashboardPage.membershipActive', {
+                package: membershipSummary.subscription.package_name,
+                until: membershipSummary.subscription.end_date,
+            })
+        : membershipSummary?.pending_subscription
+            ? t('teacherDashboardPage.membershipPending', {
+                package: membershipSummary.pending_subscription.package_name,
+            })
+            : t('teacherDashboardPage.membershipInactive');
+    const isSchoolManaged = !!membershipSummary?.is_school_owned;
+
     return (
         <DashboardLayout auth={auth}>
             <Head title={t('teacherDashboardPage.title')} />
@@ -178,18 +195,38 @@ export default function TeacherDashboard({ auth, teacher, stats, membershipSumma
                                 <div>
                                     <h2 className="text-lg font-bold text-gray-900">{t('teacherDashboardPage.membershipTitle')}</h2>
                                     <p className="mt-1 text-sm text-gray-600">
-                                        {membershipSummary?.subscription
-                                            ? t('teacherDashboardPage.membershipActive', {
-                                                package: membershipSummary.subscription.package_name,
-                                                until: membershipSummary.subscription.end_date,
-                                            })
-                                            : t('teacherDashboardPage.membershipInactive')}
+                                        {membershipMessage}
                                     </p>
+                                    {isSchoolManaged && (
+                                        <p className="mt-1 text-sm text-blue-700">
+                                            {t('teacherDashboardPage.membershipManagedBySchool', {
+                                                school: membershipSummary.owner_name,
+                                            })}
+                                        </p>
+                                    )}
                                     <p className="mt-1 text-sm font-medium">
                                         {membershipSummary?.certificate_access
                                             ? t('teacherDashboardPage.certificateAccessEnabled')
                                             : t('teacherDashboardPage.certificateAccessDisabled')}
                                     </p>
+                                    {membershipSummary?.is_expiring_soon && membershipSummary?.subscription && (
+                                        <p className="mt-2 text-sm text-amber-700">
+                                            {t('teacherDashboardPage.membershipExpiringSoon', {
+                                                days: membershipSummary.subscription.days_remaining ?? 0,
+                                                until: membershipSummary.subscription.end_date,
+                                            })}
+                                        </p>
+                                    )}
+                                    {membershipSummary?.needs_renewal && (
+                                        <p className="mt-2 text-sm text-red-700">
+                                            {t('teacherDashboardPage.membershipRenewalRequired')}
+                                        </p>
+                                    )}
+                                    {membershipSummary?.trial_available && !membershipSummary?.subscription && !membershipSummary?.pending_subscription && !isSchoolManaged && (
+                                        <p className="mt-2 text-sm text-emerald-700">
+                                            {t('teacherDashboardPage.membershipTrialAvailable')}
+                                        </p>
+                                    )}
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                     <Link
@@ -198,11 +235,19 @@ export default function TeacherDashboard({ auth, teacher, stats, membershipSumma
                                     >
                                         {t('teacherDashboardPage.openCertificates')}
                                     </Link>
+                                    {!isSchoolManaged && (
+                                        <Link
+                                            href="/packages"
+                                            className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-800 hover:border-[#A3C042]/40"
+                                        >
+                                            {t('teacherDashboardPage.openPackages')}
+                                        </Link>
+                                    )}
                                     <Link
-                                        href="/packages"
+                                        href="/my-subscriptions"
                                         className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-800 hover:border-[#A3C042]/40"
                                     >
-                                        {t('teacherDashboardPage.openPackages')}
+                                        {t('teacherDashboardPage.openSubscriptions')}
                                     </Link>
                                 </div>
                             </div>

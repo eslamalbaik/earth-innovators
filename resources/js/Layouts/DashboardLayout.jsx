@@ -12,11 +12,12 @@ import { useSelector } from 'react-redux';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import SidebarItem from '@/Components/SidebarItem';
 import SidebarSubMenu from '@/Components/SidebarSubMenu';
-import { getInitials, getColorFromName } from '@/utils/imageUtils';
+import { getInitials, getColorFromName, getUserImageUrl } from '@/utils/imageUtils';
 import { useToast } from '@/Contexts/ToastContext';
 import { useFlashNotifications } from '@/Hooks/useFlashNotifications';
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
 import { useTranslation } from '@/i18n';
+import WhatsAppSupportButton from '@/Components/Support/WhatsAppSupportButton';
 
 export default function DashboardLayout({ children, header }) {
     const { t } = useTranslation();
@@ -40,13 +41,7 @@ export default function DashboardLayout({ children, header }) {
     const previousDashboardDataRef = useRef(null);
 
     const getUserImage = () => {
-        if (auth?.user?.image) {
-            return auth.user.image;
-        }
-        if (auth?.user?.role === 'teacher' && auth?.user?.teacher?.image) {
-            return auth.user.teacher.image;
-        }
-        return null;
+        return getUserImageUrl(auth?.user, auth?.user?.teacher);
     };
 
     const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
@@ -1004,6 +999,8 @@ export default function DashboardLayout({ children, header }) {
                     </div>
                 </main>
             </div>
+
+            <WhatsAppSupportButton />
 
             {sidebarOpen && (
                 <div

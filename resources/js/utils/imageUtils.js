@@ -97,6 +97,37 @@ export const getPublicationImageUrl = (imagePath, fallback = '/images/default-pu
 };
 
 /**
+ * Get challenge image URL
+ * Supports accessor URLs, storage paths, images directory assets and inline previews.
+ * @param {string|null|undefined} imagePath
+ * @param {string} fallback
+ * @returns {string}
+ */
+export const getChallengeImageUrl = (imagePath, fallback = '/images/hero.png') => {
+    if (!imagePath) {
+        return fallback;
+    }
+
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+        return imagePath;
+    }
+
+    if (imagePath.startsWith('data:')) {
+        return imagePath;
+    }
+
+    if (imagePath.startsWith('/storage/') || imagePath.startsWith('/images/')) {
+        return imagePath;
+    }
+
+    if (imagePath.startsWith('storage/')) {
+        return `/${imagePath}`;
+    }
+
+    return `/storage/${imagePath}`;
+};
+
+/**
  * Get publication file URL
  * Similar to getPublicationImageUrl but for PDF files
  * @param {string|null|undefined} filePath - The file path from the API
@@ -125,4 +156,3 @@ export const getPublicationFileUrl = (filePath) => {
     // Assume it's a relative path in storage
     return `/storage/${filePath}`;
 };
-

@@ -6,12 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Teacher;
 use App\Models\User;
 use App\Services\MembershipService;
+use App\Services\PackagePaymentService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -126,11 +128,21 @@ class RegisteredUserController extends Controller
                     'gender' => null,
                     'neighborhoods' => json_encode([]),
                     'is_verified' => false,
-                    'is_active' => false,
+                    'is_active' => true,
                 ]);
             }
 
             DB::commit();
+
+            try {
+                app(PackagePaymentService::class)->activateDefaultTrialForNewUser($user);
+            } catch (\Throwable $trialException) {
+                Log::warning('Unable to activate default trial after registration', [
+                    'user_id' => $user->id,
+                    'role' => $user->role,
+                    'error' => $trialException->getMessage(),
+                ]);
+            }
 
             event(new Registered($user));
             Auth::login($user);

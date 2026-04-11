@@ -2,6 +2,7 @@ import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { FaSave, FaArrowRight, FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaGraduationCap, FaDollarSign, FaImage } from 'react-icons/fa';
 import { useMemo, useState } from 'react';
+import { DEFAULT_DIAL_CODE, PHONE_COUNTRY_OPTIONS, detectDialCode, stripDialCode } from '@/utils/dialCodeOptions';
 
 const parseJsonArray = (value) => {
     if (!value) {
@@ -32,47 +33,10 @@ const parseJsonArray = (value) => {
     return [];
 };
 
-const DEFAULT_DIAL_CODE = '+971';
-
-const dialCodeOptions = [
-    { value: '+971', label: '+971' },
-];
-
-const detectDialCode = (phone) => {
-    if (typeof phone !== 'string') {
-        return DEFAULT_DIAL_CODE;
-    }
-
-    const trimmed = phone.trim();
-    if (!trimmed) {
-        return DEFAULT_DIAL_CODE;
-    }
-
-    const matchedOption = dialCodeOptions.find((option) => trimmed.startsWith(option.value));
-    if (matchedOption) {
-        return matchedOption.value;
-    }
-
-    const plusNumberMatch = trimmed.match(/^\+\d{1,4}/);
-    if (plusNumberMatch) {
-        return plusNumberMatch[0];
-    }
-
-    return DEFAULT_DIAL_CODE;
-};
-
-const stripDialCode = (phone, dialCode) => {
-    if (typeof phone !== 'string') {
-        return '';
-    }
-
-    const normalizedDialCode = dialCode || DEFAULT_DIAL_CODE;
-    if (phone.startsWith(normalizedDialCode)) {
-        return phone.slice(normalizedDialCode.length).trim().replace(/\D/g, '');
-    }
-
-    return phone.replace(/\D/g, '');
-};
+const dialCodeOptions = PHONE_COUNTRY_OPTIONS.map((option) => ({
+    value: option.value,
+    label: `${option.flag} ${option.value}`,
+}));
 
 export default function EditTeacher({ teacher, subjects, cities, auth }) {
     const [selectedImage, setSelectedImage] = useState(null);

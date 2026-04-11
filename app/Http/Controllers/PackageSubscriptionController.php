@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Package;
 use App\Models\Payment;
 use App\Models\UserPackage;
+use App\Services\MembershipAccessService;
 use App\Services\PackagePaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,9 +19,13 @@ class PackageSubscriptionController extends Controller
 
     public function index()
     {
+        $user = Auth::user();
+
         $packages = Package::where('is_active', true)
+            ->orderByDesc('is_trial')
             ->orderBy('price', 'asc')
             ->get()
+            ->filter(fn (Package $package) => $package->supportsRole($user?->role))
             ->map(function ($package) {
                 return [
                     'id' => $package->id,
@@ -37,15 +42,22 @@ class PackageSubscriptionController extends Controller
                     'challenges_limit' => $package->challenges_limit,
                     'certificate_access' => $package->certificate_access,
                     'badge_access' => $package->badge_access,
+                    'is_trial' => $package->is_trial,
+                    'trial_days' => $package->trial_days,
                     'features' => $package->features,
                     'features_ar' => $package->features_ar,
                     'is_popular' => $package->is_popular,
+                    'audience' => $package->resolveAudience(),
                 ];
             });
 
         $userPackage = null;
-        if (Auth::check()) {
-            $activeSubscription = $this->packagePaymentService->getActiveSubscription(Auth::user());
+        $trialStatus = null;
+        $membershipSummary = null;
+        if ($user) {
+            $trialStatus = $this->packagePaymentService->getTrialStatus($user);
+            $activeSubscription = $this->packagePaymentService->getActiveSubscription($user);
+            $membershipSummary = app(MembershipAccessService::class)->getMembershipSummary($user);
 
             if ($activeSubscription) {
                 $userPackage = [
@@ -59,14 +71,11 @@ class PackageSubscriptionController extends Controller
                     'start_date' => $activeSubscription->start_date->format('Y-m-d'),
                     'end_date' => $activeSubscription->end_date->format('Y-m-d'),
                     'status' => $activeSubscription->status,
+                    'is_trial' => (bool) ($activeSubscription->package?->is_trial ?? false),
                 ];
             } else {
                 // Show the latest pending subscription to avoid "processing..." without feedback
-                $pending = UserPackage::where('user_id', Auth::id())
-                    ->where('status', 'pending')
-                    ->with('package')
-                    ->latest()
-                    ->first();
+                $pending = $this->packagePaymentService->getLatestPendingSubscription(Auth::user());
 
                 if ($pending) {
                     $userPackage = [
@@ -80,6 +89,7 @@ class PackageSubscriptionController extends Controller
                         'start_date' => $pending->start_date?->format('Y-m-d'),
                         'end_date' => $pending->end_date?->format('Y-m-d'),
                         'status' => $pending->status,
+                        'is_trial' => (bool) ($pending->package?->is_trial ?? false),
                     ];
                 }
             }
@@ -88,9 +98,11 @@ class PackageSubscriptionController extends Controller
         return Inertia::render('Packages/Index', [
             'packages' => $packages,
             'userPackage' => $userPackage,
+            'trialStatus' => $trialStatus,
+            'membershipSummary' => $membershipSummary,
             'auth' => [
-                'user' => Auth::check() ? Auth::user() : null,
-                'unreadCount' => Auth::check() ? Auth::user()->unreadNotifications()->count() : 0,
+                'user' => $user,
+                'unreadCount' => $user ? $user->unreadNotifications()->count() : 0,
             ],
         ]);
     }
@@ -108,20 +120,10 @@ class PackageSubscriptionController extends Controller
             ]);
         }
 
-        if ($user->status === 'inactive') {
-            return redirect()->back()->with('error', [
-                'key' => 'toastMessages.inactiveUserCannotSubscribe',
-            ]);
-        }
-
         $result = $this->packagePaymentService->createSubscriptionCheckout($user, $package);
 
         if (!$result['success']) {
-            $message = $result['message'];
-            if (is_string($message) && str_contains(strtolower($message), 'inactive')) {
-                $message = ['key' => 'toastMessages.inactiveUserCannotSubscribe'];
-            }
-            return redirect()->back()->with('error', $message);
+            return redirect()->back()->with('error', $result['message']);
         }
 
         if (!empty($result['redirect_url'])) {
@@ -198,6 +200,8 @@ class PackageSubscriptionController extends Controller
                         'name_ar' => $subscription->package->name_ar,
                         'price' => $subscription->package->price,
                         'currency' => $subscription->package->currency,
+                        'is_trial' => (bool) ($subscription->package->is_trial ?? false),
+                        'trial_days' => $subscription->package->trial_days,
                     ],
                     'start_date' => $subscription->start_date->format('Y-m-d'),
                     'end_date' => $subscription->end_date->format('Y-m-d'),
@@ -207,11 +211,13 @@ class PackageSubscriptionController extends Controller
                     'payment_method' => $subscription->payment_method,
                     'transaction_id' => $subscription->transaction_id,
                     'created_at' => $subscription->created_at->format('Y-m-d H:i'),
+                    'is_trial' => (bool) ($subscription->package->is_trial ?? false),
                 ];
             });
 
         return Inertia::render('Packages/MySubscriptions', [
             'subscriptions' => $subscriptions,
+            'membershipSummary' => app(MembershipAccessService::class)->getMembershipSummary($user),
             'auth' => [
                 'user' => $user,
                 'unreadCount' => $user->unreadNotifications()->count(),

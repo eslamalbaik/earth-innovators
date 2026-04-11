@@ -34,7 +34,7 @@ class ProjectService extends BaseService
                     'school:id,name',
                     'approver:id,name'
                 ])
-                ->select('id', 'title', 'description', 'category', 'status', 'teacher_id', 'user_id', 'school_id', 'approved_by', 'views', 'likes', 'rating', 'points_earned', 'images', 'created_at');
+                ->select('id', 'title', 'description', 'category', 'status', 'teacher_id', 'user_id', 'school_id', 'approved_by', 'views', 'likes', 'rating', 'points_earned', 'images', 'thumbnail', 'project_document', 'created_at');
 
             if ($search) {
                 $query->where(function ($q) use ($search) {
@@ -79,7 +79,7 @@ class ProjectService extends BaseService
                           ->latest();
                 },
             ])
-            ->select('id', 'title', 'description', 'category', 'status', 'teacher_id', 'user_id', 'school_id', 'approved_by', 'views', 'likes', 'rating', 'files', 'images', 'created_at')
+            ->select('id', 'title', 'description', 'category', 'status', 'teacher_id', 'user_id', 'school_id', 'approved_by', 'views', 'likes', 'rating', 'files', 'images', 'thumbnail', 'project_document', 'created_at')
             ->find($projectId);
         }, 600); // Cache for 10 minutes
 
@@ -106,7 +106,7 @@ class ProjectService extends BaseService
 
         return $this->cacheTags($cacheTag, $cacheKey, function () use ($userId, $status, $perPage) {
             $query = Project::where('user_id', $userId)
-                ->select('id', 'title', 'description', 'category', 'status', 'rating', 'likes', 'views', 'points_earned', 'created_at')
+                ->select('id', 'title', 'description', 'category', 'status', 'rating', 'likes', 'views', 'points_earned', 'thumbnail', 'project_document', 'created_at')
                 ->latest();
 
             if ($status) {
@@ -125,7 +125,7 @@ class ProjectService extends BaseService
         return $this->cacheTags($cacheTag, $cacheKey, function () use ($teacherId, $perPage) {
             return Project::where('teacher_id', $teacherId)
                 ->with(['school:id,name', 'approver:id,name', 'user:id,name'])
-                ->select('id', 'title', 'description', 'category', 'status', 'school_id', 'approved_by', 'approved_at', 'user_id', 'created_at')
+                ->select('id', 'title', 'description', 'category', 'status', 'school_id', 'approved_by', 'approved_at', 'user_id', 'thumbnail', 'project_document', 'created_at')
                 ->orderBy('created_at', 'desc')
                 ->paginate($perPage);
         }, 60); // تقليل وقت الكاش إلى دقيقة واحدة
@@ -171,7 +171,7 @@ class ProjectService extends BaseService
                 'teacher:id,name_ar,user_id',
                 'teacher.user:id,name'
             ])
-            ->select('id', 'title', 'description', 'category', 'status', 'user_id', 'teacher_id', 'created_at');
+            ->select('id', 'title', 'description', 'category', 'status', 'user_id', 'teacher_id', 'thumbnail', 'project_document', 'created_at');
 
             if ($search) {
                 $query->where(function ($q) use ($search) {
@@ -229,7 +229,7 @@ class ProjectService extends BaseService
                 'teacher.user:id,name',
                 'school:id,name'
             ])
-            ->select('id', 'title', 'description', 'category', 'status', 'user_id', 'teacher_id', 'school_id', 'created_at');
+            ->select('id', 'title', 'description', 'category', 'status', 'user_id', 'teacher_id', 'school_id', 'thumbnail', 'project_document', 'created_at');
 
             if ($search) {
                 $query->where(function ($q) use ($search) {
@@ -323,4 +323,3 @@ class ProjectService extends BaseService
         }
     }
 }
-

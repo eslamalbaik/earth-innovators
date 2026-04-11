@@ -34,6 +34,10 @@ export default function EditSchoolProject({ auth, project }) {
     const { t, language } = useTranslation();
     const BackIcon = useBackIcon();
     const { showError, showSuccess } = useToast();
+    const [thumbnailFile, setThumbnailFile] = useState(null);
+    const [projectDocumentFile, setProjectDocumentFile] = useState(null);
+    const [existingThumbnail, setExistingThumbnail] = useState(project?.thumbnail || null);
+    const [existingProjectDocument, setExistingProjectDocument] = useState(project?.project_document || null);
     const [fileList, setFileList] = useState([]);
     const [imageList, setImageList] = useState([]);
     const [existingFiles, setExistingFiles] = useState(project?.files || []);
@@ -41,11 +45,17 @@ export default function EditSchoolProject({ auth, project }) {
     const [dragActive, setDragActive] = useState(false);
     const fileInputRef = useRef(null);
     const imageInputRef = useRef(null);
+    const thumbnailInputRef = useRef(null);
+    const projectDocumentInputRef = useRef(null);
 
     const { data, setData, processing, errors } = useForm({
         title: project?.title || '',
         description: project?.description || '',
         category: project?.category || 'other',
+        thumbnail: null,
+        project_document: null,
+        remove_thumbnail: false,
+        remove_project_document: false,
         files: [],
         images: [],
         report: project?.report || '',
@@ -80,6 +90,39 @@ export default function EditSchoolProject({ auth, project }) {
 
         return true;
     });
+
+    const handleThumbnail = (file) => {
+        if (!file) return;
+
+        const valid = validateImages([file]);
+        if (valid.length === 0) return;
+
+        setThumbnailFile(file);
+        setData('thumbnail', file);
+        setData('remove_thumbnail', false);
+    };
+
+    const handleProjectDocument = (file) => {
+        if (!file) return;
+
+        const valid = validateFiles([file]).filter((candidate) => {
+            const mime = (candidate?.type || '').toLowerCase();
+            return [
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            ].includes(mime);
+        });
+
+        if (valid.length === 0) {
+            showError(t('schoolProjectEditPage.errors.fileTypeNotSupported', { name: file.name }));
+            return;
+        }
+
+        setProjectDocumentFile(file);
+        setData('project_document', file);
+        setData('remove_project_document', false);
+    };
 
     const handleFiles = (files) => {
         const validFiles = validateFiles(files);
@@ -176,6 +219,17 @@ export default function EditSchoolProject({ auth, project }) {
         if (data.report) {
             formData.append('report', data.report);
         }
+
+        if (data.thumbnail instanceof File) {
+            formData.append('thumbnail', data.thumbnail);
+        }
+
+        if (data.project_document instanceof File) {
+            formData.append('project_document', data.project_document);
+        }
+
+        formData.append('remove_thumbnail', data.remove_thumbnail ? '1' : '0');
+        formData.append('remove_project_document', data.remove_project_document ? '1' : '0');
 
         existingFiles.forEach((file, index) => {
             formData.append(`existing_files[${index}]`, file);
@@ -279,6 +333,103 @@ export default function EditSchoolProject({ auth, project }) {
                                 ))}
                             </select>
                             <InputError message={errors.category} className="mt-2" />
+                        </div>
+
+                        <div>
+                            <InputLabel value={t('schoolProjectsCreatePage.form.imagesLabel')} />
+                            {existingThumbnail && !thumbnailFile && (
+                                <div className="mt-2 w-40 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+                                    <img
+                                        src={existingThumbnail.startsWith('http') ? existingThumbnail : `/storage/${existingThumbnail}`}
+                                        alt={t('schoolProjectEditPage.imageAlt', { number: 1 })}
+                                        className="h-28 w-full object-cover"
+                                    />
+                                </div>
+                            )}
+                            <div className="mt-2 flex items-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => thumbnailInputRef.current?.click()}
+                                    className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                >
+                                    {t('schoolProjectEditPage.actions.chooseImages')}
+                                </button>
+                                {(thumbnailFile || existingThumbnail) && (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setThumbnailFile(null);
+                                            setExistingThumbnail(null);
+                                            setData('thumbnail', null);
+                                            setData('remove_thumbnail', true);
+                                            if (thumbnailInputRef.current) thumbnailInputRef.current.value = '';
+                                        }}
+                                        className="text-red-500 hover:text-red-700"
+                                        aria-label={t('common.remove')}
+                                    >
+                                        <FaTrash />
+                                    </button>
+                                )}
+                            </div>
+                            <input
+                                ref={thumbnailInputRef}
+                                type="file"
+                                accept="image/*"
+                                onChange={(event) => handleThumbnail(event.target.files?.[0])}
+                                className="hidden"
+                            />
+                            <p className="mt-1 text-xs text-gray-500">{t('schoolProjectsCreatePage.dropzone.imagesTitle')}</p>
+                            {thumbnailFile && <p className="mt-1 text-sm text-gray-700">{thumbnailFile.name}</p>}
+                            <InputError message={errors.thumbnail} className="mt-2" />
+                        </div>
+
+                        <div>
+                            <InputLabel value={t('schoolProjectsCreatePage.form.filesLabel')} />
+                            {existingProjectDocument && !projectDocumentFile && (
+                                <a
+                                    href={existingProjectDocument.startsWith('http') ? existingProjectDocument : `/storage/${existingProjectDocument}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="mt-2 inline-flex text-sm text-blue-600 hover:text-blue-700"
+                                >
+                                    {existingProjectDocument.split('/').pop()}
+                                </a>
+                            )}
+                            <div className="mt-2 flex items-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => projectDocumentInputRef.current?.click()}
+                                    className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                >
+                                    {t('schoolProjectEditPage.actions.chooseFiles')}
+                                </button>
+                                {(projectDocumentFile || existingProjectDocument) && (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setProjectDocumentFile(null);
+                                            setExistingProjectDocument(null);
+                                            setData('project_document', null);
+                                            setData('remove_project_document', true);
+                                            if (projectDocumentInputRef.current) projectDocumentInputRef.current.value = '';
+                                        }}
+                                        className="text-red-500 hover:text-red-700"
+                                        aria-label={t('common.remove')}
+                                    >
+                                        <FaTrash />
+                                    </button>
+                                )}
+                            </div>
+                            <input
+                                ref={projectDocumentInputRef}
+                                type="file"
+                                accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                onChange={(event) => handleProjectDocument(event.target.files?.[0])}
+                                className="hidden"
+                            />
+                            <p className="mt-1 text-xs text-gray-500">{t('schoolProjectsCreatePage.dropzone.filesTitle')}</p>
+                            {projectDocumentFile && <p className="mt-1 text-sm text-gray-700">{projectDocumentFile.name}</p>}
+                            <InputError message={errors.project_document} className="mt-2" />
                         </div>
 
                         {existingImages.length > 0 && (

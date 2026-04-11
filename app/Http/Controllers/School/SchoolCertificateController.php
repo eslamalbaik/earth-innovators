@@ -100,6 +100,7 @@ class SchoolCertificateController extends Controller
             'pendingRequests' => $pendingRequests,
             'recentIssuedCertificates' => $recentIssuedCertificates,
             'membershipSummary' => $this->membershipAccessService->getMembershipSummary($school),
+            'certificateSystemHealth' => $this->certificateService->getGenerationHealth(),
         ]);
     }
 
@@ -139,14 +140,28 @@ class SchoolCertificateController extends Controller
             Storage::disk('public')->delete($certificate->file_path);
         }
 
-        $filePath = $this->certificateService->generateCertificate(
-            $recipient,
-            $school,
-            $preparedData,
-            null,
-            'Y-m-d',
-            $certificate->type
-        );
+        try {
+            $filePath = $this->certificateService->generateCertificate(
+                $recipient,
+                $school,
+                $preparedData,
+                null,
+                'Y-m-d',
+                $certificate->type
+            );
+        } catch (\Throwable $e) {
+            $message = [
+                'key' => 'toastMessages.certificateDownloadFailed',
+            ];
+
+            if (str_contains($e->getMessage(), 'TCPDF') || str_contains($e->getMessage(), 'FPDI')) {
+                $message = ['key' => 'toastMessages.certificatePdfLibraryMissing'];
+            } elseif (str_contains($e->getMessage(), 'template') || str_contains($e->getMessage(), 'field mapping')) {
+                $message = ['key' => 'toastMessages.certificateTemplateMissing'];
+            }
+
+            return redirect()->back()->with('error', $message);
+        }
 
         $certificate->update([
             'certificate_number' => $certificateNumber,

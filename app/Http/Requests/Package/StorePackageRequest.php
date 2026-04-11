@@ -27,6 +27,8 @@ class StorePackageRequest extends FormRequest
             'challenges_limit' => 'nullable|integer|min:0',
             'certificate_access' => 'boolean',
             'badge_access' => 'boolean',
+            'is_trial' => 'boolean',
+            'trial_days' => 'nullable|integer|min:1|max:90',
             'features' => 'nullable|array',
             'features_ar' => 'nullable|array',
             'is_active' => 'boolean',
@@ -34,4 +36,3 @@ class StorePackageRequest extends FormRequest
         ];
     }
 }
-

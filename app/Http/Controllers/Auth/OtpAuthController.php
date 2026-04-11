@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Services\OtpService;
 use App\Services\EmailService;
+use App\Services\PackagePaymentService;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use App\Mail\OtpMail;
@@ -112,6 +114,16 @@ class OtpAuthController extends Controller
                 'role' => $request->role,
                 'email_verified_at' => now(),
             ]);
+
+            try {
+                app(PackagePaymentService::class)->activateDefaultTrialForNewUser($user);
+            } catch (\Throwable $trialException) {
+                Log::warning('Unable to activate default trial after OTP signup', [
+                    'user_id' => $user->id,
+                    'role' => $user->role,
+                    'error' => $trialException->getMessage(),
+                ]);
+            }
 
             // Log in user
             Auth::login($user);

@@ -128,11 +128,10 @@ class SchoolBadgeController extends Controller
             abort(403, 'غير مصرح لك بعرض هذه الشارة');
         }
         
-        $badge->load(['creator', 'approver', 'school']);
-        
+        $badge->load(['creator', 'approver', 'school'])->loadCount('users');
+
         return Inertia::render('School/Badges/Show', [
             'badge' => $badge,
         ]);
     }
 }
-

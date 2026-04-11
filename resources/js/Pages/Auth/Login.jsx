@@ -10,18 +10,26 @@ import { useState } from 'react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { useTranslation } from '@/i18n';
 
+const getCsrfToken = () => document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
 export default function Login({ status, canResetPassword }) {
     const { t, language } = useTranslation();
     const [showPassword, setShowPassword] = useState(false);
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, post, processing, errors, reset, transform } = useForm({
         email: '',
         password: '',
         remember: false,
         role: 'student',
+        _token: getCsrfToken(),
     });
 
     const submit = (e) => {
         e.preventDefault();
+
+        transform((formData) => ({
+            ...formData,
+            _token: getCsrfToken(),
+        }));
 
         post(route('login'), {
             onFinish: () => reset('password'),

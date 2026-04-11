@@ -65,6 +65,22 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
         }
     };
 
+    const membershipMessage = membershipSummary?.subscription
+        ? membershipSummary.subscription.is_trial
+            ? t('schoolDashboardPage.membershipTrialActive', {
+                package: membershipSummary.subscription.package_name,
+                until: membershipSummary.subscription.end_date,
+            })
+            : t('schoolDashboardPage.membershipActive', {
+                package: membershipSummary.subscription.package_name,
+                until: membershipSummary.subscription.end_date,
+            })
+        : membershipSummary?.pending_subscription
+            ? t('schoolDashboardPage.membershipPending', {
+                package: membershipSummary.pending_subscription.package_name,
+            })
+            : t('schoolDashboardPage.membershipInactive');
+
     return (
         <DashboardLayout header={t('dashboard.schoolDashboard')}>
             <Head title={t('schoolDashboardPage.pageTitle', { appName: t('common.appName') })} />
@@ -104,18 +120,31 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                         <div>
                             <h2 className="text-lg font-bold text-gray-900">{t('schoolDashboardPage.membershipTitle')}</h2>
                             <p className="mt-1 text-sm text-gray-600">
-                                {membershipSummary?.subscription
-                                    ? t('schoolDashboardPage.membershipActive', {
-                                        package: membershipSummary.subscription.package_name,
-                                        until: membershipSummary.subscription.end_date,
-                                    })
-                                    : t('schoolDashboardPage.membershipInactive')}
+                                {membershipMessage}
                             </p>
                             <p className="mt-1 text-sm font-medium">
                                 {membershipSummary?.certificate_access
                                     ? t('schoolDashboardPage.certificateAccessEnabled')
                                     : t('schoolDashboardPage.certificateAccessDisabled')}
                             </p>
+                            {membershipSummary?.is_expiring_soon && membershipSummary?.subscription && (
+                                <p className="mt-2 text-sm text-amber-700">
+                                    {t('schoolDashboardPage.membershipExpiringSoon', {
+                                        days: membershipSummary.subscription.days_remaining ?? 0,
+                                        until: membershipSummary.subscription.end_date,
+                                    })}
+                                </p>
+                            )}
+                            {membershipSummary?.needs_renewal && (
+                                <p className="mt-2 text-sm text-red-700">
+                                    {t('schoolDashboardPage.membershipRenewalRequired')}
+                                </p>
+                            )}
+                            {membershipSummary?.trial_available && !membershipSummary?.subscription && !membershipSummary?.pending_subscription && (
+                                <p className="mt-2 text-sm text-emerald-700">
+                                    {t('schoolDashboardPage.membershipTrialAvailable')}
+                                </p>
+                            )}
                             {!membershipSummary?.subscription && (
                                 <div className="mt-3">
                                     <Link
@@ -136,6 +165,9 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                             </Link>
                             <Link href="/school/challenge-suggestions" className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-800 hover:border-[#A3C042]/40">
                                 {t('schoolDashboardPage.openChallengeSuggestions')}
+                            </Link>
+                            <Link href="/my-subscriptions" className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-800 hover:border-[#A3C042]/40">
+                                {t('schoolDashboardPage.openSubscriptions')}
                             </Link>
                         </div>
                     </div>

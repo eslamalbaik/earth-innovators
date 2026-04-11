@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Models\Publication;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class PublicationService extends BaseService
 {
@@ -13,19 +13,20 @@ class PublicationService extends BaseService
         ?string $type = null,
         int $perPage = 12
     ): LengthAwarePaginator {
-        $cacheKey = "approved_publications_" . md5(json_encode([$search, $type, $perPage]));
+        $page = max(1, (int) request()->integer('page', 1));
+        $cacheKey = 'approved_publications_'.md5(json_encode([$search, $type, $perPage, $page]));
         $cacheTag = 'approved_publications';
 
-        return $this->cacheTags($cacheTag, $cacheKey, function () use ($search, $type, $perPage) {
+        return $this->cacheTags($cacheTag, $cacheKey, function () use ($search, $type, $perPage, $page) {
             $query = Publication::where('status', 'approved')
                 ->with(['author:id,name', 'school:id,name'])
-                ->select('id', 'title', 'description', 'type', 'cover_image', 'file', 'content', 'issue_number', 'publish_date', 'publisher_name', 'likes_count', 'author_id', 'school_id', 'created_at')
+                ->select('id', 'title', 'description', 'type', 'cover_image', 'file', 'content', 'issue_number', 'publish_date', 'publisher_name', 'likes_count', 'views', 'author_id', 'school_id', 'created_at')
                 ->orderBy('created_at', 'desc');
 
             if ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%")
-                      ->orWhere('description', 'like', "%{$search}%");
+                        ->orWhere('description', 'like', "%{$search}%");
                 });
             }
 
@@ -33,7 +34,7 @@ class PublicationService extends BaseService
                 $query->where('type', $type);
             }
 
-            return $query->paginate($perPage);
+            return $query->paginate($perPage, ['*'], 'page', $page);
         }, 300); // Cache for 5 minutes
     }
 
@@ -44,14 +45,14 @@ class PublicationService extends BaseService
 
         $publication = $this->cacheTags($cacheTag, $cacheKey, function () use ($publicationId) {
             return Publication::with(['author:id,name', 'school:id,name', 'approver:id,name'])
-                ->select('id', 'title', 'description', 'type', 'cover_image', 'file', 'content', 'issue_number', 'publish_date', 'publisher_name', 'likes_count', 'author_id', 'school_id', 'approved_by', 'status', 'created_at')
+                ->select('id', 'title', 'description', 'type', 'cover_image', 'file', 'content', 'issue_number', 'publish_date', 'publisher_name', 'likes_count', 'views', 'author_id', 'school_id', 'approved_by', 'status', 'created_at')
                 ->find($publicationId);
         }, 600); // Cache for 10 minutes
 
         if ($publication && $publication->status === 'approved') {
             // Increment views (don't cache this)
             $publication->incrementViews();
-            
+
             // Check if liked by user
             if ($userId) {
                 $publication->is_liked = $publication->isLikedBy($userId);
@@ -61,58 +62,106 @@ class PublicationService extends BaseService
         return $publication;
     }
 
+    public function getRelatedApprovedPublications(int $publicationId, ?string $type = null, int $limit = 3): Collection
+    {
+        $cacheKey = 'related_publications_'.md5(json_encode([$publicationId, $type, $limit]));
+        $cacheTag = 'approved_publications';
+        $select = [
+            'id',
+            'title',
+            'description',
+            'type',
+            'cover_image',
+            'file',
+            'issue_number',
+            'publish_date',
+            'publisher_name',
+            'likes_count',
+            'views',
+            'school_id',
+            'created_at',
+        ];
+
+        return $this->cacheTags($cacheTag, $cacheKey, function () use ($publicationId, $type, $limit, $select) {
+            $baseQuery = Publication::where('status', 'approved')
+                ->where('id', '!=', $publicationId)
+                ->with(['school:id,name'])
+                ->orderByDesc('publish_date')
+                ->orderByDesc('created_at');
+
+            $related = (clone $baseQuery)
+                ->when($type, fn ($query) => $query->where('type', $type))
+                ->limit($limit)
+                ->get($select);
+
+            if ($related->count() >= $limit) {
+                return $related;
+            }
+
+            $fallback = (clone $baseQuery)
+                ->whereNotIn('id', $related->pluck('id'))
+                ->limit($limit - $related->count())
+                ->get($select);
+
+            return $related->concat($fallback)->values();
+        }, 300);
+    }
+
     public function getTeacherPublications(int $userId, int $perPage = 10): LengthAwarePaginator
     {
-        $cacheKey = "teacher_publications_{$userId}_{$perPage}";
+        $page = max(1, (int) request()->integer('page', 1));
+        $cacheKey = "teacher_publications_{$userId}_{$perPage}_{$page}";
         $cacheTag = "teacher_publications_{$userId}";
 
-        return $this->cacheTags($cacheTag, $cacheKey, function () use ($userId, $perPage) {
+        return $this->cacheTags($cacheTag, $cacheKey, function () use ($userId, $perPage, $page) {
             return Publication::where('author_id', $userId)
                 ->with('school:id,name')
-                ->select('id', 'title', 'description', 'type', 'status', 'cover_image', 'file', 'content', 'issue_number', 'publish_date', 'publisher_name', 'likes_count', 'school_id', 'created_at')
+                ->select('id', 'title', 'description', 'type', 'status', 'cover_image', 'file', 'content', 'issue_number', 'publish_date', 'publisher_name', 'likes_count', 'views', 'school_id', 'created_at')
                 ->orderBy('created_at', 'desc')
-                ->paginate($perPage);
+                ->paginate($perPage, ['*'], 'page', $page);
         }, 300); // Cache for 5 minutes
     }
 
     public function getSchoolPublications(int $schoolId, ?string $status = null, int $perPage = 10): LengthAwarePaginator
     {
-        $cacheKey = "school_publications_{$schoolId}_" . md5($status ?? '') . "_{$perPage}";
+        $page = max(1, (int) request()->integer('page', 1));
+        $cacheKey = "school_publications_{$schoolId}_".md5($status ?? '')."_{$perPage}_{$page}";
         $cacheTag = "school_publications_{$schoolId}";
 
-        return $this->cacheTags($cacheTag, $cacheKey, function () use ($schoolId, $status, $perPage) {
+        return $this->cacheTags($cacheTag, $cacheKey, function () use ($schoolId, $status, $perPage, $page) {
             $query = Publication::query();
             if ($schoolId > 0) {
                 $query->where('school_id', $schoolId);
             }
             $query->with('author:id,name')
-                ->select('id', 'title', 'description', 'type', 'status', 'cover_image', 'file', 'content', 'issue_number', 'publish_date', 'publisher_name', 'likes_count', 'author_id', 'created_at')
+                ->select('id', 'title', 'description', 'type', 'status', 'cover_image', 'file', 'content', 'issue_number', 'publish_date', 'publisher_name', 'likes_count', 'views', 'author_id', 'created_at')
                 ->orderBy('created_at', 'desc');
 
             if ($status) {
                 $query->where('status', $status);
             }
 
-            return $query->paginate($perPage);
+            return $query->paginate($perPage, ['*'], 'page', $page);
         }, 300); // Cache for 5 minutes
     }
 
     public function getSchoolPendingPublications(int $schoolId, int $perPage = 10): LengthAwarePaginator
     {
-        $cacheKey = "school_pending_publications_{$schoolId}_{$perPage}";
+        $page = max(1, (int) request()->integer('page', 1));
+        $cacheKey = "school_pending_publications_{$schoolId}_{$perPage}_{$page}";
         $cacheTag = "school_publications_{$schoolId}";
 
-        return $this->cacheTags($cacheTag, $cacheKey, function () use ($schoolId, $perPage) {
+        return $this->cacheTags($cacheTag, $cacheKey, function () use ($schoolId, $perPage, $page) {
             $query = Publication::query();
             if ($schoolId > 0) {
                 $query->where('school_id', $schoolId);
             }
+
             return $query->where('status', 'pending')
-                ->whereColumn('author_id', '!=', 'school_id') // Not from school itself
                 ->with('author:id,name')
-                ->select('id', 'title', 'description', 'type', 'status', 'cover_image', 'author_id', 'created_at')
+                ->select('id', 'title', 'description', 'type', 'status', 'cover_image', 'views', 'author_id', 'created_at')
                 ->orderBy('created_at', 'desc')
-                ->paginate($perPage);
+                ->paginate($perPage, ['*'], 'page', $page);
         }, 300); // Cache for 5 minutes
     }
 
@@ -126,6 +175,7 @@ class PublicationService extends BaseService
             if ($schoolId > 0) {
                 $query->where('school_id', $schoolId);
             }
+
             return [
                 'total' => (clone $query)->count(),
                 'pending' => (clone $query)->where('status', 'pending')->count(),
@@ -136,7 +186,7 @@ class PublicationService extends BaseService
 
     public function normalizeImagePath(?string $imagePath): ?string
     {
-        if (!$imagePath) {
+        if (! $imagePath) {
             return null;
         }
 
@@ -152,11 +202,11 @@ class PublicationService extends BaseService
 
         // If it starts with storage/ without /, add /
         if (str_starts_with($imagePath, 'storage/')) {
-            return '/' . $imagePath;
+            return '/'.$imagePath;
         }
 
         // Assume it's a relative path in storage
-        return '/storage/' . $imagePath;
+        return '/storage/'.$imagePath;
     }
 
     public function normalizeFilePath(?string $filePath): ?string
@@ -245,12 +295,12 @@ class PublicationService extends BaseService
         // إرسال إشعار لجميع الطلاب والمعلمين في المدرسة مباشرة
         try {
             $publication = $publication->fresh(['author', 'school']);
-            
+
             if ($publication->school_id) {
                 $users = \App\Models\User::where('school_id', $publication->school_id)
                     ->whereIn('role', ['student', 'teacher'])
                     ->get();
-                
+
                 foreach ($users as $user) {
                     try {
                         $user->notify(new \App\Notifications\NewPublicationNotification($publication));
@@ -262,7 +312,7 @@ class PublicationService extends BaseService
                         ]);
                     }
                 }
-                
+
                 \Log::info('Publication notifications sent after approval', [
                     'publication_id' => $publication->id,
                     'users_count' => $users->count(),
@@ -335,4 +385,3 @@ class PublicationService extends BaseService
         }
     }
 }
-

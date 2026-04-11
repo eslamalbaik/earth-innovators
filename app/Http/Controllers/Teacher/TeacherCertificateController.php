@@ -102,6 +102,7 @@ class TeacherCertificateController extends Controller
                 'name' => $teacherUser->school->name,
             ] : null,
             'membershipSummary' => $this->membershipAccessService->getMembershipSummary($teacherUser),
+            'certificateSystemHealth' => $this->certificateService->getGenerationHealth(),
         ]);
     }
 

@@ -23,11 +23,15 @@ export default function AdminPackagesEdit({ package: pkg }) {
         challenges_limit: pkg.challenges_limit || null,
         certificate_access: pkg.certificate_access || false,
         badge_access: pkg.badge_access || false,
+        is_trial: pkg.is_trial || false,
+        trial_days: pkg.trial_days || 14,
         features: pkg.features || [],
         features_ar: pkg.features_ar || [],
         is_active: pkg.is_active !== undefined ? pkg.is_active : true,
         is_popular: pkg.is_popular || false,
     });
+
+    const isTrial = !!data.is_trial;
 
     const addFeature = (isArabic = false) => {
         if (isArabic) {
@@ -161,10 +165,14 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                 step="0.01"
                                 value={data.price}
                                 onChange={(e) => setData('price', parseFloat(e.target.value) || 0)}
+                                disabled={isTrial}
                                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.price ? 'border-red-500' : 'border-gray-300'
                                     }`}
                                 required
                             />
+                            {isTrial && (
+                                <p className="mt-1 text-xs text-emerald-700">{t('adminPackagesCreatePage.fields.trialPriceHint')}</p>
+                            )}
                             {errors.price && (
                                 <p className="mt-1 text-sm text-red-600">{errors.price}</p>
                             )}
@@ -196,7 +204,8 @@ export default function AdminPackagesEdit({ package: pkg }) {
                             <select
                                 value={data.duration_type}
                                 onChange={(e) => setData('duration_type', e.target.value)}
-                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent border-gray-300"
+                                disabled={isTrial}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent border-gray-300 ${isTrial ? 'bg-gray-50 text-gray-400' : ''}`}
                                 required
                             >
                                 <option value="monthly">{t('packagesIndexPage.duration.monthly')}</option>
@@ -216,7 +225,8 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                 min="1"
                                 value={data.duration_months}
                                 onChange={(e) => setData('duration_months', parseInt(e.target.value) || 1)}
-                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent border-gray-300"
+                                disabled={isTrial}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent border-gray-300 ${isTrial ? 'bg-gray-50 text-gray-400' : ''}`}
                             />
                         </div>
 
@@ -264,6 +274,23 @@ export default function AdminPackagesEdit({ package: pkg }) {
                             />
                         </div>
 
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                {t('adminPackagesCreatePage.fields.trialDays')}
+                            </label>
+                            <input
+                                type="number"
+                                min="1"
+                                max="90"
+                                value={data.trial_days || ''}
+                                disabled={!isTrial}
+                                onChange={(e) => setData('trial_days', e.target.value ? parseInt(e.target.value, 10) : null)}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent border-gray-300 ${!isTrial ? 'bg-gray-50 text-gray-400' : ''}`}
+                                placeholder="14"
+                            />
+                            <p className="mt-1 text-xs text-gray-500">{t('adminPackagesCreatePage.fields.trialDaysHint')}</p>
+                        </div>
+
                         {/* Checkboxes */}
                         <div className="md:col-span-2 space-y-4">
                             <div className="flex items-center">
@@ -287,6 +314,24 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                 />
                                 <label className="ms-2 text-sm font-medium text-gray-700">
                                     {t('adminPackagesCreatePage.fields.badgeAccess')}
+                                </label>
+                            </div>
+
+                            <div className="flex items-center">
+                                <input
+                                    type="checkbox"
+                                    checked={data.is_trial}
+                                    onChange={(e) => {
+                                        const checked = e.target.checked;
+                                        setData('is_trial', checked);
+                                        setData('price', checked ? 0 : data.price);
+                                        setData('trial_days', checked ? (data.trial_days || 14) : null);
+                                        setData('duration_type', checked ? 'monthly' : data.duration_type);
+                                    }}
+                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                />
+                                <label className="ms-2 text-sm font-medium text-gray-700">
+                                    {t('adminPackagesCreatePage.fields.isTrial')}
                                 </label>
                             </div>
 

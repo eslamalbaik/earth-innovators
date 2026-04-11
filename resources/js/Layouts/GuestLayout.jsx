@@ -1,6 +1,7 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Link } from '@inertiajs/react';
 import { useSelector } from 'react-redux';
+import WhatsAppSupportButton from '@/Components/Support/WhatsAppSupportButton';
 
 export default function GuestLayout({ children }) {
     const { dir } = useSelector((state) => state.language);
@@ -10,6 +11,7 @@ export default function GuestLayout({ children }) {
             <div className='sm:py-4'>
                 {children}
             </div>
+            <WhatsAppSupportButton />
         </div>
     );
 }

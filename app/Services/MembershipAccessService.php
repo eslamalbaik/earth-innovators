@@ -16,11 +16,33 @@ class MembershipAccessService
             ->first();
     }
 
+    public function getLatestSubscription(User $user): ?UserPackage
+    {
+        return UserPackage::with('package')
+            ->where('user_id', $user->id)
+            ->latest('end_date')
+            ->latest('created_at')
+            ->first();
+    }
+
+    public function getPendingSubscription(User $user): ?UserPackage
+    {
+        return UserPackage::with('package')
+            ->where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->latest()
+            ->first();
+    }
+
     public function getAccessOwner(User $user): User
     {
-        if ($user->isTeacher() && $user->school_id) {
+        if ($this->userOwnsMembershipContext($user)) {
+            return $user;
+        }
+
+        if (($user->isTeacher() || $user->isStudent()) && $user->school_id) {
             $school = User::find($user->school_id);
-            if ($school && $school->isSchool()) {
+            if ($school && $school->isSchool() && $this->schoolOwnsMemberAccess($school)) {
                 return $school;
             }
         }
@@ -52,6 +74,25 @@ class MembershipAccessService
     {
         $owner = $this->getAccessOwner($user);
         $subscription = $this->getActiveSubscription($owner);
+        $pendingSubscription = $subscription ? null : $this->getPendingSubscription($owner);
+        $latestSubscription = $subscription ?? $pendingSubscription ?? $this->getLatestSubscription($owner);
+        $daysRemaining = null;
+
+        if ($subscription?->end_date) {
+            $today = now()->startOfDay();
+            $endDate = $subscription->end_date->copy()->startOfDay();
+            $daysRemaining = $endDate->greaterThanOrEqualTo($today)
+                ? $today->diffInDays($endDate)
+                : 0;
+        }
+
+        $effectiveLatestStatus = $latestSubscription?->effective_status;
+        $isExpiringSoon = $subscription !== null
+            && $daysRemaining !== null
+            && $daysRemaining <= 7;
+        $needsRenewal = $subscription === null
+            && $pendingSubscription === null
+            && $effectiveLatestStatus === 'expired';
 
         return [
             'owner_id' => $owner->id,
@@ -68,15 +109,38 @@ class MembershipAccessService
                 ? optional($owner->teacher->contract_end_date)?->format('Y-m-d')
                 : optional($owner->contract_end_date)?->format('Y-m-d'),
             'has_active_subscription' => $subscription !== null,
+            'has_pending_subscription' => $pendingSubscription !== null,
             'certificate_access' => $this->hasCertificateAccess($user),
+            'is_expiring_soon' => $isExpiringSoon,
+            'needs_renewal' => $needsRenewal,
+            'trial_available' => !$this->hasUsedTrialSubscription($owner),
             'subscription' => $subscription ? [
                 'id' => $subscription->id,
                 'package_name' => $subscription->package->name_ar ?? $subscription->package->name,
                 'status' => $subscription->status,
                 'start_date' => optional($subscription->start_date)?->format('Y-m-d'),
                 'end_date' => optional($subscription->end_date)?->format('Y-m-d'),
+                'days_remaining' => $daysRemaining,
                 'paid_amount' => $subscription->paid_amount,
                 'payment_method' => $subscription->payment_method,
+                'is_trial' => (bool) ($subscription->package?->is_trial ?? false),
+                'trial_days' => $subscription->package?->trial_days,
+                'currency' => $subscription->package?->currency,
+            ] : null,
+            'pending_subscription' => $pendingSubscription ? [
+                'id' => $pendingSubscription->id,
+                'package_name' => $pendingSubscription->package->name_ar ?? $pendingSubscription->package->name,
+                'status' => $pendingSubscription->status,
+                'created_at' => optional($pendingSubscription->created_at)?->format('Y-m-d H:i'),
+                'is_trial' => (bool) ($pendingSubscription->package?->is_trial ?? false),
+            ] : null,
+            'latest_subscription' => $latestSubscription ? [
+                'id' => $latestSubscription->id,
+                'package_name' => $latestSubscription->package->name_ar ?? $latestSubscription->package->name,
+                'status' => $effectiveLatestStatus,
+                'start_date' => optional($latestSubscription->start_date)?->format('Y-m-d'),
+                'end_date' => optional($latestSubscription->end_date)?->format('Y-m-d'),
+                'is_trial' => (bool) ($latestSubscription->package?->is_trial ?? false),
             ] : null,
         ];
     }
@@ -144,5 +208,41 @@ class MembershipAccessService
                 'contract_status' => 'inactive',
             ]);
         }
+    }
+
+    private function schoolOwnsMemberAccess(User $school): bool
+    {
+        if ($this->getActiveSubscription($school)) {
+            return true;
+        }
+
+        return $school->membership_type === 'subscription'
+            && $school->contract_status === 'active'
+            && $school->isContractValid();
+    }
+
+    private function hasUsedTrialSubscription(User $user): bool
+    {
+        return UserPackage::query()
+            ->where('user_id', $user->id)
+            ->whereHas('package', fn ($query) => $query->where('is_trial', true))
+            ->exists();
+    }
+
+    private function userOwnsMembershipContext(User $user): bool
+    {
+        if ($this->getActiveSubscription($user) || $this->getPendingSubscription($user)) {
+            return true;
+        }
+
+        if ($user->isTeacher() && $user->teacher) {
+            return $user->teacher->membership_type === 'subscription'
+                && $user->teacher->contract_status === 'active'
+                && $user->isTeacherContractValid();
+        }
+
+        return $user->membership_type === 'subscription'
+            && $user->contract_status === 'active'
+            && $user->isContractValid();
     }
 }

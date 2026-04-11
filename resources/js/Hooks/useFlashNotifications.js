@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { usePage } from '@inertiajs/react';
 import { useToast } from '@/Contexts/ToastContext';
 import { useTranslation } from '@/i18n';
@@ -11,6 +11,12 @@ export function useFlashNotifications() {
     const { flash } = usePage().props;
     const { showSuccess, showError, showWarning, showInfo } = useToast();
     const { t } = useTranslation();
+    const lastShownRef = useRef({
+        success: null,
+        error: null,
+        warning: null,
+        info: null,
+    });
 
     const resolveMessage = (payload) => {
         if (!payload) return null;
@@ -49,7 +55,8 @@ export function useFlashNotifications() {
 
     useEffect(() => {
         const successMessage = resolveMessage(flash?.success);
-        if (successMessage) {
+        if (successMessage && lastShownRef.current.success !== successMessage) {
+            lastShownRef.current.success = successMessage;
             showSuccess(successMessage, {
                 autoDismiss: 2500, // Short duration for success messages
                 title: null, // No title for simple notifications
@@ -57,7 +64,8 @@ export function useFlashNotifications() {
         }
 
         const errorMessage = resolveMessage(flash?.error);
-        if (errorMessage) {
+        if (errorMessage && lastShownRef.current.error !== errorMessage) {
+            lastShownRef.current.error = errorMessage;
             showError(errorMessage, {
                 autoDismiss: 4000, // Slightly longer for errors
                 title: null,
@@ -65,7 +73,8 @@ export function useFlashNotifications() {
         }
 
         const warningMessage = resolveMessage(flash?.warning);
-        if (warningMessage) {
+        if (warningMessage && lastShownRef.current.warning !== warningMessage) {
+            lastShownRef.current.warning = warningMessage;
             showWarning(warningMessage, {
                 autoDismiss: 3000,
                 title: null,
@@ -73,7 +82,8 @@ export function useFlashNotifications() {
         }
 
         const infoMessage = resolveMessage(flash?.info);
-        if (infoMessage) {
+        if (infoMessage && lastShownRef.current.info !== infoMessage) {
+            lastShownRef.current.info = infoMessage;
             showInfo(infoMessage, {
                 autoDismiss: 3000,
                 title: null,

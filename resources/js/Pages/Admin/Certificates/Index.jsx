@@ -24,7 +24,7 @@ const certificateTypeKeyMap = {
     membership: 'membership',
 };
 
-export default function AdminCertificatesIndex({ certificates, stats, users, filters = {} }) {
+export default function AdminCertificatesIndex({ certificates, stats, users, filters = {}, certificateSystemHealth = null }) {
     const { t, language } = useTranslation();
     const { confirm } = useConfirmDialog();
     const [search, setSearch] = useState(filters?.search || '');
@@ -110,6 +110,22 @@ export default function AdminCertificatesIndex({ certificates, stats, users, fil
             <Head title={pageTitle} />
 
             <div className="space-y-6">
+                {certificateSystemHealth && !certificateSystemHealth.ready && (
+                    <div className="rounded-xl border border-amber-300 bg-amber-50 p-4">
+                        <div className="text-sm font-bold text-amber-900">
+                            {t('adminCertificatesPage.systemHealth.title')}
+                        </div>
+                        <div className="mt-1 text-sm text-amber-800">
+                            {t('adminCertificatesPage.systemHealth.description')}
+                        </div>
+                        <ul className="mt-3 list-disc space-y-1 ps-5 text-sm text-amber-900">
+                            {certificateSystemHealth.issues?.map((issue) => (
+                                <li key={issue}>{t(`adminCertificatesPage.systemHealth.issues.${issue}`)}</li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div className="bg-white rounded-xl shadow-lg p-6">
                         <div className="flex items-center justify-between">

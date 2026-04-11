@@ -17,7 +17,7 @@ class JoinTeacherRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255', 'min:2'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'phone' => ['required', 'string', 'regex:/^(\+971)[0-9]{9}$/', 'unique:users,phone'],
+            'phone' => ['required', 'string', 'regex:/^\+[1-9][0-9]{7,14}$/', 'unique:users,phone'],
             'city' => ['required', 'string', 'max:100'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'password_confirmation' => ['required', 'string', 'min:8'],
