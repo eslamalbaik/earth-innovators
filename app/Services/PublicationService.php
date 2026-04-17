@@ -20,7 +20,7 @@ class PublicationService extends BaseService
         return $this->cacheTags($cacheTag, $cacheKey, function () use ($search, $type, $perPage, $page) {
             $query = Publication::where('status', 'approved')
                 ->with(['author:id,name', 'school:id,name'])
-                ->select('id', 'title', 'description', 'type', 'cover_image', 'file', 'content', 'issue_number', 'publish_date', 'publisher_name', 'likes_count', 'views', 'author_id', 'school_id', 'created_at')
+                ->select('id', 'title', 'description', 'type', 'cover_image', 'file', 'youtube_url', 'content', 'issue_number', 'publish_date', 'publisher_name', 'likes_count', 'views', 'author_id', 'school_id', 'created_at')
                 ->orderBy('created_at', 'desc');
 
             if ($search) {
@@ -45,7 +45,7 @@ class PublicationService extends BaseService
 
         $publication = $this->cacheTags($cacheTag, $cacheKey, function () use ($publicationId) {
             return Publication::with(['author:id,name', 'school:id,name', 'approver:id,name'])
-                ->select('id', 'title', 'description', 'type', 'cover_image', 'file', 'content', 'issue_number', 'publish_date', 'publisher_name', 'likes_count', 'views', 'author_id', 'school_id', 'approved_by', 'status', 'created_at')
+                ->select('id', 'title', 'description', 'type', 'cover_image', 'file', 'youtube_url', 'content', 'issue_number', 'publish_date', 'publisher_name', 'likes_count', 'views', 'author_id', 'school_id', 'approved_by', 'status', 'created_at')
                 ->find($publicationId);
         }, 600); // Cache for 10 minutes
 
@@ -116,7 +116,7 @@ class PublicationService extends BaseService
         return $this->cacheTags($cacheTag, $cacheKey, function () use ($userId, $perPage, $page) {
             return Publication::where('author_id', $userId)
                 ->with('school:id,name')
-                ->select('id', 'title', 'description', 'type', 'status', 'cover_image', 'file', 'content', 'issue_number', 'publish_date', 'publisher_name', 'likes_count', 'views', 'school_id', 'created_at')
+                ->select('id', 'title', 'description', 'type', 'status', 'cover_image', 'file', 'youtube_url', 'content', 'issue_number', 'publish_date', 'publisher_name', 'likes_count', 'views', 'school_id', 'created_at')
                 ->orderBy('created_at', 'desc')
                 ->paginate($perPage, ['*'], 'page', $page);
         }, 300); // Cache for 5 minutes
@@ -134,7 +134,7 @@ class PublicationService extends BaseService
                 $query->where('school_id', $schoolId);
             }
             $query->with('author:id,name')
-                ->select('id', 'title', 'description', 'type', 'status', 'cover_image', 'file', 'content', 'issue_number', 'publish_date', 'publisher_name', 'likes_count', 'views', 'author_id', 'created_at')
+                ->select('id', 'title', 'description', 'type', 'status', 'cover_image', 'file', 'youtube_url', 'content', 'issue_number', 'publish_date', 'publisher_name', 'likes_count', 'views', 'author_id', 'created_at')
                 ->orderBy('created_at', 'desc');
 
             if ($status) {
@@ -237,19 +237,26 @@ class PublicationService extends BaseService
     {
         // Handle file uploads
         if (isset($data['cover_image']) && is_file($data['cover_image'])) {
-            // Delete old image
-            if ($publication->cover_image) {
-                \Storage::disk('public')->delete($publication->cover_image);
+            // Delete old image using raw attribute (accessor returns full URL)
+            $rawCover = $publication->getAttributes()['cover_image'] ?? null;
+            if ($rawCover) {
+                \Storage::disk('public')->delete($rawCover);
             }
             $data['cover_image'] = $data['cover_image']->store('publications/covers', 'public');
         }
 
         if (isset($data['file']) && is_file($data['file'])) {
-            // Delete old file
-            if ($publication->file) {
-                \Storage::disk('public')->delete($publication->file);
+            // Delete old file using raw attribute
+            $rawFile = $publication->getAttributes()['file'] ?? null;
+            if ($rawFile) {
+                \Storage::disk('public')->delete($rawFile);
             }
             $data['file'] = $data['file']->store('publications/files', 'public');
+        }
+
+        // Normalize empty youtube_url to null
+        if (array_key_exists('youtube_url', $data)) {
+            $data['youtube_url'] = !empty($data['youtube_url']) ? $data['youtube_url'] : null;
         }
 
         $publication->update($data);
@@ -348,12 +355,14 @@ class PublicationService extends BaseService
 
     public function deletePublication(Publication $publication): bool
     {
-        // Delete files
-        if ($publication->cover_image) {
-            \Storage::disk('public')->delete($publication->cover_image);
+        // Delete files using raw attributes (accessor returns full URL)
+        $rawCover = $publication->getAttributes()['cover_image'] ?? null;
+        if ($rawCover) {
+            \Storage::disk('public')->delete($rawCover);
         }
-        if ($publication->file) {
-            \Storage::disk('public')->delete($publication->file);
+        $rawFile = $publication->getAttributes()['file'] ?? null;
+        if ($rawFile) {
+            \Storage::disk('public')->delete($rawFile);
         }
 
         $schoolId = $publication->school_id;

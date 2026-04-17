@@ -12,6 +12,7 @@ import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 import { useTranslation } from '@/i18n';
+import PhoneInput from '@/Components/PhoneInput';
 
 export default function Index({ auth, students, availableBadges }) {
     const { t, language } = useTranslation();
@@ -392,14 +393,13 @@ export default function Index({ auth, students, availableBadges }) {
 
                         <div>
                             <InputLabel htmlFor="phone" value={t('schoolStudentsIndexPage.form.phoneOptional')} />
-                            <TextInput
+                            <PhoneInput
                                 id="phone"
-                                type="text"
-                                className="mt-1 block w-full"
+                                name="phone"
                                 value={createForm.data.phone}
-                                onChange={(e) => createForm.setData('phone', e.target.value)}
+                                onChange={(full) => createForm.setData('phone', full)}
+                                error={createForm.errors.phone}
                             />
-                            <InputError message={createForm.errors.phone} className="mt-2" />
                         </div>
 
                         <div>
@@ -487,14 +487,13 @@ export default function Index({ auth, students, availableBadges }) {
 
                         <div>
                             <InputLabel htmlFor="edit_phone" value={t('schoolStudentsIndexPage.form.phoneOptional')} />
-                            <TextInput
+                            <PhoneInput
                                 id="edit_phone"
-                                type="text"
-                                className="mt-1 block w-full"
+                                name="phone"
                                 value={editForm.data.phone}
-                                onChange={(e) => editForm.setData('phone', e.target.value)}
+                                onChange={(full) => editForm.setData('phone', full)}
+                                error={editForm.errors.phone}
                             />
-                            <InputError message={editForm.errors.phone} className="mt-2" />
                         </div>
 
                         <div>

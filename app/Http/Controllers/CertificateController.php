@@ -48,7 +48,9 @@ class CertificateController extends Controller
         if (!$this->canManageCertificate($actor, $recipient)) {
             return response()->json([
                 'success' => false,
-                'message' => 'غير مصرح لك بإدارة الشهادة لهذا المستخدم.',
+                'message' => [
+                    'key' => 'toastMessages.certificateUnauthorized',
+                ],
             ], 403);
         }
 
@@ -64,14 +66,18 @@ class CertificateController extends Controller
                 if (!$school || !$school->isSchool()) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'يجب أن يكون المعلم مرتبطاً بمدرسة صحيحة قبل طلب اعتماد الشهادة.',
+                        'message' => [
+                            'key' => 'toastMessages.certificateTeacherNeedsSchool',
+                        ],
                     ], 422);
                 }
 
                 if (!$this->membershipAccessService->hasCertificateAccess($school)) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'عضوية المدرسة الحالية لا تسمح بإصدار أو اعتماد الشهادات حالياً.',
+                        'message' => [
+                            'key' => 'toastMessages.certificateSchoolAccessDenied',
+                        ],
                     ], 422);
                 }
 
@@ -86,7 +92,9 @@ class CertificateController extends Controller
                 return response()->json([
                     'success' => true,
                     'requires_approval' => true,
-                    'message' => 'تم إرسال طلب الشهادة إلى المدرسة لاعتماده.',
+                    'message' => [
+                        'key' => 'toastMessages.certificateSentToSchoolForApproval',
+                    ],
                     'certificate' => [
                         'id' => $certificate->id,
                         'certificate_number' => $certificate->certificate_number,
@@ -98,7 +106,9 @@ class CertificateController extends Controller
             if (!$actor->isAdmin() && !$this->membershipAccessService->hasCertificateAccess($actor)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'العضوية الحالية لا تسمح بإصدار الشهادات أو لا توجد باقة فعالة تدعم الشهادات.',
+                    'message' => [
+                        'key' => 'toastMessages.certificateAccessDenied',
+                    ],
                 ], 422);
             }
 

@@ -3,7 +3,7 @@ import { FaPlus, FaTrash, FaEye, FaEyeSlash, FaSpinner, FaCheck, FaExclamationTr
 import axios from 'axios';
 import { router } from '@inertiajs/react';
 import { useTranslation } from '@/i18n';
-import { DEFAULT_DIAL_CODE, getDialCodeOptions } from '@/utils/dialCodeOptions';
+import PhoneInput from '@/Components/PhoneInput';
 
 const getSubjectLabel = (subject, language) => {
     if (language === 'ar') {
@@ -62,7 +62,6 @@ export default function JoinTeacherForm({ subjects = [], cities = [] }) {
         description: '',
     });
 
-    const dialCodeOptions = useMemo(() => getDialCodeOptions(t), [t]);
 
     const stageOptions = useMemo(() => [
         { value: '\u0627\u0644\u0627\u0628\u062a\u062f\u0627\u0626\u064a\u0629', label: t('joinTeacherPage.form.stageOptions.primary') },
@@ -115,14 +114,7 @@ export default function JoinTeacherForm({ subjects = [], cities = [] }) {
         }));
     };
 
-    const handlePhoneChange = (event) => {
-        const sanitized = event.target.value.replace(/\D/g, '');
-        setFormData((prev) => ({ ...prev, phone: sanitized }));
-    };
 
-    const handleDialCodeChange = (event) => {
-        setFormData((prev) => ({ ...prev, dial_code: event.target.value }));
-    };
 
     const addCertification = () => {
         if (!newCertification.name || !newCertification.issuer) {
@@ -209,17 +201,10 @@ export default function JoinTeacherForm({ subjects = [], cities = [] }) {
 
         try {
             const formDataToSend = new FormData();
-            let cleanedPhone = String(formData.phone || '').replace(/\D/g, '');
-
-            if (cleanedPhone.startsWith('0')) {
-                cleanedPhone = cleanedPhone.substring(1);
-            }
-
-            const fullPhone = `${formData.dial_code}${cleanedPhone}`;
-
+            
             formDataToSend.append('name', formData.name || '');
             formDataToSend.append('email', formData.email || '');
-            formDataToSend.append('phone', fullPhone);
+            formDataToSend.append('phone', formData.phone || '');
             formDataToSend.append('city', formData.city || '');
             formDataToSend.append('password', formData.password || '');
             formDataToSend.append('password_confirmation', formData.password_confirmation || '');
@@ -356,29 +341,13 @@ export default function JoinTeacherForm({ subjects = [], cities = [] }) {
                     </div>
                     <div>
                         <label className="mb-2 block text-sm font-medium text-gray-700">{t('joinTeacherPage.form.fields.phone')} *</label>
-                        <div className="flex gap-2">
-                            <select
-                                value={formData.dial_code}
-                                onChange={handleDialCodeChange}
-                                className="w-1/3 rounded-lg border border-gray-300 bg-gray-50 px-3 py-3 text-sm focus:border-transparent focus:ring-2 focus:ring-yellow-500"
-                                required
-                            >
-                                {dialCodeOptions.map((option) => (
-                                    <option key={option.value} value={option.value}>
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </select>
-                            <input
-                                type="tel"
-                                name="phone"
-                                value={formData.phone}
-                                onChange={handlePhoneChange}
-                                className="flex-1 rounded-lg border border-gray-300 px-4 py-3 focus:border-transparent focus:ring-2 focus:ring-yellow-500"
-                                placeholder={t('joinTeacherPage.form.placeholders.phone')}
-                                required
-                            />
-                        </div>
+                        <PhoneInput
+                            id="phone"
+                            name="phone"
+                            value={formData.phone || ''}
+                            onChange={(full) => setFormData((prev) => ({ ...prev, phone: full }))}
+                            error={''}
+                        />
                     </div>
                     <div>
                         <label className="mb-2 block text-sm font-medium text-gray-700">{t('joinTeacherPage.form.fields.city')} *</label>

@@ -1,4 +1,4 @@
-import { Head, Link, useForm, router } from '@inertiajs/react';
+﻿import { Head, Link, useForm, router } from '@inertiajs/react';
 import MobileAppLayout from '@/Layouts/MobileAppLayout';
 import { useState, useRef } from 'react';
 import {
@@ -22,9 +22,11 @@ import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
 import PrimaryButton from '../../../Components/PrimaryButton';
 import { useTranslation } from '@/i18n';
+import { usePremiumGate } from '@/Hooks/usePremiumGate';
 
-export default function StudentChallengeShow({ auth, challenge }) {
+export default function StudentChallengeShow({ auth, challenge, membershipSummary = null }) {
     const { t, language } = useTranslation();
+    const { gate } = usePremiumGate(membershipSummary);
     const [activeTab, setActiveTab] = useState('details');
     const [fileList, setFileList] = useState([]);
     const [dragActive, setDragActive] = useState(false);
@@ -160,7 +162,7 @@ export default function StudentChallengeShow({ auth, challenge }) {
 
     const submitChallenge = (e) => {
         e.preventDefault();
-
+        gate(() => {
         // Validate that at least answer or files are provided
         if (!submissionForm.data.answer?.trim() && fileList.length === 0) {
             alert(t('studentChallengesShowPage.errors.answerOrFileRequired'));
@@ -187,6 +189,7 @@ export default function StudentChallengeShow({ auth, challenge }) {
                 }
             },
         });
+        }); // end gate
     };
 
     const statusBadge = getStatusBadge();

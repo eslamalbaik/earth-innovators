@@ -21,7 +21,7 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
-            'role' => ['nullable', 'string', 'in:student,teacher,school,admin,educational_institution'],
+            'role' => ['nullable', 'string', 'in:student,teacher,school,admin,system_supervisor,school_support_coordinator,educational_institution'],
         ];
     }
 
@@ -63,6 +63,10 @@ class LoginRequest extends FormRequest
 
     private function selectedRoleMatchesUserRole(string $selectedRole, string $userRole): bool
     {
+        if (in_array($selectedRole, ['admin', 'system_supervisor', 'school_support_coordinator'], true)) {
+            return in_array($userRole, ['admin', 'system_supervisor', 'school_support_coordinator'], true);
+        }
+
         if (in_array($selectedRole, ['school', 'educational_institution'], true)) {
             return in_array($userRole, ['school', 'educational_institution'], true);
         }

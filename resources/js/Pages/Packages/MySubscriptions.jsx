@@ -12,6 +12,8 @@ import {
     FaBox,
     FaSpinner,
     FaTrash,
+    FaFileInvoice,
+    FaDownload,
 } from 'react-icons/fa';
 import { useToast } from '@/Contexts/ToastContext';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
@@ -146,11 +148,23 @@ export default function MySubscriptions({ auth, subscriptions = [], membershipSu
                                 </div>
 
                                 {canCancel && (
-                                    <div className="pt-3 border-t border-gray-200">
+                                    <div className="pt-3 border-t border-gray-200 flex gap-2">
+                                        {/* Invoice download — only for paid completed subscriptions */}
+                                        {subscription.payment_id && !subscription.is_trial && (
+                                            <a
+                                                href={`/payments/${subscription.payment_id}/invoice`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 transition text-xs font-semibold"
+                                            >
+                                                <FaFileInvoice />
+                                                {t('mySubscriptionsPage.actions.downloadInvoice')}
+                                            </a>
+                                        )}
                                         <button
                                             onClick={() => handleCancelSubscription(subscription.id)}
                                             disabled={isCancelling}
-                                            className={`w-full px-4 py-2 rounded-xl transition text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${subscription.status === 'pending'
+                                            className={`flex-1 px-4 py-2 rounded-xl transition text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${subscription.status === 'pending'
                                                 ? 'bg-yellow-50 text-yellow-800 hover:bg-yellow-100'
                                                 : 'bg-red-50 text-red-700 hover:bg-red-100'
                                                 }`}
@@ -167,6 +181,20 @@ export default function MySubscriptions({ auth, subscriptions = [], membershipSu
                                                 </>
                                             )}
                                         </button>
+                                    </div>
+                                )}
+                                {/* Invoice for completed subscriptions that can't be cancelled */}
+                                {!canCancel && subscription.payment_id && !subscription.is_trial && (
+                                    <div className="pt-3 border-t border-gray-200">
+                                        <a
+                                            href={`/payments/${subscription.payment_id}/invoice`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 transition text-xs font-semibold"
+                                        >
+                                            <FaFileInvoice />
+                                            {t('mySubscriptionsPage.actions.downloadInvoice')}
+                                        </a>
                                     </div>
                                 )}
                             </div>

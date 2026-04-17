@@ -67,7 +67,7 @@ export const getColorFromName = (name) => {
  * @param {string} fallback - Fallback image path (default: '/images/default-publication.jpg')
  * @returns {string} The complete image URL
  */
-export const getPublicationImageUrl = (imagePath, fallback = '/images/default-publication.jpg') => {
+export const getPublicationImageUrl = (imagePath, fallback = 'https://placehold.co/600x400/A3C042/white?text=Publication') => {
     if (!imagePath) {
         return fallback;
     }

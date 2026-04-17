@@ -4,13 +4,18 @@ import { useToast } from '@/Contexts/ToastContext';
 import { useTranslation } from '@/i18n';
 
 /**
- * Hook to automatically show toast notifications from Laravel flash messages
- * Non-intrusive popup notifications that don't interrupt user workflow
+ * Hook to automatically show toast notifications from Laravel flash messages.
+ * Uses a composite key (message + page-url) to deduplicate across navigations
+ * while still showing the same message on different pages if needed.
  */
 export function useFlashNotifications() {
-    const { flash } = usePage().props;
+    const { flash, ziggy } = usePage().props;
     const { showSuccess, showError, showWarning, showInfo } = useToast();
     const { t } = useTranslation();
+
+    // Track the last shown message per type WITH its source URL so that:
+    // - The same message does NOT appear twice on the same page load.
+    // - The same message CAN appear again if the user navigates to a different page.
     const lastShownRef = useRef({
         success: null,
         error: null,
@@ -21,17 +26,17 @@ export function useFlashNotifications() {
     const resolveMessage = (payload) => {
         if (!payload) return null;
 
-        // Strings are returned as-is
+        // Plain strings
         if (typeof payload === 'string') {
             return payload;
         }
 
-        // If Laravel sends arrays of messages
+        // Arrays of messages
         if (Array.isArray(payload)) {
             return payload.map(resolveMessage).filter(Boolean).join(' ');
         }
 
-        // Objects coming from controllers: { key, params?, message? }
+        // Objects: { key, params?, message? }
         if (typeof payload === 'object') {
             if (payload.key) {
                 try {
@@ -40,13 +45,11 @@ export function useFlashNotifications() {
                     return payload.message || payload.key;
                 }
             }
-
             if (payload.message) {
                 return payload.message;
             }
-
-            // Fallback: first string-ish value
-            const firstString = Object.values(payload).find((val) => typeof val === 'string');
+            // Fallback: first string value
+            const firstString = Object.values(payload).find((v) => typeof v === 'string');
             if (firstString) return firstString;
         }
 
@@ -54,40 +57,21 @@ export function useFlashNotifications() {
     };
 
     useEffect(() => {
-        const successMessage = resolveMessage(flash?.success);
-        if (successMessage && lastShownRef.current.success !== successMessage) {
-            lastShownRef.current.success = successMessage;
-            showSuccess(successMessage, {
-                autoDismiss: 2500, // Short duration for success messages
-                title: null, // No title for simple notifications
-            });
-        }
+        // Build a fingerprint that is unique per (message + current url)
+        const currentUrl = ziggy?.url || window.location.href;
 
-        const errorMessage = resolveMessage(flash?.error);
-        if (errorMessage && lastShownRef.current.error !== errorMessage) {
-            lastShownRef.current.error = errorMessage;
-            showError(errorMessage, {
-                autoDismiss: 4000, // Slightly longer for errors
-                title: null,
-            });
-        }
+        const check = (type, showFn, message, opts) => {
+            if (!message) return;
+            const fingerprint = `${currentUrl}||${message}`;
+            if (lastShownRef.current[type] === fingerprint) return;
+            lastShownRef.current[type] = fingerprint;
+            showFn(message, { title: null, ...opts });
+        };
 
-        const warningMessage = resolveMessage(flash?.warning);
-        if (warningMessage && lastShownRef.current.warning !== warningMessage) {
-            lastShownRef.current.warning = warningMessage;
-            showWarning(warningMessage, {
-                autoDismiss: 3000,
-                title: null,
-            });
-        }
+        check('success', showSuccess, resolveMessage(flash?.success), { autoDismiss: 2500 });
+        check('error',   showError,   resolveMessage(flash?.error),   { autoDismiss: 4000 });
+        check('warning', showWarning, resolveMessage(flash?.warning), { autoDismiss: 3000 });
+        check('info',    showInfo,    resolveMessage(flash?.info),    { autoDismiss: 3000 });
 
-        const infoMessage = resolveMessage(flash?.info);
-        if (infoMessage && lastShownRef.current.info !== infoMessage) {
-            lastShownRef.current.info = infoMessage;
-            showInfo(infoMessage, {
-                autoDismiss: 3000,
-                title: null,
-            });
-        }
-    }, [flash, showSuccess, showError, showWarning, showInfo, t]);
+    }, [flash, ziggy?.url, showSuccess, showError, showWarning, showInfo, t]);
 }

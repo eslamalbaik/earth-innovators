@@ -5,6 +5,7 @@ import {
     FaSearch,
     FaFilter,
     FaEye,
+    FaEdit,
     FaTrash,
     FaBook,
     FaCalendar,
@@ -24,6 +25,7 @@ export default function AdminPublicationsIndex({
     const [search, setSearch] = useState(filters?.search || '');
     const [status, setStatus] = useState(filters?.status || '');
     const [type, setType] = useState(filters?.type || '');
+    const [activeTab, setActiveTab] = useState('all');
 
     const handleFilter = () => {
         router.get(route('admin.publications.index'), {
@@ -115,8 +117,8 @@ export default function AdminPublicationsIndex({
                         {t('adminPublicationsIndexPage.actions.add')}
                     </Link>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.search')}</label>
                         <div className="relative">
                             <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -124,6 +126,7 @@ export default function AdminPublicationsIndex({
                                 type="text"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleFilter()}
                                 placeholder={t('adminPublicationsIndexPage.filters.searchPlaceholder')}
                                 className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
@@ -133,7 +136,7 @@ export default function AdminPublicationsIndex({
                         <label className="block text-sm font-medium text-gray-700 mb-2">{t('common.status')}</label>
                         <select
                             value={status}
-                            onChange={(e) => setStatus(e.target.value)}
+                            onChange={(e) => { setStatus(e.target.value); setTimeout(handleFilter, 10); }}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         >
                             <option value="">{t('common.all')}</option>
@@ -142,36 +145,54 @@ export default function AdminPublicationsIndex({
                             <option value="rejected">{t('adminPublicationsIndexPage.statuses.rejected')}</option>
                         </select>
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminPublicationsIndexPage.filters.typeLabel')}</label>
-                        <select
-                            value={type}
-                            onChange={(e) => setType(e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                            <option value="">{t('common.all')}</option>
-                            <option value="magazine">{t('common.publicationTypes.magazine')}</option>
-                            <option value="booklet">{t('common.publicationTypes.booklet')}</option>
-                            <option value="report">{t('common.publicationTypes.report')}</option>
-                            <option value="article">{t('common.publicationTypes.article')}</option>
-                        </select>
-                    </div>
                     <div className="flex items-end">
                         <button
                             onClick={handleFilter}
-                            className="w-full bg-[#A3C042] hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
+                            className="w-full bg-gray-900 border border-gray-900 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-800 transition shadow-sm flex items-center justify-center gap-2"
                         >
                             <FaFilter />
                             {t('common.filter')}
                         </button>
                     </div>
                 </div>
+
+                <div className="pt-4 border-t border-gray-100 flex items-center gap-2 overflow-x-auto no-scrollbar">
+                    {[
+                        { id: 'all', label: t('common.all') },
+                        { id: 'magazine', label: t('common.publicationTypes.magazine') },
+                        { id: 'booklet', label: t('common.publicationTypes.booklet') },
+                        { id: 'report', label: t('common.publicationTypes.report') },
+                        { id: 'article', label: t('common.publicationTypes.article') },
+                    ].map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`px-4 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
+                                activeTab === tab.id
+                                    ? 'bg-[#A3C042] text-white shadow-md'
+                                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                            }`}
+                        >
+                            {tab.label}
+                            <span className={`ml-2 rounded-full px-1.5 py-0.5 text-[10px] ${
+                                activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+                            }`}>
+                                {tab.id === 'all' 
+                                    ? publications.data.length 
+                                    : publications.data.filter(p => p.type === tab.id).length
+                                }
+                            </span>
+                        </button>
+                    ))}
+                </div>
             </div>
 
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                 {publications?.data?.length > 0 ? (
                     <div className="divide-y divide-gray-200">
-                        {publications.data.map((publication) => {
+                        {publications.data
+                            .filter(p => activeTab === 'all' || p.type === activeTab)
+                            .map((publication) => {
                             const coverImage = getPublicationImageUrl(publication.cover_image);
 
                             return (
@@ -241,6 +262,13 @@ export default function AdminPublicationsIndex({
                                                     title={t('common.viewDetails')}
                                                 >
                                                     <FaEye />
+                                                </Link>
+                                                <Link
+                                                    href={route('admin.publications.edit', publication.id)}
+                                                    className="text-amber-600 hover:text-amber-800 p-2 rounded-lg hover:bg-amber-50 transition"
+                                                    title={t('common.edit')}
+                                                >
+                                                    <FaEdit />
                                                 </Link>
                                                 <button
                                                     onClick={() => handleDelete(publication)}

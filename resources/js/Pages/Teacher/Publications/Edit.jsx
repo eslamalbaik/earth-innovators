@@ -1,7 +1,7 @@
 import DashboardLayout from '../../../Layouts/DashboardLayout';
 import { Head, useForm, Link } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
-import { FaUpload, FaSpinner, FaArrowLeft } from 'react-icons/fa';
+import { FaUpload, FaSpinner, FaArrowLeft, FaYoutube } from 'react-icons/fa';
 import TextInput from '../../../Components/TextInput';
 import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
@@ -18,6 +18,7 @@ export default function TeacherPublicationEdit({ auth, publication }) {
         content: publication?.content || '',
         cover_image: null,
         file: null,
+        youtube_url: publication?.youtube_url || '',
         issue_number: publication?.issue_number || '',
         publish_date: publication?.publish_date || '',
         publisher_name: publication?.publisher_name || '',
@@ -207,6 +208,25 @@ export default function TeacherPublicationEdit({ auth, publication }) {
                                 )}
                             </div>
                             <InputError message={errors.file} className="mt-2" />
+                        </div>
+
+                        {/* YouTube URL */}
+                        <div>
+                            <InputLabel htmlFor="youtube_url" value={t('teacherPublicationEditPage.form.youtubeUrlLabel', { defaultValue: 'رابط YouTube (اختياري)' })} />
+                            <div className="mt-1 relative">
+                                <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
+                                    <FaYoutube className="text-red-500 text-lg" />
+                                </div>
+                                <TextInput
+                                    id="youtube_url"
+                                    type="url"
+                                    value={data.youtube_url}
+                                    onChange={(e) => setData('youtube_url', e.target.value)}
+                                    className="mt-1 block w-full ps-10"
+                                    placeholder="https://www.youtube.com/watch?v=..."
+                                />
+                            </div>
+                            <InputError message={errors.youtube_url} className="mt-2" />
                         </div>
 
                         <div>

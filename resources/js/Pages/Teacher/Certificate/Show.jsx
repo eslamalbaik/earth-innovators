@@ -1,5 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { FaDownload, FaPrint, FaShare, FaCertificate, FaMedal } from 'react-icons/fa';
+import { usePremiumGate } from '@/Hooks/usePremiumGate';
 import MobileAppLayout from '@/Layouts/MobileAppLayout';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
@@ -11,11 +12,17 @@ import { downloadFile } from '@/utils/downloadFile';
 export default function TeacherCertificateShow({ auth, user, stats, certificate, membershipSummary = null, school = null, latestApprovedCertificates = [] }) {
     const { t, language } = useTranslation();
     const { showError } = useToast();
+    const { gate, premiumModal } = usePremiumGate(membershipSummary, {
+        featureName: t('common.certificates'),
+        requiredAccessKey: 'certificate_access',
+    });
     const isAuthed = !!auth?.user;
     const currentUser = auth?.user;
 
     const handleDownload = async () => {
-        if (certificate?.download_url) {
+        gate(async () => {
+            if (!certificate?.download_url) return;
+
             try {
                 await downloadFile(
                     certificate.download_url,
@@ -24,7 +31,7 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate,
             } catch (error) {
                 showError(t('errors.somethingWentWrong'));
             }
-        }
+        });
     };
 
     const handlePrint = () => {
@@ -89,6 +96,7 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate,
                     }
                 `}</style>
             </Head>
+            {premiumModal}
             <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
 
                 {/* Mobile View */}
@@ -415,9 +423,13 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate,
                                                             <div className="text-xs text-gray-500">{item.approved_at}</div>
                                                         </div>
                                                         {item.download_url && (
-                                                            <a href={item.download_url} download className="text-sm font-bold text-blue-600 hover:text-blue-700">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => gate(() => downloadFile(item.download_url, `certificate_${item.id}.pdf`))}
+                                                                className="text-sm font-bold text-blue-600 hover:text-blue-700"
+                                                            >
                                                                 {t('common.download')}
-                                                            </a>
+                                                            </button>
                                                         )}
                                                     </div>
                                                 ))}

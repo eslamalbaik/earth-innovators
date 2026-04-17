@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\MembershipCertificateService;
+use App\Services\MembershipAccessService;
 use App\Models\Certificate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,14 +15,17 @@ class MembershipCertificateController extends Controller
 {
     protected $membershipCertificateService;
     protected $certificateService;
+    protected $membershipAccessService;
 
     public function __construct(
         MembershipCertificateService $membershipCertificateService,
-        \App\Services\CertificateService $certificateService
+        \App\Services\CertificateService $certificateService,
+        MembershipAccessService $membershipAccessService
     )
     {
         $this->membershipCertificateService = $membershipCertificateService;
         $this->certificateService = $certificateService;
+        $this->membershipAccessService = $membershipAccessService;
     }
 
     /**
@@ -34,6 +38,8 @@ class MembershipCertificateController extends Controller
         if (!$user) {
             abort(403, 'Unauthorized');
         }
+
+        $membershipSummary = $this->membershipAccessService->getMembershipSummary($user);
 
         $certificate = $this->membershipCertificateService->getUserMembershipCertificate(
             $user->id,
@@ -61,6 +67,7 @@ class MembershipCertificateController extends Controller
                 'download_url' => route('membership-certificates.download', $certificate->id),
             ] : null,
             'eligibility' => $eligibility,
+            'membershipSummary' => $membershipSummary,
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
@@ -80,6 +87,11 @@ class MembershipCertificateController extends Controller
 
         if (!$this->canViewCertificate($user, $certificate)) {
             abort(403, 'You do not have permission to download this certificate');
+        }
+
+        // Enforce certificate entitlement for non-admin downloads.
+        if (!$user?->isAdmin() && !$this->membershipAccessService->hasCertificateAccess($user)) {
+            abort(403, 'Certificate access requires an active subscription.');
         }
 
         $filePath = Storage::disk('public')->path(

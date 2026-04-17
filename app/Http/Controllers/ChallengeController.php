@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Services\ChallengeService;
+use App\Services\ChallengeSubmissionService;
 use App\Services\ChallengeWinnerService;
+use App\Services\MembershipAccessService;
 use App\Models\Challenge;
 use App\Models\Category;
 use Illuminate\Http\Request;
@@ -14,7 +16,9 @@ class ChallengeController extends Controller
 {
     public function __construct(
         private ChallengeService $challengeService,
-        private ChallengeWinnerService $winnerService
+        private ChallengeWinnerService $winnerService,
+        private ChallengeSubmissionService $submissionService,
+        private MembershipAccessService $membershipAccessService,
     ) {}
 
     public function index(Request $request)
@@ -22,6 +26,95 @@ class ChallengeController extends Controller
         $user = Auth::user();
         $schoolId = null;
         $challenges = null;
+
+        if ($user && in_array($user->role, ['admin', 'system_supervisor', 'school_support_coordinator'], true)) {
+            $query = Challenge::where('status', '!=', 'cancelled')
+                ->with(['creator:id,name', 'school:id,name'])
+                ->withCount(['submissions as submissions_count', 'participants as participants_count'])
+                ->orderBy('created_at', 'desc');
+
+            if ($request->get('search')) {
+                $search = $request->get('search');
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                        ->orWhere('objective', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
+                });
+            }
+
+            if ($request->get('category')) {
+                $query->where('category', $request->get('category'));
+            }
+
+            if ($request->get('challenge_type')) {
+                $query->where('challenge_type', $request->get('challenge_type'));
+            }
+
+            $status = $request->get('status');
+            if ($status === 'active') {
+                $query->where('status', 'active')
+                    ->where('start_date', '<=', now())
+                    ->where('deadline', '>=', now());
+            } elseif ($status === 'upcoming') {
+                $query->where('status', 'active')
+                    ->where('start_date', '>', now());
+            } elseif ($status === 'finished') {
+                $query->where(function ($q) {
+                    $q->where('status', 'completed')
+                        ->orWhere('deadline', '<', now());
+                });
+            } elseif ($status) {
+                $query->where('status', $status);
+            }
+
+            $challenges = $query->paginate(12)->withQueryString();
+            $challenges->getCollection()->transform(function ($challenge) {
+                if (!isset($challenge->image_url) && $challenge->image) {
+                    $challenge->image_url = $challenge->getImageUrlAttribute();
+                }
+                return $challenge;
+            });
+        }
+
+        if ($challenges) {
+            $previousWinners = $this->winnerService->getPreviousWinnersUnscoped(3);
+            $participationConditions = $this->getParticipationConditions();
+
+            $allCategories = Category::where('is_active', true)
+                ->orderBy('name')
+                ->get();
+
+            $otherCategory = $allCategories->firstWhere('slug', 'other');
+            $otherCategories = $allCategories->filter(function ($category) {
+                return $category->slug !== 'other';
+            });
+
+            $categories = collect([['value' => '', 'label' => 'ط§ظ„ظƒظ„']])
+                ->merge($otherCategories->map(function ($category) {
+                    return [
+                        'value' => $category->slug,
+                        'label' => $category->name,
+                    ];
+                }))
+                ->when($otherCategory, function ($collection) use ($otherCategory) {
+                    return $collection->push([
+                        'value' => $otherCategory->slug,
+                        'label' => $otherCategory->name,
+                    ]);
+                })
+                ->toArray();
+
+            return Inertia::render('Challenges/Index', [
+                'challenges' => $challenges,
+                'userRole' => $user ? $user->role : null,
+                'previousWinners' => $previousWinners,
+                'participationConditions' => $participationConditions,
+                'categories' => $categories,
+                'auth' => [
+                    'user' => $user,
+                ],
+            ]);
+        }
 
         if ($user) {
             if ($user->isStudent() && $user->school_id) {
@@ -228,31 +321,57 @@ class ChallengeController extends Controller
     public function show(int $id)
     {
         $user = Auth::user();
-        if ($user && $user->isStudent()) {
-            return redirect()->route('student.challenges.show', $id);
+        $isStudent = $user && $user->isStudent();
+
+        if ($isStudent) {
+            $challenge = $this->submissionService->getChallengeDetailsForStudent($id, $user->id);
+            if (!$challenge) {
+                abort(404);
+            }
+        } else {
+            $challenge = Challenge::with(['creator', 'school'])->findOrFail($id);
         }
-        if ($user && $user->isTeacher()) {
-            $challenge = Challenge::findOrFail($id);
-            if ($challenge->created_by === $user->id) {
-                return redirect()->route('teacher.challenges.show', $id);
+
+        // Restrict school-bound challenges to the same school context.
+        if ($challenge->school_id !== null && $user) {
+            $userSchoolId = null;
+            if ($user->isSchool()) {
+                $userSchoolId = $user->id;
+            } elseif ($user->isTeacher() || $user->isStudent()) {
+                $userSchoolId = $user->school_id;
+            }
+
+            if ($userSchoolId && (int) $challenge->school_id !== (int) $userSchoolId && (int) $challenge->created_by !== (int) $user->id) {
+                abort(403, 'غير مصرح لك بالوصول إلى هذا التحدي');
             }
         }
-        $challenge = Challenge::with(['creator', 'school'])
-            ->findOrFail($id);
+
         if (!isset($challenge->image_url) && $challenge->image) {
             $challenge->image_url = $challenge->getImageUrlAttribute();
         }
-        $existingSubmission = null;
-        if ($user && $user->isStudent()) {
-            $existingSubmission = \App\Models\ChallengeSubmission::where('challenge_id', $challenge->id)
-                ->where('student_id', $user->id)
-                ->first();
+
+        $canManage = false;
+        $canSubmit = false;
+        $editUrl = null;
+        if ($user && $user->isTeacher() && (int) $challenge->created_by === (int) $user->id) {
+            $canManage = true;
+            $editUrl = route('teacher.challenges.edit', $challenge->id);
+        } elseif ($user && $user->isSchool() && (int) $challenge->school_id === (int) $user->id) {
+            $canManage = true;
+            $editUrl = route('school.challenges.edit', $challenge->id);
         }
-        return Inertia::render('Student/Challenges/Show', [
+
+        if ($isStudent) {
+            $canSubmit = $challenge->school_id === null || (int) $challenge->school_id === (int) $user->school_id;
+        }
+
+        return Inertia::render('Challenges/Show', [
             'challenge' => $challenge,
-            'existingSubmission' => $existingSubmission,
             'userRole' => $user ? $user->role : null,
-            'canSubmit' => $user && $user->isStudent() && ($challenge->school_id === $user->school_id || $challenge->school_id === null),
+            'canManage' => $canManage,
+            'canSubmit' => $canSubmit,
+            'editUrl' => $editUrl,
+            'membershipSummary' => $isStudent ? $this->membershipAccessService->getMembershipSummary($user) : null,
         ]);
     }
 

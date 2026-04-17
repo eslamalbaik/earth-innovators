@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { getColorFromName, getInitials } from '@/utils/imageUtils';
 import { useToast } from '@/Contexts/ToastContext';
 import { useTranslation } from '@/i18n';
+import PhoneInput from '@/Components/PhoneInput';
 
 const NATIONALITY_OPTIONS = [
     { value: 'إماراتي', key: 'emirati' },
@@ -62,19 +63,8 @@ export default function Profile({ teacher }) {
         nationality: teacher?.nationality || 'إماراتي',
         gender: teacher?.gender || '',
         bio: teacher?.bio || '',
-        qualifications: teacher?.qualifications || '',
-        subjects: teacher?.subjects || [],
-        stages: teacher?.stages || [],
-        experience_years: teacher?.experience_years || 0,
-        city: teacher?.city || '',
-        neighborhoods: teacher?.neighborhoods || [],
-        price_per_hour: teacher?.price_per_hour || 0,
         email: teacher?.email || teacher?.user?.email || '',
         phone: teacher?.phone || teacher?.user?.phone || '',
-        contract_start_date: teacher?.contract_start_date || '',
-        contract_end_date: teacher?.contract_end_date || '',
-        contract_status: teacher?.contract_status || (teacher?.is_active ? 'active' : 'inactive'),
-        membership_type: teacher?.membership_type || 'basic',
     });
 
     useEffect(() => {
@@ -127,33 +117,11 @@ export default function Profile({ teacher }) {
             'nationality',
             'gender',
             'bio',
-            'qualifications',
-            'experience_years',
-            'city',
-            'price_per_hour',
             'email',
             'phone',
         ].forEach((field) => {
             formData.append(field, data[field] ?? '');
         });
-
-        if (Array.isArray(data.subjects)) {
-            data.subjects.forEach((subject, index) => {
-                formData.append(`subjects[${index}]`, subject);
-            });
-        }
-
-        if (Array.isArray(data.stages)) {
-            data.stages.forEach((stage, index) => {
-                formData.append(`stages[${index}]`, stage);
-            });
-        }
-
-        if (Array.isArray(data.neighborhoods)) {
-            data.neighborhoods.forEach((neighborhood, index) => {
-                formData.append(`neighborhoods[${index}]`, neighborhood);
-            });
-        }
 
         if (selectedImage) {
             formData.append('image', selectedImage);
@@ -446,15 +414,14 @@ export default function Profile({ teacher }) {
                                         <FaPhone className="text-slate-400" />
                                         {t('teacherDashboardProfilePage.fields.phone')} *
                                     </label>
-                                    <input
-                                        type="tel"
-                                        value={data.phone}
-                                        onChange={(event) => setData('phone', event.target.value)}
+                                    <PhoneInput
+                                        id="phone"
+                                        name="phone"
+                                        value={data.phone || ''}
+                                        onChange={(full) => setData('phone', full)}
                                         disabled={!isEditing}
-                                        className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-[#A3C042] focus:outline-none focus:ring-2 focus:ring-[#DCE8B3] disabled:bg-slate-50"
-                                        required
+                                        error={errors.phone || ''}
                                     />
-                                    {errors.phone && <p className="mt-2 text-sm text-red-600">{errors.phone}</p>}
                                 </div>
                             </div>
 
@@ -515,7 +482,7 @@ export default function Profile({ teacher }) {
                                             {t('teacherDashboardProfilePage.membershipCard.startDate')}
                                         </div>
                                         <div className="font-semibold">
-                                            {data.contract_start_date || t('common.notAvailable')}
+                                            {teacher?.contract_start_date || t('common.notAvailable')}
                                         </div>
                                     </div>
                                     <div>
@@ -523,7 +490,7 @@ export default function Profile({ teacher }) {
                                             {t('teacherDashboardProfilePage.membershipCard.endDate')}
                                         </div>
                                         <div className="font-semibold">
-                                            {data.contract_end_date || t('common.notAvailable')}
+                                            {teacher?.contract_end_date || t('common.notAvailable')}
                                         </div>
                                     </div>
                                 </div>

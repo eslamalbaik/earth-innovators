@@ -1,11 +1,13 @@
 import DashboardLayout from '../../../Layouts/DashboardLayout';
 import { Head, Link } from '@inertiajs/react';
-import { FaBook, FaPlus, FaEye, FaClock, FaCheckCircle, FaTimesCircle, FaEdit } from 'react-icons/fa';
+import React from 'react';
+import { FaBook, FaPlus, FaEye, FaClock, FaCheckCircle, FaTimesCircle, FaEdit, FaNewspaper, FaFileAlt } from 'react-icons/fa';
 import { useTranslation } from '@/i18n';
 import { toHijriDate } from '@/utils/dateUtils';
 
 export default function TeacherPublications({ publications, auth }) {
     const { t, language } = useTranslation();
+    const [activeTab, setActiveTab] = React.useState('all');
 
     const statusLabels = {
         pending: { label: t('teacherPublicationsPage.statuses.pending'), color: 'bg-yellow-100 text-yellow-700 border-yellow-300', icon: FaClock },
@@ -55,10 +57,44 @@ export default function TeacherPublications({ publications, auth }) {
                         {t('teacherPublicationsPage.listTitle', { count: publications?.total || 0 })}
                     </h3>
                 </div>
+                
+                <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-2 overflow-x-auto no-scrollbar bg-gray-50/50">
+                    {[
+                        { id: 'all', label: t('common.all'), icon: <FaBook /> },
+                        { id: 'magazine', label: t('teacherPublicationsPage.types.magazine'), icon: <FaNewspaper /> },
+                        { id: 'booklet', label: t('teacherPublicationsPage.types.booklet'), icon: <FaBook /> },
+                        { id: 'report', label: t('teacherPublicationsPage.types.report'), icon: <FaFileAlt /> },
+                        { id: 'article', label: t('teacherPublicationsPage.types.article'), icon: <FaFileAlt /> },
+                    ].map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`flex items-center gap-2 whitespace-nowrap rounded-lg px-4 py-2 text-sm font-bold transition-all ${
+                                activeTab === tab.id
+                                    ? 'bg-[#A3C042] text-white shadow-sm'
+                                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                            }`}
+                        >
+                            {tab.icon}
+                            {tab.label}
+                            <span className={`ml-1 rounded-full px-1.5 py-0.5 text-[10px] ${
+                                activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+                            }`}>
+                                {tab.id === 'all' 
+                                    ? publications.data.length 
+                                    : publications.data.filter(p => p.type === tab.id).length
+                                }
+                            </span>
+                        </button>
+                    ))}
+                </div>
+
                 <div className="p-6">
                     {publications.data && publications.data.length > 0 ? (
                         <div className="space-y-4">
-                            {publications.data.map((publication) => {
+                            {publications.data
+                                .filter(p => activeTab === 'all' || p.type === activeTab)
+                                .map((publication) => {
                                 const StatusIcon = statusLabels[publication.status]?.icon || FaClock;
                                 return (
                                     <div key={publication.id} className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition">

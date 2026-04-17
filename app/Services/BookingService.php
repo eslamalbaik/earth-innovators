@@ -11,6 +11,44 @@ use Illuminate\Support\Facades\Schema;
 
 class BookingService extends BaseService
 {
+    /**
+     * Finalize a booking after a successful payment.
+     *
+     * This method is referenced by PaymentObserver. It is intentionally defensive
+     * because the bookings schema has evolved (some deployments have different columns).
+     */
+    public function finalizePaidBooking(Booking $booking): Booking
+    {
+        $update = [];
+
+        if (Schema::hasColumn('bookings', 'payment_received')) {
+            $update['payment_received'] = true;
+        }
+        if (Schema::hasColumn('bookings', 'payment_received_at')) {
+            $update['payment_received_at'] = now();
+        }
+        if (Schema::hasColumn('bookings', 'payment_status')) {
+            $update['payment_status'] = 'paid';
+        }
+
+        // Keep status consistent with "paid" bookings.
+        if (Schema::hasColumn('bookings', 'status') && in_array($booking->status, ['pending', 'processing'], true)) {
+            $update['status'] = 'confirmed';
+        }
+
+        if (!empty($update)) {
+            $booking->update($update);
+        }
+
+        $this->forgetCacheTags([
+            'bookings',
+            "teacher_bookings_{$booking->teacher_id}",
+            "booking_{$booking->id}",
+        ]);
+
+        return $booking->fresh();
+    }
+
     public function getAllBookings(
         ?string $status = null,
         ?int $teacherId = null,

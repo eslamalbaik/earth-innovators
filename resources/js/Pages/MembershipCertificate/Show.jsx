@@ -7,26 +7,33 @@ import DesktopFooter from '@/Components/Mobile/DesktopFooter';
 import { useTranslation } from '@/i18n';
 import { useToast } from '@/Contexts/ToastContext';
 import { downloadFile } from '@/utils/downloadFile';
+import { usePremiumGate } from '@/Hooks/usePremiumGate';
 
-export default function MembershipCertificateShow({ auth, certificate, eligibility, user }) {
+export default function MembershipCertificateShow({ auth, certificate, eligibility, user, membershipSummary = null }) {
     const { t, language } = useTranslation();
     const { showError } = useToast();
+    const { gate, premiumModal } = usePremiumGate(membershipSummary, {
+        featureName: t('common.certificates'),
+        requiredAccessKey: 'certificate_access',
+    });
     const isAuthed = !!auth?.user;
     const currentUser = auth?.user;
 
     const handleDownload = async () => {
-        if (!certificate?.download_url) {
-            return;
-        }
+        gate(async () => {
+            if (!certificate?.download_url) {
+                return;
+            }
 
-        try {
-            await downloadFile(
-                certificate.download_url,
-                `certificate_${certificate.certificate_number || user?.membership_number || 'membership'}.pdf`
-            );
-        } catch (error) {
-            showError(t('errors.somethingWentWrong'));
-        }
+            try {
+                await downloadFile(
+                    certificate.download_url,
+                    `certificate_${certificate.certificate_number || user?.membership_number || 'membership'}.pdf`
+                );
+            } catch (error) {
+                showError(t('errors.somethingWentWrong'));
+            }
+        });
     };
 
     const handleCheckEligibility = async () => {
@@ -147,6 +154,7 @@ export default function MembershipCertificateShow({ auth, certificate, eligibili
     return (
         <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
             <Head title={t('membershipCertificatePage.pageTitle', { appName: t('common.appName') })} />
+            {premiumModal}
 
             <div className="block md:hidden">
                 <MobileAppLayout

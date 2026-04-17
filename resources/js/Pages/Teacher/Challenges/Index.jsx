@@ -1,7 +1,7 @@
 import DashboardLayout from '../../../Layouts/DashboardLayout';
-import { Head, Link, router } from '@inertiajs/react';
-import { FaTrophy, FaPlus, FaCalendar, FaEye, FaEdit, FaTrash, FaUsers, FaSearch } from 'react-icons/fa';
-import { useState } from 'react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { FaTrophy, FaPlus, FaCalendar, FaEye, FaEdit, FaTrash, FaUsers, FaSearch, FaExclamationTriangle } from 'react-icons/fa';
+import { useState, useEffect } from 'react';
 import InnovationChallengeCard from '@/Components/Challenges/InnovationChallengeCard';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 import { useTranslation } from '@/i18n';
@@ -10,6 +10,7 @@ export default function TeacherChallengesIndex({ auth, challenges }) {
     const { confirm } = useConfirmDialog();
     const { t, language } = useTranslation();
     const [processing, setProcessing] = useState(null);
+    const { errors } = usePage().props;
 
     const handleDelete = async (challengeId) => {
         const confirmed = await confirm({
@@ -105,6 +106,16 @@ export default function TeacherChallengesIndex({ auth, challenges }) {
 
             <div className="min-h-screen bg-gray-50 pb-32" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    {/* Flash Error Banner */}
+                    {errors.error && (
+                        <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3">
+                            <FaExclamationTriangle className="text-red-500 mt-0.5 text-lg" />
+                            <div className="flex-1 text-red-800 font-semibold text-sm">
+                                {errors.error}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Header with Actions */}
                     <div className="mb-8">
                         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">

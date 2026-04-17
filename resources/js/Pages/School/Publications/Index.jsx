@@ -22,6 +22,7 @@ export default function SchoolPublicationsIndex({ auth, publications, stats, fil
     const { confirm } = useConfirmDialog();
     const [processing, setProcessing] = useState(null);
     const [selectedStatus, setSelectedStatus] = useState(filters?.status || '');
+    const [activeTab, setActiveTab] = useState('all');
 
     const handleStatusFilter = (status) => {
         setSelectedStatus(status);
@@ -125,59 +126,85 @@ export default function SchoolPublicationsIndex({ auth, publications, stats, fil
 
                     <div className="bg-white rounded-lg shadow mb-6 p-4">
                         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                            <Link
-                                href="/school/publications/create"
-                                className="inline-flex items-center gap-2 px-6 py-3 bg-[#A3C042] text-white rounded-lg hover:opacity-90 transition"
-                            >
-                                <FaPlus />
-                                {t('schoolPublicationsPage.actions.create')}
-                            </Link>
-
                             <div className="flex gap-2">
+                                <Link
+                                    href="/school/publications/create"
+                                    className="inline-flex items-center gap-2 px-6 py-3 bg-[#A3C042] text-white rounded-lg hover:opacity-90 transition shadow-sm"
+                                >
+                                    <FaPlus />
+                                    {t('schoolPublicationsPage.actions.create')}
+                                </Link>
+                            </div>
+
+                            <div className="flex gap-2 bg-gray-50 p-1.5 rounded-xl border border-gray-100 overflow-x-auto no-scrollbar max-w-full">
                                 <button
                                     onClick={() => handleStatusFilter('')}
-                                    className={`px-4 py-2 rounded-lg transition ${!selectedStatus
-                                        ? 'bg-[#A3C042] text-white'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${!selectedStatus
+                                        ? 'bg-white text-gray-900 shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-700'
                                         }`}
                                 >
                                     {t('schoolPublicationsPage.filters.all')}
                                 </button>
                                 <button
                                     onClick={() => handleStatusFilter('pending')}
-                                    className={`px-4 py-2 rounded-lg transition ${selectedStatus === 'pending'
-                                        ? 'bg-yellow-500 text-white'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${selectedStatus === 'pending'
+                                        ? 'bg-yellow-100 text-yellow-700 shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-700'
                                         }`}
                                 >
                                     {t('schoolPublicationsPage.filters.pending')}
                                 </button>
                                 <button
                                     onClick={() => handleStatusFilter('approved')}
-                                    className={`px-4 py-2 rounded-lg transition ${selectedStatus === 'approved'
-                                        ? 'bg-green-500 text-white'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${selectedStatus === 'approved'
+                                        ? 'bg-green-100 text-green-700 shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-700'
                                         }`}
                                 >
                                     {t('schoolPublicationsPage.filters.approved')}
                                 </button>
                                 <button
                                     onClick={() => handleStatusFilter('rejected')}
-                                    className={`px-4 py-2 rounded-lg transition ${selectedStatus === 'rejected'
-                                        ? 'bg-red-500 text-white'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${selectedStatus === 'rejected'
+                                        ? 'bg-red-100 text-red-700 shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-700'
                                         }`}
                                 >
                                     {t('schoolPublicationsPage.stats.rejected')}
                                 </button>
                             </div>
                         </div>
+
+                        <div className="mt-4 pt-4 border-t border-gray-100 flex items-center gap-2 overflow-x-auto no-scrollbar">
+                            {[
+                                { id: 'all', label: t('common.all') },
+                                { id: 'magazine', label: t('schoolPublicationsPage.types.magazine') },
+                                { id: 'booklet', label: t('schoolPublicationsPage.types.booklet') },
+                                { id: 'report', label: t('schoolPublicationsPage.types.report') },
+                                { id: 'article', label: t('schoolPublicationsPage.types.article') },
+                            ].map((tab) => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${
+                                        activeTab === tab.id
+                                            ? 'bg-[#A3C042]/10 text-[#A3C042] border border-[#A3C042]/20'
+                                            : 'text-gray-500 hover:text-gray-700'
+                                    }`}
+                                >
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
                     <div className="bg-white rounded-lg shadow">
                         {publications.data && publications.data.length > 0 ? (
                             <div className="divide-y divide-gray-200">
-                                {publications.data.map((publication) => {
+                                {publications.data
+                                    .filter(p => activeTab === 'all' || p.type === activeTab)
+                                    .map((publication) => {
                                     const coverImage = getPublicationImageUrl(publication.cover_image);
                                     const title = getPublicationTitle(publication);
                                     const description = getPublicationDescription(publication);

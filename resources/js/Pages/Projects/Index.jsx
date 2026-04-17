@@ -16,22 +16,25 @@ function parseQueryFromUrl(url) {
     };
 }
 
-/** لا نرسل category عند "الكل"، ونعيد page فقط عند الحاجة لتفادي بقاء رقم صفحة من فلتر سابق */
-function buildProjectsQuery({ search, category, page = 1 }) {
+/** لا نرسل category/status عند "الكل"، ونعيد page فقط عند الحاجة لتفادي بقاء رقم صفحة من فلتر سابق */
+function buildProjectsQuery({ search, category, status, page = 1 }) {
     const params = {};
     const s = typeof search === 'string' ? search.trim() : '';
     const c = typeof category === 'string' ? category.trim() : '';
+    const st = typeof status === 'string' ? status.trim() : '';
     if (s) params.search = s;
     if (c) params.category = c;
+    if (st) params.status = st;
     if (page > 1) params.page = page;
     return params;
 }
 
-export default function ProjectsIndex({ auth, projects, userRole, categories = [] }) {
+export default function ProjectsIndex({ auth, projects, userRole, viewMode = 'public', categories = [], filters = {} }) {
     const { t, language } = useTranslation();
     const page = usePage();
     const [search, setSearch] = useState('');
     const [category, setCategory] = useState('');
+    const [status, setStatus] = useState('');
     const [showFilterModal, setShowFilterModal] = useState(false);
     const [filterAgeGroup, setFilterAgeGroup] = useState('');
     const [filterSchool, setFilterSchool] = useState('');
@@ -52,21 +55,23 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
 
     useEffect(() => {
         const { search: s, category: c } = parseQueryFromUrl(page.url);
-        setSearch(s);
-        setCategory(c);
-    }, [page.url]);
+        setSearch(filters.search ?? s);
+        setCategory(filters.category ?? c);
+        setStatus(filters.status ?? '');
+    }, [page.url, filters.search, filters.category, filters.status]);
 
     const visitProjects = useCallback((overrides = {}) => {
         const next = {
             search: overrides.search !== undefined ? overrides.search : search,
             category: overrides.category !== undefined ? overrides.category : category,
+            status: overrides.status !== undefined ? overrides.status : status,
             page: overrides.page !== undefined ? overrides.page : 1,
         };
         router.get('/projects', buildProjectsQuery(next), {
             preserveState: true,
             preserveScroll: true,
         });
-    }, [search, category]);
+    }, [search, category, status]);
 
     const ageGroups = [
         { value: '6-9', label: t('projects.age6_9') },
@@ -90,7 +95,7 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
 
     const handleSearch = (e) => {
         e.preventDefault();
-        visitProjects({ search, category, page: 1 });
+        visitProjects({ search, category, status, page: 1 });
     };
 
     const handleApplyFilters = () => {
@@ -99,6 +104,7 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
         router.get('/projects', buildProjectsQuery({
             search,
             category: subj,
+            status,
             page: 1,
         }), {
             preserveState: true,
@@ -200,7 +206,7 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
                     {filteredProjects.map((project) => {
                         const isWinner = project.rating >= 4.5 || project.is_winner;
                         const categoryLabel = getCategoryLabel(project.category);
-                        const projectImage = project.image || project.thumbnail || '/images/hero.png';
+                        const projectImage = project.image || '/images/hero.png';
                         const ageRange = project.age_range || t('projects.ageUnknown');
                         const schoolName = project.school?.name || t('projects.middleSchoolDefault');
                         const teacherName = project.teacher?.name_ar || project.user?.name || t('projects.teacherNameDefault');
@@ -211,7 +217,13 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
                         return (
                             <Link
                                 key={project.id}
-                                href={`/projects/${project.id}`}
+                                href={
+                                    viewMode === 'teacher'
+                                        ? `/teacher/projects/${project.id}`
+                                        : viewMode === 'school'
+                                            ? `/school/projects/${project.id}`
+                                            : `/projects/${project.id}`
+                                }
                                 className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md transition"
                             >
                                 <div className="relative">
@@ -293,6 +305,34 @@ export default function ProjectsIndex({ auth, projects, userRole, categories = [
                             />
                         ))}
                     </div>
+                </div>
+            )}
+
+            {(viewMode === 'teacher' || viewMode === 'student' || viewMode === 'school') && (
+                <div className="pt-2">
+                    <button
+                        type="button"
+                        onClick={() => {
+                            if (viewMode === 'teacher') {
+                                router.visit('/teacher/projects/create');
+                                return;
+                            }
+                            if (viewMode === 'student') {
+                                router.visit('/student/projects/create');
+                                return;
+                            }
+                            if (viewMode === 'school') {
+                                router.visit('/school/projects/create');
+                            }
+                        }}
+                        className="w-full rounded-xl bg-[#A3C042] px-4 py-3 text-sm font-bold text-white hover:bg-[#8CA635] transition"
+                    >
+                        {viewMode === 'teacher'
+                            ? t('teacherProjectsPage.createAction')
+                            : viewMode === 'student'
+                                ? t('studentProjects.actions.newSubmission')
+                                : t('schoolProjectsPage.actions.create')}
+                    </button>
                 </div>
             )}
         </div>

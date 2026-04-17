@@ -22,17 +22,19 @@ class TeacherProjectController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $teacher = $user->teacher;
-        
+        $teacher = $user?->teacher;
+
         if (!$teacher) {
-            return redirect()->route('teacher.dashboard')
-                ->with('error', 'لم يتم العثور على بيانات المعلم');
+            abort(403, 'لم يتم العثور على بيانات المعلم');
         }
-        
-        $projects = $this->projectService->getTeacherProjects($teacher->id, 10);
+
+        $projects = $this->projectService->getTeacherProjects($teacher->id, 12)->withQueryString();
 
         return Inertia::render('Teacher/Projects/Index', [
             'projects' => $projects,
+            'auth' => [
+                'user' => $user,
+            ],
         ]);
     }
 
@@ -91,7 +93,7 @@ class TeacherProjectController extends Controller
             'school_id' => 'nullable|exists:users,id',
             'files' => 'nullable|array',
             'files.*' => 'file|max:10240|mimes:pdf,doc,docx,jpg,jpeg,png,gif,mp4,avi,mov',
-            'thumbnail' => 'nullable|image|max:5120',
+            'thumbnail' => 'required|image|max:5120',
             'project_document' => 'nullable|file|max:10240|mimes:pdf,doc,docx',
             'evaluation' => 'nullable|array',
         ], [
@@ -101,6 +103,9 @@ class TeacherProjectController extends Controller
             'school_id.exists' => 'المدرسة المحددة غير موجودة',
             'files.*.max' => 'حجم الملف يجب ألا يتجاوز 10 ميجابايت',
             'files.*.mimes' => 'نوع الملف المدعوم: صور، فيديو، PDF',
+            'thumbnail.required' => 'صورة الغلاف مطلوبة',
+            'thumbnail.image' => 'الملف يجب أن يكون صورة',
+            'thumbnail.max' => 'حجم صورة الغلاف يجب ألا يتجاوز 5 ميجابايت',
         ]);
 
         // الحصول على school_id من الطلب أو من المستخدم
@@ -378,7 +383,8 @@ class TeacherProjectController extends Controller
             'school_id' => 'nullable|exists:users,id',
             'files' => 'nullable|array',
             'files.*' => 'file|max:10240',
-            'thumbnail' => 'nullable|image|max:5120',
+            // PDF requirement: must upload a clear cover image whenever the teacher updates a project.
+            'thumbnail' => 'required|image|max:5120',
             'project_document' => 'nullable|file|max:10240|mimes:pdf,doc,docx',
             'remove_files' => 'nullable|array',
             'remove_files.*' => 'string',
@@ -390,6 +396,9 @@ class TeacherProjectController extends Controller
             'school_id.exists' => 'المدرسة المحددة غير موجودة',
             'files.*.max' => 'حجم الملف يجب ألا يتجاوز 10 ميجابايت',
             'files.*.mimes' => 'نوع الملف المدعوم: صور، فيديو، PDF',
+            'thumbnail.required' => 'صورة الغلاف مطلوبة عند تحديث المشروع',
+            'thumbnail.image' => 'الملف يجب أن يكون صورة',
+            'thumbnail.max' => 'حجم صورة الغلاف يجب ألا يتجاوز 5 ميجابايت',
         ]);
 
         // الحصول على school_id من الطلب أو من المستخدم

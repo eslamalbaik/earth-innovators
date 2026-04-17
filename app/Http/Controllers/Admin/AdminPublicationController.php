@@ -143,6 +143,57 @@ class AdminPublicationController extends Controller
         ]);
     }
 
+    public function edit(Publication $publication): Response
+    {
+        $publication->load(['author:id,name', 'school:id,name']);
+
+        $schools = User::where('role', 'school')
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
+
+        return Inertia::render('Admin/Publications/Edit', [
+            'publication' => $publication,
+            'schools'     => $schools,
+        ]);
+    }
+
+    public function update(StorePublicationRequest $request, Publication $publication)
+    {
+        $validated = $request->validated();
+
+        // Normalize empty youtube_url to null
+        if (array_key_exists('youtube_url', $validated)) {
+            $validated['youtube_url'] = !empty($validated['youtube_url']) ? $validated['youtube_url'] : null;
+        }
+
+        if ($request->hasFile('cover_image')) {
+            $rawCover = $publication->getAttributes()['cover_image'] ?? null;
+            if ($rawCover) {
+                Storage::disk('public')->delete($rawCover);
+            }
+            $validated['cover_image'] = $request->file('cover_image')->store('publications/covers', 'public');
+        } else {
+            unset($validated['cover_image']);
+        }
+
+        if ($request->hasFile('file')) {
+            $rawFile = $publication->getAttributes()['file'] ?? null;
+            if ($rawFile) {
+                Storage::disk('public')->delete($rawFile);
+            }
+            $validated['file'] = $request->file('file')->store('publications/files', 'public');
+        } else {
+            unset($validated['file']);
+        }
+
+        $publication->update($validated);
+
+        return redirect()
+            ->route('admin.publications.show', $publication->id)
+            ->with('success', 'تم تحديث المنشور بنجاح!');
+    }
+
     public function approve(Publication $publication)
     {
         $user = auth()->user();
@@ -171,11 +222,14 @@ class AdminPublicationController extends Controller
 
     public function destroy(Publication $publication)
     {
-        if ($publication->cover_image) {
-            Storage::disk('public')->delete($publication->cover_image);
+        // Use raw attributes — accessor returns full URL which breaks Storage::delete
+        $rawCover = $publication->getAttributes()['cover_image'] ?? null;
+        if ($rawCover) {
+            Storage::disk('public')->delete($rawCover);
         }
-        if ($publication->file) {
-            Storage::disk('public')->delete($publication->file);
+        $rawFile = $publication->getAttributes()['file'] ?? null;
+        if ($rawFile) {
+            Storage::disk('public')->delete($rawFile);
         }
 
         $publication->delete();

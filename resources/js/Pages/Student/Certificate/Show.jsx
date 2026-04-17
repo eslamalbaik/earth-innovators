@@ -1,5 +1,6 @@
-import { Head, Link, router } from '@inertiajs/react';
-import { FaDownload, FaPrint, FaShare, FaCertificate, FaCalendarAlt, FaProjectDiagram, FaMedal } from 'react-icons/fa';
+﻿import { Head, Link, router } from '@inertiajs/react';
+import { FaDownload, FaPrint, FaShare, FaCertificate, FaCalendarAlt, FaProjectDiagram, FaMedal, FaLock } from 'react-icons/fa';
+import { usePremiumGate } from '@/Hooks/usePremiumGate';
 import MobileAppLayout from '@/Layouts/MobileAppLayout';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
@@ -8,23 +9,29 @@ import { useTranslation } from '@/i18n';
 import { useToast } from '@/Contexts/ToastContext';
 import { downloadFile } from '@/utils/downloadFile';
 
-export default function StudentCertificateShow({ auth, user, stats, certificate }) {
+export default function StudentCertificateShow({ auth, user, stats, certificate, membershipSummary = null }) {
     const { t, language } = useTranslation();
     const { showError } = useToast();
+    const { gate, premiumModal } = usePremiumGate(membershipSummary, {
+        featureName: t('common.certificates'),
+        requiredAccessKey: 'certificate_access',
+    });
     const isAuthed = !!auth?.user;
     const currentUser = auth?.user;
 
     const handleDownload = async () => {
-        if (certificate?.download_url) {
-            try {
-                await downloadFile(
-                    certificate.download_url,
-                    `certificate_${certificate?.certificate_number || user?.membership_number || 'student'}.pdf`
-                );
-            } catch (error) {
-                showError(t('errors.somethingWentWrong'));
+        gate(async () => {
+            if (certificate?.download_url) {
+                try {
+                    await downloadFile(
+                        certificate.download_url,
+                        `certificate_${certificate?.certificate_number || user?.membership_number || 'student'}.pdf`
+                    );
+                } catch (error) {
+                    showError(t('errors.somethingWentWrong'));
+                }
             }
-        }
+        });
     };
 
     const handlePrint = () => {
@@ -103,6 +110,7 @@ export default function StudentCertificateShow({ auth, user, stats, certificate 
                     }
                 `}</style>
             </Head>
+            {premiumModal}
             <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
 
                 {/* Mobile View */}
@@ -225,6 +233,15 @@ export default function StudentCertificateShow({ auth, user, stats, certificate 
                                         </div>
                                     </div>
                                 </div>
+                                {/* Premium gate notice */}
+                                {!canAccess && (
+                                    <div className="no-print mt-3 flex items-center gap-2 rounded-xl bg-amber-50 border border-amber-200 px-3 py-2">
+                                        <FaLock className="text-amber-500 text-sm shrink-0" />
+                                        <span className="text-xs text-amber-700 font-medium">{t('premiumGate.featureRequiresPremium')}</span>
+                                        <button onClick={() => router.visit('/packages')} className="ms-auto text-xs font-bold text-[#A3C042] hover:underline">{t('premiumGate.upgrade')}</button>
+                                    </div>
+                                )}
+
 
                                 {/* Action Buttons */}
                                 <div className="no-print mt-4 grid grid-cols-3 gap-3">

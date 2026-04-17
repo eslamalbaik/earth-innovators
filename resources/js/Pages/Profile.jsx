@@ -33,9 +33,11 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
     const teacherImageInputRef = useRef(null);
 
     const basicForm = useForm({
-        name: user.name || '',
-        email: user.email || '',
-        image: null,
+        name:        user.name || '',
+        email:       user.email || '',
+        image:       null,
+        institution: auth.institution ?? '',
+        bio:         auth.bio ?? '',
     });
 
     const teacherForm = useForm({
@@ -93,12 +95,21 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
         if (basicForm.data.image) {
             formData.append('image', basicForm.data.image);
         }
+        // Admin extra fields
+        if (user.role === 'admin' || user.role === 'system_supervisor' || user.role === 'school_support_coordinator') {
+            if (basicForm.data.institution !== undefined) {
+                formData.append('institution', basicForm.data.institution ?? '');
+            }
+            if (basicForm.data.bio !== undefined) {
+                formData.append('bio', basicForm.data.bio ?? '');
+            }
+        }
         formData.append('_method', 'PATCH');
 
         router.post(route('profile.update'), formData, {
             forceFormData: true,
             preserveScroll: true,
-            onSuccess: (page) => {
+            onSuccess: () => {
                 setImagePreview(null);
                 basicForm.reset('image');
                 setTimeout(() => {
@@ -115,6 +126,7 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
             },
         });
     };
+
 
     const handleTeacherSubmit = (e) => {
         e.preventDefault();
@@ -543,8 +555,8 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                                                 required
                                             >
                                                 <option value="">{t('profilePage.teacher.placeholders.selectGender')}</option>
-                                                <option value="ذكر">{t('profilePage.gender.male')}</option>
-                                                <option value="أنثى">{t('profilePage.gender.female')}</option>
+                                                <option value="ذكر">{t('common.gender.male')}</option>
+                                                <option value="أنثى">{t('common.gender.female')}</option>
                                             </select>
                                         </div>
                                     </div>

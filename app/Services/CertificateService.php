@@ -155,7 +155,14 @@ class CertificateService
             $data['join_date'] = $this->formatDate($joinDate, $dateFormat);
             $data['issue_time'] = $issueTime->format('H:i:s'); // Time format: HH:MM:SS
             $data['today_date'] = $this->formatDate($todayDate, $dateFormat);
-            
+
+            // Membership period (from/to) — used by newer templates.
+            $periodStart = $this->resolveDateOverride($overrides['period_start'] ?? null) ?? $joinDate;
+            $periodEnd = $this->resolveDateOverride($overrides['period_end'] ?? null) ?? $issueDate->copy()->addYear();
+            $data['period_start'] = $this->formatDate($periodStart, $dateFormat);
+            $data['period_end'] = $this->formatDate($periodEnd, $dateFormat);
+            $data['period_range'] = sprintf('من %s إلى %s', $data['period_start'], $data['period_end']);
+             
             // Override course_name for membership certificate
             $data['course_name'] = $overrides['course_name'] ?? 'شهادة عضوية';
         }
@@ -360,6 +367,18 @@ class CertificateService
             $overrides['join_date'] = optional($recipient->created_at)->toDateString() ?? $issueDate->toDateString();
             $overrides['today_date'] = $issueDate->toDateString();
             $overrides['issue_time'] = $issueDate->format('H:i:s');
+
+            // Membership period defaults:
+            // - For teachers: prefer contract dates if available.
+            // - Otherwise: use join_date -> issue_date + 1 year.
+            $periodStart = null;
+            $periodEnd = null;
+            if ($recipient->isTeacher() && $recipient->teacher) {
+                $periodStart = optional($recipient->teacher->contract_start_date)->toDateString();
+                $periodEnd = optional($recipient->teacher->contract_end_date)->toDateString();
+            }
+            $overrides['period_start'] = $periodStart ?? $overrides['join_date'];
+            $overrides['period_end'] = $periodEnd ?? Carbon::parse($issueDate)->addYear()->toDateString();
         }
 
         $templatePath = $this->resolveTemplatePath($certificate->template);

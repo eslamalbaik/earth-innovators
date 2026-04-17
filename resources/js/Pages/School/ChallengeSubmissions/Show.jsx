@@ -190,20 +190,31 @@ export default function SchoolChallengeSubmissionShow({ auth, submission, availa
                                 <div className="mb-6">
                                     <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('schoolChallengeSubmissionShowPage.attachmentsTitle')}</h3>
                                     <div className="space-y-2">
-                                        {submission.files.map((file, index) => (
-                                            <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition">
-                                                {getFileIcon(file.split('/').pop())}
-                                                <span className="flex-1 text-sm text-gray-900">{file.split('/').pop()}</span>
-                                                <a
-                                                    href={getFileUrl(file)}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-blue-600 hover:text-blue-700"
-                                                >
-                                                    <FaDownload />
-                                                </a>
-                                            </div>
-                                        ))}
+                                        {(() => {
+                                            let filesToMap = [];
+                                            try {
+                                                if (Array.isArray(submission.files)) filesToMap = submission.files;
+                                                else if (typeof submission.files === 'string') {
+                                                    const parsed = JSON.parse(submission.files);
+                                                    filesToMap = Array.isArray(parsed) ? parsed : (parsed ? Object.values(parsed) : []);
+                                                }
+                                            } catch(e) { filesToMap = []; }
+                                            
+                                            return filesToMap.map((file, index) => (
+                                                <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition">
+                                                    {getFileIcon(file.split('/').pop())}
+                                                    <span className="flex-1 text-sm text-gray-900">{file.split('/').pop()}</span>
+                                                    <a
+                                                        href={getFileUrl(file)}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-blue-600 hover:text-blue-700 font-medium"
+                                                    >
+                                                        {t('schoolChallengeSubmissionShowPage.downloadAttachment')}
+                                                    </a>
+                                                </div>
+                                            ));
+                                        })()}
                                     </div>
                                 </div>
                             )}

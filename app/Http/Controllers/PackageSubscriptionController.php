@@ -127,7 +127,9 @@ class PackageSubscriptionController extends Controller
         }
 
         if (!empty($result['redirect_url'])) {
-            return redirect($result['redirect_url']);
+            // When subscribing via Inertia (XHR), a normal 302 may not navigate the SPA.
+            // Inertia::location forces a full client-side redirect to the payment gateway.
+            return Inertia::location($result['redirect_url']);
         }
 
         if (!empty($result['bypass'])) {
@@ -188,32 +190,38 @@ class PackageSubscriptionController extends Controller
         $user = Auth::user();
 
         $subscriptions = UserPackage::where('user_id', $user->id)
-            ->with('package')
+            ->with(['package', 'payments' => fn ($q) => $q->where('status', 'completed')->latest()->limit(1)])
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($subscription) {
+                $completedPayment = $subscription->payments->first();
+
                 return [
-                    'id' => $subscription->id,
-                    'package' => [
-                        'id' => $subscription->package->id,
-                        'name' => $subscription->package->name,
-                        'name_ar' => $subscription->package->name_ar,
-                        'price' => $subscription->package->price,
-                        'currency' => $subscription->package->currency,
-                        'is_trial' => (bool) ($subscription->package->is_trial ?? false),
-                        'trial_days' => $subscription->package->trial_days,
+                    'id'             => $subscription->id,
+                    'package'        => [
+                        'id'        => $subscription->package->id,
+                        'name'      => $subscription->package->name,
+                        'name_ar'   => $subscription->package->name_ar,
+                        'price'     => $subscription->package->price,
+                        'currency'  => $subscription->package->currency,
+                        'is_trial'  => (bool) ($subscription->package->is_trial ?? false),
+                        'trial_days'=> $subscription->package->trial_days,
                     ],
-                    'start_date' => $subscription->start_date->format('Y-m-d'),
-                    'end_date' => $subscription->end_date->format('Y-m-d'),
-                    'status' => $subscription->effective_status,
-                    'raw_status' => $subscription->status,
-                    'paid_amount' => $subscription->paid_amount,
+                    'start_date'     => $subscription->start_date->format('Y-m-d'),
+                    'end_date'       => $subscription->end_date->format('Y-m-d'),
+                    'status'         => $subscription->effective_status,
+                    'raw_status'     => $subscription->status,
+                    'paid_amount'    => $subscription->paid_amount,
                     'payment_method' => $subscription->payment_method,
                     'transaction_id' => $subscription->transaction_id,
-                    'created_at' => $subscription->created_at->format('Y-m-d H:i'),
-                    'is_trial' => (bool) ($subscription->package->is_trial ?? false),
+                    'created_at'     => $subscription->created_at->format('Y-m-d H:i'),
+                    'is_trial'       => (bool) ($subscription->package->is_trial ?? false),
+                    // Invoice
+                    'payment_id'     => $completedPayment?->id,
+                    'paid_at'        => $completedPayment?->paid_at?->format('Y-m-d'),
                 ];
             });
+
 
         return Inertia::render('Packages/MySubscriptions', [
             'subscriptions' => $subscriptions,

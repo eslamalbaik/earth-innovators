@@ -2,6 +2,7 @@ import DashboardLayout from '@/Layouts/DashboardLayout';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 import { Head, Link, router } from '@inertiajs/react';
 import { useTranslation } from '@/i18n';
+import TrialCountdownBanner from '@/Components/Dashboard/TrialCountdownBanner';
 import {
     FaProjectDiagram, FaTrophy, FaMedal, FaChartLine, FaUsers,
     FaCheckCircle, FaTimesCircle, FaClock, FaFlask, FaRocket,
@@ -113,6 +114,9 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                     </div>
                 </div>
             </div>
+
+            {/* Trial countdown banner */}
+            <TrialCountdownBanner membershipSummary={membershipSummary} />
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <div className="md:col-span-2 lg:col-span-4 rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-6 shadow-sm">

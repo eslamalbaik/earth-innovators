@@ -7,9 +7,9 @@ import GuestLayout from '@/Layouts/GuestLayout';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Head, Link, useForm, usePage, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
-import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaPhone, FaChevronDown, FaExclamationTriangle, FaTimes, FaSchool, FaUserGraduate, FaChalkboardTeacher, FaUniversity } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaPhone, FaExclamationTriangle, FaTimes, FaSchool, FaUserGraduate, FaChalkboardTeacher, FaUniversity } from 'react-icons/fa';
 import { getTranslation, useTranslation } from '@/i18n';
-import { DEFAULT_DIAL_CODE, getDialCodeOptions } from '@/utils/dialCodeOptions';
+import PhoneInput from '@/Components/PhoneInput';
 
 const getCsrfToken = () => document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
@@ -17,12 +17,8 @@ export default function Register({ schools = [] }) {
     const { t, language } = useTranslation();
     const { props } = usePage();
     const phoneInUseMessage = getTranslation('ar', 'auth.phoneInUseMessage');
-    const dialCodeOptions = getDialCodeOptions(t);
-
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [selectedDialCode, setSelectedDialCode] = useState(DEFAULT_DIAL_CODE);
-    const [showDialCodeDropdown, setShowDialCodeDropdown] = useState(false);
     const [showErrorsAlert, setShowErrorsAlert] = useState(true);
     const [pageErrors, setPageErrors] = useState({});
 
@@ -68,27 +64,14 @@ export default function Register({ schools = [] }) {
         }
     }, [data.role]);
 
-    const handlePhoneInputChange = (e) => {
-        // Allow only digits and plus sign
-        const sanitized = e.target.value.replace(/[^\d+]/g, '');
-        setData('phone', sanitized);
-    };
-
     const submit = (e) => {
         e.preventDefault();
 
         const dataToSend = { ...data };
 
-        if (data.phone && data.phone.trim() !== '') {
-            let cleanedPhone = String(data.phone || '').replace(/\D/g, '');
-
-            if (cleanedPhone.startsWith('0')) {
-                cleanedPhone = cleanedPhone.substring(1);
-            }
-
-            const dialCode = selectedDialCode || DEFAULT_DIAL_CODE;
-            const fullPhone = `${dialCode}${cleanedPhone}`;
-            dataToSend.phone = fullPhone;
+        // PhoneInput already returns a full E.164 number e.g. +971501234567
+        if (data.phone && data.phone.trim() !== '' && data.phone !== '+971') {
+            dataToSend.phone = data.phone;
         } else {
             dataToSend.phone = null;
         }
@@ -274,63 +257,12 @@ export default function Register({ schools = [] }) {
                             </div>
 
                             <div>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
-                                        <FaPhone className="h-5 w-5 text-gray-400" />
-                                    </div>
-                                    <div className="absolute inset-y-0 end-0 pe-3 flex items-center z-10">
-                                        <div className="relative">
-                                            <button
-                                                type="button"
-                                                onClick={() => setShowDialCodeDropdown(!showDialCodeDropdown)}
-                                                className="flex items-center space-x-1 space-x-reverse text-gray-700 hover:text-gray-900 focus:outline-none"
-                                            >
-                                                <span className="text-sm font-medium">
-                                                    {dialCodeOptions.find(opt => opt.value === selectedDialCode)?.flag || '🇸🇦'} {selectedDialCode}
-                                                </span>
-                                                <FaChevronDown className={`h-3 w-3 transition-transform ${showDialCodeDropdown ? 'rotate-180' : ''}`} />
-                                            </button>
-                                            {showDialCodeDropdown && (
-                                                <>
-                                                    <div
-                                                        className="fixed inset-0 z-10"
-                                                        onClick={() => setShowDialCodeDropdown(false)}
-                                                    ></div>
-                                                    <div className="absolute end-0 mt-1 w-56 bg-white border border-gray-300 rounded-md shadow-lg z-20 max-h-60 overflow-y-auto">
-                                                        {dialCodeOptions.map((option) => (
-                                                            <button
-                                                                key={option.value}
-                                                                type="button"
-                                                                onClick={() => {
-                                                                    setSelectedDialCode(option.value);
-                                                                    setShowDialCodeDropdown(false);
-                                                                }}
-                                                                className={`w-full  px-4 py-2 text-sm hover:bg-[#A3C042]/10 flex items-center justify-between ${selectedDialCode === option.value ? 'bg-gradient-to-r from-[#A3C042]/20 to-legacy-blue/20' : ''
-                                                                    }`}
-                                                            >
-                                                                <span className="text-gray-700">{option.label}</span>
-                                                                <span className="text-lg me-2">{option.flag}</span>
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <TextInput
-                                        id="phone"
-                                        type="tel"
-                                        name="phone"
-                                        value={data.phone || ''}
-                                        className="block w-full ps-20 pe-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
-                                        autoComplete="tel"
-                                        onChange={handlePhoneInputChange}
-                                        placeholder={t('auth.phoneNumber')}
-                                    />
-                                </div>
-                                <InputError
-                                    message={errors.phone}
-                                    className={`mt-2 ${errors.phone && errors.phone.includes(phoneInUseMessage) ? 'font-bold text-red-800 bg-red-50 px-3 py-2 rounded border border-red-200' : ''}`}
+                                <PhoneInput
+                                    id="phone"
+                                    name="phone"
+                                    value={data.phone || ''}
+                                    onChange={(full) => setData('phone', full)}
+                                    error={errors.phone || ''}
                                 />
                             </div>
 

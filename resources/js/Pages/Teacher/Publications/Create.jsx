@@ -1,7 +1,7 @@
 import DashboardLayout from '../../../Layouts/DashboardLayout';
 import { Head, useForm, router, Link } from '@inertiajs/react';
 import { useState, useRef } from 'react';
-import { FaUpload, FaImage, FaSpinner, FaTrash } from 'react-icons/fa';
+import { FaUpload, FaImage, FaSpinner, FaTrash, FaYoutube } from 'react-icons/fa';
 import TextInput from '../../../Components/TextInput';
 import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
@@ -17,6 +17,7 @@ export default function CreatePublication({ auth, school }) {
         content: '',
         description: '',
         cover_image: null,
+        youtube_url: '',
         type: 'magazine',
     });
 
@@ -171,6 +172,26 @@ export default function CreatePublication({ auth, school }) {
                                 className="hidden"
                             />
                             <InputError message={errors.cover_image} className="mt-2" />
+                        </div>
+
+                        {/* YouTube URL */}
+                        <div>
+                            <InputLabel htmlFor="youtube_url" value={t('teacherPublicationCreatePage.youtubeUrlLabel', { defaultValue: 'رابط YouTube (اختياري)' })} className="text-sm font-medium text-gray-700 mb-2" />
+                            <div className="relative">
+                                <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
+                                    <FaYoutube className="text-red-500 text-lg" />
+                                </div>
+                                <TextInput
+                                    id="youtube_url"
+                                    type="url"
+                                    value={data.youtube_url}
+                                    onChange={(e) => setData('youtube_url', e.target.value)}
+                                    className="block w-full ps-10"
+                                    placeholder="https://www.youtube.com/watch?v=..."
+                                />
+                            </div>
+                            <p className="mt-1 text-xs text-gray-500">{t('teacherPublicationCreatePage.youtubeUrlHint', { defaultValue: 'أضف رابط فيديو YouTube ليظهر مُضمّناً في صفحة المنشور' })}</p>
+                            <InputError message={errors.youtube_url} className="mt-2" />
                         </div>
 
                         <div>

@@ -395,9 +395,9 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                                             <p className="text-xs text-gray-600 mb-1">{winner.project}</p>
                                             <div className="flex items-center gap-2 flex-wrap">
                                                 <span className="text-[10px] text-gray-500">{winner.date}</span>
-                                                {winner.rating > 0 && (
+                                                {Number.isFinite(Number(winner.rating)) && Number(winner.rating) > 0 && (
                                                     <span className="px-2 py-1 rounded-full text-[10px] font-semibold border bg-green-100 text-green-700 border-green-300">
-                                                        {t('challenges.ratingLabel', { rating: winner.rating.toFixed(1) })}
+                                                        {t('challenges.ratingLabel', { rating: Number(winner.rating).toFixed(1) })}
                                                     </span>
                                                 )}
                                                 {winner.points > 0 && (

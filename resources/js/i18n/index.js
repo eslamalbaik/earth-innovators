@@ -19,8 +19,6 @@ const reportMissingKey = (language, key) => {
     if (!window.__i18nMissing.keys.has(key)) {
         window.__i18nMissing.keys.add(key);
         window.__i18nMissing.entries.push({ language, key, ts: Date.now() });
-        // Visible signal during dev without breaking UI
-        // eslint-disable-next-line no-console
         console.warn(`[i18n] Missing key "${key}" for language "${language}"`);
     }
 };
@@ -36,36 +34,53 @@ const interpolate = (value, params) => {
     }, value);
 };
 
-export const getTranslation = (language, key, params) => {
-    const dictionary = translations[language] || translations.ar;
+const resolveKeyFromDictionary = (dictionary, key) => {
+    if (!dictionary) {
+        return undefined;
+    }
 
-    if (dictionary && Object.prototype.hasOwnProperty.call(dictionary, key)) {
-        return interpolate(dictionary[key], params) || key;
+    if (Object.prototype.hasOwnProperty.call(dictionary, key)) {
+        return dictionary[key];
     }
 
     const keys = key.split('.');
     let value = dictionary;
-    
+
     for (const k of keys) {
         if (value && typeof value === 'object') {
             value = value[k];
         } else {
-            reportMissingKey(language, key);
-            return key;
+            return undefined;
         }
     }
-    
-    if (value === undefined || value === null) {
-        reportMissingKey(language, key);
-        return key;
+
+    return value;
+};
+
+export const getTranslation = (language, key, params) => {
+    const dictionary = translations[language] || translations.ar;
+    const fallbackLanguage = language === 'ar' ? 'en' : 'ar';
+    const fallbackDictionary = translations[fallbackLanguage];
+
+    const directValue = resolveKeyFromDictionary(dictionary, key);
+    if (directValue !== undefined && directValue !== null) {
+        return interpolate(directValue, params) || key;
     }
 
-    return interpolate(value, params) || key;
+    // Language fallback: avoid exposing raw translation keys when the key exists
+    // in the other language dictionary.
+    const fallbackValue = resolveKeyFromDictionary(fallbackDictionary, key);
+    if (fallbackValue !== undefined && fallbackValue !== null) {
+        return interpolate(fallbackValue, params) || key;
+    }
+
+    reportMissingKey(language, key);
+    return key;
 };
 
 export const useTranslation = () => {
     const { currentLanguage } = useSelector((state) => state.language);
-    
+
     return {
         t: (key, params) => getTranslation(currentLanguage, key, params),
         language: currentLanguage,

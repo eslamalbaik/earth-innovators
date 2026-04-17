@@ -21,6 +21,7 @@ class Publication extends Model
         'content',
         'cover_image',
         'file',
+        'youtube_url',
         'status',
         'approved_by',
         'approved_at',

@@ -57,7 +57,7 @@ export default function SchoolChallengesIndex({ auth, challenges, stats, filters
     };
 
     const handleView = (challenge) => {
-        router.visit(`/challenges/${challenge.id}`);
+        router.visit(`/school/challenges/${challenge.id}`);
     };
 
     const handleEdit = (challenge) => {

@@ -18,7 +18,8 @@ class StudentEvaluationController extends Controller
      */
     public function index(Request $request)
     {
-        $schoolId = auth()->user()->school_id;
+        $user = auth()->user();
+        $schoolId = $user?->isSchool() ? $user->id : ($user?->school_id);
         $source = $request->get('source', 'projects'); // 'projects' or 'challenges'
 
         $report = $this->evaluationService->getEvaluationReport($schoolId, $source);

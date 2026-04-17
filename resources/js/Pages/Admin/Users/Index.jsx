@@ -21,6 +21,7 @@ import {
     FaCheckSquare,
     FaSquare
 } from 'react-icons/fa';
+import PhoneInput from '@/Components/PhoneInput';
 
 export default function UsersIndex({ users, stats, filters, auth, schools: initialSchools }) {
     const { t, language } = useTranslation();
@@ -547,16 +548,13 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         {t('common.phone')}
                                     </label>
-                                    <input
-                                        type="tel"
+                                    <PhoneInput
+                                        id="phone"
+                                        name="phone"
                                         value={editData.phone}
-                                        onChange={(e) => setEditData('phone', e.target.value)}
-                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.phone ? 'border-red-500' : 'border-gray-300'
-                                            }`}
+                                        onChange={(full) => setEditData('phone', full)}
+                                        error={editErrors.phone}
                                     />
-                                    {editErrors.phone && (
-                                        <p className="mt-1 text-sm text-red-600">{editErrors.phone}</p>
-                                    )}
                                 </div>
 
                                 {/* Account Type */}

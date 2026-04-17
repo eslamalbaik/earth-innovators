@@ -1,6 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import DashboardLayout from '../../Layouts/DashboardLayout';
 import { useTranslation } from '@/i18n';
+import TrialCountdownBanner from '@/Components/Dashboard/TrialCountdownBanner';
 import {
     FaProjectDiagram,
     FaBook,
@@ -189,6 +190,9 @@ export default function TeacherDashboard({ auth, teacher, stats, membershipSumma
                                 </div>
                             </div>
                         )}
+
+                        {/* Trial countdown banner — الأولوية العليا */}
+                        <TrialCountdownBanner membershipSummary={membershipSummary} />
 
                         <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-6 shadow-sm">
                             <div className="flex flex-wrap items-start justify-between gap-3">

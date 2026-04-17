@@ -14,6 +14,7 @@ export default function PublicationsIndex({ auth, publications, filters }) {
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
     const [selectedType, setSelectedType] = useState(filters?.type || '');
     const [likedPublications, setLikedPublications] = useState(new Set());
+    const [activeTab, setActiveTab] = useState('all');
 
     const getLocalizedField = (publication, field) => {
         if (!publication) {
@@ -36,6 +37,32 @@ export default function PublicationsIndex({ auth, publications, filters }) {
             preserveState: true,
             replace: true,
         });
+    };
+
+    const goToPublicationsPage = (url) => {
+        if (!url) {
+            return;
+        }
+
+        // Avoid relying on backend-generated absolute pagination URLs (APP_URL/proxy/cache can break them).
+        // Instead, extract `page` and re-request the current list with the same filters.
+        try {
+            const parsed = new URL(url, window.location.origin);
+            const page = parsed.searchParams.get('page');
+
+            router.get('/publications', {
+                search: filters?.search || undefined,
+                type: filters?.type || undefined,
+                page: page ? Number(page) : undefined,
+            }, {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+            });
+        } catch (e) {
+            // Fallback: if URL parsing fails, let Inertia handle it as-is.
+            router.visit(url, { preserveState: true, preserveScroll: true });
+        }
     };
 
     const toggleLike = async (publication) => {
@@ -128,27 +155,29 @@ export default function PublicationsIndex({ auth, publications, filters }) {
 
         return (
             <div key={publication.id} className="overflow-hidden rounded-2xl border border-gray-100 bg-white transition hover:shadow-md">
-                <div className="relative">
-                    <img
-                        src={coverImage}
-                        alt={publicationTitle || t('publicationsPage.sections.articleTitle')}
-                        className="h-64 w-full object-cover"
-                        onError={(event) => {
-                            event.target.src = '/images/default-publication.jpg';
-                        }}
-                        loading="lazy"
-                    />
-                    <div className="absolute top-3 right-3 rounded-full bg-red-500 px-3 py-1 text-xs font-semibold text-white">
-                        {t('common.new')}
+                <Link href={`/publications/${publication.id}`} className="block group">
+                    <div className="relative">
+                        <img
+                            src={coverImage}
+                            alt={publicationTitle || t('publicationsPage.sections.articleTitle')}
+                            className="h-64 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            onError={(event) => {
+                                event.target.src = 'https://placehold.co/600x400/A3C042/white?text=Publication';
+                            }}
+                            loading="lazy"
+                        />
+                        <div className="absolute top-3 right-3 rounded-full bg-red-500 px-3 py-1 text-xs font-semibold text-white">
+                            {t('common.new')}
+                        </div>
+                        <div className={`absolute top-3 left-3 flex items-center gap-2 rounded-lg border px-3 py-1 text-xs font-semibold ${getBadgeColor(publication.type)}`}>
+                            <TypeIcon className="text-xs" />
+                            {getTypeLabel(publication.type)}
+                        </div>
                     </div>
-                    <div className={`absolute top-3 left-3 flex items-center gap-2 rounded-lg border px-3 py-1 text-xs font-semibold ${getBadgeColor(publication.type)}`}>
-                        <TypeIcon className="text-xs" />
-                        {getTypeLabel(publication.type)}
-                    </div>
-                </div>
+                </Link>
 
-                <div className="p-4">
-                    <h3 className="mb-2 line-clamp-2 text-base font-bold text-gray-900">
+                <Link href={`/publications/${publication.id}`} className="block group p-4 pb-0">
+                    <h3 className="mb-2 line-clamp-2 text-base font-bold text-gray-900 group-hover:text-[#A3C042] transition-colors">
                         {publicationTitle}
                         {publication.issue_number && (
                             <span className="text-gray-600">
@@ -178,7 +207,8 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                             {publicationDescription}
                         </p>
                     )}
-
+                </Link>
+                <div className="p-4 pt-3">
                     <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                             {publication.file && (
@@ -258,63 +288,53 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                 </div>
             </div>
 
-            <div>
+            <div className="flex items-center gap-2 overflow-x-auto pb-4 scrollbar-hide no-scrollbar">
+                {[
+                    { id: 'all', label: t('common.all'), icon: <FaNewspaper /> },
+                    { id: 'magazine', label: t('publicationsPage.sections.magazineTitle'), icon: <FaNewspaper /> },
+                    { id: 'booklet', label: t('publicationsPage.sections.bookletTitle'), icon: <FaBook /> },
+                    { id: 'report', label: t('publicationsPage.sections.reportTitle'), icon: <FaFileAlt /> },
+                    { id: 'article', label: t('publicationsPage.sections.articleTitle'), icon: <FaFileAlt /> },
+                ].map((tab) => (
+                    <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`flex items-center gap-2 whitespace-nowrap rounded-xl px-4 py-2 text-sm font-bold transition-all duration-300 ${
+                            activeTab === tab.id
+                                ? 'bg-[#A3C042] text-white shadow-md'
+                                : 'bg-white text-gray-600 border border-gray-100 hover:bg-gray-50'
+                        }`}
+                    >
+                        {tab.icon}
+                        {tab.label}
+                        <span className={`ml-1 rounded-full px-1.5 py-0.5 text-[10px] ${
+                            activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+                        }`}>
+                            {tab.id === 'all' 
+                                ? (publications.data?.length || 0)
+                                : (publications.data?.filter(p => p.type === tab.id)?.length || 0)
+                            }
+                        </span>
+                    </button>
+                ))}
+            </div>
+
+            <div className="min-h-[400px]">
                 {publications.data && publications.data.length > 0 ? (
-                    <>
-                        {magazines.length > 0 && (
-                            <div className="mb-6">
-                                <div className="mb-4 flex items-center gap-2">
-                                    <FaNewspaper className="text-lg text-gray-700" />
-                                    <h2 className="text-lg font-bold text-gray-900">{t('publicationsPage.sections.magazineTitle')}</h2>
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        {publications.data
+                            .filter(p => activeTab === 'all' || p.type === activeTab)
+                            .map(renderPublicationCard)}
+                        
+                        {(activeTab !== 'all' && publications.data.filter(p => p.type === activeTab).length === 0) && (
+                            <div className="col-span-full flex flex-col items-center justify-center py-20 text-center bg-white rounded-3xl border border-gray-100 shadow-sm">
+                                <div className="mb-4 rounded-full bg-gray-50 p-6 text-4xl text-gray-300">
+                                    {getTypeIcon(activeTab)({})}
                                 </div>
-                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-                                    {magazines.map(renderPublicationCard)}
-                                </div>
+                                <p className="text-gray-500 font-medium">{t('publicationsPage.empty')}</p>
                             </div>
                         )}
-
-                        {booklets.length > 0 && (
-                            <div className="mb-6">
-                                <div className="mb-4 flex items-center gap-2">
-                                    <FaBook className="text-lg text-gray-700" />
-                                    <h2 className="text-lg font-bold text-gray-900">{t('publicationsPage.sections.bookletTitle')}</h2>
-                                </div>
-                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-                                    {booklets.map(renderPublicationCard)}
-                                </div>
-                            </div>
-                        )}
-
-                        {reports.length > 0 && (
-                            <div className="mb-6">
-                                <div className="mb-4 flex items-center gap-2">
-                                    <FaFileAlt className="text-lg text-gray-700" />
-                                    <h2 className="text-lg font-bold text-gray-900">{t('publicationsPage.sections.reportTitle')}</h2>
-                                </div>
-                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-                                    {reports.map(renderPublicationCard)}
-                                </div>
-                            </div>
-                        )}
-
-                        {articles.length > 0 && (
-                            <div className="mb-6">
-                                <div className="mb-4 flex items-center gap-2">
-                                    <FaFileAlt className="text-lg text-gray-700" />
-                                    <h2 className="text-lg font-bold text-gray-900">{t('publicationsPage.sections.articleTitle')}</h2>
-                                </div>
-                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-                                    {articles.map(renderPublicationCard)}
-                                </div>
-                            </div>
-                        )}
-
-                        {magazines.length === 0 && booklets.length === 0 && reports.length === 0 && articles.length === 0 && (
-                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-                                {publications.data.map(renderPublicationCard)}
-                            </div>
-                        )}
-                    </>
+                    </div>
                 ) : (
                     <div className="rounded-2xl border border-gray-100 bg-white p-12 text-center">
                         <p className="text-sm text-gray-500">{t('publicationsPage.empty')}</p>
@@ -324,28 +344,34 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                 {publications.links && publications.links.length > 3 && (
                     <div className="rounded-2xl border border-gray-100 bg-white p-3">
                         <div className="flex flex-wrap justify-center gap-2">
-                            {publications.links.map((link, index) => (
-                                <button
-                                    key={index}
-                                    type="button"
-                                    onClick={() => {
-                                        if (!link.url) {
-                                            return;
-                                        }
-                                        router.visit(link.url, {
-                                            preserveScroll: true,
-                                            preserveState: true,
-                                        });
-                                    }}
-                                    className={`rounded-xl px-3 py-2 text-sm font-semibold transition ${
-                                        link.active
-                                            ? 'bg-[#A3C042] text-white'
-                                            : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-                                    } ${!link.url ? 'cursor-not-allowed opacity-50' : ''}`}
-                                    disabled={!link.url}
-                                    dangerouslySetInnerHTML={{ __html: link.label }}
-                                />
-                            ))}
+                            {publications.links.map((link, index) => {
+                                const className = `rounded-xl px-3 py-2 text-sm font-semibold transition ${
+                                    link.active
+                                        ? 'bg-[#A3C042] text-white'
+                                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                                } ${!link.url ? 'cursor-not-allowed opacity-50' : ''}`;
+
+                                if (!link.url) {
+                                    return (
+                                        <span
+                                            key={index}
+                                            className={className}
+                                            dangerouslySetInnerHTML={{ __html: link.label }}
+                                        />
+                                    );
+                                }
+
+                                return (
+                                    <button
+                                        key={index}
+                                        type="button"
+                                        onClick={() => goToPublicationsPage(link.url)}
+                                        className={className}
+                                    >
+                                        <span dangerouslySetInnerHTML={{ __html: link.label }} />
+                                    </button>
+                                );
+                            })}
                         </div>
                     </div>
                 )}

@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class TeacherStudentController extends Controller
@@ -17,14 +19,14 @@ class TeacherStudentController extends Controller
         
         // الحصول على الطلاب الذين لديهم مشاريع مرتبطة بهذا المعلم
         // المشاريع التي أنشأها المعلم للطلاب (teacher_id)
-        $teacherProjects = Project::where('teacher_id', $teacher->id)
-            ->pluck('user_id')
-            ->unique();
-        
-        $query = User::whereIn('id', $teacherProjects)
-            ->where('role', 'student')
+        $query = User::where('role', 'student')
+            ->where('teacher_id', $teacher->id)
             ->withCount('projects')
             ->with('badges');
+
+        if (!empty($teacher->school_id)) {
+            $query->where('school_id', $teacher->school_id);
+        }
         
         if ($request->filled('search')) {
             $search = $request->search;
@@ -51,6 +53,7 @@ class TeacherStudentController extends Controller
                     'name' => $student->name,
                     'email' => $student->email,
                     'phone' => $student->phone,
+                    'year' => $student->year,
                     'points' => $student->points ?? 0,
                     'projects_count' => $projectsCount,
                     'approved_projects' => $approvedProjects,
@@ -73,5 +76,79 @@ class TeacherStudentController extends Controller
             'students' => $students,
         ]);
     }
-}
 
+    public function store(Request $request)
+    {
+        $teacher = Auth::user();
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'phone' => ['nullable', 'string', 'max:50'],
+            'password' => ['required', 'string', 'min:6'],
+            'year' => ['nullable', 'string', 'max:50'],
+        ]);
+
+        User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
+            'password' => Hash::make($validated['password']),
+            'role' => 'student',
+            'year' => $validated['year'] ?? null,
+            'school_id' => $teacher->school_id ?? null,
+            'teacher_id' => $teacher->id,
+        ]);
+
+        return redirect()->back()->with('success', ['key' => 'toastMessages.teacherStudentCreatedSuccess']);
+    }
+
+    public function update(Request $request, User $student)
+    {
+        $teacher = Auth::user();
+
+        if ($student->role !== 'student' || (int) $student->teacher_id !== (int) $teacher->id) {
+            abort(404);
+        }
+        if (!empty($teacher->school_id) && (int) $student->school_id !== (int) $teacher->school_id) {
+            abort(404);
+        }
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($student->id)],
+            'phone' => ['nullable', 'string', 'max:50'],
+            'password' => ['nullable', 'string', 'min:6'],
+            'year' => ['nullable', 'string', 'max:50'],
+        ]);
+
+        $student->name = $validated['name'];
+        $student->email = $validated['email'];
+        $student->phone = $validated['phone'] ?? null;
+        $student->year = $validated['year'] ?? null;
+
+        if (!empty($validated['password'])) {
+            $student->password = Hash::make($validated['password']);
+        }
+
+        $student->save();
+
+        return redirect()->back()->with('success', ['key' => 'toastMessages.teacherStudentUpdatedSuccess']);
+    }
+
+    public function destroy(User $student)
+    {
+        $teacher = Auth::user();
+
+        if ($student->role !== 'student' || (int) $student->teacher_id !== (int) $teacher->id) {
+            abort(404);
+        }
+        if (!empty($teacher->school_id) && (int) $student->school_id !== (int) $teacher->school_id) {
+            abort(404);
+        }
+
+        $student->delete();
+
+        return redirect()->back()->with('success', ['key' => 'toastMessages.teacherStudentDeletedSuccess']);
+    }
+}

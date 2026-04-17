@@ -1,7 +1,7 @@
 import DashboardLayout from '../../../Layouts/DashboardLayout';
 import { Head, useForm, router, Link } from '@inertiajs/react';
 import { useState, useRef, useEffect } from 'react';
-import { FaArrowLeft, FaUpload, FaCloudUploadAlt, FaFile, FaSpinner, FaTrash } from 'react-icons/fa';
+import { FaArrowLeft, FaUpload, FaCloudUploadAlt, FaFile, FaSpinner, FaTrash, FaImage } from 'react-icons/fa';
 import TextInput from '../../../Components/TextInput';
 import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
@@ -13,14 +13,17 @@ export default function EditProject({ auth, project, school, schools = [] }) {
         description: project?.description || '',
         category: project?.category || 'other',
         school_id: project?.school_id || school?.id || null,
+        thumbnail: null,
         files: [],
         remove_files: [],
     });
 
     const [fileList, setFileList] = useState([]);
     const [existingFiles, setExistingFiles] = useState(project?.files || []);
+    const [thumbnailPreview, setThumbnailPreview] = useState(null);
     const [dragActive, setDragActive] = useState(false);
     const fileInputRef = useRef(null);
+    const thumbnailInputRef = useRef(null);
 
     useEffect(() => {
         // تحميل بيانات المشروع عند تحميل الصفحة
@@ -30,11 +33,41 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                 description: project.description || '',
                 category: project.category || 'other',
                 school_id: project.school_id || school?.id || null,
+                thumbnail: null,
                 files: [],
                 remove_files: [],
             });
         }
     }, [project]);
+
+    const getThumbnailUrl = () => {
+        if (thumbnailPreview) return thumbnailPreview;
+        if (project?.thumbnail) {
+            const path = project.thumbnail;
+            if (path.startsWith('http://') || path.startsWith('https://')) return path;
+            if (path.startsWith('/storage/')) return path;
+            return `/storage/${path}`;
+        }
+        return null;
+    };
+
+    const handleThumbnailChange = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (file.size > 5 * 1024 * 1024) {
+            alert('حجم صورة الغلاف يجب ألا يتجاوز 5 ميجابايت');
+            return;
+        }
+
+        if (!file.type.startsWith('image/')) {
+            alert('الملف يجب أن يكون صورة');
+            return;
+        }
+
+        setData('thumbnail', file);
+        setThumbnailPreview(URL.createObjectURL(file));
+    };
 
     const handleFiles = (files) => {
         const fileArray = Array.from(files);
@@ -137,6 +170,12 @@ export default function EditProject({ auth, project, school, schools = [] }) {
             return;
         }
 
+        // حسب متطلبات النظام: صورة الغلاف مطلوبة عند كل تحديث.
+        if (!data.thumbnail) {
+            alert('يرجى رفع صورة غلاف جديدة قبل الحفظ');
+            return;
+        }
+
         // التحقق من حالة المشروع
         if (project?.status !== 'pending') {
             alert('لا يمكن تعديل المشروع بعد الموافقة عليه أو رفضه');
@@ -154,6 +193,11 @@ export default function EditProject({ auth, project, school, schools = [] }) {
 
         if (data.school_id) {
             formData.append('school_id', data.school_id);
+        }
+
+        // Cover image (required on update)
+        if (data.thumbnail instanceof File) {
+            formData.append('thumbnail', data.thumbnail);
         }
 
         // إضافة الملفات الجديدة
@@ -241,6 +285,50 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                                 required
                             />
                             <InputError message={errors.description} className="mt-2" />
+                        </div>
+
+                        {/* Cover Image (required on update) */}
+                        <div className="rounded-xl border border-gray-200 p-4">
+                            <div className="flex flex-wrap items-center justify-between gap-3">
+                                <div>
+                                    <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
+                                        <FaImage className="text-gray-400" />
+                                        صورة الغلاف (مطلوبة عند التحديث)
+                                    </div>
+                                    <p className="mt-1 text-xs text-gray-500">حد أقصى 5MB</p>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => thumbnailInputRef.current?.click()}
+                                    className="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-200"
+                                >
+                                    اختيار صورة
+                                </button>
+                            </div>
+
+                            <input
+                                ref={thumbnailInputRef}
+                                type="file"
+                                accept="image/*"
+                                onChange={handleThumbnailChange}
+                                className="hidden"
+                            />
+
+                            <div className="mt-4 overflow-hidden rounded-xl border border-gray-100 bg-gray-50">
+                                {getThumbnailUrl() ? (
+                                    <img
+                                        src={getThumbnailUrl()}
+                                        alt="Project cover"
+                                        className="h-48 w-full object-cover"
+                                        loading="lazy"
+                                    />
+                                ) : (
+                                    <div className="flex h-48 items-center justify-center text-sm text-gray-500">
+                                        لا توجد صورة غلاف حالياً
+                                    </div>
+                                )}
+                            </div>
+                            <InputError message={errors.thumbnail} className="mt-2" />
                         </div>
 
                         {/* Category */}
@@ -427,4 +515,3 @@ export default function EditProject({ auth, project, school, schools = [] }) {
         </DashboardLayout>
     );
 }
-

@@ -253,23 +253,31 @@ class SchoolPublicationController extends Controller
             'content' => 'nullable|string',
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'file' => 'nullable|file|mimes:pdf|max:10240',
+            'youtube_url' => 'nullable|url|max:500',
             'issue_number' => 'nullable|integer|min:1',
             'publish_date' => 'nullable|date',
             'publisher_name' => 'nullable|string|max:255',
         ]);
 
+        // Normalize empty youtube_url to null
+        if (array_key_exists('youtube_url', $validated)) {
+            $validated['youtube_url'] = !empty($validated['youtube_url']) ? $validated['youtube_url'] : null;
+        }
+
         // حذف الصورة القديمة إذا تم رفع صورة جديدة
         if ($request->hasFile('cover_image')) {
-            if ($publication->cover_image) {
-                Storage::disk('public')->delete($publication->cover_image);
+            $rawCover = $publication->getAttributes()['cover_image'] ?? null;
+            if ($rawCover) {
+                Storage::disk('public')->delete($rawCover);
             }
             $validated['cover_image'] = $request->file('cover_image')->store('publications/covers', 'public');
         }
 
         // حذف الملف القديم إذا تم رفع ملف جديد
         if ($request->hasFile('file')) {
-            if ($publication->file) {
-                Storage::disk('public')->delete($publication->file);
+            $rawFile = $publication->getAttributes()['file'] ?? null;
+            if ($rawFile) {
+                Storage::disk('public')->delete($rawFile);
             }
             $validated['file'] = $request->file('file')->store('publications/files', 'public');
         }

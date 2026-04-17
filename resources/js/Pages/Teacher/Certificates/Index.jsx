@@ -11,6 +11,7 @@ import { useToast } from '@/Contexts/ToastContext';
 import { useTranslation } from '@/i18n';
 import { toHijriDate } from '@/utils/dateUtils';
 import { downloadFile } from '@/utils/downloadFile';
+import { usePremiumGate } from '@/Hooks/usePremiumGate';
 
 const STATUS_STYLES = {
     approved: 'bg-green-100 text-green-700',
@@ -29,6 +30,10 @@ export default function TeacherCertificatesIndex({
 }) {
     const { showSuccess, showError } = useToast();
     const { t, language } = useTranslation();
+    const { gate, premiumModal, openPremium } = usePremiumGate(membershipSummary, {
+        featureName: t('common.certificates'),
+        requiredAccessKey: 'certificate_access',
+    });
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedRecipient, setSelectedRecipient] = useState(null);
     const [showRequestModal, setShowRequestModal] = useState(false);
@@ -115,7 +120,7 @@ export default function TeacherCertificatesIndex({
             return;
         }
         if (!membershipSummary?.certificate_access) {
-            showError(t('teacherCertificatesIndexPage.toasts.certificateAccessDenied'));
+            openPremium();
             return;
         }
         if (!certificateSystemReady) {
@@ -188,6 +193,7 @@ export default function TeacherCertificatesIndex({
     return (
         <DashboardLayout header={t('teacherCertificatesIndexPage.title')}>
             <Head title={t('teacherCertificatesIndexPage.pageTitle', { appName: t('common.appName') })} />
+            {premiumModal}
 
             <div className="space-y-6">
                 <div className="grid gap-4 md:grid-cols-3">
@@ -378,16 +384,16 @@ export default function TeacherCertificatesIndex({
 
                                     <div className="flex items-center gap-2">
                                         {item.status === 'approved' && item.download_url ? (
-                                            <a
-                                                href={item.download_url}
-                                                download
+                                            <button
+                                                type="button"
+                                                onClick={() => gate(() => downloadFile(item.download_url, `certificate_${item.certificate_number || item.id}.pdf`))}
                                                 className="rounded-xl bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700 transition hover:bg-blue-100"
                                             >
                                                 <span className="inline-flex items-center gap-2">
                                                     <FaDownload />
                                                     {t('common.download')}
                                                 </span>
-                                            </a>
+                                            </button>
                                         ) : item.status === 'pending_school_approval' ? (
                                             <span className="inline-flex items-center gap-2 rounded-xl bg-amber-50 px-4 py-2 text-sm font-bold text-amber-700">
                                                 <FaClock />

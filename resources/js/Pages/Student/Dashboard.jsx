@@ -5,8 +5,9 @@ import StudentCommunityScoreCard from '@/Pages/Student/Home/StudentCommunityScor
 import StudentWelcomeCard from '@/Pages/Student/Home/StudentWelcomeCard';
 import StudentDashboardOverview from '@/Pages/Student/Dashboard/StudentDashboardOverview';
 import { useTranslation } from '@/i18n';
+import TrialCountdownBanner from '@/Components/Dashboard/TrialCountdownBanner';
 
-export default function StudentDashboard({ auth, stats = {}, communityScorePercent = 0, engagement = null }) {
+export default function StudentDashboard({ auth, stats = {}, communityScorePercent = 0, engagement = null, membershipSummary = null }) {
     const user = auth?.user;
     const { t, language } = useTranslation();
 
@@ -24,6 +25,9 @@ export default function StudentDashboard({ auth, stats = {}, communityScorePerce
 
             <main className="mx-auto w-full max-w-5xl px-3 pb-24 pt-5 sm:px-4 lg:px-6">
                 <div className="space-y-6">
+                    {/* Trial/subscription status banner */}
+                    <TrialCountdownBanner membershipSummary={membershipSummary} />
+
                     <section className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-6" aria-label={t('studentDashboardPage.sections.hero')}>
                         <div className="lg:col-span-8">
                             <StudentWelcomeCard

@@ -39,7 +39,7 @@ class TeacherChallengeController extends Controller
     /**
      * عرض نموذج إنشاء تحدّي جديد
      */
-    public function create(): Response
+    public function create()
     {
         $user = Auth::user();
 

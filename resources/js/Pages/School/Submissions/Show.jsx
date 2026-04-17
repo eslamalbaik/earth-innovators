@@ -159,33 +159,42 @@ export default function SchoolSubmissionShow({ auth, submission, availableBadges
                                     </div>
                                 )}
 
-                                {Array.isArray(submission.files) && submission.files.length > 0 && (
+                                {submission.files && (
                                     <div className="mt-6">
                                         <h3 className="mb-3 text-lg font-bold text-gray-900">
                                             {t('schoolSubmissionShowPage.attachmentsTitle')}
                                         </h3>
                                         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                                            {submission.files.map((file, index) => {
-                                                const fileName = file?.split('/').pop() || t('schoolSubmissionShowPage.attachmentFallback');
+                                            {(() => {
+                                                let filesToMap = [];
+                                                try {
+                                                    if (Array.isArray(submission.files)) filesToMap = submission.files;
+                                                    else if (typeof submission.files === 'string') {
+                                                        const parsed = JSON.parse(submission.files);
+                                                        filesToMap = Array.isArray(parsed) ? parsed : (parsed ? Object.values(parsed) : []);
+                                                    }
+                                                } catch(e) { filesToMap = []; }
+                                                
+                                                return filesToMap.map((file, index) => {
+                                                    const fileName = file?.split('/').pop() || t('schoolSubmissionShowPage.attachmentFallback');
 
-                                                return (
-                                                    <div
-                                                        key={`${fileName}-${index}`}
-                                                        className="flex items-center gap-3 rounded-lg border border-gray-100 bg-gray-50 p-3"
-                                                    >
-                                                        {getFileIcon(fileName)}
-                                                        <span className="flex-1 truncate text-sm text-gray-900">{fileName}</span>
+                                                    return (
                                                         <a
+                                                            key={index}
                                                             href={getFileUrl(file)}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="p-2 text-blue-600 hover:text-blue-700"
+                                                            className="flex items-center gap-3 p-3 transition bg-gray-50 rounded-xl border border-gray-200 hover:bg-gray-100 hover:border-blue-300 group"
                                                         >
-                                                            <FaDownload />
+                                                            {getFileIcon(fileName)}
+                                                            <span className="flex-1 text-sm font-medium text-gray-900 group-hover:text-blue-700">
+                                                                {fileName}
+                                                            </span>
+                                                            <FaDownload className="text-gray-400 group-hover:text-blue-600 transition" />
                                                         </a>
-                                                    </div>
-                                                );
-                                            })}
+                                                    );
+                                                });
+                                            })()}
                                         </div>
                                     </div>
                                 )}

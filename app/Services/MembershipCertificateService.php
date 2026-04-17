@@ -60,14 +60,6 @@ class MembershipCertificateService extends BaseService
             $issueDate = now()->toDateString();
             $certificateNumber = $this->certificateService->generateCertificateNumber($user);
 
-            $certificateData = [
-                'course_name' => 'ط´ظ‡ط§ط¯ط© ط¹ط¶ظˆظٹط© ط·ط§ظ„ط¨',
-                'description' => $this->generateStudentCertificateDescription($eligibility),
-                'description_ar' => $this->generateStudentCertificateDescription($eligibility),
-                'certificate_number' => $certificateNumber,
-                'issue_date' => $issueDate,
-            ];
-
             // Generate certificate PDF
             $filePath = $this->certificateService->generateCertificate(
                 $user,
@@ -573,4 +565,3 @@ class MembershipCertificateService extends BaseService
         return ['eligible' => false, 'error' => 'Invalid role'];
     }
 }
-

@@ -1,5 +1,6 @@
-import { Head, router } from '@inertiajs/react';
-import { FaDownload, FaPrint, FaShare, FaMedal } from 'react-icons/fa';
+﻿import { Head, router } from '@inertiajs/react';
+import { FaDownload, FaPrint, FaShare, FaMedal, FaLock } from 'react-icons/fa';
+import { usePremiumGate } from '@/Hooks/usePremiumGate';
 import MobileAppLayout from '@/Layouts/MobileAppLayout';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
@@ -8,23 +9,29 @@ import { useToast } from '@/Contexts/ToastContext';
 import { downloadFile } from '@/utils/downloadFile';
 import { useTranslation } from '@/i18n';
 
-export default function SchoolCertificateShow({ auth, user, certificate }) {
+export default function SchoolCertificateShow({ auth, user, certificate, membershipSummary = null }) {
     const { t, language } = useTranslation();
     const { showError } = useToast();
+    const { gate, premiumModal } = usePremiumGate(membershipSummary, {
+        featureName: t('common.certificates'),
+        requiredAccessKey: 'certificate_access',
+    });
     const isAuthed = !!auth?.user;
     const currentUser = auth?.user;
 
     const handleDownload = async () => {
-        if (certificate?.download_url) {
-            try {
-                await downloadFile(
-                    certificate.download_url,
-                    `certificate_${certificate?.certificate_number || user?.membership_number || 'school'}.pdf`,
-                );
-            } catch (error) {
-                showError({ translationKey: 'toastMessages.genericUnexpectedError' });
+        gate(async () => {
+            if (certificate?.download_url) {
+                try {
+                    await downloadFile(
+                        certificate.download_url,
+                        `certificate_${certificate?.certificate_number || user?.membership_number || 'school'}.pdf`,
+                    );
+                } catch (error) {
+                    showError({ translationKey: 'toastMessages.genericUnexpectedError' });
+                }
             }
-        }
+        });
     };
 
     const handlePrint = () => {
@@ -92,6 +99,7 @@ export default function SchoolCertificateShow({ auth, user, certificate }) {
                     }
                 `}</style>
             </Head>
+            {premiumModal}
             <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
                 <div className="block md:hidden">
                     <MobileAppLayout

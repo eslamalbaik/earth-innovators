@@ -5,14 +5,13 @@ namespace App\Http\Controllers\Student;
 use App\Http\Controllers\Controller;
 use App\Models\Challenge;
 use App\Models\ChallengeSubmission;
-use App\Models\Category;
 use App\Services\ChallengeSubmissionService;
 use App\Services\ChallengeParticipationService;
 use App\Services\ChallengeWinnerService;
+use App\Services\MembershipAccessService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -21,7 +20,8 @@ class StudentChallengeController extends Controller
     public function __construct(
         private ChallengeSubmissionService $submissionService,
         private ChallengeParticipationService $participationService,
-        private ChallengeWinnerService $winnerService
+        private ChallengeWinnerService $winnerService,
+        private MembershipAccessService $membershipAccessService,
     ) {}
 
     /**
@@ -66,7 +66,6 @@ class StudentChallengeController extends Controller
         });
 
         // Get categories from database that have available challenges
-        // First, get all unique category slugs from available challenges (both school-specific and global)
         $availableCategorySlugs = Challenge::where(function ($q) use ($student) {
                 $q->where('school_id', $student->school_id)
                   ->orWhereNull('school_id');
@@ -77,19 +76,16 @@ class StudentChallengeController extends Controller
             ->pluck('category')
             ->toArray();
 
-        // Get categories from database that match available challenge categories
-        $allCategories = Category::where('is_active', true)
+        $allCategories = \App\Models\Category::where('is_active', true)
             ->whereIn('slug', $availableCategorySlugs)
             ->orderBy('name')
             ->get();
 
-        // Separate "other" category from others
         $otherCategory = $allCategories->firstWhere('slug', 'other');
         $otherCategories = $allCategories->filter(function ($category) {
             return $category->slug !== 'other';
         });
 
-        // Build categories array: "الكل" first, then other categories, then "أخرى" last
         $categories = collect([['value' => '', 'label' => 'الكل']])
             ->merge($otherCategories->map(function ($category) {
                 return [
@@ -237,15 +233,16 @@ class StudentChallengeController extends Controller
         $student = Auth::user();
 
         // Challenges can be global (no school_id) or school-specific
-        // If challenge has school_id, verify it matches student's school
         if ($challenge->school_id && $challenge->school_id !== $student->school_id) {
             abort(403, 'غير مصرح لك بعرض هذا التحدي');
         }
 
+        $membershipSummary = $this->membershipAccessService->getMembershipSummary($student);
         $challenge = $this->submissionService->getChallengeDetailsForStudent($challenge->id, $student->id);
 
         return Inertia::render('Student/Challenges/Show', [
-            'challenge' => $challenge,
+            'challenge'         => $challenge,
+            'membershipSummary' => $membershipSummary,
         ]);
     }
 

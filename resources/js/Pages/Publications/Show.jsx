@@ -42,6 +42,35 @@ const stripDuplicateCoverImage = (html, coverImagePath) => {
     );
 };
 
+/**
+ * Converts any YouTube URL format into an embed URL.
+ * Supports: watch?v=, youtu.be/, shorts/, live/
+ */
+const getYoutubeEmbedUrl = (url) => {
+    if (!url) return null;
+    try {
+        const parsed = new URL(url);
+        let videoId = null;
+
+        if (parsed.hostname === 'youtu.be') {
+            videoId = parsed.pathname.slice(1).split('?')[0];
+        } else if (
+            parsed.hostname === 'www.youtube.com' ||
+            parsed.hostname === 'youtube.com'
+        ) {
+            if (parsed.pathname.startsWith('/shorts/') || parsed.pathname.startsWith('/live/')) {
+                videoId = parsed.pathname.split('/')[2];
+            } else {
+                videoId = parsed.searchParams.get('v');
+            }
+        }
+
+        return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+    } catch {
+        return null;
+    }
+};
+
 export default function PublicationShow({
     auth,
     publication,
@@ -143,6 +172,25 @@ export default function PublicationShow({
                         />
                     </div>
                 )}
+
+                {/* YouTube embed */}
+                {(() => {
+                    const embedUrl = getYoutubeEmbedUrl(publication.youtube_url);
+                    return embedUrl ? (
+                        <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white">
+                            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                                <iframe
+                                    src={embedUrl}
+                                    title={publicationTitle}
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                    className="absolute inset-0 h-full w-full"
+                                    loading="lazy"
+                                />
+                            </div>
+                        </div>
+                    ) : null;
+                })()}
 
                 <div className="space-y-3 rounded-2xl border border-gray-100 bg-white p-4">
                     <h1 className="text-lg font-extrabold text-gray-900">

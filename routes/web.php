@@ -461,6 +461,10 @@ Route::get('/packages/payment/{payment}/success', [\App\Http\Controllers\Package
 Route::get('/packages/payment/{payment}/cancel', [\App\Http\Controllers\PackageSubscriptionController::class, 'paymentCancel'])
     ->name('packages.payment.cancel');
 
+// Invoice download (auth required)
+Route::middleware('auth')->get('/payments/{payment}/invoice', [\App\Http\Controllers\InvoiceController::class, 'download'])
+    ->name('payments.invoice');
+
 // Ziina webhook
 Route::post('/webhook/ziina', [\App\Http\Controllers\Api\ZiinaWebhookController::class, 'handle'])
     ->name('webhook.ziina');
@@ -481,7 +485,7 @@ Route::get('/contact', function () {
     return Inertia::render('Contact');
 })->name('contact');
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'membership_active'])->group(function () {
     Route::get('/dashboard', function () {
         $user = Auth::user();
 
@@ -532,7 +536,7 @@ Route::middleware(['auth'])->group(function () {
     })->name('dashboard');
 });
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'membership_active'])->group(function () {
     // Certificate API routes
     Route::post('/api/certificates/generate', [\App\Http\Controllers\CertificateController::class, 'generate'])->name('api.certificates.generate');
     Route::get('/certificates/{id}/download', [\App\Http\Controllers\CertificateController::class, 'download'])->name('certificates.download');
@@ -627,7 +631,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
 });
 
-Route::middleware(['auth', 'school'])->prefix('school')->name('school.')->group(function () {
+Route::middleware(['auth', 'school', 'membership_active'])->prefix('school')->name('school.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\School\SchoolDashboardController::class, 'index'])->name('dashboard');
 
     // إدارة المشاريع
@@ -692,10 +696,13 @@ Route::middleware(['auth', 'school'])->prefix('school')->name('school.')->group(
     Route::post('/reports', [\App\Http\Controllers\School\SchoolReportController::class, 'store'])->name('reports.store');
 });
 
-Route::middleware(['auth', 'teacher'])->group(function () {
+Route::middleware(['auth', 'teacher', 'membership_active'])->group(function () {
     Route::get('/teacher/dashboard', [TeacherDashboardController::class, 'index'])->name('teacher.dashboard');
 
     Route::get('/teacher/students', [\App\Http\Controllers\Teacher\TeacherStudentController::class, 'index'])->name('teacher.students.index');
+    Route::post('/teacher/students', [\App\Http\Controllers\Teacher\TeacherStudentController::class, 'store'])->name('teacher.students.store');
+    Route::put('/teacher/students/{student}', [\App\Http\Controllers\Teacher\TeacherStudentController::class, 'update'])->name('teacher.students.update');
+    Route::delete('/teacher/students/{student}', [\App\Http\Controllers\Teacher\TeacherStudentController::class, 'destroy'])->name('teacher.students.destroy');
     
     // تقارير تقييم الطلاب
     Route::get('/teacher/students/evaluation-report', [\App\Http\Controllers\Teacher\StudentEvaluationController::class, 'index'])->name('teacher.students.evaluation-report');
@@ -867,7 +874,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/subscriptions/subscription/{subscription}', [\App\Http\Controllers\Admin\AdminSubscriptionController::class, 'showSubscription'])->name('subscriptions.show-subscription');
 
     // إدارة الإصدارات
-    Route::resource('publications', \App\Http\Controllers\Admin\AdminPublicationController::class)->only(['index', 'create', 'store', 'show', 'destroy']);
+    Route::resource('publications', \App\Http\Controllers\Admin\AdminPublicationController::class)->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy']);
     Route::post('/publications/{publication}/approve', [\App\Http\Controllers\Admin\AdminPublicationController::class, 'approve'])->name('publications.approve');
     Route::post('/publications/{publication}/reject', [\App\Http\Controllers\Admin\AdminPublicationController::class, 'reject'])->name('publications.reject');
 

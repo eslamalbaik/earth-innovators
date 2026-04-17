@@ -1,6 +1,7 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FaArrowRight, FaSave, FaTimes } from 'react-icons/fa';
+import PhoneInput from '@/Components/PhoneInput';
 
 export default function UsersCreate({ schools, auth }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -81,16 +82,13 @@ export default function UsersCreate({ schools, auth }) {
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 الهاتف
                             </label>
-                            <input
-                                type="tel"
+                            <PhoneInput
+                                id="phone"
+                                name="phone"
                                 value={data.phone}
-                                onChange={(e) => setData('phone', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.phone ? 'border-red-500' : 'border-gray-300'
-                                    }`}
+                                onChange={(full) => setData('phone', full)}
+                                error={errors.phone}
                             />
-                            {errors.phone && (
-                                <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
-                            )}
                         </div>
 
                         {/* نوع الحساب */}

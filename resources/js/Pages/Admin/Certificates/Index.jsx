@@ -15,6 +15,8 @@ import {
     FaUser,
 } from 'react-icons/fa';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
+import { useToast } from '@/Contexts/ToastContext';
+import { downloadFile } from '@/utils/downloadFile';
 
 const certificateTypeKeyMap = {
     student: 'student',
@@ -27,6 +29,7 @@ const certificateTypeKeyMap = {
 export default function AdminCertificatesIndex({ certificates, stats, users, filters = {}, certificateSystemHealth = null }) {
     const { t, language } = useTranslation();
     const { confirm } = useConfirmDialog();
+    const { showError } = useToast();
     const [search, setSearch] = useState(filters?.search || '');
     const [type, setType] = useState(filters?.type || 'all');
     const [status, setStatus] = useState(filters?.status || 'all');
@@ -57,6 +60,17 @@ export default function AdminCertificatesIndex({ certificates, stats, users, fil
             router.delete(route('admin.certificates.destroy', certificateId), {
                 preserveScroll: true,
             });
+        }
+    };
+
+    const handleDownload = async (certificate) => {
+        try {
+            await downloadFile(
+                route('admin.certificates.download', certificate.id),
+                `certificate_${certificate.certificate_number || certificate.id}.pdf`
+            );
+        } catch (e) {
+            showError(t('toastMessages.certificateDownloadFailed'));
         }
     };
 
@@ -306,13 +320,14 @@ export default function AdminCertificatesIndex({ certificates, stats, users, fil
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 <div className="flex items-center gap-2">
                                                     {certificate.file_path && (
-                                                        <Link
-                                                            href={route('admin.certificates.download', certificate.id)}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleDownload(certificate)}
                                                             className="text-blue-600 hover:text-blue-900"
                                                             title={t('common.download')}
                                                         >
                                                             <FaDownload />
-                                                        </Link>
+                                                        </button>
                                                     )}
                                                     <Link
                                                         href={route('admin.certificates.edit', certificate.id)}

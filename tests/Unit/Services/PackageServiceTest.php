@@ -181,8 +181,9 @@ class PackageServiceTest extends TestCase
         Package::factory()->count(2)->create(['is_active' => false]);
 
         $activePackages = $this->packageService->getAllPackages(['status' => 'active']);
+        $expectedActiveCount = Package::where('is_active', true)->count();
 
-        $this->assertCount(3, $activePackages);
+        $this->assertCount($expectedActiveCount, $activePackages);
         $activePackages->each(function ($package) {
             $this->assertTrue($package->is_active);
         });
@@ -193,14 +194,16 @@ class PackageServiceTest extends TestCase
      */
     public function test_can_get_packages_sorted_by_price(): void
     {
-        Package::factory()->create(['price' => 300.00]);
-        Package::factory()->create(['price' => 100.00]);
-        Package::factory()->create(['price' => 200.00]);
+        Package::factory()->create(['name' => 'Sort A', 'price' => 300.00]);
+        Package::factory()->create(['name' => 'Sort B', 'price' => 100.00]);
+        Package::factory()->create(['name' => 'Sort C', 'price' => 200.00]);
 
         $packages = $this->packageService->getAllPackages([], 'price', 'asc');
+        $testPackages = $packages->whereIn('name', ['Sort A', 'Sort B', 'Sort C'])->values();
 
-        $this->assertEquals(100.00, $packages->first()->price);
-        $this->assertEquals(300.00, $packages->last()->price);
+        $this->assertCount(3, $testPackages);
+        $this->assertEquals('100.00', (string) $testPackages->first()->price);
+        $this->assertEquals('300.00', (string) $testPackages->last()->price);
     }
 
     /**
@@ -213,10 +216,13 @@ class PackageServiceTest extends TestCase
         Package::factory()->count(2)->create(['is_active' => true, 'is_popular' => true]);
 
         $stats = $this->packageService->getPackageStats();
+        $expectedTotal = Package::count();
+        $expectedActive = Package::where('is_active', true)->count();
+        $expectedPopular = Package::where('is_popular', true)->count();
 
-        $this->assertEquals(7, $stats['total']);
-        $this->assertEquals(5, $stats['active']);
-        $this->assertEquals(2, $stats['popular']);
+        $this->assertEquals($expectedTotal, $stats['total']);
+        $this->assertEquals($expectedActive, $stats['active']);
+        $this->assertEquals($expectedPopular, $stats['popular']);
         $this->assertArrayHasKey('totalSubscribers', $stats);
         $this->assertArrayHasKey('totalRevenue', $stats);
         $this->assertArrayHasKey('monthlyRevenue', $stats);
@@ -338,6 +344,7 @@ class PackageServiceTest extends TestCase
     public function test_cache_is_cleared_after_package_creation(): void
     {
         Package::factory()->count(2)->create();
+        $initialCount = Package::count();
         
         // Populate cache
         $this->packageService->getAllPackages();
@@ -352,7 +359,7 @@ class PackageServiceTest extends TestCase
 
         // Cache should be cleared, new package should appear
         $packages = $this->packageService->getAllPackages();
-        $this->assertCount(3, $packages);
+        $this->assertCount($initialCount + 1, $packages);
     }
 }
 

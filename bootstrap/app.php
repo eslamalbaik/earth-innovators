@@ -11,6 +11,7 @@ use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\EnsureUserIsTeacher;
 use App\Http\Middleware\EnsureUserIsSystemSupervisor;
 use App\Http\Middleware\EnsureUserIsSchoolSupportCoordinator;
+use App\Http\Middleware\EnsureMembershipActive;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withProviders([
@@ -46,6 +47,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'system_supervisor' => EnsureUserIsSystemSupervisor::class,
             'school_support_coordinator' => EnsureUserIsSchoolSupportCoordinator::class,
             'redirect_student_explore' => \App\Http\Middleware\RedirectStudentFromPublicExploreRoutes::class,
+            'membership_active' => EnsureMembershipActive::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

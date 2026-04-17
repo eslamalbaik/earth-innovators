@@ -245,7 +245,7 @@ class CertificateController extends Controller
             ->with('success', 'تم حذف الشهادة بنجاح');
     }
 
-    public function download(Certificate $certificate)
+    public function download(Request $request, Certificate $certificate)
     {
         if (false && (!$certificate->file_path || !Storage::disk('public')->exists($certificate->file_path))) {
             abort(404, 'ملف الشهادة غير موجود');
@@ -264,9 +264,18 @@ class CertificateController extends Controller
                 $messageKey = 'toastMessages.certificateTemplateMissing';
             }
 
-            return redirect()->back()->with('error', [
-                'key' => $messageKey,
-            ]);
+            // For XHR download attempts, return JSON so the frontend can show a toast without
+            // accidentally downloading an HTML error page as a PDF.
+            if ($request->expectsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+                return response()->json([
+                    'success' => false,
+                    'message' => [
+                        'key' => $messageKey,
+                    ],
+                ], 500);
+            }
+
+            return redirect()->back()->with('error', ['key' => $messageKey]);
         }
     }
 

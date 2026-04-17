@@ -109,7 +109,7 @@ export default function TeacherChallengeCreate({ auth, school }) {
         return (
             <DashboardLayout
                 auth={auth}
-                header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">{t('teacherChallengesCreatePage.title')}</h2>}
+                header={t('teacherChallengesCreatePage.title')}
             >
                 <Head title={t('teacherChallengesCreatePage.pageTitle')} />
                 <div className="py-6">
@@ -133,7 +133,7 @@ export default function TeacherChallengeCreate({ auth, school }) {
     return (
         <DashboardLayout
             auth={auth}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">{t('teacherChallengesCreatePage.title')}</h2>}
+            header={t('teacherChallengesCreatePage.title')}
         >
             <Head title={t('teacherChallengesCreatePage.pageTitle')} />
 

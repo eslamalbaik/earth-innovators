@@ -12,6 +12,7 @@ import {
     FaBook,
     FaDownload,
     FaEye,
+    FaEdit,
 } from 'react-icons/fa';
 import { getPublicationImageUrl } from '@/utils/imageUtils';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
@@ -279,6 +280,13 @@ export default function AdminPublicationShow({ publication }) {
                                 <FaEye />
                                 عرض المقال
                             </a>
+                            <Link
+                                href={route('admin.publications.edit', publication.id)}
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
+                            >
+                                <FaEdit />
+                                تعديل المنشور
+                            </Link>
                             <button
                                 onClick={handleDelete}
                                 className="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"

@@ -33,23 +33,25 @@ class StudentProjectController extends Controller
         $student->refresh();
         $hasSchool = filled($student->school_id);
 
-        $projects = $this->hydrateApprovedProjectsForStudent(
-            $student,
-            $this->projectService->getApprovedProjects(
-                $request->get('search'),
-                $request->get('category'),
-                $hasSchool ? (int) $student->school_id : null,
-                12,
-                ! $hasSchool
-            )
+        $approvedProjects = $this->projectService->getApprovedProjects(
+            $request->filled('search') ? (string) $request->input('search') : null,
+            $request->filled('category') ? (string) $request->input('category') : null,
+            $hasSchool ? (int) $student->school_id : null,
+            12,
+            ! $hasSchool
         )->withQueryString();
 
+        $projects = $this->hydrateApprovedProjectsForStudent($student, $approvedProjects);
         $canStartNewSubmission = $this->studentCanStartNewProjectSubmission($student);
 
         return Inertia::render('Student/Projects/Index', [
             'projects' => $projects,
+            'message' => null,
             'noticeKey' => $hasSchool ? null : 'studentProjects.noSchoolLinked',
             'canStartNewSubmission' => $canStartNewSubmission,
+            'auth' => [
+                'user' => $student,
+            ],
         ]);
     }
 
@@ -179,44 +181,39 @@ class StudentProjectController extends Controller
     {
         $student = Auth::user();
 
-        // Verify project is available for student
-        // المشروع يجب أن يكون معتمداً وإما:
-        // 1. متاح لجميع المؤسسات تعليمية (school_id = null)
-        // 2. أو متاح لمدرسة الطالب (school_id = student->school_id)
-        $isAvailableForAllSchools = $project->school_id === null;
+        // المشروع يجب أن يكون معتمداً ومتاحاً للطالب
+        $isAvailableForAllSchools  = $project->school_id === null;
         $isAvailableForStudentSchool = $project->school_id === $student->school_id;
-        
+
         if ($project->status !== 'approved' || (!$isAvailableForAllSchools && !$isAvailableForStudentSchool)) {
             abort(403, 'غير مصرح لك بعرض هذا المشروع');
         }
 
-        // Increment views
-        $project->increment('views');
+        // Get project details with optimized query (includes views increment inside the service)
+        $projectDetails = $this->projectService->getProjectDetails($project->id, $student);
 
-        // Get project details with optimized query
-        $project = $this->projectService->getProjectDetails($project->id, $student);
-        
-        // Load additional relations
-        $project->load([
-            'submissions' => function ($query) use ($student) {
-                $query->where('student_id', $student->id)->latest();
-            },
+        if (!$projectDetails) {
+            abort(404);
+        }
+
+        // Load additional relations not covered by the service
+        $projectDetails->load([
             'comments' => function ($query) {
                 $query->with(['user:id,name,image', 'replies.user:id,name,image'])->latest();
             },
         ]);
 
         // Get existing submission
-        $existingSubmission = $project->submissions
-            ->where('student_id', $student->id)
-            ->first();
+        $existingSubmission = $projectDetails->submissions
+            ? $projectDetails->submissions->where('student_id', $student->id)->first()
+            : null;
 
-        // Load badges if exists
+        // Load badges if submission exists
         if ($existingSubmission && $existingSubmission->badges) {
-            $badgeIds = is_array($existingSubmission->badges) 
-                ? $existingSubmission->badges 
+            $badgeIds = is_array($existingSubmission->badges)
+                ? $existingSubmission->badges
                 : (is_string($existingSubmission->badges) ? json_decode($existingSubmission->badges, true) : []);
-            
+
             if (!empty($badgeIds)) {
                 $badges = \App\Models\Badge::whereIn('id', $badgeIds)->get();
                 $existingSubmission->badges_data = $badges;
@@ -224,7 +221,7 @@ class StudentProjectController extends Controller
         }
 
         return Inertia::render('Student/Projects/Show', [
-            'project' => $project,
+            'project'            => $projectDetails,
             'existingSubmission' => $existingSubmission,
         ]);
     }

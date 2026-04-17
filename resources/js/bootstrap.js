@@ -10,6 +10,16 @@ if (csrfToken) {
     window.axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;
 }
 
+// If APP_URL (server) differs from the current origin (local dev / proxy), Ziggy may generate absolute URLs
+// that break CSRF/session cookies and cause frequent 419 Page Expired responses. Force Ziggy to the current origin.
+try {
+    if (typeof window !== 'undefined' && window.Ziggy && window.location?.origin) {
+        window.Ziggy.url = window.location.origin;
+    }
+} catch (e) {
+    // Ignore; app can still work without Ziggy in some contexts.
+}
+
 window.axios.interceptors.response.use(
     (response) => response,
     (error) => {

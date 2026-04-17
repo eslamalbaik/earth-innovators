@@ -44,12 +44,14 @@ class SchoolProjectController extends Controller
             $request->get('search'),
             $request->get('status'),
             $request->get('category'),
-            15,
-            false
+            15
         )->withQueryString();
 
         return Inertia::render('School/Projects/Index', [
             'projects' => $projects,
+            'auth' => [
+                'user' => $school,
+            ],
         ]);
     }
 
@@ -69,7 +71,7 @@ class SchoolProjectController extends Controller
             'files.*' => 'file|max:10240',
             'images' => 'nullable|array',
             'images.*' => 'image|max:5120',
-            'thumbnail' => 'nullable|image|max:5120',
+            'thumbnail' => 'required|image|max:5120',
             'project_document' => 'nullable|file|max:10240|mimes:pdf,doc,docx',
             'report' => 'nullable|string',
         ]);

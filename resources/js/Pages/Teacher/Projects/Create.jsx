@@ -1,6 +1,6 @@
 import { Head, useForm, router, Link } from '@inertiajs/react';
 import { useState, useRef } from 'react';
-import { FaArrowLeft, FaUpload, FaCloudUploadAlt, FaFile, FaSpinner, FaTrash, FaCheckCircle } from 'react-icons/fa';
+import { FaArrowLeft, FaUpload, FaCloudUploadAlt, FaFile, FaSpinner, FaTrash, FaCheckCircle, FaImage } from 'react-icons/fa';
 import TextInput from '../../../Components/TextInput';
 import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
@@ -19,6 +19,7 @@ export default function CreateProject({ auth, school, schools = [] }) {
         description: '',
         category: 'other',
         school_id: school?.id || null,
+        thumbnail: null,
         files: [],
         evaluation: {
             innovation: 0,
@@ -32,6 +33,8 @@ export default function CreateProject({ auth, school, schools = [] }) {
     const [fileList, setFileList] = useState([]);
     const [dragActive, setDragActive] = useState(false);
     const fileInputRef = useRef(null);
+    const thumbnailInputRef = useRef(null);
+    const [thumbnailPreview, setThumbnailPreview] = useState(null);
     const [activeTab, setActiveTab] = useState('upload'); // 'evaluation' or 'upload'
 
     const handleFiles = (files) => {
@@ -87,6 +90,22 @@ export default function CreateProject({ auth, school, schools = [] }) {
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
             handleFiles(e.dataTransfer.files);
         }
+    };
+
+
+    const handleThumbnailChange = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) {
+            showError(t('teacherProjectsCreatePage.errors.fileTooLarge', { name: file.name }));
+            return;
+        }
+        if (!file.type.startsWith('image/')) {
+            showError(t('teacherProjectsCreatePage.errors.fileTypeNotSupported', { name: file.name }));
+            return;
+        }
+        setData('thumbnail', file);
+        setThumbnailPreview(URL.createObjectURL(file));
     };
 
     const handleFileInputChange = (e) => {
@@ -191,6 +210,41 @@ export default function CreateProject({ auth, school, schools = [] }) {
                     {/* Form */}
                     {activeTab === 'upload' && (
                         <form onSubmit={submit} className="bg-white rounded-2xl border border-gray-100 p-6 space-y-6 mt-4">
+                            {/* Cover Image */}
+                            <div>
+                                <InputLabel value={t('teacherProjectsCreatePage.form.coverImageLabel', { defaultValue: 'صورة الغلاف *' })} className="text-sm font-medium text-gray-700 mb-2" />
+                                <div
+                                    onClick={() => thumbnailInputRef.current?.click()}
+                                    className={`relative border-2 border-dashed rounded-2xl cursor-pointer transition overflow-hidden
+                                        ${thumbnailPreview ? 'border-[#A3C042]' : 'border-gray-300 hover:border-[#A3C042]/60'}
+                                    `}
+                                >
+                                    {thumbnailPreview ? (
+                                        <div className="relative">
+                                            <img src={thumbnailPreview} alt="cover" className="w-full h-40 object-cover" />
+                                            <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition">
+                                                <FaImage className="text-white text-3xl" />
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center py-8 text-gray-400">
+                                            <FaImage className="text-4xl mb-2" />
+                                            <p className="text-sm">{t('teacherProjectsCreatePage.form.uploadCoverImage', { defaultValue: 'اضغط لرفع صورة الغلاف' })}</p>
+                                            <p className="text-xs mt-1 text-gray-400">{t('teacherProjectsCreatePage.form.coverImageHint', { defaultValue: 'JPG, PNG — بحد أقصى 5 MB' })}</p>
+                                        </div>
+                                    )}
+                                </div>
+                                <input
+                                    ref={thumbnailInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleThumbnailChange}
+                                    className="hidden"
+                                    required={!thumbnailPreview}
+                                />
+                                <InputError message={errors.thumbnail} className="mt-2" />
+                            </div>
+
                             {/* Title */}
                             <div>
                                 <InputLabel htmlFor="title" value={t('teacherProjectsCreatePage.form.titleLabel')} className="text-sm font-medium text-gray-700 mb-2" />
@@ -345,7 +399,7 @@ export default function CreateProject({ auth, school, schools = [] }) {
                             <div className="flex items-center justify-end pt-4 border-t border-gray-200">
                                 <PrimaryButton
                                     type="submit"
-                                    disabled={processing || !data.title || !data.description}
+                                    disabled={processing || !data.title || !data.description || !data.thumbnail}
                                     className="bg-[#A3C042] hover:bg-[#8CA635] flex items-center gap-2 rounded-xl"
                                 >
                                     {processing ? (
@@ -451,6 +505,41 @@ export default function CreateProject({ auth, school, schools = [] }) {
                         {/* Form */}
                         {activeTab === 'upload' && (
                             <form onSubmit={submit} className="bg-white rounded-2xl border border-gray-100 p-6 space-y-6 mt-4">
+                                {/* Cover Image */}
+                                <div>
+                                    <InputLabel value={t('teacherProjectsCreatePage.form.coverImageLabel', { defaultValue: 'صورة الغلاف *' })} className="text-sm font-medium text-gray-700 mb-2" />
+                                    <div
+                                        onClick={() => thumbnailInputRef.current?.click()}
+                                        className={`relative border-2 border-dashed rounded-2xl cursor-pointer transition overflow-hidden
+                                            ${thumbnailPreview ? 'border-[#A3C042]' : 'border-gray-300 hover:border-[#A3C042]/60'}
+                                        `}
+                                    >
+                                        {thumbnailPreview ? (
+                                            <div className="relative">
+                                                <img src={thumbnailPreview} alt="cover" className="w-full h-40 object-cover" />
+                                                <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition">
+                                                    <FaImage className="text-white text-3xl" />
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center py-8 text-gray-400">
+                                                <FaImage className="text-4xl mb-2" />
+                                                <p className="text-sm">{t('teacherProjectsCreatePage.form.uploadCoverImage', { defaultValue: 'اضغط لرفع صورة الغلاف' })}</p>
+                                                <p className="text-xs mt-1 text-gray-400">{t('teacherProjectsCreatePage.form.coverImageHint', { defaultValue: 'JPG, PNG — بحد أقصى 5 MB' })}</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <input
+                                        ref={thumbnailInputRef}
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleThumbnailChange}
+                                        className="hidden"
+                                        required={!thumbnailPreview}
+                                    />
+                                    <InputError message={errors.thumbnail} className="mt-2" />
+                                </div>
+
                                 {/* Title */}
                                 <div>
                                         <InputLabel htmlFor="title" value={t('teacherProjectsCreatePage.form.titleLabel')} className="text-sm font-medium text-gray-700 mb-2" />
@@ -605,7 +694,7 @@ export default function CreateProject({ auth, school, schools = [] }) {
                                 <div className="flex items-center justify-end pt-4 border-t border-gray-200">
                                     <PrimaryButton
                                         type="submit"
-                                        disabled={processing || !data.title || !data.description}
+                                        disabled={processing || !data.title || !data.description || !data.thumbnail}
                                         className="bg-[#A3C042] hover:bg-[#8CA635] flex items-center gap-2 rounded-xl"
                                     >
                                         {processing ? (

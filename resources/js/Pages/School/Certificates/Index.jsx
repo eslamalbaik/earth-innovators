@@ -11,6 +11,7 @@ import axios from 'axios';
 import { useToast } from '@/Contexts/ToastContext';
 import { toHijriDate } from '@/utils/dateUtils';
 import { downloadFile } from '@/utils/downloadFile';
+import { usePremiumGate } from '@/Hooks/usePremiumGate';
 
 const STATUS_STYLES = {
     approved: 'bg-green-100 text-green-700',
@@ -37,6 +38,10 @@ export default function SchoolCertificatesIndex({
 }) {
     const { t, language } = useTranslation();
     const { showSuccess, showError } = useToast();
+    const { gate, premiumModal, openPremium } = usePremiumGate(membershipSummary, {
+        featureName: t('common.certificates'),
+        requiredAccessKey: 'certificate_access',
+    });
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedRecipient, setSelectedRecipient] = useState(null);
     const [showIssueModal, setShowIssueModal] = useState(false);
@@ -120,7 +125,7 @@ export default function SchoolCertificatesIndex({
 
     const openIssueModal = (recipient, defaultType = 'achievement') => {
         if (!membershipSummary?.certificate_access) {
-            showError(t('schoolCertificatesIndexPage.toasts.accessDenied'));
+            openPremium();
             return;
         }
         if (!certificateSystemReady) {
@@ -221,6 +226,7 @@ export default function SchoolCertificatesIndex({
     return (
         <DashboardLayout auth={auth} header={t('schoolCertificatesIndexPage.title')}>
             <Head title={pageTitle} />
+            {premiumModal}
 
             <div className="space-y-6">
                 <div className="grid gap-4 md:grid-cols-3">
@@ -455,16 +461,16 @@ export default function SchoolCertificatesIndex({
                                 </div>
 
                                 {certificate.download_url && (
-                                    <a
-                                        href={certificate.download_url}
-                                        download
+                                    <button
+                                        type="button"
+                                        onClick={() => gate(() => downloadFile(certificate.download_url, `certificate_${certificate.certificate_number || certificate.id}.pdf`))}
                                         className="rounded-xl bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700 transition hover:bg-blue-100"
                                     >
                                         <span className="inline-flex items-center gap-2">
                                             <FaDownload />
                                             {t('schoolCertificatesIndexPage.actions.download')}
                                         </span>
-                                    </a>
+                                    </button>
                                 )}
                             </div>
                         ))}

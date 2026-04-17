@@ -28,6 +28,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'image',
         'points',
         'school_id',
+        'teacher_id',
         'membership_number',
         'membership_type',
         'account_type',
@@ -368,6 +369,22 @@ class User extends Authenticatable implements MustVerifyEmail
     public function school(): BelongsTo
     {
         return $this->belongsTo(User::class, 'school_id');
+    }
+
+    /**
+     * Primary (assigned) teacher for a student.
+     */
+    public function primaryTeacher(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'teacher_id');
+    }
+
+    /**
+     * Students assigned to this teacher.
+     */
+    public function assignedStudents(): HasMany
+    {
+        return $this->hasMany(User::class, 'teacher_id')->where('role', 'student');
     }
 
     public function students(): HasMany

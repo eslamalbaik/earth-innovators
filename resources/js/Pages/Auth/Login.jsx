@@ -19,17 +19,26 @@ export default function Login({ status, canResetPassword }) {
         email: '',
         password: '',
         remember: false,
-        role: 'student',
+        role: '',
         _token: getCsrfToken(),
     });
 
     const submit = (e) => {
         e.preventDefault();
 
-        transform((formData) => ({
-            ...formData,
-            _token: getCsrfToken(),
-        }));
+        transform((formData) => {
+            const payload = {
+                ...formData,
+                _token: getCsrfToken(),
+            };
+
+            // Only send role when the user explicitly chooses it.
+            if (!payload.role) {
+                delete payload.role;
+            }
+
+            return payload;
+        });
 
         post(route('login'), {
             onFinish: () => reset('password'),

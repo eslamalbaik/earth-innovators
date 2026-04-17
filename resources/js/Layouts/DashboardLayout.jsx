@@ -18,6 +18,7 @@ import { useFlashNotifications } from '@/Hooks/useFlashNotifications';
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
 import { useTranslation } from '@/i18n';
 import WhatsAppSupportButton from '@/Components/Support/WhatsAppSupportButton';
+import TrialBanner from '@/Components/TrialBanner';
 
 export default function DashboardLayout({ children, header }) {
     const { t } = useTranslation();
@@ -677,7 +678,8 @@ export default function DashboardLayout({ children, header }) {
             </aside>
 
             <div className={`transition-all duration-300 ${sidebarOpen ? 'ms-[300px]' : 'ms-0'}`}>
-                <header className={`sticky top-2 z-30 pt-0 mb-2 mx-4 md:mx-6 lg:mx-8"${sidebarOpen ? 'max-w-full' : 'max-w-7xl'}`}>
+                <TrialBanner />
+                <header className={`sticky top-0 z-30 pt-0 mb-2 mx-4 md:mx-6 lg:mx-8"${sidebarOpen ? 'max-w-full' : 'max-w-7xl'}`}>
                     <div className="bg-white rounded-2xl shadow-lg border border-gray-100 backdrop-blur-sm">
                         <div className="flex items-center justify-between px-4 py-2">
                             <div className="flex items-center gap-4">
