@@ -6,11 +6,13 @@ use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Faker\Factory as Faker;
 
 class DemoUsersSeeder extends Seeder
 {
     public function run(): array
     {
+        $faker = Faker::create();
         // Deterministic demo accounts
         $systemSupervisor = User::updateOrCreate(
             ['email' => 'supervisor@demo.com'],
