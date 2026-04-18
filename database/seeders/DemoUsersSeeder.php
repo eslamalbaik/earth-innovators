@@ -6,15 +6,12 @@ use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Faker\Generator as Faker;  // Change this line
 
 class DemoUsersSeeder extends Seeder
 {
-    public function run(Faker $faker): array  // Inject Faker as a parameter
+    public function run(): array  // No Faker parameter needed
     {
-        // Remove this line: $faker = Faker::create();
-        
-        // Deterministic demo accounts
+        // Deterministic demo accounts (same as before, but without Faker)
         $systemSupervisor = User::updateOrCreate(
             ['email' => 'supervisor@demo.com'],
             [
@@ -111,7 +108,7 @@ class DemoUsersSeeder extends Seeder
             );
         }
 
-        // Students linked to the school and assigned to a primary teacher (users.teacher_id)
+        // Students linked to the school - using deterministic values
         $students = [];
         for ($i = 1; $i <= 12; $i++) {
             $assignedTeacherUser = $teacherUsers[($i - 1) % count($teacherUsers)];
@@ -126,8 +123,8 @@ class DemoUsersSeeder extends Seeder
                     'teacher_id' => $assignedTeacherUser->id,
                     'membership_type' => 'basic',
                     'membership_number' => sprintf('S%05d', $i),
-                    'year' => (string) $faker->numberBetween(1, 12),  // Changed fake() to $faker
-                    'points' => $faker->numberBetween(0, 120),  // Changed fake() to $faker
+                    'year' => (string) (($i % 12) + 1),  // Year 1-12
+                    'points' => ($i * 10),  // Points: 10, 20, 30...
                 ]
             );
         }
