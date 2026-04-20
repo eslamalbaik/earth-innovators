@@ -9,12 +9,31 @@ use App\Models\Publication;
 use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\User;
+use Carbon\CarbonInterface;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ProfileService extends BaseService
 {
+    protected function formatDateYmd(mixed $value): ?string
+    {
+        if ($value instanceof CarbonInterface) {
+            return $value->format('Y-m-d');
+        }
+
+        if (is_string($value) && $value !== '') {
+            try {
+                return Carbon::parse($value)->format('Y-m-d');
+            } catch (\Throwable) {
+                return null;
+            }
+        }
+
+        return null;
+    }
+
     public function getProfileData(User $user): array
     {
         $data = [
@@ -91,7 +110,7 @@ class ProfileService extends BaseService
                         'description_ar' => $badge->description_ar,
                         'icon' => $badge->icon,
                         'image' => $badge->image,
-                        'earned_at' => $badge->pivot->earned_at?->format('Y-m-d'),
+                        'earned_at' => $this->formatDateYmd($badge->pivot->earned_at ?? null),
                         'reason' => $badge->pivot->reason,
                     ];
                 });

@@ -1,4 +1,4 @@
-import DashboardLayout from '@/Layouts/DashboardLayout';
+import StudentLayout from '@/Layouts/StudentLayout';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { FaSpinner, FaExclamationTriangle } from 'react-icons/fa';
 import { useEffect, useState } from 'react';
@@ -22,7 +22,7 @@ export default function Payment() {
 
     if (showError || flash?.error) {
         return (
-            <DashboardLayout header={t('studentPaymentPage.errorHeader')}>
+            <StudentLayout title={t('studentPaymentPage.errorHeader')} activeNav="profile">
                 <Head title={t('studentPaymentPage.errorHeader')} />
                 <div className="max-w-2xl mx-auto">
                     <div className="bg-white rounded-xl shadow-lg p-8 text-center space-y-4">
@@ -75,12 +75,12 @@ export default function Payment() {
                         </div>
                     </div>
                 </div>
-            </DashboardLayout>
+            </StudentLayout>
         );
     }
 
     return (
-        <DashboardLayout header={t('studentPaymentPage.redirectHeader')}>
+        <StudentLayout title={t('studentPaymentPage.redirectHeader')} activeNav="profile">
             <Head title={t('studentPaymentPage.redirectHeader')} />
             <div className="max-w-2xl mx-auto">
                 <div className="bg-white rounded-xl shadow-lg p-8 text-center space-y-4">
@@ -95,6 +95,6 @@ export default function Payment() {
                     </p>
                 </div>
             </div>
-        </DashboardLayout>
+        </StudentLayout>
     );
 }

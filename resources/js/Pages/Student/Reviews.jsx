@@ -1,4 +1,4 @@
-import DashboardLayout from '@/Layouts/DashboardLayout';
+import StudentLayout from '@/Layouts/StudentLayout';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import {
@@ -157,7 +157,7 @@ export default function StudentReviews({ reviews, reviewableBookings, stats }) {
     }, [flash, language]);
 
     return (
-        <DashboardLayout header="تقييماتي">
+        <StudentLayout title="تقييماتي" activeNav="profile">
             <Head title="تقييماتي" />
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
@@ -627,6 +627,6 @@ export default function StudentReviews({ reviews, reviewableBookings, stats }) {
                     </div>
                 </div>
             )}
-        </DashboardLayout>
+        </StudentLayout>
     );
 }

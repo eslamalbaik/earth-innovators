@@ -1,4 +1,4 @@
-import DashboardLayout from '@/Layouts/DashboardLayout';
+import StudentLayout from '@/Layouts/StudentLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { useTranslation } from '@/i18n';
@@ -54,7 +54,7 @@ export default function StudentSubjects({ studentSubjects, allSubjects }) {
     };
 
     return (
-        <DashboardLayout header={t('studentSubjectsPage.title')}>
+        <StudentLayout title={t('studentSubjectsPage.title')} activeNav="home">
             <Head title={t('studentSubjectsPage.pageTitle', { appName: t('common.appName') })} />
             <div className="mb-6 flex items-center justify-between flex-wrap gap-4">
                 <div>
@@ -304,7 +304,6 @@ export default function StudentSubjects({ studentSubjects, allSubjects }) {
                     </div>
                 </div>
             )}
-        </DashboardLayout>
+        </StudentLayout>
     );
 }
-

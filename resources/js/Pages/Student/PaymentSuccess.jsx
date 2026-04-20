@@ -1,4 +1,4 @@
-import DashboardLayout from '@/Layouts/DashboardLayout';
+import StudentLayout from '@/Layouts/StudentLayout';
 import { Head, Link } from '@inertiajs/react';
 import { FaCheckCircle, FaPrint, FaTimes } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
@@ -16,7 +16,7 @@ export default function PaymentSuccess({ payment }) {
     }, []);
 
     return (
-        <DashboardLayout header={t('studentPaymentPage.successHeader')}>
+        <StudentLayout title={t('studentPaymentPage.successHeader')} activeNav="profile">
             <Head title={t('studentPaymentPage.successHeader')} />
 
             {showToast && (
@@ -90,6 +90,6 @@ export default function PaymentSuccess({ payment }) {
                     </div>
                 </div>
             </div>
-        </DashboardLayout>
+        </StudentLayout>
     );
 }

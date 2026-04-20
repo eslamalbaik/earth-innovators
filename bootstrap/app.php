@@ -56,6 +56,12 @@ return Application::configure(basePath: dirname(__DIR__))
                 $request->session()->regenerateToken();
             }
 
+            // Inertia requests (XHR) should force a full page reload so the new CSRF token is picked up
+            // and the SPA doesn't get stuck in a repeated 419 loop.
+            if ($request->header('X-Inertia')) {
+                return response('', 409)->header('X-Inertia-Location', $request->fullUrl());
+            }
+
             if ($request->expectsJson()) {
                 return response()->json([
                     'message' => 'Session expired. Please refresh and try again.',

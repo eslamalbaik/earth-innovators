@@ -1,4 +1,4 @@
-import DashboardLayout from '@/Layouts/DashboardLayout';
+import StudentLayout from '@/Layouts/StudentLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import { useTranslation } from '@/i18n';
@@ -123,7 +123,7 @@ export default function StudentBookings({ bookings, auth }) {
     };
 
     return (
-        <DashboardLayout header={t('studentBookingsPage.title')}>
+        <StudentLayout title={t('studentBookingsPage.title')} activeNav="profile">
             <Head title={t('studentBookingsPage.pageTitle', { appName: t('common.appName') })} />
             
             {showError && errorMessage && (
@@ -369,6 +369,6 @@ export default function StudentBookings({ bookings, auth }) {
                     </div>
                 </div>
             )}
-        </DashboardLayout>
+        </StudentLayout>
     );
 }

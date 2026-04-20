@@ -1,4 +1,4 @@
-import DashboardLayout from '@/Layouts/DashboardLayout';
+import StudentLayout from '@/Layouts/StudentLayout';
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import {
@@ -184,7 +184,7 @@ export default function StudentPayments({ payments, stats, filters }) {
     };
 
     return (
-        <DashboardLayout header={t('studentPaymentsPage.title')}>
+        <StudentLayout title={t('studentPaymentsPage.title')} activeNav="profile">
             <Head title={t('studentPaymentsPage.pageTitle', { appName: t('common.appName') })} />
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
@@ -393,6 +393,6 @@ export default function StudentPayments({ payments, stats, filters }) {
                     </div>
                 )}
             </div>
-        </DashboardLayout>
+        </StudentLayout>
     );
 }

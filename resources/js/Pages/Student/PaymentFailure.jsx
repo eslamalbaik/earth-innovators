@@ -1,4 +1,4 @@
-import DashboardLayout from '@/Layouts/DashboardLayout';
+import StudentLayout from '@/Layouts/StudentLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { FaTimes, FaRedo } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
@@ -16,7 +16,7 @@ export default function PaymentFailure({ payment }) {
     }, []);
 
     return (
-        <DashboardLayout header={t('studentPaymentPage.failureHeader')}>
+        <StudentLayout title={t('studentPaymentPage.failureHeader')} activeNav="profile">
             <Head title={t('studentPaymentPage.failureHeader')} />
 
             {showToast && (
@@ -67,6 +67,6 @@ export default function PaymentFailure({ payment }) {
                     </div>
                 </div>
             </div>
-        </DashboardLayout>
+        </StudentLayout>
     );
 }

@@ -1,5 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
-import DashboardLayout from '../../../Layouts/DashboardLayout';
+import StudentLayout from '@/Layouts/StudentLayout';
 import {
     FaArrowLeft,
     FaFile,
@@ -71,10 +71,16 @@ export default function StudentChallengeSubmissionShow({ auth, challenge, submis
     };
 
     return (
-        <DashboardLayout auth={auth}>
+        <StudentLayout
+            auth={auth}
+            title={challenge?.title || 'Submission Details'}
+            activeNav="challenges"
+            onBack={() => window.history.back()}
+            desktopMainClassName="mx-auto w-full max-w-4xl px-4 pb-24 pt-4"
+        >
             <Head title={`حالة التقديم - ${challenge?.title || 'التحدي'}`} />
 
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="py-4 sm:px-2 lg:px-0">
                 {/* Back Button */}
                 <div className="mb-6">
                     <Link
@@ -215,7 +221,6 @@ export default function StudentChallengeSubmissionShow({ auth, challenge, submis
                     </div>
                 )}
             </div>
-        </DashboardLayout>
+        </StudentLayout>
     );
 }
-

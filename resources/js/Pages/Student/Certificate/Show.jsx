@@ -1,5 +1,5 @@
 ﻿import { Head, Link, router } from '@inertiajs/react';
-import { FaDownload, FaPrint, FaShare, FaCertificate, FaCalendarAlt, FaProjectDiagram, FaMedal, FaLock } from 'react-icons/fa';
+import { FaDownload, FaPrint, FaShare, FaCalendarAlt, FaProjectDiagram, FaMedal, FaLock } from 'react-icons/fa';
 import { usePremiumGate } from '@/Hooks/usePremiumGate';
 import MobileAppLayout from '@/Layouts/MobileAppLayout';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
