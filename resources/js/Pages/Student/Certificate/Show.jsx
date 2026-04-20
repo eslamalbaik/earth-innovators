@@ -12,7 +12,7 @@ import { downloadFile } from '@/utils/downloadFile';
 export default function StudentCertificateShow({ auth, user, stats, certificate, membershipSummary = null }) {
     const { t, language } = useTranslation();
     const { showError } = useToast();
-    const { gate, premiumModal } = usePremiumGate(membershipSummary, {
+    const { gate, canAccess, premiumModal } = usePremiumGate(membershipSummary, {
         featureName: t('common.certificates'),
         requiredAccessKey: 'certificate_access',
     });
