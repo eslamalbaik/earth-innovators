@@ -1,5 +1,6 @@
 ﻿import { Head, Link, router } from '@inertiajs/react';
 import { FaDownload, FaPrint, FaShare, FaCalendarAlt, FaProjectDiagram, FaMedal, FaLock } from 'react-icons/fa';
+import { useRef } from 'react';
 import { usePremiumGate } from '@/Hooks/usePremiumGate';
 import MobileAppLayout from '@/Layouts/MobileAppLayout';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
@@ -7,7 +8,7 @@ import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import DesktopFooter from '@/Components/Mobile/DesktopFooter';
 import { useTranslation } from '@/i18n';
 import { useToast } from '@/Contexts/ToastContext';
-import { downloadFile } from '@/utils/downloadFile';
+import { downloadElementAsImage } from '@/utils/downloadElementAsImage';
 
 export default function StudentCertificateShow({ auth, user, stats, certificate, membershipSummary = null }) {
     const { t, language } = useTranslation();
@@ -18,18 +19,17 @@ export default function StudentCertificateShow({ auth, user, stats, certificate,
     });
     const isAuthed = !!auth?.user;
     const currentUser = auth?.user;
+    const certificateRef = useRef(null);
 
     const handleDownload = async () => {
         gate(async () => {
-            if (certificate?.download_url) {
-                try {
-                    await downloadFile(
-                        certificate.download_url,
-                        `certificate_${certificate?.certificate_number || user?.membership_number || 'student'}.pdf`
-                    );
-                } catch (error) {
-                    showError(t('errors.somethingWentWrong'));
-                }
+            try {
+                await downloadElementAsImage(
+                    certificateRef.current,
+                    `certificate_${certificate?.certificate_number || user?.membership_number || 'student'}.png`
+                );
+            } catch (error) {
+                showError(t('errors.somethingWentWrong'));
             }
         });
     };
@@ -165,7 +165,7 @@ export default function StudentCertificateShow({ auth, user, stats, certificate,
                                 <h2 className="text-base font-bold text-gray-900 mb-4 no-print">{t('studentCertificateShowPage.certificate.title')}</h2>
 
                                 {/* Certificate Display */}
-                                <div className="certificate-print bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-4 relative">
+                                <div ref={certificateRef} className="certificate-print bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-4 relative">
                                     <div className="bg-white rounded-xl p-4">
                                         {/* Certificate Header with Logo */}
                                         <div className="flex items-center justify-between mb-4">
@@ -328,7 +328,7 @@ export default function StudentCertificateShow({ auth, user, stats, certificate,
                                     <h2 className="text-xl font-bold text-gray-900 mb-6 no-print">{t('studentCertificateShowPage.certificate.title')}</h2>
 
                                     {/* Certificate Display */}
-                                    <div className="certificate-print bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-6 relative">
+                                    <div ref={certificateRef} className="certificate-print bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-6 relative">
                                         <div className="bg-white rounded-xl p-8">
                                             {/* Certificate Header with Logo */}
                                             <div className="flex items-center justify-between mb-6">

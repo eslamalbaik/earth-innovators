@@ -205,12 +205,14 @@ export default function MySubscriptions({ auth, subscriptions = [], membershipSu
                 <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
                     <FaBox className="mx-auto text-4xl text-gray-300 mb-3" />
                     <p className="text-sm text-gray-500 mb-4">{t('mySubscriptionsPage.empty')}</p>
-                    <button
-                        onClick={() => router.visit('/packages')}
-                        className="px-4 py-2 bg-[#A3C042] text-white rounded-xl hover:bg-[#8CA635] transition text-sm font-semibold"
-                    >
-                        {t('mySubscriptionsPage.actions.browsePackages')}
-                    </button>
+                    {membershipSummary?.packages_available !== false && (
+                        <button
+                            onClick={() => router.visit('/packages')}
+                            className="px-4 py-2 bg-[#A3C042] text-white rounded-xl hover:bg-[#8CA635] transition text-sm font-semibold"
+                        >
+                            {t('mySubscriptionsPage.actions.browsePackages')}
+                        </button>
+                    )}
                 </div>
             )}
 

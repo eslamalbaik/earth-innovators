@@ -10,6 +10,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class ChallengeSubmissionService extends BaseService
 {
@@ -99,6 +100,25 @@ class ChallengeSubmissionService extends BaseService
             ]);
 
             $challenge->student_submission = $challenge->submissions->first();
+
+            if ($challenge->student_submission && is_array($challenge->student_submission->files)) {
+                $challenge->student_submission->file_urls = collect($challenge->student_submission->files)
+                    ->filter()
+                    ->map(function ($filePath) {
+                        if (!is_string($filePath)) {
+                            return null;
+                        }
+
+                        if (Str::startsWith($filePath, ['http://', 'https://', '/storage/'])) {
+                            return $filePath;
+                        }
+
+                        return '/storage/' . ltrim($filePath, '/');
+                    })
+                    ->filter()
+                    ->values()
+                    ->all();
+            }
         }
 
         return $challenge;
@@ -386,4 +406,3 @@ class ChallengeSubmissionService extends BaseService
         }
     }
 }
-

@@ -125,6 +125,18 @@ class PackageController extends Controller
     }
 
     /**
+     * Display the specified package.
+     * Redirects to the edit page as there is no specific show view.
+     * 
+     * @param Package $package
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function show(Package $package)
+    {
+        return redirect()->route('admin.packages.edit', $package->id);
+    }
+
+    /**
      * Show the form for editing a package
      * 
      * @param Package $package

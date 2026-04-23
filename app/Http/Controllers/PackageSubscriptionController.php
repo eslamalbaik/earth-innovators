@@ -59,7 +59,7 @@ class PackageSubscriptionController extends Controller
             $activeSubscription = $this->packagePaymentService->getActiveSubscription($user);
             $membershipSummary = app(MembershipAccessService::class)->getMembershipSummary($user);
 
-            if ($activeSubscription) {
+            if ($activeSubscription && $activeSubscription->package) {
                 $userPackage = [
                     'id' => $activeSubscription->id,
                     'package_id' => $activeSubscription->package->id,
@@ -77,7 +77,7 @@ class PackageSubscriptionController extends Controller
                 // Show the latest pending subscription to avoid "processing..." without feedback
                 $pending = $this->packagePaymentService->getLatestPendingSubscription(Auth::user());
 
-                if ($pending) {
+                if ($pending && $pending->package) {
                     $userPackage = [
                         'id' => $pending->id,
                         'package_id' => $pending->package->id,
@@ -193,6 +193,7 @@ class PackageSubscriptionController extends Controller
             ->with(['package', 'payments' => fn ($q) => $q->where('status', 'completed')->latest()->limit(1)])
             ->orderBy('created_at', 'desc')
             ->get()
+            ->filter(fn ($subscription) => $subscription->package !== null)
             ->map(function ($subscription) {
                 $completedPayment = $subscription->payments->first();
 

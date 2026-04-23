@@ -1,6 +1,7 @@
 import { FaBell, FaArrowRight, FaHome, FaFolderOpen, FaCompass, FaTrophy, FaBook, FaMedal, FaUser, FaSignOutAlt, FaChevronDown, FaTachometerAlt, FaArrowLeft } from 'react-icons/fa';
 import { Link, usePage, router } from '@inertiajs/react';
 import { useState, useRef, useEffect } from 'react';
+import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { getUserImageUrl, getInitials, getColorFromName } from '@/utils/imageUtils';
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
@@ -39,6 +40,39 @@ export default function MobileTopBar({
     const [navMenuOpen, setNavMenuOpen] = useState(false);
     const userMenuRef = useRef(null);
     const navMenuRef = useRef(null);
+    const notificationsMobileRef = useRef(null);
+    const notificationsDesktopRef = useRef(null);
+    const [notificationsOpen, setNotificationsOpen] = useState(false);
+    const [notifications, setNotifications] = useState([]);
+    const [unreadCountState, setUnreadCountState] = useState(unreadCount || 0);
+
+    useEffect(() => {
+        if (isAuthed) {
+            fetchNotifications();
+        }
+    }, [isAuthed]);
+
+    const fetchNotifications = async () => {
+        try {
+            const response = await axios.get('/notifications');
+            setNotifications(response.data.notifications || []);
+            setUnreadCountState(response.data.unread_count || 0);
+        } catch (error) { }
+    };
+
+    const markAsRead = async (notificationId) => {
+        try {
+            await axios.post(`/notifications/${notificationId}/read`);
+            fetchNotifications();
+        } catch (error) { }
+    };
+
+    const markAllAsRead = async () => {
+        try {
+            await axios.post('/notifications/mark-all-read');
+            fetchNotifications();
+        } catch (error) { }
+    };
 
     // Close menus when clicking outside
     useEffect(() => {
@@ -49,16 +83,90 @@ export default function MobileTopBar({
             if (navMenuRef.current && !navMenuRef.current.contains(event.target)) {
                 setNavMenuOpen(false);
             }
+            if (
+                (notificationsMobileRef.current && notificationsMobileRef.current.contains(event.target)) ||
+                (notificationsDesktopRef.current && notificationsDesktopRef.current.contains(event.target))
+            ) {
+                // do nothing if inside
+            } else {
+                setNotificationsOpen(false);
+            }
         };
 
-        if (userMenuOpen || navMenuOpen) {
+        if (userMenuOpen || navMenuOpen || notificationsOpen) {
             document.addEventListener('mousedown', handleClickOutside);
         }
 
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [userMenuOpen, navMenuOpen]);
+    }, [userMenuOpen, navMenuOpen, notificationsOpen]);
+
+    const renderNotificationsDropdown = () => {
+        if (!notificationsOpen) return null;
+
+        return (
+            <div className="absolute end-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden flex flex-col">
+                <div className="px-4 py-3 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between rounded-t-2xl">
+                    <h3 className="font-bold text-gray-900">{t('notifications.title')}</h3>
+                    {unreadCountState > 0 && (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                markAllAsRead();
+                            }}
+                            className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                        >
+                            {t('notifications.markAllRead')}
+                        </button>
+                    )}
+                </div>
+                <div className="overflow-y-auto flex-1 max-h-[60vh] md:max-h-96">
+                    {notifications.length > 0 ? (
+                        <div className="divide-y divide-gray-100">
+                            {notifications.map((notification) => (
+                                <div
+                                    key={notification.id}
+                                    className={`px-4 py-3 hover:bg-gray-50 transition cursor-pointer border-l-4 ${!notification.read_at
+                                        ? 'bg-blue-50 border-blue-400'
+                                        : 'border-transparent'
+                                        }`}
+                                    onClick={() => {
+                                        if (!notification.read_at) {
+                                            markAsRead(notification.id);
+                                        }
+                                        router.visit('/notifications');
+                                        setNotificationsOpen(false);
+                                    }}
+                                >
+                                    <p className="text-sm text-gray-800 font-medium whitespace-break-spaces">
+                                        {notification.data?.message_ar || notification.data?.message || t('notifications.newNotification')}
+                                    </p>
+                                    <p className="text-xs text-gray-500 mt-1">{notification.created_at_human || '...'}</p>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="p-8 text-center text-gray-500">
+                            <FaBell className="mx-auto text-3xl mb-3 text-gray-300" />
+                            <p className="text-sm">{t('notifications.empty')}</p>
+                        </div>
+                    )}
+                </div>
+                <div className="p-3 border-t border-gray-100 bg-gray-50">
+                    <button
+                        onClick={() => {
+                            router.visit('/notifications');
+                            setNotificationsOpen(false);
+                        }}
+                        className="w-full text-center text-sm font-bold text-blue-600 hover:text-blue-700 p-2"
+                    >
+                        {t('common.viewAll')}
+                    </button>
+                </div>
+            </div>
+        );
+    };
 
     const handleLogout = () => {
         router.post('/logout');
@@ -150,19 +258,22 @@ export default function MobileTopBar({
                     <div className="text-center flex-1 flex items-center justify-center gap-2">
                         <div className="text-sm font-bold text-[#A3C042]">{title}</div>
                     </div>
-                    <button
-                        type="button"
-                        onClick={onNotifications}
-                        className="relative h-10 w-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center hover:bg-gray-100 transition"
-                        aria-label={t('common.notifications')}
-                    >
-                        <RightIcon className="text-gray-700" />
-                        {unreadCount > 0 && (
-                            <span className="absolute -top-1 -left-1 min-w-5 h-5 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
-                                {unreadCount > 9 ? '9+' : unreadCount}
-                            </span>
-                        )}
-                    </button>
+                    <div className="relative" ref={notificationsMobileRef}>
+                        <button
+                            type="button"
+                            onClick={() => setNotificationsOpen(!notificationsOpen)}
+                            className="relative h-10 w-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center hover:bg-gray-100 transition"
+                            aria-label={t('common.notifications')}
+                        >
+                            <RightIcon className="text-gray-700" />
+                            {unreadCountState > 0 && (
+                                <span className="absolute -top-1 -left-1 min-w-5 h-5 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+                                    {unreadCountState > 9 ? '9+' : unreadCountState}
+                                </span>
+                            )}
+                        </button>
+                        {renderNotificationsDropdown()}
+                    </div>
                     <div className="ms-1">
                         <LanguageSwitcher />
                     </div>
@@ -205,8 +316,8 @@ export default function MobileTopBar({
                                     key={item.key}
                                     href={item.href}
                                     className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${isActive
-                                            ? 'bg-[#A3C042]/10 text-[#A3C042] border border-[#A3C042]/20'
-                                            : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                                        ? 'bg-[#A3C042]/10 text-[#A3C042] border border-[#A3C042]/20'
+                                        : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                                         }`}
                                 >
                                     <span>{item.label}</span>
@@ -222,19 +333,22 @@ export default function MobileTopBar({
 
                         {/* Notifications */}
                         {isAuthed && (
-                            <button
-                                type="button"
-                                onClick={onNotifications}
-                                className="relative h-10 w-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center hover:bg-gray-100 hover:border-gray-300 transition group"
-                        aria-label={t('common.notifications')}
-                            >
-                                <RightIcon className="text-gray-600 group-hover:text-[#A3C042] transition" />
-                                {unreadCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1.5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center border-2 border-white">
-                                        {unreadCount > 9 ? '9+' : unreadCount}
-                                    </span>
-                                )}
-                            </button>
+                            <div className="relative" ref={notificationsDesktopRef}>
+                                <button
+                                    type="button"
+                                    onClick={() => setNotificationsOpen(!notificationsOpen)}
+                                    className="relative h-10 w-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center hover:bg-gray-100 hover:border-gray-300 transition group"
+                                    aria-label={t('common.notifications')}
+                                >
+                                    <RightIcon className="text-gray-600 group-hover:text-[#A3C042] transition" />
+                                    {unreadCountState > 0 && (
+                                        <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1.5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center border-2 border-white">
+                                            {unreadCountState > 9 ? '9+' : unreadCountState}
+                                        </span>
+                                    )}
+                                </button>
+                                {renderNotificationsDropdown()}
+                            </div>
                         )}
 
                         {/* User Menu */}

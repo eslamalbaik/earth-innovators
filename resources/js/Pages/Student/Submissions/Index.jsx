@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { useMemo } from 'react';
-import { FaChevronRight, FaClipboardList, FaStar, FaTasks } from 'react-icons/fa';
+import { FaChevronLeft, FaClipboardList, FaStar, FaTasks } from 'react-icons/fa';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import { useTranslation } from '@/i18n';
@@ -25,7 +25,17 @@ export default function StudentSubmissionsIndex({ auth, submissions, filterStatu
             preserveScroll: true,
         });
     };
-
+    const formatDate = (dateStr) => {
+        const date = new Date(dateStr);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        let hours = date.getHours();
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12;
+        return `${day}-${month}-${year} ${hours}:${minutes} ${ampm}`;
+    };
     const SubmissionsContent = () => (
         <div className="space-y-4">
             <div className="rounded-2xl border border-indigo-100 bg-indigo-50/70 p-4">
@@ -42,11 +52,10 @@ export default function StudentSubmissionsIndex({ auth, submissions, filterStatu
                         key={key}
                         type="button"
                         onClick={() => applyFilter(key)}
-                        className={`rounded-full px-3 py-1.5 text-xs font-semibold border transition ${
-                            filterStatus === key
+                        className={`rounded-full px-3 py-1.5 text-xs font-semibold border transition ${filterStatus === key
                                 ? 'border-[#A3C042] bg-[#A3C042] text-white'
                                 : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
-                        }`}
+                            }`}
                     >
                         {t(`studentSubmissionsPage.filters.${key}`)}
                     </button>
@@ -80,7 +89,7 @@ export default function StudentSubmissionsIndex({ auth, submissions, filterStatu
                                         </div>
                                         <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-gray-500">
                                             {row.submitted_at && (
-                                                <span>{t('studentSubmissionsPage.submittedAt')}: {row.submitted_at}</span>
+                                                <span>{t('studentSubmissionsPage.submittedAt')}: {formatDate(row.submitted_at)}</span>
                                             )}
                                             {row.rating != null && Number(row.rating) > 0 && (
                                                 <span className="inline-flex items-center gap-1 text-amber-700">
@@ -90,7 +99,7 @@ export default function StudentSubmissionsIndex({ auth, submissions, filterStatu
                                             )}
                                         </div>
                                     </div>
-                                    <FaChevronRight className="mt-1 flex-shrink-0 text-gray-300" />
+                                    <FaChevronLeft className="mt-1 flex-shrink-0 text-gray-300" />
                                 </button>
                             </li>
                         );
@@ -118,11 +127,10 @@ export default function StudentSubmissionsIndex({ auth, submissions, filterStatu
                             <Link
                                 key={index}
                                 href={link.url || '#'}
-                                className={`rounded-xl px-3 py-2 text-sm font-semibold transition ${
-                                    link.active
+                                className={`rounded-xl px-3 py-2 text-sm font-semibold transition ${link.active
                                         ? 'bg-[#A3C042] text-white'
                                         : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-                                } ${!link.url ? 'cursor-not-allowed opacity-50' : ''}`}
+                                    } ${!link.url ? 'cursor-not-allowed opacity-50' : ''}`}
                                 dangerouslySetInnerHTML={{ __html: link.label }}
                             />
                         ))}

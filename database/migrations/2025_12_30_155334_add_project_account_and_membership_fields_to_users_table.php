@@ -49,6 +49,18 @@ return new class extends Migration
             Schema::table('users', function (Blueprint $table) {
                 $table->dropColumn(['membership_type', 'account_type']);
             });
+
+            DB::table('users')
+                ->where('role', 'system_supervisor')
+                ->update(['role' => 'admin']);
+
+            DB::table('users')
+                ->where('role', 'school_support_coordinator')
+                ->update(['role' => 'admin']);
+
+            DB::table('users')
+                ->where('role', 'educational_institution')
+                ->update(['role' => 'school']);
             
             // إرجاع enum role كما كان
             DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('student', 'teacher', 'school', 'admin') DEFAULT 'student'");

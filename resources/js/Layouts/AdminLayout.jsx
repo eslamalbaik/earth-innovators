@@ -91,12 +91,14 @@ export default function AdminLayout({ children, title = null }) {
                                 >
                                     <FaCog className="h-5 w-5" />
                                 </a>
-                                <a
+                                <Link
                                     href="/logout"
+                                    method="post"
+                                    as="button"
                                     className="text-gray-500 hover:text-gray-700"
                                 >
                                     <FaSignOutAlt className="h-5 w-5" />
-                                </a>
+                                </Link>
                             </div>
                         </div>
                     </div>

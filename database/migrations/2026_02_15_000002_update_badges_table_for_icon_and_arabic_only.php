@@ -22,6 +22,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        // Fix for MySQL strict mode: convert NULL to empty string before setting NOT NULL
+        \Illuminate\Support\Facades\DB::table('badges')->whereNull('description')->update(['description' => '']);
+        \Illuminate\Support\Facades\DB::table('badges')->whereNull('description_ar')->update(['description_ar' => '']);
+
         Schema::table('badges', function (Blueprint $table) {
             $table->text('description')->nullable(false)->change();
             $table->text('description_ar')->nullable(false)->change();

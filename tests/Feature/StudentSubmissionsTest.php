@@ -10,6 +10,7 @@ use App\Services\SubmissionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
 class StudentSubmissionsTest extends TestCase
@@ -141,6 +142,23 @@ class StudentSubmissionsTest extends TestCase
         Storage::disk('public')->assertExists($submission->files[0]);
     }
 
+    public function test_get_request_to_submission_store_route_redirects_instead_of_throwing_405(): void
+    {
+        $student = User::factory()->create(['role' => 'student']);
+        $owner = User::factory()->create(['role' => 'teacher']);
+        $project = Project::factory()->create([
+            'user_id' => $owner->id,
+            'status' => 'approved',
+        ]);
+
+        $response = $this->actingAs($student)
+            ->from('/student/projects/create')
+            ->get("/projects/{$project->id}/submissions");
+
+        $response->assertRedirect('/student/projects/create');
+        $response->assertSessionHasErrors(['error']);
+    }
+
     public function test_submission_evaluation_awards_badges_and_updates_submission_status(): void
     {
         $student = User::factory()->create(['role' => 'student']);
@@ -179,5 +197,30 @@ class StudentSubmissionsTest extends TestCase
             'badge_id' => $badge->id,
             'project_id' => $project->id,
         ]);
+    }
+
+    public function test_student_project_show_exposes_submission_file_urls(): void
+    {
+        $student = User::factory()->create(['role' => 'student']);
+        $owner = User::factory()->create(['role' => 'teacher']);
+        $project = Project::factory()->create([
+            'user_id' => $owner->id,
+            'status' => 'approved',
+        ]);
+
+        ProjectSubmission::factory()->create([
+            'project_id' => $project->id,
+            'student_id' => $student->id,
+            'status' => 'submitted',
+            'files' => ['project-submissions/files/demo-report.pdf'],
+        ]);
+
+        $response = $this->actingAs($student)->get("/student/projects/{$project->id}");
+
+        $response->assertOk();
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Student/Projects/Show')
+            ->where('existingSubmission.file_urls.0', '/storage/project-submissions/files/demo-report.pdf')
+        );
     }
 }

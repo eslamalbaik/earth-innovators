@@ -83,8 +83,8 @@ class PackageModelTest extends TestCase
             'price' => 100.50,
         ]);
 
-        $this->assertIsFloat($package->price);
-        $this->assertEquals(100.50, $package->price);
+        $this->assertIsString($package->price);
+        $this->assertSame('100.50', $package->price);
     }
 
     /**
@@ -168,7 +168,6 @@ class PackageModelTest extends TestCase
         $this->assertEquals('active', $packageUser->pivot->status);
     }
 }
-
 
 
 

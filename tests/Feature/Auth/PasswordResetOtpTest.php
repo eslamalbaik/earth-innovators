@@ -11,6 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cache;
+use Mockery;
 use Tests\TestCase;
 use App\Mail\OtpMail;
 
@@ -287,6 +288,23 @@ class PasswordResetOtpTest extends TestCase
         ]);
 
         $blockedResponse->assertSessionHasErrors(['email']);
+    }
+
+    public function test_email_delivery_failure_returns_friendly_validation_error(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'delivery-failure@example.com',
+        ]);
+
+        $mock = Mockery::mock(EmailService::class);
+        $mock->shouldReceive('send')->once()->andReturnFalse();
+        $this->app->instance(EmailService::class, $mock);
+
+        $response = $this->post('/forgot-password', [
+            'email' => $user->email,
+        ]);
+
+        $response->assertSessionHasErrors(['email']);
     }
 
     /**

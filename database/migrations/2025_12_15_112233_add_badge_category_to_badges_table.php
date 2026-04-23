@@ -21,8 +21,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('badges', function (Blueprint $table) {
-            $table->dropColumn('badge_category');
-        });
+        if (Schema::hasColumn('badges', 'badge_category')) {
+            Schema::table('badges', function (Blueprint $table) {
+                $table->dropColumn('badge_category');
+            });
+        }
     }
 };

@@ -69,7 +69,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                 }
             });
         }
-    }, []);
+    }, [schools, router]);
 
     // Update selectAll when selectedUsers changes
     useEffect(() => {
@@ -304,8 +304,8 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                     type="text"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
-                                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                                placeholder={t('adminUsersIndexPage.searchPlaceholder')}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                                    placeholder={t('adminUsersIndexPage.searchPlaceholder')}
                                     className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
                             </div>

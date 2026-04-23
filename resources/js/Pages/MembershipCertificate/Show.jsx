@@ -1,12 +1,13 @@
 import { Head, router } from '@inertiajs/react';
 import { FaDownload, FaCertificate, FaCheckCircle, FaTimesCircle, FaTrophy } from 'react-icons/fa';
+import { useRef } from 'react';
 import MobileAppLayout from '@/Layouts/MobileAppLayout';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import DesktopFooter from '@/Components/Mobile/DesktopFooter';
 import { useTranslation } from '@/i18n';
 import { useToast } from '@/Contexts/ToastContext';
-import { downloadFile } from '@/utils/downloadFile';
+import { downloadElementAsImage } from '@/utils/downloadElementAsImage';
 import { usePremiumGate } from '@/Hooks/usePremiumGate';
 
 export default function MembershipCertificateShow({ auth, certificate, eligibility, user, membershipSummary = null }) {
@@ -18,17 +19,18 @@ export default function MembershipCertificateShow({ auth, certificate, eligibili
     });
     const isAuthed = !!auth?.user;
     const currentUser = auth?.user;
+    const certificateRef = useRef(null);
 
     const handleDownload = async () => {
         gate(async () => {
-            if (!certificate?.download_url) {
+            if (!certificateRef.current) {
                 return;
             }
 
             try {
-                await downloadFile(
-                    certificate.download_url,
-                    `certificate_${certificate.certificate_number || user?.membership_number || 'membership'}.pdf`
+                await downloadElementAsImage(
+                    certificateRef.current,
+                    `certificate_${certificate.certificate_number || user?.membership_number || 'membership'}.png`
                 );
             } catch (error) {
                 showError(t('errors.somethingWentWrong'));
@@ -166,7 +168,7 @@ export default function MembershipCertificateShow({ auth, certificate, eligibili
                     <div className="space-y-4">
                         {certificate ? (
                             <>
-                                <div className="bg-gradient-to-br from-[#A3C042] to-[#8CA635] rounded-2xl p-6 text-white text-center shadow-lg">
+                                <div ref={certificateRef} className="bg-gradient-to-br from-[#A3C042] to-[#8CA635] rounded-2xl p-6 text-white text-center shadow-lg">
                                     <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
                                         <FaCertificate className="text-4xl" />
                                     </div>
@@ -265,7 +267,7 @@ export default function MembershipCertificateShow({ auth, certificate, eligibili
                     <div className="space-y-6">
                         {certificate ? (
                             <>
-                                <div className="bg-gradient-to-br from-[#A3C042] to-[#8CA635] rounded-2xl p-8 text-white text-center shadow-lg">
+                                <div ref={certificateRef} className="bg-gradient-to-br from-[#A3C042] to-[#8CA635] rounded-2xl p-8 text-white text-center shadow-lg">
                                     <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
                                         <FaCertificate className="text-5xl" />
                                     </div>
@@ -361,4 +363,3 @@ export default function MembershipCertificateShow({ auth, certificate, eligibili
         </div>
     );
 }
-

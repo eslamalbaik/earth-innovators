@@ -395,6 +395,7 @@ export default function DashboardLayout({ children, header }) {
                 href: '/admin/challenges',
                 icon: FaCalendar,
                 subItems: [
+                    { name: t('sidebar.challenges'), href: '/admin/challenges', icon: FaCalendar },
                     { name: t('sidebar.challengeSuggestions'), href: '/admin/challenge-suggestions', icon: FaLightbulb },
                 ]
             },

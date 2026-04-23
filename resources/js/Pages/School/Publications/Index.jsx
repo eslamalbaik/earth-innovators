@@ -128,6 +128,13 @@ export default function SchoolPublicationsIndex({ auth, publications, stats, fil
                         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                             <div className="flex gap-2">
                                 <Link
+                                    href={route('school.publications.pending')}
+                                    className="inline-flex items-center gap-2 px-6 py-3 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition shadow-sm"
+                                >
+                                    <FaBook />
+                                    {language === 'ar' ? 'المعلّق للمراجعة' : 'Pending review'}
+                                </Link>
+                                <Link
                                     href="/school/publications/create"
                                     className="inline-flex items-center gap-2 px-6 py-3 bg-[#A3C042] text-white rounded-lg hover:opacity-90 transition shadow-sm"
                                 >

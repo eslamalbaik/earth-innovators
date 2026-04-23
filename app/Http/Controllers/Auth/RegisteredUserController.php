@@ -128,7 +128,7 @@ class RegisteredUserController extends Controller
                     'gender' => null,
                     'neighborhoods' => json_encode([]),
                     'is_verified' => false,
-                    'is_active' => true,
+                    'is_active' => false,
                 ]);
             }
 

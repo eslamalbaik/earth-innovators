@@ -180,6 +180,10 @@ class StudentProjectController extends Controller
     public function show(Project $project)
     {
         $student = Auth::user();
+        $requestedTab = request()->query('tab');
+        $backTo = request()->query('from') === 'create'
+            ? '/student/projects/create'
+            : '/student/projects';
 
         // المشروع يجب أن يكون معتمداً ومتاحاً للطالب
         $isAvailableForAllSchools  = $project->school_id === null;
@@ -220,9 +224,25 @@ class StudentProjectController extends Controller
             }
         }
 
+        if ($existingSubmission && is_array($existingSubmission->files)) {
+            $existingSubmission->file_urls = collect($existingSubmission->files)
+                ->filter(fn ($path) => is_string($path) && $path !== '')
+                ->map(function ($path) {
+                    if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+                        return $path;
+                    }
+
+                    return '/storage/' . ltrim($path, '/');
+                })
+                ->values()
+                ->all();
+        }
+
         return Inertia::render('Student/Projects/Show', [
             'project'            => $projectDetails,
             'existingSubmission' => $existingSubmission,
+            'initialTab'         => in_array($requestedTab, ['details', 'submit', 'comments'], true) ? $requestedTab : 'details',
+            'backTo'             => $backTo,
         ]);
     }
 }

@@ -17,7 +17,9 @@ import {
     FaBell,
     FaCheck,
     FaMedal,
-    FaAward
+    FaAward,
+    FaTrophy,
+    FaPlus
 } from 'react-icons/fa';
 import { useMemo, useState, useEffect, useCallback } from 'react';
 import { router } from '@inertiajs/react';
@@ -68,6 +70,7 @@ export default function AdminDashboard({
 }) {
     const { t, language } = useTranslation();
     const isArabic = language === 'ar';
+    const createChallengeLabel = isArabic ? 'إنشاء تحدٍ' : 'Create Challenge';
     const [currentYear, setCurrentYear] = useState(selectedYear);
     const [loading, setLoading] = useState(false);
     const [chartDataState, setChartDataState] = useState(chartData || null);
@@ -480,6 +483,36 @@ export default function AdminDashboard({
                             <div className="text-gray-500">{t('adminDashboardPage.workflow.pendingChallengeSuggestions')}</div>
                             <div className="font-bold text-gray-900">{workflow.pending_challenge_suggestions || 0}</div>
                         </Link>
+                    </div>
+                </div>
+
+                <div className="mb-8 rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 via-white to-lime-50 p-6 shadow-sm">
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                        <div className="flex items-start gap-4">
+                            <div className="rounded-2xl bg-emerald-100 p-3 text-emerald-700">
+                                <FaTrophy className="text-2xl" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-gray-900">{t('adminDashboardLegacy.manageChallengesTitle')}</h3>
+                                <p className="text-sm text-gray-600">{t('adminDashboardLegacy.manageChallengesDescription')}</p>
+                            </div>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                            <Link
+                                href="/admin/challenges/create"
+                                className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
+                            >
+                                <FaPlus className="text-xs" />
+                                {createChallengeLabel}
+                            </Link>
+                            <Link
+                                href="/admin/challenges"
+                                className="inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-white px-4 py-2 text-sm font-semibold text-emerald-800 transition hover:border-emerald-300"
+                            >
+                                <FaTrophy className="text-xs" />
+                                {t('adminDashboardLegacy.manageChallengesTitle')}
+                            </Link>
+                        </div>
                     </div>
                 </div>
 

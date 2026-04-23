@@ -13,7 +13,9 @@ export default function TrialCountdownBanner({ membershipSummary = null }) {
 
     if (!membershipSummary) return null;
 
-    const { subscription, is_expiring_soon, needs_renewal, trial_available, is_school_owned } = membershipSummary;
+    const { subscription, is_expiring_soon, needs_renewal, trial_available, is_school_owned, packages_available } = membershipSummary;
+
+    if (packages_available === false) return null;
 
     // If the membership is owned/managed by the school, don't show billing CTAs here.
     if (is_school_owned) return null;
@@ -147,4 +149,3 @@ export default function TrialCountdownBanner({ membershipSummary = null }) {
 
     return null;
 }
-

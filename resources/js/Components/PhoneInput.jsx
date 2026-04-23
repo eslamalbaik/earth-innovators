@@ -72,7 +72,7 @@ export default function PhoneInput({
         <div className="w-full">
             <div
                 dir={resolvedDir}
-                className={`flex items-stretch border rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-[#A3C042] focus-within:border-[#A3C042] transition
+                className={`flex items-stretch border rounded-lg focus-within:ring-2 focus-within:ring-[#A3C042] focus-within:border-[#A3C042] transition
                     ${error ? 'border-red-400' : 'border-gray-300'}
                     ${disabled ? 'opacity-60 cursor-not-allowed bg-gray-50' : 'bg-white'}`}
             >
@@ -84,7 +84,7 @@ export default function PhoneInput({
                         onClick={() => setOpen(v => !v)}
                         aria-haspopup="listbox"
                         aria-expanded={open}
-                        className="h-full flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-50 border-e border-gray-300 hover:bg-gray-100 transition select-none whitespace-nowrap"
+                        className="h-full flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-50 border-e border-gray-300 hover:bg-gray-100 transition select-none whitespace-nowrap rounded-s-lg"
                     >
                         <span className="text-base leading-none">{selectedOption.flag}</span>
                         <span>{dialCode}</span>
@@ -126,7 +126,7 @@ export default function PhoneInput({
                     onChange={handleLocalChange}
                     dir="ltr"
                     placeholder="501234567"
-                    className={`flex-1 min-w-0 px-3 py-2 text-sm outline-none bg-transparent placeholder-gray-400 ${className}`}
+                    className={`flex-1 min-w-0 px-3 py-2 text-sm outline-none bg-transparent placeholder-gray-400 rounded-e-lg ${className}`}
                 />
             </div>
 

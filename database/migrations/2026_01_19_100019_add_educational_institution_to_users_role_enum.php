@@ -29,6 +29,18 @@ return new class extends Migration
         $driver = DB::getDriverName();
         
         if ($driver !== 'sqlite') {
+            // Normalize any role values not supported by the older enum before shrinking it.
+            DB::table('users')
+                ->whereNotIn('role', [
+                    'student',
+                    'teacher',
+                    'school',
+                    'admin',
+                    'system_supervisor',
+                    'school_support_coordinator',
+                ])
+                ->update(['role' => 'school']);
+
             // إرجاع enum role كما كان (بدون educational_institution)
             DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('student', 'teacher', 'school', 'admin', 'system_supervisor', 'school_support_coordinator') DEFAULT 'student'");
         }

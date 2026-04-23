@@ -35,7 +35,7 @@ class StudentServiceTest extends TestCase
         $result = $this->studentService->getStudentsBySchool($school->id);
 
         $this->assertCount(5, $result->items());
-        $this->assertEquals($school->id, $result->first()->school_id);
+        $this->assertEquals($school->id, $result->first()['school_id']);
     }
 
     public function test_can_award_badge_to_student(): void
@@ -55,4 +55,3 @@ class StudentServiceTest extends TestCase
         ]);
     }
 }
-

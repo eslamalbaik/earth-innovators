@@ -2,10 +2,12 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Mail\OtpMail;
+use App\Models\EmailOtp;
 use App\Models\User;
-use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class PasswordResetTest extends TestCase
@@ -14,60 +16,72 @@ class PasswordResetTest extends TestCase
 
     public function test_reset_password_link_screen_can_be_rendered(): void
     {
-        $response = $this->get('/forgot-password');
-
-        $response->assertStatus(200);
+        $this->get('/forgot-password')->assertOk();
     }
 
     public function test_reset_password_link_can_be_requested(): void
     {
-        Notification::fake();
+        Mail::fake();
 
         $user = User::factory()->create();
 
-        $this->post('/forgot-password', ['email' => $user->email]);
+        $response = $this->post('/forgot-password', ['email' => $user->email]);
 
-        Notification::assertSentTo($user, ResetPassword::class);
+        $response->assertSessionHasNoErrors();
+        $response->assertRedirect();
+
+        $this->assertDatabaseHas('email_otps', [
+            'email' => $user->email,
+            'purpose' => 'password_reset',
+        ]);
+
+        Mail::assertSent(OtpMail::class);
     }
 
-    public function test_reset_password_screen_can_be_rendered(): void
+    public function test_reset_password_screen_can_be_rendered_after_otp_verification(): void
     {
-        Notification::fake();
-
         $user = User::factory()->create();
+        $otp = EmailOtp::create([
+            'token' => \Illuminate\Support\Str::random(64),
+            'email' => $user->email,
+            'code' => Hash::make('123456'),
+            'purpose' => 'password_reset',
+            'attempts' => 0,
+            'used_at' => now(),
+            'expires_at' => now()->addMinutes(10),
+        ]);
 
-        $this->post('/forgot-password', ['email' => $user->email]);
-
-        Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
-            $response = $this->get('/reset-password/'.$notification->token);
-
-            $response->assertStatus(200);
-
-            return true;
-        });
+        $this->get("/reset-password/form/{$otp->token}")
+            ->assertOk();
     }
 
     public function test_password_can_be_reset_with_valid_token(): void
     {
-        Notification::fake();
+        $user = User::factory()->create([
+            'password' => Hash::make('OldPassword123!'),
+        ]);
 
-        $user = User::factory()->create();
+        $otp = EmailOtp::create([
+            'token' => \Illuminate\Support\Str::random(64),
+            'email' => $user->email,
+            'code' => Hash::make('123456'),
+            'purpose' => 'password_reset',
+            'attempts' => 0,
+            'used_at' => now(),
+            'expires_at' => now()->addMinutes(10),
+        ]);
 
-        $this->post('/forgot-password', ['email' => $user->email]);
+        $response = $this->post('/reset-password', [
+            'token' => $otp->token,
+            'email' => $user->email,
+            'password' => 'NewPassword123!',
+            'password_confirmation' => 'NewPassword123!',
+        ]);
 
-        Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
-            $response = $this->post('/reset-password', [
-                'token' => $notification->token,
-                'email' => $user->email,
-                'password' => 'password',
-                'password_confirmation' => 'password',
-            ]);
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect(route('login'));
 
-            $response
-                ->assertSessionHasNoErrors()
-                ->assertRedirect(route('login'));
-
-            return true;
-        });
+        $this->assertTrue(Hash::check('NewPassword123!', $user->refresh()->password));
     }
 }

@@ -10,6 +10,7 @@ use App\Services\PublicationService;
 use App\Services\PointsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Notification;
 
 class PublicationsIntegrationTest extends TestCase
 {
@@ -62,5 +63,46 @@ class PublicationsIntegrationTest extends TestCase
         // Assert ArticleApproved event was fired
         Event::assertDispatched(\App\Events\ArticleApproved::class);
     }
-}
 
+    /** @test */
+    public function publication_approval_notifies_school_teachers_and_students()
+    {
+        Notification::fake();
+
+        $school = User::factory()->create([
+            'role' => 'school',
+        ]);
+        $teacherAuthor = User::factory()->create([
+            'role' => 'teacher',
+            'school_id' => $school->id,
+        ]);
+        $student = User::factory()->create([
+            'role' => 'student',
+            'school_id' => $school->id,
+        ]);
+        $teacherColleague = User::factory()->create([
+            'role' => 'teacher',
+            'school_id' => $school->id,
+        ]);
+        $outsideTeacher = User::factory()->create([
+            'role' => 'teacher',
+        ]);
+
+        $publication = Publication::factory()->create([
+            'author_id' => $teacherAuthor->id,
+            'school_id' => $school->id,
+            'status' => 'pending',
+        ]);
+
+        $this->publicationService->approvePublication($publication, $school->id);
+
+        Notification::assertSentTo(
+            [$student, $teacherAuthor, $teacherColleague],
+            \App\Notifications\NewPublicationNotification::class
+        );
+        Notification::assertNotSentTo(
+            [$school, $outsideTeacher],
+            \App\Notifications\NewPublicationNotification::class
+        );
+    }
+}

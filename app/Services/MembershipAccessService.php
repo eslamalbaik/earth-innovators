@@ -9,8 +9,7 @@ class MembershipAccessService
 {
     public function getActiveSubscription(User $user): ?UserPackage
     {
-        return UserPackage::with('package')
-            ->where('user_id', $user->id)
+        return $this->subscriptionQueryForUser($user)
             ->currentActive()
             ->latest('end_date')
             ->first();
@@ -18,8 +17,7 @@ class MembershipAccessService
 
     public function getLatestSubscription(User $user): ?UserPackage
     {
-        return UserPackage::with('package')
-            ->where('user_id', $user->id)
+        return $this->subscriptionQueryForUser($user)
             ->latest('end_date')
             ->latest('created_at')
             ->first();
@@ -27,8 +25,7 @@ class MembershipAccessService
 
     public function getPendingSubscription(User $user): ?UserPackage
     {
-        return UserPackage::with('package')
-            ->where('user_id', $user->id)
+        return $this->subscriptionQueryForUser($user)
             ->where('status', 'pending')
             ->latest()
             ->first();
@@ -57,6 +54,10 @@ class MembershipAccessService
         }
 
         $owner = $this->getAccessOwner($user);
+        if (!$this->hasAvailablePackagesFor($owner)) {
+            return true;
+        }
+
         $subscription = $this->getActiveSubscription($owner);
 
         if ($subscription) {
@@ -73,6 +74,7 @@ class MembershipAccessService
     public function getMembershipSummary(User $user): array
     {
         $owner = $this->getAccessOwner($user);
+        $packagesAvailable = $this->hasAvailablePackagesFor($owner);
         $subscription = $this->getActiveSubscription($owner);
         $pendingSubscription = $subscription ? null : $this->getPendingSubscription($owner);
         $latestSubscription = $subscription ?? $pendingSubscription ?? $this->getLatestSubscription($owner);
@@ -90,7 +92,8 @@ class MembershipAccessService
         $isExpiringSoon = $subscription !== null
             && $daysRemaining !== null
             && $daysRemaining <= 7;
-        $needsRenewal = $subscription === null
+        $needsRenewal = $packagesAvailable
+            && $subscription === null
             && $pendingSubscription === null
             && $effectiveLatestStatus === 'expired';
 
@@ -98,6 +101,7 @@ class MembershipAccessService
             'owner_id' => $owner->id,
             'owner_name' => $owner->name,
             'is_school_owned' => $owner->id !== $user->id,
+            'packages_available' => $packagesAvailable,
             'membership_type' => $owner->membership_type ?? ($subscription ? 'subscription' : 'basic'),
             'contract_status' => $owner->role === 'teacher' && $owner->teacher
                 ? ($owner->teacher->contract_status ?? null)
@@ -113,7 +117,7 @@ class MembershipAccessService
             'certificate_access' => $this->hasCertificateAccess($user),
             'is_expiring_soon' => $isExpiringSoon,
             'needs_renewal' => $needsRenewal,
-            'trial_available' => !$this->hasUsedTrialSubscription($owner),
+            'trial_available' => $packagesAvailable && !$this->hasUsedTrialSubscription($owner),
             'subscription' => $subscription ? [
                 'id' => $subscription->id,
                 'package_name' => $subscription->package->name_ar ?? $subscription->package->name,
@@ -225,8 +229,16 @@ class MembershipAccessService
     {
         return UserPackage::query()
             ->where('user_id', $user->id)
-            ->whereHas('package', fn ($query) => $query->where('is_trial', true))
+            ->whereHas('package', fn ($query) => $query->where('is_trial', true)->where('is_active', true))
             ->exists();
+    }
+
+    public function hasAvailablePackagesFor(User $user): bool
+    {
+        return \App\Models\Package::query()
+            ->where('is_active', true)
+            ->get()
+            ->contains(fn (\App\Models\Package $package) => $package->supportsRole($user->role));
     }
 
     private function userOwnsMembershipContext(User $user): bool
@@ -244,5 +256,12 @@ class MembershipAccessService
         return $user->membership_type === 'subscription'
             && $user->contract_status === 'active'
             && $user->isContractValid();
+    }
+
+    private function subscriptionQueryForUser(User $user)
+    {
+        return UserPackage::with('package')
+            ->where('user_id', $user->id)
+            ->whereHas('package', fn ($query) => $query->where('is_active', true));
     }
 }

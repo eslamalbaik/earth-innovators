@@ -30,9 +30,9 @@ import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
 import PrimaryButton from '../../../Components/PrimaryButton';
 
-export default function StudentProjectShow({ auth, project, existingSubmission }) {
+export default function StudentProjectShow({ auth, project, existingSubmission, initialTab = 'details', backTo = '/student/projects' }) {
     const { t, language } = useTranslation();
-    const [activeTab, setActiveTab] = useState('details'); // 'details', 'submit', 'comments'
+    const [activeTab, setActiveTab] = useState(initialTab); // 'details', 'submit', 'comments'
     const [fileList, setFileList] = useState([]);
     const [dragActive, setDragActive] = useState(false);
     const [replyingTo, setReplyingTo] = useState(null);
@@ -42,6 +42,8 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
     const fileInputRef = useRef(null);
     const commentTextareaRef = useRef(null);
     const { showSuccess, showError } = useToast();
+    const attachmentsTitle = language === 'ar' ? 'الملفات المرفقة' : 'Attached files';
+    const fileLabel = language === 'ar' ? 'ملف' : 'File';
 
 
     const submissionForm = useForm({
@@ -54,6 +56,10 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
     useEffect(() => {
         submissionForm.setData('comment', existingSubmission?.comment ?? '');
     }, [existingSubmission?.id, existingSubmission?.comment]);
+
+    useEffect(() => {
+        setActiveTab(initialTab);
+    }, [initialTab]);
 
     const handleFiles = (files) => {
         if (!canEditSubmission) {
@@ -367,6 +373,31 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                                         <div className="mt-2">
                                             <p className="text-sm font-medium text-green-900 mb-1">{t('studentProjectShowPage.submission.yourComment')}:</p>
                                             <p className="text-sm text-green-800 bg-white p-2 rounded border border-green-200">{existingSubmission.comment}</p>
+                                        </div>
+                                    )}
+                                    {existingSubmission.file_urls?.length > 0 && (
+                                        <div className="mt-3">
+                                            <p className="text-sm font-medium text-green-900 mb-2">{attachmentsTitle}:</p>
+                                            <div className="space-y-2">
+                                                {existingSubmission.file_urls.map((fileUrl, index) => {
+                                                    const fileName = existingSubmission.files?.[index]
+                                                        ? existingSubmission.files[index].split('/').pop()
+                                                        : `${fileLabel} ${index + 1}`;
+
+                                                    return (
+                                                        <a
+                                                            key={`${fileUrl}-${index}`}
+                                                            href={fileUrl}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="flex items-center gap-2 rounded-xl border border-green-200 bg-white px-3 py-2 text-sm text-green-800 transition hover:bg-green-100"
+                                                        >
+                                                            <FaFile className="text-green-600" />
+                                                            <span className="truncate">{fileName}</span>
+                                                        </a>
+                                                    );
+                                                })}
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -725,7 +756,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                     activeNav="projects"
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
-                    onBack={() => router.visit('/student/projects')}
+                    onBack={() => router.visit(backTo)}
                 >
                     {ProjectContent()}
                 </MobileAppLayout>
@@ -737,7 +768,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
                     title={project.title}
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
-                    onBack={() => router.visit('/student/projects')}
+                    onBack={() => router.visit(backTo)}
                     auth={auth}
                 />
                 <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-4">
@@ -750,4 +781,3 @@ export default function StudentProjectShow({ auth, project, existingSubmission }
         </div>
     );
 }
-

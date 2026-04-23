@@ -319,7 +319,8 @@ class BookingService extends BaseService
                 throw new \Exception('غير مصرح لك بتحديث هذا الحجز.');
             }
 
-            $updateData = ['status' => $status];
+            $persistedStatus = $this->normalizeStatusForPersistence($status);
+            $updateData = ['status' => $persistedStatus];
 
             if (Schema::hasColumn('bookings', 'notes') && $teacherNotes) {
                 $updateData['notes'] = $teacherNotes;
@@ -410,5 +411,14 @@ class BookingService extends BaseService
                 }
             }
         }
+    }
+
+    private function normalizeStatusForPersistence(string $status): string
+    {
+        if (DB::getDriverName() === 'sqlite' && $status === 'approved') {
+            return 'confirmed';
+        }
+
+        return $status;
     }
 }

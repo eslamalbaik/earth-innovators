@@ -1,5 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { FaDownload, FaPrint, FaShare, FaCertificate, FaMedal } from 'react-icons/fa';
+import { useRef } from 'react';
 import { usePremiumGate } from '@/Hooks/usePremiumGate';
 import MobileAppLayout from '@/Layouts/MobileAppLayout';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
@@ -7,7 +8,7 @@ import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import DesktopFooter from '@/Components/Mobile/DesktopFooter';
 import { useTranslation } from '@/i18n';
 import { useToast } from '@/Contexts/ToastContext';
-import { downloadFile } from '@/utils/downloadFile';
+import { downloadElementAsImage } from '@/utils/downloadElementAsImage';
 
 export default function TeacherCertificateShow({ auth, user, stats, certificate, membershipSummary = null, school = null, latestApprovedCertificates = [] }) {
     const { t, language } = useTranslation();
@@ -18,15 +19,14 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate,
     });
     const isAuthed = !!auth?.user;
     const currentUser = auth?.user;
+    const certificateRef = useRef(null);
 
     const handleDownload = async () => {
         gate(async () => {
-            if (!certificate?.download_url) return;
-
             try {
-                await downloadFile(
-                    certificate.download_url,
-                    `certificate_${certificate?.certificate_number || user?.membership_number || 'teacher'}.pdf`
+                await downloadElementAsImage(
+                    certificateRef.current,
+                    `certificate_${certificate?.certificate_number || user?.membership_number || 'teacher'}.png`
                 );
             } catch (error) {
                 showError(t('errors.somethingWentWrong'));
@@ -140,7 +140,7 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate,
                                 <h2 className="text-base font-bold text-gray-900 mb-4">{t('teacherCertificateShowPage.certificate.title')}</h2>
 
                                 {/* Certificate Display */}
-                                <div className="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-4 relative">
+                                <div ref={certificateRef} className="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-4 relative">
                                     <div className="bg-white rounded-xl p-4">
                                         {/* Certificate Header with Logo */}
                                         <div className="flex items-center justify-between mb-4">
@@ -309,7 +309,7 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate,
                                     <h2 className="text-xl font-bold text-gray-900 mb-6 no-print">{t('teacherCertificateShowPage.certificate.title')}</h2>
 
                                     {/* Certificate Display */}
-                                    <div className="certificate-print bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-6 relative">
+                                    <div ref={certificateRef} className="certificate-print bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-6 relative">
                                         <div className="bg-white rounded-xl p-8">
                                             {/* Certificate Header with Logo */}
                                             <div className="flex items-center justify-between mb-6">

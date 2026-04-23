@@ -33,6 +33,8 @@ export default function StudentChallengeShow({ auth, challenge, membershipSummar
     const fileInputRef = useRef(null);
 
     const existingSubmission = challenge?.student_submission;
+    const existingFilesTitle = language === 'ar' ? 'الملفات المرفقة في تسليمك' : 'Files attached to your submission';
+    const existingFileLabel = language === 'ar' ? 'ملف' : 'File';
 
     const submissionForm = useForm({
         answer: existingSubmission?.answer || '',
@@ -310,6 +312,32 @@ export default function StudentChallengeShow({ auth, challenge, membershipSummar
                                         <p className="text-gray-700 mt-1">{existingSubmission.feedback}</p>
                                     </div>
                                 )}
+                                {existingSubmission.file_urls?.length > 0 && (
+                                    <div className="pt-2">
+                                        <strong>{existingFilesTitle}:</strong>
+                                        <div className="mt-2 space-y-2">
+                                            {existingSubmission.file_urls.map((fileUrl, index) => {
+                                                const fallbackName = `${existingFileLabel} ${index + 1}`;
+                                                const fileName = typeof existingSubmission.files?.[index] === 'string'
+                                                    ? existingSubmission.files[index].split('/').pop()
+                                                    : fallbackName;
+
+                                                return (
+                                                    <a
+                                                        key={`${fileUrl}-${index}`}
+                                                        href={fileUrl}
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                        className="flex items-center gap-2 rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-700 hover:bg-blue-100"
+                                                    >
+                                                        <FaFile className="text-xs" />
+                                                        <span className="text-xs font-medium">{fileName || fallbackName}</span>
+                                                    </a>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
@@ -329,7 +357,6 @@ export default function StudentChallengeShow({ auth, challenge, membershipSummar
                                 rows={8}
                                 className="mt-2 block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042] text-sm"
                                 placeholder={t('studentChallengesShowPage.form.answerPlaceholder')}
-                                required
                             />
                             <InputError message={submissionForm.errors.answer} className="mt-2" />
                         </div>
@@ -462,4 +489,3 @@ export default function StudentChallengeShow({ auth, challenge, membershipSummar
         </div>
     );
 }
-

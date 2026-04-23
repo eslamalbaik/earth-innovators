@@ -167,12 +167,13 @@ export default function TeacherCertificatesIndex({
                     showSuccess(response.data.message || t('teacherCertificatesIndexPage.toasts.requestSentToSchool'));
                 } else {
                     showSuccess(t('teacherCertificatesIndexPage.toasts.issuedSuccessfully'));
-                    const downloadUrl = response.data?.certificate?.download_url;
-                    if (downloadUrl) {
-                        await downloadFile(
-                            downloadUrl,
-                            `certificate_${response.data?.certificate?.certificate_number || 'issued'}.pdf`
-                        );
+                    const isSelfCertificate = selectedRecipient?.id === teacherRecipient?.id;
+
+                    if (isSelfCertificate) {
+                        setShowRequestModal(false);
+                        setSelectedRecipient(null);
+                        router.visit(route('teacher.certificate.show'));
+                        return;
                     }
                 }
 

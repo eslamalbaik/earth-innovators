@@ -34,6 +34,10 @@ class EnsureMembershipActive
 
         $summary = $this->membershipAccessService->getMembershipSummary($user);
 
+        if (empty($summary['packages_available'])) {
+            return $next($request);
+        }
+
         // If the school owns the access context, don't gate the member pages.
         if (!empty($summary['is_school_owned'])) {
             return $next($request);
@@ -55,4 +59,3 @@ class EnsureMembershipActive
         return $next($request);
     }
 }
-

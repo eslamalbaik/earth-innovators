@@ -62,18 +62,6 @@ export default function TeacherChallengeCreate({ auth, school }) {
     const submit = (e) => {
         e.preventDefault();
 
-        // Prepare data - convert empty strings to null for optional fields
-        const submitData = {
-            ...data,
-            max_participants: data.max_participants === '' ? null : (data.max_participants ? parseInt(data.max_participants) : null),
-            points_reward: parseInt(data.points_reward) || 0,
-        };
-
-        // Update form data
-        Object.keys(submitData).forEach(key => {
-            setData(key, submitData[key]);
-        });
-
         post('/teacher/challenges', {
             onSuccess: () => {
             },
@@ -322,25 +310,6 @@ export default function TeacherChallengeCreate({ auth, school }) {
                             <InputError message={errors.difficulty} className="mt-2" />
                         </div>
 
-                        {/* Points Reward */}
-                        <div>
-                            <InputLabel htmlFor="points_reward" value={t('teacherChallengesCreatePage.fields.pointsReward')} />
-                            <select
-                                id="points_reward"
-                                value={data.points_reward}
-                                onChange={(e) => setData('points_reward', parseInt(e.target.value))}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
-                            >
-                                <option value={0}>{t('teacherChallengesCreatePage.pointsOptions', { count: 0 })}</option>
-                                <option value={10}>{t('teacherChallengesCreatePage.pointsOptions', { count: 10 })}</option>
-                                <option value={20}>{t('teacherChallengesCreatePage.pointsOptions', { count: 20 })}</option>
-                                <option value={30}>{t('teacherChallengesCreatePage.pointsOptions', { count: 30 })}</option>
-                                <option value={50}>{t('teacherChallengesCreatePage.pointsOptions', { count: 50 })}</option>
-                                <option value={100}>{t('teacherChallengesCreatePage.pointsOptions', { count: 100 })}</option>
-                            </select>
-                            <InputError message={errors.points_reward} className="mt-2" />
-                        </div>
-
                         {/* Date Range */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
@@ -436,4 +405,3 @@ export default function TeacherChallengeCreate({ auth, school }) {
         </DashboardLayout>
     );
 }
-

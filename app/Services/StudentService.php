@@ -122,6 +122,7 @@ class StudentService extends BaseService
                     'name' => $student->name,
                     'email' => $student->email,
                     'phone' => $student->phone,
+                    'school_id' => $student->school_id,
                     'membership_number' => $student->membership_number,
                     'points' => $student->points ?? 0,
                     'projects_count' => $counts->total ?? 0,
@@ -283,4 +284,3 @@ class StudentService extends BaseService
         $this->forgetCacheTags(["school_students_{$schoolId}"]);
     }
 }
-

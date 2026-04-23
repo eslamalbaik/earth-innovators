@@ -75,8 +75,8 @@ class UserPackageModelTest extends TestCase
             'paid_amount' => 150.75,
         ]);
 
-        $this->assertIsFloat($userPackage->paid_amount);
-        $this->assertEquals(150.75, $userPackage->paid_amount);
+        $this->assertIsString($userPackage->paid_amount);
+        $this->assertSame('150.75', $userPackage->paid_amount);
     }
 
     /**
@@ -142,7 +142,6 @@ class UserPackageModelTest extends TestCase
         ]);
     }
 }
-
 
 
 

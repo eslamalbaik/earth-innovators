@@ -14,6 +14,18 @@ class ProjectSubmissionController extends Controller
         private SubmissionService $submissionService
     ) {}
 
+    public function redirectGet(Project $project)
+    {
+        $fallbackRoute = auth()->check() && auth()->user()->isStudent()
+            ? route('student.projects.show', $project)
+            : route('projects.show', $project);
+
+        return redirect()->back(fallback: $fallbackRoute)
+            ->withErrors([
+                'error' => 'يرجى استخدام نموذج التسليم لإرسال المشروع، وليس فتح رابط الإرسال مباشرة.',
+            ]);
+    }
+
     public function store(Request $request, Project $project)
     {
         $student = Auth::user();

@@ -3,12 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Subject;
+use App\Services\SubjectService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 class SubjectController extends Controller
 {
+    public function __construct(
+        private SubjectService $subjectService
+    ) {}
+
     public function index()
     {
         $subjects = $this->subjectService->getActiveSubjects();

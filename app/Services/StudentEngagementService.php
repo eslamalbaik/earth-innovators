@@ -88,7 +88,9 @@ class StudentEngagementService
             'is_expiring_soon' => (bool) ($membershipSummary['is_expiring_soon'] ?? false),
             'needs_renewal' => (bool) ($membershipSummary['needs_renewal'] ?? false),
             'trial_available' => (bool) ($membershipSummary['trial_available'] ?? false),
-            'can_subscribe' => $subscription === null && $pendingSubscription === null,
+            'can_subscribe' => (bool) ($membershipSummary['packages_available'] ?? false)
+                && $subscription === null
+                && $pendingSubscription === null,
             'rewards' => [
                 'active_count' => $activeRewardsCount,
                 'redeemable_count' => $redeemableRewardsCount,

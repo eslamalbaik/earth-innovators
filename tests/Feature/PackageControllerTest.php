@@ -34,6 +34,7 @@ class PackageControllerTest extends TestCase
      */
     public function test_admin_can_view_packages_index(): void
     {
+        $initialCount = Package::count();
         Package::factory()->count(5)->create();
 
         $response = $this->actingAs($this->admin)
@@ -42,7 +43,7 @@ class PackageControllerTest extends TestCase
         $response->assertOk();
         $response->assertInertia(fn ($page) => 
             $page->component('Admin/Packages/Index')
-                ->has('packages', 5)
+                ->has('packages', $initialCount + 5)
                 ->has('stats')
         );
     }
@@ -356,6 +357,7 @@ class PackageControllerTest extends TestCase
      */
     public function test_can_filter_packages_by_status(): void
     {
+        $expectedActive = Package::where('is_active', true)->count() + 3;
         Package::factory()->count(3)->create(['is_active' => true]);
         Package::factory()->count(2)->create(['is_active' => false]);
 
@@ -364,11 +366,10 @@ class PackageControllerTest extends TestCase
 
         $response->assertOk();
         $response->assertInertia(fn ($page) => 
-            $page->has('packages', 3)
+            $page->has('packages', $expectedActive)
         );
     }
 }
-
 
 
 

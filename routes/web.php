@@ -597,6 +597,7 @@ Route::middleware(['auth', 'membership_active'])->group(function () {
     Route::post('/student/challenge-suggestions', [\App\Http\Controllers\Student\StudentChallengeSuggestionController::class, 'store'])->name('student.challenge-suggestions.store');
 
     // تسليمات المشاريع
+    Route::get('/projects/{project}/submissions', [\App\Http\Controllers\ProjectSubmissionController::class, 'redirectGet'])->name('project.submissions.redirect');
     Route::post('/projects/{project}/submissions', [\App\Http\Controllers\ProjectSubmissionController::class, 'store'])->name('project.submissions.store');
     // POST + PUT: رفع الملفات يعتمد على POST حتى تُعبأ $_FILES في PHP؛ الواجهة تستخدم POST مع forceFormData
     Route::match(['post', 'put'], '/project-submissions/{submission}', [\App\Http\Controllers\ProjectSubmissionController::class, 'update'])->name('project.submissions.update');

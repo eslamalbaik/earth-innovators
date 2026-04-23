@@ -239,7 +239,7 @@ export default function TeacherDashboard({ auth, teacher, stats, membershipSumma
                                     >
                                         {t('teacherDashboardPage.openCertificates')}
                                     </Link>
-                                    {!isSchoolManaged && (
+                                    {!isSchoolManaged && membershipSummary?.packages_available !== false && (
                                         <Link
                                             href="/packages"
                                             className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-800 hover:border-[#A3C042]/40"

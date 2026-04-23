@@ -41,10 +41,15 @@ return new class extends Migration
             // لا حاجة لتغيير نوع العمود في SQLite
         } else {
             // MySQL/MariaDB
-            Schema::table('users', function (Blueprint $table) {
-                // إرجاع enum role كما كان
-                DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('student', 'teacher', 'admin') DEFAULT 'student'");
-            });
+            DB::table('users')
+                ->where('role', 'school')
+                ->update(['role' => 'admin']);
+
+            DB::table('users')
+                ->where('role', 'educational_institution')
+                ->update(['role' => 'admin']);
+
+            DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('student', 'teacher', 'admin') DEFAULT 'student'");
         }
     }
 };

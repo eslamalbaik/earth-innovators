@@ -149,7 +149,7 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                                     {t('schoolDashboardPage.membershipTrialAvailable')}
                                 </p>
                             )}
-                            {!membershipSummary?.subscription && (
+                            {!membershipSummary?.subscription && membershipSummary?.packages_available !== false && (
                                 <div className="mt-3">
                                     <Link
                                         href="/packages"
