@@ -7,7 +7,7 @@ import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import DesktopFooter from '@/Components/Mobile/DesktopFooter';
 import { useToast } from '@/Contexts/ToastContext';
-import { downloadElementAsImage } from '@/utils/downloadElementAsImage';
+import { downloadElementAsImage, printElementAsImage, shareElementAsImage } from '@/utils/downloadElementAsImage';
 import { useTranslation } from '@/i18n';
 
 export default function SchoolCertificateShow({ auth, user, certificate, membershipSummary = null }) {
@@ -34,27 +34,41 @@ export default function SchoolCertificateShow({ auth, user, certificate, members
         });
     };
 
-    const handlePrint = () => {
-        window.print();
+    const handlePrint = async () => {
+        gate(async () => {
+            try {
+                await printElementAsImage(
+                    certificateRef.current,
+                    `certificate_${certificate?.certificate_number || user?.membership_number || 'school'}`
+                );
+            } catch (error) {
+                showError({ translationKey: 'toastMessages.genericUnexpectedError' });
+            }
+        });
     };
 
     const handleShare = async () => {
-        if (navigator.share) {
+        gate(async () => {
             try {
-                await navigator.share({
+                await shareElementAsImage(certificateRef.current, {
+                    filename: `certificate_${certificate?.certificate_number || user?.membership_number || 'school'}.png`,
                     title: t('schoolCertificateShowPage.share.title', { appName: t('common.appName') }),
                     text: t('schoolCertificateShowPage.share.text', {
                         name: user?.school_name || user?.name || t('schoolCertificateShowPage.schoolFallback'),
                         appName: t('common.appName'),
                     }),
-                    url: window.location.href,
                 });
             } catch (error) {
+                try {
+                    await downloadElementAsImage(
+                        certificateRef.current,
+                        `certificate_${certificate?.certificate_number || user?.membership_number || 'school'}.png`
+                    );
+                } catch {
+                    showError({ translationKey: 'toastMessages.genericUnexpectedError' });
+                }
             }
-        } else {
-            navigator.clipboard.writeText(window.location.href);
-            alert(t('schoolCertificateShowPage.toasts.linkCopied'));
-        }
+        });
     };
 
     const formatDate = (dateString) => {

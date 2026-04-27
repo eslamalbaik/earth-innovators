@@ -8,7 +8,7 @@ import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import DesktopFooter from '@/Components/Mobile/DesktopFooter';
 import { useTranslation } from '@/i18n';
 import { useToast } from '@/Contexts/ToastContext';
-import { downloadElementAsImage } from '@/utils/downloadElementAsImage';
+import { downloadElementAsImage, printElementAsImage, shareElementAsImage } from '@/utils/downloadElementAsImage';
 
 export default function TeacherCertificateShow({ auth, user, stats, certificate, membershipSummary = null, school = null, latestApprovedCertificates = [] }) {
     const { t, language } = useTranslation();
@@ -34,24 +34,38 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate,
         });
     };
 
-    const handlePrint = () => {
-        window.print();
+    const handlePrint = async () => {
+        gate(async () => {
+            try {
+                await printElementAsImage(
+                    certificateRef.current,
+                    `certificate_${certificate?.certificate_number || user?.membership_number || 'teacher'}`
+                );
+            } catch (error) {
+                showError(t('errors.somethingWentWrong'));
+            }
+        });
     };
 
     const handleShare = async () => {
-        if (navigator.share) {
+        gate(async () => {
             try {
-                await navigator.share({
+                await shareElementAsImage(certificateRef.current, {
+                    filename: `certificate_${certificate?.certificate_number || user?.membership_number || 'teacher'}.png`,
                     title: t('teacherCertificateShowPage.share.title', { appName: t('common.appName') }),
                     text: t('teacherCertificateShowPage.share.text', { name: user?.name || t('common.user'), appName: t('common.appName') }),
-                    url: window.location.href,
                 });
             } catch (error) {
+                try {
+                    await downloadElementAsImage(
+                        certificateRef.current,
+                        `certificate_${certificate?.certificate_number || user?.membership_number || 'teacher'}.png`
+                    );
+                } catch {
+                    showError(t('errors.somethingWentWrong'));
+                }
             }
-        } else {
-            navigator.clipboard.writeText(window.location.href);
-            alert(t('teacherCertificateShowPage.toasts.linkCopied'));
-        }
+        });
     };
 
     const formatDate = (dateString) => {
