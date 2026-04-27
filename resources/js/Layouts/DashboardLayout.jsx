@@ -977,16 +977,17 @@ export default function DashboardLayout({ children, header }) {
                                                     {t('profile.profile')}
                                                 </Link>
                                                 <div className="border-t border-gray-100 my-1" />
-                                                <Link
-                                                    href="/logout"
-                                                    method="post"
-                                                    as="button"
-                                                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition w-full "
-                                                    onClick={() => setUserDropdownOpen(false)}
+                                                <button
+                                                    type="button"
+                                                    className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 transition hover:bg-red-50"
+                                                    onClick={() => {
+                                                        setUserDropdownOpen(false);
+                                                        router.post(route('logout'));
+                                                    }}
                                                 >
                                                     <FaSignOutAlt className="text-red-500" />
                                                     {t('profile.logout')}
-                                                </Link>
+                                                </button>
                                             </div>
                                         </div>
                                     )}

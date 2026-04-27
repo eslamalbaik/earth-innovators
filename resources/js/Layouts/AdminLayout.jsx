@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { FaBars, FaUser, FaCog, FaSignOutAlt, FaHome, FaUsers, FaBook, FaCalendar, FaChartBar, FaFileAlt, FaTrophy, FaCreditCard, FaShieldAlt } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
@@ -91,14 +91,13 @@ export default function AdminLayout({ children, title = null }) {
                                 >
                                     <FaCog className="h-5 w-5" />
                                 </a>
-                                <Link
-                                    href="/logout"
-                                    method="post"
-                                    as="button"
+                                <button
+                                    type="button"
                                     className="text-gray-500 hover:text-gray-700"
+                                    onClick={() => router.post(route('logout'))}
                                 >
                                     <FaSignOutAlt className="h-5 w-5" />
-                                </Link>
+                                </button>
                             </div>
                         </div>
                     </div>
