@@ -80,7 +80,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
     }, [dropdownOpen, userDropdownOpen]);
 
     const handleLogout = () => {
-        router.post('/logout');
+        router.post(route('logout'));
     };
 
     const items = [

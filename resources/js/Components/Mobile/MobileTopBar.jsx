@@ -169,7 +169,7 @@ export default function MobileTopBar({
     };
 
     const handleLogout = () => {
-        router.post('/logout');
+        router.post(route('logout'));
     };
 
     const getRoleLinks = (role) => {
@@ -497,5 +497,4 @@ export default function MobileTopBar({
         </div>
     );
 }
-
 

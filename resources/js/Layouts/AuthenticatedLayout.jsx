@@ -2,7 +2,7 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
@@ -73,9 +73,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                             Profile
                                         </Dropdown.Link>
                                         <Dropdown.Link
-                                            href={route('logout')}
-                                            method="post"
                                             as="button"
+                                            onClick={() => router.post(route('logout'))}
                                         >
                                             Log Out
                                         </Dropdown.Link>
@@ -157,9 +156,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                 Profile
                             </ResponsiveNavLink>
                             <ResponsiveNavLink
-                                method="post"
-                                href={route('logout')}
                                 as="button"
+                                onClick={() => router.post(route('logout'))}
                             >
                                 Log Out
                             </ResponsiveNavLink>
