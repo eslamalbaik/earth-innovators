@@ -1,4 +1,4 @@
-import { Link, router } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { FaUser, FaSignInAlt, FaSignOutAlt, FaBars, FaTimes, FaChevronLeft, FaTwitter, FaInstagram, FaEnvelope } from 'react-icons/fa';
 import { useState, useRef, useEffect } from 'react';
 import { useSelector } from 'react-redux';
@@ -6,6 +6,7 @@ import { getUserImageUrl, getInitials, getColorFromName } from '../utils/imageUt
 import LanguageSwitcher from '../Components/LanguageSwitcher';
 import { useTranslation } from '../i18n';
 import WhatsAppSupportButton from '@/Components/Support/WhatsAppSupportButton';
+import { logout } from '@/utils/logout';
 
 export default function MainLayout({ children, auth }) {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -15,7 +16,7 @@ export default function MainLayout({ children, auth }) {
     const { t } = useTranslation();
 
     const handleLogout = () => {
-        router.post(route('logout'));
+        logout();
     };
 
     useEffect(() => {

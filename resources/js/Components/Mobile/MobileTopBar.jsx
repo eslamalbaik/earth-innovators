@@ -7,6 +7,7 @@ import { getUserImageUrl, getInitials, getColorFromName } from '@/utils/imageUti
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
 import { useTranslation, useBackIcon } from '@/i18n';
 import { getDropdownPosition } from '@/utils/directionUtils';
+import { logout } from '@/utils/logout';
 
 export default function MobileTopBar({
     title,
@@ -169,7 +170,7 @@ export default function MobileTopBar({
     };
 
     const handleLogout = () => {
-        router.post(route('logout'));
+        logout();
     };
 
     const getRoleLinks = (role) => {
@@ -497,4 +498,3 @@ export default function MobileTopBar({
         </div>
     );
 }
-

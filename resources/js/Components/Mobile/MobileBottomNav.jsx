@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { FaHome, FaFolderOpen, FaCompass, FaTrophy, FaUser, FaSignOutAlt, FaBook, FaMedal, FaTachometerAlt, FaCreditCard } from 'react-icons/fa';
 import { getUserImageUrl, getInitials, getColorFromName } from '@/utils/imageUtils';
 import { useTranslation } from '@/i18n';
+import { logout } from '@/utils/logout';
 
 const getRoleLinks = (role) => {
     if (role === 'teacher') {
@@ -80,7 +81,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
     }, [dropdownOpen, userDropdownOpen]);
 
     const handleLogout = () => {
-        router.post(route('logout'));
+        logout();
     };
 
     const items = [

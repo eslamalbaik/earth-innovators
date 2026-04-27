@@ -1,8 +1,9 @@
 import PrimaryButton from '@/Components/PrimaryButton';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { FaEnvelope, FaSignOutAlt } from 'react-icons/fa';
 import { useTranslation } from '@/i18n';
+import { logout } from '@/utils/logout';
 
 export default function VerifyEmail({ status }) {
     const { post, processing } = useForm({});
@@ -78,7 +79,7 @@ export default function VerifyEmail({ status }) {
 
                                 <button
                                     type="button"
-                                    onClick={() => router.post(route('logout'))}
+                                    onClick={logout}
                                     className="w-full flex items-center justify-center gap-2 py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#A3C042]"
                                 >
                                     <FaSignOutAlt />

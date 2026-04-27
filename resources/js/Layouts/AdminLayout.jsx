@@ -1,10 +1,11 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { FaBars, FaUser, FaCog, FaSignOutAlt, FaHome, FaUsers, FaBook, FaCalendar, FaChartBar, FaFileAlt, FaTrophy, FaCreditCard, FaShieldAlt } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
 import { useTranslation } from '@/i18n';
+import { logout } from '@/utils/logout';
 
 export default function AdminLayout({ children, title = null }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -94,7 +95,7 @@ export default function AdminLayout({ children, title = null }) {
                                 <button
                                     type="button"
                                     className="text-gray-500 hover:text-gray-700"
-                                    onClick={() => router.post(route('logout'))}
+                                    onClick={logout}
                                 >
                                     <FaSignOutAlt className="h-5 w-5" />
                                 </button>

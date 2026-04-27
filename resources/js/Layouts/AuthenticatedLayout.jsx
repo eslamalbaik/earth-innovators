@@ -6,6 +6,7 @@ import { Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
+import { logout } from '@/utils/logout';
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
@@ -74,7 +75,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                         </Dropdown.Link>
                                         <Dropdown.Link
                                             as="button"
-                                            onClick={() => router.post(route('logout'))}
+                                            onClick={logout}
                                         >
                                             Log Out
                                         </Dropdown.Link>
@@ -157,7 +158,7 @@ export default function AuthenticatedLayout({ header, children }) {
                             </ResponsiveNavLink>
                             <ResponsiveNavLink
                                 as="button"
-                                onClick={() => router.post(route('logout'))}
+                                onClick={logout}
                             >
                                 Log Out
                             </ResponsiveNavLink>

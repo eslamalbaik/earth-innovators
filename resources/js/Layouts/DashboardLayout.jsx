@@ -19,6 +19,7 @@ import LanguageSwitcher from '@/Components/LanguageSwitcher';
 import { useTranslation } from '@/i18n';
 import WhatsAppSupportButton from '@/Components/Support/WhatsAppSupportButton';
 import TrialBanner from '@/Components/TrialBanner';
+import { logout } from '@/utils/logout';
 
 export default function DashboardLayout({ children, header }) {
     const { t } = useTranslation();
@@ -982,7 +983,7 @@ export default function DashboardLayout({ children, header }) {
                                                     className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 transition hover:bg-red-50"
                                                     onClick={() => {
                                                         setUserDropdownOpen(false);
-                                                        router.post(route('logout'));
+                                                        logout();
                                                     }}
                                                 >
                                                     <FaSignOutAlt className="text-red-500" />
