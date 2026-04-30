@@ -5,7 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\PaymentGatewaySetting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class PaymentGatewayController extends Controller
@@ -36,18 +37,21 @@ class PaymentGatewayController extends Controller
             'sort_order' => 'integer|min:0',
         ]);
 
-        // Handle additional_settings as JSON
         if ($request->has('additional_settings')) {
             $validated['additional_settings'] = json_encode($request->additional_settings);
         }
 
         $paymentGateway->update($validated);
+        $envSyncResult = $this->updateConfigFile($paymentGateway);
 
-        // Update .env file or config cache if needed
-        $this->updateConfigFile($paymentGateway);
-
-        return redirect()->route('admin.payment-gateways.index')
+        $redirect = redirect()->route('admin.payment-gateways.index')
             ->with('success', 'تم تحديث إعدادات بوابة الدفع بنجاح');
+
+        if (!$envSyncResult['success']) {
+            $redirect->with('warning', $envSyncResult['message']);
+        }
+
+        return $redirect;
     }
 
     public function toggleStatus(PaymentGatewaySetting $paymentGateway)
@@ -56,16 +60,21 @@ class PaymentGatewayController extends Controller
             'is_enabled' => !$paymentGateway->is_enabled,
         ]);
 
-        $this->updateConfigFile($paymentGateway);
+        $envSyncResult = $this->updateConfigFile($paymentGateway);
 
-        return redirect()->back()
+        $redirect = redirect()->back()
             ->with('success', $paymentGateway->is_enabled ? 'تم تفعيل بوابة الدفع' : 'تم إلغاء تفعيل بوابة الدفع');
+
+        if (!$envSyncResult['success']) {
+            $redirect->with('warning', $envSyncResult['message']);
+        }
+
+        return $redirect;
     }
 
     public function testConnection(PaymentGatewaySetting $paymentGateway)
     {
         try {
-            // Test connection based on gateway type
             $result = $this->performConnectionTest($paymentGateway);
 
             return response()->json([
@@ -80,22 +89,27 @@ class PaymentGatewayController extends Controller
         }
     }
 
-    private function updateConfigFile(PaymentGatewaySetting $gateway)
+    private function updateConfigFile(PaymentGatewaySetting $gateway): array
     {
-        // Update config/services.php values via .env
-        // This is a simplified approach - in production, you might want to use a config cache
         $envFile = base_path('.env');
-        
+
         if (!file_exists($envFile)) {
-            return;
+            return [
+                'success' => false,
+                'message' => 'تم حفظ الإعدادات في قاعدة البيانات، لكن ملف البيئة .env غير موجود على الخادم.',
+            ];
         }
 
-        $envContent = file_get_contents($envFile);
-        
-        // Update gateway-specific environment variables
+        $envContent = @file_get_contents($envFile);
+        if ($envContent === false) {
+            return [
+                'success' => false,
+                'message' => 'تم حفظ الإعدادات في قاعدة البيانات، لكن تعذر قراءة ملف البيئة .env على الخادم.',
+            ];
+        }
+
         $gatewayName = strtoupper($gateway->gateway_name);
-        
-        // Update API key
+
         if ($gateway->api_key) {
             $pattern = "/^{$gatewayName}_API_KEY=.*/m";
             $replacement = "{$gatewayName}_API_KEY={$gateway->api_key}";
@@ -106,7 +120,6 @@ class PaymentGatewayController extends Controller
             }
         }
 
-        // Update test mode
         $pattern = "/^{$gatewayName}_TEST_MODE=.*/m";
         $replacement = "{$gatewayName}_TEST_MODE=" . ($gateway->is_test_mode ? 'true' : 'false');
         if (preg_match($pattern, $envContent)) {
@@ -115,43 +128,59 @@ class PaymentGatewayController extends Controller
             $envContent .= "\n{$replacement}";
         }
 
-        // Update webhook secret if exists
-        if ($gateway->webhook_secret) {
-            $pattern = "/^{$gatewayName}_WEBHOOK_SECRET=.*/m";
-            $replacement = "{$gatewayName}_WEBHOOK_SECRET={$gateway->webhook_secret}";
-            if (preg_match($pattern, $envContent)) {
-                $envContent = preg_replace($pattern, $replacement, $envContent);
-            } else {
-                $envContent .= "\n{$replacement}";
-            }
+        $pattern = "/^{$gatewayName}_WEBHOOK_SECRET=.*/m";
+        $replacement = "{$gatewayName}_WEBHOOK_SECRET=" . ($gateway->webhook_secret ?? '');
+        if (preg_match($pattern, $envContent)) {
+            $envContent = preg_replace($pattern, $replacement, $envContent);
+        } else {
+            $envContent .= "\n{$replacement}";
         }
 
-        file_put_contents($envFile, $envContent);
+        try {
+            $written = @file_put_contents($envFile, $envContent);
+
+            if ($written === false) {
+                throw new \RuntimeException('Unable to write .env file.');
+            }
+
+            return [
+                'success' => true,
+                'message' => null,
+            ];
+        } catch (\Throwable $exception) {
+            Log::warning('Failed to sync payment gateway settings to .env', [
+                'gateway' => $gateway->gateway_name,
+                'path' => $envFile,
+                'error' => $exception->getMessage(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'تم حفظ الإعدادات في قاعدة البيانات، لكن تعذر تحديث ملف .env على الخادم بسبب الصلاحيات. قد تحتاج لتحديث متغيرات البيئة يدويًا.',
+            ];
+        }
     }
 
     private function performConnectionTest(PaymentGatewaySetting $gateway)
     {
-        switch ($gateway->gateway_name) {
-            case 'tamara':
-                return $this->testTamaraConnection($gateway);
-            case 'ziina':
-                return $this->testZiinaConnection($gateway);
-            default:
-                return [
-                    'success' => false,
-                    'message' => 'نوع بوابة الدفع غير مدعوم للاختبار',
-                ];
-        }
+        return match ($gateway->gateway_name) {
+            'tamara' => $this->testTamaraConnection($gateway),
+            'ziina' => $this->testZiinaConnection($gateway),
+            default => [
+                'success' => false,
+                'message' => 'نوع بوابة الدفع غير مدعوم للاختبار',
+            ],
+        };
     }
 
     private function testTamaraConnection(PaymentGatewaySetting $gateway)
     {
         try {
-            $baseUrl = $gateway->is_test_mode 
+            $baseUrl = $gateway->is_test_mode
                 ? 'https://api-sandbox.tamara.co'
                 : 'https://api.tamara.co';
 
-            $response = \Illuminate\Support\Facades\Http::withHeaders([
+            $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $gateway->api_key,
             ])->get("{$baseUrl}/merchants/me");
 
@@ -177,16 +206,14 @@ class PaymentGatewayController extends Controller
     private function testZiinaConnection(PaymentGatewaySetting $gateway)
     {
         try {
-            // Ziina uses the same base URL for test and production
             $baseUrl = 'https://api-v2.ziina.com/api';
 
-            // Try to create a minimal test payment intent to verify credentials
-            $response = \Illuminate\Support\Facades\Http::withHeaders([
+            $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $gateway->api_key,
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
             ])->post("{$baseUrl}/payment_intent", [
-                'amount' => 200, // 2 AED in fils (minimum amount)
+                'amount' => 200,
                 'currency_code' => 'AED',
                 'success_url' => 'https://example.com/success',
                 'cancel_url' => 'https://example.com/cancel',
@@ -199,11 +226,10 @@ class PaymentGatewayController extends Controller
                 ];
             }
 
-            // Check if it's an authentication error
             if ($response->status() === 401) {
                 return [
                     'success' => false,
-                    'message' => 'فشل الاتصال: مفتاح API غير صحيح (Authentication Required)',
+                    'message' => 'فشل الاتصال: مفتاح API غير صحيح',
                 ];
             }
 
@@ -219,4 +245,3 @@ class PaymentGatewayController extends Controller
         }
     }
 }
-
