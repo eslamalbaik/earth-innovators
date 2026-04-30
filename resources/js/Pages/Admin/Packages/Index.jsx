@@ -23,6 +23,18 @@ export default function AdminPackagesIndex({ packages, stats }) {
         }).format(amount);
     };
 
+    const getAudienceLabel = (audience) => {
+        const labels = {
+            all: language === 'ar' ? 'الكل' : 'All',
+            student: language === 'ar' ? 'الطلاب' : 'Students',
+            teacher: language === 'ar' ? 'المعلمون' : 'Teachers',
+            school: language === 'ar' ? 'المدارس' : 'Schools',
+            educational_institution: language === 'ar' ? 'المؤسسات التعليمية' : 'Educational Institutions',
+        };
+
+        return labels[audience] || labels.all;
+    };
+
     const handleDelete = (pkg) => {
         setPackageToDelete(pkg);
         setShowDeleteModal(true);
@@ -194,6 +206,10 @@ export default function AdminPackagesIndex({ packages, stats }) {
                                     )}
 
                                     <div className="flex flex-wrap gap-2 mb-4">
+                                        <span className="px-2 py-1 bg-sky-100 text-sky-800 rounded text-xs font-semibold">
+                                            {language === 'ar' ? 'الفئة: ' : 'Audience: '}
+                                            {getAudienceLabel(pkg.audience)}
+                                        </span>
                                         {pkg.points_bonus > 0 && (
                                             <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs">
                                                 {t('adminPackagesPage.badges.pointsBonus', { points: pkg.points_bonus })}

@@ -27,6 +27,7 @@ export default function AdminPackagesCreate() {
         trial_days: 14,
         features: [],
         features_ar: [],
+        audience: 'all',
         is_active: true,
         is_popular: false,
     });
@@ -300,6 +301,27 @@ export default function AdminPackagesCreate() {
                             />
                             {errors.challenges_limit && (
                                 <p className="mt-1 text-sm text-red-600">{errors.challenges_limit}</p>
+                            )}
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                الفئة المستهدفة <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                                value={data.audience}
+                                onChange={(e) => setData('audience', e.target.value)}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.audience ? 'border-red-500' : 'border-gray-300'}`}
+                                required
+                            >
+                                <option value="all">الكل</option>
+                                <option value="student">الطلاب</option>
+                                <option value="teacher">المعلمون</option>
+                                <option value="school">المدارس</option>
+                                <option value="educational_institution">المؤسسات التعليمية</option>
+                            </select>
+                            {errors.audience && (
+                                <p className="mt-1 text-sm text-red-600">{errors.audience}</p>
                             )}
                         </div>
 

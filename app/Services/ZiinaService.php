@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\PaymentGatewaySetting;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -13,8 +14,12 @@ class ZiinaService
 
     public function __construct()
     {
-        $this->apiKey = config('services.ziina.api_key') ?? '';
-        $this->testMode = config('services.ziina.test_mode', true);
+        $gateway = PaymentGatewaySetting::query()
+            ->where('gateway_name', 'ziina')
+            ->first();
+
+        $this->apiKey = $gateway?->api_key ?: (config('services.ziina.api_key') ?? '');
+        $this->testMode = $gateway?->is_test_mode ?? config('services.ziina.test_mode', true);
         $this->baseUrl = 'https://api-v2.ziina.com/api';
     }
 
@@ -144,7 +149,11 @@ class ZiinaService
      */
     public function verifyWebhookSignature(string $payload, string $signature): bool
     {
-        $webhookSecret = config('services.ziina.webhook_secret');
+        $gateway = PaymentGatewaySetting::query()
+            ->where('gateway_name', 'ziina')
+            ->first();
+
+        $webhookSecret = $gateway?->webhook_secret ?: config('services.ziina.webhook_secret');
         
         if (!$webhookSecret) {
             Log::warning('Ziina webhook secret not configured');

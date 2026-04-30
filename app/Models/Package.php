@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 class Package extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'name',
         'name_ar',
@@ -28,6 +29,7 @@ class Package extends Model
         'trial_days',
         'features',
         'features_ar',
+        'audience',
         'is_active',
         'is_popular',
     ];
@@ -36,6 +38,7 @@ class Package extends Model
         'price' => 'decimal:2',
         'features' => 'array',
         'features_ar' => 'array',
+        'audience' => 'string',
         'is_active' => 'boolean',
         'is_popular' => 'boolean',
         'certificate_access' => 'boolean',
@@ -53,35 +56,25 @@ class Package extends Model
 
     public function resolveAudience(): string
     {
+        if (filled($this->audience)) {
+            return $this->audience;
+        }
+
         if ($this->is_trial) {
             return 'all';
         }
 
-        $haystack = Str::lower(trim(($this->name ?? '') . ' ' . ($this->name_ar ?? '')));
+        $haystack = Str::lower(trim(
+            implode(' ', array_filter([
+                $this->name ?? '',
+                $this->name_ar ?? '',
+                $this->description ?? '',
+                $this->description_ar ?? '',
+            ]))
+        ));
 
-        if (
-            str_contains($haystack, 'educational institution')
-            || str_contains($haystack, 'institution')
-            || str_contains($haystack, 'المؤسسة التعليمية')
-            || str_contains($haystack, 'المؤسسة')
-        ) {
-            return 'educational_institution';
-        }
-
-        if (str_contains($haystack, 'school') || str_contains($haystack, 'المدرسة')) {
-            return 'school';
-        }
-
-        if (
-            str_contains($haystack, 'teacher')
-            || str_contains($haystack, 'المعلم')
-            || str_contains($haystack, 'المدرس')
-        ) {
-            return 'teacher';
-        }
-
-        if (str_contains($haystack, 'student') || str_contains($haystack, 'الطالب')) {
-            return 'student';
+        if (preg_match('/\[(student|teacher|school|educational_institution|all)\]/i', $haystack, $matches)) {
+            return Str::lower($matches[1]);
         }
 
         return 'all';

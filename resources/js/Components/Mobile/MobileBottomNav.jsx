@@ -24,6 +24,15 @@ const getRoleLinks = (role) => {
             profile: '/profile',
         };
     }
+    if (role === 'educational_institution') {
+        return {
+            home: '/school/dashboard',
+            dashboard: '/school/dashboard',
+            projects: '/school/projects',
+            challenges: '/school/challenges',
+            profile: '/profile',
+        };
+    }
     if (role === 'student') {
         return {
             home: '/dashboard',
@@ -207,6 +216,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                                                 {role === 'student' && t('roles.student')}
                                                 {role === 'teacher' && t('roles.teacher')}
                                                 {role === 'school' && t('roles.school')}
+                                                {role === 'educational_institution' && t('roles.educationalInstitution')}
                                             </div>
                                         </div>
                                     </div>
@@ -292,7 +302,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                                 {userDropdownOpen && (
                                     <div className="absolute bottom-full end-0 mb-2 w-40 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden z-50">
                                         {/* Dashboard link for all roles */}
-                                        {(role === 'admin' || role === 'teacher' || role === 'school' || role === 'student') && (
+                                        {(role === 'admin' || role === 'teacher' || role === 'school' || role === 'educational_institution' || role === 'student') && (
                                             <>
                                                 <button
                                                     type="button"
@@ -318,7 +328,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                                         >
                                             <span>{t('profile.profile')}</span>
                                         </button>
-                                        {role === 'student' && (
+                                        {(role === 'student' || role === 'school' || role === 'educational_institution') && (
                                             <>
                                                 <div className="border-t border-gray-100" />
                                                 <button

@@ -69,7 +69,7 @@ class PackageService extends BaseService
                 'id', 'name', 'name_ar', 'description', 'description_ar',
                 'price', 'currency', 'duration_type', 'duration_months',
                 'points_bonus', 'projects_limit', 'challenges_limit',
-                'certificate_access', 'badge_access', 'is_trial', 'trial_days', 'features', 'features_ar',
+                'certificate_access', 'badge_access', 'is_trial', 'trial_days', 'features', 'features_ar', 'audience',
                 'is_active', 'is_popular', 'created_at'
             )->get();
         }, 3600); // Cache for 1 hour
@@ -410,6 +410,8 @@ class PackageService extends BaseService
         } else {
             $data['trial_days'] = null;
         }
+
+        $data['audience'] = $data['audience'] ?? 'all';
 
         return $data;
     }

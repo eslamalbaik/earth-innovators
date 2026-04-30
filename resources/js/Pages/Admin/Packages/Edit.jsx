@@ -27,6 +27,7 @@ export default function AdminPackagesEdit({ package: pkg }) {
         trial_days: pkg.trial_days || 14,
         features: pkg.features || [],
         features_ar: pkg.features_ar || [],
+        audience: pkg.audience || 'all',
         is_active: pkg.is_active !== undefined ? pkg.is_active : true,
         is_popular: pkg.is_popular || false,
     });
@@ -272,6 +273,27 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent border-gray-300"
                                 placeholder={t('adminPackagesCreatePage.placeholders.unlimited')}
                             />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                الفئة المستهدفة <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                                value={data.audience}
+                                onChange={(e) => setData('audience', e.target.value)}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.audience ? 'border-red-500' : 'border-gray-300'}`}
+                                required
+                            >
+                                <option value="all">الكل</option>
+                                <option value="student">الطلاب</option>
+                                <option value="teacher">المعلمون</option>
+                                <option value="school">المدارس</option>
+                                <option value="educational_institution">المؤسسات التعليمية</option>
+                            </select>
+                            {errors.audience && (
+                                <p className="mt-1 text-sm text-red-600">{errors.audience}</p>
+                            )}
                         </div>
 
                         <div>

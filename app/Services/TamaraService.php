@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\PaymentGatewaySetting;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -15,16 +16,20 @@ class TamaraService
 
     public function __construct()
     {
-        $this->apiToken = config('services.tamara.api_key') ?? '';
-        $this->notificationToken = config('services.tamara.notification_key') ?? '';
-        $this->publicKey = config('services.tamara.public_key') ?? '';
-        $this->isSandbox = (bool) (config('services.tamara.sandbox') ?? true);
+        $gateway = PaymentGatewaySetting::query()
+            ->where('gateway_name', 'tamara')
+            ->first();
+
+        $this->apiToken = $gateway?->api_key ?: (config('services.tamara.api_key') ?? '');
+        $this->notificationToken = $gateway?->api_secret ?: (config('services.tamara.notification_key') ?? '');
+        $this->publicKey = $gateway?->public_key ?: (config('services.tamara.public_key') ?? '');
+        $this->isSandbox = $gateway?->is_test_mode ?? (bool) (config('services.tamara.sandbox') ?? true);
 
         $defaultBaseUrl = $this->isSandbox
             ? 'https://api-sandbox.tamara.co'
             : 'https://api.tamara.co';
 
-        $this->baseUrl = rtrim(config('services.tamara.base_url') ?? $defaultBaseUrl, '/');
+        $this->baseUrl = rtrim($gateway?->base_url ?: (config('services.tamara.base_url') ?? $defaultBaseUrl), '/');
     }
 
     public function createCheckout(array $orderData): ?array

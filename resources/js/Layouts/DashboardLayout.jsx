@@ -56,6 +56,7 @@ export default function DashboardLayout({ children, header }) {
             case 'teacher':
                 return t('dashboard.teacherDashboard');
             case 'school':
+            case 'educational_institution':
                 return t('dashboard.schoolDashboard');
             case 'admin':
                 return t('dashboard.adminDashboard');
@@ -487,6 +488,7 @@ export default function DashboardLayout({ children, header }) {
             { name: t('sidebar.addReports'), href: '/school/reports', icon: FaFile },
             { name: t('sidebar.students'), href: '/school/students', icon: FaGraduationCap },
             { name: t('sidebar.certificates'), href: '/school/certificates', icon: FaFile },
+            { name: t('sidebar.packages'), href: '/packages', icon: FaCreditCard },
             { name: t('sidebar.profile'), href: '/profile', icon: FaUser },
         ],
         educational_institution: [
@@ -532,6 +534,7 @@ export default function DashboardLayout({ children, header }) {
             { name: t('sidebar.addReports'), href: '/school/reports', icon: FaFile },
             { name: t('sidebar.students'), href: '/school/students', icon: FaGraduationCap },
             { name: t('sidebar.certificates'), href: '/school/certificates', icon: FaFile },
+            { name: t('sidebar.packages'), href: '/packages', icon: FaCreditCard },
             { name: t('sidebar.profile'), href: '/profile', icon: FaUser },
         ],
         student: [
@@ -942,7 +945,7 @@ export default function DashboardLayout({ children, header }) {
                                     {userDropdownOpen && (
                                         <div className="absolute end-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
                                             <div className="py-2">
-                                                {(auth?.user?.role === 'admin' || auth?.user?.role === 'teacher' || auth?.user?.role === 'school' || auth?.user?.role === 'student') && (
+                                                {(auth?.user?.role === 'admin' || auth?.user?.role === 'teacher' || auth?.user?.role === 'school' || auth?.user?.role === 'educational_institution' || auth?.user?.role === 'student') && (
                                                     <>
                                                         <Link
                                                             href={
@@ -950,7 +953,7 @@ export default function DashboardLayout({ children, header }) {
                                                                     ? '/admin/dashboard'
                                                                     : auth?.user?.role === 'teacher'
                                                                         ? '/teacher/dashboard'
-                                                                        : auth?.user?.role === 'school'
+                                                                        : auth?.user?.role === 'school' || auth?.user?.role === 'educational_institution'
                                                                             ? '/school/dashboard'
                                                                             : '/dashboard'
                                                             }

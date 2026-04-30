@@ -31,6 +31,7 @@ class StorePackageRequest extends FormRequest
             'trial_days' => 'nullable|integer|min:1|max:90',
             'features' => 'nullable|array',
             'features_ar' => 'nullable|array',
+            'audience' => 'required|in:all,student,teacher,school,educational_institution',
             'is_active' => 'boolean',
             'is_popular' => 'boolean',
         ];
