@@ -453,7 +453,7 @@ Route::get('/my-subscriptions', [\App\Http\Controllers\PackageSubscriptionContro
 Route::post('/packages/{package}/subscribe', [\App\Http\Controllers\PackageSubscriptionController::class, 'subscribe'])
     ->middleware('auth')
     ->name('packages.subscribe');
-Route::post('/packages/subscriptions/{userPackage}/cancel', [\App\Http\Controllers\PackageSubscriptionController::class, 'cancelSubscription'])
+Route::match(['get', 'post'], '/packages/subscriptions/{userPackage}/cancel', [\App\Http\Controllers\PackageSubscriptionController::class, 'cancelSubscription'])
     ->middleware('auth')
     ->name('packages.subscription.cancel');
 Route::get('/packages/payment/{payment}/success', [\App\Http\Controllers\PackageSubscriptionController::class, 'paymentSuccess'])
