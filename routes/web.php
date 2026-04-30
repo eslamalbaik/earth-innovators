@@ -568,9 +568,9 @@ Route::middleware(['auth', 'membership_active'])->group(function () {
     Route::post('/payment/{booking}/initiate', [\App\Http\Controllers\PaymentController::class, 'initiate'])->name('payment.initiate');
     Route::get('/payment/{payment}/success', [\App\Http\Controllers\PaymentController::class, 'success'])->name('payment.success');
     Route::get('/payment/{payment}/failure', [\App\Http\Controllers\PaymentController::class, 'failure'])->name('payment.failure');
-    Route::post('/payment/{payment}/cancel', [\App\Http\Controllers\PaymentController::class, 'cancel'])->name('payment.cancel');
+    Route::match(['get', 'post'], '/payment/{payment}/cancel', [\App\Http\Controllers\PaymentController::class, 'cancel'])->name('payment.cancel');
     Route::post('/payment/{payment}/capture', [\App\Http\Controllers\PaymentController::class, 'capture'])->name('payment.capture');
-    Route::post('/payment/{payment}/refund', [\App\Http\Controllers\PaymentController::class, 'refund'])->name('payment.refund');
+    Route::match(['get', 'post'], '/payment/{payment}/refund', [\App\Http\Controllers\PaymentController::class, 'refund'])->name('payment.refund');
 
     Route::get('/student/subjects', [\App\Http\Controllers\Student\StudentSubjectController::class, 'index'])->name('student.subjects');
     Route::post('/student/subjects', [\App\Http\Controllers\Student\StudentSubjectController::class, 'store'])->name('student.subjects.store');
@@ -637,8 +637,8 @@ Route::middleware(['auth', 'school', 'membership_active'])->prefix('school')->na
 
     // إدارة المشاريع
     Route::get('/projects/pending', [\App\Http\Controllers\School\SchoolProjectController::class, 'pending'])->name('projects.pending');
-    Route::post('/projects/{project}/approve', [\App\Http\Controllers\School\SchoolProjectController::class, 'approve'])->name('projects.approve');
-    Route::post('/projects/{project}/reject', [\App\Http\Controllers\School\SchoolProjectController::class, 'reject'])->name('projects.reject');
+    Route::match(['get', 'post'], '/projects/{project}/approve', [\App\Http\Controllers\School\SchoolProjectController::class, 'approve'])->name('projects.approve');
+    Route::match(['get', 'post'], '/projects/{project}/reject', [\App\Http\Controllers\School\SchoolProjectController::class, 'reject'])->name('projects.reject');
     Route::resource('projects', \App\Http\Controllers\School\SchoolProjectController::class);
 
     // إدارة الطلاب
@@ -658,8 +658,8 @@ Route::middleware(['auth', 'school', 'membership_active'])->prefix('school')->na
 
     // إدارة الإصدارات
     Route::get('/publications/pending', [\App\Http\Controllers\School\SchoolPublicationController::class, 'pending'])->name('publications.pending');
-    Route::post('/publications/{publication}/approve', [\App\Http\Controllers\School\SchoolPublicationController::class, 'approve'])->name('publications.approve');
-    Route::post('/publications/{publication}/reject', [\App\Http\Controllers\School\SchoolPublicationController::class, 'reject'])->name('publications.reject');
+    Route::match(['get', 'post'], '/publications/{publication}/approve', [\App\Http\Controllers\School\SchoolPublicationController::class, 'approve'])->name('publications.approve');
+    Route::match(['get', 'post'], '/publications/{publication}/reject', [\App\Http\Controllers\School\SchoolPublicationController::class, 'reject'])->name('publications.reject');
     Route::resource('publications', \App\Http\Controllers\School\SchoolPublicationController::class);
 
     // إدارة التحديات
@@ -668,26 +668,26 @@ Route::middleware(['auth', 'school', 'membership_active'])->prefix('school')->na
     // إدارة تقديمات التحديات
     Route::get('/challenge-submissions', [\App\Http\Controllers\School\SchoolChallengeSubmissionController::class, 'index'])->name('challenge-submissions.index');
     Route::get('/challenge-submissions/{submission}', [\App\Http\Controllers\School\SchoolChallengeSubmissionController::class, 'show'])->name('challenge-submissions.show');
-    Route::post('/challenge-submissions/{submission}/evaluate', [\App\Http\Controllers\School\SchoolChallengeSubmissionController::class, 'evaluate'])->name('challenge-submissions.evaluate');
+    Route::match(['get', 'post'], '/challenge-submissions/{submission}/evaluate', [\App\Http\Controllers\School\SchoolChallengeSubmissionController::class, 'evaluate'])->name('challenge-submissions.evaluate');
     Route::get('/challenge-suggestions', [\App\Http\Controllers\School\SchoolChallengeSuggestionController::class, 'index'])->name('challenge-suggestions.index');
     Route::patch('/challenge-suggestions/{challengeSuggestion}/status', [\App\Http\Controllers\School\SchoolChallengeSuggestionController::class, 'updateStatus'])->name('challenge-suggestions.update-status');
 
     // إدارة الشارات من المعلمين
     Route::get('/badges/pending', [\App\Http\Controllers\School\SchoolBadgeController::class, 'pending'])->name('badges.pending');
-    Route::post('/badges/{badge}/approve', [\App\Http\Controllers\School\SchoolBadgeController::class, 'approve'])->name('badges.approve');
-    Route::post('/badges/{badge}/reject', [\App\Http\Controllers\School\SchoolBadgeController::class, 'reject'])->name('badges.reject');
+    Route::match(['get', 'post'], '/badges/{badge}/approve', [\App\Http\Controllers\School\SchoolBadgeController::class, 'approve'])->name('badges.approve');
+    Route::match(['get', 'post'], '/badges/{badge}/reject', [\App\Http\Controllers\School\SchoolBadgeController::class, 'reject'])->name('badges.reject');
     Route::get('/badges', [\App\Http\Controllers\School\SchoolBadgeController::class, 'index'])->name('badges.index');
     Route::get('/badges/{badge}', [\App\Http\Controllers\School\SchoolBadgeController::class, 'show'])->name('badges.show');
 
     // إدارة تسليمات المشاريع للمدرسة
     Route::get('/submissions', [\App\Http\Controllers\School\SchoolSubmissionController::class, 'index'])->name('submissions.index');
     Route::get('/submissions/{submission}', [\App\Http\Controllers\School\SchoolSubmissionController::class, 'show'])->name('submissions.show');
-    Route::post('/submissions/{submission}/evaluate', [\App\Http\Controllers\School\SchoolSubmissionController::class, 'evaluate'])->name('submissions.evaluate');
+    Route::match(['get', 'post'], '/submissions/{submission}/evaluate', [\App\Http\Controllers\School\SchoolSubmissionController::class, 'evaluate'])->name('submissions.evaluate');
 
     // إدارة الشهادات
     Route::get('/certificates', [\App\Http\Controllers\School\SchoolCertificateController::class, 'index'])->name('certificates.index');
-    Route::post('/certificates/{certificate}/approve', [\App\Http\Controllers\School\SchoolCertificateController::class, 'approve'])->name('certificates.approve');
-    Route::post('/certificates/{certificate}/reject', [\App\Http\Controllers\School\SchoolCertificateController::class, 'reject'])->name('certificates.reject');
+    Route::match(['get', 'post'], '/certificates/{certificate}/approve', [\App\Http\Controllers\School\SchoolCertificateController::class, 'approve'])->name('certificates.approve');
+    Route::match(['get', 'post'], '/certificates/{certificate}/reject', [\App\Http\Controllers\School\SchoolCertificateController::class, 'reject'])->name('certificates.reject');
 
     // التقارير
     Route::get('/reports', [\App\Http\Controllers\School\SchoolReportController::class, 'index'])->name('reports.index');
@@ -723,8 +723,8 @@ Route::middleware(['auth', 'teacher', 'membership_active'])->group(function () {
     Route::post('/teacher/reviews/{review}/reply', [\App\Http\Controllers\Teacher\TeacherReviewController::class, 'reply'])->name('teacher.reviews.reply');
 
     Route::get('/teacher/payments', [\App\Http\Controllers\Teacher\TeacherPaymentController::class, 'index'])->name('teacher.payments');
-    Route::post('/teacher/payments/{id}/cancel', [\App\Http\Controllers\Teacher\TeacherPaymentController::class, 'cancel'])->name('teacher.payments.cancel');
-    Route::post('/teacher/payments/{id}/refund', [\App\Http\Controllers\Teacher\TeacherPaymentController::class, 'refund'])->name('teacher.payments.refund');
+    Route::match(['get', 'post'], '/teacher/payments/{id}/cancel', [\App\Http\Controllers\Teacher\TeacherPaymentController::class, 'cancel'])->name('teacher.payments.cancel');
+    Route::match(['get', 'post'], '/teacher/payments/{id}/refund', [\App\Http\Controllers\Teacher\TeacherPaymentController::class, 'refund'])->name('teacher.payments.refund');
     Route::get('/teacher/availability', [AvailabilityController::class, 'index'])->name('teacher.availability.index');
     Route::post('/teacher/availability', [AvailabilityController::class, 'store'])->name('teacher.availability.store');
     Route::put('/teacher/availability/{availability}', [AvailabilityController::class, 'update'])->name('teacher.availability.update');
@@ -751,7 +751,7 @@ Route::middleware(['auth', 'teacher', 'membership_active'])->group(function () {
     // إدارة تقديمات التحديات
     Route::get('/teacher/challenge-submissions', [\App\Http\Controllers\Teacher\TeacherChallengeSubmissionController::class, 'index'])->name('teacher.challenge-submissions.index');
     Route::get('/teacher/challenge-submissions/{submission}', [\App\Http\Controllers\Teacher\TeacherChallengeSubmissionController::class, 'show'])->name('teacher.challenge-submissions.show');
-    Route::post('/teacher/challenge-submissions/{submission}/evaluate', [\App\Http\Controllers\Teacher\TeacherChallengeSubmissionController::class, 'evaluate'])->name('teacher.challenge-submissions.evaluate');
+    Route::match(['get', 'post'], '/teacher/challenge-submissions/{submission}/evaluate', [\App\Http\Controllers\Teacher\TeacherChallengeSubmissionController::class, 'evaluate'])->name('teacher.challenge-submissions.evaluate');
     Route::get('/teacher/challenge-suggestions', [\App\Http\Controllers\Teacher\TeacherChallengeSuggestionController::class, 'index'])->name('teacher.challenge-suggestions.index');
     Route::patch('/teacher/challenge-suggestions/{challengeSuggestion}/status', [\App\Http\Controllers\Teacher\TeacherChallengeSuggestionController::class, 'updateStatus'])->name('teacher.challenge-suggestions.update-status');
 
@@ -777,7 +777,7 @@ Route::middleware(['auth', 'teacher', 'membership_active'])->group(function () {
     // إدارة تسليمات المشاريع للمعلمين
     Route::get('/teacher/submissions', [\App\Http\Controllers\Teacher\TeacherSubmissionController::class, 'index'])->name('teacher.submissions.index');
     Route::get('/teacher/submissions/{submission}', [\App\Http\Controllers\Teacher\TeacherSubmissionController::class, 'show'])->name('teacher.submissions.show');
-    Route::post('/teacher/submissions/{submission}/evaluate', [\App\Http\Controllers\Teacher\TeacherSubmissionController::class, 'evaluate'])->name('teacher.submissions.evaluate');
+    Route::match(['get', 'post'], '/teacher/submissions/{submission}/evaluate', [\App\Http\Controllers\Teacher\TeacherSubmissionController::class, 'evaluate'])->name('teacher.submissions.evaluate');
 
     // إدارة الشهادات
     Route::get('/teacher/certificates', [\App\Http\Controllers\Teacher\TeacherCertificateController::class, 'index'])->name('teacher.certificates.index');
@@ -821,8 +821,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::get('/teacher-applications', [App\Http\Controllers\Admin\TeacherApplicationController::class, 'index'])->name('teacher-applications.index');
     Route::get('/teacher-applications/{application}', [App\Http\Controllers\Admin\TeacherApplicationController::class, 'show'])->name('teacher-applications.show');
-    Route::post('/teacher-applications/{application}/approve', [App\Http\Controllers\Admin\TeacherApplicationController::class, 'approve'])->name('teacher-applications.approve');
-    Route::post('/teacher-applications/{application}/reject', [App\Http\Controllers\Admin\TeacherApplicationController::class, 'reject'])->name('teacher-applications.reject');
+    Route::match(['get', 'post'], '/teacher-applications/{application}/approve', [App\Http\Controllers\Admin\TeacherApplicationController::class, 'approve'])->name('teacher-applications.approve');
+    Route::match(['get', 'post'], '/teacher-applications/{application}/reject', [App\Http\Controllers\Admin\TeacherApplicationController::class, 'reject'])->name('teacher-applications.reject');
     Route::post('/teacher-applications/{application}/review', [App\Http\Controllers\Admin\TeacherApplicationController::class, 'markUnderReview'])->name('teacher-applications.review');
 
     Route::get('/import', [\App\Http\Controllers\Admin\ImportController::class, 'index'])->name('import.index');
@@ -848,27 +848,27 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Certificates Management
     Route::resource('certificates', \App\Http\Controllers\Admin\CertificateController::class);
     Route::get('/certificates/{certificate}/download', [\App\Http\Controllers\Admin\CertificateController::class, 'download'])->name('certificates.download');
-    Route::post('/certificates/{certificate}/toggle-status', [\App\Http\Controllers\Admin\CertificateController::class, 'toggleStatus'])->name('certificates.toggle-status');
+    Route::match(['get', 'post'], '/certificates/{certificate}/toggle-status', [\App\Http\Controllers\Admin\CertificateController::class, 'toggleStatus'])->name('certificates.toggle-status');
 
     // Payment Gateways Management
     Route::get('/payment-gateways', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'index'])->name('payment-gateways.index');
     Route::put('/payment-gateways/{paymentGateway}', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'update'])->name('payment-gateways.update');
-    Route::post('/payment-gateways/{paymentGateway}/toggle-status', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'toggleStatus'])->name('payment-gateways.toggle-status');
+    Route::match(['get', 'post'], '/payment-gateways/{paymentGateway}/toggle-status', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'toggleStatus'])->name('payment-gateways.toggle-status');
     Route::post('/payment-gateways/{paymentGateway}/test-connection', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'testConnection'])->name('payment-gateways.test-connection');
 
     // Point store rewards (CRUD + approval queue)
     Route::resource('store-rewards', \App\Http\Controllers\Admin\StoreRewardController::class)->except(['show']);
     Route::get('/store-reward-requests', [\App\Http\Controllers\Admin\StoreRewardRequestController::class, 'index'])->name('store-reward-requests.index');
-    Route::post('/store-reward-requests/{store_reward_request}/approve', [\App\Http\Controllers\Admin\StoreRewardRequestController::class, 'approve'])->name('store-reward-requests.approve');
-    Route::post('/store-reward-requests/{store_reward_request}/reject', [\App\Http\Controllers\Admin\StoreRewardRequestController::class, 'reject'])->name('store-reward-requests.reject');
+    Route::match(['get', 'post'], '/store-reward-requests/{store_reward_request}/approve', [\App\Http\Controllers\Admin\StoreRewardRequestController::class, 'approve'])->name('store-reward-requests.approve');
+    Route::match(['get', 'post'], '/store-reward-requests/{store_reward_request}/reject', [\App\Http\Controllers\Admin\StoreRewardRequestController::class, 'reject'])->name('store-reward-requests.reject');
 
     // Packages Management
     Route::resource('packages', \App\Http\Controllers\Admin\PackageController::class);
-    Route::post('/packages/{package}/toggle-status', [\App\Http\Controllers\Admin\PackageController::class, 'toggleStatus'])->name('packages.toggle-status');
+    Route::match(['get', 'post'], '/packages/{package}/toggle-status', [\App\Http\Controllers\Admin\PackageController::class, 'toggleStatus'])->name('packages.toggle-status');
     Route::get('/packages/{package}/subscribers', [\App\Http\Controllers\Admin\PackageController::class, 'subscribers'])->name('packages.subscribers');
-    Route::post('/packages/subscribers/{userPackage}/update-status', [\App\Http\Controllers\Admin\PackageController::class, 'updateSubscriberStatus'])->name('packages.subscribers.update-status');
-    Route::post('/packages/subscribers/{userPackage}/cancel', [\App\Http\Controllers\Admin\PackageController::class, 'cancelSubscription'])->name('packages.subscribers.cancel');
-    Route::post('/packages/subscribers/{userPackage}/renew', [\App\Http\Controllers\Admin\PackageController::class, 'renewSubscription'])->name('packages.subscribers.renew');
+    Route::match(['get', 'post'], '/packages/subscribers/{userPackage}/update-status', [\App\Http\Controllers\Admin\PackageController::class, 'updateSubscriberStatus'])->name('packages.subscribers.update-status');
+    Route::match(['get', 'post'], '/packages/subscribers/{userPackage}/cancel', [\App\Http\Controllers\Admin\PackageController::class, 'cancelSubscription'])->name('packages.subscribers.cancel');
+    Route::match(['get', 'post'], '/packages/subscribers/{userPackage}/renew', [\App\Http\Controllers\Admin\PackageController::class, 'renewSubscription'])->name('packages.subscribers.renew');
 
     // إدارة الاشتراكات والمدفوعات
     Route::get('/subscriptions', [\App\Http\Controllers\Admin\AdminSubscriptionController::class, 'index'])->name('subscriptions.index');
@@ -876,8 +876,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // إدارة الإصدارات
     Route::resource('publications', \App\Http\Controllers\Admin\AdminPublicationController::class)->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy']);
-    Route::post('/publications/{publication}/approve', [\App\Http\Controllers\Admin\AdminPublicationController::class, 'approve'])->name('publications.approve');
-    Route::post('/publications/{publication}/reject', [\App\Http\Controllers\Admin\AdminPublicationController::class, 'reject'])->name('publications.reject');
+    Route::match(['get', 'post'], '/publications/{publication}/approve', [\App\Http\Controllers\Admin\AdminPublicationController::class, 'approve'])->name('publications.approve');
+    Route::match(['get', 'post'], '/publications/{publication}/reject', [\App\Http\Controllers\Admin\AdminPublicationController::class, 'reject'])->name('publications.reject');
 
     // إدارة التحديات - CRUD كامل
     Route::resource('challenges', \App\Http\Controllers\Admin\AdminChallengeController::class);
@@ -889,7 +889,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // إدارة تقديمات التحديات
     Route::get('/challenges/{challenge}/submissions', [\App\Http\Controllers\Admin\AdminChallengeSubmissionController::class, 'index'])->name('challenge-submissions.index');
     Route::get('/challenge-submissions/{submission}', [\App\Http\Controllers\Admin\AdminChallengeSubmissionController::class, 'show'])->name('challenge-submissions.show');
-    Route::post('/challenge-submissions/{submission}/evaluate', [\App\Http\Controllers\Admin\AdminChallengeSubmissionController::class, 'evaluate'])->name('challenge-submissions.evaluate');
+    Route::match(['get', 'post'], '/challenge-submissions/{submission}/evaluate', [\App\Http\Controllers\Admin\AdminChallengeSubmissionController::class, 'evaluate'])->name('challenge-submissions.evaluate');
 
     // إدارة المشاريع - CRUD كامل
     Route::get('/projects', [\App\Http\Controllers\Admin\AdminProjectController::class, 'index'])->name('projects.index');
@@ -898,13 +898,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/projects/{project}/edit', [\App\Http\Controllers\Admin\AdminProjectController::class, 'edit'])->name('projects.edit');
     Route::put('/projects/{project}', [\App\Http\Controllers\Admin\AdminProjectController::class, 'update'])->name('projects.update');
     Route::get('/projects/{project}', [\App\Http\Controllers\Admin\AdminProjectController::class, 'show'])->name('projects.show');
-    Route::post('/projects/{project}/approve', [\App\Http\Controllers\Admin\AdminProjectController::class, 'approve'])->name('projects.approve');
-    Route::post('/projects/{project}/reject', [\App\Http\Controllers\Admin\AdminProjectController::class, 'reject'])->name('projects.reject');
+    Route::match(['get', 'post'], '/projects/{project}/approve', [\App\Http\Controllers\Admin\AdminProjectController::class, 'approve'])->name('projects.approve');
+    Route::match(['get', 'post'], '/projects/{project}/reject', [\App\Http\Controllers\Admin\AdminProjectController::class, 'reject'])->name('projects.reject');
     Route::delete('/projects/{project}', [\App\Http\Controllers\Admin\AdminProjectController::class, 'destroy'])->name('projects.destroy');
     
     // إدارة تسليمات المشاريع
     Route::get('/submissions/{submission}', [\App\Http\Controllers\Admin\AdminSubmissionController::class, 'show'])->name('submissions.show');
-    Route::post('/submissions/{submission}/evaluate', [\App\Http\Controllers\Admin\AdminSubmissionController::class, 'evaluate'])->name('submissions.evaluate');
+    Route::match(['get', 'post'], '/submissions/{submission}/evaluate', [\App\Http\Controllers\Admin\AdminSubmissionController::class, 'evaluate'])->name('submissions.evaluate');
 
     // إدارة معايير القبول
     Route::get('/acceptance-criteria', [\App\Http\Controllers\Admin\AcceptanceCriteriaController::class, 'index'])->name('acceptance-criteria.index');
@@ -952,8 +952,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
     Route::get('/payments', [\App\Http\Controllers\Admin\PaymentController::class, 'index'])->name('payments.index');
     Route::get('/payments/{id}', [\App\Http\Controllers\Admin\PaymentController::class, 'show'])->name('payments.show');
-    Route::post('/payments/{id}/cancel', [\App\Http\Controllers\Admin\PaymentController::class, 'cancel'])->name('admin.payments.cancel');
-    Route::post('/payments/{id}/refund', [\App\Http\Controllers\Admin\PaymentController::class, 'refund'])->name('admin.payments.refund');
+    Route::match(['get', 'post'], '/payments/{id}/cancel', [\App\Http\Controllers\Admin\PaymentController::class, 'cancel'])->name('admin.payments.cancel');
+    Route::match(['get', 'post'], '/payments/{id}/refund', [\App\Http\Controllers\Admin\PaymentController::class, 'refund'])->name('admin.payments.refund');
 
 });
 

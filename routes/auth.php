@@ -63,6 +63,10 @@ Route::middleware('guest')->group(function () {
     Route::get('reset-password/form/{token}', [\App\Http\Controllers\Auth\PasswordResetOtpController::class, 'showResetForm'])
         ->name('password.reset.form');
 
+    // Backward-compatible alias used by the reset email template.
+    Route::get('reset-password/{token}', [\App\Http\Controllers\Auth\PasswordResetOtpController::class, 'showResetForm'])
+        ->name('password.reset');
+
     Route::post('reset-password', [\App\Http\Controllers\Auth\PasswordResetOtpController::class, 'store'])
         ->name('password.store');
 });
