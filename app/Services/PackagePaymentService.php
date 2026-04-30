@@ -449,16 +449,67 @@ class PackagePaymentService extends BaseService
         */
     private function normalizeErrorMessage($message)
     {
+        if (is_array($message)) {
+            $details = $this->extractGatewayErrorDetails($message);
+            $key = $message['key'] ?? null;
+
+            if ($key === 'toastMessages.packagePaymentRequestFailed' && $details) {
+                return [
+                    'key' => $key,
+                    'details' => $details,
+                ];
+            }
+
+            if (!$key && $details) {
+                return [
+                    'key' => 'toastMessages.packagePaymentRequestFailed',
+                    'details' => $details,
+                ];
+            }
+
+            return $message;
+        }
+
         if (is_string($message)) {
-            $lower = strtolower($message);
-            if (str_contains($lower, 'attempting to transfer') && str_contains($lower, 'inactive')) {
-                return ['key' => 'toastMessages.packagePaymentRequestFailed'];
-            }
-            if (str_contains($lower, 'inactive user')) {
-                return ['key' => 'toastMessages.packagePaymentRequestFailed'];
-            }
+            return [
+                'key' => 'toastMessages.packagePaymentRequestFailed',
+                'details' => $message,
+            ];
         }
 
         return $message;
+    }
+
+    private function extractGatewayErrorDetails(array $message): ?string
+    {
+        $details = $message['details'] ?? null;
+
+        if (is_array($details)) {
+            $code = $details['code'] ?? null;
+            $detailMessage = $details['message'] ?? null;
+
+            if (is_string($code) && is_string($detailMessage) && $detailMessage !== '') {
+                return sprintf('%s: %s', $code, $detailMessage);
+            }
+
+            if (is_string($detailMessage) && $detailMessage !== '') {
+                return $detailMessage;
+            }
+
+            if (is_string($code) && $code !== '') {
+                return $code;
+            }
+        }
+
+        if (is_string($details) && trim($details) !== '') {
+            return trim($details);
+        }
+
+        $messageText = $message['message'] ?? null;
+        if (is_string($messageText) && trim($messageText) !== '') {
+            return trim($messageText);
+        }
+
+        return null;
     }
 }

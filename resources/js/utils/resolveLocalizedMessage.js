@@ -112,7 +112,10 @@ export const resolveLocalizedMessage = (message, language = 'ar') => {
         const translationKey = message.translationKey || message.key;
 
         if (translationKey) {
-            return getTranslation(language, translationKey, message.params || {});
+            const translated = getTranslation(language, translationKey, message.params || {});
+            const details = typeof message.details === 'string' ? message.details.trim() : '';
+
+            return details ? `${translated}\n${details}` : translated;
         }
 
         if (typeof message.message === 'string') {
