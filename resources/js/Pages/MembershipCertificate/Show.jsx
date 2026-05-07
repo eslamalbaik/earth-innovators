@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { FaDownload, FaCertificate, FaCheckCircle, FaTimesCircle, FaTrophy } from 'react-icons/fa';
+import { FaDownload, FaCertificate, FaCheckCircle, FaTimesCircle, FaTrophy, FaBarcode } from 'react-icons/fa';
 import { useRef } from 'react';
 import MobileAppLayout from '@/Layouts/MobileAppLayout';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
@@ -267,12 +267,17 @@ export default function MembershipCertificateShow({ auth, certificate, eligibili
                     <div className="space-y-6">
                         {certificate ? (
                             <>
-                                <div ref={certificateRef} className="bg-gradient-to-br from-[#A3C042] to-[#8CA635] rounded-2xl p-8 text-white text-center shadow-lg">
-                                    <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                                        <FaCertificate className="text-5xl" />
+                                <div ref={certificateRef} className="bg-gradient-to-br from-[#A3C042] to-[#6B8E23] rounded-2xl p-8 text-white text-center shadow-lg border-4 border-white/20">
+                                    <div className="flex items-center justify-center gap-3 mb-4">
+                                        <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+                                            <FaCertificate className="text-3xl" />
+                                        </div>
                                     </div>
-                                    <h2 className="text-2xl font-bold mb-3">{certificate.title}</h2>
-                                    <p className="text-base opacity-90 mb-6">{certificate.description}</p>
+                                    <h3 className="text-lg font-semibold opacity-80 mb-2">أكاديمية إرث المبتكرين</h3>
+                                    <h2 className="text-3xl font-bold mb-4">{certificate.title}</h2>
+                                    <div className="border-t border-b border-white/20 py-3 my-4">
+                                        <p className="text-lg">{certificate.description}</p>
+                                    </div>
                                     <div className="grid grid-cols-2 gap-4 text-sm">
                                         <div>
                                             <div className="opacity-75 mb-1">{t('membershipCertificatePage.certificateNumberLabel')}</div>
@@ -283,6 +288,19 @@ export default function MembershipCertificateShow({ auth, certificate, eligibili
                                             <div className="font-bold">{certificate.issue_date_formatted}</div>
                                         </div>
                                     </div>
+                                    {certificate.barcode && (
+                                        <div className="mt-4 pt-4 border-t border-white/20">
+                                            <div className="flex items-center justify-center gap-2">
+                                                <FaBarcode className="text-2xl" />
+                                                <span className="text-sm">باركود العضوية</span>
+                                            </div>
+                                            <img 
+                                                src={`/storage/${certificate.barcode}`} 
+                                                alt="Barcode" 
+                                                className="mt-2 mx-auto h-16 bg-white/10 rounded"
+                                            />
+                                        </div>
+                                    )}
                                 </div>
 
                                 <button

@@ -288,5 +288,14 @@ class CertificateController extends Controller
         return redirect()->back()
             ->with('success', $certificate->is_active ? 'تم تفعيل الشهادة' : 'تم إلغاء تفعيل الشهادة');
     }
+
+    public function show(Certificate $certificate)
+    {
+        $certificate->load(['user:id,name,email,role,school_id', 'issuer:id,name']);
+
+        return Inertia::render('Admin/Certificates/Show', [
+            'certificate' => $certificate,
+        ]);
+    }
 }
 

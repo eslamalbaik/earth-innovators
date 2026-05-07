@@ -80,9 +80,13 @@ export default function TeacherProjects({ projects, auth }) {
         <>
             <div className="flex items-center justify-between mb-3">
                 <div className="text-lg font-extrabold text-gray-900">{t('teacherProjectsPage.title')}</div>
-                <div className="flex items-center gap-2 text-gray-400">
-                    <span className="text-sm">{t('teacherProjectsPage.filterLabel')}</span>
-                </div>
+                <Link
+                    href={route('teacher.projects.create')}
+                    className="flex items-center gap-2 px-4 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-[#8fa832] transition"
+                >
+                    <FaPlus />
+                    <span className="text-sm font-bold">{t('teacherProjectsPage.createButton') || 'إنشاء مشروع'}</span>
+                </Link>
             </div>
 
             <div className="flex gap-2 overflow-x-auto pb-2">

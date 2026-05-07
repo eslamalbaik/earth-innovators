@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class Package extends Model
@@ -52,6 +53,11 @@ class Package extends Model
         return $this->belongsToMany(User::class, 'user_packages')
             ->withPivot('start_date', 'end_date', 'status', 'auto_renew', 'paid_amount', 'payment_method', 'transaction_id')
             ->withTimestamps();
+    }
+
+    public function userPackages(): HasMany
+    {
+        return $this->hasMany(UserPackage::class);
     }
 
     public function resolveAudience(): string

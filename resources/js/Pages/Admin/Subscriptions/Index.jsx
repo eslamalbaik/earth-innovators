@@ -1,7 +1,7 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
-import { FaSearch, FaFilter, FaEye, FaCreditCard, FaUsers, FaCheckCircle, FaTimesCircle, FaClock, FaExclamationCircle } from 'react-icons/fa';
+import { FaSearch, FaFilter, FaEye, FaCreditCard, FaUsers, FaCheckCircle, FaTimesCircle, FaClock, FaExclamationCircle, FaFileExcel, FaFileCsv } from 'react-icons/fa';
 import { useTranslation } from '@/i18n';
 
 export default function AdminSubscriptionsIndex({
@@ -122,6 +122,45 @@ export default function AdminSubscriptionsIndex({
                         {t('adminSubscriptionsIndexPage.tabs.payments', { count: paymentStats.total })}
                     </button>
                 </div>
+            </div>
+
+            {/* Export Buttons */}
+            <div className="flex justify-end gap-3 mb-6">
+                {type === 'subscriptions' ? (
+                    <>
+                        <a
+                            href={route('admin.subscriptions.export.excel')}
+                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+                        >
+                            <FaFileExcel />
+                            تصدير Excel
+                        </a>
+                        <a
+                            href={route('admin.subscriptions.export.csv')}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                        >
+                            <FaFileCsv />
+                            تصدير CSV
+                        </a>
+                    </>
+                ) : (
+                    <>
+                        <a
+                            href={route('admin.payments.export.excel')}
+                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+                        >
+                            <FaFileExcel />
+                            تصدير Excel
+                        </a>
+                        <a
+                            href={route('admin.payments.export.csv')}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                        >
+                            <FaFileCsv />
+                            تصدير CSV
+                        </a>
+                    </>
+                )}
             </div>
 
             {/* Stats Cards */}

@@ -30,6 +30,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'school_id',
         'teacher_id',
         'membership_number',
+        'membership_barcode',
         'membership_type',
         'account_type',
         'notification_preferences',

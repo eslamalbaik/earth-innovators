@@ -19,7 +19,7 @@ export default function Subjects({ teacher, teacherSubjects, availableSubjects, 
         const filterValidStages = (stagesArray) => {
             if (!Array.isArray(stagesArray)) return [];
 
-            const generalStages = ['الابتدائية', 'المتوسطة', 'الثانوية', 'الجامعية'];
+            const generalStages = ['الابتدائية', 'المتوسطة', 'الثانوية', 'ثانوية بلس', 'الجامعية'];
             const validStages = stagesArray
                 .filter((stage) => {
                     if (!stage) return false;

@@ -336,4 +336,24 @@ class PackageController extends Controller
                 ->with('error', $e->getMessage());
         }
     }
+
+    /**
+     * Export packages to Excel
+     *
+     * @return \Maatwebsite\Excel\Excel
+     */
+    public function exportExcel()
+    {
+        return app('excel')->download(new \App\Exports\PackagesExport(), 'packages_' . now()->format('Y-m-d') . '.xlsx');
+    }
+
+    /**
+     * Export packages to CSV
+     *
+     * @return \Maatwebsite\Excel\Excel
+     */
+    public function exportCsv()
+    {
+        return app('excel')->download(new \App\Exports\PackagesExport(), 'packages_' . now()->format('Y-m-d') . '.csv');
+    }
 }

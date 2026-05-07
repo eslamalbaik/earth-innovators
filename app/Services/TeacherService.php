@@ -260,6 +260,8 @@ class TeacherService extends BaseService
             'primary' => 'الابتدائية',
             'middle' => 'المتوسطة',
             'secondary' => 'الثانوية',
+            'secondary_plus' => 'ثانوية بلس',
+            'secondary plus' => 'ثانوية بلس',
             'university' => 'الجامعية',
         ];
         return $map[$value] ?? $value;
@@ -278,4 +280,3 @@ class TeacherService extends BaseService
         return $map[$value] ?? $value;
     }
 }
-

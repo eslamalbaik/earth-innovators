@@ -491,4 +491,65 @@ class CertificateService
 
         return null;
     }
+
+    /**
+     * Generate QR code for certificate verification
+     * 
+     * @param string $certificateNumber
+     * @param int $userId
+     * @return string Path to QR code image
+     */
+    public function generateQRCode(string $certificateNumber, int $userId): ?string
+    {
+        try {
+            $verificationUrl = route('certificates.verify', [
+                'certificate_number' => $certificateNumber,
+                'user_id' => $userId,
+            ]);
+
+            $qrCode = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')
+                ->size(150)
+                ->errorCorrection('M')
+                ->generate($verificationUrl);
+
+            $qrDirectory = storage_path('app/public/qr-codes');
+            if (!file_exists($qrDirectory)) {
+                mkdir($qrDirectory, 0755, true);
+            }
+
+            $fileName = 'qr_' . $certificateNumber . '_' . time() . '.png';
+            $filePath = $qrDirectory . '/' . $fileName;
+
+            file_put_contents($filePath, $qrCode);
+
+            return 'qr-codes/' . $fileName;
+        } catch (\Exception $e) {
+            Log::error('Failed to generate QR code', [
+                'certificate_number' => $certificateNumber,
+                'error' => $e->getMessage(),
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Embed QR code image into PDF at specified position
+     * 
+     * @param object $pdf TCPDF/FPDI instance
+     * @param string $qrCodePath Path to QR code image
+     * @param float $x X position
+     * @param float $y Y position
+     * @param float $width Width of QR code
+     * @param float $height Height of QR code
+     */
+    public function embedQRCodeInPdf($pdf, string $qrCodePath, float $x, float $y, float $width = 50, float $height = 50): void
+    {
+        $fullPath = storage_path('app/public/' . $qrCodePath);
+        
+        if (!file_exists($fullPath)) {
+            return;
+        }
+
+        $pdf->Image($fullPath, $x, $y, $width, $height, 'PNG');
+    }
 }

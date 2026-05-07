@@ -1,7 +1,7 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
-import { FaSearch, FaFilter, FaEye, FaEdit, FaTrash, FaPlus, FaBox, FaUsers, FaDollarSign } from 'react-icons/fa';
+import { FaSearch, FaFilter, FaEye, FaEdit, FaTrash, FaPlus, FaBox, FaUsers, FaDollarSign, FaFileExcel, FaFileCsv } from 'react-icons/fa';
 import { useTranslation } from '@/i18n';
 
 export default function AdminPackagesIndex({ packages, stats }) {
@@ -76,6 +76,24 @@ export default function AdminPackagesIndex({ packages, stats }) {
     return (
         <DashboardLayout header={t('adminPackagesPage.title')}>
             <Head title={t('adminPackagesPage.pageTitle', { appName: t('common.appName') })} />
+
+            {/* Export Buttons */}
+            <div className="flex justify-end gap-3 mb-6">
+                <a
+                    href={route('admin.packages.export.excel')}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+                >
+                    <FaFileExcel />
+                    تصدير Excel
+                </a>
+                <a
+                    href={route('admin.packages.export.csv')}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                >
+                    <FaFileCsv />
+                    تصدير CSV
+                </a>
+            </div>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">

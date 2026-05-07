@@ -366,4 +366,47 @@ class CertificateController extends Controller
             default => "تمنح هذه الشهادة لـ {$recipient->name} تقديراً لإتمام البرنامج بنجاح.",
         };
     }
+
+    /**
+     * Verify certificate by certificate number and user ID (for QR code)
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function verify(Request $request)
+    {
+        $request->validate([
+            'certificate_number' => 'required|string',
+            'user_id' => 'required|integer',
+        ]);
+
+        $certificate = Certificate::where('certificate_number', $request->certificate_number)
+            ->where('user_id', $request->user_id)
+            ->where('is_active', true)
+            ->first();
+
+        if (!$certificate) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'الشهادة غير موجودة أو غير صالحة',
+            ], 404);
+        }
+
+        return response()->json([
+            'valid' => true,
+            'certificate' => [
+                'id' => $certificate->id,
+                'type' => $certificate->type,
+                'title' => $certificate->title,
+                'title_ar' => $certificate->title_ar,
+                'certificate_number' => $certificate->certificate_number,
+                'issue_date' => $certificate->issue_date?->format('Y-m-d'),
+                'expiry_date' => $certificate->expiry_date?->format('Y-m-d'),
+                'user' => [
+                    'name' => $certificate->user?->name,
+                ],
+            ],
+            'message' => 'الشهادة صالحة ومفعّلة',
+        ]);
+    }
 }

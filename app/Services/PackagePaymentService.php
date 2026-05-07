@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\SubscriptionUpdated;
 use App\Models\Package;
 use App\Models\Payment;
 use App\Models\User;
@@ -328,6 +329,8 @@ class PackagePaymentService extends BaseService
 
             $this->membershipAccessService->syncMembershipFromUserPackage($userPackage);
 
+            event(new SubscriptionUpdated($userPackage->fresh()));
+
             if (($userPackage->package->points_bonus ?? 0) > 0) {
                 app(PointsService::class)->awardPoints(
                     $userPackage->user->id,
@@ -374,10 +377,12 @@ class PackagePaymentService extends BaseService
     {
         if ($userPackage->status === 'pending') {
             $userPackage->update(['status' => 'cancelled']);
+            event(new SubscriptionUpdated($userPackage->fresh()));
             return;
         }
 
         $this->packageService->cancelSubscription($userPackage);
+        event(new SubscriptionUpdated($userPackage->fresh()));
     }
 
     private function cancelPendingSubscriptions(User $user): void

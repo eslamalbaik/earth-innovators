@@ -91,6 +91,19 @@ class MembershipCertificateService extends BaseService
                 'membership'
             );
 
+            // Generate QR code for certificate verification
+            try {
+                $qrCodePath = $this->certificateService->generateQRCode($certificateNumber, $user->id);
+                if ($qrCodePath) {
+                    $certificate->update(['qr_code' => $qrCodePath]);
+                }
+            } catch (\Exception $e) {
+                Log::warning('Failed to generate QR code for certificate', [
+                    'certificate_id' => $certificate->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
             // Fire event
             event(new \App\Events\CertificateIssued($certificate, $user));
 

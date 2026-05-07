@@ -8,6 +8,7 @@ use App\Models\Payment;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AdminSubscriptionController extends Controller
 {
@@ -193,5 +194,45 @@ class AdminSubscriptionController extends Controller
                 'created_at' => $subscription->created_at->format('Y-m-d H:i'),
             ],
         ]);
+    }
+
+    /**
+     * Export subscriptions to Excel
+     *
+     * @return \Maatwebsite\Excel\Excel
+     */
+    public function exportExcel()
+    {
+        return Excel::download(new \App\Exports\SubscriptionsExport(), 'subscriptions_' . now()->format('Y-m-d') . '.xlsx');
+    }
+
+    /**
+     * Export subscriptions to CSV
+     *
+     * @return \Maatwebsite\Excel\Excel
+     */
+    public function exportCsv()
+    {
+        return Excel::download(new \App\Exports\SubscriptionsExport(), 'subscriptions_' . now()->format('Y-m-d') . '.csv');
+    }
+
+    /**
+     * Export payments to Excel
+     *
+     * @return \Maatwebsite\Excel\Excel
+     */
+    public function exportPaymentsExcel()
+    {
+        return Excel::download(new \App\Exports\PaymentsExport(), 'payments_' . now()->format('Y-m-d') . '.xlsx');
+    }
+
+    /**
+     * Export payments to CSV
+     *
+     * @return \Maatwebsite\Excel\Excel
+     */
+    public function exportPaymentsCsv()
+    {
+        return Excel::download(new \App\Exports\PaymentsExport(), 'payments_' . now()->format('Y-m-d') . '.csv');
     }
 }

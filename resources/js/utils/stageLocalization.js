@@ -3,6 +3,7 @@ export const getStageLabels = (t) => {
         primary: t('bookingModal.stages.primary'),
         middle: t('bookingModal.stages.middle'),
         high: t('bookingModal.stages.high'),
+        secondary_plus: t('bookingModal.stages.secondaryPlus'),
         university: t('bookingModal.stages.university'),
     };
 
@@ -18,6 +19,9 @@ export const getStageLabels = (t) => {
         secondary: 'high',
         'high school': 'high',
         '\u0627\u0644\u062b\u0627\u0646\u0648\u064a\u0629': 'high',
+        secondary_plus: 'secondary_plus',
+        'secondary plus': 'secondary_plus',
+        '\u062b\u0627\u0646\u0648\u064a\u0629 \u0628\u0644\u0633': 'secondary_plus',
         university: 'university',
         college: 'university',
         '\u0627\u0644\u062c\u0627\u0645\u0639\u064a\u0629': 'university',
@@ -41,7 +45,7 @@ export const getStageLabels = (t) => {
 export const formatLocationWithStages = (location, stageLabels) => {
     if (!location) return '';
 
-    const generalStages = ['primary', 'middle', 'high', 'university'];
+    const generalStages = ['primary', 'middle', 'high', 'secondary_plus', 'university'];
 
     if (location.includes(' - ')) {
         const [city, stagesPart] = location.split(' - ');

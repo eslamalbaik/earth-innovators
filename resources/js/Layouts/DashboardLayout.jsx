@@ -124,6 +124,18 @@ export default function DashboardLayout({ children, header }) {
                             }
                         });
 
+                        const subscriptionChannel = window.Echo.private(`user.${userId}`);
+                        subscriptionChannel.listen('.subscription.updated', (data) => {
+                            if (import.meta.env.DEV) {
+                                console.log('[Subscription Update Received]', data);
+                            }
+                            showInfo(data.status === 'active'
+                                ? t('toastMessages.subscriptionActivatedBroadcast', { package: data.package?.name_ar || data.package?.name })
+                                : t('toastMessages.subscriptionChangedBroadcast', { status: data.status })
+                            );
+                            router.reload({ only: ['auth'] });
+                        });
+
                         notificationChannel.error((error) => {
                             reconnectAttempts++;
                             if (reconnectAttempts < maxReconnectAttempts) {
@@ -544,7 +556,6 @@ export default function DashboardLayout({ children, header }) {
             { name: t('sidebar.challengeSuggestions'), href: '/student/challenge-suggestions/create', icon: FaLightbulb },
             { name: t('sidebar.badges'), href: '/badges', icon: FaCommentDots },
             { name: t('sidebar.points'), href: '/student/points', icon: FaChartLine },
-            { name: t('sidebar.packages'), href: '/packages', icon: FaCreditCard },
             { name: t('sidebar.profile'), href: '/student/profile', icon: FaUser },
         ]
     };

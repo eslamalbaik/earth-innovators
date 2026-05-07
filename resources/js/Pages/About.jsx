@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { FaRocket, FaUsers, FaLightbulb, FaBullseye, FaTrophy, FaCheckCircle, FaEnvelope, FaPhone, FaMapMarkerAlt, FaStar, FaAward, FaGraduationCap } from 'react-icons/fa';
+import { FaRocket, FaUsers, FaLightbulb, FaBullseye, FaTrophy, FaCheckCircle, FaEnvelope, FaPhone, FaMapMarkerAlt, FaStar, FaAward, FaGraduationCap, FaInstagram, FaYoutube, FaTiktok, FaLinkedin } from 'react-icons/fa';
 import MobileAppLayout from '../Layouts/MobileAppLayout';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
@@ -32,6 +32,13 @@ export default function About({ auth }) {
         { icon: FaEnvelope, text: t('aboutPage.contact.email'), label: t('aboutPage.contact.emailLabel'), color: 'from-blue-500/20 to-cyan-500/20', iconColor: 'text-blue-600' },
         { icon: FaPhone, text: t('aboutPage.contact.phone'), label: t('aboutPage.contact.phoneLabel'), color: 'from-green-500/20 to-emerald-500/20', iconColor: 'text-green-600' },
         { icon: FaMapMarkerAlt, text: t('aboutPage.contact.address'), label: t('aboutPage.contact.addressLabel'), color: 'from-purple-500/20 to-pink-500/20', iconColor: 'text-purple-600' },
+    ];
+
+    const socialLinks = [
+        { icon: FaTiktok, url: 'https://www.tiktok.com/@earth.innovators', label: 'TikTok', color: 'from-black to-gray-800' },
+        { icon: FaYoutube, url: 'https://youtube.com/@earth-innovators-r8e', label: 'YouTube', color: 'from-red-500 to-red-700' },
+        { icon: FaInstagram, url: 'https://www.instagram.com/earth.innovators', label: 'Instagram', color: 'from-pink-500 to-purple-600' },
+        { icon: FaLinkedin, url: 'https://www.linkedin.com/in/earth-innovators-0569913a7', label: 'LinkedIn', color: 'from-blue-600 to-blue-800' },
     ];
 
     const AboutContent = ({ isDesktop = false }) => (
@@ -161,6 +168,34 @@ export default function About({ auth }) {
                             </div>
                         );
                     })}
+                </div>
+
+                <div className="mt-8 pt-6 border-t border-gray-200">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-xl flex items-center justify-center">
+                            <FaStar className="text-pink-600 text-xl" />
+                        </div>
+                        <h2 className="text-xl md:text-2xl font-bold text-gray-900">{t('aboutPage.socialTitle')}</h2>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {socialLinks.map((social, index) => {
+                            const Icon = social.icon;
+                            return (
+                                <a
+                                    key={index}
+                                    href={social.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-3 bg-gray-50 rounded-xl p-4 border border-gray-100 hover:shadow-md transition hover:-translate-y-1"
+                                >
+                                    <div className={`w-10 h-10 bg-gradient-to-br ${social.color} rounded-lg flex items-center justify-center`}>
+                                        <Icon className="text-white text-lg" />
+                                    </div>
+                                    <span className="text-sm font-bold text-gray-900">{social.label}</span>
+                                </a>
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
         </div>

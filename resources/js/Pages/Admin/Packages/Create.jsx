@@ -1,13 +1,14 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FaArrowRight, FaSave, FaTimes } from 'react-icons/fa';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from '@/i18n';
 
 export default function AdminPackagesCreate() {
     const { t } = useTranslation();
     const [features, setFeatures] = useState(['']);
     const [featuresAr, setFeaturesAr] = useState(['']);
+    const [baseMonthlyPrice, setBaseMonthlyPrice] = useState(0);
 
     const { data, setData, post, processing, errors } = useForm({
         name: '',
@@ -33,6 +34,20 @@ export default function AdminPackagesCreate() {
     });
 
     const isTrial = !!data.is_trial;
+    const computedTotalPrice = useMemo(() => {
+        if (isTrial) {
+            return 0;
+        }
+
+        const months = Math.max(1, Number(data.duration_months) || 1);
+        const monthlyPrice = Math.max(0, Number(baseMonthlyPrice) || 0);
+
+        return Number((monthlyPrice * months).toFixed(2));
+    }, [baseMonthlyPrice, data.duration_months, isTrial]);
+
+    useEffect(() => {
+        setData('price', computedTotalPrice);
+    }, [computedTotalPrice, setData]);
 
     const addFeature = (isArabic = false) => {
         if (isArabic) {
@@ -164,14 +179,14 @@ export default function AdminPackagesCreate() {
                         {/* السعر */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                {t('adminPackagesCreatePage.fields.price')} <span className="text-red-500">*</span>
+                                {t('adminPackagesCreatePage.fields.baseMonthlyPrice')} <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="number"
                                 min="0"
                                 step="0.01"
-                                value={data.price}
-                                onChange={(e) => setData('price', parseFloat(e.target.value) || 0)}
+                                value={baseMonthlyPrice}
+                                onChange={(e) => setBaseMonthlyPrice(parseFloat(e.target.value) || 0)}
                                 disabled={isTrial}
                                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.price ? 'border-red-500' : 'border-gray-300'
                                     }`}
@@ -179,6 +194,16 @@ export default function AdminPackagesCreate() {
                             />
                             {isTrial && (
                                 <p className="mt-1 text-xs text-emerald-700">{t('adminPackagesCreatePage.fields.trialPriceHint')}</p>
+                            )}
+                            {!isTrial && (
+                                <p className="mt-1 text-xs text-gray-500">
+                                    {t('adminPackagesCreatePage.fields.totalPricePreview', {
+                                        monthly: baseMonthlyPrice || 0,
+                                        months: Math.max(1, Number(data.duration_months) || 1),
+                                        total: computedTotalPrice,
+                                        currency: data.currency,
+                                    })}
+                                </p>
                             )}
                             {errors.price && (
                                 <p className="mt-1 text-sm text-red-600">{errors.price}</p>
@@ -246,6 +271,19 @@ export default function AdminPackagesCreate() {
                             {errors.duration_months && (
                                 <p className="mt-1 text-sm text-red-600">{errors.duration_months}</p>
                             )}
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                {t('adminPackagesCreatePage.fields.price')}
+                            </label>
+                            <input
+                                type="text"
+                                value={`${computedTotalPrice} ${data.currency}`}
+                                readOnly
+                                className="w-full px-4 py-2 border rounded-lg bg-gray-50 text-gray-700 border-gray-300"
+                            />
+                            <p className="mt-1 text-xs text-gray-500">{t('adminPackagesCreatePage.fields.totalPriceHint')}</p>
                         </div>
 
                         {/* نقاط المكافأة */}

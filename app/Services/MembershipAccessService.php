@@ -74,7 +74,7 @@ class MembershipAccessService
     public function getMembershipSummary(User $user): array
     {
         $owner = $this->getAccessOwner($user);
-        $packagesAvailable = $this->hasAvailablePackagesFor($owner);
+        $packagesAvailable = !$user->isStudent() && $this->hasAvailablePackagesFor($owner);
         $subscription = $this->getActiveSubscription($owner);
         $pendingSubscription = $subscription ? null : $this->getPendingSubscription($owner);
         $latestSubscription = $subscription ?? $pendingSubscription ?? $this->getLatestSubscription($owner);
@@ -235,6 +235,10 @@ class MembershipAccessService
 
     public function hasAvailablePackagesFor(User $user): bool
     {
+        if ($user->isStudent()) {
+            return false;
+        }
+
         return \App\Models\Package::query()
             ->where('is_active', true)
             ->get()

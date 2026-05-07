@@ -22,6 +22,7 @@ class Certificate extends Model
         'expiry_date',
         'template',
         'file_path',
+        'qr_code',
         'issued_by',
         'requested_by',
         'reviewed_by',

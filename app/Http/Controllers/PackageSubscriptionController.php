@@ -21,6 +21,12 @@ class PackageSubscriptionController extends Controller
     {
         $user = Auth::user();
 
+        if ($user?->isStudent()) {
+            return redirect()->route('dashboard')->with('info', [
+                'key' => 'packagesIndexPage.errors.managedBySchool',
+            ]);
+        }
+
         $packages = Package::where('is_active', true)
             ->orderByDesc('is_trial')
             ->orderBy('price', 'asc')
@@ -120,6 +126,22 @@ class PackageSubscriptionController extends Controller
             ]);
         }
 
+        if ($user->isStudent()) {
+            return redirect()->route('dashboard')->with('error', [
+                'key' => 'packagesIndexPage.errors.managedBySchool',
+            ]);
+        }
+
+        if ($user->isTeacher()) {
+            $school = $user->school;
+            if ($school && $school->membership_status === 'active') {
+                return redirect()->route('dashboard')->with('info', [
+                    'key' => 'packagesIndexPage.errors.teacherSchoolSubscribed',
+                    'data' => ['school_name' => $school->name],
+                ]);
+            }
+        }
+
         $result = $this->packagePaymentService->createSubscriptionCheckout($user, $package);
 
         if (!$result['success']) {
@@ -168,7 +190,7 @@ class PackageSubscriptionController extends Controller
         $user = Auth::user();
 
         if ($userPackage->user_id !== $user->id) {
-            abort(403, 'Unauthorized');
+            return redirect()->route('packages.index')->with('error', 'غير مصرح لك بهذا الإجراء');
         }
 
         try {
@@ -181,6 +203,7 @@ class PackageSubscriptionController extends Controller
         } catch (\Throwable $exception) {
             return redirect()->route('packages.index')->with('error', [
                 'key' => 'toastMessages.packageSubscriptionCancelError',
+                'details' => $exception->getMessage(),
             ]);
         }
     }
@@ -188,6 +211,12 @@ class PackageSubscriptionController extends Controller
     public function mySubscriptions()
     {
         $user = Auth::user();
+
+        if ($user->isStudent()) {
+            return redirect()->route('dashboard')->with('info', [
+                'key' => 'packagesIndexPage.errors.managedBySchool',
+            ]);
+        }
 
         $subscriptions = UserPackage::where('user_id', $user->id)
             ->with(['package', 'payments' => fn ($q) => $q->where('status', 'completed')->latest()->limit(1)])

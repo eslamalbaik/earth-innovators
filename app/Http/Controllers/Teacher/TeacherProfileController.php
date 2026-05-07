@@ -159,7 +159,7 @@ class TeacherProfileController extends Controller
             return redirect()->route('login');
         }
 
-        $stages = ['الابتدائية', 'المتوسطة', 'الثانوية', 'الجامعية'];
+        $stages = ['الابتدائية', 'المتوسطة', 'الثانوية', 'ثانوية بلس', 'الجامعية'];
 
         $availableSubjects = \App\Models\Subject::where('is_active', true)
             ->orderBy('name_ar')

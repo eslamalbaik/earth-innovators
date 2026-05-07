@@ -12,6 +12,8 @@ import {
     FaTrophy,
     FaBook,
     FaCompass,
+    FaYoutube,
+    FaTiktok,
 } from 'react-icons/fa';
 import { useTranslation } from '@/i18n';
 import WhatsAppSupportButton from '@/Components/Support/WhatsAppSupportButton';
@@ -20,8 +22,10 @@ export default function DesktopFooter({ auth }) {
     const { t } = useTranslation();
     const user = auth?.user;
     const isAuthed = !!user;
-    const supportEmail = import.meta.env.VITE_SUPPORT_EMAIL || 'info@innovatorslegacy.ae';
-    const supportPhone = import.meta.env.VITE_SUPPORT_PHONE || '';
+    
+    const supportEmail = 'info@earthinnovators.ae';
+    const supportPhone = '+971544405004';
+    const supportAddress = 'دبي، الإمارات العربية المتحدة';
 
     const quickLinks = [
         { name: t('common.home'), href: '/', icon: FaRocket },
@@ -33,16 +37,18 @@ export default function DesktopFooter({ auth }) {
     ];
 
     const socialLinks = [
-        { name: t('footer.social.twitter'), icon: FaTwitter, href: import.meta.env.VITE_SOCIAL_TWITTER, color: 'hover:text-blue-400' },
-        { name: t('footer.social.instagram'), icon: FaInstagram, href: import.meta.env.VITE_SOCIAL_INSTAGRAM, color: 'hover:text-pink-500' },
-        { name: t('footer.social.facebook'), icon: FaFacebook, href: import.meta.env.VITE_SOCIAL_FACEBOOK, color: 'hover:text-blue-600' },
-        { name: t('footer.social.linkedin'), icon: FaLinkedin, href: import.meta.env.VITE_SOCIAL_LINKEDIN, color: 'hover:text-blue-700' },
+        { name: 'TikTok', icon: FaTiktok, href: 'https://www.tiktok.com/@earth.innovators', color: 'hover:text-white' },
+        { name: 'YouTube', icon: FaYoutube, href: 'https://youtube.com/@earth-innovators-r8e', color: 'hover:text-red-500' },
+        { name: 'Instagram', icon: FaInstagram, href: 'https://www.instagram.com/earth.innovators', color: 'hover:text-pink-500' },
+        { name: 'LinkedIn', icon: FaLinkedin, href: 'https://www.linkedin.com/in/earth-innovators-0569913a7', color: 'hover:text-blue-700' },
+        { name: 'Twitter', icon: FaTwitter, href: null, color: 'hover:text-blue-400' },
+        { name: 'Facebook', icon: FaFacebook, href: null, color: 'hover:text-blue-600' },
     ].filter((link) => Boolean(link.href));
 
     const contactInfo = [
+        { icon: FaPhone, text: supportPhone, href: `tel:${supportPhone.replace(/[^\d+]/g, '')}` },
         { icon: FaEnvelope, text: supportEmail, href: `mailto:${supportEmail}` },
-        supportPhone ? { icon: FaPhone, text: supportPhone, href: `tel:${supportPhone.replace(/[^\d+]/g, '')}` } : null,
-        { icon: FaMapMarkerAlt, text: t('countries.uae') },
+        { icon: FaMapMarkerAlt, text: supportAddress },
     ].filter(Boolean);
 
     const dashboardHref = user?.role === 'student'

@@ -147,14 +147,16 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                         <div className="pt-6 border-t border-gray-200">
                             <h3 className="text-xs font-bold text-gray-500 uppercase mb-4 px-3">{t('sections.quickLinks')}</h3>
                             <div className="space-y-1">
-                                <button
-                                    type="button"
-                                    onClick={() => router.visit('/packages')}
-                                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-gray-700 hover:bg-gray-50 transition"
-                                >
-                                    <FaCreditCard className="text-base" />
-                                    <span>{t('common.packages')}</span>
-                                </button>
+                                {role !== 'student' && (
+                                    <button
+                                        type="button"
+                                        onClick={() => router.visit('/packages')}
+                                        className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-gray-700 hover:bg-gray-50 transition"
+                                    >
+                                        <FaCreditCard className="text-base" />
+                                        <span>{t('common.packages')}</span>
+                                    </button>
+                                )}
                                 <button
                                     type="button"
                                     onClick={() => router.visit('/publications')}
@@ -328,7 +330,7 @@ export default function MobileBottomNav({ active = 'home', role, isAuthed = fals
                                         >
                                             <span>{t('profile.profile')}</span>
                                         </button>
-                                        {(role === 'student' || role === 'school' || role === 'educational_institution') && (
+                                        {(role === 'school' || role === 'educational_institution') && (
                                             <>
                                                 <div className="border-t border-gray-100" />
                                                 <button

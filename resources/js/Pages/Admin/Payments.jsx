@@ -7,6 +7,8 @@ import {
     FaUser,
     FaGraduationCap,
     FaEye,
+    FaFileExcel,
+    FaFileCsv,
 } from 'react-icons/fa';
 import { useTranslation } from '@/i18n';
 
@@ -58,6 +60,24 @@ export default function AdminPayments({ payments, stats, teachers, filters }) {
     return (
         <DashboardLayout header={t('adminPaymentsPage.title')}>
             <Head title={t('adminPaymentsPage.pageTitle', { appName: t('common.appName') })} />
+
+            {/* Export Buttons */}
+            <div className="flex justify-end gap-3 mb-6">
+                <a
+                    href={route('admin.payments.export.excel')}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+                >
+                    <FaFileExcel />
+                    تصدير Excel
+                </a>
+                <a
+                    href={route('admin.payments.export.csv')}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                >
+                    <FaFileCsv />
+                    تصدير CSV
+                </a>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
                 <div className="bg-white rounded-xl shadow-lg p-4 border-r-4 border-blue-500">

@@ -122,21 +122,7 @@ export default function BookingModal({ teacher, isOpen, onClose, restoredState =
         }
     }, [subjects, isOpen, restoredState]);
 
-    const stageLabels = useMemo(() => {
-        const toKey = {
-            '\u0627\u0644\u0627\u0628\u062a\u062f\u0627\u0626\u064a\u0629': 'primary',
-            '\u0627\u0644\u0645\u062a\u0648\u0633\u0637\u0629': 'middle',
-            '\u0627\u0644\u062b\u0627\u0646\u0648\u064a\u0629': 'high',
-            '\u0627\u0644\u062c\u0627\u0645\u0639\u064a\u0629': 'university',
-        };
-        const toLabel = {
-            primary: t('bookingModal.stages.primary'),
-            middle: t('bookingModal.stages.middle'),
-            high: t('bookingModal.stages.high'),
-            university: t('bookingModal.stages.university'),
-        };
-        return { toKey, toLabel };
-    }, [t]);
+    const stageLabels = useMemo(() => getStageLabels(t), [t]);
 
     const fetchAvailabilities = async () => {
         if (!selectedSubject) return;

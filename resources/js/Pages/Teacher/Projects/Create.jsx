@@ -343,6 +343,9 @@ export default function CreateProject({ auth, school, schools = [] }) {
                                     <p className="text-sm text-gray-500">
                                         {t('teacherProjectsCreatePage.form.dropzoneSubtitle')}
                                     </p>
+                                    <p className="text-xs text-gray-400 mt-2">
+                                        📏 الحد الأقصى: 10MB للملف الواحد | 📁 الأنواع المدعومة: صور (JPG, PNG, GIF), فيديوهات (MP4, AVI, MOV), مستندات (PDF, DOC, DOCX)
+                                    </p>
                                     <button
                                         type="button"
                                         onClick={() => fileInputRef.current?.click()}

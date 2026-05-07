@@ -352,7 +352,7 @@ export default function Index({ auth, students, availableBadges }) {
 
             {/* Modal إضافة طالب */}
             <Modal show={showCreateModal} onClose={() => setShowCreateModal(false)}>
-                <form onSubmit={handleCreate} className="p-6">
+                <form onSubmit={handleCreate} className="p-6" autoComplete="off">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-bold text-gray-900">{t('schoolStudentsIndexPage.modals.create.title')}</h3>
                         <button
@@ -373,6 +373,7 @@ export default function Index({ auth, students, availableBadges }) {
                                 className="mt-1 block w-full"
                                 value={createForm.data.name}
                                 onChange={(e) => createForm.setData('name', e.target.value)}
+                                autoComplete="off"
                                 required
                             />
                             <InputError message={createForm.errors.name} className="mt-2" />
@@ -386,6 +387,7 @@ export default function Index({ auth, students, availableBadges }) {
                                 className="mt-1 block w-full"
                                 value={createForm.data.email}
                                 onChange={(e) => createForm.setData('email', e.target.value)}
+                                autoComplete="email"
                                 required
                             />
                             <InputError message={createForm.errors.email} className="mt-2" />
@@ -410,6 +412,7 @@ export default function Index({ auth, students, availableBadges }) {
                                 className="mt-1 block w-full"
                                 value={createForm.data.password}
                                 onChange={(e) => createForm.setData('password', e.target.value)}
+                                autoComplete="new-password"
                                 required
                             />
                             <InputError message={createForm.errors.password} className="mt-2" />
@@ -419,11 +422,13 @@ export default function Index({ auth, students, availableBadges }) {
                             <InputLabel htmlFor="year" value={t('schoolStudentsIndexPage.form.year')} />
                             <TextInput
                                 id="year"
-                                type="number"
+                                type="text"
                                 className="mt-1 block w-full"
                                 value={createForm.data.year}
                                 onChange={(e) => createForm.setData('year', e.target.value)}
                                 placeholder={t('schoolStudentsIndexPage.form.yearPlaceholder')}
+                                autoComplete="off"
+                                inputMode="numeric"
                             />
                             <InputError message={createForm.errors.year} className="mt-2" />
                         </div>
@@ -446,7 +451,7 @@ export default function Index({ auth, students, availableBadges }) {
 
             {/* Modal تعديل طالب */}
             <Modal show={showEditModal} onClose={() => setShowEditModal(false)}>
-                <form onSubmit={handleUpdate} className="p-6">
+                <form onSubmit={handleUpdate} className="p-6" autoComplete="off">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-bold text-gray-900">{t('schoolStudentsIndexPage.modals.edit.title')}</h3>
                         <button
@@ -467,6 +472,7 @@ export default function Index({ auth, students, availableBadges }) {
                                 className="mt-1 block w-full"
                                 value={editForm.data.name}
                                 onChange={(e) => editForm.setData('name', e.target.value)}
+                                autoComplete="off"
                                 required
                             />
                             <InputError message={editForm.errors.name} className="mt-2" />
@@ -480,6 +486,7 @@ export default function Index({ auth, students, availableBadges }) {
                                 className="mt-1 block w-full"
                                 value={editForm.data.email}
                                 onChange={(e) => editForm.setData('email', e.target.value)}
+                                autoComplete="email"
                                 required
                             />
                             <InputError message={editForm.errors.email} className="mt-2" />
@@ -500,11 +507,13 @@ export default function Index({ auth, students, availableBadges }) {
                             <InputLabel htmlFor="edit_year" value={t('schoolStudentsIndexPage.form.year')} />
                             <TextInput
                                 id="edit_year"
-                                type="number"
+                                type="text"
                                 className="mt-1 block w-full"
                                 value={editForm.data.year}
                                 onChange={(e) => editForm.setData('year', e.target.value)}
                                 placeholder={t('schoolStudentsIndexPage.form.yearPlaceholder')}
+                                autoComplete="off"
+                                inputMode="numeric"
                             />
                             <InputError message={editForm.errors.year} className="mt-2" />
                         </div>
@@ -517,6 +526,7 @@ export default function Index({ auth, students, availableBadges }) {
                                 className="mt-1 block w-full"
                                 value={editForm.data.password}
                                 onChange={(e) => editForm.setData('password', e.target.value)}
+                                autoComplete="new-password"
                             />
                             <InputError message={editForm.errors.password} className="mt-2" />
                         </div>
@@ -655,4 +665,3 @@ export default function Index({ auth, students, availableBadges }) {
         </DashboardLayout>
     );
 }
-

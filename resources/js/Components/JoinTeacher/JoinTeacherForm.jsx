@@ -67,6 +67,7 @@ export default function JoinTeacherForm({ subjects = [], cities = [] }) {
         { value: '\u0627\u0644\u0627\u0628\u062a\u062f\u0627\u0626\u064a\u0629', label: t('joinTeacherPage.form.stageOptions.primary') },
         { value: '\u0627\u0644\u0645\u062a\u0648\u0633\u0637\u0629', label: t('joinTeacherPage.form.stageOptions.middle') },
         { value: '\u0627\u0644\u062b\u0627\u0646\u0648\u064a\u0629', label: t('joinTeacherPage.form.stageOptions.high') },
+        { value: '\u062b\u0627\u0646\u0648\u064a\u0629 \u0628\u0644\u0633', label: t('joinTeacherPage.form.stageOptions.secondaryPlus') },
     ], [t]);
 
     const handleInputChange = (event) => {

@@ -628,6 +628,7 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                                             { value: 'الابتدائية (الحلقة الأولى)', label: t('profilePage.teacher.stages.primaryCycle1') },
                                             { value: 'المتوسطة (الحلقة الثانية)', label: t('profilePage.teacher.stages.middleCycle2') },
                                             { value: 'الثانوية (الحلقة الثالثة)', label: t('profilePage.teacher.stages.highCycle3') },
+                                            { value: 'ثانوية بلس', label: 'ثانوية بلس' },
                                             { value: 'المؤسسات التعليمية', label: t('profilePage.teacher.stages.educationalInstitutions') },
                                         ].map((stage) => (
                                             <label key={stage} className="flex items-center gap-2 cursor-pointer">

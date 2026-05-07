@@ -13,8 +13,10 @@
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
+        "maatwebsite/excel": "*",
         "predis/predis": "^3.2",
         "setasign/fpdi": "^2.6",
+        "simplesoftwareio/simple-qrcode": "*",
         "tamara-solution/php-sdk": "^2.0",
         "tecnickcom/tcpdf": "^6.10",
         "tightenco/ziggy": "^2.0"

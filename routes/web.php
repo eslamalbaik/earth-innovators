@@ -541,6 +541,9 @@ Route::middleware(['auth', 'membership_active'])->group(function () {
     Route::post('/api/certificates/generate', [\App\Http\Controllers\CertificateController::class, 'generate'])->name('api.certificates.generate');
     Route::get('/certificates/{id}/download', [\App\Http\Controllers\CertificateController::class, 'download'])->name('certificates.download');
 
+    // Certificate verification (for QR codes)
+    Route::get('/certificates/verify', [\App\Http\Controllers\CertificateController::class, 'verify'])->name('certificates.verify');
+
     Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
     Route::post('/availabilities/book', [AvailabilityController::class, 'book'])->name('availabilities.book');
     Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
@@ -850,6 +853,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/certificates/{certificate}/download', [\App\Http\Controllers\Admin\CertificateController::class, 'download'])->name('certificates.download');
     Route::match(['get', 'post'], '/certificates/{certificate}/toggle-status', [\App\Http\Controllers\Admin\CertificateController::class, 'toggleStatus'])->name('certificates.toggle-status');
 
+    // Categories Management
+    Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
+
     // Payment Gateways Management
     Route::get('/payment-gateways', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'index'])->name('payment-gateways.index');
     Route::put('/payment-gateways/{paymentGateway}', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'update'])->name('payment-gateways.update');
@@ -870,9 +876,19 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::match(['get', 'post'], '/packages/subscribers/{userPackage}/cancel', [\App\Http\Controllers\Admin\PackageController::class, 'cancelSubscription'])->name('packages.subscribers.cancel');
     Route::match(['get', 'post'], '/packages/subscribers/{userPackage}/renew', [\App\Http\Controllers\Admin\PackageController::class, 'renewSubscription'])->name('packages.subscribers.renew');
 
+    // Packages Export
+    Route::get('/packages/export/excel', [\App\Http\Controllers\Admin\PackageController::class, 'exportExcel'])->name('packages.export.excel');
+    Route::get('/packages/export/csv', [\App\Http\Controllers\Admin\PackageController::class, 'exportCsv'])->name('packages.export.csv');
+
     // إدارة الاشتراكات والمدفوعات
     Route::get('/subscriptions', [\App\Http\Controllers\Admin\AdminSubscriptionController::class, 'index'])->name('subscriptions.index');
     Route::get('/subscriptions/subscription/{subscription}', [\App\Http\Controllers\Admin\AdminSubscriptionController::class, 'showSubscription'])->name('subscriptions.show-subscription');
+
+    // Subscriptions & Payments Export
+    Route::get('/subscriptions/export/excel', [\App\Http\Controllers\Admin\AdminSubscriptionController::class, 'exportExcel'])->name('subscriptions.export.excel');
+    Route::get('/subscriptions/export/csv', [\App\Http\Controllers\Admin\AdminSubscriptionController::class, 'exportCsv'])->name('subscriptions.export.csv');
+    Route::get('/payments/export/excel', [\App\Http\Controllers\Admin\AdminSubscriptionController::class, 'exportPaymentsExcel'])->name('payments.export.excel');
+    Route::get('/payments/export/csv', [\App\Http\Controllers\Admin\AdminSubscriptionController::class, 'exportPaymentsCsv'])->name('payments.export.csv');
 
     // إدارة الإصدارات
     Route::resource('publications', \App\Http\Controllers\Admin\AdminPublicationController::class)->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy']);

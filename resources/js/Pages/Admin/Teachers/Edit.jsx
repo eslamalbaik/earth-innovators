@@ -128,7 +128,7 @@ export default function EditTeacher({ teacher, subjects, cities, auth }) {
     }, [teacher.stages]);
 
     const stageOptions = useMemo(() => {
-        const defaults = ['الابتدائية', 'المتوسطة', 'الثانوية', 'الجامعية', 'رياض الأطفال'];
+        const defaults = ['الابتدائية', 'المتوسطة', 'الثانوية', 'ثانوية بلس', 'الجامعية', 'رياض الأطفال'];
         return Array.from(new Set([...defaults, ...initialStages]));
     }, [initialStages]);
 

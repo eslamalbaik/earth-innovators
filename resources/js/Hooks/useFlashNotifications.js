@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { usePage } from '@inertiajs/react';
 import { useToast } from '@/Contexts/ToastContext';
 import { useTranslation } from '@/i18n';
+import resolveLocalizedMessage from '@/utils/resolveLocalizedMessage';
 
 /**
  * Hook to automatically show toast notifications from Laravel flash messages.
@@ -11,7 +12,7 @@ import { useTranslation } from '@/i18n';
 export function useFlashNotifications() {
     const { flash, ziggy } = usePage().props;
     const { showSuccess, showError, showWarning, showInfo } = useToast();
-    const { t } = useTranslation();
+    const { language } = useTranslation();
 
     // Track the last shown message per type WITH its source URL so that:
     // - The same message does NOT appear twice on the same page load.
@@ -26,34 +27,7 @@ export function useFlashNotifications() {
     const resolveMessage = (payload) => {
         if (!payload) return null;
 
-        // Plain strings
-        if (typeof payload === 'string') {
-            return payload;
-        }
-
-        // Arrays of messages
-        if (Array.isArray(payload)) {
-            return payload.map(resolveMessage).filter(Boolean).join(' ');
-        }
-
-        // Objects: { key, params?, message? }
-        if (typeof payload === 'object') {
-            if (payload.key) {
-                try {
-                    return t(payload.key, payload.params || payload.values || {});
-                } catch (e) {
-                    return payload.message || payload.key;
-                }
-            }
-            if (payload.message) {
-                return payload.message;
-            }
-            // Fallback: first string value
-            const firstString = Object.values(payload).find((v) => typeof v === 'string');
-            if (firstString) return firstString;
-        }
-
-        return null;
+        return resolveLocalizedMessage(payload, language);
     };
 
     useEffect(() => {
@@ -73,5 +47,5 @@ export function useFlashNotifications() {
         check('warning', showWarning, resolveMessage(flash?.warning), { autoDismiss: 3000 });
         check('info',    showInfo,    resolveMessage(flash?.info),    { autoDismiss: 3000 });
 
-    }, [flash, ziggy?.url, showSuccess, showError, showWarning, showInfo, t]);
+    }, [flash, ziggy?.url, showSuccess, showError, showWarning, showInfo, language]);
 }

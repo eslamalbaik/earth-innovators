@@ -5,7 +5,7 @@ function getCsrfToken() {
 }
 
 export function logout() {
-    const logoutUrl = route('logout');
+    const logoutUrl = typeof route === 'function' ? route('logout') : '/logout';
     const csrfToken = getCsrfToken();
 
     if (!logoutUrl || !csrfToken) {

@@ -184,13 +184,14 @@ class TeacherController extends Controller
                 ->values()
                 ->toArray();
 
-            $generalStages = ['الابتدائية', 'المتوسطة', 'الثانوية', 'الجامعية'];
+            $generalStages = ['الابتدائية', 'المتوسطة', 'الثانوية', 'ثانوية بلس', 'الجامعية'];
 
             $stages = collect($generalStages)->map(function ($stage) {
                 $stageMap = [
                     'الابتدائية' => 'primary',
                     'المتوسطة' => 'middle',
                     'الثانوية' => 'secondary',
+                    'ثانوية بلس' => 'secondary_plus',
                     'الجامعية' => 'university',
                 ];
 
@@ -502,7 +503,7 @@ class TeacherController extends Controller
             if (empty($stage) || !is_string($stage)) return false;
             $trimmed = trim($stage);
             if (strlen($trimmed) === 0 || strlen($trimmed) > 50) return false;
-            $generalStages = ['الابتدائية', 'المتوسطة', 'الثانوية', 'الجامعية'];
+            $generalStages = ['الابتدائية', 'المتوسطة', 'الثانوية', 'ثانوية بلس', 'الجامعية'];
             return in_array($trimmed, $generalStages);
         }) : [];
         $stages = array_values(array_map('trim', $stages));
