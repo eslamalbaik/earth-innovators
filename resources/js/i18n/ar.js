@@ -3211,6 +3211,27 @@ export const ar = {
             trialDays: '{count} يومًا تجريبيًا',
             months: '{count} شهر',
         },
+        pricing: {
+            currency: 'د.إ',
+            perMonth: '/شهر',
+            perYear: '/سنة',
+        },
+        status: {
+            active: 'نشطة',
+            expired: 'منتهية',
+            cancelled: 'ملغاة',
+            pending: 'قيد الانتظار',
+        },
+        currentSubscription: {
+            title: 'اشتراكي الحالي',
+            description: 'لديك اشتراك نشط في {package}',
+            viewDetails: 'عرض التفاصيل',
+        },
+        freePlan: {
+            title: 'الخطة المجانية',
+            description: 'ابدأ مجاناً واستمتع بميزات أساسية',
+            foreverFree: 'مجاني إلى الأبد',
+        },
         pending: {
             title: 'الاشتراك قيد المعالجة',
             subtitle: 'ننتظر تأكيد بوابة الدفع للاشتراك، وعادة ما يستغرق ذلك ثوانٍ قليلة.',
@@ -3238,6 +3259,7 @@ export const ar = {
         },
         badges: {
             mostPopular: '⭐ الأكثر شعبية',
+            current: '✓ الحالية',
             currentPackage: '✓ باقتك الحالية',
             trial: 'تجريبية',
             freeTrial: 'تجربة مجانية',
@@ -3255,8 +3277,10 @@ export const ar = {
         actions: {
             processing: 'جاري المعالجة...',
             renew: 'تجديد الاشتراك',
+            subscribe: 'اشترك الآن',
             subscribeNow: 'اشترك الآن',
             activateTrial: 'تفعيل التجربة المجانية',
+            activateFree: 'تفعيل مجاني',
             trialUsed: 'تم استخدام التجربة',
             subscriptionPending: 'يوجد اشتراك قيد المعالجة',
             managedBySchool: 'تديره المدرسة',
@@ -6601,6 +6625,86 @@ export const ar = {
         points: 'النقاط',
         achievements: 'الإنجازات',
         myProjects: 'مشاريعي',
+    },
+    packagesIndexPage: {
+        pageTitle: 'الباقات والاشتراكات - {appName}',
+        navTitle: 'الباقات',
+        title: 'اختر الخطة المناسبة لك',
+        subtitle: 'استثمر في مهاراتك وانضم إلى مجتمع المبتكرين مع خططنا المرنة.',
+        roles: {
+            student: 'طالب',
+            teacher: 'معلم',
+            school: 'مدرسة',
+            educationalInstitution: 'مؤسسة تعليمية',
+            general: 'مستخدم',
+        },
+        duration: {
+            monthly: 'شهري',
+            quarterly: 'ربع سنوي',
+            yearly: 'سنوي',
+            lifetime: 'مدى الحياة',
+            months: '{count} شهر',
+        },
+        pricing: {
+            free: 'مجاني',
+            currency: 'درهم',
+        },
+        badges: {
+            mostPopular: 'الأكثر رواجاً',
+            current: 'باقتك الحالية',
+        },
+        actions: {
+            subscribe: 'اشترك الآن',
+            activateFree: 'تفعيل الخطة المجانية',
+            processing: 'جاري المعالجة...',
+        },
+        status: {
+            active: 'نشط',
+        },
+        features: {
+            more: 'ميزات إضافية',
+        },
+        currentSubscription: {
+            title: 'اشتراكك الحالي',
+            description: 'أنت مشترك حالياً في: {package}',
+            expiresAt: 'ينتهي في: {date}',
+            viewDetails: 'عرض تفاصيل اشتراكي',
+        },
+        pendingSubscription: {
+            title: 'اشتراك قيد الانتظار',
+            description: 'طلب اشتراكك قيد المعالجة حالياً. سيتم تفعيله فور تأكيد الدفع.',
+        },
+        trial: {
+            title: 'الفترة التجريبية',
+            description: 'متبقي {daysLeft} أيام في فترتك التجريبية.',
+        },
+        freePlan: {
+            title: 'الخطة المجانية الدائمة',
+            description: 'استكشف الميزات الأساسية للمنصة بدون أي تكلفة.',
+            foreverFree: 'مجانية للأبد',
+        },
+        info: {
+            title: 'معلومات مهمة',
+            items: {
+                cancelAnytime: 'يمكنك إلغاء الاشتراك في أي وقت',
+                autoRenew: 'سيتم تجديد الاشتراك تلقائياً عند انتهاء المدة',
+                viewAllFromMySubscriptions: 'يمكنك عرض جميع اشتراكاتك من صفحة "اشتراكاتي"',
+            },
+        },
+        errors: {
+            activeSubscriptionExists: 'لديك بالفعل اشتراك نشط.',
+            managedBySchool: 'اشتراكك مُدار من قبل المدرسة.',
+            subscribeFailed: 'فشل بدء عملية الاشتراك. يرجى المحاولة مرة أخرى.',
+        },
+        schoolManaged: {
+            title: 'اشتراك مُدار من قبل المدرسة',
+            description: 'حسابك مرتبط باشتراك مدرستك. يمكنك الوصول إلى جميع الميزات المتاحة لمدرستك تلقائياً.',
+        },
+        institutionInvite: {
+            title: 'هل أنت مدرّس؟',
+            description: 'يمكنك دعوة مؤسستك التعليمية للانضمام والحصول على ميزات إضافية.',
+            cta: 'دعوة مؤسسة',
+        }
     },
 };
 

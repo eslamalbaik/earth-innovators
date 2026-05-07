@@ -6468,6 +6468,86 @@ export const en = {
         achievements: 'Achievements',
         myProjects: 'My Projects',
     },
+    packagesIndexPage: {
+        pageTitle: 'Packages & Subscriptions - {appName}',
+        navTitle: 'Packages',
+        title: 'Choose the right plan for you',
+        subtitle: 'Invest in your skills and join the innovators community with our flexible plans.',
+        roles: {
+            student: 'Student',
+            teacher: 'Teacher',
+            school: 'School',
+            educationalInstitution: 'Educational Institution',
+            general: 'User',
+        },
+        duration: {
+            monthly: 'Monthly',
+            quarterly: 'Quarterly',
+            yearly: 'Yearly',
+            lifetime: 'Lifetime',
+            months: '{count} Months',
+        },
+        pricing: {
+            free: 'Free',
+            currency: 'AED',
+        },
+        badges: {
+            mostPopular: 'Most Popular',
+            current: 'Current Plan',
+        },
+        actions: {
+            subscribe: 'Subscribe Now',
+            activateFree: 'Activate Free Plan',
+            processing: 'Processing...',
+        },
+        status: {
+            active: 'Active',
+        },
+        features: {
+            more: 'Additional features',
+        },
+        currentSubscription: {
+            title: 'Current Subscription',
+            description: 'You are currently subscribed to: {package}',
+            expiresAt: 'Expires at: {date}',
+            viewDetails: 'View my subscription details',
+        },
+        pendingSubscription: {
+            title: 'Pending Subscription',
+            description: 'Your subscription request is currently being processed. It will be activated once payment is confirmed.',
+        },
+        trial: {
+            title: 'Trial Period',
+            description: '{daysLeft} days remaining in your trial period.',
+        },
+        freePlan: {
+            title: 'Forever Free Plan',
+            description: 'Explore the basic features of the platform at no cost.',
+            foreverFree: 'Free Forever',
+        },
+        info: {
+            title: 'Important Information',
+            items: {
+                cancelAnytime: 'You can cancel your subscription at any time',
+                autoRenew: 'The subscription will be automatically renewed at the end of the period',
+                viewAllFromMySubscriptions: 'You can view all your subscriptions from the "My Subscriptions" page',
+            },
+        },
+        errors: {
+            activeSubscriptionExists: 'You already have an active subscription.',
+            managedBySchool: 'Your subscription is managed by the school.',
+            subscribeFailed: 'Failed to start the subscription process. Please try again.',
+        },
+        schoolManaged: {
+            title: 'School Managed Subscription',
+            description: 'Your account is linked to your school\'s subscription. You automatically have access to all features available to your school.',
+        },
+        institutionInvite: {
+            title: 'Are you a teacher?',
+            description: 'You can invite your educational institution to join and get additional features.',
+            cta: 'Invite Institution',
+        }
+    },
 };
 
 export default en;

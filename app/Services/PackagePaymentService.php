@@ -245,8 +245,7 @@ class PackagePaymentService extends BaseService
 
     private function shouldBypassPayment(): bool
     {
-        return app()->environment('local')
-            && (bool) config('services.ziina.test_mode', true)
+        return (bool) config('services.ziina.test_mode', true)
             && (bool) config('services.ziina.test_bypass', false);
     }
 
