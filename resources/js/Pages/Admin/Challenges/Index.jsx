@@ -27,6 +27,31 @@ import { useTranslation } from '@/i18n';
 // This reduces initial bundle size since analytics is optional
 const AnalyticsPreview = lazy(() => import('@/Components/Challenges/AnalyticsPreview'));
 
+const toDateTimeLocalValue = (value) => {
+    if (!value) {
+        return '';
+    }
+
+    if (typeof value === 'string') {
+        const normalized = value.trim();
+        const match = normalized.match(/^(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2})/);
+
+        if (match) {
+            return `${match[1]}T${match[2]}`;
+        }
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return '';
+    }
+
+    const pad = (part) => String(part).padStart(2, '0');
+
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+};
+
 export default function AdminChallengesIndex({ challenges, stats, filters, schools = [], analytics = null }) {
     const { confirm } = useConfirmDialog();
     const { t, language } = useTranslation();
@@ -51,6 +76,7 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
         challenge_type: '',
         category: '',
         age_group: '',
+        difficulty: 'medium',
         school_id: '',
         start_date: '',
         deadline: '',
@@ -155,8 +181,6 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
      */
     const handleEdit = useCallback((challenge) => {
         setChallengeToEdit(challenge);
-        const startDate = new Date(challenge.start_date).toISOString().slice(0, 16);
-        const deadlineDate = new Date(challenge.deadline).toISOString().slice(0, 16);
 
         setEditData({
             title: challenge.title || '',
@@ -166,9 +190,10 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
             challenge_type: challenge.challenge_type || '',
             category: challenge.category || '',
             age_group: challenge.age_group || '',
+            difficulty: challenge.difficulty || 'medium',
             school_id: challenge.school_id || '',
-            start_date: startDate,
-            deadline: deadlineDate,
+            start_date: toDateTimeLocalValue(challenge.start_date),
+            deadline: toDateTimeLocalValue(challenge.deadline),
             status: challenge.status || 'draft',
             points_reward: challenge.points_reward || 0,
             max_participants: challenge.max_participants || null,
@@ -537,6 +562,12 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                 </div>
 
                                 <form onSubmit={handleEditSubmit} className="space-y-6">
+                                    {editErrors.error && (
+                                        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                                            {editErrors.error}
+                                        </div>
+                                    )}
+
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         {/* Title */}
                                         <div className="md:col-span-2">
@@ -623,6 +654,14 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                                 required
                                             >
                                                 <option value="">{t('adminChallengesIndexPage.editModal.selectChallengeType')}</option>
+                                                <option value="cognitive">{t('adminChallengesEditPage.challengeTypes.cognitive')}</option>
+                                                <option value="applied">{t('adminChallengesEditPage.challengeTypes.applied')}</option>
+                                                <option value="creative">{t('adminChallengesEditPage.challengeTypes.creative')}</option>
+                                                <option value="artistic_creative">{t('adminChallengesEditPage.challengeTypes.artisticCreative')}</option>
+                                                <option value="collaborative">{t('adminChallengesEditPage.challengeTypes.collaborative')}</option>
+                                                <option value="analytical">{t('adminChallengesEditPage.challengeTypes.analytical')}</option>
+                                                <option value="technological">{t('adminChallengesEditPage.challengeTypes.technological')}</option>
+                                                <option value="behavioral">{t('adminChallengesEditPage.challengeTypes.behavioral')}</option>
                                                 <option value="60_seconds">{t('challenges.minseconds')}</option>
                                                 <option value="mental_math">{t('challenges.mentalMath')}</option>
                                                 <option value="conversions">{t('challenges.conversions')}</option>
@@ -680,6 +719,26 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                                             </select>
                                             {editErrors.age_group && (
                                                 <p className="mt-1 text-sm text-red-600">{editErrors.age_group}</p>
+                                            )}
+                                        </div>
+
+                                        {/* Difficulty */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                {t('adminChallengesEditPage.fields.difficulty')}
+                                            </label>
+                                            <select
+                                                value={editData.difficulty}
+                                                onChange={(e) => setEditData('difficulty', e.target.value)}
+                                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${editErrors.difficulty ? 'border-red-500' : 'border-gray-300'
+                                                    }`}
+                                            >
+                                                <option value="easy">{t('common.difficultyLevels.easy')}</option>
+                                                <option value="medium">{t('common.difficultyLevels.medium')}</option>
+                                                <option value="hard">{t('common.difficultyLevels.hard')}</option>
+                                            </select>
+                                            {editErrors.difficulty && (
+                                                <p className="mt-1 text-sm text-red-600">{editErrors.difficulty}</p>
                                             )}
                                         </div>
 

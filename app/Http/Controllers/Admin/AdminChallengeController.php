@@ -308,8 +308,8 @@ class AdminChallengeController extends Controller
             \Illuminate\Support\Facades\Cache::forget('admin_challenge_stats');
             \Illuminate\Support\Facades\Cache::forget('admin_challenge_analytics');
             
-            if ($request->wantsJson() || $request->header('X-Inertia')) {
-                return back()->with('success', 'تم تحديث التحدي بنجاح');
+            if ($request->wantsJson()) {
+                return response()->json(['message' => 'تم تحديث التحدي بنجاح']);
             }
 
             return redirect()
