@@ -122,6 +122,7 @@ class StudentService extends BaseService
                     'name' => $student->name,
                     'email' => $student->email,
                     'phone' => $student->phone,
+                    'year' => $student->year,
                     'school_id' => $student->school_id,
                     'membership_number' => $student->membership_number,
                     'points' => $student->points ?? 0,
@@ -180,6 +181,7 @@ class StudentService extends BaseService
             'role' => 'student',
             'school_id' => $dto->schoolId,
             'points' => $dto->points,
+            'year' => $dto->year,
             'membership_number' => $this->membershipService->generateMembershipNumber('student'),
         ]);
 
@@ -201,6 +203,7 @@ class StudentService extends BaseService
             'name' => $dto->name,
             'email' => $dto->email,
             'phone' => $dto->phone,
+            'year' => $dto->year,
         ];
 
         if ($dto->password) {
@@ -233,11 +236,7 @@ class StudentService extends BaseService
 
     public function awardBadge(int $studentId, int $schoolId, int $badgeId, ?string $reason = null): void
     {
-        $student = $this->userRepository->findByIdAndSchoolId($studentId, $schoolId, 'student');
-        
-        if (!$student) {
-            throw new \Exception('Student not found');
-        }
+        $student = $this->ensureStudentBelongsToSchool($studentId, $schoolId);
 
         // Check if badge already exists
         $existingBadge = UserBadge::where('user_id', $studentId)
@@ -268,11 +267,7 @@ class StudentService extends BaseService
 
     public function removeBadge(int $studentId, int $schoolId, int $badgeId): void
     {
-        $student = $this->userRepository->findByIdAndSchoolId($studentId, $schoolId, 'student');
-        
-        if (!$student) {
-            throw new \Exception('Student not found');
-        }
+        $this->ensureStudentBelongsToSchool($studentId, $schoolId);
 
         $userBadge = UserBadge::where('user_id', $studentId)
             ->where('badge_id', $badgeId)
@@ -282,5 +277,16 @@ class StudentService extends BaseService
 
         // Clear cache
         $this->forgetCacheTags(["school_students_{$schoolId}"]);
+    }
+
+    public function ensureStudentBelongsToSchool(int $studentId, int $schoolId): User
+    {
+        $student = $this->userRepository->findByIdAndSchoolId($studentId, $schoolId, 'student');
+
+        if (!$student) {
+            throw new \Exception('Student not found');
+        }
+
+        return $student;
     }
 }

@@ -651,8 +651,10 @@ Route::middleware(['auth', 'school', 'membership_active'])->prefix('school')->na
     // إدارة الطلاب
     Route::get('/students', [\App\Http\Controllers\School\SchoolStudentController::class, 'index'])->name('students.index');
     Route::post('/students', [\App\Http\Controllers\School\SchoolStudentController::class, 'store'])->name('students.store');
+    Route::get('/students/{id}', [\App\Http\Controllers\School\SchoolStudentController::class, 'show'])->name('students.show');
     Route::put('/students/{id}', [\App\Http\Controllers\School\SchoolStudentController::class, 'update'])->name('students.update');
     Route::delete('/students/{id}', [\App\Http\Controllers\School\SchoolStudentController::class, 'destroy'])->name('students.destroy');
+    Route::get('/students/{id}/award-badge', [\App\Http\Controllers\School\SchoolStudentController::class, 'awardBadgeFallback'])->name('students.award-badge.fallback');
     Route::post('/students/{id}/award-badge', [\App\Http\Controllers\School\SchoolStudentController::class, 'awardBadge'])->name('students.award-badge');
     Route::delete('/students/{studentId}/badges/{badgeId}', [\App\Http\Controllers\School\SchoolStudentController::class, 'removeBadge'])->name('students.remove-badge');
     

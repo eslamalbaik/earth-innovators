@@ -49,6 +49,19 @@ class SchoolStudentController extends Controller
             ->with('success', 'تم إضافة الطالب بنجاح');
     }
 
+    public function show($id)
+    {
+        $school = Auth::user();
+
+        try {
+            $this->studentService->ensureStudentBelongsToSchool((int) $id, $school->id);
+        } catch (\Throwable $e) {
+            abort(404);
+        }
+
+        return redirect()->route('school.students.index');
+    }
+
     public function update(UpdateStudentRequest $request, $id)
     {
         $school = Auth::user();
@@ -87,6 +100,19 @@ class SchoolStudentController extends Controller
         } catch (\Exception $e) {
             return back()->withErrors(['badge_id' => $e->getMessage()]);
         }
+    }
+
+    public function awardBadgeFallback($id)
+    {
+        $school = Auth::user();
+
+        try {
+            $this->studentService->ensureStudentBelongsToSchool((int) $id, $school->id);
+        } catch (\Throwable $e) {
+            abort(404);
+        }
+
+        return redirect()->route('school.students.index');
     }
 
     public function removeBadge(Request $request, $studentId, $badgeId)

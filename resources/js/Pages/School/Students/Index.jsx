@@ -422,7 +422,9 @@ export default function Index({ auth, students, availableBadges }) {
                             <InputLabel htmlFor="year" value={t('schoolStudentsIndexPage.form.year')} />
                             <TextInput
                                 id="year"
-                                type="text"
+                                type="number"
+                                min="1900"
+                                max="2100"
                                 className="mt-1 block w-full"
                                 value={createForm.data.year}
                                 onChange={(e) => createForm.setData('year', e.target.value)}
@@ -507,7 +509,9 @@ export default function Index({ auth, students, availableBadges }) {
                             <InputLabel htmlFor="edit_year" value={t('schoolStudentsIndexPage.form.year')} />
                             <TextInput
                                 id="edit_year"
-                                type="text"
+                                type="number"
+                                min="1900"
+                                max="2100"
                                 className="mt-1 block w-full"
                                 value={editForm.data.year}
                                 onChange={(e) => editForm.setData('year', e.target.value)}

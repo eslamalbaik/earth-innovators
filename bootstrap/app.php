@@ -6,6 +6,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Session\TokenMismatchException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\EnsureUserIsTeacher;
@@ -90,6 +91,24 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($e->getStatusCode() === 419) {
                 return $handleExpiredRequest($request);
             }
+        });
+
+        $exceptions->render(function (MethodNotAllowedHttpException $e, Request $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'message' => 'Method not allowed for this route.',
+                ], 405);
+            }
+
+            $fallbackUrl = url('/');
+            $referer = $request->headers->get('referer');
+
+            if ($referer && $referer !== $request->fullUrl()) {
+                $fallbackUrl = $referer;
+            }
+
+            return redirect()->to($fallbackUrl)
+                ->with('error', 'هذا الرابط مخصص لتنفيذ إجراء وليس صفحة مباشرة.');
         });
 
         $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e, \Illuminate\Http\Request $request) {
