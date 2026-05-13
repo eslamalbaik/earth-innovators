@@ -23,7 +23,7 @@ class AdminChallengeController extends Controller
     {
         $challenges = Challenge::select([
             'id', 'title', 'objective', 'description', 'instructions', 
-            'challenge_type', 'category', 'age_group', 'status',
+            'challenge_type', 'category', 'age_group', 'difficulty', 'status',
             'school_id', 'created_by', 'start_date', 'deadline',
             'points_reward', 'max_participants', 'current_participants', 'created_at'
         ])
@@ -61,6 +61,7 @@ class AdminChallengeController extends Controller
                     'challenge_type_label' => $challenge->challenge_type_label,
                     'category' => $challenge->category,
                     'age_group' => $challenge->age_group,
+                    'difficulty' => $challenge->difficulty ?? 'medium',
                     'status' => $challenge->status,
                     'school_id' => $challenge->school_id,
                     'school_name' => $challenge->school->name ?? 'غير محدد',
@@ -143,6 +144,7 @@ class AdminChallengeController extends Controller
             
             $data['created_by'] = auth()->id();
             $data['status'] = $data['status'] ?? 'draft';
+            $data['difficulty'] = $data['difficulty'] ?? 'medium';
             $data['current_participants'] = 0;
             
             $data = $this->normalizeChallengeDates($data);
@@ -171,6 +173,9 @@ class AdminChallengeController extends Controller
             ]);
 
             $challenge = $this->challengeService->createChallenge($data);
+
+            \Illuminate\Support\Facades\Cache::forget('admin_challenge_stats');
+            \Illuminate\Support\Facades\Cache::forget('admin_challenge_analytics');
             
             Log::info('Admin challenge created successfully', [
                 'challenge_id' => $challenge->id,
@@ -228,6 +233,7 @@ class AdminChallengeController extends Controller
                 'challenge_type_label' => $challenge->challenge_type_label,
                 'category' => $challenge->category,
                 'age_group' => $challenge->age_group,
+                'difficulty' => $challenge->difficulty ?? 'medium',
                 'status' => $challenge->status,
                 'school_id' => $challenge->school_id,
                 'school' => $challenge->school ? [
@@ -273,6 +279,7 @@ class AdminChallengeController extends Controller
                 'challenge_type' => $challenge->challenge_type,
                 'category' => $challenge->category,
                 'age_group' => $challenge->age_group,
+                'difficulty' => $challenge->difficulty ?? 'medium',
                 'status' => $challenge->status,
                 'school_id' => $challenge->school_id,
                 'image' => $challenge->image,
@@ -298,7 +305,7 @@ class AdminChallengeController extends Controller
 
         try {
             $this->challengeService->updateChallenge($challenge, $data);
-                        \Illuminate\Support\Facades\Cache::forget('admin_challenge_stats');
+            \Illuminate\Support\Facades\Cache::forget('admin_challenge_stats');
             \Illuminate\Support\Facades\Cache::forget('admin_challenge_analytics');
             
             if ($request->wantsJson() || $request->header('X-Inertia')) {

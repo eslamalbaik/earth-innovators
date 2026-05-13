@@ -3295,6 +3295,7 @@ export const en = {
             "challengeType": "Challenge type",
             "category": "Category",
             "ageGroup": "Age group",
+            "difficulty": "Difficulty level",
             "school": "School",
             "startDate": "Start date",
             "deadline": "End date",

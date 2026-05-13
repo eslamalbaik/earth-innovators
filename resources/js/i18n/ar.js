@@ -3894,6 +3894,7 @@ export const ar = {
             "challengeType": "نوع التحدي",
             "category": "الفئة",
             "ageGroup": "الفئة العمرية",
+            "difficulty": "مستوى الصعوبة",
             "school": "المدرسة",
             "startDate": "تاريخ البدء",
             "deadline": "تاريخ الانتهاء",

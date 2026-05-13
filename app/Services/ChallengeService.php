@@ -203,6 +203,7 @@ class ChallengeService extends BaseService
             // Ensure required fields have defaults
             $data['current_participants'] = $data['current_participants'] ?? 0;
             $data['points_reward'] = $data['points_reward'] ?? 0;
+            $data['difficulty'] = $data['difficulty'] ?? 'medium';
             
             // Convert empty strings to null for nullable fields
             if (isset($data['max_participants']) && $data['max_participants'] === '') {
@@ -236,12 +237,22 @@ class ChallengeService extends BaseService
             // Load relationships for event
             $challenge->load(['creator', 'school']);
 
-            // Trigger event for notification
-            event(new \App\Events\ChallengeCreated($challenge));
+            try {
+                event(new \App\Events\ChallengeCreated($challenge));
+            } catch (\Throwable $eventException) {
+                Log::error('Challenge was created, but notification dispatch failed', [
+                    'challenge_id' => $challenge->id,
+                    'error' => $eventException->getMessage(),
+                    'trace' => $eventException->getTraceAsString(),
+                ]);
+            }
 
             return $challenge;
-        } catch (\Exception $e) {
-            DB::rollBack();
+        } catch (\Throwable $e) {
+            if (DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
+
             Log::error('Error creating challenge', [
                 'data' => $data,
                 'error' => $e->getMessage(),
@@ -260,7 +271,7 @@ class ChallengeService extends BaseService
         try {
             // Handle image upload
             if (isset($data['image'])) {
-                if (is_file($data['image'])) {
+                if ($data['image'] instanceof \Illuminate\Http\UploadedFile && $data['image']->isValid()) {
                     // Delete old image if exists
                     if ($challenge->image) {
                         Storage::disk('public')->delete($challenge->image);
@@ -286,14 +297,21 @@ class ChallengeService extends BaseService
                 throw new \Exception('Deadline must be after start date');
             }
 
+            if (!array_key_exists('difficulty', $data) || $data['difficulty'] === null || $data['difficulty'] === '') {
+                $data['difficulty'] = $challenge->difficulty ?? 'medium';
+            }
+
             $challenge->update($data);
 
             $this->clearChallengeCache($challenge->school_id, $challenge->created_by);
 
             DB::commit();
             return $challenge->fresh();
-        } catch (\Exception $e) {
-            DB::rollBack();
+        } catch (\Throwable $e) {
+            if (DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
+
             throw $e;
         }
     }
@@ -410,4 +428,3 @@ class ChallengeService extends BaseService
         });
     }
 }
-

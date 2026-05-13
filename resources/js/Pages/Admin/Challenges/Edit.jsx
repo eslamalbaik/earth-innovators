@@ -4,7 +4,7 @@ import { FaArrowRight, FaSave, FaTimes, FaImage, FaTrash } from 'react-icons/fa'
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from '@/i18n';
 
-export default function AdminChallengesEdit({ challenge, schools }) {
+export default function AdminChallengesEdit({ challenge, schools = [] }) {
     const { t, language } = useTranslation();
     const [imagePreview, setImagePreview] = useState(null);
     const [existingImage, setExistingImage] = useState(challenge?.image_url || null);
@@ -20,6 +20,7 @@ export default function AdminChallengesEdit({ challenge, schools }) {
         challenge_type: challenge.challenge_type || '',
         category: challenge.category || '',
         age_group: challenge.age_group || '',
+        difficulty: challenge.difficulty || 'medium',
         school_id: challenge.school_id || '',
         start_date: challenge.start_date || '',
         deadline: challenge.deadline || '',
@@ -92,6 +93,12 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                     <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('adminChallengesEditPage.sections.challengeInfo')}</h2>
 
                     <form onSubmit={submit} className="space-y-6">
+                        {errors.error && (
+                            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                                {errors.error}
+                            </div>
+                        )}
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* العنوان */}
                             <div className="md:col-span-2">
@@ -310,6 +317,26 @@ export default function AdminChallengesEdit({ challenge, schools }) {
                             </select>
                             {errors.age_group && (
                                 <p className="mt-1 text-sm text-red-600">{errors.age_group}</p>
+                            )}
+                        </div>
+
+                        {/* مستوى الصعوبة */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                {t('adminChallengesEditPage.fields.difficulty')}
+                            </label>
+                            <select
+                                value={data.difficulty}
+                                onChange={(e) => setData('difficulty', e.target.value)}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.difficulty ? 'border-red-500' : 'border-gray-300'
+                                    }`}
+                            >
+                                <option value="easy">{t('common.difficultyLevels.easy')}</option>
+                                <option value="medium">{t('common.difficultyLevels.medium')}</option>
+                                <option value="hard">{t('common.difficultyLevels.hard')}</option>
+                            </select>
+                            {errors.difficulty && (
+                                <p className="mt-1 text-sm text-red-600">{errors.difficulty}</p>
                             )}
                         </div>
 
