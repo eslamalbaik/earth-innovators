@@ -1,15 +1,10 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { useState, useMemo, useCallback, lazy, Suspense, useEffect, useRef } from 'react';
 import {
     FaSearch,
     FaFilter,
-    FaEye,
-    FaEdit,
-    FaTrash,
     FaPlus,
-    FaSave,
-    FaTimes,
     FaTable,
     FaTh,
     FaChartLine,
@@ -27,32 +22,7 @@ import { useTranslation } from '@/i18n';
 // This reduces initial bundle size since analytics is optional
 const AnalyticsPreview = lazy(() => import('@/Components/Challenges/AnalyticsPreview'));
 
-const toDateTimeLocalValue = (value) => {
-    if (!value) {
-        return '';
-    }
-
-    if (typeof value === 'string') {
-        const normalized = value.trim();
-        const match = normalized.match(/^(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2})/);
-
-        if (match) {
-            return `${match[1]}T${match[2]}`;
-        }
-    }
-
-    const date = new Date(value);
-
-    if (Number.isNaN(date.getTime())) {
-        return '';
-    }
-
-    const pad = (part) => String(part).padStart(2, '0');
-
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-};
-
-export default function AdminChallengesIndex({ challenges, stats, filters, schools = [], analytics = null }) {
+export default function AdminChallengesIndex({ challenges, stats, filters, analytics = null }) {
     const { confirm } = useConfirmDialog();
     const { t, language } = useTranslation();
     const [search, setSearch] = useState(filters?.search || '');
@@ -60,30 +30,10 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
     const [category, setCategory] = useState(filters?.category || '');
     const [challengeType, setChallengeType] = useState(filters?.challenge_type || '');
     const [viewMode, setViewMode] = useState('table'); // 'table' or 'card'
-    const [showEditModal, setShowEditModal] = useState(false);
-    const [challengeToEdit, setChallengeToEdit] = useState(null);
 
     // PERFORMANCE: Optimistic UI state management for instant feedback
     const [optimisticChallenges, setOptimisticChallenges] = useState(null);
     const [deletingIds, setDeletingIds] = useState(new Set());
-    const [updatingId, setUpdatingId] = useState(null);
-
-    const { data: editData, setData: setEditData, put: updateChallenge, processing: editProcessing, errors: editErrors, reset: resetEditForm } = useForm({
-        title: '',
-        objective: '',
-        description: '',
-        instructions: '',
-        challenge_type: '',
-        category: '',
-        age_group: '',
-        difficulty: 'medium',
-        school_id: '',
-        start_date: '',
-        deadline: '',
-        status: 'draft',
-        points_reward: 0,
-        max_participants: null,
-    });
 
     /**
      * PERFORMANCE: Use partial reload for filtering to preserve other component state
@@ -180,65 +130,12 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
      * PERFORMANCE: Memoize handlers to prevent unnecessary re-renders
      */
     const handleEdit = useCallback((challenge) => {
-        setChallengeToEdit(challenge);
-
-        setEditData({
-            title: challenge.title || '',
-            objective: challenge.objective || '',
-            description: challenge.description || '',
-            instructions: challenge.instructions || '',
-            challenge_type: challenge.challenge_type || '',
-            category: challenge.category || '',
-            age_group: challenge.age_group || '',
-            difficulty: challenge.difficulty || 'medium',
-            school_id: challenge.school_id || '',
-            start_date: toDateTimeLocalValue(challenge.start_date),
-            deadline: toDateTimeLocalValue(challenge.deadline),
-            status: challenge.status || 'draft',
-            points_reward: challenge.points_reward || 0,
-            max_participants: challenge.max_participants || null,
-        });
-        setShowEditModal(true);
-    }, [setEditData]);
+        router.visit(route('admin.challenges.edit', challenge.id));
+    }, []);
 
     const handleView = useCallback((challenge) => {
         router.visit(route('admin.challenges.show', challenge.id));
     }, []);
-
-    /**
-     * PERFORMANCE OPTIMIZED: Optimistic update with partial reload
-     * Note: updateChallenge and resetEditForm from useForm are stable references
-     */
-    const handleEditSubmit = useCallback((e) => {
-        e.preventDefault();
-
-        if (!challengeToEdit) return;
-
-        // INSTANT UI UPDATE: Mark as updating for visual feedback
-        setUpdatingId(challengeToEdit.id);
-
-        // Update with partial reload - only refresh challenges and stats
-        updateChallenge(route('admin.challenges.update', challengeToEdit.id), {
-            preserveState: true,
-            preserveScroll: true,
-            only: ['challenges', 'stats'], // PARTIAL RELOAD: Only refresh these props
-            onSuccess: () => {
-                setShowEditModal(false);
-                setChallengeToEdit(null);
-                resetEditForm();
-                setUpdatingId(null);
-            },
-            onError: () => {
-                setUpdatingId(null);
-            },
-        });
-    }, [challengeToEdit]);
-
-    const closeEditModal = useCallback(() => {
-        setShowEditModal(false);
-        setChallengeToEdit(null);
-        resetEditForm();
-    }, [resetEditForm]);
 
     /**
      * PERFORMANCE: Memoize helper functions to prevent recreation on each render
@@ -546,343 +443,6 @@ export default function AdminChallengesIndex({ challenges, stats, filters, schoo
                             </div>
                         </div>
                     </div>
-
-                    {/* Edit Modal */}
-                    {showEditModal && challengeToEdit && (
-                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-                            <div className="bg-white rounded-xl shadow-xl p-6 max-w-4xl w-full my-8 max-h-[90vh] overflow-y-auto">
-                                <div className="flex items-center justify-between mb-6 sticky top-0 bg-white pb-4 border-b">
-                                    <h3 className="text-2xl font-bold text-gray-900">{t('adminChallengesIndexPage.editModal.title')}</h3>
-                                    <button
-                                        onClick={closeEditModal}
-                                        className="text-gray-400 hover:text-gray-600 transition"
-                                    >
-                                        <FaTimes className="text-xl" />
-                                    </button>
-                                </div>
-
-                                <form onSubmit={handleEditSubmit} className="space-y-6">
-                                    {editErrors.error && (
-                                        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                                            {editErrors.error}
-                                        </div>
-                                    )}
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        {/* Title */}
-                                        <div className="md:col-span-2">
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                {t('adminChallengesIndexPage.editModal.titleLabel')} <span className="text-red-500">*</span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={editData.title}
-                                                onChange={(e) => setEditData('title', e.target.value)}
-                                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${editErrors.title ? 'border-red-500' : 'border-gray-300'
-                                                    }`}
-                                                required
-                                            />
-                                            {editErrors.title && (
-                                                <p className="mt-1 text-sm text-red-600">{editErrors.title}</p>
-                                            )}
-                                        </div>
-
-                                        {/* Objective */}
-                                        <div className="md:col-span-2">
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                {t('adminChallengesIndexPage.editModal.objectiveLabel')} <span className="text-red-500">*</span>
-                                            </label>
-                                            <textarea
-                                                value={editData.objective}
-                                                onChange={(e) => setEditData('objective', e.target.value)}
-                                                rows={3}
-                                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${editErrors.objective ? 'border-red-500' : 'border-gray-300'
-                                                    }`}
-                                                required
-                                            />
-                                            {editErrors.objective && (
-                                                <p className="mt-1 text-sm text-red-600">{editErrors.objective}</p>
-                                            )}
-                                        </div>
-
-                                        {/* Description */}
-                                        <div className="md:col-span-2">
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                {t('adminChallengesIndexPage.editModal.descriptionLabel')} <span className="text-red-500">*</span>
-                                            </label>
-                                            <textarea
-                                                value={editData.description}
-                                                onChange={(e) => setEditData('description', e.target.value)}
-                                                rows={4}
-                                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${editErrors.description ? 'border-red-500' : 'border-gray-300'
-                                                    }`}
-                                                required
-                                            />
-                                            {editErrors.description && (
-                                                <p className="mt-1 text-sm text-red-600">{editErrors.description}</p>
-                                            )}
-                                        </div>
-
-                                        {/* Instructions */}
-                                        <div className="md:col-span-2">
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                {t('adminChallengesIndexPage.editModal.instructionsLabel')} <span className="text-red-500">*</span>
-                                            </label>
-                                            <textarea
-                                                value={editData.instructions}
-                                                onChange={(e) => setEditData('instructions', e.target.value)}
-                                                rows={4}
-                                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${editErrors.instructions ? 'border-red-500' : 'border-gray-300'
-                                                    }`}
-                                                required
-                                            />
-                                            {editErrors.instructions && (
-                                                <p className="mt-1 text-sm text-red-600">{editErrors.instructions}</p>
-                                            )}
-                                        </div>
-
-                                        {/* Challenge Type */}
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                {t('adminChallengesIndexPage.editModal.challengeTypeLabel')} <span className="text-red-500">*</span>
-                                            </label>
-                                            <select
-                                                value={editData.challenge_type}
-                                                onChange={(e) => setEditData('challenge_type', e.target.value)}
-                                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${editErrors.challenge_type ? 'border-red-500' : 'border-gray-300'
-                                                    }`}
-                                                required
-                                            >
-                                                <option value="">{t('adminChallengesIndexPage.editModal.selectChallengeType')}</option>
-                                                <option value="cognitive">{t('adminChallengesEditPage.challengeTypes.cognitive')}</option>
-                                                <option value="applied">{t('adminChallengesEditPage.challengeTypes.applied')}</option>
-                                                <option value="creative">{t('adminChallengesEditPage.challengeTypes.creative')}</option>
-                                                <option value="artistic_creative">{t('adminChallengesEditPage.challengeTypes.artisticCreative')}</option>
-                                                <option value="collaborative">{t('adminChallengesEditPage.challengeTypes.collaborative')}</option>
-                                                <option value="analytical">{t('adminChallengesEditPage.challengeTypes.analytical')}</option>
-                                                <option value="technological">{t('adminChallengesEditPage.challengeTypes.technological')}</option>
-                                                <option value="behavioral">{t('adminChallengesEditPage.challengeTypes.behavioral')}</option>
-                                                <option value="60_seconds">{t('challenges.minseconds')}</option>
-                                                <option value="mental_math">{t('challenges.mentalMath')}</option>
-                                                <option value="conversions">{t('challenges.conversions')}</option>
-                                                <option value="team_fastest">{t('challenges.teamFastest')}</option>
-                                                <option value="build_problem">{t('challenges.buildProblem')}</option>
-                                                <option value="custom">{t('adminChallengesIndexPage.types.custom')}</option>
-                                            </select>
-                                            {editErrors.challenge_type && (
-                                                <p className="mt-1 text-sm text-red-600">{editErrors.challenge_type}</p>
-                                            )}
-                                        </div>
-
-                                        {/* Category */}
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                {t('adminChallengesIndexPage.editModal.categoryLabel')} <span className="text-red-500">*</span>
-                                            </label>
-                                            <select
-                                                value={editData.category}
-                                                onChange={(e) => setEditData('category', e.target.value)}
-                                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${editErrors.category ? 'border-red-500' : 'border-gray-300'
-                                                    }`}
-                                                required
-                                            >
-                                                <option value="">{t('adminChallengesIndexPage.editModal.selectCategory')}</option>
-                                                <option value="science">{t('categories.science')}</option>
-                                                <option value="technology">{t('categories.technology')}</option>
-                                                <option value="engineering">{t('categories.engineering')}</option>
-                                                <option value="mathematics">{t('categories.mathematics')}</option>
-                                                <option value="arts">{t('categories.arts')}</option>
-                                                <option value="other">{t('categories.other')}</option>
-                                            </select>
-                                            {editErrors.category && (
-                                                <p className="mt-1 text-sm text-red-600">{editErrors.category}</p>
-                                            )}
-                                        </div>
-
-                                        {/* Age Group */}
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                {t('adminChallengesIndexPage.editModal.ageGroupLabel')} <span className="text-red-500">*</span>
-                                            </label>
-                                            <select
-                                                value={editData.age_group}
-                                                onChange={(e) => setEditData('age_group', e.target.value)}
-                                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${editErrors.age_group ? 'border-red-500' : 'border-gray-300'
-                                                    }`}
-                                                required
-                                            >
-                                                <option value="">{t('adminChallengesIndexPage.editModal.selectAgeGroup')}</option>
-                                                <option value="6-9">{t('adminChallengesIndexPage.ageGroups.6to9')}</option>
-                                                <option value="10-13">{t('adminChallengesIndexPage.ageGroups.10to13')}</option>
-                                                <option value="14-17">{t('adminChallengesIndexPage.ageGroups.14to17')}</option>
-                                                <option value="18+">{t('adminChallengesIndexPage.ageGroups.18plus')}</option>
-                                            </select>
-                                            {editErrors.age_group && (
-                                                <p className="mt-1 text-sm text-red-600">{editErrors.age_group}</p>
-                                            )}
-                                        </div>
-
-                                        {/* Difficulty */}
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                {t('adminChallengesEditPage.fields.difficulty')}
-                                            </label>
-                                            <select
-                                                value={editData.difficulty}
-                                                onChange={(e) => setEditData('difficulty', e.target.value)}
-                                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${editErrors.difficulty ? 'border-red-500' : 'border-gray-300'
-                                                    }`}
-                                            >
-                                                <option value="easy">{t('common.difficultyLevels.easy')}</option>
-                                                <option value="medium">{t('common.difficultyLevels.medium')}</option>
-                                                <option value="hard">{t('common.difficultyLevels.hard')}</option>
-                                            </select>
-                                            {editErrors.difficulty && (
-                                                <p className="mt-1 text-sm text-red-600">{editErrors.difficulty}</p>
-                                            )}
-                                        </div>
-
-                                        {/* School */}
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                {t('adminChallengesIndexPage.editModal.schoolLabel')}
-                                            </label>
-                                            <select
-                                                value={editData.school_id}
-                                                onChange={(e) => setEditData('school_id', e.target.value)}
-                                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${editErrors.school_id ? 'border-red-500' : 'border-gray-300'
-                                                    }`}
-                                            >
-                                                <option value="">{t('adminChallengesIndexPage.editModal.selectSchool')}</option>
-                                                {schools.map((school) => (
-                                                    <option key={school.id} value={school.id}>
-                                                        {school.name}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            {editErrors.school_id && (
-                                                <p className="mt-1 text-sm text-red-600">{editErrors.school_id}</p>
-                                            )}
-                                        </div>
-
-                                        {/* Start Date */}
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                {t('adminChallengesIndexPage.editModal.startDateLabel')} <span className="text-red-500">*</span>
-                                            </label>
-                                            <input
-                                                type="datetime-local"
-                                                value={editData.start_date}
-                                                onChange={(e) => setEditData('start_date', e.target.value)}
-                                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${editErrors.start_date ? 'border-red-500' : 'border-gray-300'
-                                                    }`}
-                                                required
-                                            />
-                                            {editErrors.start_date && (
-                                                <p className="mt-1 text-sm text-red-600">{editErrors.start_date}</p>
-                                            )}
-                                        </div>
-
-                                        {/* Deadline */}
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                {t('adminChallengesIndexPage.editModal.deadlineLabel')} <span className="text-red-500">*</span>
-                                            </label>
-                                            <input
-                                                type="datetime-local"
-                                                value={editData.deadline}
-                                                onChange={(e) => setEditData('deadline', e.target.value)}
-                                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${editErrors.deadline ? 'border-red-500' : 'border-gray-300'
-                                                    }`}
-                                                required
-                                            />
-                                            {editErrors.deadline && (
-                                                <p className="mt-1 text-sm text-red-600">{editErrors.deadline}</p>
-                                            )}
-                                        </div>
-
-                                        {/* Status */}
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                {t('common.status')}
-                                            </label>
-                                            <select
-                                                value={editData.status}
-                                                onChange={(e) => setEditData('status', e.target.value)}
-                                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${editErrors.status ? 'border-red-500' : 'border-gray-300'
-                                                    }`}
-                                            >
-                                                <option value="draft">{t('common.draft')}</option>
-                                                <option value="active">{t('common.active')}</option>
-                                                <option value="completed">{t('common.completed')}</option>
-                                                <option value="cancelled">{t('common.cancelled')}</option>
-                                            </select>
-                                            {editErrors.status && (
-                                                <p className="mt-1 text-sm text-red-600">{editErrors.status}</p>
-                                            )}
-                                        </div>
-
-                                        {/* Points Reward */}
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                {t('adminChallengesIndexPage.editModal.pointsRewardLabel')}
-                                            </label>
-                                            <input
-                                                type="number"
-                                                min="0"
-                                                value={editData.points_reward}
-                                                onChange={(e) => setEditData('points_reward', parseInt(e.target.value) || 0)}
-                                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${editErrors.points_reward ? 'border-red-500' : 'border-gray-300'
-                                                    }`}
-                                            />
-                                            {editErrors.points_reward && (
-                                                <p className="mt-1 text-sm text-red-600">{editErrors.points_reward}</p>
-                                            )}
-                                        </div>
-
-                                        {/* Max Participants */}
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                {t('adminChallengesIndexPage.editModal.maxParticipantsLabel')}
-                                            </label>
-                                            <input
-                                                type="number"
-                                                min="1"
-                                                value={editData.max_participants || ''}
-                                                onChange={(e) => setEditData('max_participants', e.target.value ? parseInt(e.target.value) : null)}
-                                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${editErrors.max_participants ? 'border-red-500' : 'border-gray-300'
-                                                    }`}
-                                                placeholder={t('adminChallengesIndexPage.editModal.unlimitedPlaceholder')}
-                                            />
-                                            {editErrors.max_participants && (
-                                                <p className="mt-1 text-sm text-red-600">{editErrors.max_participants}</p>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* Actions */}
-                                    <div className="flex items-center gap-4 pt-6 border-t border-gray-200">
-                                        <button
-                                            type="submit"
-                                            disabled={editProcessing}
-                                            className="px-6 py-2.5 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50 transition-colors"
-                                        >
-                                            <FaSave />
-                                            {editProcessing ? t('adminChallengesIndexPage.editModal.saving') : t('adminChallengesIndexPage.editModal.saveChanges')}
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={closeEditModal}
-                                            className="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg flex items-center gap-2 transition-colors"
-                                        >
-                                            <FaTimes />
-                                            {t('common.cancel')}
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    )}
 
                 </div>
             </div>

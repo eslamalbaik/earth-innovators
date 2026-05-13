@@ -212,12 +212,6 @@ class PackageSubscriptionController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->isStudent()) {
-            return redirect()->route('dashboard')->with('info', [
-                'key' => 'packagesIndexPage.errors.managedBySchool',
-            ]);
-        }
-
         $subscriptions = UserPackage::where('user_id', $user->id)
             ->with(['package', 'payments' => fn ($q) => $q->where('status', 'completed')->latest()->limit(1)])
             ->orderBy('created_at', 'desc')

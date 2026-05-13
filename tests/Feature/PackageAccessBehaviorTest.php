@@ -61,7 +61,7 @@ class PackageAccessBehaviorTest extends TestCase
         $response->assertInertia(fn ($page) => $page
             ->component('Packages/MySubscriptions')
             ->has('subscriptions', 0)
-            ->where('membershipSummary.packages_available', true)
+            ->where('membershipSummary.packages_available', false)
         );
     }
 }

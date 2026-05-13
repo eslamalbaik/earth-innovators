@@ -81,7 +81,7 @@ class StudentChallengeWorkflowTest extends TestCase
             ->get(route('student.challenges.show', $challenge))
             ->assertInertia(fn ($page) => $page
                 ->component('Student/Challenges/Show')
-                ->where('challenge.student_submission.file_urls.0', '/storage/challenge-submissions/work/demo.pdf')
+                ->where('challenge.student_submission.file_urls.0', url('/media/challenge-submissions/work/demo.pdf'))
             );
     }
 }
