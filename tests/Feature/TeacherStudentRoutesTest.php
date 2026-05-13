@@ -102,4 +102,30 @@ class TeacherStudentRoutesTest extends TestCase
             'year' => 2026,
         ]);
     }
+
+    public function test_teacher_can_attach_existing_unassigned_student(): void
+    {
+        $this->withoutMiddleware(EnsureMembershipActive::class);
+
+        $teacher = User::factory()->create([
+            'role' => 'teacher',
+            'school_id' => null,
+        ]);
+
+        $student = User::factory()->create([
+            'role' => 'student',
+            'teacher_id' => null,
+            'school_id' => null,
+        ]);
+
+        $response = $this->actingAs($teacher)->from('/teacher/students')->post('/teacher/students', [
+            'existing_student_id' => $student->id,
+        ]);
+
+        $response->assertRedirect('/teacher/students');
+        $this->assertDatabaseHas('users', [
+            'id' => $student->id,
+            'teacher_id' => $teacher->id,
+        ]);
+    }
 }

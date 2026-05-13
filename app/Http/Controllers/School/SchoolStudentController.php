@@ -9,6 +9,7 @@ use App\Http\Requests\Student\AwardBadgeRequest;
 use App\DTO\Student\StoreStudentDTO;
 use App\DTO\Student\UpdateStudentDTO;
 use App\Services\StudentService;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -30,16 +31,43 @@ class SchoolStudentController extends Controller
         )->withQueryString();
 
         $availableBadges = $this->studentService->getAvailableBadges($school->canAccessAllSchoolData() ? 0 : $school->id);
+        $availableStudents = User::where('role', 'student')
+            ->where(function ($query) use ($school) {
+                $query->whereNull('school_id')
+                    ->orWhere('school_id', $school->id);
+            })
+            ->where(function ($query) use ($school) {
+                $query->whereNull('school_id')
+                    ->orWhereDoesntHave('school', fn ($schoolQuery) => $schoolQuery->where('id', $school->id));
+            })
+            ->orderBy('name')
+            ->limit(200)
+            ->get(['id', 'name', 'email', 'phone', 'school_id'])
+            ->map(fn ($student) => [
+                'id' => $student->id,
+                'name' => $student->name,
+                'email' => $student->email,
+                'phone' => $student->phone,
+                'school_id' => $student->school_id,
+            ]);
 
         return Inertia::render('School/Students/Index', [
             'students' => $students,
             'availableBadges' => $availableBadges,
+            'availableStudents' => $availableStudents,
         ]);
     }
 
     public function store(StoreStudentRequest $request)
     {
         $school = Auth::user();
+
+        if ($request->filled('existing_student_id')) {
+            $this->studentService->attachExistingStudentToSchool((int) $request->validated()['existing_student_id'], $school->id);
+
+            return redirect()->route('school.students.index')
+                ->with('success', 'تم ربط الطالب بالمدرسة بنجاح');
+        }
 
         $dto = StoreStudentDTO::fromRequest($request->validated(), $school->id);
 

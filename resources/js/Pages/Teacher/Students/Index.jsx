@@ -13,16 +13,18 @@ import InputError from '@/Components/InputError';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 import PhoneInput from '@/Components/PhoneInput';
 
-export default function Index({ auth, students }) {
+export default function Index({ auth, students, availableStudents = [] }) {
     const { t } = useTranslation();
     const { confirm } = useConfirmDialog();
     const [searchTerm, setSearchTerm] = useState('');
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [selectedStudent, setSelectedStudent] = useState(null);
+    const [createMode, setCreateMode] = useState('existing');
     const studentRows = students?.data || [];
 
     const createForm = useForm({
+        existing_student_id: '',
         name: '',
         email: '',
         phone: '',
@@ -47,6 +49,12 @@ export default function Index({ auth, students }) {
                 createForm.reset();
             },
         });
+    };
+
+    const closeCreateModal = () => {
+        setShowCreateModal(false);
+        setCreateMode('existing');
+        createForm.reset();
     };
 
     const handleEdit = (student) => {
@@ -317,11 +325,60 @@ export default function Index({ auth, students }) {
             </div>
 
             {/* Create */}
-            <Modal show={showCreateModal} onClose={() => { setShowCreateModal(false); createForm.reset(); }} maxWidth="lg">
+            <Modal show={showCreateModal} onClose={closeCreateModal} maxWidth="lg">
                 <div className="p-6 border-b border-gray-200 font-bold text-gray-900">
                     {t('teacherStudentsPage.createModal.title')}
                 </div>
                 <form onSubmit={handleCreate} className="p-6 space-y-4">
+                    <div className="grid grid-cols-2 gap-2 rounded-lg bg-gray-100 p-1">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setCreateMode('existing');
+                                createForm.clearErrors();
+                            }}
+                            className={`rounded-md px-3 py-2 text-sm font-medium transition ${createMode === 'existing' ? 'bg-white text-[#A3C042] shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+                        >
+                            اختيار طالب موجود
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setCreateMode('new');
+                                createForm.setData('existing_student_id', '');
+                                createForm.clearErrors();
+                            }}
+                            className={`rounded-md px-3 py-2 text-sm font-medium transition ${createMode === 'new' ? 'bg-white text-[#A3C042] shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+                        >
+                            إنشاء طالب جديد
+                        </button>
+                    </div>
+
+                    {createMode === 'existing' && (
+                        <div>
+                            <InputLabel value="الطالب الموجود" />
+                            <select
+                                value={createForm.data.existing_student_id}
+                                onChange={(e) => createForm.setData('existing_student_id', e.target.value)}
+                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
+                                required={createMode === 'existing'}
+                            >
+                                <option value="">اختر طالبًا من النظام...</option>
+                                {availableStudents.map((student) => (
+                                    <option key={student.id} value={student.id}>
+                                        {student.name} - {student.email}
+                                    </option>
+                                ))}
+                            </select>
+                            <InputError message={createForm.errors.existing_student_id} className="mt-1" />
+                            {availableStudents.length === 0 && (
+                                <p className="mt-2 text-sm text-gray-500">لا يوجد طلاب متاحون للربط حاليًا. يمكنك إنشاء طالب جديد.</p>
+                            )}
+                        </div>
+                    )}
+
+                    {createMode === 'new' && (
+                        <>
                     <div>
                         <InputLabel value={t('common.name')} />
                         <TextInput
@@ -372,17 +429,19 @@ export default function Index({ auth, students }) {
                         />
                         <InputError message={createForm.errors.password} className="mt-1" />
                     </div>
+                        </>
+                    )}
 
                     <div className="flex items-center justify-end gap-3 pt-2">
                         <button
                             type="button"
-                            onClick={() => { setShowCreateModal(false); createForm.reset(); }}
+                            onClick={closeCreateModal}
                             className="px-4 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50"
                         >
                             {t('common.cancel')}
                         </button>
                         <PrimaryButton disabled={createForm.processing}>
-                            {createForm.processing ? t('common.processing') : t('common.create')}
+                            {createForm.processing ? t('common.processing') : (createMode === 'existing' ? 'ربط الطالب' : t('common.create'))}
                         </PrimaryButton>
                     </div>
                 </form>

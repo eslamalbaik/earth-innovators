@@ -157,4 +157,28 @@ class SchoolStudentRoutesTest extends TestCase
             'year' => 2026,
         ]);
     }
+
+    public function test_school_can_attach_existing_unassigned_student(): void
+    {
+        $this->withoutMiddleware(EnsureMembershipActive::class);
+
+        $school = User::factory()->create([
+            'role' => 'school',
+        ]);
+
+        $student = User::factory()->create([
+            'role' => 'student',
+            'school_id' => null,
+        ]);
+
+        $response = $this->actingAs($school)->from('/school/students')->post('/school/students', [
+            'existing_student_id' => $student->id,
+        ]);
+
+        $response->assertRedirect(route('school.students.index'));
+        $this->assertDatabaseHas('users', [
+            'id' => $student->id,
+            'school_id' => $school->id,
+        ]);
+    }
 }

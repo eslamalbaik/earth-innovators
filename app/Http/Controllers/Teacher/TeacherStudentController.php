@@ -74,6 +74,7 @@ class TeacherStudentController extends Controller
         
         return Inertia::render('Teacher/Students/Index', [
             'students' => $students,
+            'availableStudents' => $this->availableStudentsForTeacher($teacher),
         ]);
     }
 
@@ -82,12 +83,37 @@ class TeacherStudentController extends Controller
         $teacher = Auth::user();
 
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'existing_student_id' => ['nullable', 'integer', 'exists:users,id'],
+            'name' => [$request->filled('existing_student_id') ? 'nullable' : 'required', 'string', 'max:255'],
+            'email' => [$request->filled('existing_student_id') ? 'nullable' : 'required', 'string', 'email', 'max:255', 'unique:users,email'],
             'phone' => ['nullable', 'string', 'max:50'],
-            'password' => ['required', 'string', 'min:6'],
+            'password' => [$request->filled('existing_student_id') ? 'nullable' : 'required', 'string', 'min:6'],
             'year' => ['nullable', 'integer', 'min:1', 'max:9999'],
         ]);
+
+        if (!empty($validated['existing_student_id'])) {
+            $student = User::where('role', 'student')
+                ->where('id', $validated['existing_student_id'])
+                ->where(function ($query) use ($teacher) {
+                    $query->whereNull('teacher_id')
+                        ->orWhere('teacher_id', $teacher->id);
+                })
+                ->when(!empty($teacher->school_id), function ($query) use ($teacher) {
+                    $query->where(function ($schoolQuery) use ($teacher) {
+                        $schoolQuery->whereNull('school_id')
+                            ->orWhere('school_id', $teacher->school_id);
+                    });
+                })
+                ->firstOrFail();
+
+            $student->teacher_id = $teacher->id;
+            if (!empty($teacher->school_id) && empty($student->school_id)) {
+                $student->school_id = $teacher->school_id;
+            }
+            $student->save();
+
+            return redirect()->back()->with('success', ['key' => 'toastMessages.teacherStudentCreatedSuccess']);
+        }
 
         User::create([
             'name' => $validated['name'],
@@ -164,5 +190,35 @@ class TeacherStudentController extends Controller
         $student->delete();
 
         return redirect()->back()->with('success', ['key' => 'toastMessages.teacherStudentDeletedSuccess']);
+    }
+
+    private function availableStudentsForTeacher(User $teacher)
+    {
+        return User::where('role', 'student')
+            ->where(function ($query) use ($teacher) {
+                $query->whereNull('teacher_id')
+                    ->orWhere('teacher_id', $teacher->id);
+            })
+            ->when(!empty($teacher->school_id), function ($query) use ($teacher) {
+                $query->where(function ($schoolQuery) use ($teacher) {
+                    $schoolQuery->whereNull('school_id')
+                        ->orWhere('school_id', $teacher->school_id);
+                });
+            })
+            ->where(function ($query) use ($teacher) {
+                $query->whereNull('teacher_id')
+                    ->orWhere('teacher_id', '!=', $teacher->id);
+            })
+            ->orderBy('name')
+            ->limit(200)
+            ->get(['id', 'name', 'email', 'phone', 'school_id', 'teacher_id'])
+            ->map(fn ($student) => [
+                'id' => $student->id,
+                'name' => $student->name,
+                'email' => $student->email,
+                'phone' => $student->phone,
+                'school_id' => $student->school_id,
+                'teacher_id' => $student->teacher_id,
+            ]);
     }
 }

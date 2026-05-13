@@ -191,6 +191,29 @@ class StudentService extends BaseService
         return $user;
     }
 
+    public function attachExistingStudentToSchool(int $studentId, int $schoolId): User
+    {
+        $student = User::where('role', 'student')
+            ->where('id', $studentId)
+            ->where(function ($query) use ($schoolId) {
+                $query->whereNull('school_id')
+                    ->orWhere('school_id', $schoolId);
+            })
+            ->first();
+
+        if (!$student) {
+            throw new \Exception('Student not found');
+        }
+
+        $student->school_id = $schoolId;
+        $student->save();
+
+        $this->membershipService->ensureMembershipNumber($student);
+        $this->forgetCacheTags(["school_students_{$schoolId}"]);
+
+        return $student->fresh();
+    }
+
     public function updateStudent(int $id, int $schoolId, UpdateStudentDTO $dto): User
     {
         $student = $this->userRepository->findByIdAndSchoolId($id, $schoolId, 'student');
