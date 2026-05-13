@@ -55,6 +55,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'notification_preferences' => 'array',
             'contract_start_date' => 'date',
             'contract_end_date' => 'date',
+            'year' => 'integer',
         ];
     }
 

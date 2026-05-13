@@ -352,6 +352,10 @@ export default function Index({ auth, students }) {
                     <div>
                         <InputLabel value={t('teacherStudentsPage.form.year')} />
                         <TextInput
+                            type="number"
+                            min="1"
+                            max="9999"
+                            inputMode="numeric"
                             value={createForm.data.year}
                             onChange={(e) => createForm.setData('year', e.target.value)}
                             className="mt-1 block w-full"
@@ -420,6 +424,10 @@ export default function Index({ auth, students }) {
                     <div>
                         <InputLabel value={t('teacherStudentsPage.form.year')} />
                         <TextInput
+                            type="number"
+                            min="1"
+                            max="9999"
+                            inputMode="numeric"
                             value={editForm.data.year}
                             onChange={(e) => editForm.setData('year', e.target.value)}
                             className="mt-1 block w-full"

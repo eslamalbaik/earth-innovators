@@ -709,6 +709,7 @@ Route::middleware(['auth', 'teacher', 'membership_active'])->group(function () {
 
     Route::get('/teacher/students', [\App\Http\Controllers\Teacher\TeacherStudentController::class, 'index'])->name('teacher.students.index');
     Route::post('/teacher/students', [\App\Http\Controllers\Teacher\TeacherStudentController::class, 'store'])->name('teacher.students.store');
+    Route::get('/teacher/students/{student}', [\App\Http\Controllers\Teacher\TeacherStudentController::class, 'show'])->name('teacher.students.show');
     Route::put('/teacher/students/{student}', [\App\Http\Controllers\Teacher\TeacherStudentController::class, 'update'])->name('teacher.students.update');
     Route::delete('/teacher/students/{student}', [\App\Http\Controllers\Teacher\TeacherStudentController::class, 'destroy'])->name('teacher.students.destroy');
     

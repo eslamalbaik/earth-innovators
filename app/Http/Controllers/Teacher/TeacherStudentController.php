@@ -86,7 +86,7 @@ class TeacherStudentController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'phone' => ['nullable', 'string', 'max:50'],
             'password' => ['required', 'string', 'min:6'],
-            'year' => ['nullable', 'string', 'max:50'],
+            'year' => ['nullable', 'integer', 'min:1', 'max:9999'],
         ]);
 
         User::create([
@@ -101,6 +101,20 @@ class TeacherStudentController extends Controller
         ]);
 
         return redirect()->back()->with('success', ['key' => 'toastMessages.teacherStudentCreatedSuccess']);
+    }
+
+    public function show(User $student)
+    {
+        $teacher = Auth::user();
+
+        if ($student->role !== 'student' || (int) $student->teacher_id !== (int) $teacher->id) {
+            abort(404);
+        }
+        if (!empty($teacher->school_id) && (int) $student->school_id !== (int) $teacher->school_id) {
+            abort(404);
+        }
+
+        return redirect()->route('teacher.students.index');
     }
 
     public function update(Request $request, User $student)
@@ -119,7 +133,7 @@ class TeacherStudentController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($student->id)],
             'phone' => ['nullable', 'string', 'max:50'],
             'password' => ['nullable', 'string', 'min:6'],
-            'year' => ['nullable', 'string', 'max:50'],
+            'year' => ['nullable', 'integer', 'min:1', 'max:9999'],
         ]);
 
         $student->name = $validated['name'];
