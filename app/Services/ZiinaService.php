@@ -11,6 +11,7 @@ class ZiinaService
     private ?string $apiKey;
     private string $baseUrl;
     private bool $testMode;
+    private bool $isEnabled;
 
     public function __construct()
     {
@@ -18,9 +19,18 @@ class ZiinaService
             ->where('gateway_name', 'ziina')
             ->first();
 
-        $this->apiKey = $gateway?->api_key ?: (config('services.ziina.api_key') ?? '');
+        if (!$gateway) {
+            $this->apiKey = '';
+            $this->testMode = (bool) config('services.ziina.test_mode', true);
+            $this->isEnabled = false;
+            $this->baseUrl = rtrim(config('services.ziina.base_url', 'https://api-v2.ziina.com/api'), '/');
+            return;
+        }
+
+        $this->apiKey = $this->normalizeApiKey($gateway?->api_key ?: (config('services.ziina.api_key') ?? ''));
         $this->testMode = $gateway?->is_test_mode ?? config('services.ziina.test_mode', true);
-        $this->baseUrl = 'https://api-v2.ziina.com/api';
+        $this->isEnabled = $gateway?->is_enabled ?? true;
+        $this->baseUrl = rtrim($gateway?->base_url ?: config('services.ziina.base_url', 'https://api-v2.ziina.com/api'), '/');
     }
 
     /**
@@ -31,11 +41,20 @@ class ZiinaService
      */
     public function createPaymentRequest(array $data): ?array
     {
+        if (!$this->isEnabled) {
+            Log::warning('Ziina payment service is disabled');
+
+            return [
+                'error' => true,
+                'message' => ['key' => 'toastMessages.packageGatewayDisabled'],
+            ];
+        }
+
         if (empty($this->apiKey)) {
             Log::error('Ziina API key is not configured');
             return [
                 'error' => true,
-                'message' => 'Ziina payment service is not configured. Please set ZIINA_API_KEY in your .env file.',
+                'message' => ['key' => 'toastMessages.packageGatewayNotConfigured'],
             ];
         }
 
@@ -78,6 +97,18 @@ class ZiinaService
                 'status' => $response->status(),
                 'body' => $response->body(),
             ]);
+
+            if ($response->status() === 401) {
+                return [
+                    'error' => true,
+                    'message' => [
+                        'key' => 'toastMessages.packagePaymentUnauthorized',
+                        'details' => $this->testMode ? 'Ziina test mode' : 'Ziina live mode',
+                    ],
+                    'status' => $response->status(),
+                    'details' => $response->json(),
+                ];
+            }
 
             return [
                 'error' => true,
@@ -153,6 +184,11 @@ class ZiinaService
             ->where('gateway_name', 'ziina')
             ->first();
 
+        if (!$gateway) {
+            Log::warning('Ziina webhook received but payment gateway setting is missing');
+            return false;
+        }
+
         $webhookSecret = $gateway?->webhook_secret ?: config('services.ziina.webhook_secret');
         
         if (!$webhookSecret) {
@@ -173,5 +209,16 @@ class ZiinaService
     public function isTestMode(): bool
     {
         return $this->testMode;
+    }
+
+    private function normalizeApiKey(?string $apiKey): string
+    {
+        $apiKey = trim((string) $apiKey);
+
+        if (str_starts_with(strtolower($apiKey), 'bearer ')) {
+            $apiKey = trim(substr($apiKey, 7));
+        }
+
+        return $apiKey;
     }
 }

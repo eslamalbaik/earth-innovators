@@ -2,7 +2,7 @@ import DashboardLayout from '@/Layouts/DashboardLayout';
 import { useTranslation } from '@/i18n';
 import { Head, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
-import { FaCreditCard, FaToggleOn, FaToggleOff, FaSave, FaSpinner, FaEdit, FaPlug } from 'react-icons/fa';
+import { FaCreditCard, FaToggleOn, FaToggleOff, FaSave, FaSpinner, FaEdit, FaPlug, FaTrash } from 'react-icons/fa';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 
 export default function AdminPaymentGatewaysIndex({ gateways }) {
@@ -45,6 +45,29 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                 preserveScroll: true,
             });
         }
+    };
+
+    const handleDeleteGateway = async (gateway) => {
+        const confirmed = await confirm({
+            title: t('adminPaymentGatewaysPage.confirm.deleteTitle'),
+            message: t('adminPaymentGatewaysPage.confirm.deleteMessage', {
+                name: getGatewayDisplayName(gateway),
+            }),
+            confirmText: t('adminPaymentGatewaysPage.actions.delete'),
+            cancelText: t('common.cancel'),
+            variant: 'danger',
+        });
+
+        if (!confirmed) {
+            return;
+        }
+
+        router.delete(route('admin.payment-gateways.destroy', gateway.id), {
+            preserveScroll: true,
+            onSuccess: () => {
+                setEditingGateway(null);
+            },
+        });
     };
 
     const handleTestConnection = async (gateway) => {
@@ -422,6 +445,13 @@ export default function AdminPaymentGatewaysIndex({ gateways }) {
                                                         : t('adminPaymentGatewaysPage.actions.activate')}
                                                 >
                                                     {gateway.is_enabled ? <FaToggleOn className="text-2xl" /> : <FaToggleOff className="text-2xl" />}
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteGateway(gateway)}
+                                                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                                                    title={t('adminPaymentGatewaysPage.actions.delete')}
+                                                >
+                                                    <FaTrash />
                                                 </button>
                                             </div>
                                         </div>

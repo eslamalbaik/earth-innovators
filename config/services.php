@@ -53,5 +53,6 @@ return [
         'webhook_secret' => env('ZIINA_WEBHOOK_SECRET'),
         'test_mode' => env('ZIINA_TEST_MODE', true),
         'test_bypass' => env('ZIINA_TEST_BYPASS', false),
+        'base_url' => env('ZIINA_BASE_URL', 'https://api-v2.ziina.com/api'),
     ],
 ];

@@ -454,7 +454,7 @@ Route::get('/packages', [\App\Http\Controllers\PackageSubscriptionController::cl
 Route::get('/my-subscriptions', [\App\Http\Controllers\PackageSubscriptionController::class, 'mySubscriptions'])
     ->middleware('auth')
     ->name('packages.my-subscriptions');
-Route::post('/packages/{package}/subscribe', [\App\Http\Controllers\PackageSubscriptionController::class, 'subscribe'])
+Route::match(['get', 'post'], '/packages/{package}/subscribe', [\App\Http\Controllers\PackageSubscriptionController::class, 'subscribe'])
     ->middleware('auth')
     ->name('packages.subscribe');
 Route::match(['get', 'post'], '/packages/subscriptions/{userPackage}/cancel', [\App\Http\Controllers\PackageSubscriptionController::class, 'cancelSubscription'])
@@ -863,6 +863,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Payment Gateways Management
     Route::get('/payment-gateways', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'index'])->name('payment-gateways.index');
     Route::put('/payment-gateways/{paymentGateway}', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'update'])->name('payment-gateways.update');
+    Route::delete('/payment-gateways/{paymentGateway}', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'destroy'])->name('payment-gateways.destroy');
     Route::match(['get', 'post'], '/payment-gateways/{paymentGateway}/toggle-status', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'toggleStatus'])->name('payment-gateways.toggle-status');
     Route::post('/payment-gateways/{paymentGateway}/test-connection', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'testConnection'])->name('payment-gateways.test-connection');
 

@@ -41,6 +41,10 @@ class PaymentGatewayController extends Controller
             $validated['additional_settings'] = json_encode($request->additional_settings);
         }
 
+        if (array_key_exists('api_key', $validated)) {
+            $validated['api_key'] = $this->normalizeApiKey($validated['api_key']);
+        }
+
         $paymentGateway->update($validated);
         $envSyncResult = $this->updateConfigFile($paymentGateway);
 
@@ -87,6 +91,18 @@ class PaymentGatewayController extends Controller
                 'message' => 'حدث خطأ أثناء اختبار الاتصال: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function destroy(PaymentGatewaySetting $paymentGateway)
+    {
+        $gatewayName = $paymentGateway->gateway_name;
+        $displayName = $paymentGateway->display_name_ar ?: $paymentGateway->display_name;
+
+        $paymentGateway->delete();
+        $this->removeConfigFileKeys($gatewayName);
+
+        return redirect()->route('admin.payment-gateways.index')
+            ->with('success', "تم حذف بوابة الدفع {$displayName} بنجاح");
     }
 
     private function updateConfigFile(PaymentGatewaySetting $gateway): array
@@ -159,6 +175,65 @@ class PaymentGatewayController extends Controller
                 'message' => 'تم حفظ الإعدادات في قاعدة البيانات، لكن تعذر تحديث ملف .env على الخادم بسبب الصلاحيات. قد تحتاج لتحديث متغيرات البيئة يدويًا.',
             ];
         }
+    }
+
+    private function removeConfigFileKeys(string $gatewayName): void
+    {
+        $envFile = base_path('.env');
+
+        if (!file_exists($envFile)) {
+            return;
+        }
+
+        $envContent = @file_get_contents($envFile);
+        if ($envContent === false) {
+            return;
+        }
+
+        $prefix = strtoupper($gatewayName);
+        $keys = [
+            "{$prefix}_API_KEY",
+            "{$prefix}_API_SECRET",
+            "{$prefix}_PUBLIC_KEY",
+            "{$prefix}_WEBHOOK_SECRET",
+            "{$prefix}_NOTIFICATION_KEY",
+            "{$prefix}_TEST_MODE",
+            "{$prefix}_ENV",
+            "{$prefix}_BASE_URL",
+        ];
+
+        foreach ($keys as $key) {
+            $envContent = preg_replace("/^{$key}=.*\R?/m", '', $envContent);
+        }
+
+        try {
+            $written = @file_put_contents($envFile, rtrim($envContent) . PHP_EOL);
+
+            if ($written === false) {
+                throw new \RuntimeException('Unable to write .env file.');
+            }
+        } catch (\Throwable $exception) {
+            Log::warning('Failed to remove payment gateway settings from .env', [
+                'gateway' => $gatewayName,
+                'path' => $envFile,
+                'error' => $exception->getMessage(),
+            ]);
+        }
+    }
+
+    private function normalizeApiKey(?string $apiKey): ?string
+    {
+        if (!is_string($apiKey)) {
+            return $apiKey;
+        }
+
+        $apiKey = trim($apiKey);
+
+        if (str_starts_with(strtolower($apiKey), 'bearer ')) {
+            $apiKey = trim(substr($apiKey, 7));
+        }
+
+        return $apiKey;
     }
 
     private function performConnectionTest(PaymentGatewaySetting $gateway)

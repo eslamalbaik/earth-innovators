@@ -13,6 +13,7 @@ class TamaraService
     private string $publicKey;
     private string $baseUrl;
     private bool $isSandbox;
+    private bool $isEnabled;
 
     public function __construct()
     {
@@ -20,10 +21,26 @@ class TamaraService
             ->where('gateway_name', 'tamara')
             ->first();
 
+        if (!$gateway) {
+            $this->apiToken = '';
+            $this->notificationToken = '';
+            $this->publicKey = '';
+            $this->isSandbox = (bool) (config('services.tamara.sandbox') ?? true);
+            $this->isEnabled = false;
+
+            $defaultBaseUrl = $this->isSandbox
+                ? 'https://api-sandbox.tamara.co'
+                : 'https://api.tamara.co';
+
+            $this->baseUrl = rtrim(config('services.tamara.base_url') ?? $defaultBaseUrl, '/');
+            return;
+        }
+
         $this->apiToken = $gateway?->api_key ?: (config('services.tamara.api_key') ?? '');
         $this->notificationToken = $gateway?->api_secret ?: (config('services.tamara.notification_key') ?? '');
         $this->publicKey = $gateway?->public_key ?: (config('services.tamara.public_key') ?? '');
         $this->isSandbox = $gateway?->is_test_mode ?? (bool) (config('services.tamara.sandbox') ?? true);
+        $this->isEnabled = (bool) $gateway->is_enabled;
 
         $defaultBaseUrl = $this->isSandbox
             ? 'https://api-sandbox.tamara.co'
@@ -34,6 +51,15 @@ class TamaraService
 
     public function createCheckout(array $orderData): ?array
     {
+        if (!$this->isEnabled) {
+            return [
+                'error' => true,
+                'status' => 0,
+                'message' => 'Tamara payment gateway is disabled. Please enable it from Payment Gateways.',
+                'body' => [],
+            ];
+        }
+
         // التحقق من وجود API key
         if (empty($this->apiToken)) {
             return [
