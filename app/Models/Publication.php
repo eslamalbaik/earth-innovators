@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Storage;
+use App\Support\StorageUrl;
 
 class Publication extends Model
 {
@@ -141,7 +141,7 @@ class Publication extends Model
 
         // Return absolute URL - always use url() helper
         // This ensures proper domain handling (works in dev and production)
-        return url('/storage/' . $normalizedPath);
+        return StorageUrl::url($normalizedPath);
     }
 
     /**
@@ -189,6 +189,6 @@ class Publication extends Model
         // نحتاج إلى تحويله إلى: /storage/publications/files/filename.pdf
 
         // Return absolute URL
-        return url('/storage/' . $normalizedPath);
+        return StorageUrl::url($normalizedPath);
     }
 }

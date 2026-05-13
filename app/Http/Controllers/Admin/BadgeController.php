@@ -7,7 +7,9 @@ use App\Http\Requests\Badge\StoreBadgeRequest;
 use App\Http\Requests\Badge\UpdateBadgeRequest;
 use App\Http\Requests\Badge\AwardBadgeRequest;
 use App\Models\Badge;
+use App\Models\User;
 use App\Services\BadgeService;
+use App\Support\StorageUrl;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -31,6 +33,11 @@ class BadgeController extends Controller
         return Inertia::render('Admin/Badges/Index', [
             'badges' => $badges,
             'stats' => $stats,
+            'users' => User::whereIn('role', ['student', 'teacher', 'school', 'educational_institution'])
+                ->select('id', 'name', 'email', 'role')
+                ->orderBy('name')
+                ->orderBy('email')
+                ->get(),
             'filters' => [
                 'search' => $request->get('search'),
                 'status' => $request->get('status'),
@@ -54,8 +61,11 @@ class BadgeController extends Controller
 
     public function edit(Badge $badge)
     {
+        $badgePayload = $badge->toArray();
+        $badgePayload['image'] = StorageUrl::url($badge->image);
+
         return Inertia::render('Admin/Badges/Edit', [
-            'badge' => $badge,
+            'badge' => $badgePayload,
         ]);
     }
 

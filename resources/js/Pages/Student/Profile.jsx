@@ -8,7 +8,7 @@ import DangerButton from '@/Components/DangerButton';
 import { useToast } from '@/Contexts/ToastContext';
 import { useTranslation } from '@/i18n';
 import { FaChevronLeft, FaStar, FaMedal, FaBookmark, FaHeart, FaAward, FaEdit, FaCog, FaIdCard, FaArrowRight, FaTrophy, FaChartLine, FaGift, FaCamera, FaLock, FaTrash, FaSave, FaTimes } from 'react-icons/fa';
-import { getInitials, getColorFromName, getUserImageUrl } from '@/utils/imageUtils';
+import { getBadgeImageUrl, getColorFromName, getInitials, getUserImageUrl } from '@/utils/imageUtils';
 
 function StudentProfileContent({ user, stats = {}, badges = [], projects = [], activities = [], school, availableSchools = [], tags = [], onImageChange, imageInputRef, imagePreview, showPasswordModal, setShowPasswordModal, showDeleteModal, setShowDeleteModal, onSchoolChange, showSchoolModal, setShowSchoolModal, selectedSchoolId, setSelectedSchoolId }) {
     const { t } = useTranslation();
@@ -37,7 +37,7 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
     const getBadgeIcon = (badge) => {
         // If badge has image, show it
         if (badge.image) {
-            const imageUrl = badge.image.startsWith('/') ? badge.image : `/storage/${badge.image}`;
+            const imageUrl = getBadgeImageUrl(badge.image);
             return <img src={imageUrl} alt={badge.name_ar || badge.name} className="w-12 h-12 object-contain" />;
         }
 

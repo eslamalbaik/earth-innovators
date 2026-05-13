@@ -6,6 +6,7 @@ use App\Models\Teacher;
 use App\Models\Subject;
 use App\Models\User;
 use App\Services\TeacherService;
+use App\Support\StorageUrl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
@@ -417,7 +418,7 @@ class TeacherController extends Controller
                 'gender' => $validated['gender'] ?? null,
                 'bio' => $validated['bio'] ?? null,
                 'qualifications' => $validated['qualifications'] ?? null,
-                'image' => $imagePath ? Storage::url($imagePath) : null,
+                'image' => $imagePath,
                 'subjects' => $validated['subjects'],
                 'stages' => $validated['stages'],
                 'city' => $validated['city'],
@@ -471,9 +472,7 @@ class TeacherController extends Controller
 
                 $reviewerImage = null;
                 if ($review->student && $review->student->image) {
-                    $reviewerImage = str_starts_with($review->student->image, 'http')
-                        ? $review->student->image
-                        : asset('storage/' . $review->student->image);
+                    $reviewerImage = StorageUrl::url($review->student->image);
                 }
 
                 return [
@@ -519,7 +518,7 @@ class TeacherController extends Controller
         $transformedTeacher = [
             'id' => $teacher->id,
             'name' => $teacher->name_ar,
-            'image' => $teacher->image ? asset('storage/' . $teacher->image) : null,
+            'image' => StorageUrl::url($teacher->image),
             'rating' => $teacher->calculateRating(),
             'reviewsCount' => $teacher->calculateReviewsCount(),
             'location' => $location,
@@ -715,7 +714,7 @@ class TeacherController extends Controller
             'gender' => $teacher->gender,
             'bio' => $teacher->bio,
             'qualifications' => $teacher->qualifications,
-            'image' => $teacher->image ? asset('storage/' . $teacher->image) : null,
+            'image' => StorageUrl::url($teacher->image),
             'subjects' => $subjectNames,
             'subjects_relation' => $subjectsFromPivot,
             'stages' => $teacher->stages ?? [],
@@ -856,11 +855,7 @@ class TeacherController extends Controller
 
         if ($request->hasFile('image')) {
             if ($teacher->image) {
-                $oldImagePath = str_replace('/storage/', '', $teacher->image);
-                if (str_starts_with($oldImagePath, 'http')) {
-                    $parsed = parse_url($oldImagePath);
-                    $oldImagePath = str_replace('/storage/', '', $parsed['path'] ?? '');
-                }
+                $oldImagePath = StorageUrl::diskPath($teacher->image);
                 if ($oldImagePath && Storage::disk('public')->exists($oldImagePath)) {
                     Storage::disk('public')->delete($oldImagePath);
                 }
@@ -872,11 +867,7 @@ class TeacherController extends Controller
             if ($teacher->user) {
                 $user = $teacher->user;
                 if ($user->image) {
-                    $oldUserImagePath = str_replace('/storage/', '', $user->image);
-                    if (str_starts_with($oldUserImagePath, 'http')) {
-                        $parsed = parse_url($oldUserImagePath);
-                        $oldUserImagePath = str_replace('/storage/', '', $parsed['path'] ?? '');
-                    }
+                    $oldUserImagePath = StorageUrl::diskPath($user->image);
                     if ($oldUserImagePath && Storage::disk('public')->exists($oldUserImagePath)) {
                         Storage::disk('public')->delete($oldUserImagePath);
                     }

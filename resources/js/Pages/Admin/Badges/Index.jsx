@@ -5,7 +5,7 @@ import { FaSearch, FaFilter, FaEye, FaEdit, FaTrash, FaPlus, FaTrophy, FaSave, F
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 import { useTranslation } from '@/i18n';
 
-export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
+export default function AdminBadgesIndex({ badges, stats, filters = {}, users = [] }) {
     const { confirm } = useConfirmDialog();
     const { t } = useTranslation();
     const [search, setSearch] = useState(filters?.search || '');
@@ -218,6 +218,7 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                                                         if (!url) return false;
                                                         return url.startsWith('http') ||
                                                             url.startsWith('/storage/') ||
+                                                            url.startsWith('/media/') ||
                                                             url.startsWith('/images/') ||
                                                             /\.(jpg|jpeg|png|gif|svg|webp)$/i.test(url);
                                                     };
@@ -226,7 +227,7 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                                                     const isEmojiOrText = (icon) => {
                                                         if (!icon) return false;
                                                         // If it starts with /storage/, it's been incorrectly formatted
-                                                        if (icon.startsWith('/storage/') && icon.length < 100) {
+                                                        if ((icon.startsWith('/storage/') || icon.startsWith('/media/')) && icon.length < 100) {
                                                             // Likely an emoji that was formatted incorrectly
                                                             return true;
                                                         }
@@ -253,7 +254,7 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                                                         // If icon is emoji or text, display as text
                                                         if (isEmojiOrText(badge.icon)) {
                                                             // Remove /storage/ prefix if it was incorrectly added
-                                                            const displayIcon = badge.icon.replace(/^\/storage\//, '');
+                                                            const displayIcon = badge.icon.replace(/^\/(storage|media)\//, '');
                                                             return (
                                                                 <div className="w-16 h-16 flex items-center justify-center text-3xl">
                                                                     {displayIcon}
@@ -388,22 +389,27 @@ export default function AdminBadgesIndex({ badges, stats, filters = {} }) {
                                 {/* معرف المستخدم */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        {t('adminBadgesPage.awardModal.userIdLabel')} <span className="text-red-500">*</span>
+                                        {t('adminBadgesPage.awardModal.userLabel')} <span className="text-red-500">*</span>
                                     </label>
                                     <div className="relative">
                                         <FaUser className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                                        <input
-                                            type="number"
+                                        <select
                                             value={awardData.user_id}
                                             onChange={(e) => setAwardData('user_id', e.target.value)}
-                                            placeholder={t('adminBadgesPage.awardModal.userIdPlaceholder')}
                                             className={`w-full ps-10 pe-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${awardErrors.user_id ? 'border-red-500' : 'border-gray-300'
                                                 }`}
                                             required
-                                        />
+                                        >
+                                            <option value="">{t('adminBadgesPage.awardModal.userPlaceholder')}</option>
+                                            {users.map((user) => (
+                                                <option key={user.id} value={user.id}>
+                                                    {user.name || user.email} - {user.email}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
                                     <p className="mt-1 text-xs text-gray-500">
-                                        {t('adminBadgesPage.awardModal.userIdHint')}
+                                        {t('adminBadgesPage.awardModal.userHint')}
                                     </p>
                                     {awardErrors.user_id && (
                                         <p className="mt-1 text-sm text-red-600">{awardErrors.user_id}</p>

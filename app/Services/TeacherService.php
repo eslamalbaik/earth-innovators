@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Teacher;
 use App\Models\Subject;
+use App\Support\StorageUrl;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -222,7 +223,7 @@ class TeacherService extends BaseService
             'nationality' => $teacher->nationality,
             'gender' => $teacher->gender,
             'bio' => $teacher->bio,
-            'image' => $teacher->image ? asset('storage/' . $teacher->image) : null,
+            'image' => StorageUrl::url($teacher->image),
             'subjects' => $subjectNames,
             'stages' => $stages,
             'experience_years' => $teacher->experience_years,

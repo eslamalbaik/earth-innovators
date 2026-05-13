@@ -3,6 +3,7 @@ import { Head, Link } from '@inertiajs/react';
 import { FaMedal, FaPlus, FaEye, FaClock, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { useTranslation } from '@/i18n';
 import { toHijriDate } from '@/utils/dateUtils';
+import { getBadgeImageUrl } from '@/utils/imageUtils';
 
 export default function TeacherBadges({ badges, auth }) {
     const { t, language } = useTranslation();
@@ -65,7 +66,7 @@ export default function TeacherBadges({ badges, auth }) {
                                             </div>
                                             {badge.image && (
                                                 <img
-                                                    src={badge.image.startsWith('http') ? badge.image : `/storage/${badge.image}`}
+                                                    src={getBadgeImageUrl(badge.image)}
                                                     alt={badge.name_ar || badge.name}
                                                     className="w-16 h-16 rounded-lg object-cover"
                                                 />

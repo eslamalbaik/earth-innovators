@@ -6,7 +6,7 @@ import DesktopFooter from '@/Components/Mobile/DesktopFooter';
 import { FaBook, FaFileAlt, FaCalendar, FaBuilding, FaHeart, FaSearch, FaDownload, FaNewspaper } from 'react-icons/fa';
 import { useState } from 'react';
 import axios from 'axios';
-import { getPublicationImageUrl } from '../../utils/imageUtils';
+import { getPublicationFileUrl, getPublicationImageUrl } from '../../utils/imageUtils';
 import { useTranslation } from '@/i18n';
 
 export default function PublicationsIndex({ auth, publications, filters }) {
@@ -213,9 +213,7 @@ export default function PublicationsIndex({ auth, publications, filters }) {
                         <div className="flex items-center gap-2">
                             {publication.file && (
                                 <a
-                                    href={publication.file.startsWith('http') || publication.file.startsWith('/storage/') || publication.file.startsWith('/images/')
-                                        ? publication.file
-                                        : `/storage/${publication.file}`}
+                                    href={getPublicationFileUrl(publication.file) || '#'}
                                     download
                                     className="flex items-center gap-1 rounded-xl border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600 transition hover:bg-blue-100"
                                 >

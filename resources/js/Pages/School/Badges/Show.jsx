@@ -14,6 +14,7 @@ import {
 } from 'react-icons/fa';
 import { useTranslation } from '@/i18n';
 import { toHijriDate } from '@/utils/dateUtils';
+import { getBadgeImageUrl } from '@/utils/imageUtils';
 
 export default function SchoolBadgeShow({ auth, badge }) {
     const { t, language } = useTranslation();
@@ -119,7 +120,7 @@ export default function SchoolBadgeShow({ auth, badge }) {
                             <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-2xl border border-[#A3C042]/20 bg-[#A3C042]/10">
                                 {badge?.image ? (
                                     <img
-                                        src={badge.image.startsWith('http') ? badge.image : `/storage/${badge.image}`}
+                                        src={getBadgeImageUrl(badge.image)}
                                         alt={badgeName}
                                         className="h-full w-full object-cover"
                                     />

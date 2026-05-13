@@ -63,6 +63,7 @@ export default function TeacherChallengeCreate({ auth, school }) {
         e.preventDefault();
 
         post('/teacher/challenges', {
+            forceFormData: true,
             onSuccess: () => {
             },
             onError: (errors) => {

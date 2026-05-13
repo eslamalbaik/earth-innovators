@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Teacher;
 use App\Models\Subject;
+use App\Support\StorageUrl;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -186,7 +187,7 @@ class SearchService extends BaseService
                         'nationality' => $teacher->nationality,
                         'gender' => $teacher->gender,
                         'bio' => $teacher->bio,
-                        'image' => $teacher->image ? asset('storage/' . $teacher->image) : null,
+                        'image' => StorageUrl::url($teacher->image),
                         'subjects' => $subjectNames,
                         'stages' => $stages,
                         'experience_years' => $teacher->experience_years,
@@ -426,7 +427,7 @@ class SearchService extends BaseService
                 'nationality' => $teacher->nationality,
                 'gender' => $teacher->gender,
                 'bio' => $teacher->bio,
-                'image' => $teacher->image ? (str_starts_with($teacher->image, 'http') ? $teacher->image : asset('storage/' . $teacher->image)) : null,
+                'image' => StorageUrl::url($teacher->image),
                 'subjects' => $teacher->subjects,
                 'stages' => $teacher->stages,
                 'experience_years' => $teacher->experience_years,
@@ -446,9 +447,7 @@ class SearchService extends BaseService
 
                     $reviewerImage = null;
                     if ($review->student && $review->student->image) {
-                        $reviewerImage = str_starts_with($review->student->image, 'http')
-                            ? $review->student->image
-                            : asset('storage/' . $review->student->image);
+                        $reviewerImage = StorageUrl::url($review->student->image);
                     }
 
                     return [
@@ -496,4 +495,3 @@ class SearchService extends BaseService
         });
     }
 }
-

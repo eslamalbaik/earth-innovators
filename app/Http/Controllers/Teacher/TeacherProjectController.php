@@ -383,8 +383,7 @@ class TeacherProjectController extends Controller
             'school_id' => 'nullable|exists:users,id',
             'files' => 'nullable|array',
             'files.*' => 'file|max:10240',
-            // PDF requirement: must upload a clear cover image whenever the teacher updates a project.
-            'thumbnail' => 'required|image|max:5120',
+            'thumbnail' => 'nullable|image|max:5120',
             'project_document' => 'nullable|file|max:10240|mimes:pdf,doc,docx',
             'remove_files' => 'nullable|array',
             'remove_files.*' => 'string',

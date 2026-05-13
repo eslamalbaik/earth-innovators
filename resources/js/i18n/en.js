@@ -3791,6 +3791,9 @@ export const en = {
             message: 'Are you sure you want to delete the badge "{name}"? This action cannot be undone.',
         },
         awardModal: {
+            userLabel: 'User',
+            userPlaceholder: 'Choose a user...',
+            userHint: 'Choose by name or email from the users list.',
             title: 'Award badge: {name}',
             userIdLabel: 'User ID',
             userIdPlaceholder: 'Enter user ID...',
@@ -5818,6 +5821,7 @@ export const en = {
         projectTypeTag: 'Mobile apps',
         empty: 'No projects',
         createAction: 'Upload new project',
+        createButton: 'Create project',
         deleteAction: 'Delete',
         editAction: 'Edit',
         deleteError: 'An error occurred while deleting the project. Please try again.',

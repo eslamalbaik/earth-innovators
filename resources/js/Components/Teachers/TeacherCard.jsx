@@ -4,6 +4,7 @@ import { FaStar, FaCheck, FaUser, FaBook, FaGraduationCap } from 'react-icons/fa
 import BookingModal from '../Booking/BookingModal';
 import { useTranslation } from '@/i18n';
 import { formatLocationWithStages, getStageLabels } from '@/utils/stageLocalization';
+import { getStorageUrl } from '@/utils/imageUtils';
 
 const getInitials = (name) => {
     if (!name) return '?';
@@ -37,23 +38,11 @@ const getColorFromName = (name) => {
 
 const getImageUrl = (teacher) => {
     if (teacher.image) {
-        if (teacher.image.startsWith('http://') || teacher.image.startsWith('https://')) {
-            return teacher.image;
-        }
-        if (teacher.image.startsWith('/storage/')) {
-            return teacher.image;
-        }
-        return `/storage/${teacher.image}`;
+        return getStorageUrl(teacher.image);
     }
 
     if (teacher.user?.image) {
-        if (teacher.user.image.startsWith('http://') || teacher.user.image.startsWith('https://')) {
-            return teacher.user.image;
-        }
-        if (teacher.user.image.startsWith('/storage/')) {
-            return teacher.user.image;
-        }
-        return `/storage/${teacher.user.image}`;
+        return getStorageUrl(teacher.user.image);
     }
 
     return null;

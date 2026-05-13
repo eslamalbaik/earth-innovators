@@ -1,20 +1,13 @@
 import { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { FaStar, FaEdit, FaChevronDown } from 'react-icons/fa';
-import { getInitials, getColorFromName } from '../../utils/imageUtils';
+import { getColorFromName, getInitials, getStorageUrl } from '../../utils/imageUtils';
 import ReviewModal from './ReviewModal';
 import { usePage } from '@inertiajs/react';
 import { useTranslation } from '@/i18n';
 
 const getImageUrl = (image) => {
-    if (!image) return null;
-    if (image.startsWith('http://') || image.startsWith('https://')) {
-        return image;
-    }
-    if (image.startsWith('/storage/')) {
-        return image;
-    }
-    return `/storage/${image}`;
+    return getStorageUrl(image);
 };
 
 export default function ReviewsSection({ reviews = [], teacherId, reviewsTotal = 0, reviewsPage = 1, hasMoreReviews = false }) {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Support\StorageUrl;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class PublicationResource extends JsonResource
@@ -14,8 +15,8 @@ class PublicationResource extends JsonResource
             'description' => $this->description,
             'type' => $this->type,
             'status' => $this->status,
-            'cover_image' => $this->cover_image ? asset('storage/' . $this->cover_image) : null,
-            'file' => $this->file ? asset('storage/' . $this->file) : null,
+            'cover_image' => StorageUrl::url($this->cover_image),
+            'file' => StorageUrl::url($this->file),
             'content' => $this->content,
             'likes_count' => $this->likes_count ?? 0,
             'publish_date' => $this->publish_date?->format('Y-m-d'),
@@ -25,4 +26,3 @@ class PublicationResource extends JsonResource
         ];
     }
 }
-

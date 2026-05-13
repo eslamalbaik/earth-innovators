@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react';
 import { FaBook, FaFileAlt, FaHeart, FaArrowLeft, FaNewspaper } from 'react-icons/fa';
-import { getPublicationImageUrl } from '../../utils/imageUtils';
+import { getPublicationFileUrl, getPublicationImageUrl } from '../../utils/imageUtils';
 import { useTranslation, useForwardIcon } from '@/i18n';
 
 export default function PublicationsSection({
@@ -139,7 +139,7 @@ export default function PublicationsSection({
                                     <div className="flex items-center gap-2">
                                         {publication.file && (
                                             <a
-                                                href={`/storage/${publication.file}`}
+                                                href={getPublicationFileUrl(publication.file)}
                                                 download
                                                 className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition text-xs md:text-sm font-semibold"
                                             >

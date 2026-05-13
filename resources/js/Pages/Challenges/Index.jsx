@@ -5,7 +5,7 @@ import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import DesktopFooter from '@/Components/Mobile/DesktopFooter';
 import { useTranslation } from '@/i18n';
-import { getChallengeImageUrl } from '@/utils/imageUtils';
+import { getChallengeImageUrl, getStorageUrl } from '@/utils/imageUtils';
 
 export default function ChallengesIndex({ auth, challenges, userRole, previousWinners = [], participationConditions = [], categories = [] }) {
     const { t, language } = useTranslation();
@@ -371,10 +371,7 @@ export default function ChallengesIndex({ auth, challenges, userRole, previousWi
                         {previousWinners.length > 0 ? (
                             previousWinners.map((winner, index) => {
                                 const getAvatarUrl = (avatar) => {
-                                    if (!avatar) return '/images/hero.png';
-                                    if (avatar.startsWith('http://') || avatar.startsWith('https://')) return avatar;
-                                    if (avatar.startsWith('/storage/')) return avatar;
-                                    return `/storage/${avatar}`;
+                                    return getStorageUrl(avatar, '/images/hero.png');
                                 };
 
                                 return (

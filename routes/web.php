@@ -18,7 +18,11 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
-// Serve storage files directly (MUST be first to catch storage requests before other routes)
+Route::get('/media/{path}', [\App\Http\Controllers\StorageController::class, 'serve'])
+    ->where('path', '.*')
+    ->name('media.serve');
+
+// Keep legacy storage URLs working when the web server forwards them to Laravel.
 Route::get('/storage/{path}', [\App\Http\Controllers\StorageController::class, 'serve'])
     ->where('path', '.*')
     ->name('storage.serve');
@@ -84,7 +88,7 @@ $landingLogic = function () {
             ->map(fn($s) => [
                 'id' => $s->id,
                 'name' => $s->name,
-                'logo' => $s->image ? asset('storage/' . $s->image) : null,
+                'logo' => \App\Support\StorageUrl::url($s->image),
             ]);
     });
 
@@ -98,7 +102,7 @@ $landingLogic = function () {
                 'name' => $r->reviewer_name ?? 'مستخدم',
                 'content' => $r->comment,
                 'rating' => $r->rating,
-                'image' => $r->reviewer_image ? asset('storage/' . $r->reviewer_image) : null,
+                'image' => \App\Support\StorageUrl::url($r->reviewer_image),
             ]);
     });
 
@@ -174,7 +178,7 @@ Route::get('/home', function () {
                     } elseif (str_starts_with($subject->image, '/storage/') || str_starts_with($subject->image, '/images/')) {
                         $imageUrl = $subject->image;
                     } else {
-                        $imageUrl = asset('storage/' . $subject->image);
+                        $imageUrl = \App\Support\StorageUrl::url($subject->image);
                     }
                 }
 
@@ -205,7 +209,7 @@ Route::get('/home', function () {
                 return [
                     'id' => $teacher->id,
                     'name' => $teacher->name_ar,
-                    'image' => $teacher->image ? asset('storage/' . $teacher->image) : null,
+                    'image' => \App\Support\StorageUrl::url($teacher->image),
                     'rating' => round($teacher->rating ?? 0, 1),
                     'location' => $teacher->city . (is_array($stages) && count($stages) > 0 ? ' - ' . implode(' / ', $stages) : ''),
                     'subject' => is_array($subjects) && count($subjects) > 0 ? $subjects[0] : '',

@@ -23,6 +23,9 @@ import { useBackIcon, useTranslation } from '@/i18n';
 import { useToast } from '@/Contexts/ToastContext';
 import { toHijriDate } from '@/utils/dateUtils';
 import resolveLocalizedMessage from '@/utils/resolveLocalizedMessage';
+import { getProjectFileUrl } from '@/utils/imageUtils';
+
+const REVIEW_STATUSES = new Set(['reviewed', 'approved', 'rejected']);
 
 export default function TeacherChallengeSubmissionShow({ auth, submission, availableBadges }) {
     const { flash } = usePage().props;
@@ -42,7 +45,7 @@ export default function TeacherChallengeSubmissionShow({ auth, submission, avail
     const { data, setData, post, processing, errors } = useForm({
         rating: submission.rating || 0,
         feedback: submission.feedback || '',
-        status: submission.status || 'submitted',
+        status: REVIEW_STATUSES.has(submission.status) ? submission.status : 'reviewed',
         points_earned: submission.points_earned || submission.challenge?.points_reward || 0,
         badges: initialBadges,
     });
@@ -87,8 +90,7 @@ export default function TeacherChallengeSubmissionShow({ auth, submission, avail
     }, [flash, language]);
 
     const getFileUrl = (filePath) => {
-        if (filePath.startsWith('http')) return filePath;
-        return `/storage/${filePath}`;
+        return getProjectFileUrl(filePath) || '#';
     };
 
     const getFileIcon = (fileName) => {

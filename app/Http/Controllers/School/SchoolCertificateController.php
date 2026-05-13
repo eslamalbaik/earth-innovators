@@ -108,6 +108,12 @@ class SchoolCertificateController extends Controller
     {
         $school = Auth::user();
 
+        if (!$this->membershipAccessService->hasCertificateAccess($school)) {
+            return redirect()->route('packages.index')->with('error', [
+                'key' => 'schoolCertificatesIndexPage.toasts.accessDenied',
+            ]);
+        }
+
         if (!$this->canReviewCertificate($school, $certificate)) {
             abort(403, 'غير مصرح لك باعتماد هذه الشهادة.');
         }

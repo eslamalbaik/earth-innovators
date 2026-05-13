@@ -6,6 +6,7 @@ import TextInput from '@/Components/TextInput';
 import SelectInput from '@/Components/SelectInput';
 import PrimaryButton from '@/Components/PrimaryButton';
 import { toHijriDate } from '@/utils/dateUtils';
+import { getBadgeImageUrl } from '@/utils/imageUtils';
 
 const getInitialQueryValue = (key) => {
     if (typeof window === 'undefined') {
@@ -149,7 +150,7 @@ export default function SchoolBadges({ badges, auth }) {
                                             </div>
                                             {badge.image && (
                                                 <img
-                                                    src={badge.image.startsWith('http') ? badge.image : `/storage/${badge.image}`}
+                                                    src={getBadgeImageUrl(badge.image)}
                                                     alt={badgeName}
                                                     className="h-16 w-16 rounded-lg object-cover"
                                                 />

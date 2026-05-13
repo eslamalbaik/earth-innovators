@@ -167,7 +167,7 @@ class SchoolProjectController extends Controller
 
         // للمشاريع من المعلمين: التحقق من أن teacher_id موجود و school_id مطابق
         // هذا مطابق تماماً لشرط getSchoolPendingProjects: whereNotNull('teacher_id') && where('school_id', $schoolId)
-        $isTeacherProject = $project->teacher_id !== null && $project->school_id === $school->id;
+        $isTeacherProject = $project->teacher_id !== null && (int) $project->school_id === (int) $school->id;
 
         // Logging للتشخيص
         Log::info('Project approval attempt', [
@@ -284,7 +284,7 @@ class SchoolProjectController extends Controller
 
         // التحقق من الصلاحية: إما مشروع طالب أو مشروع معلم مرسل لهذه المدرسة
         $isStudentProject = in_array($project->user_id, $students->toArray());
-        $isTeacherProject = $project->teacher_id !== null && $project->school_id === $school->id;
+        $isTeacherProject = $project->teacher_id !== null && (int) $project->school_id === (int) $school->id;
 
         if (!$school->canAccessAllSchoolData() && ((!$isStudentProject && !$isTeacherProject) || $project->status !== 'pending')) {
             abort(403, 'غير مصرح لك برفض هذا المشروع');
@@ -311,7 +311,7 @@ class SchoolProjectController extends Controller
         $students = User::where('school_id', $school->id)->where('role', 'student')->pluck('id');
 
         // التحقق من الصلاحية
-        if (!$school->canAccessAllSchoolData() && !in_array($project->user_id, $students->toArray()) && $project->school_id !== $school->id) {
+        if (!$school->canAccessAllSchoolData() && !in_array($project->user_id, $students->toArray()) && (int) $project->school_id !== (int) $school->id) {
             abort(403, 'غير مصرح لك بعرض هذا المشروع');
         }
 
@@ -329,9 +329,9 @@ class SchoolProjectController extends Controller
         $students = User::where('school_id', $school->id)->where('role', 'student')->pluck('id')->toArray();
 
         // التحقق من الصلاحية: إما مشروع المدرسة مباشرة أو مشروع طالب في المدرسة أو مشروع معلم في المدرسة
-        $isSchoolProject = $project->school_id === $school->id && $project->user_id === $school->id;
-        $isStudentProject = in_array($project->user_id, $students) && $project->school_id === $school->id;
-        $isTeacherProject = $project->teacher_id !== null && $project->school_id === $school->id;
+        $isSchoolProject = (int) $project->school_id === (int) $school->id && (int) $project->user_id === (int) $school->id;
+        $isStudentProject = in_array($project->user_id, $students) && (int) $project->school_id === (int) $school->id;
+        $isTeacherProject = $project->teacher_id !== null && (int) $project->school_id === (int) $school->id;
         if (!$school->canAccessAllSchoolData() && !$isSchoolProject && !$isStudentProject && !$isTeacherProject) {
             abort(403, 'غير مصرح لك بتعديل هذا المشروع');
         }
@@ -348,9 +348,9 @@ class SchoolProjectController extends Controller
         $students = User::where('school_id', $school->id)->where('role', 'student')->pluck('id')->toArray();
 
         // التحقق من الصلاحية: إما مشروع المدرسة مباشرة أو مشروع طالب في المدرسة أو مشروع معلم في المدرسة
-        $isSchoolProject = $project->school_id === $school->id && $project->user_id === $school->id;
-        $isStudentProject = in_array($project->user_id, $students) && $project->school_id === $school->id;
-        $isTeacherProject = $project->teacher_id !== null && $project->school_id === $school->id;
+        $isSchoolProject = (int) $project->school_id === (int) $school->id && (int) $project->user_id === (int) $school->id;
+        $isStudentProject = in_array($project->user_id, $students) && (int) $project->school_id === (int) $school->id;
+        $isTeacherProject = $project->teacher_id !== null && (int) $project->school_id === (int) $school->id;
         if (!$school->canAccessAllSchoolData() && !$isSchoolProject && !$isStudentProject && !$isTeacherProject) {
             abort(403, 'غير مصرح لك بتعديل هذا المشروع');
         }
@@ -478,9 +478,9 @@ class SchoolProjectController extends Controller
         $students = User::where('school_id', $school->id)->where('role', 'student')->pluck('id')->toArray();
 
         // التحقق من الصلاحية: إما مشروع المدرسة مباشرة أو مشروع طالب في المدرسة أو مشروع معلم في المدرسة
-        $isSchoolProject = $project->school_id === $school->id && $project->user_id === $school->id;
-        $isStudentProject = in_array($project->user_id, $students) && $project->school_id === $school->id;
-        $isTeacherProject = $project->teacher_id !== null && $project->school_id === $school->id;
+        $isSchoolProject = (int) $project->school_id === (int) $school->id && (int) $project->user_id === (int) $school->id;
+        $isStudentProject = in_array($project->user_id, $students) && (int) $project->school_id === (int) $school->id;
+        $isTeacherProject = $project->teacher_id !== null && (int) $project->school_id === (int) $school->id;
 
         if (!$school->canAccessAllSchoolData() && !$isSchoolProject && !$isStudentProject && !$isTeacherProject) {
             abort(403, 'غير مصرح لك بحذف هذا المشروع');

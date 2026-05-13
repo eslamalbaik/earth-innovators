@@ -38,7 +38,7 @@ export default function SchoolCertificatesIndex({
 }) {
     const { t, language } = useTranslation();
     const { showSuccess, showError } = useToast();
-    const { gate, premiumModal, openPremium } = usePremiumGate(membershipSummary, {
+    const { gate, premiumModal } = usePremiumGate(membershipSummary, {
         featureName: t('common.certificates'),
         requiredAccessKey: 'certificate_access',
     });
@@ -108,6 +108,13 @@ export default function SchoolCertificatesIndex({
         return t(`schoolCertificatesIndexPage.certificateTypes.${translationKey}`);
     };
 
+    const redirectToPackagesAfterAccessDenied = () => {
+        showError(t('schoolCertificatesIndexPage.toasts.accessDenied'));
+        window.setTimeout(() => {
+            router.visit('/packages');
+        }, 1200);
+    };
+
     const filteredRecipients = useMemo(() => {
         const rows = recipients?.data || [];
         const query = searchTerm.trim().toLowerCase();
@@ -125,7 +132,7 @@ export default function SchoolCertificatesIndex({
 
     const openIssueModal = (recipient, defaultType = 'achievement') => {
         if (!membershipSummary?.certificate_access) {
-            openPremium();
+            redirectToPackagesAfterAccessDenied();
             return;
         }
         if (!certificateSystemReady) {
@@ -196,6 +203,10 @@ export default function SchoolCertificatesIndex({
     const handleApprove = (certificateId) => {
         if (!certificateSystemReady) {
             showError(t('schoolCertificatesIndexPage.toasts.systemNotReady'));
+            return;
+        }
+        if (!membershipSummary?.certificate_access) {
+            redirectToPackagesAfterAccessDenied();
             return;
         }
 

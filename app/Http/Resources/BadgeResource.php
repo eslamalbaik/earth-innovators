@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Support\StorageUrl;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class BadgeResource extends JsonResource
@@ -15,7 +16,7 @@ class BadgeResource extends JsonResource
             'description' => $this->description,
             'description_ar' => $this->description_ar,
             'icon' => $this->icon,
-            'image' => $this->image ? asset('storage/' . $this->image) : null,
+            'image' => StorageUrl::url($this->image),
             'badge_category' => $this->badge_category ?? 'achievement',
             'level' => $this->level,
             'level_label' => $this->level_label,
@@ -28,4 +29,3 @@ class BadgeResource extends JsonResource
         ];
     }
 }
-

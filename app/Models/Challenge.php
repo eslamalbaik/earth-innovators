@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Support\StorageUrl;
 
 class Challenge extends Model
 {
@@ -51,18 +52,7 @@ class Challenge extends Model
             return null;
         }
 
-        // If it's already a full URL, return as is
-        if (str_starts_with($this->image, 'http://') || str_starts_with($this->image, 'https://')) {
-            return $this->image;
-        }
-
-        // If it starts with /storage/, return as is
-        if (str_starts_with($this->image, '/storage/')) {
-            return $this->image;
-        }
-
-        // Otherwise, prepend /storage/
-        return '/storage/' . $this->image;
+        return StorageUrl::url($this->image);
     }
 
     public function creator(): BelongsTo

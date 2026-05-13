@@ -17,6 +17,7 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { useBackIcon, useTranslation } from '@/i18n';
+import { getProjectFileUrl } from '@/utils/imageUtils';
 
 const STATUS_META = {
     submitted: { badge: 'bg-yellow-100 text-yellow-800', option: 'border-yellow-500 bg-yellow-50 text-yellow-700', icon: FaCheck },
@@ -24,6 +25,7 @@ const STATUS_META = {
     approved: { badge: 'bg-green-100 text-green-800', option: 'border-green-500 bg-green-50 text-green-700', icon: FaCheck },
     rejected: { badge: 'bg-red-100 text-red-800', option: 'border-red-500 bg-red-50 text-red-700', icon: FaTimes },
 };
+const REVIEW_STATUSES = new Set(['reviewed', 'approved', 'rejected']);
 
 export default function SchoolSubmissionShow({ auth, submission, availableBadges = [], allSubmissions = [] }) {
     const { t, language } = useTranslation();
@@ -35,7 +37,7 @@ export default function SchoolSubmissionShow({ auth, submission, availableBadges
     const { data, setData, post, processing, errors } = useForm({
         rating: submission.rating || 0,
         feedback: submission.feedback || '',
-        status: submission.status || 'submitted',
+        status: REVIEW_STATUSES.has(submission.status) ? submission.status : 'reviewed',
         badges: submission.badges || [],
     });
 
@@ -75,7 +77,7 @@ export default function SchoolSubmissionShow({ auth, submission, availableBadges
             return '#';
         }
 
-        return filePath.startsWith('http') ? filePath : `/storage/${filePath}`;
+        return getProjectFileUrl(filePath) || '#';
     };
 
     const getFileIcon = (fileName) => {

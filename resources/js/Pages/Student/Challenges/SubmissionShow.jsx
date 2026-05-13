@@ -12,6 +12,7 @@ import {
     FaUser,
     FaDownload
 } from 'react-icons/fa';
+import { getProjectFileUrl } from '@/utils/imageUtils';
 
 export default function StudentChallengeSubmissionShow({ auth, challenge, submission }) {
     const formatDate = (date) => {
@@ -67,7 +68,7 @@ export default function StudentChallengeSubmissionShow({ auth, challenge, submis
 
     const getFileUrl = (filePath) => {
         if (!filePath) return null;
-        return `/storage/${filePath}`;
+        return getProjectFileUrl(filePath);
     };
 
     return (

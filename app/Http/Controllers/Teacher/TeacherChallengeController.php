@@ -7,6 +7,7 @@ use App\Http\Requests\Challenge\StoreChallengeRequest;
 use App\Http\Requests\Challenge\UpdateChallengeRequest;
 use App\Models\Challenge;
 use App\Services\ChallengeService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -87,13 +88,7 @@ class TeacherChallengeController extends Controller
         $data['school_id'] = $school->id;
         $data['status'] = $data['status'] ?? 'draft';
         
-        // Convert date strings to datetime
-        if (isset($data['start_date']) && !str_contains($data['start_date'], ' ')) {
-            $data['start_date'] = $data['start_date'] . ' 00:00:00';
-        }
-        if (isset($data['deadline']) && !str_contains($data['deadline'], ' ')) {
-            $data['deadline'] = $data['deadline'] . ' 23:59:59';
-        }
+        $data = $this->normalizeChallengeDates($data);
         
         // Convert max_participants to null if empty
         if (isset($data['max_participants']) && $data['max_participants'] === '') {
@@ -189,13 +184,7 @@ class TeacherChallengeController extends Controller
 
         $validated = $request->validated();
         
-        // Convert date strings to datetime
-        if (isset($validated['start_date']) && !str_contains($validated['start_date'], ' ')) {
-            $validated['start_date'] = $validated['start_date'] . ' 00:00:00';
-        }
-        if (isset($validated['deadline']) && !str_contains($validated['deadline'], ' ')) {
-            $validated['deadline'] = $validated['deadline'] . ' 23:59:59';
-        }
+        $validated = $this->normalizeChallengeDates($validated);
         
         // Convert max_participants to null if empty
         if (isset($validated['max_participants']) && $validated['max_participants'] === '') {
@@ -249,5 +238,30 @@ class TeacherChallengeController extends Controller
                 ->withErrors(['error' => 'حدث خطأ أثناء حذف التحدي: ' . $e->getMessage()]);
         }
     }
-}
 
+    private function normalizeChallengeDates(array $data): array
+    {
+        if (isset($data['start_date'])) {
+            $data['start_date'] = $this->normalizeChallengeDate($data['start_date'], '00:00:00');
+        }
+
+        if (isset($data['deadline'])) {
+            $data['deadline'] = $this->normalizeChallengeDate($data['deadline'], '23:59:59');
+        }
+
+        return $data;
+    }
+
+    private function normalizeChallengeDate(string $value, string $dateOnlyTime): string
+    {
+        $value = trim($value);
+
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+            $value .= ' ' . $dateOnlyTime;
+        } else {
+            $value = str_replace('T', ' ', $value);
+        }
+
+        return Carbon::parse($value)->format('Y-m-d H:i:s');
+    }
+}

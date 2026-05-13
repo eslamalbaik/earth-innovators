@@ -17,6 +17,9 @@ import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
+import { getProjectFileUrl } from '@/utils/imageUtils';
+
+const REVIEW_STATUSES = new Set(['reviewed', 'approved', 'rejected']);
 
 export default function AdminSubmissionShow({ submission, availableBadges }) {
     const [rating, setRating] = useState(submission.rating || 0);
@@ -27,7 +30,7 @@ export default function AdminSubmissionShow({ submission, availableBadges }) {
     const { data, setData, post, processing, errors } = useForm({
         rating: submission.rating || 0,
         feedback: submission.feedback || '',
-        status: submission.status || 'submitted',
+        status: REVIEW_STATUSES.has(submission.status) ? submission.status : 'reviewed',
         badges: submission.badges || [],
     });
 
@@ -54,8 +57,7 @@ export default function AdminSubmissionShow({ submission, availableBadges }) {
     };
 
     const getFileUrl = (filePath) => {
-        if (filePath.startsWith('http')) return filePath;
-        return `/storage/${filePath}`;
+        return getProjectFileUrl(filePath) || '#';
     };
 
     const getFileIcon = (fileName) => {
@@ -312,4 +314,3 @@ export default function AdminSubmissionShow({ submission, availableBadges }) {
         </DashboardLayout>
     );
 }
-

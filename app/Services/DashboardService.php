@@ -9,6 +9,7 @@ use App\Models\Payment;
 use App\Models\Teacher;
 use App\Models\UserBadge;
 use App\Models\ProjectSubmission;
+use App\Support\StorageUrl;
 use App\Repositories\ProjectRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
@@ -205,11 +206,7 @@ class DashboardService extends BaseService
                     $imageUrl = null;
                     if ($project->images && is_array($project->images) && count($project->images) > 0) {
                         $firstImage = $project->images[0];
-                        if (str_starts_with($firstImage, 'http://') || str_starts_with($firstImage, 'https://')) {
-                            $imageUrl = $firstImage;
-                        } else {
-                            $imageUrl = '/storage/' . $firstImage;
-                        }
+                        $imageUrl = StorageUrl::url($firstImage);
                     }
                     
                     return [

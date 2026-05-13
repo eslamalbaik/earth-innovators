@@ -95,7 +95,7 @@ class PaymentGatewayController extends Controller
 
         if (!file_exists($envFile)) {
             return [
-                'success' => false,
+                'success' => true,
                 'message' => 'تم حفظ الإعدادات في قاعدة البيانات، لكن ملف البيئة .env غير موجود على الخادم.',
             ];
         }
@@ -103,7 +103,7 @@ class PaymentGatewayController extends Controller
         $envContent = @file_get_contents($envFile);
         if ($envContent === false) {
             return [
-                'success' => false,
+                'success' => true,
                 'message' => 'تم حفظ الإعدادات في قاعدة البيانات، لكن تعذر قراءة ملف البيئة .env على الخادم.',
             ];
         }
@@ -155,7 +155,7 @@ class PaymentGatewayController extends Controller
             ]);
 
             return [
-                'success' => false,
+                'success' => true,
                 'message' => 'تم حفظ الإعدادات في قاعدة البيانات، لكن تعذر تحديث ملف .env على الخادم بسبب الصلاحيات. قد تحتاج لتحديث متغيرات البيئة يدويًا.',
             ];
         }

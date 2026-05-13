@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Subject;
+use App\Support\StorageUrl;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Collection;
@@ -91,15 +92,7 @@ class SubjectService extends BaseService
             return '/images/subjects/default.png';
         }
 
-        if (str_starts_with($subject->image, 'http://') || str_starts_with($subject->image, 'https://')) {
-            return $subject->image;
-        }
-
-        if (str_starts_with($subject->image, '/storage/') || str_starts_with($subject->image, '/images/')) {
-            return $subject->image;
-        }
-
-        return asset('storage/' . $subject->image);
+        return StorageUrl::url($subject->image);
     }
 
     public function createSubject(array $data): Subject
@@ -151,4 +144,3 @@ class SubjectService extends BaseService
         return $deleted;
     }
 }
-

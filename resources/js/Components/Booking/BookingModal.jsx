@@ -1,29 +1,17 @@
 import { useState, useMemo, useEffect } from 'react';
 import { FaChevronLeft, FaCheck, FaStar, FaXmark, FaCalendar, FaClock, FaCalendarDays, FaChevronRight, FaPlus } from 'react-icons/fa6';
 import axios from 'axios';
-import { getInitials, getColorFromName } from '@/utils/imageUtils';
+import { getColorFromName, getInitials, getStorageUrl } from '@/utils/imageUtils';
 import { useTranslation } from '@/i18n';
 import { formatLocationWithStages, getStageLabels } from '@/utils/stageLocalization';
 
 const getImageUrl = (teacher) => {
     if (teacher.image) {
-        if (teacher.image.startsWith('http://') || teacher.image.startsWith('https://')) {
-            return teacher.image;
-        }
-        if (teacher.image.startsWith('/storage/')) {
-            return teacher.image;
-        }
-        return `/storage/${teacher.image}`;
+        return getStorageUrl(teacher.image);
     }
 
     if (teacher.user?.image) {
-        if (teacher.user.image.startsWith('http://') || teacher.user.image.startsWith('https://')) {
-            return teacher.user.image;
-        }
-        if (teacher.user.image.startsWith('/storage/')) {
-            return teacher.user.image;
-        }
-        return `/storage/${teacher.user.image}`;
+        return getStorageUrl(teacher.user.image);
     }
 
     return null;

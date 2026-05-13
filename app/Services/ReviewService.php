@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Review;
+use App\Support\StorageUrl;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -39,21 +40,15 @@ class ReviewService extends BaseService
                 ->through(function ($review) {
                     $studentImage = null;
                     if ($review->student && $review->student->image) {
-                        $studentImage = str_starts_with($review->student->image, 'http')
-                            ? $review->student->image
-                            : '/storage/' . $review->student->image;
+                        $studentImage = StorageUrl::url($review->student->image);
                     }
 
                     $teacherImage = null;
                     if ($review->teacher) {
                         if ($review->teacher->image) {
-                            $teacherImage = str_starts_with($review->teacher->image, 'http')
-                                ? $review->teacher->image
-                                : '/storage/' . $review->teacher->image;
+                            $teacherImage = StorageUrl::url($review->teacher->image);
                         } elseif ($review->teacher->user && $review->teacher->user->image) {
-                            $teacherImage = str_starts_with($review->teacher->user->image, 'http')
-                                ? $review->teacher->user->image
-                                : '/storage/' . $review->teacher->user->image;
+                            $teacherImage = StorageUrl::url($review->teacher->user->image);
                         }
                     }
 
@@ -108,9 +103,7 @@ class ReviewService extends BaseService
 
                     $reviewerImage = null;
                     if ($review->student && $review->student->image) {
-                        $reviewerImage = str_starts_with($review->student->image, 'http')
-                            ? $review->student->image
-                            : asset('storage/' . $review->student->image);
+                        $reviewerImage = StorageUrl::url($review->student->image);
                     }
 
                     return [
@@ -253,4 +246,3 @@ class ReviewService extends BaseService
         \App\Jobs\UpdateTeacherRating::dispatch($teacherId);
     }
 }
-

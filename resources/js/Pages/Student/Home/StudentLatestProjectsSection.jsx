@@ -1,5 +1,6 @@
 import { FaEye, FaHeart, FaStar, FaProjectDiagram } from 'react-icons/fa';
 import { useTranslation } from '@/i18n';
+import { getProjectImageUrl } from '@/utils/imageUtils';
 
 function ProjectCard({ project, onOpen, t }) {
     if (!project) return null;
@@ -59,8 +60,7 @@ function ProjectCard({ project, onOpen, t }) {
 
     const getProjectImage = () => {
         if (project.image_url) return project.image_url;
-        if (project.image) return `/storage/${project.image}`;
-        return '/images/hero.png';
+        return getProjectImageUrl(project.image, '/images/hero.png');
     };
 
     return (

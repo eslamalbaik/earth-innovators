@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
-use Illuminate\Support\Facades\URL;
+use App\Support\StorageUrl;
 
 class BadgeService extends BaseService
 {
@@ -59,23 +59,7 @@ class BadgeService extends BaseService
             return $path;
         }
 
-        // If it's already a full URL, return as is
-        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
-            return $path;
-        }
-
-        // If it starts with /storage/ or /images/, return as is
-        if (str_starts_with($path, '/storage/') || str_starts_with($path, '/images/')) {
-            return $path;
-        }
-
-        // If it starts with storage/, add leading slash
-        if (str_starts_with($path, 'storage/')) {
-            return '/' . $path;
-        }
-
-        // Otherwise, assume it's a storage path and add /storage/
-        return '/storage/' . $path;
+        return StorageUrl::url($path);
     }
 
     public function getAllBadges(?string $search = null, int $perPage = 20, ?string $status = null, ?string $type = null): LengthAwarePaginator
@@ -427,4 +411,3 @@ class BadgeService extends BaseService
         }
     }
 }
-

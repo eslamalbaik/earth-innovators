@@ -4574,6 +4574,9 @@ export const ar = {
             message: 'هل أنت متأكد من حذف الشارة "{name}"؟ هذا الإجراء لا يمكن التراجع عنه.',
         },
         awardModal: {
+            userLabel: 'المستخدم',
+            userPlaceholder: 'اختر مستخدمًا...',
+            userHint: 'اختر المستخدم بالاسم أو البريد الإلكتروني من القائمة.',
             title: 'منح الشارة: {name}',
             userIdLabel: 'معرف المستخدم (User ID)',
             userIdPlaceholder: 'أدخل معرف المستخدم...',
@@ -5973,6 +5976,7 @@ export const ar = {
         },
     },
     teacherProjectsPage: {
+        createButton: 'إنشاء مشروع',
         pageTitle: 'المشاريع - {appName}',
         title: 'المشاريع',
         filterLabel: 'فلترة',

@@ -2,6 +2,7 @@ import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import { FaUsers, FaEdit, FaTrash, FaCheck, FaTimes, FaPlus, FaSearch, FaCalendar, FaDownload, FaUpload } from 'react-icons/fa';
+import { getStorageUrl } from '@/utils/imageUtils';
 
 const formatSubjects = (subjects, subjectsRelation) => {
     if (Array.isArray(subjectsRelation) && subjectsRelation.length > 0) {
@@ -65,23 +66,7 @@ const buildImageUrl = (path) => {
         return trimmed;
     }
 
-    if (trimmed.startsWith('data:image')) {
-        return trimmed;
-    }
-
-    if (trimmed.startsWith('/')) {
-        return trimmed;
-    }
-
-    if (trimmed.startsWith('storage/')) {
-        return `/${trimmed}`;
-    }
-
-    if (trimmed.startsWith('public/')) {
-        return `/storage/${trimmed.replace(/^public\//, '')}`;
-    }
-
-    return `/storage/${trimmed}`;
+    return getStorageUrl(trimmed.replace(/^public\//, ''));
 };
 
 const getTeacherImage = (teacher) => {

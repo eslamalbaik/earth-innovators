@@ -23,6 +23,9 @@ import PrimaryButton from '../../../Components/PrimaryButton';
 import { useTranslation } from '@/i18n';
 import { useToast } from '@/Contexts/ToastContext';
 import resolveLocalizedMessage from '@/utils/resolveLocalizedMessage';
+import { getProjectFileUrl } from '@/utils/imageUtils';
+
+const REVIEW_STATUSES = new Set(['reviewed', 'approved', 'rejected']);
 
 export default function SchoolChallengeSubmissionShow({ auth, submission, availableBadges }) {
     const { t, language } = useTranslation();
@@ -37,7 +40,7 @@ export default function SchoolChallengeSubmissionShow({ auth, submission, availa
     const { data, setData, post, processing, errors } = useForm({
         rating: submission.rating || 0,
         feedback: submission.feedback || '',
-        status: submission.status || 'submitted',
+        status: REVIEW_STATUSES.has(submission.status) ? submission.status : 'reviewed',
         points_earned: submission.points_earned || submission.challenge?.points_reward || 0,
         badges: submission.badges || [],
     });
@@ -81,8 +84,7 @@ export default function SchoolChallengeSubmissionShow({ auth, submission, availa
     }, [flash, language]);
 
     const getFileUrl = (filePath) => {
-        if (filePath.startsWith('http')) return filePath;
-        return `/storage/${filePath}`;
+        return getProjectFileUrl(filePath) || '#';
     };
 
     const getFileIcon = (fileName) => {

@@ -57,7 +57,9 @@ export default function AdminChallengesCreate({ schools }) {
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('admin.challenges.store'));
+        post(route('admin.challenges.store'), {
+            forceFormData: true,
+        });
     };
 
     return (

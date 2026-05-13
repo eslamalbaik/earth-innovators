@@ -2,6 +2,7 @@ import DashboardLayout from '@/Layouts/DashboardLayout';
 import { useTranslation } from '@/i18n';
 import { Head } from '@inertiajs/react';
 import { FaAward, FaCrown, FaMedal, FaProjectDiagram, FaStar, FaTrophy, FaUsers } from 'react-icons/fa';
+import { getBadgeImageUrl } from '@/utils/imageUtils';
 
 const getRankIcon = (rank) => {
     if (rank === 1) {
@@ -252,7 +253,7 @@ export default function SchoolRanking({
                                                 <div className="flex items-start gap-3">
                                                     {badge.image ? (
                                                         <img
-                                                            src={badge.image.startsWith('http') ? badge.image : `/storage/${badge.image}`}
+                                                            src={getBadgeImageUrl(badge.image)}
                                                             alt={getBadgeName(badge)}
                                                             className="h-14 w-14 rounded-lg object-cover"
                                                         />

@@ -13,6 +13,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { useToast } from '@/Contexts/ToastContext';
 import { useBackIcon, useTranslation } from '@/i18n';
+import { getProjectFileUrl, getProjectImageUrl } from '@/utils/imageUtils';
 
 const FILE_MAX_SIZE = 10 * 1024 * 1024;
 const IMAGE_MAX_SIZE = 5 * 1024 * 1024;
@@ -340,7 +341,7 @@ export default function EditSchoolProject({ auth, project }) {
                             {existingThumbnail && !thumbnailFile && (
                                 <div className="mt-2 w-40 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
                                     <img
-                                        src={existingThumbnail.startsWith('http') ? existingThumbnail : `/storage/${existingThumbnail}`}
+                                        src={getProjectImageUrl(existingThumbnail)}
                                         alt={t('schoolProjectEditPage.imageAlt', { number: 1 })}
                                         className="h-28 w-full object-cover"
                                     />
@@ -387,7 +388,7 @@ export default function EditSchoolProject({ auth, project }) {
                             <InputLabel value={t('schoolProjectsCreatePage.form.filesLabel')} />
                             {existingProjectDocument && !projectDocumentFile && (
                                 <a
-                                    href={existingProjectDocument.startsWith('http') ? existingProjectDocument : `/storage/${existingProjectDocument}`}
+                                    href={getProjectFileUrl(existingProjectDocument)}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="mt-2 inline-flex text-sm text-blue-600 hover:text-blue-700"
@@ -439,7 +440,7 @@ export default function EditSchoolProject({ auth, project }) {
                                     {existingImages.map((image, index) => (
                                         <div key={`${image}-${index}`} className="relative">
                                             <img
-                                                src={image.startsWith('http') ? image : `/storage/${image}`}
+                                                src={getProjectImageUrl(image)}
                                                 alt={t('schoolProjectEditPage.imageAlt', { number: index + 1 })}
                                                 className="h-32 w-full rounded-lg object-cover"
                                             />

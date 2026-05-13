@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Publication;
+use App\Support\StorageUrl;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -195,18 +196,7 @@ class PublicationService extends BaseService
             return $imagePath;
         }
 
-        // If it starts with /storage/ or /images/, return as is
-        if (str_starts_with($imagePath, '/storage/') || str_starts_with($imagePath, '/images/')) {
-            return $imagePath;
-        }
-
-        // If it starts with storage/ without /, add /
-        if (str_starts_with($imagePath, 'storage/')) {
-            return '/'.$imagePath;
-        }
-
-        // Assume it's a relative path in storage
-        return '/storage/'.$imagePath;
+        return StorageUrl::url($imagePath);
     }
 
     public function normalizeFilePath(?string $filePath): ?string

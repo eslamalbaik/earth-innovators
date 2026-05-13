@@ -30,6 +30,7 @@ class UpdateChallengeRequest extends FormRequest
             'challenge_type' => 'sometimes|required|in:cognitive,applied,creative,artistic_creative,collaborative,analytical,technological,behavioral,60_seconds,mental_math,conversions,team_fastest,build_problem,custom',
             'category' => 'sometimes|required|in:science,technology,engineering,mathematics,arts,other',
             'age_group' => 'sometimes|required|in:6-9,10-13,14-17,18+',
+            'difficulty' => 'nullable|in:easy,medium,hard',
             'school_id' => 'nullable|exists:users,id',
             'start_date' => 'sometimes|required|date',
             'deadline' => 'sometimes|required|date|after:start_date',

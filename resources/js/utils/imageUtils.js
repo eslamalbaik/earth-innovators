@@ -1,33 +1,60 @@
+export const getStorageUrl = (path, fallback = null) => {
+    if (!path || typeof path !== 'string') {
+        return fallback;
+    }
+
+    const value = path.trim();
+    if (!value) {
+        return fallback;
+    }
+
+    if (value.startsWith('data:') || value.startsWith('blob:')) {
+        return value;
+    }
+
+    if (value.startsWith('http://') || value.startsWith('https://')) {
+        try {
+            const url = new URL(value);
+            if (url.pathname.startsWith('/storage/') || url.pathname.startsWith('/media/')) {
+                const cleanPath = url.pathname
+                    .replace(/^\/+/, '')
+                    .replace(/^(storage|media)\//, '');
+                return `/media/${cleanPath}${url.search}`;
+            }
+        } catch (error) {
+            return value;
+        }
+
+        return value;
+    }
+
+    if (value.startsWith('/images/') || value.startsWith('images/')) {
+        return value.startsWith('/') ? value : `/${value}`;
+    }
+
+    const [pathPart, queryPart] = value.split('?');
+    const cleanPath = pathPart
+        .replace(/^\/+/, '')
+        .replace(/^(storage|media)\//, '');
+
+    if (!cleanPath) {
+        return fallback;
+    }
+
+    return `/media/${cleanPath}${queryPart ? `?${queryPart}` : ''}`;
+};
+
 export const getUserImageUrl = (user, teacher = null) => {
     if (user?.role === 'teacher' && teacher?.image) {
-        if (teacher.image.startsWith('http://') || teacher.image.startsWith('https://')) {
-            return teacher.image;
-        }
-        if (teacher.image.startsWith('/storage/')) {
-            return teacher.image;
-        }
-        return `/storage/${teacher.image}`;
+        return getStorageUrl(teacher.image);
     }
 
     if (user?.image) {
-        if (user.image.startsWith('http://') || user.image.startsWith('https://')) {
-            return user.image;
-        }
-        if (user.image.startsWith('/storage/')) {
-            return user.image;
-        }
-        return `/storage/${user.image}`;
+        return getStorageUrl(user.image);
     }
 
     if (user?.teacher?.image) {
-        const teacherImage = user.teacher.image;
-        if (teacherImage.startsWith('http://') || teacherImage.startsWith('https://')) {
-            return teacherImage;
-        }
-        if (teacherImage.startsWith('/storage/')) {
-            return teacherImage;
-        }
-        return `/storage/${teacherImage}`;
+        return getStorageUrl(user.teacher.image);
     }
 
     return null;
@@ -68,32 +95,7 @@ export const getColorFromName = (name) => {
  * @returns {string} The complete image URL
  */
 export const getPublicationImageUrl = (imagePath, fallback = 'https://placehold.co/600x400/A3C042/white?text=Publication') => {
-    if (!imagePath) {
-        return fallback;
-    }
-
-    // If it's already a full URL (absolute), return as is
-    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-        return imagePath;
-    }
-
-    // If it's a data URL (base64), return as is
-    if (imagePath.startsWith('data:')) {
-        return imagePath;
-    }
-
-    // If it starts with /storage/ or /images/, it's already a proper path
-    if (imagePath.startsWith('/storage/') || imagePath.startsWith('/images/')) {
-        return imagePath;
-    }
-
-    // If it starts with storage/ without leading slash, add it
-    if (imagePath.startsWith('storage/')) {
-        return '/' + imagePath;
-    }
-
-    // Assume it's a relative path in storage - prepend /storage/
-    return `/storage/${imagePath}`;
+    return getStorageUrl(imagePath, fallback);
 };
 
 /**
@@ -104,27 +106,7 @@ export const getPublicationImageUrl = (imagePath, fallback = 'https://placehold.
  * @returns {string}
  */
 export const getChallengeImageUrl = (imagePath, fallback = '/images/hero.png') => {
-    if (!imagePath) {
-        return fallback;
-    }
-
-    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-        return imagePath;
-    }
-
-    if (imagePath.startsWith('data:')) {
-        return imagePath;
-    }
-
-    if (imagePath.startsWith('/storage/') || imagePath.startsWith('/images/')) {
-        return imagePath;
-    }
-
-    if (imagePath.startsWith('storage/')) {
-        return `/${imagePath}`;
-    }
-
-    return `/storage/${imagePath}`;
+    return getStorageUrl(imagePath, fallback);
 };
 
 /**
@@ -134,25 +116,9 @@ export const getChallengeImageUrl = (imagePath, fallback = '/images/hero.png') =
  * @returns {string|null} The complete file URL or null
  */
 export const getPublicationFileUrl = (filePath) => {
-    if (!filePath) {
-        return null;
-    }
-
-    // If it's already a full URL, return as is
-    if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
-        return filePath;
-    }
-
-    // If it starts with /storage/, it's already a proper path
-    if (filePath.startsWith('/storage/')) {
-        return filePath;
-    }
-
-    // If it starts with storage/ without leading slash, add it
-    if (filePath.startsWith('storage/')) {
-        return '/' + filePath;
-    }
-
-    // Assume it's a relative path in storage
-    return `/storage/${filePath}`;
+    return getStorageUrl(filePath, null);
 };
+
+export const getProjectFileUrl = (filePath) => getStorageUrl(filePath, null);
+export const getProjectImageUrl = (imagePath, fallback = null) => getStorageUrl(imagePath, fallback);
+export const getBadgeImageUrl = (imagePath, fallback = null) => getStorageUrl(imagePath, fallback);

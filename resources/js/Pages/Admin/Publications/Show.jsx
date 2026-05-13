@@ -14,7 +14,7 @@ import {
     FaEye,
     FaEdit,
 } from 'react-icons/fa';
-import { getPublicationImageUrl } from '@/utils/imageUtils';
+import { getPublicationFileUrl, getPublicationImageUrl } from '@/utils/imageUtils';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 
 export default function AdminPublicationShow({ publication }) {
@@ -161,7 +161,7 @@ export default function AdminPublicationShow({ publication }) {
                         {publication.file && (
                             <div className="mt-6 pt-6 border-t border-gray-200">
                                 <a
-                                    href={publication.file}
+                                    href={getPublicationFileUrl(publication.file) || '#'}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center gap-2 px-4 py-2 bg-[#A3C042] hover:bg-blue-700 text-white rounded-lg transition"
@@ -343,4 +343,3 @@ export default function AdminPublicationShow({ publication }) {
         </DashboardLayout>
     );
 }
-

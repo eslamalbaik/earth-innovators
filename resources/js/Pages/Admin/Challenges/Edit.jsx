@@ -10,7 +10,7 @@ export default function AdminChallengesEdit({ challenge, schools }) {
     const [existingImage, setExistingImage] = useState(challenge?.image_url || null);
     const imageInputRef = useRef(null);
 
-    const { data, setData, put, processing, errors } = useForm({
+    const { data, setData, post, processing, errors } = useForm({
         title: challenge.title || '',
         objective: challenge.objective || '',
         description: challenge.description || '',
@@ -67,7 +67,10 @@ export default function AdminChallengesEdit({ challenge, schools }) {
 
     const submit = (e) => {
         e.preventDefault();
-        put(route('admin.challenges.update', challenge.id));
+        post(route('admin.challenges.update', challenge.id), {
+            forceFormData: true,
+            preserveScroll: true,
+        });
     };
 
     return (

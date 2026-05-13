@@ -14,7 +14,7 @@ export default function TeacherChallengeEdit({ auth, challenge }) {
     const [existingImage, setExistingImage] = useState(challenge?.image_url || null);
     const imageInputRef = useRef(null);
 
-    const { data, setData, put, processing, errors } = useForm({
+    const { data, setData, post, processing, errors } = useForm({
         title: challenge?.title || '',
         objective: challenge?.objective || '',
         description: challenge?.description || '',
@@ -91,17 +91,10 @@ export default function TeacherChallengeEdit({ auth, challenge }) {
     const submit = (e) => {
         e.preventDefault();
 
-        const submitData = {
-            ...data,
-            max_participants: data.max_participants === '' ? null : (data.max_participants ? parseInt(data.max_participants, 10) : null),
-            points_reward: parseInt(data.points_reward, 10) || 0,
-        };
-
-        Object.keys(submitData).forEach((key) => {
-            setData(key, submitData[key]);
+        post(`/teacher/challenges/${challenge.id}`, {
+            forceFormData: true,
+            preserveScroll: true,
         });
-
-        put(`/teacher/challenges/${challenge.id}`);
     };
 
     return (

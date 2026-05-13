@@ -18,6 +18,7 @@ import {
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import { useTranslation } from '@/i18n';
+import { getProjectFileUrl } from '@/utils/imageUtils';
 
 function resolveSubmissionFileName(file) {
     if (!file) return '';
@@ -79,13 +80,13 @@ export default function StudentProjectCreate({
 
     const getFileUrl = (filePath) => {
         if (!filePath) return '#';
-        if (typeof filePath === 'string' && filePath.startsWith('http')) return filePath;
+        if (typeof filePath === 'string') return getProjectFileUrl(filePath) || '#';
         if (typeof filePath === 'object') {
-            if (filePath.url) return filePath.url;
-            if (filePath.path) return filePath.path.startsWith('http') ? filePath.path : `/storage/${filePath.path}`;
+            if (filePath.url) return getProjectFileUrl(filePath.url) || filePath.url;
+            if (filePath.path) return getProjectFileUrl(filePath.path) || '#';
             return '#';
         }
-        return `/storage/${filePath}`;
+        return getProjectFileUrl(filePath) || '#';
     };
 
     const getFileIcon = (fileName) => {

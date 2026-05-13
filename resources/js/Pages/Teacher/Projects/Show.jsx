@@ -22,6 +22,7 @@ import {
 } from 'react-icons/fa';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 import { useTranslation } from '@/i18n';
+import { getProjectFileUrl, getProjectImageUrl } from '@/utils/imageUtils';
 
 export default function TeacherProjectShow({ project }) {
     const { t, language } = useTranslation();
@@ -165,7 +166,7 @@ export default function TeacherProjectShow({ project }) {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {project.files.map((file, index) => {
                                     const FileIcon = getFileIcon(file);
-                                    const fileUrl = file.startsWith('http') ? file : `/storage/${file}`;
+                                    const fileUrl = getProjectFileUrl(file);
                                     const fileName = file.split('/').pop();
 
                                     return (
@@ -201,7 +202,7 @@ export default function TeacherProjectShow({ project }) {
                             </h2>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                 {project.images.map((image, index) => {
-                                    const imageUrl = image.startsWith('http') ? image : `/storage/${image}`;
+                                    const imageUrl = getProjectImageUrl(image);
 
                                     return (
                                         <div key={index} className="relative group">

@@ -4,7 +4,7 @@ import { FaSearch, FaFilter, FaTrophy, FaTimes, FaUsers, FaCalendar, FaClock, Fa
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import { useTranslation } from '@/i18n';
-import { getChallengeImageUrl } from '@/utils/imageUtils';
+import { getChallengeImageUrl, getStorageUrl } from '@/utils/imageUtils';
 
 export default function StudentChallengesIndex({ auth, challenges, filters, message, categories = [], previousWinners = [] }) {
     const { t, language } = useTranslation();
@@ -77,10 +77,7 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
     };
 
     const getAvatarUrl = (avatar) => {
-        if (!avatar) return '/images/hero.png';
-        if (avatar.startsWith('http://') || avatar.startsWith('https://')) return avatar;
-        if (avatar.startsWith('/storage/')) return avatar;
-        return `/storage/${avatar}`;
+        return getStorageUrl(avatar, '/images/hero.png');
     };
 
     const formatDate = (date) => {

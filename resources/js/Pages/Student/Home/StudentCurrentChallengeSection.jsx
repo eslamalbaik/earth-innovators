@@ -1,6 +1,7 @@
 import { FaCalendarAlt, FaUsers, FaTrophy, FaClock } from 'react-icons/fa';
 import { Link } from '@inertiajs/react';
 import { useTranslation } from '@/i18n';
+import { getChallengeImageUrl } from '@/utils/imageUtils';
 
 function ChallengeCard({ challenge, onJoin, t }) {
     if (!challenge) return null;
@@ -14,8 +15,7 @@ function ChallengeCard({ challenge, onJoin, t }) {
 
     const getChallengeImage = () => {
         if (challenge.image_url) return challenge.image_url;
-        if (challenge.image) return `/storage/${challenge.image}`;
-        return '/images/subjects/image1.png';
+        return getChallengeImageUrl(challenge.image, '/images/subjects/image1.png');
     };
 
     const formatDate = (date) => {

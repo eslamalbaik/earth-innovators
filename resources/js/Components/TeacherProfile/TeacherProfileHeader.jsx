@@ -1,17 +1,10 @@
 import { FaStar, FaCheck, FaUser, FaBook, FaGraduationCap } from 'react-icons/fa';
-import { getInitials, getColorFromName } from '../../utils/imageUtils';
+import { getColorFromName, getInitials, getStorageUrl } from '../../utils/imageUtils';
 import { useTranslation } from '@/i18n';
 import { formatLocationWithStages, getStageLabels } from '@/utils/stageLocalization';
 
 const getImageUrl = (image) => {
-    if (!image) return null;
-    if (image.startsWith('http://') || image.startsWith('https://')) {
-        return image;
-    }
-    if (image.startsWith('/storage/')) {
-        return image;
-    }
-    return `/storage/${image}`;
+    return getStorageUrl(image);
 };
 
 const formatSubject = (subject) => {

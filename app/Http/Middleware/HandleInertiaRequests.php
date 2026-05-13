@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\UserPackage;
+use App\Support\StorageUrl;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -46,7 +47,7 @@ class HandleInertiaRequests extends Middleware
                         str_starts_with($user->image, 'http')
                             ? $user->image
                             // Add a simple cache-buster so profile image updates reflect immediately in the UI.
-                            : '/storage/' . $user->image . '?v=' . ($user->updated_at?->timestamp ?? time())
+                            : StorageUrl::url($user->image, $user->updated_at?->timestamp ?? time())
                     ) : null,
                 ] : null,
             ],

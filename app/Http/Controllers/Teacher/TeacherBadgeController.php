@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Teacher;
 use App\Http\Controllers\Controller;
 use App\Models\Badge;
 use App\Models\User;
+use App\Support\StorageUrl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -23,6 +24,11 @@ class TeacherBadgeController extends Controller
             ->with(['school', 'approver'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
+
+        $badges->getCollection()->transform(function ($badge) {
+            $badge->image = StorageUrl::url($badge->image);
+            return $badge;
+        });
 
         return Inertia::render('Teacher/Badges/Index', [
             'badges' => $badges,
@@ -105,9 +111,11 @@ class TeacherBadgeController extends Controller
 
         $badge->load(['school', 'approver', 'creator']);
 
+        $badgePayload = $badge->toArray();
+        $badgePayload['image'] = StorageUrl::url($badge->image);
+
         return Inertia::render('Teacher/Badges/Show', [
-            'badge' => $badge,
+            'badge' => $badgePayload,
         ]);
     }
 }
-

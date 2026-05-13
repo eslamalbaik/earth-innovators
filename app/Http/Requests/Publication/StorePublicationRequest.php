@@ -20,6 +20,7 @@ class StorePublicationRequest extends FormRequest
             'content' => 'nullable|string',
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'file' => 'nullable|file|mimes:pdf|max:10240',
+            'youtube_url' => 'nullable|url|max:500',
             'issue_number' => 'nullable|integer|min:1',
             'publish_date' => 'nullable|date',
             'publisher_name' => 'nullable|string|max:255',
@@ -44,4 +45,3 @@ class StorePublicationRequest extends FormRequest
         ];
     }
 }
-

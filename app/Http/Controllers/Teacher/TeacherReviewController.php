@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Review;
 use App\Models\Teacher;
 use App\Services\ReviewService;
+use App\Support\StorageUrl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -33,9 +34,7 @@ class TeacherReviewController extends Controller
             ->through(function ($review) {
                 $studentImage = null;
                 if ($review->student && $review->student->image) {
-                    $studentImage = str_starts_with($review->student->image, 'http')
-                        ? $review->student->image
-                        : '/storage/' . $review->student->image;
+                    $studentImage = StorageUrl::url($review->student->image);
                 }
 
                 return [

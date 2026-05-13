@@ -15,18 +15,20 @@ import MobileAppLayout from '@/Layouts/MobileAppLayout';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import { useTranslation } from '@/i18n';
+import { getProjectFileUrl } from '@/utils/imageUtils';
+
+const REVIEW_STATUSES = ['reviewed', 'approved', 'rejected'];
 
 export default function TeacherSubmissionShow({ auth, submission, availableBadges, allSubmissions = [] }) {
     const { t, language } = useTranslation();
     const [rating, setRating] = useState(submission.rating || 0);
     const [hoveredRating, setHoveredRating] = useState(0);
     const [selectedBadges, setSelectedBadges] = useState(submission.badges || []);
-    const [comment, setComment] = useState('');
 
     const { data, setData, post, processing, errors } = useForm({
         rating: submission.rating || 0,
         feedback: submission.feedback || '',
-        status: submission.status || 'submitted',
+        status: REVIEW_STATUSES.includes(submission.status) ? submission.status : 'reviewed',
         badges: submission.badges || [],
     });
 
@@ -53,8 +55,7 @@ export default function TeacherSubmissionShow({ auth, submission, availableBadge
     };
 
     const getFileUrl = (filePath) => {
-        if (filePath.startsWith('http')) return filePath;
-        return `/storage/${filePath}`;
+        return getProjectFileUrl(filePath) || '#';
     };
 
     const getFileIcon = (fileName) => {
@@ -186,8 +187,8 @@ export default function TeacherSubmissionShow({ auth, submission, availableBadge
                     </button>
                     <input
                         type="text"
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
+                        value={data.feedback}
+                        onChange={(e) => setData('feedback', e.target.value)}
                         placeholder={t('teacherSubmissionsPage.addCommentPlaceholder')}
                         className="flex-1 h-10 px-4 border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
                     />

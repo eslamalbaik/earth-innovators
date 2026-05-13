@@ -6,6 +6,7 @@ import TextInput from '../../../Components/TextInput';
 import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
 import PrimaryButton from '../../../Components/PrimaryButton';
+import { getProjectFileUrl, getProjectImageUrl } from '@/utils/imageUtils';
 
 export default function EditProject({ auth, project, school, schools = [] }) {
     const { data, setData, put, processing, errors } = useForm({
@@ -19,7 +20,11 @@ export default function EditProject({ auth, project, school, schools = [] }) {
     });
 
     const [fileList, setFileList] = useState([]);
-    const [existingFiles, setExistingFiles] = useState(project?.files || []);
+    const [existingFiles, setExistingFiles] = useState(() => {
+        const files = Array.isArray(project?.files) ? project.files : [];
+        const images = Array.isArray(project?.images) ? project.images : [];
+        return Array.from(new Set([...files, ...images]));
+    });
     const [thumbnailPreview, setThumbnailPreview] = useState(null);
     const [dragActive, setDragActive] = useState(false);
     const fileInputRef = useRef(null);
@@ -44,9 +49,7 @@ export default function EditProject({ auth, project, school, schools = [] }) {
         if (thumbnailPreview) return thumbnailPreview;
         if (project?.thumbnail) {
             const path = project.thumbnail;
-            if (path.startsWith('http://') || path.startsWith('https://')) return path;
-            if (path.startsWith('/storage/')) return path;
-            return `/storage/${path}`;
+            return getProjectImageUrl(path);
         }
         return null;
     };
@@ -171,7 +174,7 @@ export default function EditProject({ auth, project, school, schools = [] }) {
         }
 
         // حسب متطلبات النظام: صورة الغلاف مطلوبة عند كل تحديث.
-        if (!data.thumbnail) {
+        if (false) {
             alert('يرجى رفع صورة غلاف جديدة قبل الحفظ');
             return;
         }
@@ -195,7 +198,7 @@ export default function EditProject({ auth, project, school, schools = [] }) {
             formData.append('school_id', data.school_id);
         }
 
-        // Cover image (required on update)
+        // Cover image is optional on update; keep the existing one when no file is selected.
         if (data.thumbnail instanceof File) {
             formData.append('thumbnail', data.thumbnail);
         }
@@ -386,7 +389,7 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                                                 <div>
                                                     <p className="text-sm font-medium text-gray-900">{getFileName(filePath)}</p>
                                                     <a
-                                                        href={`/storage/${filePath}`}
+                                                        href={getProjectFileUrl(filePath) || '#'}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="text-xs text-blue-600 hover:text-blue-800"

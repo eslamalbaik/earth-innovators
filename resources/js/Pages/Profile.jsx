@@ -21,6 +21,7 @@ import {
 } from 'react-icons/fa';
 import Modal from '@/Components/Modal';
 import DangerButton from '@/Components/DangerButton';
+import { getStorageUrl } from '@/utils/imageUtils';
 
 export default function Profile({ auth, mustVerifyEmail, status, teacher, subjects, cities, badges = [] }) {
     const { t, language } = useTranslation();
@@ -258,38 +259,17 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
             }
 
             if (teacher?.image) {
-                if (teacher.image.startsWith('http://') || teacher.image.startsWith('https://')) {
-                    return teacher.image;
-                }
-                if (teacher.image.startsWith('/storage/')) {
-                    return teacher.image;
-                }
-                return `/storage/${teacher.image}`;
+                return getStorageUrl(teacher.image);
             }
             if (user.teacher?.image) {
-                if (user.teacher.image.startsWith('http://') || user.teacher.image.startsWith('https://')) {
-                    return user.teacher.image;
-                }
-                if (user.teacher.image.startsWith('/storage/')) {
-                    return user.teacher.image;
-                }
-                return `/storage/${user.teacher.image}`;
+                return getStorageUrl(user.teacher.image);
             }
         } else if (imagePreview) {
             return imagePreview;
         }
 
         if (user.image) {
-            if (user.image.startsWith('http://') || user.image.startsWith('https://')) {
-                return user.image;
-            }
-            if (user.image.startsWith('/storage/')) {
-                return user.image;
-            }
-            const imagePath = user.image.startsWith('storage/')
-                ? `/${user.image}`
-                : `/storage/${user.image}`;
-            return imagePath;
+            return getStorageUrl(user.image);
         }
 
         return null;

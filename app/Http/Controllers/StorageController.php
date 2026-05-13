@@ -9,6 +9,7 @@ class StorageController extends Controller
 {
     public function serve($path)
     {
+        $path = rawurldecode($path);
         $path = str_replace('..', '', $path);
         $path = ltrim($path, '/');
 
@@ -41,4 +42,3 @@ class StorageController extends Controller
         ]);
     }
 }
-

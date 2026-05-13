@@ -3,16 +3,14 @@ import { FaTrophy, FaArrowLeft } from 'react-icons/fa';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import { useTranslation } from '@/i18n';
+import { getStorageUrl } from '@/utils/imageUtils';
 
 export default function Winners({ auth, winners = [], backHref = '/challenges' }) {
     const { t, language } = useTranslation();
     const isArabic = language === 'ar';
 
     const getAvatarUrl = (avatar) => {
-        if (!avatar) return '/images/hero.png';
-        if (avatar.startsWith('http://') || avatar.startsWith('https://')) return avatar;
-        if (avatar.startsWith('/storage/')) return avatar;
-        return `/storage/${avatar}`;
+        return getStorageUrl(avatar, '/images/hero.png');
     };
 
     const WinnersContent = () => (

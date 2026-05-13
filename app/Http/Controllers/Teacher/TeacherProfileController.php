@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Teacher;
 use App\Models\Subject;
 use App\Services\ProfileService;
+use App\Support\StorageUrl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -97,11 +98,7 @@ class TeacherProfileController extends Controller
                 'mime' => $request->file('image')->getMimeType(),
             ]);
             if ($teacher->image) {
-                $oldImagePath = str_replace('/storage/', '', $teacher->image);
-                if (str_starts_with($oldImagePath, 'http')) {
-                    $parsed = parse_url($oldImagePath);
-                    $oldImagePath = str_replace('/storage/', '', $parsed['path'] ?? '');
-                }
+                $oldImagePath = StorageUrl::diskPath($teacher->image);
                 if ($oldImagePath && Storage::disk('public')->exists($oldImagePath)) {
                     Storage::disk('public')->delete($oldImagePath);
                 }
@@ -114,11 +111,7 @@ class TeacherProfileController extends Controller
 
             $user = Auth::user();
             if ($user->image) {
-                $oldUserImagePath = str_replace('/storage/', '', $user->image);
-                if (str_starts_with($oldUserImagePath, 'http')) {
-                    $parsed = parse_url($oldUserImagePath);
-                    $oldUserImagePath = str_replace('/storage/', '', $parsed['path'] ?? '');
-                }
+                $oldUserImagePath = StorageUrl::diskPath($user->image);
                 if ($oldUserImagePath && Storage::disk('public')->exists($oldUserImagePath)) {
                     Storage::disk('public')->delete($oldUserImagePath);
                     \Log::info('Old user image deleted', ['path' => $oldUserImagePath]);

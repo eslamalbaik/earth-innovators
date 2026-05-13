@@ -8,6 +8,7 @@ use App\Http\Requests\Challenge\UpdateChallengeRequest;
 use App\Models\Challenge;
 use App\Models\User;
 use App\Services\ChallengeService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -144,30 +145,7 @@ class AdminChallengeController extends Controller
             $data['status'] = $data['status'] ?? 'draft';
             $data['current_participants'] = 0;
             
-            // Handle date formatting
-            if (isset($data['start_date'])) {
-                if (!str_contains($data['start_date'], ' ')) {
-                    $data['start_date'] = $data['start_date'] . ' 00:00:00';
-                }
-                // Ensure it's a valid datetime
-                try {
-                    $data['start_date'] = \Carbon\Carbon::parse($data['start_date'])->format('Y-m-d H:i:s');
-                } catch (\Exception $e) {
-                    Log::warning('Invalid start_date format', ['start_date' => $data['start_date']]);
-                }
-            }
-            
-            if (isset($data['deadline'])) {
-                if (!str_contains($data['deadline'], ' ')) {
-                    $data['deadline'] = $data['deadline'] . ' 23:59:59';
-                }
-                // Ensure it's a valid datetime
-                try {
-                    $data['deadline'] = \Carbon\Carbon::parse($data['deadline'])->format('Y-m-d H:i:s');
-                } catch (\Exception $e) {
-                    Log::warning('Invalid deadline format', ['deadline' => $data['deadline']]);
-                }
-            }
+            $data = $this->normalizeChallengeDates($data);
             
             // Handle nullable fields
             if (isset($data['max_participants']) && ($data['max_participants'] === '' || $data['max_participants'] === null)) {
@@ -297,6 +275,8 @@ class AdminChallengeController extends Controller
                 'age_group' => $challenge->age_group,
                 'status' => $challenge->status,
                 'school_id' => $challenge->school_id,
+                'image' => $challenge->image,
+                'image_url' => $challenge->image_url,
                 'start_date' => $challenge->start_date->format('Y-m-d\TH:i'),
                 'deadline' => $challenge->deadline->format('Y-m-d\TH:i'),
                 'points_reward' => $challenge->points_reward ?? 0,
@@ -310,12 +290,7 @@ class AdminChallengeController extends Controller
     {
         $data = $request->validated();
         
-        if (isset($data['start_date']) && !str_contains($data['start_date'], ' ')) {
-            $data['start_date'] = $data['start_date'] . ' 00:00:00';
-        }
-        if (isset($data['deadline']) && !str_contains($data['deadline'], ' ')) {
-            $data['deadline'] = $data['deadline'] . ' 23:59:59';
-        }
+        $data = $this->normalizeChallengeDates($data);
         
         if (isset($data['max_participants']) && $data['max_participants'] === '') {
             $data['max_participants'] = null;
@@ -372,5 +347,31 @@ class AdminChallengeController extends Controller
             return back()
                 ->withErrors(['error' => 'حدث خطأ أثناء حذف التحدي: ' . $e->getMessage()]);
         }
+    }
+
+    private function normalizeChallengeDates(array $data): array
+    {
+        if (isset($data['start_date'])) {
+            $data['start_date'] = $this->normalizeChallengeDate($data['start_date'], '00:00:00');
+        }
+
+        if (isset($data['deadline'])) {
+            $data['deadline'] = $this->normalizeChallengeDate($data['deadline'], '23:59:59');
+        }
+
+        return $data;
+    }
+
+    private function normalizeChallengeDate(string $value, string $dateOnlyTime): string
+    {
+        $value = trim($value);
+
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+            $value .= ' ' . $dateOnlyTime;
+        } else {
+            $value = str_replace('T', ' ', $value);
+        }
+
+        return Carbon::parse($value)->format('Y-m-d H:i:s');
     }
 }

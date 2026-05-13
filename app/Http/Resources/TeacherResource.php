@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Support\StorageUrl;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class TeacherResource extends JsonResource
@@ -20,7 +21,7 @@ class TeacherResource extends JsonResource
             'experience_years' => $this->experience_years,
             'rating' => $this->rating ?? 0,
             'reviews_count' => $this->whenLoaded('reviews', fn() => $this->reviews->count()),
-            'image' => $this->image ? (str_starts_with($this->image, 'http') ? $this->image : asset('storage/' . $this->image)) : null,
+            'image' => StorageUrl::url($this->image),
             'is_verified' => (bool) $this->is_verified,
             'is_active' => (bool) $this->is_active,
             'user' => new UserResource($this->whenLoaded('user')),
@@ -28,4 +29,3 @@ class TeacherResource extends JsonResource
         ];
     }
 }
-

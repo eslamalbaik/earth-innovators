@@ -9,6 +9,7 @@ use App\Models\Publication;
 use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\User;
+use App\Support\StorageUrl;
 use Carbon\CarbonInterface;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Carbon;
@@ -42,9 +43,7 @@ class ProfileService extends BaseService
         ];
 
         if ($user->image) {
-            $data['user_image'] = str_starts_with($user->image, 'http')
-                ? $user->image
-                : Storage::url($user->image);
+            $data['user_image'] = StorageUrl::url($user->image);
         }
 
         if ($user->isAdmin()) {
@@ -86,7 +85,7 @@ class ProfileService extends BaseService
                 'city' => $teacher->city,
                 'neighborhoods' => is_array($teacher->neighborhoods) ? $teacher->neighborhoods : json_decode($teacher->neighborhoods ?? '[]', true),
                 'price_per_hour' => $teacher->price_per_hour,
-                'image' => $teacher->image ? (str_starts_with($teacher->image, 'http') ? $teacher->image : Storage::url($teacher->image)) : null,
+                'image' => StorageUrl::url($teacher->image),
                 'is_verified' => $teacher->is_verified,
                 'is_active' => $teacher->is_active,
                 'education_type' => $teacher->education_type ?? '',
@@ -221,14 +220,7 @@ class ProfileService extends BaseService
             return null;
         }
 
-        $path = str_replace('/storage/', '', $imagePath);
-
-        if (str_starts_with($path, 'http')) {
-            $parsed = parse_url($path);
-            $path = str_replace('/storage/', '', $parsed['path'] ?? '');
-        }
-
-        return $path;
+        return StorageUrl::diskPath($imagePath);
     }
 
     public function getTeacherProfile(int $teacherId): array
@@ -255,7 +247,7 @@ class ProfileService extends BaseService
                 ? $teacher->neighborhoods
                 : (is_string($teacher->neighborhoods) ? json_decode($teacher->neighborhoods, true) ?? [] : []),
             'price_per_hour' => $teacher->price_per_hour,
-            'image' => $teacher->image,
+            'image' => StorageUrl::url($teacher->image),
             'is_verified' => (bool) $teacher->is_verified,
             'is_active' => (bool) $teacher->is_active,
             'email' => $teacher->user?->email,

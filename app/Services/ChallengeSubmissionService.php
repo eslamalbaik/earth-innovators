@@ -6,11 +6,11 @@ use App\Models\ChallengeSubmission;
 use App\Models\Challenge;
 use App\Services\PointsService;
 use App\Services\BadgeService;
+use App\Support\StorageUrl;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class ChallengeSubmissionService extends BaseService
 {
@@ -109,11 +109,7 @@ class ChallengeSubmissionService extends BaseService
                             return null;
                         }
 
-                        if (Str::startsWith($filePath, ['http://', 'https://', '/storage/'])) {
-                            return $filePath;
-                        }
-
-                        return '/storage/' . ltrim($filePath, '/');
+                        return StorageUrl::url($filePath);
                     })
                     ->filter()
                     ->values()

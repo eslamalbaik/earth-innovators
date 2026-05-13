@@ -7,6 +7,7 @@ use App\Models\Review;
 use App\Models\Booking;
 use App\Services\ReviewService;
 use App\Services\BookingService;
+use App\Support\StorageUrl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
@@ -32,13 +33,9 @@ class StudentReviewController extends Controller
                 $teacherImage = null;
                 if ($review->teacher) {
                     if ($review->teacher->image) {
-                        $teacherImage = str_starts_with($review->teacher->image, 'http')
-                            ? $review->teacher->image
-                            : '/storage/' . $review->teacher->image;
+                        $teacherImage = StorageUrl::url($review->teacher->image);
                     } elseif ($review->teacher->user && $review->teacher->user->image) {
-                        $teacherImage = str_starts_with($review->teacher->user->image, 'http')
-                            ? $review->teacher->user->image
-                            : '/storage/' . $review->teacher->user->image;
+                        $teacherImage = StorageUrl::url($review->teacher->user->image);
                     }
                 }
 

@@ -15,6 +15,7 @@ import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 import { useToast } from '@/Contexts/ToastContext';
 import { useBackIcon, useTranslation } from '@/i18n';
 import { toHijriDate } from '@/utils/dateUtils';
+import { getProjectFileUrl, getProjectImageUrl } from '@/utils/imageUtils';
 
 const CATEGORY_COLORS = {
     science: 'bg-blue-100 text-blue-700',
@@ -178,7 +179,7 @@ export default function ShowSchoolProject({ project, auth }) {
                                 </h2>
                                 <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
                                     {project.images.map((image, index) => {
-                                        const imageUrl = image.startsWith('http') ? image : `/storage/${image}`;
+                                        const imageUrl = getProjectImageUrl(image);
 
                                         return (
                                             <div key={`${imageUrl}-${index}`} className="group relative">
@@ -211,7 +212,7 @@ export default function ShowSchoolProject({ project, auth }) {
                                 <div className="space-y-2">
                                     {project.files.map((file, index) => {
                                         const fileName = typeof file === 'string' ? file.split('/').pop() : file;
-                                        const fileUrl = file.startsWith('http') ? file : `/storage/${file}`;
+                                        const fileUrl = getProjectFileUrl(file);
 
                                         return (
                                             <a

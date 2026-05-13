@@ -2,7 +2,7 @@ import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, router, useForm } from '@inertiajs/react';
 import { FaEdit, FaEnvelope, FaPhone, FaSave, FaUpload, FaUser } from 'react-icons/fa';
 import { useEffect, useRef, useState } from 'react';
-import { getColorFromName, getInitials } from '@/utils/imageUtils';
+import { getColorFromName, getInitials, getStorageUrl } from '@/utils/imageUtils';
 import { useToast } from '@/Contexts/ToastContext';
 import { useTranslation } from '@/i18n';
 import PhoneInput from '@/Components/PhoneInput';
@@ -23,14 +23,7 @@ const GENDER_OPTIONS = [
 ];
 
 const getImageUrl = (image) => {
-    if (!image) return null;
-    if (image.startsWith('http://') || image.startsWith('https://')) {
-        return image;
-    }
-    if (image.startsWith('/storage/')) {
-        return image;
-    }
-    return `/storage/${image}`;
+    return getStorageUrl(image);
 };
 
 const getMembershipTypeKey = (membershipType) => {
