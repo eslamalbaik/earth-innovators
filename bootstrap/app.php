@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Http\Exceptions\PostTooLargeException;
 use Illuminate\Session\TokenMismatchException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -91,6 +92,23 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($e->getStatusCode() === 419) {
                 return $handleExpiredRequest($request);
             }
+        });
+
+        $exceptions->render(function (PostTooLargeException $e, Request $request) {
+            $message = 'حجم الملفات المرفوعة أكبر من الحد المسموح. يرجى تقليل حجم الملفات أو رفعها على دفعات.';
+
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'message' => $message,
+                    'errors' => [
+                        'files' => [$message],
+                    ],
+                ], 413);
+            }
+
+            return redirect()->back(303)
+                ->withErrors(['files' => $message])
+                ->with('error', $message);
         });
 
         $exceptions->render(function (MethodNotAllowedHttpException $e, Request $request) {
