@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Models\Teacher;
 use App\Models\User;
 use App\Services\ProjectService;
 use Illuminate\Http\Request;
@@ -22,7 +23,7 @@ class TeacherProjectController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $teacher = $user?->teacher;
+        $teacher = $user ? $this->resolveTeacherProfile($user) : null;
 
         if (!$teacher) {
             abort(403, 'لم يتم العثور على بيانات المعلم');
@@ -54,11 +55,15 @@ class TeacherProjectController extends Controller
             $school = $user->school;
             
             // الحصول على قائمة المؤسسات تعليمية المتاحة (اختياري - يمكن للمعلم اختيار مدرسة)
-            $schools = User::where('role', 'school')
+            $schools = User::whereIn('role', ['school', 'educational_institution'])
                 ->select('id', 'name')
                 ->get();
 
             return Inertia::render('Teacher/Projects/Create', [
+                'auth' => [
+                    'user' => $user,
+                    'unreadCount' => $user->unreadNotifications()->count(),
+                ],
                 'school' => $school ? [
                     'id' => $school->id,
                     'name' => $school->name,
@@ -78,7 +83,7 @@ class TeacherProjectController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        $teacher = $user->teacher;
+        $teacher = $this->resolveTeacherProfile($user);
         
         if (!$teacher) {
             return back()->withErrors([
@@ -114,7 +119,7 @@ class TeacherProjectController extends Controller
         // التحقق من أن المدرسة موجودة إذا تم تحديدها
         if ($schoolId) {
             $school = User::where('id', $schoolId)
-                ->where('role', 'school')
+                ->whereIn('role', ['school', 'educational_institution'])
                 ->first();
             
             if (!$school) {
@@ -224,6 +229,32 @@ class TeacherProjectController extends Controller
 
         return redirect()->route('teacher.projects.index')
             ->with('success', 'تم إرسال المشروع بنجاح! سيتم مراجعته من قبل المدرسة قريباً.');
+    }
+
+    /**
+     * ضمان وجود ملف معلم للحسابات القديمة أو المستوردة.
+     */
+    private function resolveTeacherProfile(User $user): Teacher
+    {
+        return $user->teacher()->firstOrCreate(
+            ['user_id' => $user->id],
+            [
+                'name_ar' => $user->name,
+                'name_en' => $user->name,
+                'nationality' => 'غير محدد',
+                'gender' => null,
+                'bio' => null,
+                'qualifications' => null,
+                'subjects' => [],
+                'stages' => [],
+                'experience_years' => 0,
+                'city' => 'غير محدد',
+                'neighborhoods' => [],
+                'price_per_hour' => 0,
+                'is_verified' => false,
+                'is_active' => false,
+            ]
+        );
     }
 
     /**
@@ -338,7 +369,7 @@ class TeacherProjectController extends Controller
         $project->load(['school']);
 
         // الحصول على قائمة المؤسسات تعليمية المتاحة
-        $schools = User::where('role', 'school')
+        $schools = User::whereIn('role', ['school', 'educational_institution'])
             ->select('id', 'name')
             ->get();
 
@@ -406,7 +437,7 @@ class TeacherProjectController extends Controller
         // التحقق من أن المدرسة موجودة إذا تم تحديدها
         if ($schoolId) {
             $school = User::where('id', $schoolId)
-                ->where('role', 'school')
+                ->whereIn('role', ['school', 'educational_institution'])
                 ->first();
             
             if (!$school) {

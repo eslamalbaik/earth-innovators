@@ -12,7 +12,7 @@ import { useToast } from '@/Contexts/ToastContext';
 import { useTranslation } from '@/i18n';
 
 export default function CreateProject({ auth, school, schools = [] }) {
-    const { showError } = useToast();
+    const { showError, showSuccess } = useToast();
     const { t, language } = useTranslation();
     const { data, setData, post, processing, errors } = useForm({
         title: '',
@@ -159,11 +159,32 @@ export default function CreateProject({ auth, school, schools = [] }) {
 
     const submit = (e) => {
         e.preventDefault();
+
+        const showValidationError = (formErrors) => {
+            const firstKey = Object.keys(formErrors || {})[0];
+            const error = firstKey ? formErrors[firstKey] : null;
+            const message = Array.isArray(error) ? error[0] : error;
+
+            if (message) {
+                showError(message, { title: t('common.error') });
+                return;
+            }
+
+            showError(language === 'ar' ? 'تعذر رفع المشروع. يرجى المحاولة مرة أخرى.' : 'Project upload failed. Please try again.', {
+                title: t('common.error'),
+            });
+        };
+
         post('/teacher/projects', {
             forceFormData: true,
+            preserveScroll: true,
             onSuccess: () => {
-                router.visit('/teacher/projects');
+                showSuccess(language === 'ar' ? 'تم رفع المشروع بنجاح.' : 'Project uploaded successfully.', {
+                    title: t('common.success'),
+                });
+                router.visit('/teacher/projects', { preserveState: false });
             },
+            onError: showValidationError,
         });
     };
 
