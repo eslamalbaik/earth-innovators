@@ -11,8 +11,6 @@ import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaPhone, FaExclamationTr
 import { getTranslation, useTranslation } from '@/i18n';
 import PhoneInput from '@/Components/PhoneInput';
 
-const getCsrfToken = () => document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-
 export default function Register({ schools = [] }) {
     const { t, language } = useTranslation();
     const { props } = usePage();
@@ -75,8 +73,6 @@ export default function Register({ schools = [] }) {
         } else {
             dataToSend.phone = null;
         }
-
-        dataToSend._token = getCsrfToken();
 
         router.post(route('register'), dataToSend, {
             preserveScroll: true,

@@ -10,8 +10,6 @@ import { useState } from 'react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { useTranslation } from '@/i18n';
 
-const getCsrfToken = () => document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-
 export default function Login({ status, canResetPassword }) {
     const { t, language } = useTranslation();
     const [showPassword, setShowPassword] = useState(false);
@@ -20,7 +18,6 @@ export default function Login({ status, canResetPassword }) {
         password: '',
         remember: false,
         role: '',
-        _token: getCsrfToken(),
     });
 
     const submit = (e) => {
@@ -29,7 +26,6 @@ export default function Login({ status, canResetPassword }) {
         transform((formData) => {
             const payload = {
                 ...formData,
-                _token: getCsrfToken(),
             };
 
             // Only send role when the user explicitly chooses it.

@@ -5,10 +5,7 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 window.axios.defaults.withCredentials = true;
 window.axios.defaults.withXSRFToken = true;
 
-const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-if (csrfToken) {
-    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;
-}
+
 
 // If APP_URL (server) differs from the current origin (local dev / proxy), Ziggy may generate absolute URLs
 // that break CSRF/session cookies and cause frequent 419 Page Expired responses. Force Ziggy to the current origin.
