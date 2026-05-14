@@ -143,11 +143,14 @@ class TeacherProjectController extends Controller
         // تحديث المشروع للتأكد من الحفظ
         $project->refresh();
 
+        // تهيئة المصفوفات
+        $uploadedFiles = [];
+        $uploadedImages = [];
+        $firstImagePath = null;
+        $firstDocumentPath = null;
+
         // رفع الملفات
         if ($request->hasFile('files')) {
-            $uploadedFiles = [];
-            $firstImagePath = null;
-            $firstDocumentPath = null;
             foreach ($request->file('files') as $file) {
                 // تحديد نوع الملف (صورة أو فيديو أو PDF)
                 $mimeType = $file->getMimeType();
@@ -156,6 +159,7 @@ class TeacherProjectController extends Controller
                     if (!$firstImagePath) {
                         $firstImagePath = $path;
                     }
+                    $uploadedImages[] = $path;
                 } elseif (str_starts_with($mimeType, 'video/')) {
                     $path = $file->store('projects/videos', 'public');
                 } else {
@@ -166,28 +170,33 @@ class TeacherProjectController extends Controller
                 }
                 $uploadedFiles[] = $path;
             }
-            $project->files = $uploadedFiles;
-            if (!$project->thumbnail && $firstImagePath) {
-                $project->thumbnail = $firstImagePath;
-            }
-            if (!$project->project_document && $firstDocumentPath) {
-                $project->project_document = $firstDocumentPath;
-            }
         }
 
+        // رفع thumbnail
         if ($request->hasFile('thumbnail')) {
             if ($project->thumbnail) {
                 Storage::disk('public')->delete($project->thumbnail);
             }
             $project->thumbnail = $request->file('thumbnail')->store('projects/thumbnails', 'public');
+            // إضافة thumbnail إلى قائمة الصور
+            $uploadedImages[] = $project->thumbnail;
+        } elseif ($firstImagePath && !$project->thumbnail) {
+            $project->thumbnail = $firstImagePath;
         }
 
+        // رفع project_document
         if ($request->hasFile('project_document')) {
             if ($project->project_document) {
                 Storage::disk('public')->delete($project->project_document);
             }
             $project->project_document = $request->file('project_document')->store('projects/documents', 'public');
+        } elseif ($firstDocumentPath && !$project->project_document) {
+            $project->project_document = $firstDocumentPath;
         }
+
+        // تعيين الملفات والصور (حتى لو كانت فارغة)
+        $project->files = $uploadedFiles;
+        $project->images = $uploadedImages;
 
         $project->save();
 
@@ -460,17 +469,18 @@ class TeacherProjectController extends Controller
         }
 
         // رفع الملفات الجديدة
+        $uploadedFiles = $project->files ?? [];
+        $uploadedImages = $project->images ?? [];
+        $files = $request->file('files');
+        $firstImagePath = null;
+        $firstDocumentPath = null;
+        
+        // التأكد من أن files هو array
+        if (!is_array($files)) {
+            $files = [$files];
+        }
+        
         if ($request->hasFile('files')) {
-            $uploadedFiles = $project->files ?? [];
-            $files = $request->file('files');
-            $firstImagePath = null;
-            $firstDocumentPath = null;
-            
-            // التأكد من أن files هو array
-            if (!is_array($files)) {
-                $files = [$files];
-            }
-            
             foreach ($files as $file) {
                 if ($file && $file->isValid()) {
                     // تحديد نوع الملف (صورة أو فيديو أو PDF)
@@ -480,6 +490,7 @@ class TeacherProjectController extends Controller
                         if (!$firstImagePath) {
                             $firstImagePath = $path;
                         }
+                        $uploadedImages[] = $path;
                     } elseif (str_starts_with($mimeType, 'video/')) {
                         $path = $file->store('projects/videos', 'public');
                     } else {
@@ -491,28 +502,35 @@ class TeacherProjectController extends Controller
                     $uploadedFiles[] = $path;
                 }
             }
-            $project->files = $uploadedFiles;
-            if (!$project->thumbnail && $firstImagePath) {
-                $project->thumbnail = $firstImagePath;
-            }
-            if (!$project->project_document && $firstDocumentPath) {
-                $project->project_document = $firstDocumentPath;
-            }
         }
 
+        // رفع thumbnail جديد
         if ($request->hasFile('thumbnail')) {
             if ($project->thumbnail) {
                 Storage::disk('public')->delete($project->thumbnail);
             }
             $project->thumbnail = $request->file('thumbnail')->store('projects/thumbnails', 'public');
+            // إضافة thumbnail إلى قائمة الصور إذا لم يكن موجوداً
+            if (!in_array($project->thumbnail, $uploadedImages)) {
+                $uploadedImages[] = $project->thumbnail;
+            }
+        } elseif ($firstImagePath && !$project->thumbnail) {
+            $project->thumbnail = $firstImagePath;
         }
 
+        // رفع project_document جديد
         if ($request->hasFile('project_document')) {
             if ($project->project_document) {
                 Storage::disk('public')->delete($project->project_document);
             }
             $project->project_document = $request->file('project_document')->store('projects/documents', 'public');
+        } elseif ($firstDocumentPath && !$project->project_document) {
+            $project->project_document = $firstDocumentPath;
         }
+
+        // تحديث الملفات والصور
+        $project->files = $uploadedFiles;
+        $project->images = $uploadedImages;
 
         // تحديث بيانات المشروع
         $project->update([
