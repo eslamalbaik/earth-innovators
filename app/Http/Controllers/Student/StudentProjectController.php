@@ -147,26 +147,7 @@ class StudentProjectController extends Controller
                     }
                 }
 
-                if (is_string($project->thumbnail) && $project->thumbnail !== '') {
-                    if (!str_starts_with($project->thumbnail, 'http://') && !str_starts_with($project->thumbnail, 'https://')) {
-                        $project->thumbnail = '/storage/' . ltrim($project->thumbnail, '/');
-                    }
-                }
-
-                if (is_string($project->project_document) && $project->project_document !== '') {
-                    if (!str_starts_with($project->project_document, 'http://') && !str_starts_with($project->project_document, 'https://')) {
-                        $project->project_document = '/storage/' . ltrim($project->project_document, '/');
-                    }
-                }
-
-                $images = $project->images ?? [];
-                if (!$project->thumbnail && is_array($images) && count($images) > 0) {
-                    $first = $images[0];
-                    $project->thumbnail = (is_string($first) && (str_starts_with($first, 'http://') || str_starts_with($first, 'https://')))
-                        ? $first
-                        : '/storage/' . ltrim((string) $first, '/');
-                }
-
+                // Accessors in Project model now handle normalization
                 return $project;
             })
         );
@@ -225,17 +206,7 @@ class StudentProjectController extends Controller
         }
 
         if ($existingSubmission && is_array($existingSubmission->files)) {
-            $existingSubmission->file_urls = collect($existingSubmission->files)
-                ->filter(fn ($path) => is_string($path) && $path !== '')
-                ->map(function ($path) {
-                    if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
-                        return $path;
-                    }
-
-                    return '/storage/' . ltrim($path, '/');
-                })
-                ->values()
-                ->all();
+            $existingSubmission->file_urls = $existingSubmission->files;
         }
 
         return Inertia::render('Student/Projects/Show', [

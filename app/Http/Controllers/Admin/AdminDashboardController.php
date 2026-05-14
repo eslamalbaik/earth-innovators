@@ -272,19 +272,7 @@ class AdminDashboardController extends Controller
 
     private function formatUserImageUrl(?string $imagePath): ?string
     {
-        if (!$imagePath) {
-            return null;
-        }
-
-        if (strpos($imagePath, 'http://') === 0 || strpos($imagePath, 'https://') === 0) {
-            return $imagePath;
-        }
-
-        if (strpos($imagePath, '/storage/') === 0) {
-            return $imagePath;
-        }
-
-        return '/storage/' . $imagePath;
+        return \App\Support\StorageUrl::url($imagePath);
     }
 
     private function getStudentEngagementData(): array

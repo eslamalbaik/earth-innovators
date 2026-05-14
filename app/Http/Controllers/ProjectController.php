@@ -257,37 +257,11 @@ class ProjectController extends Controller
     private function normalizeProjectAssets(Collection $projects): Collection
     {
         return $projects->map(function (Project $project) {
-            $normalizePath = static function (?string $path): ?string {
-                if (!$path) {
-                    return null;
-                }
-
-                if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, 'data:')) {
-                    return $path;
-                }
-
-                if (str_starts_with($path, '/storage/') || str_starts_with($path, '/images/')) {
-                    return $path;
-                }
-
-                if (str_starts_with($path, 'storage/')) {
-                    return '/' . $path;
-                }
-
-                return '/storage/' . ltrim($path, '/');
-            };
-
-            $images = is_array($project->images) ? $project->images : [];
-            $normalizedImages = collect($images)
-                ->filter(fn ($image) => is_string($image) && trim($image) !== '')
-                ->map(fn ($image) => $normalizePath($image))
-                ->values()
-                ->all();
-
-            $project->images = $normalizedImages;
-            $project->thumbnail = $normalizePath($project->thumbnail);
-            $project->project_document = $normalizePath($project->project_document);
-            $project->image = $project->thumbnail ?: ($normalizedImages[0] ?? null);
+            // Accessors in Project model now handle normalization for:
+            // thumbnail, project_document, images, files
+            
+            // image property is a fallback for frontend
+            $project->image = $project->thumbnail ?: ($project->images[0] ?? null);
 
             return $project;
         });

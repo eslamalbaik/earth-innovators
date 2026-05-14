@@ -210,8 +210,8 @@ export default function ProjectsIndex({ auth, projects, userRole, viewMode = 'pu
                         const ageRange = project.age_range || t('projects.ageUnknown');
                         const schoolName = project.school?.name || t('projects.middleSchoolDefault');
                         const teacherName = project.teacher?.name_ar || project.user?.name || t('projects.teacherNameDefault');
-                        const likes = project.likes || 24;
-                        const comments = project.comments_count || 8;
+                        const likes = project.likes ?? 0;
+                        const comments = project.comments_count ?? 0;
                         const isLiked = project.is_liked || false;
 
                         return (

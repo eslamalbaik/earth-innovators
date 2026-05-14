@@ -285,20 +285,9 @@ class TeacherProjectController extends Controller
 
         $project->load(['school', 'approver', 'user', 'teacher', 'submissions.student']);
 
-        // Format files and images URLs
-        $files = [];
-        if ($project->files && is_array($project->files)) {
-            foreach ($project->files as $file) {
-                $files[] = $file;
-            }
-        }
-
-        $images = [];
-        if ($project->images && is_array($project->images)) {
-            foreach ($project->images as $image) {
-                $images[] = $image;
-            }
-        }
+        // Accessors in Project model handle URL normalization for thumbnail, images, etc.
+        $images = $project->images;
+        $files = $project->files;
 
         // Format submissions
         $submissions = $project->submissions->map(function ($submission) {

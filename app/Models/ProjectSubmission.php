@@ -45,4 +45,14 @@ class ProjectSubmission extends Model
     {
         return $this->belongsTo(User::class, 'reviewed_by');
     }
+
+    public function getFilesAttribute($value): array
+    {
+        $files = is_string($value) ? json_decode($value, true) : $value;
+        if (!is_array($files)) {
+            return [];
+        }
+
+        return array_map(fn($file) => \App\Support\StorageUrl::url($file), $files);
+    }
 }

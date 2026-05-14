@@ -114,4 +114,33 @@ class Project extends Model
         return $this->hasMany(AcceptanceCriterion::class)->ordered();
     }
 
+    public function getThumbnailAttribute($value): ?string
+    {
+        return \App\Support\StorageUrl::url($value);
+    }
+
+    public function getProjectDocumentAttribute($value): ?string
+    {
+        return \App\Support\StorageUrl::url($value);
+    }
+
+    public function getImagesAttribute($value): array
+    {
+        $images = is_string($value) ? json_decode($value, true) : $value;
+        if (!is_array($images)) {
+            return [];
+        }
+
+        return array_map(fn($image) => \App\Support\StorageUrl::url($image), $images);
+    }
+
+    public function getFilesAttribute($value): array
+    {
+        $files = is_string($value) ? json_decode($value, true) : $value;
+        if (!is_array($files)) {
+            return [];
+        }
+
+        return array_map(fn($file) => \App\Support\StorageUrl::url($file), $files);
+    }
 }

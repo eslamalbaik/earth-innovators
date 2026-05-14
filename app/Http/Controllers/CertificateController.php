@@ -129,7 +129,7 @@ class CertificateController extends Controller
                     'certificate_number' => $certificate->certificate_number,
                     'file_path' => $certificate->file_path,
                     'download_url' => route('certificates.download', $certificate->id),
-                    'storage_url' => $certificate->file_path ? url('/storage/' . $certificate->file_path) : null,
+                    'storage_url' => $certificate->file_path ? \App\Support\StorageUrl::url($certificate->file_path) : null,
                     'status' => $certificate->status,
                 ],
             ]);
