@@ -64,7 +64,8 @@ class SearchService extends BaseService
 
             // Filters
             if (!empty($filters['city'])) {
-                $query->where('city', $filters['city']);
+                $cityValues = is_array($filters['city']) ? $filters['city'] : [$filters['city']];
+                $query->whereIn('city', array_values(array_filter($cityValues)));
             }
 
             if (!empty($filters['subject'])) {
@@ -215,7 +216,7 @@ class SearchService extends BaseService
             return collect([]);
         }
 
-        $cacheKey = 'search_suggestions_' . md5($query);
+        $cacheKey = 'search_suggestions_v2_' . md5($query);
         $cacheTag = 'search_suggestions';
 
         return $this->cacheTags($cacheTag, $cacheKey, function () use ($query) {
@@ -281,13 +282,21 @@ class SearchService extends BaseService
             $suggestions = $suggestions->merge($subjects);
 
             // Cities
-            $cities = Teacher::where('is_active', true)
-                ->where('city', 'like', "{$primaryWord}%")
-                ->orWhere('city', 'like', "%{$query}%")
-                ->distinct()
+            $cities = Teacher::query()
+                ->where('is_active', true)
+                ->where('is_verified', true)
+                ->whereNotNull('city')
+                ->where(function ($q) use ($primaryWord, $query) {
+                    $q->where('city', 'like', "{$primaryWord}%")
+                        ->orWhere('city', 'like', "%{$query}%");
+                })
+                ->select('city')
+                ->groupBy('city')
+                ->orderByRaw('CASE WHEN city LIKE ? THEN 1 ELSE 2 END', ["{$primaryWord}%"])
+                ->orderBy('city')
+                ->limit(3)
                 ->pluck('city')
                 ->filter()
-                ->take(3)
                 ->map(function ($city) {
                     return [
                         'type' => 'city',
@@ -301,12 +310,16 @@ class SearchService extends BaseService
             $suggestions = $suggestions->merge($cities);
 
             // Stages
+            $stageQuery = mb_strtolower($query);
             $stages = Teacher::where('is_active', true)
-                ->get()
+                ->where('is_verified', true)
+                ->whereRaw('LOWER(JSON_EXTRACT(stages, "$")) LIKE ?', ['%' . $stageQuery . '%'])
+                ->limit(50)
+                ->get(['stages'])
                 ->pluck('stages')
                 ->flatten()
                 ->filter(function ($stage) use ($query) {
-                    return mb_stripos($stage, $query) !== false;
+                    return is_string($stage) && mb_stripos($stage, $query) !== false;
                 })
                 ->unique()
                 ->take(3)

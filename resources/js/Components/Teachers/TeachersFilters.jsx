@@ -2,6 +2,19 @@ import { useState } from 'react';
 import { FaSearch, FaPlus, FaMinus } from 'react-icons/fa';
 import { useTranslation } from '@/i18n';
 
+const MAX_VISIBLE_FILTER_OPTIONS = 60;
+
+const normalizeSearchText = (value = '') => String(value)
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u064B-\u065F\u0670]/g, '')
+    .replace(/[إأآا]/g, 'ا')
+    .replace(/ى/g, 'ي')
+    .replace(/ؤ/g, 'و')
+    .replace(/ئ/g, 'ي')
+    .replace(/ة/g, 'ه')
+    .trim();
+
 export default function TeachersFilters({
     filters,
     onFilterChange,
@@ -17,6 +30,7 @@ export default function TeachersFilters({
         rating: false,
         sessions: false
     });
+    const [sectionSearch, setSectionSearch] = useState({});
 
     const toggleSection = (section) => {
         setExpandedSections(prev => ({
@@ -35,6 +49,23 @@ export default function TeachersFilters({
 
     const FilterSection = ({ title, sectionKey, items, searchPlaceholder }) => {
         const safeItems = Array.isArray(items) ? items : [];
+        const sectionSearchValue = sectionSearch[sectionKey] || '';
+        const normalizedSearch = normalizeSearchText(sectionSearchValue);
+        const isItemChecked = (item) => {
+            const filterValue = filters[sectionKey];
+
+            return Array.isArray(filterValue)
+                ? filterValue.includes(item.value)
+                : filterValue === item.value;
+        };
+        const filteredItems = normalizedSearch
+            ? safeItems.filter((item) => normalizeSearchText(`${item.label || ''} ${item.value || ''}`).includes(normalizedSearch))
+            : safeItems;
+        const selectedItems = safeItems.filter(isItemChecked);
+        const visibleItems = [
+            ...selectedItems,
+            ...filteredItems.filter((item) => !isItemChecked(item)),
+        ].slice(0, MAX_VISIBLE_FILTER_OPTIONS);
 
         return (
             <div className="border border-gray-200 py-3 rounded-lg p-3">
@@ -59,6 +90,11 @@ export default function TeachersFilters({
                                 <input
                                     type="text"
                                     placeholder={searchPlaceholder}
+                                    value={sectionSearchValue}
+                                    onChange={(e) => setSectionSearch((prev) => ({
+                                        ...prev,
+                                        [sectionKey]: e.target.value
+                                    }))}
                                     className="w-full  text-gray-900 px-3 py-2 pe-10 rounded-lg border-0 focus:ring-2 focus:ring-yellow-400 focus:outline-none "
                                 />
                                 <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -66,13 +102,9 @@ export default function TeachersFilters({
                         )}
 
                         <div className="space-y-3">
-                            {safeItems.length > 0 ? (
-                                safeItems.map((item) => {
-                                    const filterValue = filters[sectionKey];
-                                    const isArray = Array.isArray(filterValue);
-                                    const isChecked = isArray
-                                        ? filterValue.includes(item.value)
-                                        : filterValue === item.value;
+                            {visibleItems.length > 0 ? (
+                                visibleItems.map((item) => {
+                                    const isChecked = isItemChecked(item);
 
                                     return (
                                         <label key={item.value} className="flex items-center justify-between cursor-pointer">

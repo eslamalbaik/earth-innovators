@@ -12,16 +12,22 @@ export default function StudentProjectsIndex({ auth, projects, message, noticeKe
     const isRtl = dir === 'rtl';
     const [filter, setFilter] = useState('all'); // all | pending | evaluated | winners
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+    const getRatingValue = (rating) => {
+        const value = Number(rating);
+        return Number.isFinite(value) ? value : 0;
+    };
 
     // Map project status to filter categories
     const getProjectStatus = (project) => {
+        const rating = getRatingValue(project.rating);
+
         // If project has submission status, use it
         if (project.submission_status) {
             if (project.submission_status === 'pending' || project.submission_status === 'under_review') {
                 return 'pending';
             }
             if (project.submission_status === 'evaluated' || project.submission_status === 'approved') {
-                return project.rating >= 4.5 ? 'winners' : 'evaluated';
+                return rating >= 4.5 ? 'winners' : 'evaluated';
             }
         }
         // Otherwise use project status
@@ -29,7 +35,7 @@ export default function StudentProjectsIndex({ auth, projects, message, noticeKe
             return 'pending';
         }
         if (project.status === 'approved' || project.status === 'evaluated') {
-            return project.rating >= 4.5 ? 'winners' : 'evaluated';
+            return rating >= 4.5 ? 'winners' : 'evaluated';
         }
         return 'evaluated';
     };
@@ -168,6 +174,8 @@ export default function StudentProjectsIndex({ auth, projects, message, noticeKe
                         const statusInfo = getStatusLabel(project);
                         const categoryLabel = getCategoryLabel(project.category);
                         const projectDate = formatDate(project.submitted_at || project.created_at || project.approved_at);
+                        const rating = getRatingValue(project.rating);
+                        const pointsEarned = Number(project.points_earned) || 0;
 
                         return (
                             <div
@@ -212,18 +220,18 @@ export default function StudentProjectsIndex({ auth, projects, message, noticeKe
                                     </div>
 
                                     {/* Rating and Points */}
-                                    {(project.rating > 0 || project.points_earned > 0) && (
+                                    {(rating > 0 || pointsEarned > 0) && (
                                         <div className="flex items-center gap-3 mt-2">
-                                            {project.rating > 0 && (
+                                            {rating > 0 && (
                                                 <div className="flex items-center gap-1 text-xs text-yellow-600">
                                                     <FaStar className="text-yellow-500" />
-                                                    <span className="font-semibold">{project.rating.toFixed(1)}</span>
+                                                    <span className="font-semibold">{rating.toFixed(1)}</span>
                                                 </div>
                                             )}
-                                            {project.points_earned > 0 && (
+                                            {pointsEarned > 0 && (
                                                 <div className="flex items-center gap-1 text-xs text-blue-600">
                                                     <FaTrophy className="text-blue-500" />
-                                                    <span className="font-semibold">{t('studentProjects.pointsCount', { count: project.points_earned })}</span>
+                                                    <span className="font-semibold">{t('studentProjects.pointsCount', { count: pointsEarned })}</span>
                                                 </div>
                                             )}
                                         </div>

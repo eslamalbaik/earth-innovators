@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import MainLayout from '../Layouts/MainLayout';
 import TeachersFilters from '../Components/Teachers/TeachersFilters';
 import TeacherCard from '../Components/Teachers/TeacherCard';
@@ -7,8 +7,18 @@ import CTASection from '../Components/Sections/CTASection';
 import SectionTitle from '../Components/SectionTitle';
 import { useTranslation } from '@/i18n';
 
+const SEARCH_DEBOUNCE_MS = 350;
+
 export default function Teachers({ auth, teachers = [], filters: initialFilters = {}, filterOptions = {} }) {
     const { t } = useTranslation();
+    const searchTimeoutRef = useRef(null);
+
+    useEffect(() => () => {
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+    }, []);
+
     const normalizeFilterValue = (value) => {
         if (!value || value === '') return '';
         if (Array.isArray(value)) return value;
@@ -44,19 +54,27 @@ export default function Teachers({ auth, teachers = [], filters: initialFilters 
 
         router.get('/teachers', cleanFilters, {
             preserveState: true,
+            preserveScroll: true,
             replace: true,
+            only: ['teachers', 'filters'],
         });
     };
 
     const handleFilterChange = (filterType, value) => {
         const newFilters = { ...filters, [filterType]: value };
         setFilters(newFilters);
-        applyFilters(newFilters);
-    };
 
-    const handleSearchChange = (value) => {
-        const newFilters = { ...filters, search: value };
-        setFilters(newFilters);
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+
+        if (filterType === 'search') {
+            searchTimeoutRef.current = setTimeout(() => {
+                applyFilters(newFilters);
+            }, SEARCH_DEBOUNCE_MS);
+            return;
+        }
+
         applyFilters(newFilters);
     };
 

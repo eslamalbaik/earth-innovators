@@ -8,7 +8,7 @@ function ProjectCard({ project, onOpen, t }) {
     const title = project.title || t('homePage.projectUntitled');
     const views = project.views ?? 0;
     const likes = project.likes ?? 0;
-    const rating = project.rating ?? null;
+    const rating = project.rating == null ? null : Number(project.rating);
     const createdAt = project.created_at || '';
     const isPlaceholder = !project.id || project.id.toString().startsWith('placeholder-');
     const status = project.status || 'pending';
@@ -114,7 +114,7 @@ function ProjectCard({ project, onOpen, t }) {
                         <FaHeart className="text-rose-400" />
                         <span>{likes}</span>
                     </div>
-                    {rating !== null && (
+                    {Number.isFinite(rating) && (
                         <div className="flex items-center gap-1">
                             <FaStar className="text-yellow-400" />
                             <span>{rating.toFixed(1)}</span>

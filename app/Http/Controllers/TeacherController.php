@@ -122,7 +122,7 @@ class TeacherController extends Controller
             }
         }
 
-        $filterOptions = Cache::remember('teacher_filter_options_v2', 3600, function () {
+        $filterOptions = Cache::remember('teacher_filter_options_v3', 3600, function () {
             $cities = Teacher::where('is_active', true)
                 ->where('is_verified', true)
                 ->whereNotNull('city')
@@ -131,16 +131,8 @@ class TeacherController extends Controller
                 ->orderBy('count', 'desc')
                 ->get()
                 ->map(function ($item) {
-                    $cityMap = [
-                        'الرياض' => 'riyadh',
-                        'جدة' => 'jeddah',
-                        'الدمام' => 'dammam',
-                        'مكة' => 'mecca',
-                        'المدينة' => 'medina',
-                        'رابغ' => 'rabigh',
-                    ];
                     return [
-                        'value' => $cityMap[$item->city] ?? strtolower(str_replace(' ', '_', $item->city)),
+                        'value' => $item->city,
                         'label' => $item->city,
                         'count' => $item->count,
                     ];
