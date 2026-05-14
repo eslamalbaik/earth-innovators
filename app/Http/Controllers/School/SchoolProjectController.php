@@ -140,6 +140,9 @@ class SchoolProjectController extends Controller
 
         $project->save();
 
+        // مسح كاش المشاريع للمدرسة
+        $this->projectService->clearProjectCache(schoolId: $school->id);
+
         // إرسال إشعار لجميع الطلاب في المدرسة
         \App\Jobs\SendNewProjectNotification::dispatch($project);
 
@@ -228,6 +231,9 @@ class SchoolProjectController extends Controller
             'approved_by' => $project->approved_by,
         ]);
 
+        // مسح كاش المشاريع للمدرسة
+        $this->projectService->clearProjectCache(schoolId: $school->id);
+
         // إرسال حدث قبول المشروع
         \App\Events\ProjectApproved::dispatch($project);
 
@@ -295,6 +301,9 @@ class SchoolProjectController extends Controller
             'approved_by' => $school->id,
             'approved_at' => now(),
         ]);
+
+        // مسح كاش المشاريع للمدرسة
+        $this->projectService->clearProjectCache(schoolId: $school->id);
 
         // إرسال حدث رفض المشروع
         \App\Events\ProjectRejected::dispatch($project);
@@ -465,6 +474,9 @@ class SchoolProjectController extends Controller
 
         $project->save();
 
+        // مسح كاش المشاريع للمدرسة
+        $this->projectService->clearProjectCache(schoolId: $school->id);
+
         return redirect()->route('school.projects.index')
             ->with('success', [
                 'key' => 'toastMessages.schoolProjectUpdatedSuccess',
@@ -506,6 +518,9 @@ class SchoolProjectController extends Controller
         }
 
         $project->delete();
+
+        // مسح كاش المشاريع للمدرسة
+        $this->projectService->clearProjectCache(schoolId: $school->id);
 
         return redirect()->route('school.projects.index')
             ->with('success', [
