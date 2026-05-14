@@ -203,10 +203,18 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
                             <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-xs font-bold border border-gray-200">
                                 {t(`common.categories.${project.category || 'other'}`)}
                             </span>
-                            <div className="flex items-center gap-1 text-gray-600 text-xs">
-                                <FaEye />
-                                <span>{project.views || 0}</span>
-                            </div>
+                            {project.views > 0 && (
+                                <div className="flex items-center gap-1 text-gray-600 text-xs">
+                                    <FaEye />
+                                    <span>{project.views}</span>
+                                </div>
+                            )}
+                            {project.likes > 0 && (
+                                <div className="flex items-center gap-1 text-gray-600 text-xs">
+                                    <FaHeart className="text-red-500 fill-current" />
+                                    <span>{project.likes}</span>
+                                </div>
+                            )}
                         </div>
 
                         <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">

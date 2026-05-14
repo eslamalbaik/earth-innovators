@@ -249,14 +249,18 @@ export default function ProjectsIndex({ auth, projects, userRole, viewMode = 'pu
                                         {ageRange} • {schoolName} • {teacherName}
                                     </div>
                                     <div className="flex items-center gap-3 text-xs text-gray-500">
-                                        <div className="flex items-center gap-1">
-                                            <FaHeart className={isLiked ? 'text-red-500 fill-current' : 'text-gray-400'} />
-                                            <span>{likes}</span>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                            <FaComment className="text-gray-400" />
-                                            <span>{comments}</span>
-                                        </div>
+                                        {likes > 0 && (
+                                            <div className="flex items-center gap-1">
+                                                <FaHeart className={isLiked ? 'text-red-500 fill-current' : 'text-gray-400'} />
+                                                <span>{likes}</span>
+                                            </div>
+                                        )}
+                                        {comments > 0 && (
+                                            <div className="flex items-center gap-1">
+                                                <FaComment className="text-gray-400" />
+                                                <span>{comments}</span>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </Link>
