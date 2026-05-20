@@ -1,5 +1,6 @@
 import { FaWhatsapp } from 'react-icons/fa';
 import { useTranslation } from '@/i18n';
+import { resolveSupportWhatsAppDigits } from '@/constants/supportContact';
 
 function normalizeWhatsAppHref(value) {
     if (!value || typeof value !== 'string') {
@@ -25,8 +26,7 @@ function normalizeWhatsAppHref(value) {
 
 export default function WhatsAppSupportButton() {
     const { t } = useTranslation();
-    const supportWhatsApp = import.meta.env.VITE_SUPPORT_WHATSAPP || import.meta.env.VITE_SUPPORT_PHONE || '';
-    const href = normalizeWhatsAppHref(supportWhatsApp);
+    const href = normalizeWhatsAppHref(resolveSupportWhatsAppDigits());
 
     if (!href) {
         return null;

@@ -601,9 +601,8 @@ export default function DashboardLayout({ children, header }) {
                         </button>
                     )}
                     <div className="w-full flex justify-center items-center gap-3">
-                        <Link href="/" className="flex items-center gap-3">
+                        <Link href="/" className="flex items-center">
                             <ApplicationLogo />
-                            <span className="text-lg font-bold bg-[#A3C042] bg-clip-text text-transparent">{t('common.appName')}</span>
                         </Link>
                     </div>
                     {auth?.user && (

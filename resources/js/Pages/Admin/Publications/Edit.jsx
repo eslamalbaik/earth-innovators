@@ -6,7 +6,7 @@ import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
-import TiptapEditor from '@/Components/TiptapEditor';
+import PublicationBilingualFields, { publicationBilingualFormIsValid } from '@/Components/Publications/PublicationBilingualFields';
 import { getPublicationImageUrl, getPublicationFileUrl } from '@/utils/imageUtils';
 import { useTranslation } from '@/i18n';
 
@@ -17,8 +17,11 @@ export default function AdminPublicationEdit({ publication, schools }) {
         _method: 'PUT',
         type:           publication?.type || 'magazine',
         title:          publication?.title || '',
+        title_ar:       publication?.title_ar || '',
         description:    publication?.description || '',
+        description_ar: publication?.description_ar || '',
         content:        publication?.content || '',
+        content_ar:     publication?.content_ar || '',
         cover_image:    null,
         file:           null,
         youtube_url:    publication?.youtube_url || '',
@@ -86,46 +89,7 @@ export default function AdminPublicationEdit({ publication, schools }) {
                             <InputError message={errors.type} className="mt-2" />
                         </div>
 
-                        {/* Title */}
-                        <div>
-                            <InputLabel htmlFor="title" value={t('adminPublicationCreatePage.form.titleLabel')} />
-                            <TextInput
-                                id="title"
-                                type="text"
-                                value={data.title}
-                                onChange={(e) => setData('title', e.target.value)}
-                                className="mt-1 block w-full"
-                                required
-                            />
-                            <InputError message={errors.title} className="mt-2" />
-                        </div>
-
-                        {/* Description */}
-                        <div>
-                            <InputLabel htmlFor="description" value={t('adminPublicationCreatePage.form.descriptionLabel')} />
-                            <textarea
-                                id="description"
-                                value={data.description}
-                                onChange={(e) => setData('description', e.target.value)}
-                                rows={4}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
-                            />
-                            <InputError message={errors.description} className="mt-2" />
-                        </div>
-
-                        {/* Content */}
-                        <div>
-                            <InputLabel htmlFor="content" value={t('adminPublicationCreatePage.form.contentLabel')} />
-                            <div className="mt-1">
-                                <TiptapEditor
-                                    key={publication?.id}
-                                    content={data.content}
-                                    onChange={(html) => setData('content', html)}
-                                    placeholder={t('adminPublicationCreatePage.form.contentPlaceholder')}
-                                />
-                            </div>
-                            <InputError message={errors.content} className="mt-2" />
-                        </div>
+                        <PublicationBilingualFields data={data} setData={setData} errors={errors} />
 
                         {/* School */}
                         {schools && schools.length > 0 && (
@@ -275,7 +239,7 @@ export default function AdminPublicationEdit({ publication, schools }) {
                             >
                                 {t('common.cancel')}
                             </Link>
-                            <PrimaryButton disabled={processing} className="bg-[#A3C042]">
+                            <PrimaryButton disabled={processing || !publicationBilingualFormIsValid(data)} className="bg-[#A3C042]">
                                 {processing ? (
                                     <>
                                         <FaSpinner className="me-2 inline-block animate-spin" />

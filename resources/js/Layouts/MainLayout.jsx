@@ -33,15 +33,14 @@ export default function MainLayout({ children, auth }) {
         <div className="min-h-screen bg-white flex flex-col" dir={dir}>
             <header className="bg-[#A3C042] sticky top-0 z-50 shadow-md">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-16">
+                    <div className="flex justify-between items-center h-[4.5rem]">
                         <div className="flex-shrink-0">
-                            <Link href="/" className="flex items-center space-x-3 space-x-reverse">
+                            <Link href="/" className="flex items-center">
                                 <img
                                     src="/images/logo-modified.png"
                                     alt={t('header.appName')}
-                                    className="h-8 w-auto object-contain"
+                                    className="h-16 w-auto max-w-[340px] object-contain"
                                 />
-                                <p className="text-white text-2xl font-bold">{t('header.appName')}</p>
                             </Link>
                         </div>
 

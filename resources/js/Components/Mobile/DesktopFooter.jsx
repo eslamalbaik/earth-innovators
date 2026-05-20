@@ -17,6 +17,7 @@ import {
 } from 'react-icons/fa';
 import { useTranslation } from '@/i18n';
 import WhatsAppSupportButton from '@/Components/Support/WhatsAppSupportButton';
+import { resolveSupportPhoneDisplay, resolveSupportPhoneE164, supportTelHref } from '@/constants/supportContact';
 
 export default function DesktopFooter({ auth }) {
     const { t } = useTranslation();
@@ -24,7 +25,8 @@ export default function DesktopFooter({ auth }) {
     const isAuthed = !!user;
     
     const supportEmail = 'info@earthinnovators.ae';
-    const supportPhone = '+971544405004';
+    const supportPhone = resolveSupportPhoneDisplay();
+    const supportPhoneTel = supportTelHref(resolveSupportPhoneE164());
     const supportAddress = 'دبي، الإمارات العربية المتحدة';
 
     const quickLinks = [
@@ -46,7 +48,7 @@ export default function DesktopFooter({ auth }) {
     ].filter((link) => Boolean(link.href));
 
     const contactInfo = [
-        { icon: FaPhone, text: supportPhone, href: `tel:${supportPhone.replace(/[^\d+]/g, '')}` },
+        { icon: FaPhone, text: supportPhone, href: supportPhoneTel },
         { icon: FaEnvelope, text: supportEmail, href: `mailto:${supportEmail}` },
         { icon: FaMapMarkerAlt, text: supportAddress },
     ].filter(Boolean);
@@ -64,18 +66,12 @@ export default function DesktopFooter({ auth }) {
             <div className="mx-auto max-w-7xl px-6 pb-4 pt-8">
                 <div className="mb-8 grid grid-cols-1 gap-8 lg:grid-cols-4">
                     <div className="lg:col-span-1">
-                        <Link href="/" className="mb-4 flex items-center gap-3">
+                        <Link href="/" className="mb-4 flex items-center">
                             <img
                                 src="/images/logo-modified.png"
                                 alt={t('header.appName')}
-                                className="h-12 w-auto object-contain"
+                                className="h-14 w-auto max-w-[320px] object-contain"
                             />
-                            <div>
-                                <div className="bg-gradient-to-r from-[#A3C042] to-[#8CA635] bg-clip-text text-xl font-extrabold text-transparent">
-                                    {t('header.appName')}
-                                </div>
-                                <div className="text-xs text-gray-400">{t('footer.brandSubtitle')}</div>
-                            </div>
                         </Link>
                         <p className="mb-4 text-sm leading-relaxed text-gray-400">
                             {t('sections.whyChooseSubtitle')}

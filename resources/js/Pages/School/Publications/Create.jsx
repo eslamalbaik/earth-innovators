@@ -7,7 +7,7 @@ import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
-import TiptapEditor from '@/Components/TiptapEditor';
+import PublicationBilingualFields, { publicationBilingualFormIsValid } from '@/Components/Publications/PublicationBilingualFields';
 
 const publicationTypeOptions = ['magazine', 'booklet', 'report', 'article'];
 
@@ -18,8 +18,11 @@ export default function SchoolPublicationCreate({ auth }) {
     const { data, setData, post, processing, errors } = useForm({
         type: 'magazine',
         title: '',
+        title_ar: '',
         description: '',
+        description_ar: '',
         content: '',
+        content_ar: '',
         cover_image: null,
         file: null,
         youtube_url: '',
@@ -108,43 +111,7 @@ export default function SchoolPublicationCreate({ auth }) {
                             <InputError message={errors.type} className="mt-2" />
                         </div>
 
-                        <div>
-                            <InputLabel htmlFor="title" value={t('schoolPublicationsPage.form.titleLabel')} />
-                            <TextInput
-                                id="title"
-                                type="text"
-                                value={data.title}
-                                onChange={(event) => setData('title', event.target.value)}
-                                className="mt-1 block w-full"
-                                required
-                            />
-                            <InputError message={errors.title} className="mt-2" />
-                        </div>
-
-                        <div>
-                            <InputLabel htmlFor="description" value={t('schoolPublicationsPage.form.descriptionLabel')} />
-                            <textarea
-                                id="description"
-                                value={data.description}
-                                onChange={(event) => setData('description', event.target.value)}
-                                rows={4}
-                                placeholder={t('schoolPublicationsPage.placeholders.description')}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
-                            />
-                            <InputError message={errors.description} className="mt-2" />
-                        </div>
-
-                        <div>
-                            <InputLabel htmlFor="content" value={t('schoolPublicationsPage.form.contentLabel')} />
-                            <div className="mt-1">
-                                <TiptapEditor
-                                    content={data.content}
-                                    onChange={(html) => setData('content', html)}
-                                    placeholder={t('schoolPublicationsPage.placeholders.content')}
-                                />
-                            </div>
-                            <InputError message={errors.content} className="mt-2" />
-                        </div>
+                        <PublicationBilingualFields data={data} setData={setData} errors={errors} />
 
                         <div>
                             <InputLabel htmlFor="cover_image" value={t('schoolPublicationsPage.form.coverImageLabel')} />
@@ -226,7 +193,7 @@ export default function SchoolPublicationCreate({ auth }) {
                             >
                                 {t('common.cancel')}
                             </Link>
-                            <PrimaryButton disabled={processing} className="bg-[#A3C042]">
+                            <PrimaryButton disabled={processing || !publicationBilingualFormIsValid(data)} className="bg-[#A3C042]">
                                 {processing ? (
                                     <>
                                         <FaSpinner className="me-2 inline-block animate-spin" />

@@ -4818,7 +4818,7 @@ export const en = {
             "phoneLabel": "Phone",
             "addressLabel": "Address",
             "email": "info@earthinnovators.ae",
-            "phone": "+971544405004",
+            "phone": "+971 54 440 5004",
             "address": "Dubai, United Arab Emirates"
         },
         "socialTitle": "Follow Us"
@@ -5142,7 +5142,7 @@ export const en = {
         "contactUs": "Contact Us",
         "dubai": "Dubai, United Arab Emirates",
         "email": "info@innovatorslegacy.ae",
-        "phone": "+971 4 XXX XXXX"
+        "phone": "+971 54 440 5004"
     },
     "countries": {
         "uae": "United Arab Emirates",
@@ -5835,6 +5835,22 @@ export const en = {
             "news": "News",
             "other": "Other"
         }
+    },
+    "publicationForm": {
+        "localeAr": "Arabic",
+        "localeEn": "English",
+        "titleArLabel": "Article title (Arabic)",
+        "titleArPlaceholder": "Enter article title in Arabic",
+        "titleEnLabel": "Article title (English)",
+        "titleEnPlaceholder": "Enter article title in English",
+        "descriptionArLabel": "Short description (Arabic)",
+        "descriptionArPlaceholder": "Enter a short description in Arabic",
+        "descriptionEnLabel": "Short description (English)",
+        "descriptionEnPlaceholder": "Enter a short description in English",
+        "contentArLabel": "Article content (Arabic)",
+        "contentArPlaceholder": "Enter article content in Arabic...",
+        "contentEnLabel": "Article content (English)",
+        "contentEnPlaceholder": "Enter article content in English..."
     },
     "teacherPublicationCreatePage": {
         "pageTitle": "Create New Article - {appName}",

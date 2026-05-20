@@ -35,7 +35,7 @@ export default function ConfirmPassword() {
                                     <img
                                         src="/images/logo-modified.png"
                                         alt={t('common.appName')}
-                                        className="h-24 w-auto object-contain"
+                                        className="h-28 w-auto max-w-[360px] object-contain"
                                     />
                                 </div>
                             </div>

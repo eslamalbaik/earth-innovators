@@ -35,15 +35,13 @@
             text-align: center;
         }
         .header .logo {
-            width: 80px;
-            height: 80px;
             margin: 0 auto 20px;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
+        }
+        .header .logo img {
+            max-width: 280px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
         }
         .header h1 {
             font-size: 28px;
@@ -195,7 +193,9 @@
 <body>
     <div class="email-container">
         <div class="header">
-            <div class="logo">📚</div>
+            <div class="logo">
+                <img src="{{ url('images/logo-modified.png') }}" alt="{{ config('app.name', 'إرث المبتكرين') }}" />
+            </div>
             <h1>تم تأكيد حجزك بنجاح!</h1>
             <p>نحن سعداء بإتمام عملية الحجز</p>
         </div>

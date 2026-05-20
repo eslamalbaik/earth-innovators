@@ -64,6 +64,12 @@ class HandleInertiaRequests extends Middleware
             'ziggy' => fn () => [
                 'url' => $request->url(),
             ],
+            'supportContact' => [
+                'phoneLocal' => config('support.phone_local'),
+                'phoneE164' => config('support.phone_e164'),
+                'phoneDisplay' => config('support.phone_display'),
+                'whatsapp' => config('support.whatsapp'),
+            ],
             // Subscription/Trial banner data — lightweight, computed once per request
             'subscription' => function () use ($user) {
                 if (!$user || in_array($user->role, ['admin'])) {

@@ -6,7 +6,7 @@ import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
-import TiptapEditor from '@/Components/TiptapEditor';
+import PublicationBilingualFields, { publicationBilingualFormIsValid } from '@/Components/Publications/PublicationBilingualFields';
 import { useTranslation } from '@/i18n';
 
 export default function AdminPublicationCreate({ schools }) {
@@ -14,8 +14,11 @@ export default function AdminPublicationCreate({ schools }) {
     const { data, setData, post, processing, errors } = useForm({
         type: 'magazine',
         title: '',
+        title_ar: '',
         description: '',
+        description_ar: '',
         content: '',
+        content_ar: '',
         cover_image: null,
         file: null,
         youtube_url: '',
@@ -77,42 +80,12 @@ export default function AdminPublicationCreate({ schools }) {
                             <InputError message={errors.type} className="mt-2" />
                         </div>
 
-                        <div>
-                            <InputLabel htmlFor="title" value={t('adminPublicationCreatePage.form.titleLabel')} />
-                            <TextInput
-                                id="title"
-                                type="text"
-                                value={data.title}
-                                onChange={(e) => setData('title', e.target.value)}
-                                className="mt-1 block w-full"
-                                required
-                            />
-                            <InputError message={errors.title} className="mt-2" />
-                        </div>
-
-                        <div>
-                            <InputLabel htmlFor="description" value={t('adminPublicationCreatePage.form.descriptionLabel')} />
-                            <textarea
-                                id="description"
-                                value={data.description}
-                                onChange={(e) => setData('description', e.target.value)}
-                                rows={4}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                            />
-                            <InputError message={errors.description} className="mt-2" />
-                        </div>
-
-                        <div>
-                            <InputLabel htmlFor="content" value={t('adminPublicationCreatePage.form.contentLabel')} />
-                            <div className="mt-1">
-                                <TiptapEditor
-                                    content={data.content}
-                                    onChange={(html) => setData('content', html)}
-                                    placeholder={t('adminPublicationCreatePage.form.contentPlaceholder')}
-                                />
-                            </div>
-                            <InputError message={errors.content} className="mt-2" />
-                        </div>
+                        <PublicationBilingualFields
+                            data={data}
+                            setData={setData}
+                            errors={errors}
+                            focusRingClass="focus:border-blue-500 focus:ring-blue-500"
+                        />
 
                         {schools && schools.length > 0 && (
                             <div>
@@ -215,7 +188,7 @@ export default function AdminPublicationCreate({ schools }) {
                                 {t('common.cancel')}
                             </Link>
                             <PrimaryButton
-                                disabled={processing}
+                                disabled={processing || !publicationBilingualFormIsValid(data)}
                                 className="bg-[#A3C042] hover:bg-blue-700"
                             >
                                 {processing ? (

@@ -38,9 +38,8 @@ export default function AdminLayout({ children, title = null }) {
                     >
                         <FaBars />
                     </button>
-                    <Link href="/" className="flex items-center gap-3">
+                    <Link href="/" className="flex items-center">
                         <ApplicationLogo />
-                        <span className="text-lg font-bold bg-[#A3C042] bg-clip-text text-transparent">{t('common.appName')}</span>
                     </Link>
                     <div className="text-xs text-gray-500 mt-1">
                         {t('adminLayout.subtitle')}

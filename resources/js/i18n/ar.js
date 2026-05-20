@@ -1604,7 +1604,7 @@ export const ar = {
         "contactUs": "اتصل بنا",
         "dubai": "دبي، الإمارات العربية المتحدة",
         "email": "info@innovatorslegacy.ae",
-        "phone": "+971 4 XXX XXXX"
+        "phone": "+971 54 440 5004"
     },
     "countries": {
         "uae": "الإمارات العربية المتحدة",
@@ -5417,7 +5417,7 @@ export const ar = {
             "phoneLabel": "الهاتف",
             "addressLabel": "العنوان",
             "email": "info@earthinnovators.ae",
-            "phone": "+971544405004",
+            "phone": "+971 54 440 5004",
             "address": "دبي، الإمارات العربية المتحدة"
         },
         "socialTitle": "تابعونا"
@@ -5910,6 +5910,22 @@ export const ar = {
             "news": "خبر",
             "other": "أخرى"
         }
+    },
+    "publicationForm": {
+        "localeAr": "العربية",
+        "localeEn": "English",
+        "titleArLabel": "عنوان المقال (عربي)",
+        "titleArPlaceholder": "أدخل عنوان المقال بالعربية",
+        "titleEnLabel": "عنوان المقال (إنجليزي)",
+        "titleEnPlaceholder": "Enter article title in English",
+        "descriptionArLabel": "وصف مختصر (عربي)",
+        "descriptionArPlaceholder": "أدخل وصفًا مختصرًا بالعربية",
+        "descriptionEnLabel": "وصف مختصر (إنجليزي)",
+        "descriptionEnPlaceholder": "Enter a short description in English",
+        "contentArLabel": "محتوى المقال (عربي)",
+        "contentArPlaceholder": "أدخل محتوى المقال بالعربية...",
+        "contentEnLabel": "محتوى المقال (إنجليزي)",
+        "contentEnPlaceholder": "Enter article content in English..."
     },
     "teacherPublicationCreatePage": {
         "pageTitle": "إنشاء مقال جديد - {appName}",

@@ -90,7 +90,7 @@ export default function Login({ status, canResetPassword }) {
                                     <img
                                         src="/images/logo-modified.png"
                                         alt={t('header.appName')}
-                                        className="h-24 w-auto object-contain"
+                                        className="h-28 w-auto max-w-[360px] object-contain"
                                     />
                                 </div>
                             </div>

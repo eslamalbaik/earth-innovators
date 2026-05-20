@@ -83,13 +83,13 @@ export default function PublicationShow({
 
     const appName = t('common.appName');
 
-    const getLocalizedField = (field) => {
-        if (!publication) {
+    const getLocalizedField = (field, source = publication) => {
+        if (!source) {
             return '';
         }
 
-        const arabicValue = publication[`${field}_ar`];
-        const defaultValue = publication[field];
+        const arabicValue = source[`${field}_ar`];
+        const defaultValue = source[field];
 
         return language === 'ar'
             ? (arabicValue || defaultValue || '')
@@ -101,8 +101,8 @@ export default function PublicationShow({
     const publicationDescription = getLocalizedField('description');
     const publicationContent = stripDuplicateCoverImage(getLocalizedField('content'), coverImage);
 
-    const getRelatedTitle = (item) => item?.title_ar || item?.title || '';
-    const getRelatedDescription = (item) => item?.description_ar || item?.description || '';
+    const getRelatedTitle = (item) => getLocalizedField('title', item);
+    const getRelatedDescription = (item) => getLocalizedField('description', item);
     const getTypeLabel = (type) => {
         const labels = {
             magazine: t('sections.publications.types.magazine'),

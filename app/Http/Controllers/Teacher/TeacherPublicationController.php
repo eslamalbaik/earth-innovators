@@ -162,7 +162,7 @@ class TeacherPublicationController extends Controller
     /**
      * تحديث مقال
      */
-    public function update(Request $request, Publication $publication)
+    public function update(StorePublicationRequest $request, Publication $publication)
     {
         $user = Auth::user();
 
@@ -178,18 +178,7 @@ class TeacherPublicationController extends Controller
                 ->with('error', 'لا يمكن تعديل المقال بعد الموافقة عليه.');
         }
 
-        $validated = $request->validate([
-            'type' => 'required|in:magazine,booklet,report,article',
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'content' => 'nullable|string',
-            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'file' => 'nullable|file|mimes:pdf|max:10240',
-            'youtube_url' => 'nullable|url|max:500',
-            'issue_number' => 'nullable|integer|min:1',
-            'publish_date' => 'nullable|date',
-            'publisher_name' => 'nullable|string|max:255',
-        ]);
+        $validated = $request->validated();
 
         try {
             // Normalize empty youtube_url to null

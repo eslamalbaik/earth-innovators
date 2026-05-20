@@ -2,11 +2,11 @@ import DashboardLayout from '../../../Layouts/DashboardLayout';
 import { Head, useForm, router, Link } from '@inertiajs/react';
 import { useState, useRef } from 'react';
 import { FaUpload, FaImage, FaSpinner, FaTrash, FaYoutube } from 'react-icons/fa';
-import TextInput from '../../../Components/TextInput';
 import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
 import PrimaryButton from '../../../Components/PrimaryButton';
-import TiptapEditor from '../../../Components/TiptapEditor';
+import TextInput from '../../../Components/TextInput';
+import PublicationBilingualFields, { publicationBilingualFormIsValid } from '@/Components/Publications/PublicationBilingualFields';
 import { useBackIcon, useTranslation } from '@/i18n';
 
 export default function CreatePublication({ auth, school }) {
@@ -14,8 +14,11 @@ export default function CreatePublication({ auth, school }) {
     const BackIcon = useBackIcon();
     const { data, setData, post, processing, errors } = useForm({
         title: '',
+        title_ar: '',
         content: '',
+        content_ar: '',
         description: '',
+        description_ar: '',
         cover_image: null,
         youtube_url: '',
         type: 'magazine',
@@ -94,42 +97,7 @@ export default function CreatePublication({ auth, school }) {
             <div className="py-6">
                 <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
                     <form onSubmit={submit} className="bg-white rounded-xl shadow-lg p-6 space-y-6">
-                        <div>
-                            <InputLabel htmlFor="title" value={t('teacherPublicationCreatePage.titleLabel')} className="text-sm font-medium text-gray-700 mb-2" />
-                            <TextInput
-                                id="title"
-                                type="text"
-                                value={data.title}
-                                onChange={(e) => setData('title', e.target.value)}
-                                className="block w-full"
-                                placeholder={t('teacherPublicationCreatePage.titlePlaceholder')}
-                                required
-                            />
-                            <InputError message={errors.title} className="mt-2" />
-                        </div>
-
-                        <div>
-                            <InputLabel htmlFor="description" value={t('teacherPublicationCreatePage.descriptionLabel')} className="text-sm font-medium text-gray-700 mb-2" />
-                            <textarea
-                                id="description"
-                                value={data.description}
-                                onChange={(e) => setData('description', e.target.value)}
-                                rows={3}
-                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
-                                placeholder={t('teacherPublicationCreatePage.descriptionPlaceholder')}
-                            />
-                            <InputError message={errors.description} className="mt-2" />
-                        </div>
-
-                        <div>
-                            <InputLabel htmlFor="content" value={t('teacherPublicationCreatePage.contentLabel')} className="text-sm font-medium text-gray-700 mb-2" />
-                            <TiptapEditor
-                                content={data.content}
-                                onChange={(html) => setData('content', html)}
-                                placeholder={t('teacherPublicationCreatePage.contentPlaceholder')}
-                            />
-                            <InputError message={errors.content} className="mt-2" />
-                        </div>
+                        <PublicationBilingualFields data={data} setData={setData} errors={errors} />
 
                         <div>
                             <InputLabel value={t('teacherPublicationCreatePage.coverImageLabel')} className="text-sm font-medium text-gray-700 mb-2" />
@@ -174,7 +142,6 @@ export default function CreatePublication({ auth, school }) {
                             <InputError message={errors.cover_image} className="mt-2" />
                         </div>
 
-                        {/* YouTube URL */}
                         <div>
                             <InputLabel htmlFor="youtube_url" value={t('teacherPublicationCreatePage.youtubeUrlLabel', { defaultValue: 'رابط YouTube (اختياري)' })} className="text-sm font-medium text-gray-700 mb-2" />
                             <div className="relative">
@@ -232,7 +199,7 @@ export default function CreatePublication({ auth, school }) {
                             </button>
                             <PrimaryButton
                                 type="submit"
-                                disabled={processing || !data.title || !data.content}
+                                disabled={processing || !publicationBilingualFormIsValid(data)}
                                 className="bg-[#A3C042] hover:bg-[#A3C042] flex items-center gap-2"
                             >
                                 {processing ? (

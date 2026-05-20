@@ -8,14 +8,18 @@ import InputError from '../../../Components/InputError';
 import PrimaryButton from '../../../Components/PrimaryButton';
 import { getPublicationImageUrl } from '../../../utils/imageUtils';
 import { useTranslation } from '@/i18n';
+import PublicationBilingualFields, { publicationBilingualFormIsValid } from '@/Components/Publications/PublicationBilingualFields';
 
 export default function TeacherPublicationEdit({ auth, publication }) {
     const { t } = useTranslation();
     const { data, setData, post, processing, errors } = useForm({
         type: publication?.type || 'magazine',
         title: publication?.title || '',
+        title_ar: publication?.title_ar || '',
         description: publication?.description || '',
+        description_ar: publication?.description_ar || '',
         content: publication?.content || '',
+        content_ar: publication?.content_ar || '',
         cover_image: null,
         file: null,
         youtube_url: publication?.youtube_url || '',
@@ -121,43 +125,7 @@ export default function TeacherPublicationEdit({ auth, publication }) {
                             <InputError message={errors.type} className="mt-2" />
                         </div>
 
-                        <div>
-                            <InputLabel htmlFor="title" value={t('teacherPublicationEditPage.form.titleLabel')} />
-                            <TextInput
-                                id="title"
-                                type="text"
-                                value={data.title}
-                                onChange={(e) => setData('title', e.target.value)}
-                                className="mt-1 block w-full"
-                                required
-                            />
-                            <InputError message={errors.title} className="mt-2" />
-                        </div>
-
-                        <div>
-                            <InputLabel htmlFor="description" value={t('teacherPublicationEditPage.form.descriptionLabel')} />
-                            <textarea
-                                id="description"
-                                value={data.description}
-                                onChange={(e) => setData('description', e.target.value)}
-                                rows={4}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
-                            />
-                            <InputError message={errors.description} className="mt-2" />
-                        </div>
-
-                        <div>
-                            <InputLabel htmlFor="content" value={t('teacherPublicationEditPage.form.contentLabel')} />
-                            <textarea
-                                id="content"
-                                value={data.content}
-                                onChange={(e) => setData('content', e.target.value)}
-                                rows={15}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042] font-mono text-sm"
-                                placeholder={t('teacherPublicationEditPage.form.contentPlaceholder')}
-                            />
-                            <InputError message={errors.content} className="mt-2" />
-                        </div>
+                        <PublicationBilingualFields data={data} setData={setData} errors={errors} />
 
                         <div>
                             <InputLabel htmlFor="cover_image" value={t('teacherPublicationEditPage.form.coverImageLabel')} />
@@ -275,7 +243,7 @@ export default function TeacherPublicationEdit({ auth, publication }) {
                                 {t('common.cancel')}
                             </Link>
                             <PrimaryButton
-                                disabled={processing}
+                                disabled={processing || !publicationBilingualFormIsValid(data)}
                                 className="bg-[#A3C042]"
                             >
                                 {processing ? (

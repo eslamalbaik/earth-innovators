@@ -252,7 +252,7 @@ export default function MobileTopBar({
                             <img
                                 src="/images/logo-modified.png"
                                 alt={t('common.appName')}
-                                className="h-10 w-auto object-contain"
+                                className="h-14 w-auto max-w-[260px] object-contain"
                             />
                         </Link>
                     </div>
@@ -287,21 +287,15 @@ export default function MobileTopBar({
     const DesktopHeader = () => (
         <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm hidden md:block">
             <div className="max-w-7xl mx-auto px-6">
-                <div className="flex items-center justify-between h-16">
+                <div className="flex items-center justify-between h-[4.5rem]">
                     {/* Logo */}
                     <div className="flex-shrink-0">
-                        <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
+                        <Link href="/" className="flex items-center hover:opacity-80 transition">
                             <img
                                 src="/images/logo-modified.png"
                                 alt={t('common.appName')}
-                                className="h-12 w-auto object-contain"
+                                className="h-16 w-auto max-w-[340px] object-contain"
                             />
-                            <div className="flex flex-col">
-                                <p className="text-xl font-bold bg-gradient-to-r from-[#A3C042] to-[#8CA635] bg-clip-text text-transparent">
-                                    {t('common.appName')}
-                                </p>
-                                <p className="text-xs text-gray-500">Innovators Legacy</p>
-                            </div>
                         </Link>
                     </div>
 
