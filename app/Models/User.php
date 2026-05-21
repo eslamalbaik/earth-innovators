@@ -79,6 +79,14 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->role === 'admin';
     }
 
+    /**
+     * Roles allowed to use the /admin panel (login + dashboard).
+     */
+    public function canAccessAdminPanel(): bool
+    {
+        return in_array($this->role, ['admin', 'system_supervisor', 'school_support_coordinator'], true);
+    }
+
     public function isTeacher(): bool
     {
         return $this->role === 'teacher';

@@ -494,7 +494,7 @@ Route::middleware(['auth', 'membership_active'])->group(function () {
         $user = Auth::user();
 
         // إعادة توجيه الأدمن مباشرة إلى لوحة التحكم الخاصة بهم
-        if ($user->isAdmin()) {
+        if ($user->canAccessAdminPanel()) {
             return redirect()->route('admin.dashboard');
         }
 

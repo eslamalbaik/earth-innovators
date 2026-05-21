@@ -23,6 +23,10 @@ export default function AdminLogin({ status }) {
     const submit = (e) => {
         e.preventDefault();
         post(route('admin.login.store'), {
+            preserveScroll: true,
+            onSuccess: () => {
+                window.location.assign(route('admin.dashboard'));
+            },
             onFinish: () => reset('password'),
         });
     };
@@ -110,6 +114,8 @@ export default function AdminLogin({ status }) {
                                 </div>
                                 <InputError message={errors.password} className="mt-2" />
                             </div>
+
+                            <InputError message={errors.role} className="mt-2" />
 
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center">

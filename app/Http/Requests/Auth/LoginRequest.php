@@ -48,7 +48,8 @@ class LoginRequest extends FormRequest
             ]);
         }
 
-        $authenticated = Auth::attempt(array_merge($baseCredentials, ['role' => $user->role]), $remember);
+        // Only email + password — do not add role to credentials (breaks login when role column differs).
+        $authenticated = Auth::attempt($baseCredentials, $remember);
 
         if (! $authenticated) {
             RateLimiter::hit($this->throttleKey());

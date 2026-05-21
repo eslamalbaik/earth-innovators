@@ -92,4 +92,9 @@ Route::middleware('auth')->group(function () {
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
+
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::post('logout', [AdminAuthenticatedSessionController::class, 'destroy'])
+            ->name('logout');
+    });
 });

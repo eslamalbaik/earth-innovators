@@ -175,15 +175,26 @@ class AdminDashboardController extends Controller
         ];
     }
 
+    private function yearExpression(string $column = 'created_at'): string
+    {
+        return match (DB::connection()->getDriverName()) {
+            'sqlite' => "CAST(strftime('%Y', {$column}) AS INTEGER) as year",
+            'pgsql' => "EXTRACT(YEAR FROM {$column})::integer as year",
+            default => "YEAR({$column}) as year",
+        };
+    }
+
     private function getAvailableYears(): array
     {
+        $yearSql = $this->yearExpression('created_at');
+
         $userYears = User::where('role', '!=', 'admin')
-            ->selectRaw('YEAR(created_at) as year')
+            ->selectRaw($yearSql)
             ->distinct()
             ->pluck('year')
             ->toArray();
 
-        $projectYears = Project::selectRaw('YEAR(created_at) as year')
+        $projectYears = Project::selectRaw($yearSql)
             ->distinct()
             ->pluck('year')
             ->toArray();

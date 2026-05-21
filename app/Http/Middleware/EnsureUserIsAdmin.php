@@ -10,8 +10,16 @@ class EnsureUserIsAdmin
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->check() || !auth()->user()->isAdmin()) {
-            abort(403, 'Unauthorized action.');
+        $user = auth()->user();
+
+        if (! $user || ! $user->canAccessAdminPanel()) {
+            if ($request->header('X-Inertia')) {
+                return redirect()->route('admin.login')
+                    ->with('error', __('يجب تسجيل الدخول بحساب مشرف للوصول إلى لوحة التحكم.'));
+            }
+
+            return redirect()->route('admin.login')
+                ->withErrors(['email' => __('يجب تسجيل الدخول بحساب مشرف للوصول إلى لوحة التحكم.')]);
         }
 
         return $next($request);

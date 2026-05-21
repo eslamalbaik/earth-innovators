@@ -43,6 +43,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
+            'auth' => \App\Http\Middleware\Authenticate::class,
             'admin' => EnsureUserIsAdmin::class,
             'teacher' => EnsureUserIsTeacher::class,
             'school' => \App\Http\Middleware\EnsureUserIsSchool::class,

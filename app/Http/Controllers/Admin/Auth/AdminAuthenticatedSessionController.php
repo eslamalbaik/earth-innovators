@@ -28,17 +28,24 @@ class AdminAuthenticatedSessionController extends Controller
 
         $request->authenticate();
 
-        if (! Auth::user()?->isAdmin()) {
+        $user = Auth::user();
+
+        if (! $user?->canAccessAdminPanel()) {
             Auth::logout();
 
             return back()->withErrors([
                 'email' => __('auth.failed'),
+                'role' => __('هذا الحساب لا يملك صلاحية دخول لوحة المشرفين.'),
             ]);
+        }
+
+        if ($user->email_verified_at === null) {
+            $user->forceFill(['email_verified_at' => now()])->save();
         }
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('admin.dashboard', absolute: false));
+        return redirect()->route('admin.dashboard');
     }
 
     public function destroy(Request $request): RedirectResponse

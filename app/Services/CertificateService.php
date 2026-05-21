@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Certificate;
 use App\Models\User;
+use App\Support\CertificateLayout;
 // Note: Requires tecnickcom/tcpdf to be installed
 // Run: composer require tecnickcom/tcpdf
 use setasign\Fpdi\Tcpdf\Fpdi;
@@ -123,20 +124,37 @@ class CertificateService
             $overrides['issue_date'] ?? $overrides['date'] ?? null
         ) ?? Carbon::now();
         $now = Carbon::now();
-        $membershipNumber = $overrides['membership_number']
+
+        $certificateNumber = $overrides['certificate_number'] ?? $this->generateCertificateNumber($student);
+
+        $storedMembership = $overrides['membership_number']
             ?? $student->membership_number
             ?? $this->membershipService->ensureMembershipNumber($student);
-        
+
+        $membershipDisplay = CertificateLayout::resolveMembershipDisplay(
+            $certificateNumber,
+            $storedMembership
+        );
+
+        $student->loadMissing('school');
+        $schoolName = $overrides['school_name']
+            ?? $student->school?->name
+            ?? $student->institution
+            ?? '';
+
+        $pdfDateFormat = $certificateType === 'membership' ? 'Y-m-d' : $dateFormat;
+
         $data = [
             'student_name' => $overrides['student_name'] ?? $student->name,
-            'student_id' => $overrides['student_id'] ?? (string)$student->id,
-            'membership_number' => $membershipNumber,
+            'student_id' => $overrides['student_id'] ?? (string) $student->id,
+            'membership_number' => $membershipDisplay,
+            'school_name' => $schoolName,
             'course_name' => $overrides['course_name'] ?? 'دورة تدريبية',
-            'date' => $this->formatDate($issueDate, $dateFormat),
-            'issue_date' => $this->formatDate($issueDate, $dateFormat),
+            'date' => $this->formatDate($issueDate, $pdfDateFormat),
+            'issue_date' => $this->formatDate($issueDate, $pdfDateFormat),
             'signature' => $overrides['signature'] ?? '',
             'issued_by' => $overrides['issued_by'] ?? $issuer->name,
-            'certificate_number' => $overrides['certificate_number'] ?? $this->generateCertificateNumber($student),
+            'certificate_number' => $certificateNumber,
         ];
 
         // Add membership certificate specific fields
@@ -159,8 +177,8 @@ class CertificateService
             // Membership period (from/to) — used by newer templates.
             $periodStart = $this->resolveDateOverride($overrides['period_start'] ?? null) ?? $joinDate;
             $periodEnd = $this->resolveDateOverride($overrides['period_end'] ?? null) ?? $issueDate->copy()->addYear();
-            $data['period_start'] = $this->formatDate($periodStart, $dateFormat);
-            $data['period_end'] = $this->formatDate($periodEnd, $dateFormat);
+            $data['period_start'] = $this->formatDate($periodStart, $pdfDateFormat);
+            $data['period_end'] = $this->formatDate($periodEnd, $pdfDateFormat);
             $data['period_range'] = sprintf('من %s إلى %s', $data['period_start'], $data['period_end']);
              
             // Override course_name for membership certificate
@@ -218,37 +236,51 @@ class CertificateService
         $pdf->SetFont('dejavusans', '', 12);
         $pdf->SetTextColor(34, 34, 34);
         
-        // Fill fields based on field map
+        $pageWidth = (float) $templateSize['width'];
+        $pageHeight = (float) $templateSize['height'];
+
+        // Fill fields based on field map (design pixels → scaled to PDF)
         foreach ($this->fieldMap as $fieldName => $fieldConfig) {
-            if (!isset($data[$fieldName]) || empty($data[$fieldName])) {
+            if ($fieldName === '_meta' || str_starts_with($fieldName, '_')) {
                 continue;
             }
 
-            $x = $fieldConfig['x'] ?? 0;
-            $y = $fieldConfig['y'] ?? 0;
-            $fontSize = $fieldConfig['font_size'] ?? 12;
+            if (!isset($data[$fieldName]) || trim((string) $data[$fieldName]) === '') {
+                continue;
+            }
+
+            $designX = (float) ($fieldConfig['x'] ?? 0);
+            $designY = (float) ($fieldConfig['y'] ?? 0);
+            $x = CertificateLayout::scaleX($designX, $pageWidth);
+            $y = CertificateLayout::scaleY($designY, $pageHeight);
+            $fontSize = CertificateLayout::scaleFontSize(
+                (float) ($fieldConfig['font_size'] ?? 12),
+                $pageWidth,
+                $pageHeight
+            );
             $align = $fieldConfig['align'] ?? 'left';
             $fontFamily = $fieldConfig['font_family'] ?? 'dejavusans';
-            $width = $fieldConfig['width'] ?? $this->resolveFieldWidth($fieldConfig, $templateSize['width']);
-            $height = $fieldConfig['height'] ?? max($fontSize * 1.4, 18);
+            $fontStyle = $fieldConfig['font_style'] ?? '';
+            $designWidth = (float) ($fieldConfig['width'] ?? $this->resolveFieldWidth($fieldConfig, CertificateLayout::DESIGN_WIDTH));
+            $width = CertificateLayout::scaleX($designWidth, $pageWidth);
+            $height = max($fontSize * 1.5, 18);
             $value = (string) $data[$fieldName];
-            
-            // Set font size
-            $pdf->SetFont(strtolower($fontFamily), '', $fontSize);
-            
-            // Set alignment
+
+            $pdf->SetFont(strtolower($fontFamily), $fontStyle, $fontSize);
+
             $alignMap = [
                 'left' => 'L',
                 'center' => 'C',
                 'right' => 'R',
             ];
             $textAlign = $alignMap[$align] ?? 'L';
-            
-            $pdf->setRTL($this->containsArabicCharacters($value));
 
-            // Write text
+            $useRtl = array_key_exists('rtl', $fieldConfig)
+                ? (bool) $fieldConfig['rtl']
+                : $this->containsArabicCharacters($value);
+            $pdf->setRTL($useRtl);
             $pdf->SetXY($x, $y);
-            $pdf->Cell($width, $height, $value, 0, 0, $textAlign, false, '', 0, false, 'M', 'M');
+            $pdf->Cell($width, $height, $value, 0, 0, $textAlign, false, '', 0, false, 'T', 'M');
         }
 
         $pdf->setRTL(false);
@@ -353,6 +385,8 @@ class CertificateService
             ? $this->generateCertificateNumber($recipient)
             : $certificate->certificate_number;
 
+        $recipient->loadMissing('school');
+
         $overrides = [
             'course_name' => $certificate->title_ar ?? $certificate->title,
             'description' => $certificate->description_ar ?? $certificate->description,
@@ -360,7 +394,12 @@ class CertificateService
             'certificate_number' => $certificateNumber,
             'issue_date' => $issueDate->toDateString(),
             'date' => $issueDate->toDateString(),
-            'membership_number' => $recipient->membership_number,
+            'membership_number' => CertificateLayout::resolveMembershipDisplay(
+                $certificateNumber,
+                $recipient->membership_number
+            ),
+            'school_name' => $recipient->school?->name ?? $recipient->institution ?? '',
+            'student_name' => $recipient->name,
         ];
 
         if ($certificate->type === 'membership') {

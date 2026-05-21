@@ -322,6 +322,13 @@ class UserManagementController extends Controller
             $updateData['password'] = Hash::make($validated['password']);
         }
 
+        if (
+            in_array($validated['role'], ['admin', 'system_supervisor', 'school_support_coordinator'], true)
+            && $user->email_verified_at === null
+        ) {
+            $updateData['email_verified_at'] = now();
+        }
+
         $user->update($updateData);
         
         // Clear cached stats since user was updated
