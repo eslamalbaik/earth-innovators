@@ -7,6 +7,12 @@
 
     <title inertia>{{ config('app.name', 'إرث المبتكرين - Innovators Legacy') }}</title>
 
+    @php
+        $canonicalBase = rtrim(config('site.primary_url', config('app.url')), '/');
+        $canonicalUrl = $canonicalBase . request()->getPathInfo();
+    @endphp
+    <link rel="canonical" href="{{ $canonicalUrl }}" />
+
     <!-- Fonts - Cairo from Google Fonts CDN -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

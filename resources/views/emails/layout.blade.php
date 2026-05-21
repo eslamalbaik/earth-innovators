@@ -106,8 +106,8 @@
             <p>منصة تعليمية لبناء مجتمع من المبتكرين والموهوبين في المؤسسات تعليمية</p>
             <p>© {{ date('Y') }} جميع الحقوق محفوظة</p>
             <p style="margin-top: 15px;">
-                <a href="{{ config('app.url') }}">زيارة الموقع</a> |
-                <a href="{{ config('app.url') }}/contact">تواصل معنا</a>
+                <a href="{{ config('site.primary_url', config('app.url')) }}">زيارة الموقع</a> |
+                <a href="{{ rtrim(config('site.primary_url', config('app.url')), '/') }}/contact">تواصل معنا</a>
             </p>
         </div>
     </div>

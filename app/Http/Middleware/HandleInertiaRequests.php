@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\UserPackage;
 use App\Support\AppBuildVersion;
+use App\Support\SiteUrl;
 use App\Support\StorageUrl;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -72,6 +73,11 @@ class HandleInertiaRequests extends Middleware
                 'whatsapp' => config('support.whatsapp'),
             ],
             'appBuildId' => AppBuildVersion::current(),
+            'site' => [
+                'primaryUrl' => SiteUrl::primary(),
+                'isPrimaryHost' => SiteUrl::isPrimaryHost($request->getHost()),
+                'isSecondaryHost' => SiteUrl::isSecondaryHost($request->getHost()),
+            ],
             // Subscription/Trial banner data — lightweight, computed once per request
             'subscription' => function () use ($user) {
                 if (!$user || in_array($user->role, ['admin'])) {

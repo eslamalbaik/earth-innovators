@@ -40,10 +40,11 @@ use App\Listeners\SendProjectEvaluatedNotification;
 use App\Listeners\SendBadgeGrantedNotification;
 use App\Listeners\SendArticleApprovedNotification;
 use App\Listeners\CheckMembershipCertificateEligibility;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Event;
 use App\Policies\ChatRoomPolicy;
 
 class AppServiceProvider extends ServiceProvider
@@ -251,6 +252,23 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if (! $this->app->runningInConsole() && $this->app->bound('request')) {
+            $request = $this->app->make('request');
+
+            if ($request->isSecure()) {
+                URL::forceScheme('https');
+            }
+
+            // Each domain (.ae / .cloud) must use its own APP_URL; if .env was copied from the other
+            // server, force links/cookies to the hostname the user is actually visiting.
+            $configuredHost = parse_url((string) config('app.url'), PHP_URL_HOST);
+            $currentHost = $request->getHost();
+
+            if ($configuredHost && $currentHost && strcasecmp($configuredHost, $currentHost) !== 0) {
+                URL::forceRootUrl($request->getSchemeAndHttpHost());
+            }
+        }
+
         Vite::prefetch(concurrency: 3);
         Payment::observe(PaymentObserver::class);
         Booking::observe(BookingObserver::class);

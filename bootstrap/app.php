@@ -9,6 +9,7 @@ use Illuminate\Session\TokenMismatchException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\RedirectSecondaryDomainToPrimary;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\EnsureUserIsTeacher;
 use App\Http\Middleware\EnsureUserIsSystemSupervisor;
@@ -28,12 +29,19 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Required when the app runs behind nginx/Cloudflare HTTPS termination (.ae / .cloud).
+        $middleware->trustProxies(at: '*');
+
         $middleware->encryptCookies(except: ['locale']);
 
         // Exempt external webhook endpoints from CSRF verification
         $middleware->validateCsrfTokens(except: [
             'webhook/ziina',
             'api/webhooks/payment/*',
+        ]);
+
+        $middleware->web(prepend: [
+            RedirectSecondaryDomainToPrimary::class,
         ]);
 
         $middleware->web(append: [
