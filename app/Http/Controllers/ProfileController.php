@@ -29,6 +29,9 @@ class ProfileController extends Controller
 
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
+        // #region agent log
+        @file_put_contents(base_path('debug-75cfd5.log'), json_encode(['sessionId' => '75cfd5', 'hypothesisId' => 'H2', 'location' => 'ProfileController::update', 'message' => 'update_entered', 'data' => ['userId' => $request->user()?->id, 'role' => $request->user()?->role, 'hasName' => $request->has('name'), 'hasEmail' => $request->has('email'), 'method' => $request->method()], 'timestamp' => (int) (microtime(true) * 1000)]) . "\n", FILE_APPEND);
+        // #endregion
         $user = $request->user();
         $updateData = $request->validated();
 
@@ -55,6 +58,10 @@ class ProfileController extends Controller
             return Redirect::route('teacher.profile')
                 ->with('success', 'تم تحديث الملف الشخصي بنجاح.');
         }
+
+        // #region agent log
+        @file_put_contents(base_path('debug-75cfd5.log'), json_encode(['sessionId' => '75cfd5', 'hypothesisId' => 'H2', 'location' => 'ProfileController::update', 'message' => 'update_success_redirect', 'data' => ['userId' => $user->id, 'emailChanged' => isset($updateData['email']) && $updateData['email'] !== $user->email], 'timestamp' => (int) (microtime(true) * 1000)]) . "\n", FILE_APPEND);
+        // #endregion
 
         return Redirect::route('profile.edit')
             ->with('success', 'تم تحديث الملف الشخصي بنجاح.');

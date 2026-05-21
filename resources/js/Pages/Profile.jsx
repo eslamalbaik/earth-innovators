@@ -78,6 +78,9 @@ export default function Profile({
     }, [user.name, user.email, isEditingBasic]);
 
     const startBasicEdit = () => {
+        // #region agent log
+        fetch('http://127.0.0.1:7283/ingest/7ac32a2a-8846-48d0-b8f7-189249512535',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'75cfd5'},body:JSON.stringify({sessionId:'75cfd5',hypothesisId:'H1',location:'Profile.jsx:startBasicEdit',message:'edit_mode_enabled',data:{},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
         basicForm.setData({
             ...basicForm.data,
             name: savedBasic.name,
@@ -145,6 +148,9 @@ export default function Profile({
 
     const handleBasicSubmit = (e) => {
         e.preventDefault();
+        // #region agent log
+        fetch('http://127.0.0.1:7283/ingest/7ac32a2a-8846-48d0-b8f7-189249512535',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'75cfd5'},body:JSON.stringify({sessionId:'75cfd5',hypothesisId:'H1',location:'Profile.jsx:handleBasicSubmit',message:'submit_started',data:{isEditingBasic,isPanelStaff,hasImage:!!basicForm.data.image,emailLen:(basicForm.data.email||'').length},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
         const formData = new FormData();
         formData.append('name', basicForm.data.name);
         formData.append('email', basicForm.data.email);
@@ -166,6 +172,9 @@ export default function Profile({
             forceFormData: true,
             preserveScroll: true,
             onSuccess: () => {
+                // #region agent log
+                fetch('http://127.0.0.1:7283/ingest/7ac32a2a-8846-48d0-b8f7-189249512535',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'75cfd5'},body:JSON.stringify({sessionId:'75cfd5',hypothesisId:'H2',location:'Profile.jsx:onSuccess',message:'profile_update_success',data:{},timestamp:Date.now()})}).catch(()=>{});
+                // #endregion
                 const nextName = basicForm.data.name;
                 const nextEmail = basicForm.data.email;
                 setSavedBasic({ name: nextName, email: nextEmail });
@@ -176,9 +185,17 @@ export default function Profile({
                 router.reload({ preserveScroll: true });
             },
             onError: (errors) => {
+                // #region agent log
+                fetch('http://127.0.0.1:7283/ingest/7ac32a2a-8846-48d0-b8f7-189249512535',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'75cfd5'},body:JSON.stringify({sessionId:'75cfd5',hypothesisId:'H3',location:'Profile.jsx:onError',message:'profile_update_error',data:{errorKeys:Object.keys(errors||{})},timestamp:Date.now()})}).catch(()=>{});
+                // #endregion
                 if (errors.image) {
                     alert(t('profilePage.alerts.imageUploadError', { message: errors.image }));
                 }
+            },
+            onFinish: (visit) => {
+                // #region agent log
+                fetch('http://127.0.0.1:7283/ingest/7ac32a2a-8846-48d0-b8f7-189249512535',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'75cfd5'},body:JSON.stringify({sessionId:'75cfd5',hypothesisId:'H4',location:'Profile.jsx:onFinish',message:'profile_update_finished',data:{cancelled:visit?.cancelled??null,completed:visit?.completed??null},timestamp:Date.now()})}).catch(()=>{});
+                // #endregion
             },
         });
     };
