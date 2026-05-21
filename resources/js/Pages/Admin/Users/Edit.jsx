@@ -1,8 +1,13 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
+import PasswordInput from '@/Components/PasswordInput';
+import { useToast } from '@/Contexts/ToastContext';
+import { useTranslation } from '@/i18n';
 import { FaArrowRight, FaSave, FaTimes } from 'react-icons/fa';
 
 export default function UsersEdit({ user, schools, auth }) {
+    const { t } = useTranslation();
+    const { showSuccess } = useToast();
     const { data, setData, put, processing, errors } = useForm({
         name: user.name || '',
         email: user.email || '',
@@ -18,7 +23,9 @@ export default function UsersEdit({ user, schools, auth }) {
 
     const submit = (e) => {
         e.preventDefault();
-        put(route('admin.users.update', user.id));
+        put(route('admin.users.update', user.id), {
+            onSuccess: () => showSuccess(t('profilePage.actions.savedSuccess')),
+        });
     };
 
     return (
@@ -214,12 +221,10 @@ export default function UsersEdit({ user, schools, auth }) {
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 كلمة المرور (اتركه فارغاً إذا لم تريد تغييره)
                             </label>
-                            <input
-                                type="password"
+                            <PasswordInput
                                 value={data.password}
                                 onChange={(e) => setData('password', e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.password ? 'border-red-500' : 'border-gray-300'
-                                    }`}
+                                inputClassName={errors.password ? 'border-red-500' : ''}
                             />
                             {errors.password && (
                                 <p className="mt-1 text-sm text-red-600">{errors.password}</p>
@@ -232,12 +237,10 @@ export default function UsersEdit({ user, schools, auth }) {
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     تأكيد كلمة المرور
                                 </label>
-                                <input
-                                    type="password"
+                                <PasswordInput
                                     value={data.password_confirmation}
                                     onChange={(e) => setData('password_confirmation', e.target.value)}
-                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.password_confirmation ? 'border-red-500' : 'border-gray-300'
-                                        }`}
+                                    inputClassName={errors.password_confirmation ? 'border-red-500' : ''}
                                 />
                                 {errors.password_confirmation && (
                                     <p className="mt-1 text-sm text-red-600">{errors.password_confirmation}</p>

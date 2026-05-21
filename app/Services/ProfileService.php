@@ -141,7 +141,8 @@ class ProfileService extends BaseService
 
         $user->fill($data);
         if ($emailChanged) {
-            $user->email_verified_at = null;
+            // Panel staff can keep using the account immediately after an email change.
+            $user->email_verified_at = $user->canAccessAdminPanel() ? now() : null;
         }
         $user->save();
 

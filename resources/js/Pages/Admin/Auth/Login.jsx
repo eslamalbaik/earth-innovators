@@ -3,16 +3,15 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
+import PasswordInput from '@/Components/PasswordInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { useState } from 'react';
-import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEnvelope, FaLock } from 'react-icons/fa';
 import { useTranslation } from '@/i18n';
 
 export default function AdminLogin({ status }) {
     const { t } = useTranslation();
-    const [showPassword, setShowPassword] = useState(false);
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
@@ -89,28 +88,16 @@ export default function AdminLogin({ status }) {
                                     <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                         <FaLock className="h-5 w-5 text-gray-400" />
                                     </div>
-                                    <TextInput
+                                    <PasswordInput
                                         id="password"
-                                        type={showPassword ? 'text' : 'password'}
                                         name="password"
                                         value={data.password}
-                                        className="block w-full ps-10 pe-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
-                                        autoComplete="current-password"
                                         onChange={(e) => setData('password', e.target.value)}
+                                        className="block w-full"
+                                        inputClassName="ps-10 pe-11 py-3 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
+                                        autoComplete="current-password"
                                         placeholder={t('adminLoginPage.passwordPlaceholder')}
                                     />
-                                    <button
-                                        type="button"
-                                        className="absolute inset-y-0 end-0 pe-3 flex items-center"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        aria-label={t('adminLoginPage.togglePassword')}
-                                    >
-                                        {showPassword ? (
-                                            <FaEyeSlash className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                                        ) : (
-                                            <FaEye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                                        )}
-                                    </button>
                                 </div>
                                 <InputError message={errors.password} className="mt-2" />
                             </div>

@@ -323,6 +323,9 @@ export const ar = {
         "actions": {
             "saving": "جاري الحفظ...",
             "saveChanges": "حفظ التغييرات",
+            "edit": "تعديل",
+            "cancel": "إلغاء",
+            "savedSuccess": "تم حفظ التغييرات بنجاح",
             "updatePassword": "تحديث كلمة المرور",
             "deleteAccount": "حذف الحساب",
             "deleting": "جاري الحذف...",

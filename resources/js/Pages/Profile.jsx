@@ -1,7 +1,8 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, useForm, router } from '@inertiajs/react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from '@/i18n';
+import { useToast } from '@/Contexts/ToastContext';
 import {
     FaUser,
     FaEnvelope,
@@ -21,12 +22,32 @@ import {
 } from 'react-icons/fa';
 import Modal from '@/Components/Modal';
 import DangerButton from '@/Components/DangerButton';
+import PasswordInput from '@/Components/PasswordInput';
 import { getStorageUrl } from '@/utils/imageUtils';
 
-export default function Profile({ auth, mustVerifyEmail, status, teacher, subjects, cities, badges = [] }) {
+const PANEL_STAFF_ROLES = ['admin', 'system_supervisor', 'school_support_coordinator'];
+
+export default function Profile({
+    auth,
+    mustVerifyEmail,
+    status,
+    teacher,
+    subjects,
+    cities,
+    badges = [],
+    institution = '',
+    bio = '',
+}) {
     const { t, language } = useTranslation();
+    const { showSuccess } = useToast();
     const user = auth.user;
+    const isPanelStaff = PANEL_STAFF_ROLES.includes(user.role);
     const [activeTab, setActiveTab] = useState('basic');
+    const [isEditingBasic, setIsEditingBasic] = useState(!isPanelStaff);
+    const [savedBasic, setSavedBasic] = useState({
+        name: user.name || '',
+        email: user.email || '',
+    });
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [imagePreview, setImagePreview] = useState(null);
     const [teacherImagePreview, setTeacherImagePreview] = useState(null);
@@ -37,9 +58,43 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
         name:        user.name || '',
         email:       user.email || '',
         image:       null,
-        institution: auth.institution ?? '',
-        bio:         auth.bio ?? '',
+        institution: institution ?? '',
+        bio:         bio ?? '',
     });
+
+    useEffect(() => {
+        const next = {
+            name: user.name || '',
+            email: user.email || '',
+        };
+        setSavedBasic(next);
+        if (!isEditingBasic) {
+            basicForm.setData((prev) => ({
+                ...prev,
+                name: next.name,
+                email: next.email,
+            }));
+        }
+    }, [user.name, user.email, isEditingBasic]);
+
+    const startBasicEdit = () => {
+        basicForm.setData({
+            ...basicForm.data,
+            name: savedBasic.name,
+            email: savedBasic.email,
+        });
+        setIsEditingBasic(true);
+    };
+
+    const cancelBasicEdit = () => {
+        basicForm.setData({
+            ...basicForm.data,
+            name: savedBasic.name,
+            email: savedBasic.email,
+        });
+        basicForm.clearErrors();
+        setIsEditingBasic(false);
+    };
 
     const teacherForm = useForm({
         name_ar: teacher?.name_ar || '',
@@ -111,14 +166,14 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
             forceFormData: true,
             preserveScroll: true,
             onSuccess: () => {
+                const nextName = basicForm.data.name;
+                const nextEmail = basicForm.data.email;
+                setSavedBasic({ name: nextName, email: nextEmail });
+                setIsEditingBasic(false);
                 setImagePreview(null);
                 basicForm.reset('image');
-                setTimeout(() => {
-                    router.reload({
-                        only: ['auth', 'teacher'],
-                        preserveScroll: false,
-                    });
-                }, 100);
+                showSuccess(t('profilePage.actions.savedSuccess'));
+                router.reload({ preserveScroll: true });
             },
             onError: (errors) => {
                 if (errors.image) {
@@ -189,10 +244,11 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
 
     const handlePasswordSubmit = (e) => {
         e.preventDefault();
-        passwordForm.post(route('password.update'), {
+        passwordForm.put(route('password.update'), {
             preserveScroll: true,
             onSuccess: () => {
                 passwordForm.reset();
+                showSuccess(t('profilePage.actions.savedSuccess'));
             },
         });
     };
@@ -338,7 +394,7 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                             <h1 className="text-2xl font-bold text-gray-900 mb-2">
                                 {getDisplayName()}
                             </h1>
-                            <p className="text-gray-600 mb-1">{user.email}</p>
+                            <p className="text-gray-600 mb-1">{savedBasic.email || user.email}</p>
                             <div className="flex items-center gap-3">
                                 <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                                     {t(`roles.${user.role}`)}
@@ -416,23 +472,42 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                 <div className="bg-white rounded-xl shadow-lg p-6">
                     {activeTab === 'basic' && (
                         <form onSubmit={handleBasicSubmit}>
-                            <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                                <FaUser />
-                                {t('profilePage.sections.basicInfo')}
-                            </h2>
+                            <div className="flex items-center justify-between mb-6 gap-4">
+                                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                                    <FaUser />
+                                    {t('profilePage.sections.basicInfo')}
+                                </h2>
+                                {isPanelStaff && !isEditingBasic && (
+                                    <button
+                                        type="button"
+                                        onClick={startBasicEdit}
+                                        className="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition"
+                                    >
+                                        <FaEdit />
+                                        {t('profilePage.actions.edit')}
+                                    </button>
+                                )}
+                            </div>
 
                             <div className="space-y-6">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         {t('common.name')}
                                     </label>
-                                    <input
-                                        type="text"
-                                        value={basicForm.data.name}
-                                        onChange={(e) => basicForm.setData('name', e.target.value)}
-                                        className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
-                                        required
-                                    />
+                                    {isPanelStaff && !isEditingBasic ? (
+                                        <p className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900">
+                                            {savedBasic.name}
+                                        </p>
+                                    ) : (
+                                        <input
+                                            type="text"
+                                            value={basicForm.data.name}
+                                            onChange={(e) => basicForm.setData('name', e.target.value)}
+                                            readOnly={isPanelStaff && !isEditingBasic}
+                                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-transparent read-only:bg-gray-50 read-only:cursor-default"
+                                            required
+                                        />
+                                    )}
                                     {basicForm.errors.name && (
                                         <p className="text-red-500 text-sm mt-1">{basicForm.errors.name}</p>
                                     )}
@@ -442,13 +517,20 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         {t('common.email')}
                                     </label>
-                                    <input
-                                        type="email"
-                                        value={basicForm.data.email}
-                                        onChange={(e) => basicForm.setData('email', e.target.value)}
-                                        className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
-                                        required
-                                    />
+                                    {isPanelStaff && !isEditingBasic ? (
+                                        <p className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 break-all">
+                                            {savedBasic.email}
+                                        </p>
+                                    ) : (
+                                        <input
+                                            type="email"
+                                            value={basicForm.data.email}
+                                            onChange={(e) => basicForm.setData('email', e.target.value)}
+                                            readOnly={isPanelStaff && !isEditingBasic}
+                                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-transparent read-only:bg-gray-50 read-only:cursor-default"
+                                            required
+                                        />
+                                    )}
                                     {basicForm.errors.email && (
                                         <p className="text-red-500 text-sm mt-1">{basicForm.errors.email}</p>
                                     )}
@@ -459,16 +541,29 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                                     )}
                                 </div>
 
-                                <div className="flex justify-end">
-                                    <button
-                                        type="submit"
-                                        disabled={basicForm.processing}
-                                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition disabled:opacity-50"
-                                    >
-                                        <FaSave />
-                                        {basicForm.processing ? t('profilePage.actions.saving') : t('profilePage.actions.saveChanges')}
-                                    </button>
-                                </div>
+                                {(!isPanelStaff || isEditingBasic) && (
+                                    <div className="flex justify-end gap-3">
+                                        {isPanelStaff && (
+                                            <button
+                                                type="button"
+                                                onClick={cancelBasicEdit}
+                                                disabled={basicForm.processing}
+                                                className="border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition hover:bg-gray-50 disabled:opacity-50"
+                                            >
+                                                <FaTimes />
+                                                {t('profilePage.actions.cancel')}
+                                            </button>
+                                        )}
+                                        <button
+                                            type="submit"
+                                            disabled={basicForm.processing}
+                                            className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition disabled:opacity-50"
+                                        >
+                                            <FaSave />
+                                            {basicForm.processing ? t('profilePage.actions.saving') : t('profilePage.actions.saveChanges')}
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </form>
                     )}
@@ -791,12 +886,12 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         {t('profilePage.password.current')} *
                                     </label>
-                                    <input
-                                        type="password"
+                                    <PasswordInput
+                                        id="current_password"
                                         value={passwordForm.data.current_password}
                                         onChange={(e) => passwordForm.setData('current_password', e.target.value)}
-                                        className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400"
                                         required
+                                        autoComplete="current-password"
                                     />
                                     {passwordForm.errors.current_password && (
                                         <p className="text-red-500 text-sm mt-1">{passwordForm.errors.current_password}</p>
@@ -807,13 +902,13 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         {t('profilePage.password.new')} *
                                     </label>
-                                    <input
-                                        type="password"
+                                    <PasswordInput
+                                        id="password"
                                         value={passwordForm.data.password}
                                         onChange={(e) => passwordForm.setData('password', e.target.value)}
-                                        className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400"
                                         required
-                                        minLength="8"
+                                        minLength={8}
+                                        autoComplete="new-password"
                                     />
                                     <p className="text-xs text-gray-500 mt-1">
                                         {language === 'ar'
@@ -829,12 +924,12 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         {t('profilePage.password.confirm')} *
                                     </label>
-                                    <input
-                                        type="password"
+                                    <PasswordInput
+                                        id="password_confirmation"
                                         value={passwordForm.data.password_confirmation}
                                         onChange={(e) => passwordForm.setData('password_confirmation', e.target.value)}
-                                        className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-yellow-400"
                                         required
+                                        autoComplete="new-password"
                                     />
                                     {passwordForm.errors.password_confirmation && (
                                         <p className="text-red-500 text-sm mt-1">{passwordForm.errors.password_confirmation}</p>
@@ -890,11 +985,11 @@ export default function Profile({ auth, mustVerifyEmail, status, teacher, subjec
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
                                             {t('common.password')} *
                                         </label>
-                                        <input
-                                            type="password"
+                                        <PasswordInput
+                                            id="delete_account_password"
                                             value={deleteForm.data.password}
                                             onChange={(e) => deleteForm.setData('password', e.target.value)}
-                                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-400"
+                                            inputClassName="focus:ring-2 focus:ring-red-400"
                                             required
                                             autoFocus
                                         />

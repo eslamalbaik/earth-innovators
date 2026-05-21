@@ -323,6 +323,9 @@ export const en = {
         "actions": {
             "saving": "Saving...",
             "saveChanges": "Save changes",
+            "edit": "Edit",
+            "cancel": "Cancel",
+            "savedSuccess": "Changes saved successfully",
             "updatePassword": "Update password",
             "deleteAccount": "Delete account",
             "deleting": "Deleting...",

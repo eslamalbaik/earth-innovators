@@ -22,9 +22,12 @@ import {
     FaSquare
 } from 'react-icons/fa';
 import PhoneInput from '@/Components/PhoneInput';
+import PasswordInput from '@/Components/PasswordInput';
+import { useToast } from '@/Contexts/ToastContext';
 
 export default function UsersIndex({ users, stats, filters, auth, schools: initialSchools }) {
     const { t, language } = useTranslation();
+    const { showSuccess } = useToast();
     const [search, setSearch] = useState(filters?.search || '');
     const [roleFilter, setRoleFilter] = useState(filters?.role || 'all');
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -198,9 +201,11 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
         updateUser(route('admin.users.update', userToEdit.id), {
             preserveScroll: true,
             onSuccess: () => {
+                showSuccess(t('profilePage.actions.savedSuccess'));
                 setShowEditModal(false);
                 setUserToEdit(null);
                 resetEditForm();
+                router.reload({ only: ['users', 'stats'], preserveScroll: true });
             },
         });
     };
@@ -678,12 +683,10 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         {t('adminUsersIndexPage.editModal.passwordHint')}
                                     </label>
-                                    <input
-                                        type="password"
+                                    <PasswordInput
                                         value={editData.password}
                                         onChange={(e) => setEditData('password', e.target.value)}
-                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.password ? 'border-red-500' : 'border-gray-300'
-                                            }`}
+                                        inputClassName={editErrors.password ? 'border-red-500' : ''}
                                     />
                                     {editErrors.password && (
                                         <p className="mt-1 text-sm text-red-600">{editErrors.password}</p>
@@ -696,12 +699,10 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
                                                 {t('adminUsersIndexPage.editModal.passwordConfirmLabel')}
                                         </label>
-                                        <input
-                                            type="password"
+                                        <PasswordInput
                                             value={editData.password_confirmation}
                                             onChange={(e) => setEditData('password_confirmation', e.target.value)}
-                                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.password_confirmation ? 'border-red-500' : 'border-gray-300'
-                                                }`}
+                                            inputClassName={editErrors.password_confirmation ? 'border-red-500' : ''}
                                         />
                                         {editErrors.password_confirmation && (
                                             <p className="mt-1 text-sm text-red-600">{editErrors.password_confirmation}</p>
