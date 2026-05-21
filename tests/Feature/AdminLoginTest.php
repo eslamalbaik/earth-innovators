@@ -85,6 +85,51 @@ class AdminLoginTest extends TestCase
         $this->assertAuthenticated();
     }
 
+    public function test_existing_teacher_session_is_cleared_on_admin_login_page(): void
+    {
+        User::factory()->create([
+            'email' => 'teacher-on-ae@test.com',
+            'password' => Hash::make('password'),
+            'role' => 'teacher',
+        ]);
+
+        $this->actingAs(User::where('email', 'teacher-on-ae@test.com')->first())
+            ->get('/admin/login')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page->component('Admin/Auth/Login'));
+
+        $this->assertGuest();
+    }
+
+    public function test_teacher_can_be_replaced_by_admin_login(): void
+    {
+        $teacher = User::factory()->create([
+            'email' => 'teacher-switch@test.com',
+            'password' => Hash::make('password'),
+            'role' => 'teacher',
+        ]);
+
+        User::factory()->create([
+            'email' => 'admin-switch@test.com',
+            'password' => Hash::make('password'),
+            'role' => 'admin',
+            'email_verified_at' => now(),
+        ]);
+
+        $this->actingAs($teacher)
+            ->get('/admin/login')
+            ->assertOk();
+
+        $response = $this->post('/admin/login', [
+            'email' => 'admin-switch@test.com',
+            'password' => 'password',
+            'role' => 'admin',
+        ]);
+
+        $response->assertRedirect(route('admin.dashboard'));
+        $this->assertAuthenticatedAs(User::where('email', 'admin-switch@test.com')->first());
+    }
+
     public function test_unauthenticated_admin_dashboard_redirects_to_admin_login(): void
     {
         $this->get('/admin/dashboard')

@@ -12,15 +12,16 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
+// Admin login is outside "guest" so an existing site session (student/teacher) can be replaced.
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('login', [AdminAuthenticatedSessionController::class, 'create'])
+        ->name('login');
+
+    Route::post('login', [AdminAuthenticatedSessionController::class, 'store'])
+        ->name('login.store');
+});
+
 Route::middleware('guest')->group(function () {
-    Route::prefix('admin')->name('admin.')->group(function () {
-        Route::get('login', [AdminAuthenticatedSessionController::class, 'create'])
-            ->name('login');
-
-        Route::post('login', [AdminAuthenticatedSessionController::class, 'store'])
-            ->name('login.store');
-    });
-
     Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register');
 

@@ -12,8 +12,20 @@ use Inertia\Response;
 
 class AdminAuthenticatedSessionController extends Controller
 {
-    public function create(): Response
+    public function create(): Response|RedirectResponse
     {
+        $user = Auth::user();
+
+        if ($user?->canAccessAdminPanel()) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        if ($user) {
+            Auth::logout();
+            request()->session()->invalidate();
+            request()->session()->regenerateToken();
+        }
+
         return Inertia::render('Admin/Auth/Login', [
             'status' => session('status'),
         ]);
@@ -21,6 +33,10 @@ class AdminAuthenticatedSessionController extends Controller
 
     public function store(LoginRequest $request): RedirectResponse
     {
+        if (Auth::check() && ! Auth::user()->canAccessAdminPanel()) {
+            Auth::logout();
+        }
+
         // Force the role to admin to avoid tampering
         $request->merge([
             'role' => 'admin',

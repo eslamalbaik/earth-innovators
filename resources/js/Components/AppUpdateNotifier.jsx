@@ -6,6 +6,18 @@ import { useTranslation } from '@/i18n';
 const STORAGE_KEY = 'earth_app_build_id';
 const POLL_MS = 5 * 60 * 1000;
 
+const AUTH_PATH_PREFIXES = ['/admin/login', '/login', '/register', '/forgot-password', '/reset-password'];
+
+const isAuthPath = () => {
+    if (typeof window === 'undefined') {
+        return false;
+    }
+
+    const path = window.location.pathname.replace(/\/$/, '') || '/';
+
+    return AUTH_PATH_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
+};
+
 export default function AppUpdateNotifier({ initialBuildId = null }) {
     const [appBuildId, setAppBuildId] = useState(initialBuildId);
     const { showInfo } = useToast();
@@ -43,7 +55,7 @@ export default function AppUpdateNotifier({ initialBuildId = null }) {
     );
 
     const checkRemoteVersion = useCallback(async () => {
-        if (import.meta.env.DEV) {
+        if (import.meta.env.DEV || isAuthPath()) {
             return;
         }
 
@@ -91,15 +103,16 @@ export default function AppUpdateNotifier({ initialBuildId = null }) {
     }, []);
 
     useEffect(() => {
-        if (import.meta.env.DEV || !appBuildId) {
+        if (import.meta.env.DEV || !appBuildId || isAuthPath()) {
             return undefined;
         }
 
         const stored = sessionStorage.getItem(STORAGE_KEY);
 
-        if (stored && stored !== appBuildId) {
-            promptUpdate(appBuildId);
-        } else if (!stored) {
+        if (!stored) {
+            sessionStorage.setItem(STORAGE_KEY, appBuildId);
+        } else if (stored !== appBuildId) {
+            // Sync after deploy without interrupting login / auth pages
             sessionStorage.setItem(STORAGE_KEY, appBuildId);
         }
 
