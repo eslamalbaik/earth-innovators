@@ -71,6 +71,21 @@ npm run build
 
 ---
 
+## 5) خطأ `BreezeServiceProvider not found` على السيرفر
+
+يحدث عند `composer install --no-dev` مع كاش قديم. نفّذ:
+
+```bash
+cd /var/www/earth-innovators
+rm -f bootstrap/cache/packages.php bootstrap/cache/services.php bootstrap/cache/config.php
+composer install --no-dev --optimize-autoloader
+php artisan package:discover --ansi
+php artisan config:clear
+php artisan cache:clear
+```
+
+---
+
 ## 4) تشخيص
 
 ```bash
