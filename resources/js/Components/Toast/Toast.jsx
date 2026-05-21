@@ -86,6 +86,17 @@ const Toast = ({ toast, onRemove }) => {
                 <p className={`text-xs ${getTextColor()} opacity-95 leading-relaxed`}>
                     {toast.message}
                 </p>
+                {toast.action?.label && (
+                    <button
+                        type="button"
+                        onClick={() => {
+                            toast.action.onClick?.();
+                        }}
+                        className={`mt-2 inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold ${getTextColor()} bg-white/80 hover:bg-white border border-current/20 transition-colors`}
+                    >
+                        {toast.action.label}
+                    </button>
+                )}
             </div>
             <button
                 onClick={handleRemove}

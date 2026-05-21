@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\UserPackage;
+use App\Support\AppBuildVersion;
 use App\Support\StorageUrl;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -70,6 +71,7 @@ class HandleInertiaRequests extends Middleware
                 'phoneDisplay' => config('support.phone_display'),
                 'whatsapp' => config('support.whatsapp'),
             ],
+            'appBuildId' => AppBuildVersion::current(),
             // Subscription/Trial banner data — lightweight, computed once per request
             'subscription' => function () use ($user) {
                 if (!$user || in_array($user->role, ['admin'])) {

@@ -301,6 +301,11 @@ export const en = {
         "appName": "Innovators Legacy",
         "welcome": "Welcome"
     },
+    "appUpdate": {
+        "title": "New update available",
+        "message": "A new version of the site is available. Press the button below to refresh.",
+        "action": "Refresh site"
+    },
     "profilePage": {
         "pageTitle": "Profile - {appName}",
         "title": "Profile",

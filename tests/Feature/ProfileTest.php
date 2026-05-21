@@ -43,6 +43,34 @@ class ProfileTest extends TestCase
         $this->assertNull($user->email_verified_at);
     }
 
+    public function test_admin_profile_email_can_be_updated_via_form_post(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'email' => 'admin-old@example.com',
+            'email_verified_at' => now(),
+        ]);
+
+        $response = $this
+            ->actingAs($admin)
+            ->post('/profile', [
+                '_method' => 'PATCH',
+                'name' => 'Admin User',
+                'email' => 'admin-new@example.com',
+                'institution' => 'Test Org',
+                'bio' => 'Bio text',
+            ]);
+
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect('/profile');
+
+        $admin->refresh();
+
+        $this->assertSame('admin-new@example.com', $admin->email);
+        $this->assertNotNull($admin->email_verified_at);
+    }
+
     public function test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged(): void
     {
         $user = User::factory()->create();

@@ -301,6 +301,11 @@ export const ar = {
         "appName": "إرث المبتكرين",
         "welcome": "مرحباً"
     },
+    "appUpdate": {
+        "title": "تحديث جديد",
+        "message": "يتوفر إصدار جديد من الموقع. اضغط الزر أدناه لتحديث الصفحة.",
+        "action": "تحديث الموقع"
+    },
     "profilePage": {
         "pageTitle": "الملف الشخصي - {appName}",
         "title": "الملف الشخصي",

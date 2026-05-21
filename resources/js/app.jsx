@@ -8,6 +8,7 @@ import { Provider } from 'react-redux';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './lib/react-query';
 import { ToastProvider } from './Contexts/ToastContext';
+import AppUpdateNotifier from './Components/AppUpdateNotifier';
 import { ConfirmProvider } from './Contexts/ConfirmContext';
 import store from './store/store';
 import { getTranslation } from './i18n';
@@ -45,6 +46,7 @@ createInertiaApp({
                 <QueryClientProvider client={queryClient}>
                     <ToastProvider>
                         <ConfirmProvider>
+                            <AppUpdateNotifier initialBuildId={props.initialPage?.props?.appBuildId} />
                             <App {...props} />
                         </ConfirmProvider>
                     </ToastProvider>

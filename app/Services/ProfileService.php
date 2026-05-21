@@ -46,7 +46,7 @@ class ProfileService extends BaseService
             $data['user_image'] = StorageUrl::url($user->image);
         }
 
-        if ($user->isAdmin()) {
+        if ($user->canAccessAdminPanel()) {
             $data['institution'] = $user->institution ?? '';
             $data['bio'] = $user->bio ?? '';
 
@@ -116,7 +116,7 @@ class ProfileService extends BaseService
             $data['badges'] = $badges;
         }
 
-        if ($user->isAdmin()) {
+        if ($user->canAccessAdminPanel()) {
             $data['admin_stats'] = $this->getAdminStats($user);
         }
 
