@@ -12,20 +12,29 @@
 ## 1) سيرفر الإمارات `.ae` (الأساسي)
 
 ```env
+APP_ENV=production
+APP_DEBUG=false
 APP_URL=https://earth-innovators.ae
 APP_PRIMARY_URL=https://earth-innovators.ae
 APP_REDIRECT_TO_PRIMARY=false
 APP_SECONDARY_HOSTS=earth-innovators.cloud
 
+SESSION_DRIVER=database
+SESSION_LIFETIME=120
 SESSION_DOMAIN=null
 SESSION_SECURE_COOKIE=true
-SESSION_DRIVER=database
+SESSION_SAME_SITE=lax
 ```
+
+**أخطاء شائعة تمنع دخول الأدمن:**
+- `APP_ENV=loacal` ← خطأ إملائي، استخدم `production`
+- `APP_URL` لا يساوي `https://earth-innovators.ae`
+- لا يوجد مستخدم `admin` في قاعدة `erthnew` على هذا السيرفر
 
 بعد الرفع:
 
 ```bash
-php artisan db:seed --class=DemoUsersSeeder   # تجريبي فقط
+php artisan admin:ensure --email=admin@demo.com --password='YourStrongPass123'
 php artisan config:clear
 php artisan cache:clear
 php artisan migrate --force

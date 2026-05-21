@@ -21,8 +21,16 @@ class HandleInertiaRequests extends Middleware
     /**
      * Determine the current asset version.
      */
-    public function version(Request $request): string|null
+    public function version(Request $request): ?string
     {
+        $manifest = public_path('build/manifest.json');
+
+        if (is_readable($manifest)) {
+            $hash = @md5_file($manifest);
+
+            return $hash !== false && $hash !== '' ? $hash : parent::version($request);
+        }
+
         return parent::version($request);
     }
 
@@ -54,6 +62,9 @@ class HandleInertiaRequests extends Middleware
                 ] : null,
             ],
             // Flash messages are lightweight, keep them
+            'old' => fn () => $request->hasSession()
+                ? $request->session()->getOldInput()
+                : [],
             'flash' => [
                 // Use pull() to avoid repeated toasts across subsequent Inertia requests
                 // when the session doesn't rotate flash data the way a full redirect does.

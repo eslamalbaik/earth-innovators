@@ -6,28 +6,22 @@ import TextInput from '@/Components/TextInput';
 import PasswordInput from '@/Components/PasswordInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import ApplicationLogo from '@/Components/ApplicationLogo';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { FaEnvelope, FaLock } from 'react-icons/fa';
 import { useTranslation } from '@/i18n';
 
+const csrfToken = () =>
+    typeof document !== 'undefined'
+        ? document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? ''
+        : '';
+
 export default function AdminLogin({ status }) {
     const { t } = useTranslation();
-    const { data, setData, post, processing, errors, reset } = useForm({
-        email: '',
-        password: '',
-        remember: false,
-        role: 'admin',
-    });
+    const { errors, old: oldInput = {} } = usePage().props;
 
-    const submit = (e) => {
-        e.preventDefault();
-        post(route('admin.login.store'), {
-            preserveScroll: true,
-            onSuccess: () => {
-                window.location.assign(route('admin.dashboard'));
-            },
-            onFinish: () => reset('password'),
-        });
+    const fieldError = (name) => {
+        const value = errors?.[name];
+        return Array.isArray(value) ? value[0] : value;
     };
 
     return (
@@ -60,7 +54,15 @@ export default function AdminLogin({ status }) {
                     )}
 
                     <div className="bg-white shadow-lg rounded-2xl px-4 py-10 min-w-[92vw] sm:min-w-[350px]">
-                        <form onSubmit={submit} className="space-y-6">
+                        {/* Full page POST avoids Inertia 409 (CSRF / asset version) loops on production */}
+                        <form
+                            method="POST"
+                            action={route('admin.login.store')}
+                            className="space-y-6"
+                        >
+                            <input type="hidden" name="_token" value={csrfToken()} />
+                            <input type="hidden" name="role" value="admin" />
+
                             <div>
                                 <InputLabel htmlFor="email" value={t('adminLoginPage.emailLabel')} className="text-sm font-medium text-gray-700 mb-2" />
                                 <div className="relative">
@@ -71,15 +73,15 @@ export default function AdminLogin({ status }) {
                                         id="email"
                                         type="email"
                                         name="email"
-                                        value={data.email}
+                                        defaultValue={oldInput.email ?? ''}
                                         className="block w-full ps-10 pe-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
                                         autoComplete="username"
                                         isFocused
-                                        onChange={(e) => setData('email', e.target.value)}
                                         placeholder={t('adminLoginPage.emailPlaceholder')}
+                                        required
                                     />
                                 </div>
-                                <InputError message={errors.email} className="mt-2" />
+                                <InputError message={fieldError('email')} className="mt-2" />
                             </div>
 
                             <div>
@@ -91,25 +93,23 @@ export default function AdminLogin({ status }) {
                                     <PasswordInput
                                         id="password"
                                         name="password"
-                                        value={data.password}
-                                        onChange={(e) => setData('password', e.target.value)}
                                         className="block w-full"
                                         inputClassName="ps-10 pe-11 py-3 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#A3C042] focus:border-[#A3C042] sm:text-sm"
                                         autoComplete="current-password"
                                         placeholder={t('adminLoginPage.passwordPlaceholder')}
+                                        required
                                     />
                                 </div>
-                                <InputError message={errors.password} className="mt-2" />
+                                <InputError message={fieldError('password')} className="mt-2" />
                             </div>
 
-                            <InputError message={errors.role} className="mt-2" />
+                            <InputError message={fieldError('role')} className="mt-2" />
 
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center">
                                     <Checkbox
                                         name="remember"
-                                        checked={data.remember}
-                                        onChange={(e) => setData('remember', e.target.checked)}
+                                        defaultChecked={!!oldInput.remember}
                                     />
                                     <label className="ms-2 block text-sm text-gray-900">
                                         {t('adminLoginPage.rememberMe')}
@@ -119,17 +119,10 @@ export default function AdminLogin({ status }) {
 
                             <div>
                                 <PrimaryButton
+                                    type="submit"
                                     className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#A3C042] hover:from-primary-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#A3C042] disabled:opacity-50"
-                                    disabled={processing}
                                 >
-                                    {processing ? (
-                                        <div className="flex items-center">
-                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white me-2"></div>
-                                            {t('adminLoginPage.loggingIn')}
-                                        </div>
-                                    ) : (
-                                        t('adminLoginPage.loginButton')
-                                    )}
+                                    {t('adminLoginPage.loginButton')}
                                 </PrimaryButton>
                             </div>
                         </form>
