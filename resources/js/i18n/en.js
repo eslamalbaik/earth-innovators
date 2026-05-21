@@ -331,6 +331,8 @@ export const en = {
             "edit": "Edit",
             "cancel": "Cancel",
             "savedSuccess": "Changes saved successfully",
+            "imageSavedSuccess": "Photo uploaded successfully",
+            "uploadingImage": "Uploading photo...",
             "updatePassword": "Update password",
             "deleteAccount": "Delete account",
             "deleting": "Deleting...",

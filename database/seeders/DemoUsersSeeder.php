@@ -29,6 +29,7 @@ class DemoUsersSeeder extends Seeder
                 'name' => 'Admin',
                 'password' => Hash::make('password'),
                 'role' => 'admin',
+                'email_verified_at' => now(),
                 'membership_type' => 'subscription',
                 'points' => 0,
             ]

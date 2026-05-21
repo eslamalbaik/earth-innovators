@@ -51,6 +51,8 @@ export default function Profile({
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [imagePreview, setImagePreview] = useState(null);
     const [teacherImagePreview, setTeacherImagePreview] = useState(null);
+    const [isSavingBasic, setIsSavingBasic] = useState(false);
+    const [isSavingTeacher, setIsSavingTeacher] = useState(false);
     const imageInputRef = useRef(null);
     const teacherImageInputRef = useRef(null);
 
@@ -129,55 +131,157 @@ export default function Profile({
         password: '',
     });
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            basicForm.setData('image', file);
-            setImagePreview(URL.createObjectURL(file));
-            setActiveTab('basic');
+    const buildBasicFormData = (imageFile = null) => {
+        const formData = new FormData();
+        const useSavedValues = isPanelStaff && !isEditingBasic;
+        const name = useSavedValues ? (savedBasic.name || user.name) : basicForm.data.name;
+        const email = useSavedValues ? (savedBasic.email || user.email) : basicForm.data.email;
+
+        formData.append('name', name || '');
+        formData.append('email', email || '');
+
+        const file = imageFile ?? basicForm.data.image;
+        if (file instanceof File) {
+            formData.append('image', file);
+        }
+
+        if (isPanelStaff) {
+            formData.append('institution', basicForm.data.institution ?? '');
+            formData.append('bio', basicForm.data.bio ?? '');
+        }
+
+        formData.append('_method', 'PATCH');
+
+        return formData;
+    };
+
+    const handleBasicProfileErrors = (errors) => {
+        const messages = Object.entries(errors || {})
+            .map(([field, message]) => {
+                const text = Array.isArray(message) ? message.join(', ') : message;
+                return `${field}: ${text}`;
+            })
+            .filter(Boolean);
+
+        if (messages.length > 0) {
+            showError(messages.join('\n'), { autoDismiss: 8000 });
+        } else if (errors?.image) {
+            showError(t('profilePage.alerts.imageUploadError', { message: errors.image }));
         }
     };
 
-    const handleTeacherImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            teacherForm.setData('teacher_image', file);
-            setTeacherImagePreview(URL.createObjectURL(file));
-            setActiveTab('teacher');
+    const submitBasicProfile = ({ imageFile = null, exitEditMode = true } = {}) => {
+        const isImageUpload = imageFile instanceof File || basicForm.data.image instanceof File;
+
+        setIsSavingBasic(true);
+        router.post(route('profile.update'), buildBasicFormData(imageFile), {
+            forceFormData: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                const nextName = isPanelStaff && !isEditingBasic
+                    ? (savedBasic.name || user.name)
+                    : basicForm.data.name;
+                const nextEmail = isPanelStaff && !isEditingBasic
+                    ? (savedBasic.email || user.email)
+                    : basicForm.data.email;
+
+                setSavedBasic({ name: nextName, email: nextEmail });
+
+                if (exitEditMode) {
+                    setIsEditingBasic(false);
+                }
+
+                showSuccess(
+                    isImageUpload
+                        ? t('profilePage.actions.imageSavedSuccess')
+                        : t('profilePage.actions.savedSuccess'),
+                );
+
+                router.reload({
+                    preserveScroll: true,
+                    onFinish: () => {
+                        setImagePreview(null);
+                        basicForm.setData('image', null);
+                    },
+                });
+            },
+            onError: handleBasicProfileErrors,
+            onFinish: () => setIsSavingBasic(false),
+        });
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) {
+            return;
         }
+
+        if (imageInputRef.current) {
+            imageInputRef.current.value = '';
+        }
+
+        basicForm.setData('image', file);
+        setImagePreview(URL.createObjectURL(file));
+        setActiveTab('basic');
+        submitBasicProfile({ imageFile: file, exitEditMode: false });
     };
 
     const handleBasicSubmit = (e) => {
         e.preventDefault();
+        submitBasicProfile({ exitEditMode: true });
+    };
+
+    const buildTeacherFormData = (teacherImageFile = null) => {
         const formData = new FormData();
-        formData.append('name', basicForm.data.name);
-        formData.append('email', basicForm.data.email);
-        if (basicForm.data.image) {
-            formData.append('image', basicForm.data.image);
-        }
-        // Admin extra fields
-        if (user.role === 'admin' || user.role === 'system_supervisor' || user.role === 'school_support_coordinator') {
-            if (basicForm.data.institution !== undefined) {
-                formData.append('institution', basicForm.data.institution ?? '');
+
+        formData.append('name', user.name || basicForm.data.name || '');
+        formData.append('email', user.email || basicForm.data.email || '');
+
+        Object.keys(teacherForm.data).forEach((key) => {
+            if (key === 'teacher_image') {
+                return;
             }
-            if (basicForm.data.bio !== undefined) {
-                formData.append('bio', basicForm.data.bio ?? '');
+
+            if (Array.isArray(teacherForm.data[key])) {
+                teacherForm.data[key].forEach((item, index) => {
+                    formData.append(`teacher_data[${key}][${index}]`, item);
+                });
+            } else {
+                formData.append(`teacher_data[${key}]`, teacherForm.data[key]);
             }
+        });
+
+        const file = teacherImageFile ?? teacherForm.data.teacher_image;
+        if (file instanceof File) {
+            formData.append('teacher_image', file);
         }
+
         formData.append('_method', 'PATCH');
 
-        router.post(route('profile.update'), formData, {
+        return formData;
+    };
+
+    const submitTeacherProfile = ({ teacherImageFile = null } = {}) => {
+        const isImageUpload = teacherImageFile instanceof File || teacherForm.data.teacher_image instanceof File;
+
+        setIsSavingTeacher(true);
+        router.post(route('profile.update'), buildTeacherFormData(teacherImageFile), {
             forceFormData: true,
             preserveScroll: true,
             onSuccess: () => {
-                const nextName = basicForm.data.name;
-                const nextEmail = basicForm.data.email;
-                setSavedBasic({ name: nextName, email: nextEmail });
-                setIsEditingBasic(false);
-                setImagePreview(null);
-                basicForm.reset('image');
-                showSuccess(t('profilePage.actions.savedSuccess'));
-                router.reload({ preserveScroll: true });
+                showSuccess(
+                    isImageUpload
+                        ? t('profilePage.actions.imageSavedSuccess')
+                        : t('profilePage.actions.savedSuccess'),
+                );
+
+                router.reload({
+                    preserveScroll: true,
+                    onFinish: () => {
+                        setTeacherImagePreview(null);
+                        teacherForm.setData('teacher_image', null);
+                    },
+                });
             },
             onError: (errors) => {
                 const messages = Object.entries(errors || {})
@@ -189,70 +293,31 @@ export default function Profile({
 
                 if (messages.length > 0) {
                     showError(messages.join('\n'), { autoDismiss: 8000 });
-                } else if (errors?.image) {
-                    showError(t('profilePage.alerts.imageUploadError', { message: errors.image }));
                 }
             },
+            onFinish: () => setIsSavingTeacher(false),
         });
     };
 
+    const handleTeacherImageChange = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) {
+            return;
+        }
+
+        if (teacherImageInputRef.current) {
+            teacherImageInputRef.current.value = '';
+        }
+
+        teacherForm.setData('teacher_image', file);
+        setTeacherImagePreview(URL.createObjectURL(file));
+        setActiveTab('teacher');
+        submitTeacherProfile({ teacherImageFile: file });
+    };
 
     const handleTeacherSubmit = (e) => {
         e.preventDefault();
-        const formData = new FormData();
-        
-        formData.append('name', user.name || basicForm.data.name || '');
-        formData.append('email', user.email || basicForm.data.email || '');
-        
-        Object.keys(teacherForm.data).forEach(key => {
-            if (key !== 'teacher_image') {
-                if (Array.isArray(teacherForm.data[key])) {
-                    teacherForm.data[key].forEach((item, index) => {
-                        formData.append(`teacher_data[${key}][${index}]`, item);
-                    });
-                } else {
-                    formData.append(`teacher_data[${key}]`, teacherForm.data[key]);
-                }
-            }
-        });
-        if (teacherForm.data.teacher_image) {
-            formData.append('teacher_image', teacherForm.data.teacher_image);
-        }
-
-        formData.append('_method', 'PATCH');
-
-        router.post(route('profile.update'), formData, {
-            forceFormData: true,
-            preserveScroll: true,
-            onSuccess: (page) => {
-                setTeacherImagePreview(null);
-                teacherForm.reset();
-                setTimeout(() => {
-                    router.reload({
-                        only: ['auth', 'teacher'],
-                        preserveScroll: false,
-                    });
-                }, 100);
-            },
-            onError: (errors) => {
-                let errorMessage = `${t('profilePage.alerts.saveDataErrorTitle')}\n`;
-                if (errors.teacher_image) {
-                    errorMessage += `${t('common.image')}: ${Array.isArray(errors.teacher_image) ? errors.teacher_image.join(', ') : errors.teacher_image}\n`;
-                }
-                if (errors.name) {
-                    errorMessage += `${t('common.name')}: ${Array.isArray(errors.name) ? errors.name.join(', ') : errors.name}\n`;
-                }
-                if (errors.email) {
-                    errorMessage += `${t('common.email')}: ${Array.isArray(errors.email) ? errors.email.join(', ') : errors.email}\n`;
-                }
-                Object.keys(errors).forEach(key => {
-                    if (!['teacher_image', 'name', 'email'].includes(key)) {
-                        errorMessage += `${key}: ${Array.isArray(errors[key]) ? errors[key].join(', ') : errors[key]}\n`;
-                    }
-                });
-                alert(errorMessage);
-            },
-        });
+        submitTeacherProfile();
     };
 
     const handlePasswordSubmit = (e) => {
@@ -383,6 +448,8 @@ export default function Profile({
                                 )}
                             </div>
                             <button
+                                type="button"
+                                disabled={isSavingBasic || isSavingTeacher}
                                 onClick={() => {
                                     if (user.role === 'teacher') {
                                         teacherImageInputRef.current?.click();
@@ -390,10 +457,20 @@ export default function Profile({
                                         imageInputRef.current?.click();
                                     }
                                 }}
-                                className="absolute bottom-0 start-0 bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded-full shadow-lg transition"
+                                className="absolute bottom-0 start-0 bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded-full shadow-lg transition disabled:opacity-50"
+                                title={
+                                    isSavingBasic || isSavingTeacher
+                                        ? t('profilePage.actions.uploadingImage')
+                                        : undefined
+                                }
                             >
                                 <FaCamera className="text-sm" />
                             </button>
+                            {(isSavingBasic || isSavingTeacher) && (
+                                <p className="absolute -bottom-6 start-0 text-xs text-gray-500 whitespace-nowrap">
+                                    {t('profilePage.actions.uploadingImage')}
+                                </p>
+                            )}
                             <input
                                 ref={user.role === 'teacher' ? teacherImageInputRef : imageInputRef}
                                 type="file"
@@ -560,7 +637,7 @@ export default function Profile({
                                             <button
                                                 type="button"
                                                 onClick={cancelBasicEdit}
-                                                disabled={basicForm.processing}
+                                                disabled={isSavingBasic}
                                                 className="border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition hover:bg-gray-50 disabled:opacity-50"
                                             >
                                                 <FaTimes />
@@ -569,11 +646,11 @@ export default function Profile({
                                         )}
                                         <button
                                             type="submit"
-                                            disabled={basicForm.processing}
+                                            disabled={isSavingBasic}
                                             className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition disabled:opacity-50"
                                         >
                                             <FaSave />
-                                            {basicForm.processing ? t('profilePage.actions.saving') : t('profilePage.actions.saveChanges')}
+                                            {isSavingBasic ? t('profilePage.actions.saving') : t('profilePage.actions.saveChanges')}
                                         </button>
                                     </div>
                                 )}

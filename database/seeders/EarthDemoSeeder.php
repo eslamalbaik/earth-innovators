@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Faker\Factory as FakerFactory;
 
 class EarthDemoSeeder extends Seeder
 {
@@ -11,8 +10,7 @@ class EarthDemoSeeder extends Seeder
     {
         $this->call(CoreCatalogSeeder::class);
 
-        $faker = FakerFactory::create();
-        $context = (new DemoUsersSeeder())->run($faker);
+        $context = (new DemoUsersSeeder())->run();
 
         (new DemoContentSeeder())->run($context);
         (new DemoBookingsSeeder())->run($context);

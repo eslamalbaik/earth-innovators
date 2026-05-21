@@ -331,6 +331,8 @@ export const ar = {
             "edit": "تعديل",
             "cancel": "إلغاء",
             "savedSuccess": "تم حفظ التغييرات بنجاح",
+            "imageSavedSuccess": "تم رفع الصورة بنجاح",
+            "uploadingImage": "جاري رفع الصورة...",
             "updatePassword": "تحديث كلمة المرور",
             "deleteAccount": "حذف الحساب",
             "deleting": "جاري الحذف...",

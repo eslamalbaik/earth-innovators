@@ -71,6 +71,20 @@ class AdminLoginTest extends TestCase
         $this->get('/admin/dashboard')->assertOk();
     }
 
+    public function test_demo_admin_credentials_can_login(): void
+    {
+        $this->seed(\Database\Seeders\DemoUsersSeeder::class);
+
+        $response = $this->post('/admin/login', [
+            'email' => 'admin@demo.com',
+            'password' => 'password',
+            'role' => 'admin',
+        ]);
+
+        $response->assertRedirect(route('admin.dashboard'));
+        $this->assertAuthenticated();
+    }
+
     public function test_unauthenticated_admin_dashboard_redirects_to_admin_login(): void
     {
         $this->get('/admin/dashboard')
