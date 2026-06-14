@@ -281,7 +281,7 @@ export default function VerifyOtpJoinTeacher() {
                                 <div className="flex items-center gap-3 text-sm text-gray-700">
                                     <FaPhone className="text-gray-400" />
                                     <span className="font-medium">{t('joinTeacherVerifyOtpPage.phoneLabel')}</span>
-                                    <span>{userData.dial_code || '+971'} {userData.phone}</span>
+                                    <span dir="ltr">{userData.dial_code || '+971'} {userData.phone}</span>
                                 </div>
                             )}
                         </div>

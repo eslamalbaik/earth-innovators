@@ -126,7 +126,7 @@ export default function TeacherApplicationDetails({ application }) {
                                     <label className="block text-sm font-medium text-gray-700">{t('common.phone')}</label>
                                     <p className="mt-1 text-sm text-gray-900 flex items-center gap-1">
                                         <FaPhone className="w-4 h-4 text-gray-400" />
-                                        {teacher?.phone}
+                                        <span dir="ltr">{teacher?.phone}</span>
                                     </p>
                                 </div>
                                 <div>

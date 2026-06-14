@@ -122,7 +122,7 @@ export default function UsersShow({ user, contributions, auth }) {
                                     </div>
                                     <div>
                                         <p className="text-sm text-gray-600">الهاتف</p>
-                                        <p className="font-semibold text-gray-900">{user.phone}</p>
+                                        <p className="font-semibold text-gray-900" dir="ltr">{user.phone}</p>
                                     </div>
                                 </div>
                             )}

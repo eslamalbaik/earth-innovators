@@ -193,16 +193,14 @@ export default function Login({ status, canResetPassword }) {
                                     </label>
                                 </div>
 
-                                {canResetPassword && (
-                                    <div className="text-sm">
-                                        <Link
-                                            href={route('password.request')}
-                                            className="font-medium text-[#A3C042] hover:text-[#F9D536]"
-                                        >
-                                            {t('auth.forgotPassword')}
-                                        </Link>
-                                    </div>
-                                )}
+                                <div className="text-sm">
+                                    <Link
+                                        href={route('password.request')}
+                                        className="font-medium text-[#A3C042] hover:text-[#F9D536]"
+                                    >
+                                        {t('auth.forgotPassword')}
+                                    </Link>
+                                </div>
                             </div>
 
                             <div className='flex flex-col items-center justify-start gap-2'>

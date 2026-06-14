@@ -156,7 +156,9 @@ return [
     |
     */
 
-    'domain' => env('SESSION_DOMAIN'),
+    'domain' => ($domain = env('SESSION_DOMAIN')) && ! in_array(strtolower((string) $domain), ['', 'null'], true)
+        ? $domain
+        : null,
 
     /*
     |--------------------------------------------------------------------------

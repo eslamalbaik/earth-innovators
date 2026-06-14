@@ -129,7 +129,7 @@ export default function DesktopFooter({ auth }) {
                                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 transition group-hover:from-[#A3C042] group-hover:to-[#8CA635]">
                                             <Icon className="text-sm text-white" />
                                         </div>
-                                        <span className="text-sm">{contact.text}</span>
+                                        <span className="text-sm" dir={contact.icon === FaPhone ? "ltr" : undefined}>{contact.text}</span>
                                     </>
                                 );
 

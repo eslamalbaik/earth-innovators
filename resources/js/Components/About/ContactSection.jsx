@@ -35,7 +35,7 @@ export default function ContactSection() {
                         <div className="w-10 h-10 bg-gradient-to-br from-[#A3C042] to-legacy-blue rounded-full flex items-center justify-center">
                             <contact.icon className="text-white text-lg" />
                         </div>
-                        <p className="text-lg text-gray-800">{contact.text}</p>
+                        <p className="text-lg text-gray-800" dir={contact.icon === FaPhone ? "ltr" : undefined}>{contact.text}</p>
                     </div>
                 ))}
             </div>

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\ChatRoom;
+use App\Support\SessionCookieDomain;
 use App\Models\Booking;
 use App\Models\Payment;
 use App\Observers\PaymentObserver;
@@ -266,6 +267,15 @@ class AppServiceProvider extends ServiceProvider
 
             if ($configuredHost && $currentHost && strcasecmp($configuredHost, $currentHost) !== 0) {
                 URL::forceRootUrl($request->getSchemeAndHttpHost());
+            }
+
+            $sessionDomain = SessionCookieDomain::forRequestHost(
+                config('session.domain'),
+                $currentHost
+            );
+
+            if ($sessionDomain !== config('session.domain')) {
+                config(['session.domain' => $sessionDomain]);
             }
         }
 

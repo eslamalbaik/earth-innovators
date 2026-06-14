@@ -67,13 +67,19 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null,
 
     const getPackageName = (pkg) => pkg?.name_ar || pkg?.name;
 
+    const isOnTrialOrFree = userPackage?.is_trial === true && userPackage?.status === 'active';
+
     const handleSubscribe = async (packageId) => {
         if (!auth?.user) {
             router.visit('/login');
             return;
         }
 
-        if (userPackage && userPackage.status === 'active') {
+        // Allow upgrade from trial/free to paid package
+        const targetPkg = packages.find(p => p.id === packageId);
+        const isUpgradeToPaid = isOnTrialOrFree && targetPkg && targetPkg.price > 0;
+
+        if (userPackage && userPackage.status === 'active' && !isUpgradeToPaid) {
             showError(t('packagesIndexPage.errors.activeSubscriptionExists'));
             return;
         }
@@ -228,24 +234,37 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null,
                     <div className={`grid gap-6 ${isDesktop ? 'grid-cols-2 lg:grid-cols-4' : 'grid-cols-1 gap-4'}`}>
                         {packages.map((pkg) => {
                             const Icon = IconMap[pkg.duration_type] || FaBox;
-                            const isPopular = pkg.duration_type === 'yearly';
+                            const isPopular = pkg.is_popular || pkg.duration_type === 'yearly';
+                            // If user is on trial/free, don't mark paid packages as "current"
                             const isCurrentPackage = userPackage && userPackage.package_id === pkg.id;
+                            const isPaidPackage = pkg.price > 0;
+                            const canUpgrade = isOnTrialOrFree && isPaidPackage;
 
                             return (
-                                <div key={pkg.id} className={`rounded-2xl border ${isPopular ? 'border-purple-300 shadow-lg' : 'border-gray-200'} overflow-hidden bg-white transition-all hover:shadow-md ${isCurrentPackage ? 'ring-2 ring-green-500' : ''}`}>
+                                <div key={pkg.id} className={`rounded-2xl border ${isPopular ? 'border-purple-300 shadow-lg' : 'border-gray-200'} overflow-hidden bg-white transition-all hover:shadow-md ${isCurrentPackage ? 'ring-2 ring-green-500' : ''} ${canUpgrade ? 'ring-2 ring-[#A3C042]/50' : ''}`}>
                                     {isPopular && (
                                         <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 text-center">
                                             <span className="text-xs font-semibold text-white">{t('packagesIndexPage.badges.mostPopular')}</span>
                                         </div>
                                     )}
-                                    <div className={`p-5 ${isPopular ? '' : ''}`}>
+                                    {canUpgrade && !isPopular && (
+                                        <div className="bg-gradient-to-r from-[#A3C042] to-green-500 px-4 py-1.5 text-center">
+                                            <span className="text-xs font-semibold text-white">⬆️ ترقية من الباقة المجانية</span>
+                                        </div>
+                                    )}
+                                    <div className={`p-5`}>
                                         <div className="flex items-center justify-between mb-3">
-                                            <div className={`rounded-xl p-3 ${isPopular ? 'bg-purple-100' : 'bg-gray-100'}`}>
-                                                <Icon className={`w-5 h-5 ${isPopular ? 'text-purple-600' : 'text-gray-600'}`} />
+                                            <div className={`rounded-xl p-3 ${isPopular ? 'bg-purple-100' : canUpgrade ? 'bg-[#A3C042]/10' : 'bg-gray-100'}`}>
+                                                <Icon className={`w-5 h-5 ${isPopular ? 'text-purple-600' : canUpgrade ? 'text-[#A3C042]' : 'text-gray-600'}`} />
                                             </div>
                                             {isCurrentPackage && (
                                                 <span className="text-xs font-medium bg-green-100 text-green-700 px-2 py-1 rounded-full">
                                                     {t('packagesIndexPage.badges.current')}
+                                                </span>
+                                            )}
+                                            {canUpgrade && (
+                                                <span className="text-xs font-medium bg-[#A3C042]/10 text-[#5a7a00] px-2 py-1 rounded-full">
+                                                    ترقية متاحة
                                                 </span>
                                             )}
                                         </div>
@@ -280,7 +299,9 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null,
                                                 onClick={() => handleSubscribe(pkg.id)}
                                                 disabled={subscribingPackageId === pkg.id}
                                                 className={`w-full rounded-lg px-4 py-2.5 font-medium transition-colors ${
-                                                    pkg.price === 0
+                                                    canUpgrade
+                                                        ? 'bg-[#A3C042] text-white hover:bg-[#8CA635]'
+                                                        : pkg.price === 0
                                                         ? 'bg-green-600 text-white hover:bg-green-700'
                                                         : 'bg-gray-900 text-white hover:bg-gray-800'
                                                 } disabled:opacity-50 disabled:cursor-not-allowed`}
@@ -290,6 +311,8 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null,
                                                         <FaSpinner className="animate-spin" />
                                                         {t('packagesIndexPage.actions.processing')}
                                                     </span>
+                                                ) : canUpgrade ? (
+                                                    'ترقية الآن'
                                                 ) : pkg.price === 0 ? (
                                                     t('packagesIndexPage.actions.activateFree')
                                                 ) : (

@@ -6,7 +6,7 @@ import {
     FaCalendar, FaChartLine, FaUser, FaSignOutAlt,
     FaGraduationCap, FaCommentDots, FaTachometerAlt, FaBell, FaBook,
     FaChevronDown, FaCreditCard, FaTrophy, FaProjectDiagram, FaMedal, FaFile,
-    FaCheckCircle, FaGift, FaLightbulb
+    FaCheckCircle, FaGift, FaLightbulb, FaChalkboardTeacher
 } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import ApplicationLogo from '@/Components/ApplicationLogo';
@@ -499,6 +499,7 @@ export default function DashboardLayout({ children, header }) {
             },
             { name: t('sidebar.addReports'), href: '/school/reports', icon: FaFile },
             { name: t('sidebar.students'), href: '/school/students', icon: FaGraduationCap },
+            { name: 'إدارة المعلمين', href: '/school/teachers', icon: FaChalkboardTeacher },
             { name: t('sidebar.certificates'), href: '/school/certificates', icon: FaFile },
             { name: t('sidebar.packages'), href: '/packages', icon: FaCreditCard },
             { name: t('sidebar.profile'), href: '/profile', icon: FaUser },
@@ -545,6 +546,7 @@ export default function DashboardLayout({ children, header }) {
             },
             { name: t('sidebar.addReports'), href: '/school/reports', icon: FaFile },
             { name: t('sidebar.students'), href: '/school/students', icon: FaGraduationCap },
+            { name: 'إدارة المعلمين', href: '/school/teachers', icon: FaChalkboardTeacher },
             { name: t('sidebar.certificates'), href: '/school/certificates', icon: FaFile },
             { name: t('sidebar.packages'), href: '/packages', icon: FaCreditCard },
             { name: t('sidebar.profile'), href: '/profile', icon: FaUser },

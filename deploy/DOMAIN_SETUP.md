@@ -29,7 +29,28 @@ SESSION_SAME_SITE=lax
 **أخطاء شائعة تمنع دخول الأدمن:**
 - `APP_ENV=loacal` ← خطأ إملائي، استخدم `production`
 - `APP_URL` لا يساوي `https://earth-innovators.ae`
+- **`SESSION_DOMAIN=earth-innovators.cloud`** (منسوخ من سيرفر `.cloud`) — المتصفح يرفض الكوكي على `.ae` ولا تُحفظ الجلسة بعد تسجيل الدخول. استخدم `SESSION_DOMAIN=null` على سيرفر `.ae`
 - لا يوجد مستخدم `admin` في قاعدة `erthnew` على هذا السيرفر
+
+**تشخيص سريع (من جهازك):**
+
+```bash
+curl -sI https://earth-innovators.ae/admin/login | findstr /i "set-cookie domain"
+```
+
+إذا ظهر `domain=earth-innovators.cloud` وأنت على `.ae` رغم أن `.env` صحيح → **كاش الإعدادات قديم**:
+
+```bash
+cd /var/www/earth-innovators
+php artisan config:clear
+rm -f bootstrap/cache/config.php
+php artisan site:diagnose
+sudo systemctl reload php8.2-fpm   # أو php8.3-fpm حسب السيرفر
+```
+
+`SESSION_DOMAIN=null` في الملف لا يكفي إذا سبق تشغيل `php artisan config:cache` والقيمة القديمة ما زالت في `bootstrap/cache/config.php`.
+
+**ملاحظة:** `.ae` و `.cloud` يشيران حالياً لنفس IP — سيرفر واحد وملف `.env` واحد.
 
 بعد الرفع:
 

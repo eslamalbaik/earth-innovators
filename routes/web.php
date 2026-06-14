@@ -658,6 +658,12 @@ Route::middleware(['auth', 'school', 'membership_active'])->prefix('school')->na
     Route::post('/students/{id}/award-badge', [\App\Http\Controllers\School\SchoolStudentController::class, 'awardBadge'])->name('students.award-badge');
     Route::delete('/students/{studentId}/badges/{badgeId}', [\App\Http\Controllers\School\SchoolStudentController::class, 'removeBadge'])->name('students.remove-badge');
     
+    // إدارة المعلمين
+    Route::get('/teachers', [\App\Http\Controllers\School\SchoolTeacherController::class, 'index'])->name('teachers.index');
+    Route::post('/teachers', [\App\Http\Controllers\School\SchoolTeacherController::class, 'store'])->name('teachers.store');
+    Route::put('/teachers/{id}', [\App\Http\Controllers\School\SchoolTeacherController::class, 'update'])->name('teachers.update');
+    Route::delete('/teachers/{id}', [\App\Http\Controllers\School\SchoolTeacherController::class, 'destroy'])->name('teachers.destroy');
+    
     // تقارير تقييم الطلاب
     Route::get('/students/evaluation-report', [\App\Http\Controllers\School\StudentEvaluationController::class, 'index'])->name('students.evaluation-report');
     Route::get('/students/{studentId}/evaluation', [\App\Http\Controllers\School\StudentEvaluationController::class, 'show'])->name('students.evaluation');

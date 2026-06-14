@@ -164,7 +164,7 @@ export default function About({ auth }) {
                                     <Icon className={`${contact.iconColor} text-lg`} />
                                 </div>
                                 <div className="text-xs font-semibold text-gray-500 mb-2">{contact.label}</div>
-                                <div className="text-sm md:text-base font-bold text-gray-900">{contact.text}</div>
+                                <div className="text-sm md:text-base font-bold text-gray-900" dir={contact.icon === FaPhone ? "ltr" : undefined}>{contact.text}</div>
                             </div>
                         );
                     })}

@@ -260,7 +260,7 @@ export default function VerifyOtp() {
                                     <div className="flex items-center justify-center gap-3">
                                         <FaPhone className="text-gray-400" />
                                         <span className="font-medium">{t('common.phone')}:</span>
-                                        <span>{userData.phone}</span>
+                                        <span dir="ltr">{userData.phone}</span>
                                     </div>
                                 )}
                             </div>

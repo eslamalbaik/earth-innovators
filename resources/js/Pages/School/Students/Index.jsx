@@ -253,7 +253,7 @@ export default function Index({ auth, students, availableBadges, availableStuden
                                                 <div className="text-sm text-gray-600">{student.email}</div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-600">{student.phone || '-'}</div>
+                                                <div className="text-sm text-gray-600" dir="ltr">{student.phone || '-'}</div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-1 text-sm font-semibold text-purple-600">

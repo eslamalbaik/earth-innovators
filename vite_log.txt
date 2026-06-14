@@ -1,0 +1,30 @@
+
+  [32m[1mVITE[22m v7.1.12[39m  [2mready in [0m[1m1524[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://127.0.0.1:[1m5173[22m/[39m
+
+  [31m[1mLARAVEL[22m v12.42.0[39m  [2mplugin[22m [1mv2.0.1[22m
+
+  [32m➜[39m  [1mAPP_URL[22m: [36mhttp://127.0.0.1:[1m8000[22m[39m
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Browserslist: browsers data (caniuse-lite) is 8 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+[2m14:06:33[22m [36m[1m[vite][22m[39m [32m.env changed, restarting server...[39m
+[2m14:06:37[22m [36m[1m[vite][22m[39m server restarted.
+
+  [31m[1mLARAVEL[22m v12.42.0[39m  [2mplugin[22m [1mv2.0.1[22m
+
+  [32m➜[39m  [1mAPP_URL[22m: [36mhttp://127.0.0.1:[1m8000[22m[39m
+[2m14:07:20[22m [36m[1m[vite][22m[39m [32m.env changed, restarting server...[39m
+[2m14:07:21[22m [36m[1m[vite][22m[39m server restarted.
+
+  [31m[1mLARAVEL[22m v12.42.0[39m  [2mplugin[22m [1mv2.0.1[22m
+
+  [32m➜[39m  [1mAPP_URL[22m: [36mhttp://127.0.0.1:[1m8000[22m[39m
+[2m14:08:23[22m [36m[1m[vite][22m[39m [32m.env changed, restarting server...[39m
+[2m14:08:23[22m [36m[1m[vite][22m[39m server restarted.
+
+  [31m[1mLARAVEL[22m v12.42.0[39m  [2mplugin[22m [1mv2.0.1[22m
+
+  [32m➜[39m  [1mAPP_URL[22m: [36mhttp://127.0.0.1:[1m8000[22m[39m
