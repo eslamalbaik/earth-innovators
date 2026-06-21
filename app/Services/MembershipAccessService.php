@@ -74,7 +74,7 @@ class MembershipAccessService
     public function getMembershipSummary(User $user): array
     {
         $owner = $this->getAccessOwner($user);
-        $packagesAvailable = !$user->isStudent() && $this->hasAvailablePackagesFor($owner);
+        $packagesAvailable = $this->hasAvailablePackagesFor($owner);
         $subscription = $this->getActiveSubscription($owner);
         $pendingSubscription = $subscription ? null : $this->getPendingSubscription($owner);
         $latestSubscription = $subscription ?? $pendingSubscription ?? $this->getLatestSubscription($owner);
