@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\School;
 
 use App\Http\Controllers\Controller;
+use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -74,6 +75,9 @@ class SchoolTeacherController extends Controller
 
             $teacher->update(['school_id' => $school->id]);
 
+            // المعلم المرتبط بمدرسة يُعتمد تلقائياً (المدرسة هي الضامن)
+            $this->ensureActiveTeacherProfile($teacher);
+
             return redirect()->route('school.teachers.index')
                 ->with('success', 'تم ربط المعلم بالمدرسة بنجاح');
         }
@@ -86,7 +90,7 @@ class SchoolTeacherController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        User::create([
+        $teacher = User::create([
             'name'      => $validated['name'],
             'email'     => $validated['email'],
             'phone'     => $validated['phone'] ?? null,
@@ -95,8 +99,41 @@ class SchoolTeacherController extends Controller
             'school_id' => $school->id,
         ]);
 
+        // المعلم المُضاف من المدرسة يُعتمد تلقائياً (المدرسة هي الضامن)
+        $this->ensureActiveTeacherProfile($teacher);
+
         return redirect()->route('school.teachers.index')
             ->with('success', 'تم إضافة المعلم بنجاح');
+    }
+
+    /**
+     * تأكيد وجود ملف معلم نشط ومعتمد للمستخدم.
+     * يُنشئ الملف إن لم يكن موجوداً، أو يفعّله إن كان غير نشط.
+     */
+    private function ensureActiveTeacherProfile(User $teacher): void
+    {
+        $profile = Teacher::firstOrNew(['user_id' => $teacher->id]);
+
+        if (!$profile->exists) {
+            $profile->fill([
+                'name_ar'          => $teacher->name,
+                'name_en'          => $teacher->name,
+                'city'             => 'غير محدد',
+                'bio'              => null,
+                'qualifications'   => null,
+                'subjects'         => json_encode([]),
+                'stages'           => json_encode([]),
+                'experience_years' => 0,
+                'price_per_hour'   => 0,
+                'nationality'      => 'إماراتي',
+                'gender'           => null,
+                'neighborhoods'    => json_encode([]),
+            ]);
+        }
+
+        $profile->is_verified = true;
+        $profile->is_active = true;
+        $profile->save();
     }
 
     public function update(Request $request, $id)
