@@ -18,19 +18,14 @@ class PackageController extends Controller
             ->orderBy('price');
 
         // تصفية الباقات حسب دور المستخدم
-        if ($role === 'student') {
-            // للطلاب: إظهار فقط الباقات المجانية (trial) أو المجانية
-            $query->where(function ($q) {
-                $q->where('is_trial', true)
-                    ->orWhere('price', 0);
-            });
-        } elseif ($role === 'teacher') {
+        if ($role === 'teacher') {
             // للمعلمين: إخفاء الباقات التجريبية إذا كانت مدرسته مشتركة
             $userSchool = $user->school;
             if ($userSchool && $userSchool->membership_status === 'active') {
                 $query->where('is_trial', false);
             }
         }
+        // للطلاب: إظهار كل الباقات (trial + non-trial + free)
 
         $packages = $query->get();
 

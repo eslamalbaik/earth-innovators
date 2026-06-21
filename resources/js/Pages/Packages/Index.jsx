@@ -109,16 +109,6 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null,
     };
 
     const PackagesContent = ({ isDesktop = false }) => {
-        if (isStudent) {
-            return (
-                <div className={isDesktop ? "p-24 text-center" : "p-12 text-center"}>
-                    <img src="/images/subscription-managed-by-school.svg" alt="اشتراك الطالب مُدار من المدرسة" style={{maxWidth: 280, margin: '0 auto 24px auto'}} />
-                    <h2 className={isDesktop ? "text-2xl font-bold mb-4" : "text-lg font-bold mb-3"}>حسابك كطالب مُدار من قبل مدرستك مباشرة</h2>
-                    <p className={isDesktop ? "text-lg text-gray-600" : "text-base text-gray-600"}>لا يحتاج الطالب إلى أي اشتراك أو تفعيل باقة؛ جميع الخدمات فعّالة تلقائياً ضمن اشتراك المدرسة/المؤسسة.</p>
-                </div>
-            );
-        }
-
         return (
             <div className={isDesktop ? "space-y-8" : "space-y-6"}>
                 {/* Header */}
