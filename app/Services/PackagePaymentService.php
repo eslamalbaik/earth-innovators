@@ -90,6 +90,72 @@ class PackagePaymentService extends BaseService
         return $this->getActiveSubscription($user);
     }
 
+    /**
+     * Reconcile any pending subscriptions for a user against the payment gateway.
+     *
+     * - If Ziina reports the payment as paid  -> activate the subscription.
+     * - If Ziina reports failed/cancelled/expired -> cancel it.
+     * - If it is still pending on Ziina but was abandoned long ago -> cancel it.
+     * - If it is recent and still pending -> leave it untouched (user may still be paying).
+     */
+    public function reconcilePendingSubscriptions(User $user, int $abandonAfterMinutes = 30): void
+    {
+        $pendingSubscriptions = UserPackage::where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->get();
+
+        foreach ($pendingSubscriptions as $userPackage) {
+            $payment = Payment::where('user_package_id', $userPackage->id)
+                ->whereNotIn('status', ['completed', 'cancelled', 'failed'])
+                ->latest()
+                ->first();
+
+            $isStale = $userPackage->created_at
+                && $userPackage->created_at->lt(now()->subMinutes($abandonAfterMinutes));
+
+            // No active payment record linked: cancel only if it has been abandoned.
+            if (!$payment) {
+                if ($isStale) {
+                    $userPackage->update(['status' => 'cancelled']);
+                    event(new SubscriptionUpdated($userPackage->fresh()));
+                }
+                continue;
+            }
+
+            // Never reached the gateway (no intent id): cancel if abandoned.
+            if (!$payment->gateway_payment_id) {
+                if ($isStale) {
+                    $this->markPaymentCancelled($payment, ['source' => 'reconcile_no_gateway']);
+                }
+                continue;
+            }
+
+            try {
+                $gatewayPayment = $this->ziinaService->getPaymentRequest($payment->gateway_payment_id);
+                $gatewayStatus = $gatewayPayment['status'] ?? null;
+
+                if (in_array($gatewayStatus, ['paid', 'completed'], true)) {
+                    $this->finalizePayment($payment, $gatewayPayment ?? []);
+                } elseif (in_array($gatewayStatus, ['failed', 'cancelled', 'canceled', 'expired'], true)) {
+                    $this->markPaymentCancelled($payment, $gatewayPayment ?? ['source' => 'reconcile_gateway_status']);
+                } elseif ($isStale) {
+                    // Still pending on Ziina but abandoned long ago.
+                    $this->markPaymentCancelled($payment, [
+                        'source' => 'reconcile_abandoned',
+                        'gateway_status' => $gatewayStatus,
+                    ]);
+                }
+                // else: recent + still pending -> leave as-is.
+            } catch (\Throwable $exception) {
+                Log::warning('Failed to reconcile pending subscription', [
+                    'user_package_id' => $userPackage->id,
+                    'payment_id' => $payment->id,
+                    'error' => $exception->getMessage(),
+                ]);
+            }
+        }
+    }
+
     public function createSubscriptionCheckout(User $user, Package $package): array
     {
         if ($this->getActiveSubscription($user)) {

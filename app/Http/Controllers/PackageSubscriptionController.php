@@ -21,6 +21,11 @@ class PackageSubscriptionController extends Controller
     {
         $user = Auth::user();
 
+        // مصالحة الاشتراكات المعلّقة: تفعيل المدفوع منها وإلغاء المتروك بدون دفع
+        if ($user) {
+            $this->packagePaymentService->reconcilePendingSubscriptions($user);
+        }
+
         // ملاحظة: تم السماح للطلاب برؤية الباقات (سابقاً كانوا يُحوَّلون للوحة التحكم)
         $packages = Package::where('is_active', true)
             ->orderByDesc('is_trial')
@@ -203,6 +208,9 @@ class PackageSubscriptionController extends Controller
     public function mySubscriptions()
     {
         $user = Auth::user();
+
+        // مصالحة الاشتراكات المعلّقة قبل العرض (تفعيل المدفوع / إلغاء المتروك)
+        $this->packagePaymentService->reconcilePendingSubscriptions($user);
 
         $subscriptions = UserPackage::where('user_id', $user->id)
             ->whereNotIn('status', ['cancelled', 'expired'])
