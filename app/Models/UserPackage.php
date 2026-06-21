@@ -21,6 +21,7 @@ class UserPackage extends Model
         'paid_amount',
         'payment_method',
         'transaction_id',
+        'expiry_reminder_sent_at',
     ];
 
     protected $casts = [
@@ -28,6 +29,7 @@ class UserPackage extends Model
         'end_date' => 'date',
         'paid_amount' => 'decimal:2',
         'auto_renew' => 'boolean',
+        'expiry_reminder_sent_at' => 'datetime',
     ];
 
     public function user(): BelongsTo
