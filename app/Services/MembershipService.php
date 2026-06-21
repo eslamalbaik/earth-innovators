@@ -15,26 +15,29 @@ class MembershipService
     {
         $prefix = $this->getPrefixForRole($role);
         $year = date('Y');
-        
-        // Get the last membership number for this role and year
-        $lastNumber = User::where('role', $role)
-            ->where('membership_number', 'like', "{$prefix}-{$year}-%")
-            ->orderBy('membership_number', 'desc')
+
+        // Get the highest existing sequence for this prefix/year
+        $lastNumber = User::where('membership_number', 'like', "{$prefix}-{$year}-%")
+            ->orderByRaw('CAST(SUBSTRING_INDEX(membership_number, "-", -1) AS UNSIGNED) DESC')
             ->value('membership_number');
-        
-        // Extract the sequence number
+
         $sequence = 1;
         if ($lastNumber) {
             $parts = explode('-', $lastNumber);
-            if (count($parts) === 3 && $parts[0] === $prefix && $parts[1] === $year) {
+            if (count($parts) === 3) {
                 $sequence = (int) $parts[2] + 1;
             }
         }
-        
-        // Format with leading zeros (3 digits)
-        $formattedSequence = str_pad($sequence, 3, '0', STR_PAD_LEFT);
-        
-        return "{$prefix}-{$year}-{$formattedSequence}";
+
+        $candidate = "{$prefix}-{$year}-" . str_pad($sequence, 3, '0', STR_PAD_LEFT);
+
+        // Skip any already-taken numbers (handles gaps from deleted users)
+        while (User::where('membership_number', $candidate)->exists()) {
+            $sequence++;
+            $candidate = "{$prefix}-{$year}-" . str_pad($sequence, 3, '0', STR_PAD_LEFT);
+        }
+
+        return $candidate;
     }
 
     /**
@@ -60,13 +63,6 @@ class MembershipService
         }
 
         $membershipNumber = $this->generateMembershipNumber($user->role);
-        
-        // Ensure uniqueness (handle race conditions)
-        $attempts = 0;
-        while (User::where('membership_number', $membershipNumber)->exists() && $attempts < 10) {
-            $membershipNumber = $this->generateMembershipNumber($user->role);
-            $attempts++;
-        }
 
         $user->update(['membership_number' => $membershipNumber]);
 

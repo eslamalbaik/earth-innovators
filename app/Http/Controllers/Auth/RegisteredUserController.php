@@ -104,43 +104,56 @@ class RegisteredUserController extends Controller
         }
 
         try {
-            DB::beginTransaction();
+            $user = DB::transaction(function () use ($validated, $userData) {
+                if (in_array($validated['role'], ['student', 'teacher'], true)) {
+                    $prefix = match($validated['role']) {
+                        'student' => 'STU',
+                        'teacher' => 'TCH',
+                        default   => 'USR',
+                    };
+                    $year = date('Y');
 
-            if (in_array($validated['role'], ['student', 'teacher'], true)) {
-                $userData['membership_number'] = $this->membershipService->generateMembershipNumber($validated['role']);
-            }
+                    // Lock existing rows so concurrent requests can't grab the same number
+                    User::where('membership_number', 'like', "{$prefix}-{$year}-%")
+                        ->lockForUpdate()
+                        ->orderByRaw('CAST(SUBSTRING_INDEX(membership_number, "-", -1) AS UNSIGNED) DESC')
+                        ->value('membership_number');
 
-            $user = User::create($userData);
+                    $userData['membership_number'] = $this->membershipService->generateMembershipNumber($validated['role']);
+                }
 
-            if ($validated['role'] === 'teacher') {
-                Teacher::create([
-                    'user_id' => $user->id,
-                    'name_ar' => $validated['name'],
-                    'name_en' => $validated['name'],
-                    'city' => 'غير محدد',
-                    'bio' => null,
-                    'qualifications' => null,
-                    'subjects' => json_encode([]),
-                    'stages' => json_encode([]),
-                    'experience_years' => 0,
-                    'price_per_hour' => 0,
-                    'nationality' => 'إماراتي',
-                    'gender' => null,
-                    'neighborhoods' => json_encode([]),
-                    'is_verified' => false,
-                    'is_active' => false,
-                ]);
-            }
+                $user = User::create($userData);
 
-            DB::commit();
+                if ($validated['role'] === 'teacher') {
+                    Teacher::create([
+                        'user_id'          => $user->id,
+                        'name_ar'          => $validated['name'],
+                        'name_en'          => $validated['name'],
+                        'city'             => 'غير محدد',
+                        'bio'              => null,
+                        'qualifications'   => null,
+                        'subjects'         => json_encode([]),
+                        'stages'           => json_encode([]),
+                        'experience_years' => 0,
+                        'price_per_hour'   => 0,
+                        'nationality'      => 'إماراتي',
+                        'gender'           => null,
+                        'neighborhoods'    => json_encode([]),
+                        'is_verified'      => false,
+                        'is_active'        => false,
+                    ]);
+                }
+
+                return $user;
+            });
 
             try {
                 app(PackagePaymentService::class)->activateDefaultTrialForNewUser($user);
             } catch (\Throwable $trialException) {
                 Log::warning('Unable to activate default trial after registration', [
                     'user_id' => $user->id,
-                    'role' => $user->role,
-                    'error' => $trialException->getMessage(),
+                    'role'    => $user->role,
+                    'error'   => $trialException->getMessage(),
                 ]);
             }
 
@@ -149,8 +162,6 @@ class RegisteredUserController extends Controller
 
             return redirect(route('dashboard', absolute: false));
         } catch (\Exception $e) {
-            DB::rollBack();
-
             return back()->withErrors([
                 'error' => 'حدث خطأ أثناء إنشاء الحساب: ' . $e->getMessage(),
             ])->withInput();
