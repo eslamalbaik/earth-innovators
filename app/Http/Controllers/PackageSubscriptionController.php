@@ -21,12 +21,7 @@ class PackageSubscriptionController extends Controller
     {
         $user = Auth::user();
 
-        if ($user?->isStudent()) {
-            return redirect()->route('dashboard')->with('info', [
-                'key' => 'packagesIndexPage.errors.managedBySchool',
-            ]);
-        }
-
+        // ملاحظة: تم السماح للطلاب برؤية الباقات (سابقاً كانوا يُحوَّلون للوحة التحكم)
         $packages = Package::where('is_active', true)
             ->orderByDesc('is_trial')
             ->orderBy('price', 'asc')
@@ -126,11 +121,7 @@ class PackageSubscriptionController extends Controller
             ]);
         }
 
-        if ($user->isStudent()) {
-            return redirect()->route('dashboard')->with('error', [
-                'key' => 'packagesIndexPage.errors.managedBySchool',
-            ]);
-        }
+        // ملاحظة: تم السماح للطلاب بالاشتراك في الباقات المدفوعة
 
         if ($user->isTeacher()) {
             $school = $user->school;
