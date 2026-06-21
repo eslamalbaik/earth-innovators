@@ -213,6 +213,7 @@ class PackageSubscriptionController extends Controller
         $user = Auth::user();
 
         $subscriptions = UserPackage::where('user_id', $user->id)
+            ->whereNotIn('status', ['cancelled', 'expired'])
             ->with(['package', 'payments' => fn ($q) => $q->where('status', 'completed')->latest()->limit(1)])
             ->orderBy('created_at', 'desc')
             ->get()
