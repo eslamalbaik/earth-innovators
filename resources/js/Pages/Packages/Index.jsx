@@ -16,8 +16,6 @@ import {
     FaCreditCard,
     FaGift,
     FaTrophy,
-    FaAward,
-    FaInfinity,
     FaInfoCircle
 } from 'react-icons/fa';
 import { useToast } from '@/Contexts/ToastContext';
@@ -321,23 +319,6 @@ export default function PackagesIndex({ auth, packages = [], userPackage = null,
                         })}
                     </div>
                 )}
-
-                {/* Free plan section */}
-                <div className={`bg-gray-50 rounded-2xl border border-gray-200 ${isDesktop ? 'p-8' : 'p-5'}`}>
-                    <div className="text-center">
-                        <FaAward className={`mx-auto mb-3 ${isDesktop ? 'text-4xl' : 'text-2xl'} text-gray-400`} />
-                        <h3 className={`font-bold text-gray-900 mb-2 ${isDesktop ? 'text-xl' : 'text-base'}`}>
-                            {t('packagesIndexPage.freePlan.title')}
-                        </h3>
-                        <p className={`text-gray-600 mb-4 ${isDesktop ? 'text-base max-w-lg mx-auto' : 'text-sm'}`}>
-                            {t('packagesIndexPage.freePlan.description')}
-                        </p>
-                        <div className={`flex items-center justify-center gap-2 text-sm ${isDesktop ? 'text-base' : 'text-sm'} text-gray-500`}>
-                            <FaInfinity className="text-gray-400" />
-                            <span>{t('packagesIndexPage.freePlan.foreverFree')}</span>
-                        </div>
-                    </div>
-                </div>
 
                 {/* Info Section */}
                 {auth?.user && !isStudent && (
