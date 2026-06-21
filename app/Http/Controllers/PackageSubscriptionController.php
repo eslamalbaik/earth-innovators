@@ -50,7 +50,8 @@ class PackageSubscriptionController extends Controller
                     'is_popular' => $package->is_popular,
                     'audience' => $package->resolveAudience(),
                 ];
-            });
+            })
+            ->values();
 
         $userPackage = null;
         $trialStatus = null;
