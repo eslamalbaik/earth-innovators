@@ -53,6 +53,80 @@ class CertificateService
         return $pdfPath;
     }
 
+    /**
+     * Generate a calibration overlay: draws a coordinate grid (in design pixels)
+     * on top of the certificate template so field positions can be read exactly.
+     */
+    public function generateCalibrationGrid(?string $templatePath = null): string
+    {
+        $templatePath = $templatePath ?? public_path('Certificate.pdf');
+        $this->assertGenerationReady($templatePath);
+
+        if (!class_exists('\TCPDF', false)) {
+            $tcpdfPath = base_path('vendor/tecnickcom/tcpdf/tcpdf.php');
+            if (file_exists($tcpdfPath)) {
+                require_once $tcpdfPath;
+            } else {
+                throw new \Exception('TCPDF library is required. Please run: composer require tecnickcom/tcpdf');
+            }
+        }
+
+        $pdf = new Fpdi('P', 'pt', 'A4', true, 'UTF-8', false);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->SetMargins(0, 0, 0);
+        $pdf->SetAutoPageBreak(false, 0);
+
+        $pdf->setSourceFile($templatePath);
+        $tplId = $pdf->importPage(1);
+        $size = $pdf->getTemplateSize($tplId);
+        $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+        $pdf->useTemplate($tplId, 0, 0, $size['width'], $size['height'], true);
+
+        $pageWidth = (float) $size['width'];
+        $pageHeight = (float) $size['height'];
+
+        $pdf->setRTL(false);
+        $pdf->SetFont('dejavusans', '', 6);
+
+        $step = 50; // design pixels between grid lines
+
+        for ($dx = 0; $dx <= CertificateLayout::DESIGN_WIDTH; $dx += $step) {
+            $x = CertificateLayout::scaleX($dx, $pageWidth);
+            $isMajor = ($dx % 100 === 0);
+            $pdf->SetDrawColor($isMajor ? 220 : 150, $isMajor ? 0 : 150, $isMajor ? 0 : 255);
+            $pdf->SetLineWidth($isMajor ? 0.4 : 0.15);
+            $pdf->Line($x, 0, $x, $pageHeight);
+            if ($isMajor) {
+                $pdf->SetTextColor(200, 0, 0);
+                $pdf->SetXY($x + 1, 2);
+                $pdf->Cell(22, 6, (string) $dx, 0, 0, 'L');
+            }
+        }
+
+        for ($dy = 0; $dy <= CertificateLayout::DESIGN_HEIGHT; $dy += $step) {
+            $y = CertificateLayout::scaleY($dy, $pageHeight);
+            $isMajor = ($dy % 100 === 0);
+            $pdf->SetDrawColor($isMajor ? 220 : 150, $isMajor ? 0 : 150, $isMajor ? 0 : 255);
+            $pdf->SetLineWidth($isMajor ? 0.4 : 0.15);
+            $pdf->Line(0, $y, $pageWidth, $y);
+            if ($isMajor) {
+                $pdf->SetTextColor(200, 0, 0);
+                $pdf->SetXY(2, $y + 1);
+                $pdf->Cell(22, 6, (string) $dy, 0, 0, 'L');
+            }
+        }
+
+        $filename = 'certificates/calibration-grid.pdf';
+        $fullPath = storage_path('app/public/' . $filename);
+        if (!is_dir(dirname($fullPath))) {
+            mkdir(dirname($fullPath), 0775, true);
+        }
+        $pdf->Output($fullPath, 'F');
+
+        return $filename;
+    }
+
     public function getGenerationHealth(?string $templatePath = null): array
     {
         $resolvedTemplatePath = $templatePath ?? public_path('Certificate.pdf');
