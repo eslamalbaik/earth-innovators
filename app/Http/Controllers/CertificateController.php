@@ -72,11 +72,13 @@ class CertificateController extends Controller
                     ], 422);
                 }
 
-                if (!$this->membershipAccessService->hasCertificateAccess($school)) {
+                // عضوية المعلم نفسه (وليست عضوية المدرسة) هي ما يخوّله طلب الشهادة.
+                // المدرسة تبقى الجهة المعتمِدة لسير العمل، لكن عضويتها لا تمنع الطلب.
+                if (!$actor->isAdmin() && !$this->membershipAccessService->hasCertificateAccess($actor)) {
                     return response()->json([
                         'success' => false,
                         'message' => [
-                            'key' => 'toastMessages.certificateSchoolAccessDenied',
+                            'key' => 'toastMessages.certificateAccessDenied',
                         ],
                     ], 422);
                 }
