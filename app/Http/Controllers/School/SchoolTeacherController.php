@@ -78,6 +78,9 @@ class SchoolTeacherController extends Controller
             // المعلم المرتبط بمدرسة يُعتمد تلقائياً (المدرسة هي الضامن)
             $this->ensureActiveTeacherProfile($teacher);
 
+            // منح التجربة المجانية تلقائياً (نفس ما يحصل عند التسجيل العادي) إن لم يسبق له اشتراك
+            app(\App\Services\PackagePaymentService::class)->activateDefaultTrialForNewUser($teacher);
+
             return redirect()->route('school.teachers.index')
                 ->with('success', 'تم ربط المعلم بالمدرسة بنجاح');
         }
@@ -101,6 +104,9 @@ class SchoolTeacherController extends Controller
 
         // المعلم المُضاف من المدرسة يُعتمد تلقائياً (المدرسة هي الضامن)
         $this->ensureActiveTeacherProfile($teacher);
+
+        // منح التجربة المجانية تلقائياً (نفس ما يحصل عند التسجيل العادي)
+        app(\App\Services\PackagePaymentService::class)->activateDefaultTrialForNewUser($teacher);
 
         return redirect()->route('school.teachers.index')
             ->with('success', 'تم إضافة المعلم بنجاح');
