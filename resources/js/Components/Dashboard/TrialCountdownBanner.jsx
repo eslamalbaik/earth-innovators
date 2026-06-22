@@ -35,7 +35,7 @@ export default function TrialCountdownBanner({ membershipSummary = null }) {
                         </div>
                         <div>
                             <p className="text-sm font-bold text-emerald-900">
-                                {t('trialBanner.trialActive', { package: subscription.package_name })}
+                                {t('trialBanner.trialActiveNoDate', { package: subscription.package_name })}
                             </p>
                             <p className="mt-0.5 text-xs text-emerald-700">
                                 {t('trialBanner.daysRemaining', { count: daysLeft })} {' - '}
