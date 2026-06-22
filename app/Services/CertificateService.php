@@ -263,6 +263,40 @@ class CertificateService
     }
 
     /**
+     * Resolve the Arabic font keys for the certificate.
+     * Uses Tajawal (resources/fonts/Tajawal-Regular.ttf & Tajawal-Bold.ttf) when present,
+     * registering it with TCPDF on first use; otherwise falls back to DejaVu Sans.
+     *
+     * @return array{regular:string,bold:string}
+     */
+    protected function resolveArabicFonts(): array
+    {
+        $fallback = ['regular' => 'dejavusans', 'bold' => 'dejavusans'];
+
+        $regularTtf = resource_path('fonts/Tajawal-Regular.ttf');
+        $boldTtf = resource_path('fonts/Tajawal-Bold.ttf');
+
+        if (!file_exists($regularTtf) || !class_exists('\TCPDF_FONTS')) {
+            return $fallback;
+        }
+
+        try {
+            // addTTFfont is cached: it skips reprocessing if the font is already registered.
+            $regular = \TCPDF_FONTS::addTTFfont($regularTtf, 'TrueTypeUnicode', '', 32);
+            $bold = file_exists($boldTtf)
+                ? \TCPDF_FONTS::addTTFfont($boldTtf, 'TrueTypeUnicode', '', 32)
+                : $regular;
+
+            return [
+                'regular' => $regular ?: 'dejavusans',
+                'bold' => $bold ?: ($regular ?: 'dejavusans'),
+            ];
+        } catch (\Throwable $exception) {
+            return $fallback;
+        }
+    }
+
+    /**
      * Fill PDF template with data
      */
     protected function fillPdfTemplate(string $templatePath, array $data): string
@@ -306,8 +340,9 @@ class CertificateService
         $pdf->AddPage($templateSize['orientation'], [$templateSize['width'], $templateSize['height']]);
         $pdf->useTemplate($tplId, 0, 0, $templateSize['width'], $templateSize['height'], true);
         
-        // Set font for Arabic text (DejaVu Sans supports Arabic)
-        $pdf->SetFont('dejavusans', '', 12);
+        // Arabic font (Tajawal if available, otherwise DejaVu Sans)
+        $fonts = $this->resolveArabicFonts();
+        $pdf->SetFont($fonts['regular'], '', 12);
         $pdf->SetTextColor(34, 34, 34);
         
         $pageWidth = (float) $templateSize['width'];
@@ -333,14 +368,16 @@ class CertificateService
                 $pageHeight
             );
             $align = $fieldConfig['align'] ?? 'left';
-            $fontFamily = $fieldConfig['font_family'] ?? 'dejavusans';
             $fontStyle = $fieldConfig['font_style'] ?? '';
             $designWidth = (float) ($fieldConfig['width'] ?? $this->resolveFieldWidth($fieldConfig, CertificateLayout::DESIGN_WIDTH));
             $width = CertificateLayout::scaleX($designWidth, $pageWidth);
             $height = max($fontSize * 1.5, 18);
             $value = (string) $data[$fieldName];
 
-            $pdf->SetFont(strtolower($fontFamily), $fontStyle, $fontSize);
+            // Use Tajawal (regular/bold) when available; bold is a separate font file.
+            $isBold = stripos((string) $fontStyle, 'B') !== false;
+            $resolvedFamily = $isBold ? $fonts['bold'] : $fonts['regular'];
+            $pdf->SetFont($resolvedFamily, '', $fontSize);
 
             $alignMap = [
                 'left' => 'L',
