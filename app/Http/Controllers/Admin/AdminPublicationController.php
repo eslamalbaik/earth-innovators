@@ -77,6 +77,85 @@ class AdminPublicationController extends Controller
     }
 
     /**
+     * توليد محتوى المقال بالذكاء الاصطناعي
+     */
+    public function generate(Request $request, \App\Services\AIEngine\DeepSeekClient $deepSeekClient)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+        ]);
+
+        $title = $request->input('title');
+
+        try {
+            $aiResponse = $deepSeekClient->chatWithJson([
+                \App\Services\AIEngine\DeepSeekClient::systemMessage(
+                    'أنت كاتب مقالات محترف. '
+                    . 'مهمتك هي كتابة مقال تعليمي مطول جداً ومفصل وشامل بناءً على العنوان المقدم. '
+                    . 'هام جداً: يجب أن يتجاوز طول المقال 600 كلمة. '
+                    . 'قم بتقسيم المقال إلى 4 فقرات رئيسية على الأقل: مقدمة جذابة، صلب الموضوع (يحتوي على شرح مفصل وأمثلة)، التطبيقات العملية، وخاتمة شاملة. '
+                    . 'توسع في الشرح ولا تختصر إطلاقاً. '
+                    . 'هام جداً للتنسيق: يجب أن يكون محتوى المقال (content و content_ar) منسقاً باستخدام وسوم HTML (مثل <h2>, <h3>, <p>, <strong>, <ul>, <li>). لا ترجع نصاً عادياً بل كود HTML جاهز للعرض. '
+                    . 'يجب توفير المحتوى والوصف باللغتين العربية والإنجليزية. '
+                    . 'بالإضافة لذلك، قم باقتراح كلمة مفتاحية واحدة باللغة الإنجليزية للبحث عن صورة مناسبة للمقال على موقع Unsplash. '
+                    . 'أجب بصيغة JSON فقط مع الحقول التالية: '
+                    . 'content (المقال بالعربية بصيغة HTML، يجب أن يكون طويلاً ومفصلاً جداً), content_ar (نفس المحتوى بالعربية بصيغة HTML), '
+                    . 'title (عنوان المقال بالإنجليزية), title_ar (عنوان المقال بالعربية), '
+                    . 'description (وصف قصير للعرض النصي العادي), description_ar (وصف قصير بالعربية)، '
+                    . 'image_keyword (كلمة مفتاحية واحدة بالإنجليزية للبحث في Unsplash).'
+                ),
+                \App\Services\AIEngine\DeepSeekClient::userMessage("عنوان المقال: " . $title),
+            ]);
+
+            if (!$aiResponse) {
+                return response()->json(['error' => 'فشل في توليد المحتوى من الذكاء الاصطناعي.'], 500);
+            }
+
+            // Fallbacks for structure
+            $content = $aiResponse['content'] ?? '';
+            $content_ar = $aiResponse['content_ar'] ?? $content;
+            $title_en = $aiResponse['title'] ?? $title;
+            $title_ar = $aiResponse['title_ar'] ?? $title;
+            $description = $aiResponse['description'] ?? '';
+            $description_ar = $aiResponse['description_ar'] ?? $description;
+            $keyword = $aiResponse['image_keyword'] ?? 'education';
+
+            // Fetch image from Unsplash
+            $imageUrl = null;
+            $unsplashAccessKey = config('services.unsplash.access_key');
+            if ($unsplashAccessKey) {
+                $unsplashResponse = \Illuminate\Support\Facades\Http::get('https://api.unsplash.com/search/photos', [
+                    'query' => $keyword,
+                    'client_id' => $unsplashAccessKey,
+                    'per_page' => 1,
+                    'orientation' => 'landscape'
+                ]);
+
+                if ($unsplashResponse->successful()) {
+                    $results = $unsplashResponse->json('results');
+                    if (!empty($results)) {
+                        $imageUrl = $results[0]['urls']['regular'] ?? null;
+                    }
+                }
+            }
+
+            return response()->json([
+                'title' => $title_en,
+                'title_ar' => $title_ar,
+                'content' => $content,
+                'content_ar' => $content_ar,
+                'description' => $description,
+                'description_ar' => $description_ar,
+                'image_url' => $imageUrl
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error generating AI publication (admin): ' . $e->getMessage());
+            return response()->json(['error' => 'حدث خطأ غير متوقع أثناء توليد المحتوى.'], 500);
+        }
+    }
+
+    /**
      * حفظ مقال جديد
      */
     public function store(StorePublicationRequest $request)

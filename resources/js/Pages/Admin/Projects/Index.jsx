@@ -11,7 +11,9 @@ import {
     FaTrash,
     FaPlus,
     FaSave,
-    FaTimes
+    FaTimes,
+    FaRobot,
+    FaSpinner
 } from 'react-icons/fa';
 
 export default function AdminProjectsIndex({ projects, stats, filters, users, schools, teachers }) {
@@ -24,6 +26,11 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [projectToEdit, setProjectToEdit] = useState(null);
     const [isLoadingProject, setIsLoadingProject] = useState(false);
+
+    // AI project assistant (create modal)
+    const [aiIdea, setAiIdea] = useState('');
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [aiImagePreview, setAiImagePreview] = useState(null);
 
     // PERFORMANCE: Optimistic UI state for instant feedback
     const [optimisticProjects, setOptimisticProjects] = useState(null);
@@ -132,6 +139,37 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
     }, [projectToEdit, updateProject, resetEditForm]);
 
     /**
+     * توليد تفاصيل المشروع بالذكاء الاصطناعي
+     */
+    const handleAIGenerate = useCallback(async () => {
+        if (!aiIdea) {
+            alert('يرجى إدخال فكرة المشروع أولاً.');
+            return;
+        }
+
+        setIsGenerating(true);
+        try {
+            const axios = (await import('axios')).default;
+            const response = await axios.post(route('admin.projects.generate'), { idea: aiIdea });
+            const result = response.data;
+
+            setCreateData((prev) => ({
+                ...prev,
+                title: result.title || prev.title,
+                description: result.description || prev.description,
+                category: result.category || prev.category,
+                images: result.image_url ? [result.image_url] : prev.images,
+            }));
+
+            setAiImagePreview(result.image_url || null);
+        } catch (error) {
+            alert(error.response?.data?.error || 'حدث خطأ أثناء توليد تفاصيل المشروع');
+        } finally {
+            setIsGenerating(false);
+        }
+    }, [aiIdea, setCreateData]);
+
+    /**
      * PERFORMANCE OPTIMIZED: Create submit with partial reload
      */
     const handleCreateSubmit = useCallback((e) => {
@@ -143,6 +181,8 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
             onSuccess: () => {
                 setShowCreateModal(false);
                 resetCreateForm();
+                setAiIdea('');
+                setAiImagePreview(null);
             },
         });
     }, [createProject, resetCreateForm]);
@@ -159,6 +199,8 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
     const closeCreateModal = useCallback(() => {
         setShowCreateModal(false);
         resetCreateForm();
+        setAiIdea('');
+        setAiImagePreview(null);
     }, [resetCreateForm]);
 
     /**
@@ -636,6 +678,51 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                         <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('adminProjectsIndexPage.modals.projectInfoTitle')}</h2>
 
                         <form onSubmit={handleCreateSubmit} className="space-y-6">
+                            {/* مساعد الذكاء الاصطناعي */}
+                            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100 flex flex-col md:flex-row md:items-center gap-4 justify-between">
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <FaRobot className="text-blue-600 text-xl" />
+                                        <h3 className="font-bold text-blue-800 text-base">مساعد الذكاء الاصطناعي للمشاريع</h3>
+                                    </div>
+                                    <p className="text-sm text-blue-600">
+                                        اكتب فكرة مبسطة وسيقوم المساعد بتوليد عنوان احترافي، وصف شامل، وتحديد الفئة وصورة غلاف مناسبة.
+                                    </p>
+                                </div>
+                                <div className="flex-1 flex gap-2 w-full md:w-auto">
+                                    <input
+                                        type="text"
+                                        value={aiIdea}
+                                        onChange={(e) => setAiIdea(e.target.value)}
+                                        placeholder="مثال: مشروع عن تدوير النفايات المدرسية..."
+                                        className="flex-1 text-sm rounded-lg border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={handleAIGenerate}
+                                        disabled={isGenerating || !aiIdea}
+                                        className="bg-blue-600 text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-blue-700 disabled:opacity-50 transition flex justify-center items-center gap-2 whitespace-nowrap"
+                                    >
+                                        {isGenerating ? (
+                                            <><FaSpinner className="animate-spin" /> جاري التوليد...</>
+                                        ) : (
+                                            <><FaRobot /> توليد التفاصيل</>
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+
+                            {aiImagePreview && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">صورة الغلاف (من الذكاء الاصطناعي)</label>
+                                    <img
+                                        src={aiImagePreview}
+                                        alt="صورة الغلاف"
+                                        className="w-full max-w-sm h-40 object-cover rounded-lg border border-gray-300"
+                                    />
+                                </div>
+                            )}
+
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* العنوان */}
                                 <div className="md:col-span-2">

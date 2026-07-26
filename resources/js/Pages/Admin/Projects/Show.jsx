@@ -1,10 +1,33 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import { FaArrowRight, FaCheckCircle, FaTimesCircle, FaTrash, FaUser, FaSchool, FaChalkboardTeacher, FaEye, FaHeart, FaStar, FaFileAlt, FaCalendar, FaStar as FaStarIcon } from 'react-icons/fa';
+import { useState } from 'react';
+import { FaArrowRight, FaCheckCircle, FaTimesCircle, FaTrash, FaUser, FaSchool, FaChalkboardTeacher, FaEye, FaHeart, FaStar, FaFileAlt, FaCalendar, FaStar as FaStarIcon, FaRobot, FaSpinner, FaThumbsUp, FaExclamationTriangle } from 'react-icons/fa';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 
 export default function AdminProjectShow({ project }) {
     const { confirm } = useConfirmDialog();
+
+    const [isEvaluating, setIsEvaluating] = useState(false);
+    const [evaluation, setEvaluation] = useState(null);
+
+    const handleEvaluate = async () => {
+        setIsEvaluating(true);
+        try {
+            const axios = (await import('axios')).default;
+            const response = await axios.post(route('admin.projects.evaluate', project.id));
+            setEvaluation(response.data);
+        } catch (error) {
+            alert(error.response?.data?.error || 'حدث خطأ أثناء تقييم المشروع');
+        } finally {
+            setIsEvaluating(false);
+        }
+    };
+
+    const recommendationMeta = {
+        approve: { label: 'يُنصح بالاعتماد', className: 'bg-green-100 text-green-800' },
+        reject: { label: 'يُنصح بالرفض', className: 'bg-red-100 text-red-800' },
+        needs_revision: { label: 'يحتاج تعديلاً', className: 'bg-yellow-100 text-yellow-800' },
+    };
 
     const handleApprove = async () => {
         const confirmed = await confirm({
@@ -122,6 +145,89 @@ export default function AdminProjectShow({ project }) {
                                 <p className="text-2xl font-bold text-gray-900">{project.rating || '—'}</p>
                             </div>
                         </div>
+                    </div>
+
+                    {/* AI Evaluation */}
+                    <div className="bg-white rounded-xl shadow-lg p-6">
+                        <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+                            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                                <FaRobot className="text-blue-600" />
+                                التقييم بالذكاء الاصطناعي
+                            </h2>
+                            <button
+                                onClick={handleEvaluate}
+                                disabled={isEvaluating}
+                                className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 transition flex items-center gap-2"
+                            >
+                                {isEvaluating ? (
+                                    <><FaSpinner className="animate-spin" /> جاري التقييم...</>
+                                ) : (
+                                    <><FaRobot /> {evaluation ? 'إعادة التقييم' : 'قيّم المشروع'}</>
+                                )}
+                            </button>
+                        </div>
+
+                        {!evaluation && !isEvaluating && (
+                            <p className="text-sm text-gray-500">
+                                اضغط "قيّم المشروع" ليحلّل الذكاء الاصطناعي المشروع ويقترح درجة وتوصية تساعدك في قرار المراجعة.
+                            </p>
+                        )}
+
+                        {evaluation && (
+                            <div className="space-y-5">
+                                <div className="flex items-center gap-4 flex-wrap">
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-4xl font-bold text-blue-700">{evaluation.score}</span>
+                                        <span className="text-lg text-gray-500">/100</span>
+                                    </div>
+                                    {evaluation.recommendation && recommendationMeta[evaluation.recommendation] && (
+                                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${recommendationMeta[evaluation.recommendation].className}`}>
+                                            {recommendationMeta[evaluation.recommendation].label}
+                                        </span>
+                                    )}
+                                </div>
+
+                                {evaluation.summary && (
+                                    <p className="text-gray-700 whitespace-pre-wrap">{evaluation.summary}</p>
+                                )}
+
+                                {evaluation.strengths && evaluation.strengths.length > 0 && (
+                                    <div>
+                                        <h3 className="text-sm font-bold text-green-700 flex items-center gap-2 mb-2">
+                                            <FaThumbsUp /> نقاط القوة
+                                        </h3>
+                                        <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
+                                            {evaluation.strengths.map((item, index) => (
+                                                <li key={index}>{item}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+
+                                {evaluation.weaknesses && evaluation.weaknesses.length > 0 && (
+                                    <div>
+                                        <h3 className="text-sm font-bold text-amber-700 flex items-center gap-2 mb-2">
+                                            <FaExclamationTriangle /> نقاط تحتاج تحسيناً
+                                        </h3>
+                                        <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
+                                            {evaluation.weaknesses.map((item, index) => (
+                                                <li key={index}>{item}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+
+                                {evaluation.recommendation_text && (
+                                    <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 text-sm text-blue-800">
+                                        {evaluation.recommendation_text}
+                                    </div>
+                                )}
+
+                                <p className="text-xs text-gray-400">
+                                    * هذا التقييم استرشادي بالذكاء الاصطناعي، والقرار النهائي يعود للمراجِع.
+                                </p>
+                            </div>
+                        )}
                     </div>
 
                     {/* Files and Images */}

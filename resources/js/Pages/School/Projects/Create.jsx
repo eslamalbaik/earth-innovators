@@ -1,7 +1,7 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, useForm, router, Link } from '@inertiajs/react';
 import { useState, useRef } from 'react';
-import { FaArrowLeft, FaUpload, FaCloudUploadAlt, FaFile, FaSpinner, FaTrash } from 'react-icons/fa';
+import { FaArrowLeft, FaUpload, FaCloudUploadAlt, FaFile, FaSpinner, FaTrash, FaRobot } from 'react-icons/fa';
 import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
@@ -24,6 +24,9 @@ export default function CreateSchoolProject({ auth }) {
         report: '',
     });
 
+    const [aiIdea, setAiIdea] = useState('');
+    const [isGenerating, setIsGenerating] = useState(false);
+
     const [thumbnailFile, setThumbnailFile] = useState(null);
     const [projectDocumentFile, setProjectDocumentFile] = useState(null);
     const [fileList, setFileList] = useState([]);
@@ -33,6 +36,46 @@ export default function CreateSchoolProject({ auth }) {
     const imageInputRef = useRef(null);
     const thumbnailInputRef = useRef(null);
     const projectDocumentInputRef = useRef(null);
+
+    const handleAIGenerate = async () => {
+        if (!aiIdea) {
+            alert(t('common.error') + ": يرجى إدخال فكرة المشروع أولاً.");
+            return;
+        }
+
+        setIsGenerating(true);
+        try {
+            const axios = (await import('axios')).default;
+            const response = await axios.post('/school/projects/generate', { idea: aiIdea });
+            const result = response.data;
+            
+            setData(prev => ({
+                ...prev,
+                title: result.title || prev.title,
+                description: result.description || prev.description,
+                category: result.category || prev.category,
+                grade: result.grade || prev.grade,
+                subject: result.subject || prev.subject,
+                instructional_approach: result.instructional_approach || prev.instructional_approach,
+            }));
+
+            if (result.image_url) {
+                try {
+                    const imgRes = await fetch(result.image_url);
+                    const blob = await imgRes.blob();
+                    const file = new File([blob], 'ai_generated_image.jpg', { type: blob.type });
+                    setData('thumbnail', file);
+                    setThumbnailFile(file);
+                } catch (imgError) {
+                    console.error("Error fetching AI image", imgError);
+                }
+            }
+        } catch (error) {
+            alert(error.response?.data?.error || t('common.error') + ': حدث خطأ أثناء توليد تفاصيل المشروع');
+        } finally {
+            setIsGenerating(false);
+        }
+    };
 
     const handleFiles = (files) => {
         const fileArray = Array.from(files);
@@ -237,6 +280,40 @@ export default function CreateSchoolProject({ auth }) {
 
                 <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg p-6">
                     <div className="space-y-6">
+                        {/* AI Project Assistant */}
+                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100 mb-4 flex flex-col md:flex-row md:items-center gap-4 justify-between">
+                            <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <FaRobot className="text-blue-600 text-xl" />
+                                    <h3 className="font-bold text-blue-800 text-base">مساعد الذكاء الاصطناعي للمشاريع</h3>
+                                </div>
+                                <p className="text-sm text-blue-600">
+                                    اكتب فكرة مبسطة وسيقوم المساعد بتوليد عنوان احترافي، وصف شامل، وتحديد الفئة وصورة غلاف مناسبة.
+                                </p>
+                            </div>
+                            <div className="flex-1 flex gap-2 w-full md:w-auto">
+                                <input
+                                    type="text"
+                                    value={aiIdea}
+                                    onChange={(e) => setAiIdea(e.target.value)}
+                                    placeholder="مثال: مشروع عن تدوير النفايات المدرسية..."
+                                    className="flex-1 text-sm rounded-lg border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={handleAIGenerate}
+                                    disabled={isGenerating || !aiIdea}
+                                    className="bg-blue-600 text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-blue-700 disabled:opacity-50 transition flex justify-center items-center gap-2 whitespace-nowrap"
+                                >
+                                    {isGenerating ? (
+                                        <><FaSpinner className="animate-spin" /> جاري التوليد...</>
+                                    ) : (
+                                        <><FaRobot /> توليد التفاصيل</>
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+
                         {/* العنوان */}
                         <div>
                             <InputLabel htmlFor="title" value={t('schoolProjectsCreatePage.form.titleLabel')} />
@@ -343,7 +420,7 @@ export default function CreateSchoolProject({ auth }) {
                         </div>
 
                         <div>
-                            <InputLabel value={t('schoolProjectsCreatePage.form.imagesLabel')} />
+                            <InputLabel value={t('schoolProjectsCreatePage.form.thumbnailLabel', { defaultValue: 'صورة الغلاف' })} />
                             <div className="mt-2 flex items-center gap-3">
                                 <button
                                     type="button"
@@ -414,68 +491,6 @@ export default function CreateSchoolProject({ auth }) {
                             <p className="mt-1 text-xs text-gray-500">{t('schoolProjectsCreatePage.dropzone.filesTitle')}</p>
                             {projectDocumentFile && <p className="mt-1 text-sm text-gray-700">{projectDocumentFile.name}</p>}
                             <InputError message={errors.project_document} className="mt-2" />
-                        </div>
-
-                        {/* رفع الصور */}
-                        <div>
-                            <InputLabel value={t('schoolProjectsCreatePage.form.imagesLabel')} />
-                            <div
-                                className={`mt-2 border-2 border-dashed rounded-lg p-6 text-center transition ${
-                                    dragActive ? 'border-[#A3C042] bg-green-50' : 'border-gray-300'
-                                }`}
-                                onDragEnter={(e) => {
-                                    e.preventDefault();
-                                    setDragActive(true);
-                                }}
-                                onDragLeave={(e) => {
-                                    e.preventDefault();
-                                    setDragActive(false);
-                                }}
-                                onDragOver={(e) => e.preventDefault()}
-                                onDrop={(e) => {
-                                    e.preventDefault();
-                                    setDragActive(false);
-                                    handleImages(e.dataTransfer.files);
-                                }}
-                            >
-                                <FaCloudUploadAlt className="mx-auto text-4xl text-gray-400 mb-2" />
-                                <p className="text-gray-600 mb-2">{t('schoolProjectsCreatePage.dropzone.imagesTitle')}</p>
-                                <button
-                                    type="button"
-                                    onClick={() => imageInputRef.current?.click()}
-                                    className="text-[#A3C042] hover:text-legacy-blue font-medium"
-                                >
-                                    {t('schoolProjectsCreatePage.actions.chooseImages')}
-                                </button>
-                                <input
-                                    ref={imageInputRef}
-                                    type="file"
-                                    multiple
-                                    accept="image/*"
-                                    onChange={(e) => handleImages(e.target.files)}
-                                    className="hidden"
-                                />
-                            </div>
-                            {imageList.length > 0 && (
-                                <div className="mt-4 grid grid-cols-4 gap-4">
-                                    {imageList.map((item) => (
-                                        <div key={item.id} className="relative">
-                                            <img
-                                                src={item.preview}
-                                                alt={item.name}
-                                                className="w-full h-32 object-cover rounded-lg"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => removeImage(item.id)}
-                                                className="absolute top-2 left-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                                            >
-                                                <FaTrash className="text-xs" />
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
                         </div>
 
                         {/* رفع الملفات */}

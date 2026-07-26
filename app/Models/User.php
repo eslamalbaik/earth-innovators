@@ -40,6 +40,10 @@ class User extends Authenticatable implements MustVerifyEmail
         'contract_end_date',
         'contract_status',
         'year',
+        'official_links',
+        'supporting_documents',
+        'innovator_classification',
+        'overall_innovation_score',
     ];
 
     protected $hidden = [
@@ -56,6 +60,9 @@ class User extends Authenticatable implements MustVerifyEmail
             'contract_start_date' => 'date',
             'contract_end_date' => 'date',
             'year' => 'integer',
+            'official_links' => 'array',
+            'supporting_documents' => 'array',
+            'overall_innovation_score' => 'decimal:2',
         ];
     }
 
@@ -91,6 +98,8 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->role === 'teacher';
     }
+
+// duplicate assignedStudents method removed – using later implementation
 
     public function isStudent(): bool
     {
@@ -436,5 +445,54 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->belongsToMany(Publication::class, 'publication_likes')
             ->withTimestamps();
+    }
+
+    // ─── Innovation System Relations ─────────────────────────
+
+    public function achievements(): HasMany
+    {
+        return $this->hasMany(Achievement::class);
+    }
+
+    public function userSkills(): HasMany
+    {
+        return $this->hasMany(UserSkill::class);
+    }
+
+    public function qualifications(): HasMany
+    {
+        return $this->hasMany(UserQualification::class);
+    }
+
+    public function innovationIndexes(): HasMany
+    {
+        return $this->hasMany(InnovationIndex::class);
+    }
+
+    public function latestInnovationIndex(): HasOne
+    {
+        return $this->hasOne(InnovationIndex::class)->latestOfMany('calculated_at');
+    }
+
+    public function cognitiveAssessments(): HasMany
+    {
+        return $this->hasMany(CognitiveAssessment::class);
+    }
+
+    public function latestCognitiveAssessment(): HasOne
+    {
+        return $this->hasOne(CognitiveAssessment::class)->latestOfMany();
+    }
+
+    /**
+     * Get innovator classification details
+     */
+    public function getInnovatorClassificationDetails(): array
+    {
+        if (!$this->innovator_classification) {
+            return InnovationIndex::CLASSIFICATIONS['developing'];
+        }
+        return InnovationIndex::CLASSIFICATIONS[$this->innovator_classification]
+            ?? InnovationIndex::CLASSIFICATIONS['developing'];
     }
 }

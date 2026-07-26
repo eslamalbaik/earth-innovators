@@ -55,4 +55,15 @@ return [
         'test_bypass' => env('ZIINA_TEST_BYPASS', false),
         'base_url' => env('ZIINA_BASE_URL', 'https://api-v2.ziina.com/api'),
     ],
+
+    'deepseek' => [
+        'api_key' => env('DEEPSEEK_API_KEY'),
+        'base_url' => env('DEEPSEEK_BASE_URL', 'https://api.deepseek.com'),
+        'model' => env('DEEPSEEK_MODEL', 'deepseek-chat'),
+    ],
+
+    'unsplash' => [
+        'access_key' => env('UNSPLASH_ACCESS_KEY'),
+        'secret_key' => env('UNSPLASH_SECRET_KEY'),
+    ],
 ];

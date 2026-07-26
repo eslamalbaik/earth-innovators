@@ -3,6 +3,7 @@ export const ar = {
         "appName": "إرث المبتكرين",
         "welcomeBack": "مرحباً بعودتك",
         "teacher": "معلم",
+        "discover": "اكتشف",
         "all": "الكل",
         "close": "إغلاق",
         "january": "يناير",
@@ -27,7 +28,7 @@ export const ar = {
         "home": "الرئيسية",
         "projects": "المشاريع",
         "challenges": "التحديات",
-        "publications": "الإصدارات",
+        "publications": "المجلة",
         "badges": "الشارات",
         "about": "عن إرث المبتكرين",
         "joinPlatform": "انضم للمنصة",
@@ -862,9 +863,9 @@ export const ar = {
         },
         "teacherRecruitmentSubtitle": "إذا كنت معلماً متميزاً وتريد المساهمة في تطوير طلابنا",
         "publications": {
-            "title": "الإصدارات",
+            "title": "المجلة",
             "subtitle": "اكتشف محتوى مبتكر من الطلاب والمعلمين: مجلات، كتيبات وتقارير تعرض إبداع مؤسساتنا التعليمية.",
-            "viewAllPublications": "عرض جميع الإصدارات",
+            "viewAllPublications": "تصفح المجلة كاملة",
             "issue": "العدد",
             "types": {
                 "magazine": "مجلة",
@@ -1005,7 +1006,7 @@ export const ar = {
     "quickLinks": {
         "challenges": "التحديات",
         "challengesDesc": "شارك في التحديات التعليمية",
-        "publications": "الإصدارات",
+        "publications": "المجلة",
         "publicationsDesc": "اقرأ المجلات والكتيبات",
         "badges": "الشارات",
         "badgesDesc": "احصل على الشارات والإنجازات",
@@ -1642,6 +1643,14 @@ export const ar = {
     },
     "sidebar": {
         "dashboard": "لوحة التحكم",
+        "innovationProfile": "ملف الابتكار",
+        "achievements": "إنجازاتي",
+        "innovationIndexes": "مؤشرات الابتكار",
+        "indexHistory": "تطور المؤشرات",
+        "aiRecommendations": "التوصيات الذكية",
+        "benchmarking": "المقارنات المرجعية",
+        "innovationTracking": "متابعة الابتكار",
+        "talentMap": "خريطة المواهب",
         "projectBox": "صندوق المشاريع",
         "projects": "المشاريع",
         "submissions": "التسليمات",
@@ -2380,6 +2389,7 @@ export const ar = {
         "openSubscriptions": "اشتراكاتي",
         "openCertificates": "فتح الشهادات",
         "openPublications": "فتح المنشورات",
+        "openStudents": "إدارة الطلاب",
         "openChallengeSuggestions": "فتح اقتراحات التحديات",
         "workflow": {
             "publications": "منشورات بانتظار المراجعة",
@@ -3760,6 +3770,7 @@ export const ar = {
             "reportLabel": "تقرير المشروع (اختياري)",
             "coverImageLabel": "صورة غلاف المشروع",
             "coverImageHint": "صورة اختيارية تظهر كغلاف لبطاقة المشروع.",
+            "thumbnailLabel": "صورة الغلاف",
             "projectDocumentLabel": "مستند المشروع (PDF/Word)",
             "projectDocumentHint": "ملف اختياري يحتوي على توثيق المشروع بالتفصيل."
         },
@@ -5603,13 +5614,18 @@ export const ar = {
         }
     },
     "publicationsPage": {
-        "pageTitle": "الإصدارات - {appName}",
-        "searchPlaceholder": "البحث عن الإصدارات...",
+        "pageTitle": "المجلة - {appName}",
+        "searchPlaceholder": "البحث في المجلة...",
         "allTypes": "جميع الأنواع",
-        "empty": "لا توجد إصدارات متاحة حالياً",
+        "empty": "لا يوجد محتوى في المجلة حالياً",
+        "emptyHint": "جرّب تعديل كلمات البحث أو تغيير التصنيف",
+        "myPosts": "منشوراتي",
         "like": "إعجاب",
         "unlike": "إزالة الإعجاب",
         "issueLabel": "العدد {number}",
+        "publicationsAvailable": "منشور متاح",
+        "publicationsFound": "منشور",
+        "featured": "الأكثر تميزاً",
         "types": {
             "article": "مقال"
         },
@@ -5907,7 +5923,7 @@ export const ar = {
         "editAction": "تعديل",
         "empty": "لا توجد مقالات منشورة",
         "statuses": {
-            "pending": "قيد المراجعة",
+            "pending": "في الانتظار",
             "approved": "منشور",
             "rejected": "مرفوض"
         },

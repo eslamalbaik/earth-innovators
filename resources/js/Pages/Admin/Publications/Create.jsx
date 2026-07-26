@@ -1,7 +1,8 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, useForm, Link } from '@inertiajs/react';
 import { useState } from 'react';
-import { FaUpload, FaSpinner, FaYoutube } from 'react-icons/fa';
+import { FaUpload, FaSpinner, FaYoutube, FaRobot } from 'react-icons/fa';
+import axios from 'axios';
 import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
@@ -28,6 +29,47 @@ export default function AdminPublicationCreate({ schools }) {
 
     const [coverPreview, setCoverPreview] = useState(null);
     const [fileName, setFileName] = useState('');
+    const [isGenerating, setIsGenerating] = useState(false);
+
+    const handleAIGenerate = async () => {
+        const titleToUse = data.title || data.title_ar;
+        if (!titleToUse) {
+            alert('يرجى إدخال عنوان المقال (بالعربية أو الإنجليزية) أولاً لتوليد المحتوى.');
+            return;
+        }
+
+        setIsGenerating(true);
+        try {
+            const response = await axios.post('/admin/publications/generate', { title: titleToUse });
+            const result = response.data;
+
+            setData((prev) => ({
+                ...prev,
+                title: result.title || prev.title,
+                title_ar: result.title_ar || prev.title_ar,
+                content: result.content || prev.content,
+                content_ar: result.content_ar || prev.content_ar,
+                description: result.description || prev.description,
+                description_ar: result.description_ar || prev.description_ar,
+            }));
+
+            if (result.image_url) {
+                try {
+                    const imgRes = await fetch(result.image_url);
+                    const blob = await imgRes.blob();
+                    const file = new File([blob], 'ai_generated_image.jpg', { type: blob.type });
+                    setData('cover_image', file);
+                    setCoverPreview(URL.createObjectURL(file));
+                } catch (imgError) {
+                    console.error('Error fetching AI image', imgError);
+                }
+            }
+        } catch (error) {
+            alert(error.response?.data?.error || 'حدث خطأ أثناء توليد المحتوى');
+        } finally {
+            setIsGenerating(false);
+        }
+    };
 
     const handleCoverImageChange = (e) => {
         const file = e.target.files[0];
@@ -78,6 +120,30 @@ export default function AdminPublicationCreate({ schools }) {
                                 <option value="article">{t('common.publicationTypes.article')}</option>
                             </select>
                             <InputError message={errors.type} className="mt-2" />
+                        </div>
+
+                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100 flex items-center justify-between">
+                            <div>
+                                <h3 className="font-semibold text-blue-800 text-sm flex items-center gap-2">
+                                    <FaRobot className="text-blue-600" />
+                                    توليد المحتوى بالذكاء الاصطناعي
+                                </h3>
+                                <p className="text-xs text-blue-600 mt-1">
+                                    اكتب العنوان فقط (بالعربية أو الإنجليزية) وسيقوم الذكاء الاصطناعي بكتابة المقال واختيار صورة مناسبة.
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={handleAIGenerate}
+                                disabled={isGenerating || (!data.title && !data.title_ar)}
+                                className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition flex items-center gap-2 shrink-0"
+                            >
+                                {isGenerating ? (
+                                    <><FaSpinner className="animate-spin" /> جاري التوليد...</>
+                                ) : (
+                                    <><FaRobot /> توليد الآن</>
+                                )}
+                            </button>
                         </div>
 
                         <PublicationBilingualFields

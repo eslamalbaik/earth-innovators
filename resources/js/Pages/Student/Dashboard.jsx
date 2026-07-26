@@ -4,10 +4,11 @@ import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import StudentCommunityScoreCard from '@/Pages/Student/Home/StudentCommunityScoreCard';
 import StudentWelcomeCard from '@/Pages/Student/Home/StudentWelcomeCard';
 import StudentDashboardOverview from '@/Pages/Student/Dashboard/StudentDashboardOverview';
+import InnovationSummaryCard from '@/Pages/Student/Dashboard/InnovationSummaryCard';
 import { useTranslation } from '@/i18n';
 import TrialCountdownBanner from '@/Components/Dashboard/TrialCountdownBanner';
 
-export default function StudentDashboard({ auth, stats = {}, communityScorePercent = 0, engagement = null, membershipSummary = null }) {
+export default function StudentDashboard({ auth, stats = {}, communityScorePercent = 0, engagement = null, membershipSummary = null, innovation = null }) {
     const user = auth?.user;
     const { t, language } = useTranslation();
 
@@ -41,6 +42,10 @@ export default function StudentDashboard({ auth, stats = {}, communityScorePerce
                                 points={stats.totalPoints || 0}
                             />
                         </div>
+                    </section>
+
+                    <section aria-label="ملف الابتكار">
+                        <InnovationSummaryCard innovation={innovation} />
                     </section>
 
                     <section aria-label={t('studentDashboardPage.sections.overview')}>

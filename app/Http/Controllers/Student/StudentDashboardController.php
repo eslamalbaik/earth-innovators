@@ -118,11 +118,46 @@ class StudentDashboardController extends Controller
         // Membership summary for trial/subscription banner
         $membershipSummary = app(MembershipAccessService::class)->getMembershipSummary($user);
 
+        // Innovation summary (إرث المبتكرين)
+        try {
+            $latestIndex = $user->latestInnovationIndex;
+            $innovation = [
+                'hasIndex'              => (bool) $latestIndex,
+                'overallScore'          => (float) ($latestIndex->overall_score ?? 0),
+                'classification'        => $latestIndex->classification ?? 'developing',
+                'classificationDetails' => $latestIndex?->getClassificationDetails()
+                    ?? \App\Models\InnovationIndex::CLASSIFICATIONS['developing'],
+                'indexes'               => $latestIndex?->toIndexArray() ?? [],
+                'indexNames'            => \App\Models\InnovationIndex::INDEX_NAMES,
+                'achievements'          => [
+                    'total'     => $user->achievements()->count(),
+                    'validated' => $user->achievements()->where('ai_validation_status', 'validated')->count(),
+                    'pending'   => $user->achievements()->where('ai_validation_status', 'pending')->count(),
+                ],
+                'recentAchievements'    => $user->achievements()
+                    ->latest()
+                    ->limit(3)
+                    ->get(['id', 'title', 'type', 'ai_validation_status', 'date']),
+            ];
+        } catch (\Exception $e) {
+            $innovation = [
+                'hasIndex'              => false,
+                'overallScore'          => 0,
+                'classification'        => 'developing',
+                'classificationDetails' => \App\Models\InnovationIndex::CLASSIFICATIONS['developing'],
+                'indexes'               => [],
+                'indexNames'            => \App\Models\InnovationIndex::INDEX_NAMES,
+                'achievements'          => ['total' => 0, 'validated' => 0, 'pending' => 0],
+                'recentAchievements'    => [],
+            ];
+        }
+
         return Inertia::render('Student/Dashboard', [
             'stats'                => $stats,
             'communityScorePercent' => $communityScorePercent,
             'engagement'           => $engagement,
             'membershipSummary'    => $membershipSummary,
+            'innovation'           => $innovation,
         ]);
     }
 }

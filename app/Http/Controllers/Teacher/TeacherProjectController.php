@@ -78,6 +78,81 @@ class TeacherProjectController extends Controller
     }
 
     /**
+     * توليد أفكار ووصف المشروع بالذكاء الاصطناعي
+     */
+    public function generate(Request $request, \App\Services\AIEngine\DeepSeekClient $deepSeekClient)
+    {
+        $request->validate([
+            'idea' => 'required|string|max:500',
+        ]);
+
+        $idea = $request->input('idea');
+
+        try {
+            $aiResponse = $deepSeekClient->chatWithJson([
+                \App\Services\AIEngine\DeepSeekClient::systemMessage(
+                    'أنت مستشار تخطيط مشاريع تعليمية وابتكارية. '
+                    . 'بناءً على الفكرة أو الوصف القصير الذي يقدمه المعلم، قم بإنشاء تفاصيل مشروع كاملة وجاهزة للنشر. '
+                    . 'اختر واحدة من الفئات التالية حصراً: science, technology, engineering, mathematics, arts, other. '
+                    . 'اقترح أيضاً كلمة مفتاحية واحدة باللغة الإنجليزية للبحث عن صورة غلاف من Unsplash تمثل المشروع. '
+                    . 'أجب بصيغة JSON فقط مع الحقول التالية: '
+                    . 'title (عنوان احترافي وجذاب للمشروع بالعربية), '
+                    . 'description (وصف مفصل وشامل للمشروع يشمل الأهداف والخطوات، لا يقل عن 150 كلمة), '
+                    . 'category (إحدى الفئات المسموحة فقط باللغة الإنجليزية), '
+                    . 'image_keyword (كلمة مفتاحية واحدة بالإنجليزية).'
+                ),
+                \App\Services\AIEngine\DeepSeekClient::userMessage("فكرة المشروع: " . $idea),
+            ]);
+
+            if (!$aiResponse) {
+                return response()->json(['error' => 'فشل في توليد محتوى المشروع من الذكاء الاصطناعي.'], 500);
+            }
+
+            // Fallbacks for structure
+            $title = $aiResponse['title'] ?? 'مشروع مبتكر';
+            $description = $aiResponse['description'] ?? $idea;
+            $category = $aiResponse['category'] ?? 'other';
+            $keyword = $aiResponse['image_keyword'] ?? 'innovation education';
+
+            // Validate category
+            $allowedCategories = ['science', 'technology', 'engineering', 'mathematics', 'arts', 'other'];
+            if (!in_array(strtolower($category), $allowedCategories)) {
+                $category = 'other';
+            }
+
+            // Fetch image from Unsplash
+            $imageUrl = null;
+            $unsplashAccessKey = config('services.unsplash.access_key');
+            if ($unsplashAccessKey) {
+                $unsplashResponse = \Illuminate\Support\Facades\Http::get('https://api.unsplash.com/search/photos', [
+                    'query' => $keyword,
+                    'client_id' => $unsplashAccessKey,
+                    'per_page' => 1,
+                    'orientation' => 'landscape'
+                ]);
+
+                if ($unsplashResponse->successful()) {
+                    $results = $unsplashResponse->json('results');
+                    if (!empty($results)) {
+                        $imageUrl = $results[0]['urls']['regular'] ?? null;
+                    }
+                }
+            }
+
+            return response()->json([
+                'title' => $title,
+                'description' => $description,
+                'category' => strtolower($category),
+                'image_url' => $imageUrl
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error generating AI project: ' . $e->getMessage());
+            return response()->json(['error' => 'حدث خطأ غير متوقع أثناء توليد تفاصيل المشروع.'], 500);
+        }
+    }
+
+    /**
      * حفظ مشروع جديد
      */
     public function store(Request $request)

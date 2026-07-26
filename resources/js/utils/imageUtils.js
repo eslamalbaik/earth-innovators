@@ -88,13 +88,28 @@ export const getColorFromName = (name) => {
 };
 
 /**
+ * Default cover images per publication type, sourced from Unsplash.
+ * Used when a publication has no uploaded cover_image.
+ */
+const PUBLICATION_TYPE_FALLBACK_IMAGES = {
+    magazine: 'https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=1200&q=80',
+    booklet: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=1200&q=80',
+    report: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80',
+    article: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1200&q=80',
+};
+
+export const getPublicationTypeFallbackImage = (type) => {
+    return PUBLICATION_TYPE_FALLBACK_IMAGES[type] || PUBLICATION_TYPE_FALLBACK_IMAGES.magazine;
+};
+
+/**
  * Get publication cover image URL
  * Handles both absolute URLs (from Laravel accessor) and relative paths
  * @param {string|null|undefined} imagePath - The image path from the API
- * @param {string} fallback - Fallback image path (default: '/images/default-publication.jpg')
+ * @param {string} fallback - Fallback image path (default: type-based Unsplash image, or magazine fallback)
  * @returns {string} The complete image URL
  */
-export const getPublicationImageUrl = (imagePath, fallback = 'https://placehold.co/600x400/A3C042/white?text=Publication') => {
+export const getPublicationImageUrl = (imagePath, fallback = PUBLICATION_TYPE_FALLBACK_IMAGES.magazine) => {
     return getStorageUrl(imagePath, fallback);
 };
 

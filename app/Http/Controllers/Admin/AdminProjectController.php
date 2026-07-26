@@ -98,31 +98,139 @@ class AdminProjectController extends Controller
      */
     public function create()
     {
-        $users = \App\Models\User::where('role', 'student')
-            ->select('id', 'name', 'email')
-            ->orderBy('name')
-            ->get();
+        // إنشاء المشروع يتم عبر النافذة المنبثقة في صفحة القائمة (Index)،
+        // لذا نوجّه هذا المسار إلى القائمة بدلاً من عرض صفحة منفصلة.
+        return redirect()->route('admin.projects.index');
+    }
 
-        $schools = \App\Models\User::where('role', 'school')
-            ->select('id', 'name')
-            ->orderBy('name')
-            ->get();
-
-        $teachers = \App\Models\Teacher::with('user:id,name')
-            ->select('id', 'user_id', 'name_ar')
-            ->get()
-            ->map(function ($teacher) {
-                return [
-                    'id' => $teacher->id,
-                    'name' => $teacher->name_ar ?? $teacher->user->name ?? 'غير معروف',
-                ];
-            });
-
-        return Inertia::render('Admin/Projects/Create', [
-            'users' => $users,
-            'schools' => $schools,
-            'teachers' => $teachers,
+    /**
+     * توليد تفاصيل المشروع بالذكاء الاصطناعي
+     */
+    public function generate(Request $request, \App\Services\AIEngine\DeepSeekClient $deepSeekClient)
+    {
+        $request->validate([
+            'idea' => 'required|string|max:500',
         ]);
+
+        $idea = $request->input('idea');
+
+        try {
+            $aiResponse = $deepSeekClient->chatWithJson([
+                \App\Services\AIEngine\DeepSeekClient::systemMessage(
+                    'أنت مستشار تخطيط مشاريع تعليمية وابتكارية. '
+                    . 'بناءً على الفكرة أو الوصف القصير الذي يقدمه المستخدم، قم بإنشاء تفاصيل مشروع كاملة وجاهزة للنشر. '
+                    . 'اختر واحدة من الفئات التالية حصراً: science, technology, engineering, mathematics, arts, other. '
+                    . 'اقترح أيضاً كلمة مفتاحية واحدة باللغة الإنجليزية للبحث عن صورة غلاف من Unsplash تمثل المشروع. '
+                    . 'أجب بصيغة JSON فقط مع الحقول التالية: '
+                    . 'title (عنوان احترافي وجذاب للمشروع بالعربية), '
+                    . 'description (وصف مفصل وشامل للمشروع يشمل الأهداف والخطوات، لا يقل عن 150 كلمة), '
+                    . 'category (إحدى الفئات المسموحة فقط باللغة الإنجليزية), '
+                    . 'image_keyword (كلمة مفتاحية واحدة بالإنجليزية).'
+                ),
+                \App\Services\AIEngine\DeepSeekClient::userMessage("فكرة المشروع: " . $idea),
+            ]);
+
+            if (!$aiResponse) {
+                return response()->json(['error' => 'فشل في توليد محتوى المشروع من الذكاء الاصطناعي.'], 500);
+            }
+
+            // Fallbacks for structure
+            $title = $aiResponse['title'] ?? 'مشروع مبتكر';
+            $description = $aiResponse['description'] ?? $idea;
+            $category = $aiResponse['category'] ?? 'other';
+            $keyword = $aiResponse['image_keyword'] ?? 'innovation education';
+
+            // Validate category
+            $allowedCategories = ['science', 'technology', 'engineering', 'mathematics', 'arts', 'other'];
+            if (!in_array(strtolower($category), $allowedCategories)) {
+                $category = 'other';
+            }
+
+            // Fetch image from Unsplash
+            $imageUrl = null;
+            $unsplashAccessKey = config('services.unsplash.access_key');
+            if ($unsplashAccessKey) {
+                $unsplashResponse = \Illuminate\Support\Facades\Http::get('https://api.unsplash.com/search/photos', [
+                    'query' => $keyword,
+                    'client_id' => $unsplashAccessKey,
+                    'per_page' => 1,
+                    'orientation' => 'landscape'
+                ]);
+
+                if ($unsplashResponse->successful()) {
+                    $results = $unsplashResponse->json('results');
+                    if (!empty($results)) {
+                        $imageUrl = $results[0]['urls']['regular'] ?? null;
+                    }
+                }
+            }
+
+            return response()->json([
+                'title' => $title,
+                'description' => $description,
+                'category' => strtolower($category),
+                'image_url' => $imageUrl
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error generating AI project (admin): ' . $e->getMessage());
+            return response()->json(['error' => 'حدث خطأ غير متوقع أثناء توليد تفاصيل المشروع.'], 500);
+        }
+    }
+
+    /**
+     * تقييم المشروع بالذكاء الاصطناعي (عند المراجعة)
+     */
+    public function evaluate(Project $project, \App\Services\AIEngine\DeepSeekClient $deepSeekClient)
+    {
+        try {
+            $aiResponse = $deepSeekClient->chatWithJson([
+                \App\Services\AIEngine\DeepSeekClient::systemMessage(
+                    'أنت محكّم خبير في تقييم المشاريع التعليمية والابتكارية للطلاب. '
+                    . 'قيّم المشروع بناءً على عنوانه ووصفه من حيث: الأصالة والابتكار، الوضوح والتنظيم، القيمة التعليمية، وقابلية التطبيق. '
+                    . 'كن موضوعياً وبنّاءً. '
+                    . 'أجب بصيغة JSON فقط مع الحقول التالية: '
+                    . 'score (رقم صحيح من 0 إلى 100 يمثل الدرجة الإجمالية للمشروع), '
+                    . 'summary (ملخص تقييمي موجز بالعربية في 2-3 جمل), '
+                    . 'strengths (مصفوفة نصية من 2 إلى 4 نقاط قوة بالعربية), '
+                    . 'weaknesses (مصفوفة نصية من 1 إلى 4 نقاط تحتاج تحسيناً بالعربية), '
+                    . 'recommendation (واحدة فقط من: approve أو reject أو needs_revision), '
+                    . 'recommendation_text (جملة قصيرة بالعربية تشرح سبب التوصية).'
+                ),
+                \App\Services\AIEngine\DeepSeekClient::userMessage(
+                    "عنوان المشروع: " . $project->title . "\n\n"
+                    . "فئة المشروع: " . ($project->category ?? 'غير محددة') . "\n\n"
+                    . "وصف المشروع: " . ($project->description ?? '')
+                ),
+            ]);
+
+            if (!$aiResponse) {
+                return response()->json(['error' => 'فشل في تقييم المشروع من الذكاء الاصطناعي.'], 500);
+            }
+
+            // Normalize/guard the structure
+            $score = (int) ($aiResponse['score'] ?? 0);
+            $score = max(0, min(100, $score));
+
+            $recommendation = $aiResponse['recommendation'] ?? 'needs_revision';
+            $allowedRecommendations = ['approve', 'reject', 'needs_revision'];
+            if (!in_array($recommendation, $allowedRecommendations, true)) {
+                $recommendation = 'needs_revision';
+            }
+
+            return response()->json([
+                'score'               => $score,
+                'summary'             => $aiResponse['summary'] ?? '',
+                'strengths'           => array_values((array) ($aiResponse['strengths'] ?? [])),
+                'weaknesses'          => array_values((array) ($aiResponse['weaknesses'] ?? [])),
+                'recommendation'      => $recommendation,
+                'recommendation_text' => $aiResponse['recommendation_text'] ?? '',
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error evaluating AI project (admin): ' . $e->getMessage());
+            return response()->json(['error' => 'حدث خطأ غير متوقع أثناء تقييم المشروع.'], 500);
+        }
     }
 
     /**

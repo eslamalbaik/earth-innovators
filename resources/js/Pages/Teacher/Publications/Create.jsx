@@ -1,13 +1,14 @@
 import DashboardLayout from '../../../Layouts/DashboardLayout';
 import { Head, useForm, router, Link } from '@inertiajs/react';
 import { useState, useRef } from 'react';
-import { FaUpload, FaImage, FaSpinner, FaTrash, FaYoutube } from 'react-icons/fa';
+import { FaUpload, FaImage, FaSpinner, FaTrash, FaYoutube, FaRobot } from 'react-icons/fa';
 import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
 import PrimaryButton from '../../../Components/PrimaryButton';
 import TextInput from '../../../Components/TextInput';
 import PublicationBilingualFields, { publicationBilingualFormIsValid } from '@/Components/Publications/PublicationBilingualFields';
 import { useBackIcon, useTranslation } from '@/i18n';
+import axios from 'axios';
 
 export default function CreatePublication({ auth, school }) {
     const { t } = useTranslation();
@@ -22,10 +23,71 @@ export default function CreatePublication({ auth, school }) {
         cover_image: null,
         youtube_url: '',
         type: 'magazine',
+        file: null,
     });
 
     const [imagePreview, setImagePreview] = useState(null);
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [fileName, setFileName] = useState('');
     const imageInputRef = useRef(null);
+
+    const handleFileChange = (e) => {
+        const selected = e.target.files?.[0];
+        if (!selected) {
+            return;
+        }
+        if (selected.type !== 'application/pdf') {
+            alert('الملف المرفق يجب أن يكون بصيغة PDF.');
+            return;
+        }
+        if (selected.size > 10 * 1024 * 1024) {
+            alert('حجم الملف يجب ألا يتجاوز 10 ميجابايت.');
+            return;
+        }
+        setData('file', selected);
+        setFileName(selected.name);
+    };
+
+    const handleAIGenerate = async () => {
+        const titleToUse = data.title || data.title_ar;
+        if (!titleToUse) {
+            alert("يرجى إدخال عنوان المقال (بالعربية أو الإنجليزية) أولاً لتوليد المحتوى.");
+            return;
+        }
+
+        setIsGenerating(true);
+        try {
+            const response = await axios.post('/teacher/publications/generate', { title: titleToUse });
+            const result = response.data;
+            
+            setData(prev => ({
+                ...prev,
+                title: result.title || prev.title,
+                title_ar: result.title_ar || prev.title_ar,
+                content: result.content || prev.content,
+                content_ar: result.content_ar || prev.content_ar,
+                description: result.description || prev.description,
+                description_ar: result.description_ar || prev.description_ar,
+            }));
+
+            if (result.image_url) {
+                // Fetch the image and convert to File object
+                try {
+                    const imgRes = await fetch(result.image_url);
+                    const blob = await imgRes.blob();
+                    const file = new File([blob], 'ai_generated_image.jpg', { type: blob.type });
+                    setData('cover_image', file);
+                    setImagePreview(URL.createObjectURL(file));
+                } catch (imgError) {
+                    console.error("Error fetching AI image", imgError);
+                }
+            }
+        } catch (error) {
+            alert(error.response?.data?.error || 'حدث خطأ أثناء توليد المحتوى');
+        } finally {
+            setIsGenerating(false);
+        }
+    };
 
     const handleImageChange = (e) => {
         const file = e.target.files?.[0];
@@ -35,8 +97,8 @@ export default function CreatePublication({ auth, school }) {
                 return;
             }
 
-            if (file.size > 2 * 1024 * 1024) {
-                alert(t('teacherPublicationCreatePage.alerts.imageTooLarge'));
+            if (file.size > 5 * 1024 * 1024) {
+                alert(t('teacherPublicationCreatePage.alerts.imageTooLarge', { defaultValue: 'حجم الصورة يجب ألا يتجاوز 5 ميجابايت.' }));
                 return;
             }
 
@@ -97,6 +159,31 @@ export default function CreatePublication({ auth, school }) {
             <div className="py-6">
                 <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
                     <form onSubmit={submit} className="bg-white rounded-xl shadow-lg p-6 space-y-6">
+                        
+                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 mb-4 border border-blue-100 flex items-center justify-between">
+                            <div>
+                                <h3 className="font-semibold text-blue-800 text-sm flex items-center gap-2">
+                                    <FaRobot className="text-blue-600" />
+                                    توليد المحتوى بالذكاء الاصطناعي
+                                </h3>
+                                <p className="text-xs text-blue-600 mt-1">
+                                    اكتب العنوان فقط (بالعربية أو الإنجليزية) وسيقوم الذكاء الاصطناعي بكتابة المقال واختيار صورة مناسبة.
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={handleAIGenerate}
+                                disabled={isGenerating || (!data.title && !data.title_ar)}
+                                className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition flex items-center gap-2"
+                            >
+                                {isGenerating ? (
+                                    <><FaSpinner className="animate-spin" /> جاري التوليد...</>
+                                ) : (
+                                    <><FaRobot /> توليد الآن</>
+                                )}
+                            </button>
+                        </div>
+
                         <PublicationBilingualFields data={data} setData={setData} errors={errors} />
 
                         <div>
@@ -176,6 +263,27 @@ export default function CreatePublication({ auth, school }) {
                                 <option value="article">{t('teacherPublicationsPage.types.article')}</option>
                             </select>
                             <InputError message={errors.type} className="mt-2" />
+                        </div>
+
+                        {/* مرفق PDF (كتيب/مجلة) */}
+                        <div>
+                            <InputLabel htmlFor="file" value="مرفق PDF (اختياري)" className="text-sm font-medium text-gray-700 mb-2" />
+                            <input
+                                id="file"
+                                type="file"
+                                accept=".pdf,application/pdf"
+                                onChange={handleFileChange}
+                                className="block w-full text-sm text-gray-500 file:ms-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#A3C042]/15 file:text-[#5a7a00] hover:file:bg-[#A3C042]/25"
+                            />
+                            {fileName ? (
+                                <p className="mt-2 text-sm text-gray-600">{fileName}</p>
+                            ) : null}
+                            <p className="mt-1 text-xs text-gray-500">
+                                {data.type === 'booklet'
+                                    ? 'أرفق ملف الكتيب بصيغة PDF (بحد أقصى 10 ميجابايت).'
+                                    : 'يمكنك إرفاق ملف PDF للإصدار (كتيب/مجلة) بحد أقصى 10 ميجابايت.'}
+                            </p>
+                            <InputError message={errors.file} className="mt-2" />
                         </div>
 
                         {school && (

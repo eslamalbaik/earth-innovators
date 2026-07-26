@@ -159,6 +159,19 @@ class TeacherDashboardController extends Controller
         $isActive = (bool) $teacher->is_active;
         $isVerified = (bool) $teacher->is_verified;
 
+        // Innovation statistics for the teacher's students (إرث المبتكرين)
+        try {
+            $innovationService = app(\App\Services\InnovationStatsService::class);
+            $innovationStudents = $innovationService->studentsWithIndexes($user);
+            $innovationStats = [
+                'totalStudents'   => $innovationStudents->count(),
+                'statistics'      => $innovationService->statistics($innovationStudents),
+                'classifications' => \App\Models\InnovationIndex::CLASSIFICATIONS,
+            ];
+        } catch (\Exception $e) {
+            $innovationStats = null;
+        }
+
         return Inertia::render('Teacher/Dashboard', [
             'teacher' => [
                 'name' => $teacher->name_ar,
@@ -167,6 +180,7 @@ class TeacherDashboardController extends Controller
                 'is_verified' => $isVerified,
             ],
             'stats' => $stats,
+            'innovationStats' => $innovationStats,
             'membershipSummary' => $membershipSummary,
             'activationBanner' => !$isActive ? [
                 'is_verified' => $isVerified,

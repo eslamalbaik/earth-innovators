@@ -24,3 +24,11 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+/.mcp.json
+
+# Local tooling / scratch (not part of the app)
+/.agents
+/.claude
+/.codegraph
+/skills-lock.json
+/fix_colors.py

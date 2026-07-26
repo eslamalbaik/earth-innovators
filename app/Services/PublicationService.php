@@ -112,6 +112,23 @@ class PublicationService extends BaseService
         }, 300);
     }
 
+    public function getMyPublications(int $userId, int $limit = 6): Collection
+    {
+        $cacheKey = "my_publications_{$userId}_{$limit}";
+        $cacheTag = "user_publications_{$userId}";
+
+        return $this->cacheTags($cacheTag, $cacheKey, function () use ($userId, $limit) {
+            return Publication::where(function ($query) use ($userId) {
+                    $query->where('author_id', $userId)->orWhere('school_id', $userId);
+                })
+                ->with(['school:id,name'])
+                ->select('id', 'title', 'title_ar', 'description', 'description_ar', 'type', 'status', 'cover_image', 'file', 'youtube_url', 'content', 'content_ar', 'issue_number', 'publish_date', 'publisher_name', 'likes_count', 'views', 'author_id', 'school_id', 'created_at')
+                ->orderByDesc('created_at')
+                ->limit($limit)
+                ->get();
+        }, 120); // Short TTL — this is the author's own view, should feel fresh
+    }
+
     public function getTeacherPublications(int $userId, int $perPage = 10): LengthAwarePaginator
     {
         $page = max(1, (int) request()->integer('page', 1));
@@ -380,11 +397,11 @@ class PublicationService extends BaseService
         }
 
         if ($schoolId) {
-            $this->forgetCacheTags(["school_publications_{$schoolId}"]);
+            $this->forgetCacheTags(["school_publications_{$schoolId}", "user_publications_{$schoolId}"]);
         }
 
         if ($authorId) {
-            $this->forgetCacheTags(["teacher_publications_{$authorId}"]);
+            $this->forgetCacheTags(["teacher_publications_{$authorId}", "user_publications_{$authorId}"]);
         }
     }
 }

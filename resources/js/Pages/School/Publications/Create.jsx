@@ -2,7 +2,7 @@ import DashboardLayout from '@/Layouts/DashboardLayout';
 import { useTranslation } from '@/i18n';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
-import { FaArrowLeft, FaArrowRight, FaSpinner, FaUpload, FaYoutube } from 'react-icons/fa';
+import { FaArrowLeft, FaArrowRight, FaSpinner, FaUpload, FaYoutube, FaRobot } from 'react-icons/fa';
 import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
@@ -31,12 +31,54 @@ export default function SchoolPublicationCreate({ auth }) {
 
     const [coverPreview, setCoverPreview] = useState(null);
     const [fileName, setFileName] = useState('');
+    const [isGenerating, setIsGenerating] = useState(false);
 
     useEffect(() => () => {
         if (coverPreview) {
             URL.revokeObjectURL(coverPreview);
         }
     }, [coverPreview]);
+
+    const handleAIGenerate = async () => {
+        const titleToUse = data.title || data.title_ar;
+        if (!titleToUse) {
+            alert("يرجى إدخال عنوان المقال (بالعربية أو الإنجليزية) أولاً لتوليد المحتوى.");
+            return;
+        }
+
+        setIsGenerating(true);
+        try {
+            const axios = (await import('axios')).default;
+            const response = await axios.post('/school/publications/generate', { title: titleToUse });
+            const result = response.data;
+            
+            setData(prev => ({
+                ...prev,
+                title: result.title || prev.title,
+                title_ar: result.title_ar || prev.title_ar,
+                content: result.content || prev.content,
+                content_ar: result.content_ar || prev.content_ar,
+                description: result.description || prev.description,
+                description_ar: result.description_ar || prev.description_ar,
+            }));
+
+            if (result.image_url) {
+                try {
+                    const imgRes = await fetch(result.image_url);
+                    const blob = await imgRes.blob();
+                    const file = new File([blob], 'ai_generated_image.jpg', { type: blob.type });
+                    setData('cover_image', file);
+                    setCoverPreview(URL.createObjectURL(file));
+                } catch (imgError) {
+                    console.error("Error fetching AI image", imgError);
+                }
+            }
+        } catch (error) {
+            alert(error.response?.data?.error || 'حدث خطأ أثناء توليد المحتوى');
+        } finally {
+            setIsGenerating(false);
+        }
+    };
 
     const handleCoverImageChange = (event) => {
         const file = event.target.files[0];
@@ -94,6 +136,31 @@ export default function SchoolPublicationCreate({ auth }) {
                     </div>
 
                     <form onSubmit={submit} className="space-y-6 rounded-lg bg-white p-6 shadow-sm">
+                        
+                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 mb-4 border border-blue-100 flex items-center justify-between">
+                            <div>
+                                <h3 className="font-semibold text-blue-800 text-sm flex items-center gap-2">
+                                    <FaRobot className="text-blue-600" />
+                                    توليد المحتوى بالذكاء الاصطناعي
+                                </h3>
+                                <p className="text-xs text-blue-600 mt-1">
+                                    اكتب العنوان فقط (بالعربية أو الإنجليزية) وسيقوم الذكاء الاصطناعي بكتابة المقال واختيار صورة مناسبة.
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={handleAIGenerate}
+                                disabled={isGenerating || (!data.title && !data.title_ar)}
+                                className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition flex items-center gap-2"
+                            >
+                                {isGenerating ? (
+                                    <><FaSpinner className="animate-spin" /> جاري التوليد...</>
+                                ) : (
+                                    <><FaRobot /> توليد الآن</>
+                                )}
+                            </button>
+                        </div>
+
                         <div>
                             <InputLabel htmlFor="type" value={t('schoolPublicationsPage.form.typeLabel')} />
                             <select

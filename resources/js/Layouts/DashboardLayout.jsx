@@ -6,7 +6,7 @@ import {
     FaCalendar, FaChartLine, FaUser, FaSignOutAlt,
     FaGraduationCap, FaCommentDots, FaTachometerAlt, FaBell, FaBook,
     FaChevronDown, FaCreditCard, FaTrophy, FaProjectDiagram, FaMedal, FaFile,
-    FaCheckCircle, FaGift, FaLightbulb, FaChalkboardTeacher
+    FaCheckCircle, FaGift, FaLightbulb, FaChalkboardTeacher, FaRobot, FaSearch
 } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import ApplicationLogo from '@/Components/ApplicationLogo';
@@ -413,6 +413,9 @@ export default function DashboardLayout({ children, header }) {
                     { name: t('sidebar.challengeSuggestions'), href: '/admin/challenge-suggestions', icon: FaLightbulb },
                 ]
             },
+            { name: t('sidebar.talentMap'), href: '/admin/innovation/talent-map', icon: FaChartLine },
+            { name: 'الوكيل الذكي', href: '/admin/innovation/chat', icon: FaRobot },
+            { name: 'البحث الذكي بالمواهب', href: '/admin/innovation/smart-search', icon: FaSearch },
             { name: t('sidebar.users'), href: '/admin/users', icon: FaUsers },
             { name: t('sidebar.badges'), href: '/admin/badges', icon: FaCommentDots },
             { name: t('sidebar.packages'), href: '/admin/packages', icon: FaCreditCard },
@@ -454,6 +457,7 @@ export default function DashboardLayout({ children, header }) {
                 ]
             },
             { name: t('sidebar.followedStudents'), href: '/teacher/students', icon: FaGraduationCap },
+            { name: t('sidebar.innovationTracking'), href: '/teacher/innovation/dashboard', icon: FaChartLine },
             { name: t('sidebar.myBadges'), href: '/teacher/badges', icon: FaMedal },
             { name: t('sidebar.certificates'), href: '/teacher/certificates', icon: FaFile },
             { name: t('sidebar.profile'), href: '/teacher/profile', icon: FaUser },
@@ -499,6 +503,7 @@ export default function DashboardLayout({ children, header }) {
             },
             { name: t('sidebar.addReports'), href: '/school/reports', icon: FaFile },
             { name: t('sidebar.students'), href: '/school/students', icon: FaGraduationCap },
+            { name: t('sidebar.innovationTracking'), href: '/teacher/innovation/dashboard', icon: FaChartLine },
             { name: 'إدارة المعلمين', href: '/school/teachers', icon: FaChalkboardTeacher },
             { name: t('sidebar.certificates'), href: '/school/certificates', icon: FaFile },
             { name: t('sidebar.packages'), href: '/packages', icon: FaCreditCard },
@@ -546,6 +551,7 @@ export default function DashboardLayout({ children, header }) {
             },
             { name: t('sidebar.addReports'), href: '/school/reports', icon: FaFile },
             { name: t('sidebar.students'), href: '/school/students', icon: FaGraduationCap },
+            { name: t('sidebar.innovationTracking'), href: '/teacher/innovation/dashboard', icon: FaChartLine },
             { name: 'إدارة المعلمين', href: '/school/teachers', icon: FaChalkboardTeacher },
             { name: t('sidebar.certificates'), href: '/school/certificates', icon: FaFile },
             { name: t('sidebar.packages'), href: '/packages', icon: FaCreditCard },
@@ -553,6 +559,18 @@ export default function DashboardLayout({ children, header }) {
         ],
         student: [
             { name: t('sidebar.dashboard'), href: '/dashboard', icon: FaTachometerAlt },
+            {
+                name: t('sidebar.innovationProfile'),
+                href: '/innovation/achievements',
+                icon: FaTrophy,
+                subItems: [
+                    { name: t('sidebar.achievements'), href: '/innovation/achievements', icon: FaTrophy },
+                    { name: t('sidebar.innovationIndexes'), href: '/innovation/indexes', icon: FaChartLine },
+                    { name: t('sidebar.indexHistory'), href: '/innovation/history', icon: FaChartLine },
+                    { name: t('sidebar.aiRecommendations'), href: '/innovation/recommendations', icon: FaLightbulb },
+                    { name: t('sidebar.benchmarking'), href: '/innovation/benchmarking', icon: FaCheckCircle },
+                ]
+            },
             { name: t('sidebar.myProjects'), href: '/student/projects', icon: FaBook },
             { name: t('sidebar.challenges'), href: '/student/challenges', icon: FaCalendar },
             { name: t('sidebar.challengeSuggestions'), href: '/student/challenge-suggestions/create', icon: FaLightbulb },

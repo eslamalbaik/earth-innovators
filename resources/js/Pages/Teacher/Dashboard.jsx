@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import DashboardLayout from '../../Layouts/DashboardLayout';
+import CoachInnovationSummary from '@/Components/Innovation/CoachInnovationSummary';
 import { useTranslation } from '@/i18n';
 import TrialCountdownBanner from '@/Components/Dashboard/TrialCountdownBanner';
 import {
@@ -15,7 +16,7 @@ import {
     FaGraduationCap
 } from 'react-icons/fa';
 
-export default function TeacherDashboard({ auth, teacher, stats, membershipSummary = null, activationBanner }) {
+export default function TeacherDashboard({ auth, teacher, stats, innovationStats = null, membershipSummary = null, activationBanner }) {
     const { t } = useTranslation();
     const {
         projects = {},
@@ -97,7 +98,7 @@ export default function TeacherDashboard({ auth, teacher, stats, membershipSumma
                 <div className="grid grid-cols-1 gap-6 lg:gap-8">
                     <div className="space-y-6 lg:col-span-8  mb-6">
 
-                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
+                        <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200 p-6 md:p-8">
                             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                                 <div>
                                     <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
@@ -112,7 +113,7 @@ export default function TeacherDashboard({ auth, teacher, stats, membershipSumma
                         </div>
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-4 lg:grid-cols-4 lg:gap-5 lg:content-start">
-                            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+                            <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow">
                                 <div className="flex items-center justify-between mb-4">
                                     <div>
                                         <p className="text-gray-500 text-sm font-medium mb-2">{t('teacherDashboardPage.totalPoints')}</p>
@@ -127,7 +128,7 @@ export default function TeacherDashboard({ auth, teacher, stats, membershipSumma
                                 </div>
                             </div>
 
-                            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+                            <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow">
                                 <div className="flex items-center justify-between mb-4">
                                     <div>
                                         <p className="text-gray-500 text-sm font-medium mb-2">{t('common.projects')}</p>
@@ -142,7 +143,7 @@ export default function TeacherDashboard({ auth, teacher, stats, membershipSumma
                                 </div>
                             </div>
 
-                            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+                            <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow">
                                 <div className="flex items-center justify-between mb-4">
                                     <div>
                                         <p className="text-gray-500 text-sm font-medium mb-2">{t('teacherDashboardPage.publications')}</p>
@@ -157,7 +158,7 @@ export default function TeacherDashboard({ auth, teacher, stats, membershipSumma
                                 </div>
                             </div>
 
-                            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+                            <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow">
                                 <div className="flex items-center justify-between mb-4">
                                     <div>
                                         <p className="text-gray-500 text-sm font-medium mb-2">{t('common.badges')}</p>
@@ -193,6 +194,9 @@ export default function TeacherDashboard({ auth, teacher, stats, membershipSumma
 
                         {/* Trial countdown banner — الأولوية العليا */}
                         <TrialCountdownBanner membershipSummary={membershipSummary} />
+
+                        {/* متابعة الابتكار — إرث المبتكرين */}
+                        <CoachInnovationSummary innovationStats={innovationStats} />
 
                         <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-6 shadow-sm">
                             <div className="flex flex-wrap items-start justify-between gap-3">
@@ -289,7 +293,7 @@ export default function TeacherDashboard({ auth, teacher, stats, membershipSumma
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200 p-6">
                         <div className="flex items-center gap-3 mb-4">
                             <div className="bg-blue-50 p-3 rounded-xl border border-blue-100">
                                 <FaProjectDiagram className="text-blue-600 text-2xl" />
@@ -330,7 +334,7 @@ export default function TeacherDashboard({ auth, teacher, stats, membershipSumma
                         </Link>
                     </div>
 
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200 p-6">
                         <div className="flex items-center gap-3 mb-4">
                             <div className="bg-green-50 p-3 rounded-xl border border-green-100">
                                 <FaBook className="text-green-600 text-2xl" />
@@ -367,7 +371,7 @@ export default function TeacherDashboard({ auth, teacher, stats, membershipSumma
                         </Link>
                     </div>
 
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200 p-6">
                         <div className="flex items-center gap-3 mb-4">
                             <div className="bg-orange-50 p-3 rounded-xl border border-orange-100">
                                 <FaTrophy className="text-orange-600 text-2xl" />

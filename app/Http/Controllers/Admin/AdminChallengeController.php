@@ -129,6 +129,95 @@ class AdminChallengeController extends Controller
     }
 
     /**
+     * توليد أفكار وتفاصيل التحدي بالذكاء الاصطناعي
+     */
+    public function generate(Request $request, \App\Services\AIEngine\DeepSeekClient $deepSeekClient)
+    {
+        $request->validate([
+            'idea' => 'required|string|max:500',
+        ]);
+
+        $idea = $request->input('idea');
+
+        try {
+            $aiResponse = $deepSeekClient->chatWithJson([
+                \App\Services\AIEngine\DeepSeekClient::systemMessage(
+                    'أنت خبير في تصميم التحديات والمسابقات التعليمية والابتكارية للطلاب. '
+                    . 'بناءً على الفكرة أو الوصف القصير الذي يقدمه المستخدم، قم بإنشاء تفاصيل تحدي كاملة ومحفزة. '
+                    . 'قم باختيار إحدى الفئات التالية حصراً: science, technology, engineering, mathematics, arts, other. '
+                    . 'اقترح أيضاً كلمة مفتاحية واحدة باللغة الإنجليزية للبحث عن صورة غلاف من Unsplash. '
+                    . 'هام جداً للتنسيق: استخدم فقرات واضحة ومسافات أسطر (Newlines) لتنسيق النصوص بشكل جميل، ولا تستخدم وسوم HTML إطلاقاً لأن النص سيعرض في حقل نصي عادي. '
+                    . 'أجب بصيغة JSON فقط مع الحقول التالية، ولا تترك أياً منها فارغاً: '
+                    . 'title (عنوان احترافي وجذاب للتحدي بالعربية), '
+                    . 'objective (الهدف التعليمي أو الابتكاري المحدد لهذا التحدي، جملة أو جملتين بالعربية), '
+                    . 'description (وصف مفصل وشامل ومحفز للتحدي كنص عادي منسق بأسطر واضحة، يشمل الأهداف والمعايير), '
+                    . 'instructions (خطوات تنفيذ التحدي بالتفصيل للطالب، كنص عادي منسق بأسطر واضحة), '
+                    . 'category (إحدى الفئات المسموحة فقط باللغة الإنجليزية), '
+                    . 'image_keyword (كلمة مفتاحية واحدة بالإنجليزية).'
+                ),
+                \App\Services\AIEngine\DeepSeekClient::userMessage("فكرة التحدي: " . $idea),
+            ]);
+
+            if (!$aiResponse) {
+                return response()->json(['error' => 'فشل في توليد تفاصيل التحدي من الذكاء الاصطناعي.'], 500);
+            }
+
+            // Fallbacks for structure
+            $title = $aiResponse['title'] ?? 'تحدي جديد';
+            $objective = trim($aiResponse['objective'] ?? '');
+            $description = $aiResponse['description'] ?? $idea;
+            $instructions = trim($aiResponse['instructions'] ?? '');
+            $category = $aiResponse['category'] ?? 'other';
+            $keyword = $aiResponse['image_keyword'] ?? 'education challenge';
+
+            // Validate category against the same enum enforced by StoreChallengeRequest
+            $allowedCategories = ['science', 'technology', 'engineering', 'mathematics', 'arts', 'other'];
+            if (!in_array(strtolower($category), $allowedCategories)) {
+                $category = 'other';
+            }
+
+            // Fields the AI failed to populate, so the frontend can flag them
+            $incompleteFields = array_keys(array_filter([
+                'objective' => $objective === '',
+                'instructions' => $instructions === '',
+            ]));
+
+            // Fetch image from Unsplash
+            $imageUrl = null;
+            $unsplashAccessKey = config('services.unsplash.access_key');
+            if ($unsplashAccessKey) {
+                $unsplashResponse = \Illuminate\Support\Facades\Http::get('https://api.unsplash.com/search/photos', [
+                    'query' => $keyword,
+                    'client_id' => $unsplashAccessKey,
+                    'per_page' => 1,
+                    'orientation' => 'landscape'
+                ]);
+
+                if ($unsplashResponse->successful()) {
+                    $results = $unsplashResponse->json('results');
+                    if (!empty($results)) {
+                        $imageUrl = $results[0]['urls']['regular'] ?? null;
+                    }
+                }
+            }
+
+            return response()->json([
+                'title' => $title,
+                'objective' => $objective,
+                'description' => $description,
+                'instructions' => $instructions,
+                'category' => strtolower($category),
+                'image_url' => $imageUrl,
+                'incomplete_fields' => $incompleteFields,
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error generating AI challenge (admin): ' . $e->getMessage());
+            return response()->json(['error' => 'حدث خطأ غير متوقع أثناء توليد تفاصيل التحدي.'], 500);
+        }
+    }
+
+    /**
      * حفظ تحدٍ جديد
      */
     public function store(StoreChallengeRequest $request)

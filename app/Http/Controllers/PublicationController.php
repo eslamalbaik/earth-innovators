@@ -29,8 +29,18 @@ class PublicationController extends Controller
             return $publication;
         });
 
+        $myPublications = Auth::check()
+            ? $this->publicationService->getMyPublications(Auth::id())
+            : collect();
+
+        $myPublications = $myPublications->map(function ($publication) {
+            $publication->is_liked = Auth::check() ? $publication->isLikedBy(Auth::id()) : false;
+            return $publication;
+        });
+
         return Inertia::render('Publications/Index', [
             'publications' => $publications,
+            'myPublications' => $myPublications,
             'filters' => [
                 'search' => $request->search,
                 'type' => $request->type,

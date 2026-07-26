@@ -61,6 +61,11 @@ class Teacher extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function assignedStudents(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(User::class, 'teacher_id');
+    }
+
     public function availabilities(): HasMany
     {
         return $this->hasMany(TeacherAvailability::class);

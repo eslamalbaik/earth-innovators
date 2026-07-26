@@ -1,6 +1,6 @@
 import DashboardLayout from '../../../Layouts/DashboardLayout';
 import { Head, useForm } from '@inertiajs/react';
-import { FaTrophy, FaSpinner, FaImage, FaTrash } from 'react-icons/fa';
+import { FaTrophy, FaSpinner, FaImage, FaTrash, FaRobot } from 'react-icons/fa';
 import TextInput from '../../../Components/TextInput';
 import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
@@ -12,6 +12,10 @@ export default function SchoolChallengeCreate({ auth }) {
     const { t } = useTranslation();
     const [imagePreview, setImagePreview] = useState(null);
     const imageInputRef = useRef(null);
+
+    const [aiIdea, setAiIdea] = useState('');
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [aiIncompleteFields, setAiIncompleteFields] = useState([]);
 
     const { data, setData, post, processing, errors } = useForm({
         title: '',
@@ -29,6 +33,47 @@ export default function SchoolChallengeCreate({ auth }) {
         points_reward: 0,
         max_participants: '',
     });
+
+    const handleAIGenerate = async () => {
+        if (!aiIdea) {
+            alert(t('common.error') + ": يرجى إدخال فكرة التحدي أولاً.");
+            return;
+        }
+
+        setIsGenerating(true);
+        try {
+            const axios = (await import('axios')).default;
+            const response = await axios.post('/school/challenges/generate', { idea: aiIdea });
+            const result = response.data;
+
+            setData(prev => ({
+                ...prev,
+                title: result.title || prev.title,
+                objective: result.objective || prev.objective,
+                description: result.description || prev.description,
+                instructions: result.instructions || prev.instructions,
+                category: result.category || prev.category,
+            }));
+
+            setAiIncompleteFields(result.incomplete_fields || []);
+
+            if (result.image_url) {
+                try {
+                    const imgRes = await fetch(result.image_url);
+                    const blob = await imgRes.blob();
+                    const file = new File([blob], 'ai_generated_image.jpg', { type: blob.type });
+                    setData('image', file);
+                    setImagePreview(URL.createObjectURL(file));
+                } catch (imgError) {
+                    console.error("Error fetching AI image", imgError);
+                }
+            }
+        } catch (error) {
+            alert(error.response?.data?.error || t('common.error') + ': حدث خطأ أثناء توليد تفاصيل التحدي');
+        } finally {
+            setIsGenerating(false);
+        }
+    };
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -115,6 +160,40 @@ export default function SchoolChallengeCreate({ auth }) {
             <div className="py-6">
                 <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
                     <form onSubmit={submit} className="bg-white shadow-sm rounded-lg p-6 space-y-6">
+                        {/* AI Challenge Assistant */}
+                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100 mb-4 flex flex-col md:flex-row md:items-center gap-4 justify-between">
+                            <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <FaRobot className="text-blue-600 text-xl" />
+                                    <h3 className="font-bold text-blue-800 text-base">مساعد الذكاء الاصطناعي للتحديات</h3>
+                                </div>
+                                <p className="text-sm text-blue-600">
+                                    اكتب فكرة مبسطة وسيقوم المساعد بتوليد عنوان احترافي، وصف شامل، وتحديد الفئة وصورة غلاف مناسبة.
+                                </p>
+                            </div>
+                            <div className="flex-1 flex gap-2 w-full md:w-auto">
+                                <input
+                                    type="text"
+                                    value={aiIdea}
+                                    onChange={(e) => setAiIdea(e.target.value)}
+                                    placeholder="مثال: تحدي عن ابتكار حلول لترشيد المياه..."
+                                    className="flex-1 text-sm rounded-lg border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={handleAIGenerate}
+                                    disabled={isGenerating || !aiIdea}
+                                    className="bg-blue-600 text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-blue-700 disabled:opacity-50 transition flex justify-center items-center gap-2 whitespace-nowrap"
+                                >
+                                    {isGenerating ? (
+                                        <><FaSpinner className="animate-spin" /> جاري التوليد...</>
+                                    ) : (
+                                        <><FaRobot /> توليد التفاصيل</>
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+
                         {/* Title */}
                         <div>
                             <InputLabel htmlFor="title" value={t('schoolChallengesCreatePage.fields.title')} />
@@ -135,12 +214,20 @@ export default function SchoolChallengeCreate({ auth }) {
                             <textarea
                                 id="objective"
                                 value={data.objective}
-                                onChange={(e) => setData('objective', e.target.value)}
+                                onChange={(e) => {
+                                    setData('objective', e.target.value);
+                                    setAiIncompleteFields(prev => prev.filter(f => f !== 'objective'));
+                                }}
                                 rows={3}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                                 required
                                 placeholder={t('schoolChallengesCreatePage.placeholders.objectiveExample')}
                             />
+                            {aiIncompleteFields.includes('objective') && (
+                                <p className="mt-1 text-sm text-amber-600">
+                                    لم يتمكن الذكاء الاصطناعي من توليد هذا الحقل تلقائياً — يرجى تعبئته يدوياً.
+                                </p>
+                            )}
                             <InputError message={errors.objective} className="mt-2" />
                         </div>
 
@@ -205,12 +292,20 @@ export default function SchoolChallengeCreate({ auth }) {
                             <textarea
                                 id="instructions"
                                 value={data.instructions}
-                                onChange={(e) => setData('instructions', e.target.value)}
+                                onChange={(e) => {
+                                    setData('instructions', e.target.value);
+                                    setAiIncompleteFields(prev => prev.filter(f => f !== 'instructions'));
+                                }}
                                 rows={4}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                                 required
                                 placeholder={t('schoolChallengesCreatePage.placeholders.instructionsExample')}
                             />
+                            {aiIncompleteFields.includes('instructions') && (
+                                <p className="mt-1 text-sm text-amber-600">
+                                    لم يتمكن الذكاء الاصطناعي من توليد هذا الحقل تلقائياً — يرجى تعبئته يدوياً.
+                                </p>
+                            )}
                             <InputError message={errors.instructions} className="mt-2" />
                         </div>
 

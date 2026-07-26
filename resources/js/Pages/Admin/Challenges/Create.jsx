@@ -1,6 +1,6 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { FaArrowRight, FaSave, FaTimes, FaImage, FaTrash } from 'react-icons/fa';
+import { FaArrowRight, FaSave, FaTimes, FaImage, FaTrash, FaRobot, FaSpinner } from 'react-icons/fa';
 import { useState, useRef } from 'react';
 import { useTranslation } from '@/i18n';
 
@@ -8,6 +8,8 @@ export default function AdminChallengesCreate({ schools = [] }) {
     const { t, language } = useTranslation();
     const [imagePreview, setImagePreview] = useState(null);
     const imageInputRef = useRef(null);
+    const [aiIdea, setAiIdea] = useState('');
+    const [isGenerating, setIsGenerating] = useState(false);
 
     const { data, setData, post, processing, errors } = useForm({
         title: '',
@@ -56,6 +58,49 @@ export default function AdminChallengesCreate({ schools = [] }) {
         }
     };
 
+    const handleAIGenerate = async () => {
+        if (!aiIdea) {
+            alert('يرجى إدخال فكرة التحدي أولاً.');
+            return;
+        }
+
+        setIsGenerating(true);
+        try {
+            const axios = (await import('axios')).default;
+            const response = await axios.post(route('admin.challenges.generate'), { idea: aiIdea });
+            const result = response.data;
+
+            setData((prev) => ({
+                ...prev,
+                title: result.title || prev.title,
+                objective: result.objective || prev.objective,
+                description: result.description || prev.description,
+                instructions: result.instructions || prev.instructions,
+                category: result.category || prev.category,
+            }));
+
+            if (result.image_url) {
+                try {
+                    const imgRes = await fetch(result.image_url);
+                    const blob = await imgRes.blob();
+                    const file = new File([blob], 'ai_generated_image.jpg', { type: blob.type });
+                    setData('image', file);
+                    setImagePreview(URL.createObjectURL(file));
+                } catch (imgError) {
+                    console.error('Error fetching AI image', imgError);
+                }
+            }
+
+            if (result.incomplete_fields && result.incomplete_fields.length > 0) {
+                alert('تم توليد التحدي. يرجى مراجعة الحقول التالية وإكمالها: ' + result.incomplete_fields.join('، '));
+            }
+        } catch (error) {
+            alert(error.response?.data?.error || 'حدث خطأ أثناء توليد تفاصيل التحدي');
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
     const submit = (e) => {
         e.preventDefault();
         post(route('admin.challenges.store'), {
@@ -88,6 +133,40 @@ export default function AdminChallengesCreate({ schools = [] }) {
                                 {errors.error}
                             </div>
                         )}
+
+                        {/* مساعد الذكاء الاصطناعي */}
+                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100 flex flex-col md:flex-row md:items-center gap-4 justify-between">
+                            <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <FaRobot className="text-blue-600 text-xl" />
+                                    <h3 className="font-bold text-blue-800 text-base">مساعد الذكاء الاصطناعي للتحديات</h3>
+                                </div>
+                                <p className="text-sm text-blue-600">
+                                    اكتب فكرة مبسطة وسيقوم المساعد بتوليد عنوان، هدف، وصف، خطوات تنفيذ، تحديد الفئة وصورة غلاف مناسبة.
+                                </p>
+                            </div>
+                            <div className="flex-1 flex gap-2 w-full md:w-auto">
+                                <input
+                                    type="text"
+                                    value={aiIdea}
+                                    onChange={(e) => setAiIdea(e.target.value)}
+                                    placeholder="مثال: تحدي لتصميم روبوت يفرز النفايات..."
+                                    className="flex-1 text-sm rounded-lg border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={handleAIGenerate}
+                                    disabled={isGenerating || !aiIdea}
+                                    className="bg-blue-600 text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-blue-700 disabled:opacity-50 transition flex justify-center items-center gap-2 whitespace-nowrap"
+                                >
+                                    {isGenerating ? (
+                                        <><FaSpinner className="animate-spin" /> جاري التوليد...</>
+                                    ) : (
+                                        <><FaRobot /> توليد التفاصيل</>
+                                    )}
+                                </button>
+                            </div>
+                        </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* العنوان */}

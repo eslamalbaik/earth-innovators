@@ -646,6 +646,7 @@ Route::middleware(['auth', 'school', 'membership_active'])->prefix('school')->na
     Route::get('/projects/pending', [\App\Http\Controllers\School\SchoolProjectController::class, 'pending'])->name('projects.pending');
     Route::match(['get', 'post'], '/projects/{project}/approve', [\App\Http\Controllers\School\SchoolProjectController::class, 'approve'])->name('projects.approve');
     Route::match(['get', 'post'], '/projects/{project}/reject', [\App\Http\Controllers\School\SchoolProjectController::class, 'reject'])->name('projects.reject');
+    Route::post('/projects/generate', [\App\Http\Controllers\School\SchoolProjectController::class, 'generate'])->name('projects.generate');
     Route::resource('projects', \App\Http\Controllers\School\SchoolProjectController::class);
 
     // إدارة الطلاب
@@ -672,12 +673,14 @@ Route::middleware(['auth', 'school', 'membership_active'])->prefix('school')->na
     Route::get('/ranking', [\App\Http\Controllers\School\SchoolRankingController::class, 'index'])->name('ranking');
 
     // إدارة الإصدارات
+    Route::post('/publications/generate', [\App\Http\Controllers\School\SchoolPublicationController::class, 'generate'])->name('publications.generate');
     Route::get('/publications/pending', [\App\Http\Controllers\School\SchoolPublicationController::class, 'pending'])->name('publications.pending');
     Route::match(['get', 'post'], '/publications/{publication}/approve', [\App\Http\Controllers\School\SchoolPublicationController::class, 'approve'])->name('publications.approve');
     Route::match(['get', 'post'], '/publications/{publication}/reject', [\App\Http\Controllers\School\SchoolPublicationController::class, 'reject'])->name('publications.reject');
     Route::resource('publications', \App\Http\Controllers\School\SchoolPublicationController::class);
 
     // إدارة التحديات
+    Route::post('challenges/generate', [\App\Http\Controllers\School\SchoolChallengeController::class, 'generate'])->name('challenges.generate');
     Route::resource('challenges', \App\Http\Controllers\School\SchoolChallengeController::class);
 
     // إدارة تقديمات التحديات
@@ -748,6 +751,7 @@ Route::middleware(['auth', 'teacher', 'membership_active'])->group(function () {
 
     // إدارة مقالات المعلمين
     Route::get('/teacher/publications', [\App\Http\Controllers\Teacher\TeacherPublicationController::class, 'index'])->name('teacher.publications.index');
+    Route::post('/teacher/publications/generate', [\App\Http\Controllers\Teacher\TeacherPublicationController::class, 'generate'])->name('teacher.publications.generate');
     Route::get('/teacher/publications/create', [\App\Http\Controllers\Teacher\TeacherPublicationController::class, 'create'])->name('teacher.publications.create');
     Route::post('/teacher/publications', [\App\Http\Controllers\Teacher\TeacherPublicationController::class, 'store'])->name('teacher.publications.store');
     Route::get('/teacher/publications/{publication}', [\App\Http\Controllers\Teacher\TeacherPublicationController::class, 'show'])->name('teacher.publications.show');
@@ -782,6 +786,7 @@ Route::middleware(['auth', 'teacher', 'membership_active'])->group(function () {
     });
 
     // إدارة المشاريع من المعلمين
+    Route::post('/teacher/projects/generate', [\App\Http\Controllers\Teacher\TeacherProjectController::class, 'generate'])->name('teacher.projects.generate');
     Route::get('/teacher/projects', [\App\Http\Controllers\Teacher\TeacherProjectController::class, 'index'])->name('teacher.projects.index');
     Route::get('/teacher/projects/create', [\App\Http\Controllers\Teacher\TeacherProjectController::class, 'create'])->name('teacher.projects.create');
     Route::post('/teacher/projects', [\App\Http\Controllers\Teacher\TeacherProjectController::class, 'store'])->name('teacher.projects.store');
@@ -806,6 +811,7 @@ Route::prefix('api/webhooks/payment')->group(function () {
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/chart-data', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'getChartDataApi'])->name('dashboard.chart-data');
+    Route::get('/analytics', [\App\Http\Controllers\Admin\AnalyticsController::class, 'dashboard'])->name('analytics');
 
     Route::get('/subjects', [SubjectController::class, 'adminIndex'])->name('subjects.index');
     Route::post('/subjects', [SubjectController::class, 'store'])->name('subjects.store');
@@ -905,12 +911,24 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/payments/export/csv', [\App\Http\Controllers\Admin\AdminSubscriptionController::class, 'exportPaymentsCsv'])->name('payments.export.csv');
 
     // إدارة الإصدارات
+    Route::post('/publications/generate', [\App\Http\Controllers\Admin\AdminPublicationController::class, 'generate'])->name('publications.generate');
     Route::resource('publications', \App\Http\Controllers\Admin\AdminPublicationController::class)->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy']);
     Route::match(['get', 'post'], '/publications/{publication}/approve', [\App\Http\Controllers\Admin\AdminPublicationController::class, 'approve'])->name('publications.approve');
     Route::match(['get', 'post'], '/publications/{publication}/reject', [\App\Http\Controllers\Admin\AdminPublicationController::class, 'reject'])->name('publications.reject');
 
     // إدارة التحديات - CRUD كامل
+    Route::post('challenges/generate', [\App\Http\Controllers\Admin\AdminChallengeController::class, 'generate'])->name('challenges.generate');
     Route::resource('challenges', \App\Http\Controllers\Admin\AdminChallengeController::class);
+
+    // خريطة المواهب (محرك التقييم — المرحلة الأولى والثانية)
+    Route::get('/innovation/talent-map', [\App\Http\Controllers\Admin\AdminInnovationController::class, 'talentMap'])->name('innovation.talent-map');
+    Route::post('/innovation/recalculate', [\App\Http\Controllers\Admin\AdminInnovationController::class, 'recalculate'])->name('innovation.recalculate');
+    Route::get('/innovation/users/{student}', [\App\Http\Controllers\Admin\AdminInnovationController::class, 'userProfile'])->name('innovation.user-profile');
+    Route::post('/innovation/users/{student}/generate-report', [\App\Http\Controllers\Admin\AdminInnovationController::class, 'generateReport'])->name('innovation.generate-report');
+    Route::get('/innovation/chat', [\App\Http\Controllers\Admin\AdminChatController::class, 'index'])->name('innovation.chat');
+    Route::post('/innovation/chat/ask', [\App\Http\Controllers\Admin\AdminChatController::class, 'ask'])->name('innovation.chat.ask');
+    Route::get('/innovation/smart-search', [\App\Http\Controllers\Admin\AdminInnovationController::class, 'smartSearch'])->name('innovation.smart-search');
+    Route::post('/innovation/users/{student}/generate-document', [\App\Http\Controllers\Admin\AdminInnovationController::class, 'generateDocument'])->name('innovation.generate-document');
     Route::get('/challenge-suggestions', [\App\Http\Controllers\Admin\AdminChallengeSuggestionController::class, 'index'])->name('challenge-suggestions.index');
     Route::patch('/challenge-suggestions/{challengeSuggestion}/status', [\App\Http\Controllers\Admin\AdminChallengeSuggestionController::class, 'updateStatus'])->name('challenge-suggestions.update-status');
     Route::get('/challenges/{challenge}/assign-students', [\App\Http\Controllers\Admin\ChallengeStudentController::class, 'show'])->name('challenges.assign-students');
@@ -924,6 +942,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // إدارة المشاريع - CRUD كامل
     Route::get('/projects', [\App\Http\Controllers\Admin\AdminProjectController::class, 'index'])->name('projects.index');
     Route::get('/projects/create', [\App\Http\Controllers\Admin\AdminProjectController::class, 'create'])->name('projects.create');
+    Route::post('/projects/generate', [\App\Http\Controllers\Admin\AdminProjectController::class, 'generate'])->name('projects.generate');
+    Route::post('/projects/{project}/evaluate', [\App\Http\Controllers\Admin\AdminProjectController::class, 'evaluate'])->name('projects.evaluate');
     Route::post('/projects', [\App\Http\Controllers\Admin\AdminProjectController::class, 'store'])->name('projects.store');
     Route::get('/projects/{project}/edit', [\App\Http\Controllers\Admin\AdminProjectController::class, 'edit'])->name('projects.edit');
     Route::put('/projects/{project}', [\App\Http\Controllers\Admin\AdminProjectController::class, 'update'])->name('projects.update');
@@ -992,3 +1012,42 @@ Route::get('/publications', [\App\Http\Controllers\PublicationController::class,
 Route::get('/publications/{publication}', [\App\Http\Controllers\PublicationController::class, 'show'])->name('publications.show');
 
 require __DIR__ . '/auth.php';
+
+// ═══════════════════════════════════════════════════════════════════
+// Innovation System Routes (إرث المبتكرين)
+// ═══════════════════════════════════════════════════════════════════
+
+Route::middleware('auth')->prefix('innovation')->name('innovation.')->group(function () {
+    // ─── Achievements CRUD ───────────────────────────────────
+    Route::resource('achievements', \App\Http\Controllers\AchievementController::class);
+    Route::post('achievements/{achievement}/attachments', [\App\Http\Controllers\AchievementController::class, 'uploadAttachment'])
+        ->name('achievements.upload-attachment');
+
+    // ─── Innovator Indexes ───────────────────────────────────
+    Route::get('indexes', [\App\Http\Controllers\InnovationController::class, 'indexes'])->name('indexes');
+    Route::post('recalculate', [\App\Http\Controllers\InnovationController::class, 'recalculate'])->name('recalculate');
+    Route::get('history', [\App\Http\Controllers\InnovationController::class, 'history'])->name('history');
+
+    // ─── AI Features ─────────────────────────────────────────
+    Route::get('recommendations', [\App\Http\Controllers\InnovationController::class, 'recommendations'])->name('recommendations');
+    Route::get('benchmarking', [\App\Http\Controllers\InnovationController::class, 'benchmarking'])->name('benchmarking');
+    Route::post('generate-report', [\App\Http\Controllers\InnovationController::class, 'generateReport'])->name('generate-report');
+    Route::match(['get', 'post'], 'smart-search', [\App\Http\Controllers\InnovationController::class, 'smartSearch'])->name('smart-search');
+    Route::post('generate-content', [\App\Http\Controllers\InnovationController::class, 'generateContent'])->name('generate-content');
+});
+
+// ─── Innovation Coach Dashboard (للمعلم/المدرسة/الأدمن) ─────────
+Route::middleware(['auth', 'membership_active'])->prefix('teacher/innovation')->name('teacher.innovation.')->group(function () {
+    Route::get('dashboard', [\App\Http\Controllers\CoachDashboardController::class, 'index'])->name('dashboard');
+    Route::get('student/{student}/report', [\App\Http\Controllers\CoachDashboardController::class, 'studentReport'])->name('student-report');
+    Route::get('compare', [\App\Http\Controllers\CoachDashboardController::class, 'compareStudents'])->name('compare');
+    Route::get('student/{student}/cognitive-assessment', [\App\Http\Controllers\CognitiveAssessmentController::class, 'form'])->name('cognitive-assessment.form');
+    Route::post('student/{student}/cognitive-assessment', [\App\Http\Controllers\CognitiveAssessmentController::class, 'store'])->name('cognitive-assessment.store');
+});
+
+// ─── Analytics & Reporting API ─────────────────────────────────
+Route::middleware(['auth'])->prefix('api/analytics')->name('api.analytics.')->group(function () {
+    Route::get('top-schools', [\App\Http\Controllers\AnalyticsController::class, 'topSchools'])->name('top-schools');
+    Route::get('top-students', [\App\Http\Controllers\AnalyticsController::class, 'topStudents'])->name('top-students');
+    Route::get('dashboard-stats', [\App\Http\Controllers\AnalyticsController::class, 'dashboardStats'])->name('dashboard-stats');
+});
