@@ -7,6 +7,7 @@ use App\Models\ProjectSubmission;
 use App\Models\Badge;
 use App\Models\User;
 use App\Services\SubmissionService;
+use App\Support\StorageUrl;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -124,7 +125,8 @@ class StudentSubmissionsTest extends TestCase
 
         $this->assertIsArray($submission->files);
         $this->assertNotEmpty($submission->files);
-        Storage::disk('public')->assertExists($submission->files[0]);
+        // files accessor returns public /media URLs; assert on the raw stored path
+        Storage::disk('public')->assertExists(StorageUrl::diskPath($submission->files[0]));
 
         $updateResponse = $this->actingAs($student)->post("/project-submissions/{$submission->id}", [
             'comment' => 'updated submission',
@@ -139,7 +141,7 @@ class StudentSubmissionsTest extends TestCase
         $this->assertSame('updated submission', $submission->comment);
         $this->assertIsArray($submission->files);
         $this->assertNotEmpty($submission->files);
-        Storage::disk('public')->assertExists($submission->files[0]);
+        Storage::disk('public')->assertExists(StorageUrl::diskPath($submission->files[0]));
     }
 
     public function test_get_request_to_submission_store_route_redirects_instead_of_throwing_405(): void
@@ -220,7 +222,7 @@ class StudentSubmissionsTest extends TestCase
         $response->assertOk();
         $response->assertInertia(fn (Assert $page) => $page
             ->component('Student/Projects/Show')
-            ->where('existingSubmission.file_urls.0', '/storage/project-submissions/files/demo-report.pdf')
+            ->where('existingSubmission.file_urls.0', StorageUrl::url('project-submissions/files/demo-report.pdf'))
         );
     }
 }

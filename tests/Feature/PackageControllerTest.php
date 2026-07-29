@@ -322,7 +322,8 @@ class PackageControllerTest extends TestCase
         $response = $this->actingAs($user)
             ->get(route('admin.packages.index'));
 
-        $response->assertForbidden();
+        // admin middleware redirects non-admins to the dedicated admin login
+        $response->assertRedirect(route('admin.login'));
     }
 
     /**
@@ -332,7 +333,7 @@ class PackageControllerTest extends TestCase
     {
         $response = $this->get(route('admin.packages.index'));
 
-        $response->assertRedirect('/login');
+        $response->assertRedirect(route('admin.login'));
     }
 
     /**

@@ -32,3 +32,5 @@ Thumbs.db
 /.codegraph
 /skills-lock.json
 /fix_colors.py
+/npm_install_log.txt
+/vite_log.txt

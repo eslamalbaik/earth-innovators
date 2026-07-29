@@ -5,6 +5,7 @@ namespace Tests\Feature\Auth;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class PasswordUpdateTest extends TestCase
@@ -14,7 +15,8 @@ class PasswordUpdateTest extends TestCase
     public function test_password_can_be_updated(): void
     {
         $user = User::factory()->create();
-        $newPassword = 'NewPassword123!';
+        // random strong password to satisfy the uncompromised (not-pwned) password rule
+        $newPassword = Str::password(20);
 
         $response = $this
             ->actingAs($user)

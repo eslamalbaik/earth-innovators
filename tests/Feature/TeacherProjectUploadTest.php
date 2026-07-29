@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Project;
 use App\Models\Teacher;
 use App\Models\User;
+use App\Support\StorageUrl;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -50,7 +51,8 @@ class TeacherProjectUploadTest extends TestCase
         $this->assertSame($teacherUser->id, $project->user_id);
         $this->assertSame($institution->id, $project->school_id);
         $this->assertSame('pending', $project->status);
-        Storage::disk('public')->assertExists($project->thumbnail);
+        // thumbnail accessor returns a public /media URL; assert on the raw stored path
+        Storage::disk('public')->assertExists(StorageUrl::diskPath($project->thumbnail));
     }
 
     public function test_teacher_project_upload_creates_missing_teacher_profile(): void

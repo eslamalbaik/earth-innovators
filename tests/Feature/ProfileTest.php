@@ -34,9 +34,10 @@ class ProfileTest extends TestCase
                 'email' => 'test@example.com',
             ]);
 
+        // default factory role is student, which redirects to the student profile page
         $response
             ->assertSessionHasNoErrors()
-            ->assertRedirect('/profile');
+            ->assertRedirect(route('student.profile'));
 
         $user->refresh();
 
@@ -114,7 +115,7 @@ class ProfileTest extends TestCase
 
         $response
             ->assertSessionHasNoErrors()
-            ->assertRedirect('/profile');
+            ->assertRedirect(route('student.profile'));
 
         $this->assertNotNull($user->refresh()->email_verified_at);
     }

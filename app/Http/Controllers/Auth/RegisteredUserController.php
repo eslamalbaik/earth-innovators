@@ -113,10 +113,12 @@ class RegisteredUserController extends Controller
                     };
                     $year = date('Y');
 
-                    // Lock existing rows so concurrent requests can't grab the same number
+                    // Lock existing rows so concurrent requests can't grab the same number.
+                    // DB-agnostic ordering (MySQL + SQLite); result is only used for the lock.
                     User::where('membership_number', 'like', "{$prefix}-{$year}-%")
                         ->lockForUpdate()
-                        ->orderByRaw('CAST(SUBSTRING_INDEX(membership_number, "-", -1) AS UNSIGNED) DESC')
+                        ->orderByRaw('LENGTH(membership_number) DESC')
+                        ->orderBy('membership_number', 'desc')
                         ->value('membership_number');
 
                     $userData['membership_number'] = $this->membershipService->generateMembershipNumber($validated['role']);
