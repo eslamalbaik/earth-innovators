@@ -100,7 +100,9 @@ $landingLogic = function () {
             ->map(fn($r) => [
                 'id' => $r->id,
                 'name' => $r->reviewer_name ?? 'مستخدم',
+                'text' => $r->comment,
                 'content' => $r->comment,
+                'location' => $r->reviewer_location,
                 'rating' => $r->rating,
                 'image' => \App\Support\StorageUrl::url($r->reviewer_image),
             ]);

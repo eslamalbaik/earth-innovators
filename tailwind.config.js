@@ -13,8 +13,8 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Cairo', ...defaultTheme.fontFamily.sans],
-                cairo: ['Cairo', 'sans-serif'],
+                sans: ['Baloo Bhaijaan 2', ...defaultTheme.fontFamily.sans],
+                cairo: ['Baloo Bhaijaan 2', 'sans-serif'],
             },
             colors: {
                 primary: {

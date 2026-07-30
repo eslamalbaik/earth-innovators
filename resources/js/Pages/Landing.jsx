@@ -14,6 +14,10 @@ import TestimonialsSection from '@/Components/Sections/TestimonialsSection';
 import FAQSection from '@/Components/Sections/FAQSection';
 import PublicationsSection from '@/Components/Sections/PublicationsSection';
 import CTASection from '@/Components/Sections/CTASection';
+import WhatCanYouMakeSection from '@/Components/Sections/WhatCanYouMakeSection';
+import InnovatorJourneySection from '@/Components/Sections/InnovatorJourneySection';
+import InnovationAxesSection from '@/Components/Sections/InnovationAxesSection';
+import FeaturedProjectsSection from '@/Components/Sections/FeaturedProjectsSection';
 
 export default function Landing({
     auth,
@@ -187,170 +191,38 @@ export default function Landing({
                             </div>
                         )}
 
+                        {/* What Can You Make Section */}
+                        <WhatCanYouMakeSection />
+
+                        {/* Innovator Journey Section */}
+                        <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100 p-4">
+                            <InnovatorJourneySection />
+                        </div>
+
+                        {/* Innovation Axes Section */}
+                        <div className="bg-white rounded-2xl border border-gray-100 p-4">
+                            <InnovationAxesSection />
+                        </div>
+
                         {/* Featured Projects */}
-                        {featuredProjects && featuredProjects.length > 0 && (
-                            <div className="bg-white rounded-2xl border border-gray-100 p-4">
-                                <div className="flex items-center justify-between mb-4">
-                                    <h2 className="text-lg font-bold text-gray-900">{t('sections.featuredProjects')}</h2>
-                                    <Link
-                                        href="/projects"
-                                        className="text-[#A3C042] text-sm font-semibold flex items-center gap-1"
-                                    >
-                                        {t('common.viewAll')}
-                                        <ForwardIcon className="text-xs" />
-                                    </Link>
-                                </div>
-                                <div className="space-y-3">
-                                    {featuredProjects.slice(0, 3).map((project) => (
-                                        <Link
-                                            key={project.id}
-                                            href={`/projects/${project.id}`}
-                                            className="block bg-gray-50 rounded-xl p-3 border border-gray-100 hover:shadow-md transition"
-                                        >
-                                            <div className="flex items-start gap-3">
-                                                <div className="w-12 h-12 bg-gradient-to-br from-[#A3C042]/20 to-[#8CA635]/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                                                    <FaProjectDiagram className="text-[#A3C042] text-xl" />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <h3 className="text-sm font-bold text-gray-900 mb-1 line-clamp-1">
-                                                        {project.title}
-                                                    </h3>
-                                                    <p className="text-xs text-gray-600 mb-2 line-clamp-2">
-                                                        {project.description}
-                                                    </p>
-                                                    <div className="flex items-center gap-2 flex-wrap">
-                                                        <span className="px-2 py-1 bg-gray-100 text-gray-700 text-[10px] font-semibold rounded-full">
-                                                            {getCategoryLabel(project.category)}
-                                                        </span>
-                                                        {project.views > 0 && (
-                                                            <span className="text-[10px] text-gray-500">
-                                                                {project.views} {t('project.views')}
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Link>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Quick Links */}
-                            <div className="grid grid-cols-2 gap-3">
-                            <Link
-                                href="/challenges"
-                                className="bg-white rounded-2xl border border-gray-100 p-4 hover:shadow-md transition"
-                            >
-                                <div className="flex items-center gap-3 mb-2">
-                                    <div className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">
-                                        <FaTrophy className="text-yellow-600 text-lg" />
-                                    </div>
-                                    <div className="text-sm font-bold text-gray-900">{t('quickLinks.challenges')}</div>
-                                </div>
-                                <p className="text-xs text-gray-600">{t('quickLinks.challengesDesc')}</p>
-                            </Link>
-
-                            <Link
-                                href="/publications"
-                                className="bg-white rounded-2xl border border-gray-100 p-4 hover:shadow-md transition"
-                            >
-                                <div className="flex items-center gap-3 mb-2">
-                                    <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                                        <FaBook className="text-blue-600 text-lg" />
-                                    </div>
-                                    <div className="text-sm font-bold text-gray-900">{t('quickLinks.publications')}</div>
-                                </div>
-                                <p className="text-xs text-gray-600">{t('quickLinks.publicationsDesc')}</p>
-                            </Link>
-
-                            <Link
-                                href="/badges"
-                                className="bg-white rounded-2xl border border-gray-100 p-4 hover:shadow-md transition"
-                            >
-                                <div className="flex items-center gap-3 mb-2">
-                                    <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-                                        <FaMedal className="text-purple-600 text-lg" />
-                                    </div>
-                                    <div className="text-sm font-bold text-gray-900">{t('quickLinks.badges')}</div>
-                                </div>
-                                <p className="text-xs text-gray-600">{t('quickLinks.badgesDesc')}</p>
-                            </Link>
-
-                            <Link
-                                href="/about"
-                                className="bg-white rounded-2xl border border-gray-100 p-4 hover:shadow-md transition"
-                            >
-                                <div className="flex items-center gap-3 mb-2">
-                                    <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                                        <FaRocket className="text-green-600 text-lg" />
-                                    </div>
-                                    <div className="text-sm font-bold text-gray-900">{t('quickLinks.about')}</div>
-                                </div>
-                                <p className="text-xs text-gray-600">{t('quickLinks.aboutDesc')}</p>
-                            </Link>
+                        <div className="bg-white rounded-2xl border border-gray-100 p-4">
+                            <FeaturedProjectsSection
+                                projects={featuredProjects}
+                                getCategoryLabel={getCategoryLabel}
+                            />
                         </div>
 
-                        {/* Why Choose Section */}
+
+                        {/* Testimonials / Stories Section */}
                         <div className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6">
-                            <WhyChooseSection
-                                title={t('sections.whyChoose')}
-                                subtitle={t('sections.whyChooseSubtitle')}
-                                benefits={whyChooseBenefits}
-                                imageSrc="/images/erth-img.jpg"
-                                imageAlt={t('header.appName')}
+                            <TestimonialsSection
+                                title={language === 'ar' ? 'قصص من مجتمعنا' : 'Stories from Our Community'}
+                                subtitle={language === 'ar' ? 'تجارب حقيقية من طلابنا ومعلمينا ومبتكرينا' : 'Real experiences from our students, teachers and innovators'}
+                                testimonials={testimonials}
                                 compact={true}
                             />
                         </div>
 
-                        {/* Platform Features Section */}
-                        <div className="bg-gradient-to-br from-[#A3C042]/5 to-[#8CA635]/5 rounded-2xl border border-gray-100 p-4 md:p-6">
-                            <PlatformFeaturesSection
-                                title={t('sections.platformFeatures')}
-                                subtitle={t('sections.platformFeaturesSubtitle')}
-                                compact={true}
-                            />
-                        </div>
-
-                        {/* UAE Schools Section */}
-                        {uaeSchools && uaeSchools.length > 0 && (
-                            <div className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6">
-                                <UAESchoolsSection
-                                    title={t('sections.uaeSchools')}
-                                    subtitle={t('sections.uaeSchoolsSubtitle')}
-                                    schools={uaeSchools}
-                                    compact={true}
-                                />
-                            </div>
-                        )}
-
-                        {/* Teacher Recruitment Section - Only show to non-authenticated users or non-teachers */}
-                        {(!isAuthed || (user?.role !== 'teacher' && user?.role !== 'school')) && (
-                            <div className="bg-gradient-to-br from-[#A3C042] to-[#8CA635] rounded-2xl p-4 md:p-6 text-white">
-                                <TeacherRecruitmentSection
-                                    title={t('sections.teacherRecruitment.title')}
-                                    callToAction={t('sections.joinToInnovators')}
-                                    description={t('sections.joinDescription')}
-                                    buttonText={isAuthed ? t('hero.goToDashboard') : t('sections.join')}
-                                    imageSrc="/images/avatar2.svg"
-                                    imageAlt={t('landingPage.teacherRecruitment.imageAlt')}
-                                    onJoinClick={() => router.visit(isAuthed ? '/dashboard' : '/register')}
-                                    compact={true}
-                                />
-                            </div>
-                        )}
-
-                        {/* Testimonials Section */}
-                        {testimonials && testimonials.length > 0 && (
-                            <div className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6">
-                                <TestimonialsSection
-                                    title={t('sections.testimonials.title')}
-                                    subtitle={t('sections.testimonials.subtitle')}
-                                    testimonials={testimonials}
-                                    compact={true}
-                                />
-                            </div>
-                        )}
 
                         {/* FAQ Section */}
                         <div className="bg-gradient-to-br from-[#A3C042]/10 to-[#8CA635]/10 rounded-2xl border border-gray-100 p-4 md:p-6">
@@ -441,230 +313,141 @@ export default function Landing({
                         )}
 
                         {/* Hero Section */}
-                        <div dir={dir} className="bg-gradient-to-br from-[#A3C042] to-[#8CA635] rounded-3xl p-8 text-white relative overflow-hidden">
-                            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                                <div className='z-10'>
-                                    <h1 className="text-4xl font-extrabold mb-4 leading-tight">
-                                        {t('hero.title')}
-                                    </h1>
-                                    <p className="text-white/90 text-lg mb-6">
-                                        {t('hero.subtitle')}
-                                    </p>
+                        <div dir={dir} className="relative min-h-[360px] overflow-hidden rounded-3xl bg-white shadow-sm lg:min-h-[460px]">
+                            {/* Image side (opposite the green panel) */}
+                            <div className="absolute inset-y-0 end-0 w-[64%]">
+                                <img
+                                    src="/images/hero.png"
+                                    alt={t('hero.imageAlt')}
+                                    className="h-full w-full object-cover object-center"
+                                />
+                            </div>
+
+                            {/* Decorative shapes — drawn in CSS/SVG, mirrored for LTR */}
+                            <div className={`pointer-events-none absolute inset-0 ${dir === 'rtl' ? '' : '-scale-x-100'}`}>
+                                <svg
+                                    className="absolute inset-0 h-full w-full"
+                                    viewBox="0 0 500 440"
+                                    preserveAspectRatio="none"
+                                    aria-hidden="true"
+                                >
+                                    <defs>
+                                        <linearGradient id="heroGreen" x1="0" y1="0" x2="1" y2="1">
+                                            <stop offset="0%" stopColor="#A3C042" />
+                                            <stop offset="100%" stopColor="#8CA635" />
+                                        </linearGradient>
+                                    </defs>
+                                    {/* lighter accent swoosh */}
+                                    <path
+                                        d="M500 0 L240 0 C205 130 205 300 285 440 L345 440 C270 300 270 130 305 0 Z"
+                                        fill="#C1DA6C"
+                                        opacity="0.85"
+                                    />
+                                    {/* main green panel */}
+                                    <path
+                                        d="M500 0 L300 0 C235 130 235 310 320 440 L500 440 Z"
+                                        fill="url(#heroGreen)"
+                                    />
+                                </svg>
+
+                                {/* dotted grid in the green top corner */}
+                                <div
+                                    className="absolute right-6 top-6 h-24 w-40 opacity-40"
+                                    style={{
+                                        backgroundImage:
+                                            'radial-gradient(rgba(255,255,255,0.9) 1.5px, transparent 1.5px)',
+                                        backgroundSize: '14px 14px',
+                                    }}
+                                />
+                            </div>
+
+                            {/* Text content over the green panel */}
+                            <div className="absolute inset-y-0 start-0 z-10 flex w-[52%] flex-col justify-center gap-4 p-8 text-white lg:w-[46%] lg:p-12">
+                                <h1 className="text-3xl font-extrabold leading-tight lg:text-4xl xl:text-5xl">
+                                    {t('hero.title')}
+                                </h1>
+                                <p className="text-base text-white/90 lg:text-lg">
+                                    {t('hero.subtitle')}
+                                </p>
+                                <div>
                                     <button
                                         onClick={handleStartJourney}
-                                        className="bg-white text-[#A3C042] px-8 py-4 rounded-xl font-bold text-base hover:bg-gray-100 transition shadow-lg"
+                                        className="mt-2 rounded-xl bg-white px-8 py-4 text-base font-bold text-[#A3C042] shadow-lg transition hover:scale-105 hover:bg-gray-100"
                                     >
                                         {isAuthed ? t('hero.goToDashboard') : t('hero.startJourney')}
                                     </button>
-                                </div>
-                                <div className={`flex justify-center items-center ${dir === 'rtl' ? '' : 'lg:order-last'}`}>
-                                    <div className={`absolute bg-[#C1DA6C] md:w-[298px] md:h-[1500px] rotate-45 ${dir === 'rtl' ? '' : 'lg:-scale-x-100'}`}></div>
-                                    <img
-                                        src="/images/hero.png"
-                                        alt={t('hero.imageAlt')}
-                                        className="z-10 w-full max-w-md"
-                                    />
                                 </div>
                             </div>
                         </div>
 
                         {/* Stats Section */}
                         {stats && stats.length > 0 && (
-                            <div className="bg-white rounded-2xl border border-gray-100 p-6">
-                                <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">{t('stats.successNumbers')}</h2>
-                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                                    {stats.map((stat, index) => (
-                                        <div key={index} className="text-center">
-                                            <div className="text-3xl font-extrabold text-[#A3C042] mb-2">
-                                                {stat.value || '0'}
+                            <div className="relative overflow-hidden rounded-3xl border border-gray-100 bg-white p-8 shadow-sm">
+                                <div className="pointer-events-none absolute -end-16 -top-16 h-48 w-48 rounded-full bg-[#A3C042]/5 blur-2xl" />
+                                <div className="relative mb-8 text-center">
+                                    <h2 className="text-2xl font-extrabold text-gray-900 md:text-3xl">{t('stats.successNumbers')}</h2>
+                                    <div className="mx-auto mt-3 h-1 w-16 rounded-full bg-gradient-to-r from-[#A3C042] to-[#8CA635]" />
+                                </div>
+                                <div className="relative grid grid-cols-2 gap-6 lg:grid-cols-4 lg:gap-0">
+                                    {stats.map((stat, index) => {
+                                        const StatIcon = [FaMedal, FaChartLine, FaUsers, FaTrophy][index % 4];
+                                        return (
+                                            <div
+                                                key={index}
+                                                className="flex flex-col items-center text-center lg:border-gray-100 lg:px-6 lg:border-e lg:last:border-e-0"
+                                            >
+                                                <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#A3C042] to-[#8CA635] text-white shadow-md">
+                                                    <StatIcon className="text-2xl" />
+                                                </div>
+                                                <div className="bg-gradient-to-r from-[#A3C042] to-[#8CA635] bg-clip-text text-3xl font-extrabold text-transparent md:text-4xl">
+                                                    {stat.value || '0'}
+                                                </div>
+                                                <div className="mt-1 text-sm font-semibold text-gray-600">
+                                                    {getStatLabel(stat.label)}
+                                                </div>
                                             </div>
-                                            <div className="text-sm text-gray-600 font-semibold">
-                                                {getStatLabel(stat.label)}
-                                            </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </div>
                         )}
+
+                        {/* What Can You Make Section */}
+                        <section className="relative overflow-hidden rounded-3xl border border-gray-100 bg-white p-8 shadow-sm">
+                            <WhatCanYouMakeSection />
+                        </section>
+
+                        {/* Innovator Journey Section */}
+                        <section className="relative overflow-hidden rounded-3xl border border-gray-100 bg-gradient-to-br from-gray-50 to-white p-8 shadow-sm">
+                            <div className="pointer-events-none absolute -start-16 -top-16 h-48 w-48 rounded-full bg-[#A3C042]/5 blur-2xl" />
+                            <InnovatorJourneySection />
+                        </section>
+
+                        {/* Innovation Axes Section */}
+                        <section className="relative overflow-hidden rounded-3xl border border-gray-100 bg-white p-8 shadow-sm">
+                            <InnovationAxesSection />
+                        </section>
 
                         {/* Featured Projects */}
-                        {featuredProjects && featuredProjects.length > 0 && (
-                            <div className="bg-white rounded-2xl border border-gray-100 p-6">
-                                <div className="flex items-center justify-between mb-6">
-                                    <h2 className="text-2xl font-bold text-gray-900">{t('sections.featuredProjects')}</h2>
-                                    <Link
-                                        href="/projects"
-                                        className="text-[#A3C042] text-sm font-semibold flex items-center gap-2 hover:text-[#8CA635] transition"
-                                    >
-                                        {t('sections.allProjects')}
-                                        <ForwardIcon />
-                                    </Link>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                    {featuredProjects.slice(0, 4).map((project) => (
-                                        <Link
-                                            key={project.id}
-                                            href={`/projects/${project.id}`}
-                                            className="bg-gray-50 rounded-xl p-4 border border-gray-100 hover:shadow-md transition"
-                                        >
-                                            <div className="flex items-center gap-2 mb-3">
-                                                <FaProjectDiagram className="text-[#A3C042] text-lg" />
-                                                <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
-                                                    {t('common.approved')}
-                                                </span>
-                                            </div>
-                                            <h3 className="text-sm font-bold text-gray-900 mb-2 line-clamp-2">
-                                                {project.title}
-                                            </h3>
-                                            <p className="text-xs text-gray-600 mb-3 line-clamp-2">
-                                                {project.description}
-                                            </p>
-                                            <div className="flex items-center justify-between text-xs text-gray-500">
-                                                <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full">
-                                                    {getCategoryLabel(project.category)}
-                                                </span>
-                                                {project.views > 0 && (
-                                                    <span>{project.views} {t('project.views')}</span>
-                                                )}
-                                            </div>
-                                        </Link>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Quick Links */}
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                            <Link
-                                href="/challenges"
-                                className="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-md transition text-center"
-                            >
-                                <div className="w-16 h-16 bg-yellow-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                                    <FaTrophy className="text-yellow-600 text-2xl" />
-                                </div>
-                                <div className="text-base font-bold text-gray-900 mb-2">{t('quickLinks.challenges')}</div>
-                                <p className="text-sm text-gray-600">{t('quickLinks.challengesDesc')}</p>
-                            </Link>
-
-                            <Link
-                                href="/publications"
-                                className="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-md transition text-center"
-                            >
-                                <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                                    <FaBook className="text-blue-600 text-2xl" />
-                                </div>
-                                <div className="text-base font-bold text-gray-900 mb-2">{t('quickLinks.publications')}</div>
-                                <p className="text-sm text-gray-600">{t('quickLinks.publicationsDesc')}</p>
-                            </Link>
-
-                            <Link
-                                href="/badges"
-                                className="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-md transition text-center"
-                            >
-                                <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                                    <FaMedal className="text-purple-600 text-2xl" />
-                                </div>
-                                <div className="text-base font-bold text-gray-900 mb-2">{t('quickLinks.badges')}</div>
-                                <p className="text-sm text-gray-600">{t('quickLinks.badgesDesc')}</p>
-                            </Link>
-
-                            <Link
-                                href="/about"
-                                className="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-md transition text-center"
-                            >
-                                <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                                    <FaRocket className="text-green-600 text-2xl" />
-                                </div>
-                                <div className="text-base font-bold text-gray-900 mb-2">{t('quickLinks.about')}</div>
-                                <p className="text-sm text-gray-600">{t('quickLinks.aboutDesc')}</p>
-                            </Link>
-                        </div>
-
-                        {/* Why Choose Section */}
-                        <section className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8">
-                            <WhyChooseSection
-                                title={t('sections.whyChoose')}
-                                subtitle={t('sections.whyChooseSubtitle')}
-                                benefits={whyChooseBenefits}
-                                imageSrc="/images/erth-img.jpg"
-                                imageAlt={t('header.appName')}
-                                compact={true}
+                        <section className="relative overflow-hidden rounded-3xl border border-gray-100 bg-white p-8 shadow-sm">
+                            <FeaturedProjectsSection
+                                projects={featuredProjects}
+                                getCategoryLabel={getCategoryLabel}
                             />
                         </section>
 
-                        {/* Platform Features Section */}
-                        <section className="bg-gradient-to-br from-[#A3C042]/5 to-[#8CA635]/5 rounded-2xl border border-gray-100 p-6 md:p-8">
-                            <PlatformFeaturesSection
-                                title={t('sections.platformFeatures')}
-                                subtitle={t('sections.platformFeaturesSubtitle')}
-                                compact={true}
+                        {/* Testimonials / Stories Section */}
+                        <section>
+                            <TestimonialsSection
+                                title={language === 'ar' ? 'قصص من مجتمعنا' : 'Stories from Our Community'}
+                                subtitle={language === 'ar' ? 'تجارب حقيقية من طلابنا ومعلمينا ومبتكرينا' : 'Real experiences from our students, teachers and innovators'}
+                                testimonials={testimonials}
+                                compact={false}
                             />
                         </section>
-
-                        {/* UAE Schools Section */}
-                        {uaeSchools && uaeSchools.length > 0 && (
-                            <section className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8">
-                                <UAESchoolsSection
-                                    title={t('sections.uaeSchools')}
-                                    subtitle={t('sections.uaeSchoolsSubtitle')}
-                                    schools={uaeSchools}
-                                    compact={true}
-                                />
-                            </section>
-                        )}
-
-                        {/* Teacher Recruitment Section - Only show to non-authenticated users or non-teachers */}
-                        {(!isAuthed || (user?.role !== 'teacher' && user?.role !== 'school')) && (
-                            <section className="bg-gradient-to-br from-[#A3C042] to-[#8CA635] rounded-2xl p-6 md:p-8 text-white">
-                                <TeacherRecruitmentSection
-                                    title={t('sections.teacherRecruitment.title')}
-                                    callToAction={t('sections.joinToInnovators')}
-                                    description={t('sections.joinDescription')}
-                                    buttonText={isAuthed ? t('hero.goToDashboard') : t('sections.join')}
-                                    imageSrc="/images/avatar2.svg"
-                                    imageAlt={t('landingPage.teacherRecruitment.imageAlt')}
-                                    onJoinClick={() => router.visit(isAuthed ? '/dashboard' : '/register')}
-                                    compact={true}
-                                />
-                            </section>
-                        )}
-
-                        {/* Testimonials Section */}
-                        {testimonials && testimonials.length > 0 && (
-                            <section className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8">
-                                <TestimonialsSection
-                                    title={t('sections.testimonials.title')}
-                                    subtitle={t('sections.testimonials.subtitle')}
-                                    testimonials={testimonials}
-                                    compact={true}
-                                />
-                            </section>
-                        )}
-
-                        {/* FAQ Section */}
-                        <section className="bg-gradient-to-br from-[#A3C042]/10 to-[#8CA635]/10 rounded-2xl border border-gray-100 p-6 md:p-8">
-                            <FAQSection
-                                title={t('sections.faq.title')}
-                                subtitle={t('sections.faq.subtitle')}
-                                compact={true}
-                            />
-                        </section>
-
-                        {/* Publications Section */}
-                        {featuredPublications && featuredPublications.length > 0 && (
-                            <section className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8">
-                                <PublicationsSection
-                                    title={t('sections.publications')}
-                                    subtitle={t('landingPage.publications.subtitle')}
-                                    publications={featuredPublications}
-                                    viewAllLink="/publications"
-                                    compact={true}
-                                />
-                            </section>
-                        )}
 
                         {/* CTA Section */}
-                        <section className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 md:p-8 text-white">
+                        <section className="overflow-hidden rounded-3xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-8 md:p-12 text-white">
                             <CTASection
                                 title={t('sections.cta.title')}
                                 description={t('sections.cta.description')}

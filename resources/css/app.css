@@ -1,17 +1,17 @@
-/* Cairo Font Family - Import from Google Fonts CDN */
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800;900&display=swap');
+/* Baloo Bhaijaan 2 Font Family - Import from Google Fonts CDN */
+@import url('https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Cairo Font Family */
+/* Baloo Bhaijaan 2 Font Family */
 body {
-    font-family: 'Cairo', sans-serif;
+    font-family: 'Baloo Bhaijaan 2', sans-serif;
 }
 
 * {
-    font-family: 'Cairo', sans-serif;
+    font-family: 'Baloo Bhaijaan 2', sans-serif;
 }
 
 /* Custom Animations */

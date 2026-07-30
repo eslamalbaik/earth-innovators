@@ -13,10 +13,10 @@
     @endphp
     <link rel="canonical" href="{{ $canonicalUrl }}" />
 
-    <!-- Fonts - Cairo from Google Fonts CDN -->
+    <!-- Fonts - Baloo Bhaijaan 2 from Google Fonts CDN -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800;900&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="icon" type="image/png" href="/images/logo-modified.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/images/logo-modified.png">

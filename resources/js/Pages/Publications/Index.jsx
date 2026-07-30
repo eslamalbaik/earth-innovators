@@ -10,10 +10,10 @@ import { getPublicationFileUrl, getPublicationImageUrl, getPublicationTypeFallba
 import { useTranslation } from '@/i18n';
 
 const TYPE_ACCENTS = {
-    magazine: '#2563EB',
-    booklet: '#B45309',
-    report: '#4B5563',
-    article: '#15803D',
+    magazine: '#A3C042',
+    booklet: '#8CA635',
+    report: '#64748B',
+    article: '#0E9F6E',
 };
 
 const STATUS_ACCENTS = {
@@ -172,12 +172,12 @@ export default function PublicationsIndex({ auth, publications, filters, myPubli
         const typeFallbackImage = getPublicationTypeFallbackImage(publication.type);
         const coverImage = getPublicationImageUrl(publication.cover_image, typeFallbackImage);
         const statusLabel = t(`common.${publication.status}`) || publication.status;
-        const statusColor = STATUS_ACCENTS[publication.status] || '#6B6660';
+        const statusColor = STATUS_ACCENTS[publication.status] || '#6B7280';
         const isApproved = publication.status === 'approved';
 
         const body = (
             <>
-                <div className="aspect-[4/3] overflow-hidden bg-[#EDE8DE]">
+                <div className="aspect-[4/3] overflow-hidden rounded-2xl bg-gray-100">
                     <img
                         src={coverImage}
                         alt={publicationTitle}
@@ -188,7 +188,7 @@ export default function PublicationsIndex({ auth, publications, filters, myPubli
                 </div>
                 <div className="mt-2">
                     <TypeTag type={publication.type} />
-                    <h4 className="mt-1 line-clamp-2 text-sm font-bold leading-snug text-[#1A1815]">
+                    <h4 className="mt-1 line-clamp-2 text-sm font-bold leading-snug text-gray-900">
                         {publicationTitle}
                     </h4>
                     <span className="mt-1 inline-block text-[11px] font-bold" style={{ color: statusColor }}>
@@ -217,7 +217,7 @@ export default function PublicationsIndex({ auth, publications, filters, myPubli
                 {hasReadableContent && (
                     <Link
                         href={`/publications/${publication.id}`}
-                        className="rounded-md bg-[#1A1815] px-4 py-2 text-xs font-bold text-white transition-colors duration-200 hover:bg-[#A3C042] focus:outline-none focus:ring-2 focus:ring-[#A3C042]/50 focus:ring-offset-1"
+                        className="rounded-xl bg-gradient-to-r from-[#A3C042] to-[#8CA635] px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#A3C042]/50 focus:ring-offset-1"
                     >
                         {t('common.read')}
                     </Link>
@@ -226,7 +226,7 @@ export default function PublicationsIndex({ auth, publications, filters, myPubli
                     <a
                         href={getPublicationFileUrl(publication.file) || '#'}
                         download
-                        className="flex items-center gap-1.5 text-xs font-bold text-[#6B6660] transition-colors duration-200 hover:text-[#1A1815] focus:outline-none focus:ring-2 focus:ring-[#A3C042]/50 focus:ring-offset-1"
+                        className="flex items-center gap-1.5 text-xs font-bold text-gray-500 transition-colors duration-200 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#A3C042]/50 focus:ring-offset-1"
                     >
                         <FaDownload className="text-xs" />
                         {t('common.download')}
@@ -238,7 +238,7 @@ export default function PublicationsIndex({ auth, publications, filters, myPubli
                     aria-label={isLiked ? t('publicationsPage.unlike') : t('publicationsPage.like')}
                     aria-pressed={isLiked}
                     className={`ms-auto flex items-center gap-1.5 text-xs font-bold transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#A3C042]/50 focus:ring-offset-1 ${
-                        isLiked ? 'text-red-600' : 'text-[#6B6660] hover:text-[#1A1815]'
+                        isLiked ? 'text-red-600' : 'text-gray-500 hover:text-gray-900'
                     }`}
                 >
                     <FaHeart className={isLiked ? 'fill-current' : ''} />
@@ -258,7 +258,7 @@ export default function PublicationsIndex({ auth, publications, filters, myPubli
         return (
             <div key={publication.id}>
                 <Link href={`/publications/${publication.id}`} className="block">
-                    <div className="aspect-[16/9] overflow-hidden bg-[#EDE8DE]">
+                    <div className="aspect-[16/9] overflow-hidden rounded-2xl bg-gray-100">
                         <img
                             src={coverImage}
                             alt={publicationTitle}
@@ -271,16 +271,16 @@ export default function PublicationsIndex({ auth, publications, filters, myPubli
                 <div className="mt-4">
                     <TypeTag type={publication.type} />
                     <Link href={`/publications/${publication.id}`}>
-                        <h2 className="mt-2 text-2xl md:text-3xl font-black leading-tight text-[#1A1815] transition-colors duration-200 hover:text-[#A3C042]">
+                        <h2 className="mt-2 text-2xl md:text-3xl font-black leading-tight text-gray-900 transition-colors duration-200 hover:text-[#A3C042]">
                             {publicationTitle}
                         </h2>
                     </Link>
-                    <div className="mt-2 text-xs font-medium text-[#6B6660]">
+                    <div className="mt-2 text-xs font-medium text-gray-500">
                         {publication.publisher_name || publication.school?.name}
                         {publication.publish_date && ` · ${formatDate(publication.publish_date)}`}
                     </div>
                     {publicationDescription && (
-                        <p className="mt-3 text-sm leading-relaxed text-[#4A4640] line-clamp-3">
+                        <p className="mt-3 text-sm leading-relaxed text-gray-600 line-clamp-3">
                             {publicationDescription}
                         </p>
                     )}
@@ -294,17 +294,17 @@ export default function PublicationsIndex({ auth, publications, filters, myPubli
         const publicationTitle = getLocalizedField(publication, 'title');
 
         return (
-            <div key={publication.id} className="flex gap-4 border-b border-[#E4DFD6] py-5 last:border-b-0">
+            <div key={publication.id} className="flex gap-4 border-b border-gray-200 py-5 last:border-b-0">
                 <span className="text-2xl font-black leading-none text-[#A3C042]/40">
                     {String(number).padStart(2, '0')}
                 </span>
                 <Link href={`/publications/${publication.id}`} className="min-w-0 flex-1">
                     <TypeTag type={publication.type} />
-                    <h4 className="mt-1.5 line-clamp-2 text-base font-bold leading-snug text-[#1A1815] transition-colors duration-200 hover:text-[#A3C042]">
+                    <h4 className="mt-1.5 line-clamp-2 text-base font-bold leading-snug text-gray-900 transition-colors duration-200 hover:text-[#A3C042]">
                         {publicationTitle}
                     </h4>
                     {publication.publish_date && (
-                        <div className="mt-1 text-xs text-[#6B6660]">{formatDate(publication.publish_date)}</div>
+                        <div className="mt-1 text-xs text-gray-500">{formatDate(publication.publish_date)}</div>
                     )}
                 </Link>
             </div>
@@ -321,9 +321,9 @@ export default function PublicationsIndex({ auth, publications, filters, myPubli
         const coverImage = getPublicationImageUrl(publication.cover_image, typeFallbackImage);
 
         return (
-            <article key={publication.id} className="flex flex-col gap-5 border-b border-[#E4DFD6] py-6 sm:flex-row last:border-b-0">
+            <article key={publication.id} className="flex flex-col gap-5 border-b border-gray-200 py-6 sm:flex-row last:border-b-0">
                 <Link href={`/publications/${publication.id}`} className="block flex-shrink-0 sm:w-48">
-                    <div className="aspect-[4/3] overflow-hidden bg-[#EDE8DE]">
+                    <div className="aspect-[4/3] overflow-hidden rounded-2xl bg-gray-100">
                         <img
                             src={coverImage}
                             alt={publicationTitle}
@@ -343,21 +343,21 @@ export default function PublicationsIndex({ auth, publications, filters, myPubli
                         )}
                     </div>
                     <Link href={`/publications/${publication.id}`}>
-                        <h3 className="mt-1.5 line-clamp-2 text-xl font-black leading-snug text-[#1A1815] transition-colors duration-200 hover:text-[#A3C042]">
+                        <h3 className="mt-1.5 line-clamp-2 text-xl font-black leading-snug text-gray-900 transition-colors duration-200 hover:text-[#A3C042]">
                             {publicationTitle}
                             {publication.issue_number && (
-                                <span className="block text-sm font-semibold text-[#6B6660] mt-0.5">
+                                <span className="block text-sm font-semibold text-gray-500 mt-0.5">
                                     {t('publicationsPage.issueLabel', { number: publication.issue_number })}
                                 </span>
                             )}
                         </h3>
                     </Link>
-                    <div className="mt-1.5 text-xs font-medium text-[#6B6660]">
+                    <div className="mt-1.5 text-xs font-medium text-gray-500">
                         {publication.publisher_name || publication.school?.name}
                         {publication.publish_date && ` · ${formatDate(publication.publish_date)}`}
                     </div>
                     {publicationDescription && (
-                        <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-[#4A4640]">
+                        <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-gray-600">
                             {publicationDescription}
                         </p>
                     )}
@@ -371,17 +371,21 @@ export default function PublicationsIndex({ auth, publications, filters, myPubli
     // is the correct set to render directly — no client-side re-filtering needed.
     const currentPublications = publications.data || [];
 
-    // Lead + rail only surfaces real signal (actual likes); items shown there are excluded
-    // from the sections below so nothing repeats on the page.
-    const topPublications = activeTab === 'all'
+    // Most-liked first for the featured rail (real signal only).
+    const likedTop = activeTab === 'all'
         ? [...currentPublications]
             .filter((p) => (p.likes_count || 0) > 0)
             .sort((a, b) => (b.likes_count || 0) - (a.likes_count || 0))
-            .slice(0, 5)
         : [];
-    const leads = topPublications.slice(0, 2);
-    const rail = topPublications.slice(2);
-    const featuredIds = new Set(topPublications.map((p) => p.id));
+
+    // Always surface two lead stories side by side; when fewer than two have
+    // likes, top up with the most recent publications so the pair stays balanced.
+    const leadCandidates = activeTab === 'all'
+        ? [...likedTop, ...currentPublications.filter((p) => !likedTop.some((l) => l.id === p.id))]
+        : [];
+    const leads = leadCandidates.slice(0, 2);
+    const rail = likedTop.slice(2, 5);
+    const featuredIds = new Set([...leads, ...rail].map((p) => p.id));
     const listPublications = currentPublications.filter((p) => !featuredIds.has(p.id));
 
     // On the "all" tab, group the remaining publications into labeled sections by type
@@ -415,17 +419,17 @@ export default function PublicationsIndex({ auth, publications, filters, myPubli
             `}</style>
 
             {/* Masthead */}
-            <div className="border-b border-[#E4DFD6] pb-6">
+            <div className="border-b border-gray-200 pb-6">
                 <div className="flex items-end justify-between gap-4">
                     <div>
                         <span className="text-xs font-bold uppercase tracking-widest text-[#A3C042]">
                             {t('common.discover')}
                         </span>
-                        <h1 className="mt-1 text-4xl font-black leading-tight text-[#1A1815] md:text-5xl">
+                        <h1 className="mt-1 text-4xl font-black leading-tight text-gray-900 md:text-5xl">
                             {t('sections.publications.title')}
                         </h1>
                     </div>
-                    <div className="hidden text-sm font-semibold text-[#6B6660] sm:block">
+                    <div className="hidden text-sm font-semibold text-gray-500 sm:block">
                         {publications.total ?? currentPublications.length} {t('publicationsPage.publicationsAvailable')}
                     </div>
                 </div>
@@ -433,8 +437,8 @@ export default function PublicationsIndex({ auth, publications, filters, myPubli
 
             {/* My Posts — the current user's own submissions, any status, always at the top */}
             {auth?.user && myPublications.length > 0 && (
-                <div className="border-b border-[#E4DFD6] pb-8">
-                    <h2 className="mb-3 text-xs font-bold uppercase tracking-widest text-[#6B6660]">
+                <div className="border-b border-gray-200 pb-8">
+                    <h2 className="mb-3 text-xs font-bold uppercase tracking-widest text-gray-500">
                         {t('publicationsPage.myPosts')}
                     </h2>
                     <div className="flex gap-5 overflow-x-auto pb-2 scrollbar-hide no-scrollbar">
@@ -444,7 +448,7 @@ export default function PublicationsIndex({ auth, publications, filters, myPubli
             )}
 
             {/* Search */}
-            <div className="flex flex-col gap-3 border-b border-[#E4DFD6] pb-6 sm:flex-row sm:items-center">
+            <div className="flex flex-col gap-3 border-b border-gray-200 pb-6 sm:flex-row sm:items-center">
                 <div className="relative flex-1">
                     <FaSearch className="absolute left-0 top-1/2 -translate-y-1/2 text-[#A3C042]" />
                     <input
@@ -454,13 +458,13 @@ export default function PublicationsIndex({ auth, publications, filters, myPubli
                         onKeyDown={(event) => event.key === 'Enter' && handleSearch()}
                         placeholder={t('publicationsPage.searchPlaceholder')}
                         aria-label={t('publicationsPage.searchPlaceholder')}
-                        className="h-11 w-full border-b border-[#E4DFD6] bg-transparent ps-7 pe-2 text-sm font-medium text-[#1A1815] placeholder:text-[#6B6660] focus:border-[#A3C042] focus:outline-none"
+                        className="h-11 w-full border-b border-gray-200 bg-transparent ps-7 pe-2 text-sm font-medium text-gray-900 placeholder:text-gray-500 focus:border-[#A3C042] focus:outline-none"
                     />
                 </div>
                 <button
                     type="button"
                     onClick={handleSearch}
-                    className="h-11 rounded-md bg-[#1A1815] px-6 text-sm font-bold text-white transition-colors duration-200 hover:bg-[#A3C042] focus:outline-none focus:ring-2 focus:ring-[#A3C042]/50 focus:ring-offset-2"
+                    className="h-11 rounded-xl bg-gradient-to-r from-[#A3C042] to-[#8CA635] px-6 text-sm font-bold text-white shadow-sm transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#A3C042]/50 focus:ring-offset-2"
                 >
                     {t('common.search')}
                 </button>
@@ -469,7 +473,7 @@ export default function PublicationsIndex({ auth, publications, filters, myPubli
             {/* Category nav — underline tabs, single source of truth for type filtering */}
             <div>
                 <div
-                    className="flex items-center gap-7 overflow-x-auto border-b border-[#E4DFD6] scrollbar-hide no-scrollbar"
+                    className="flex items-center gap-7 overflow-x-auto border-b border-gray-200 scrollbar-hide no-scrollbar"
                     role="tablist"
                     aria-label={t('publicationsPage.allTypes')}
                 >
@@ -481,28 +485,28 @@ export default function PublicationsIndex({ auth, publications, filters, myPubli
                             onClick={() => selectTab(tab.id)}
                             className={`whitespace-nowrap border-b-2 pb-3 text-sm font-bold transition-colors duration-200 focus:outline-none ${
                                 activeTab === tab.id
-                                    ? 'border-[#A3C042] text-[#1A1815]'
-                                    : 'border-transparent text-[#6B6660] hover:text-[#1A1815]'
+                                    ? 'border-[#A3C042] text-gray-900'
+                                    : 'border-transparent text-gray-500 hover:text-gray-900'
                             }`}
                         >
                             {tab.label}
                         </button>
                     ))}
                 </div>
-                <div className="mt-3 text-sm font-semibold text-[#6B6660]">
+                <div className="mt-3 text-sm font-semibold text-gray-500">
                     {publications.total ?? currentPublications.length} {t('publicationsPage.publicationsFound')}
                 </div>
             </div>
 
             {/* Lead + rail — two lead stories, not one */}
             {leads.length > 0 && (
-                <div className="grid grid-cols-1 gap-10 border-b border-[#E4DFD6] pb-10 lg:grid-cols-[1.6fr_1fr]">
-                    <div className="space-y-10">
+                <div className={`grid grid-cols-1 gap-10 border-b border-gray-200 pb-10 ${rail.length > 0 ? 'lg:grid-cols-[1.6fr_1fr]' : ''}`}>
+                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
                         {leads.map((pub) => renderLead(pub))}
                     </div>
                     {rail.length > 0 && (
                         <div>
-                            <span className="text-xs font-bold uppercase tracking-widest text-[#6B6660]">
+                            <span className="text-xs font-bold uppercase tracking-widest text-gray-500">
                                 {t('publicationsPage.featured')}
                             </span>
                             <div className="mt-2">
@@ -519,27 +523,27 @@ export default function PublicationsIndex({ auth, publications, filters, myPubli
                     sections.map((section) => (
                         <div key={section.type}>
                             {activeTab === 'all' && (
-                                <div className="mb-2 flex items-center gap-3 border-b border-[#E4DFD6] pb-3">
-                                    <h2 className="text-lg font-black text-[#1A1815]">{getTypeLabel(section.type)}</h2>
-                                    <span className="text-sm font-semibold text-[#6B6660]">{section.items.length}</span>
+                                <div className="mb-2 flex items-center gap-3 border-b border-gray-200 pb-3">
+                                    <h2 className="text-lg font-black text-gray-900">{getTypeLabel(section.type)}</h2>
+                                    <span className="text-sm font-semibold text-gray-500">{section.items.length}</span>
                                 </div>
                             )}
                             <div>{section.items.map((pub) => renderListRow(pub))}</div>
                         </div>
                     ))
                 ) : currentPublications.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center border-y border-dashed border-[#E4DFD6] py-24 text-center">
-                        <div className="mb-4 text-4xl text-[#D8D2C4]">
+                    <div className="flex flex-col items-center justify-center border-y border-dashed border-gray-200 py-24 text-center">
+                        <div className="mb-4 text-4xl text-gray-300">
                             {getTypeIcon(activeTab)({})}
                         </div>
-                        <p className="text-lg font-semibold text-[#1A1815]">{t('publicationsPage.empty')}</p>
-                        <p className="mt-1 text-sm text-[#6B6660]">{t('publicationsPage.emptyHint')}</p>
+                        <p className="text-lg font-semibold text-gray-900">{t('publicationsPage.empty')}</p>
+                        <p className="mt-1 text-sm text-gray-500">{t('publicationsPage.emptyHint')}</p>
                     </div>
                 ) : null}
 
                 {/* Pagination */}
                 {publications.links && publications.links.length > 3 && (
-                    <div className="mt-8 flex flex-wrap items-center justify-center gap-5 border-t border-[#E4DFD6] pt-6">
+                    <div className="mt-8 flex flex-wrap items-center justify-center gap-5 border-t border-gray-200 pt-6">
                         {publications.links.map((link, index) => {
                             const isActive = link.active;
                             const isDisabled = !link.url;
@@ -548,8 +552,8 @@ export default function PublicationsIndex({ auth, publications, filters, myPubli
                                 isActive
                                     ? 'text-[#A3C042] underline underline-offset-4'
                                     : isDisabled
-                                    ? 'cursor-not-allowed text-[#D8D2C4]'
-                                    : 'text-[#6B6660] hover:text-[#1A1815]'
+                                    ? 'cursor-not-allowed text-gray-300'
+                                    : 'text-gray-500 hover:text-gray-900'
                             }`;
 
                             if (isDisabled) {
@@ -580,7 +584,7 @@ export default function PublicationsIndex({ auth, publications, filters, myPubli
     );
 
     return (
-        <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-[#FAF7F2]">
+        <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
             <Head title={t('publicationsPage.pageTitle', { appName: t('common.appName') })} />
 
             <div className="block md:hidden">
