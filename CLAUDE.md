@@ -53,7 +53,7 @@ Translations are **client-side** in `resources/js/i18n/ar.js` and `en.js` (each 
 User files are served through `StorageController` at `/media/{path}` and legacy `/storage/{path}` (see top of `routes/web.php`), NOT the default symlink. Build URLs with `App\Support\StorageUrl::url($path, $cacheBuster)`.
 
 ### AI & scoring engines
-- `app/Services/AIEngine/` — content analysis, report generation, recommendations, smart search. LLM calls go through `DeepSeekClient` (DeepSeek API, config in `config/services.php` under `deepseek`, key `DEEPSEEK_API_KEY`). Heavy AI work is queued: `app/Jobs/GenerateAIReportJob`, `AnalyzeAchievementJob`, `RecalculateIndexesJob`.
+- `app/Services/AIEngine/` — content analysis, report generation, recommendations, smart search. LLM calls go through `GeminiClient` (Google Gemini API, config in `config/services.php` under `gemini`, key `GEMINI_API_KEY`). Heavy AI work is queued: `app/Jobs/GenerateAIReportJob`, `AnalyzeAchievementJob`, `RecalculateIndexesJob`.
 - `app/Services/ScoringEngine/` — computes innovation indexes (Creativity, Skills, Leadership, FutureReadiness, IP, Intelligence, Projects) via per-index calculators orchestrated by `ScoringEngineService`.
 
 ### Payments & documents

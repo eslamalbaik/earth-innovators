@@ -79,7 +79,7 @@ class AdminPublicationController extends Controller
     /**
      * توليد محتوى المقال بالذكاء الاصطناعي
      */
-    public function generate(Request $request, \App\Services\AIEngine\DeepSeekClient $deepSeekClient)
+    public function generate(Request $request, \App\Services\AIEngine\GeminiClient $deepSeekClient)
     {
         $request->validate([
             'title' => 'required|string|max:255',
@@ -89,7 +89,7 @@ class AdminPublicationController extends Controller
 
         try {
             $aiResponse = $deepSeekClient->chatWithJson([
-                \App\Services\AIEngine\DeepSeekClient::systemMessage(
+                \App\Services\AIEngine\GeminiClient::systemMessage(
                     'أنت كاتب مقالات محترف. '
                     . 'مهمتك هي كتابة مقال تعليمي مطول جداً ومفصل وشامل بناءً على العنوان المقدم. '
                     . 'هام جداً: يجب أن يتجاوز طول المقال 600 كلمة. '
@@ -104,7 +104,7 @@ class AdminPublicationController extends Controller
                     . 'description (وصف قصير للعرض النصي العادي), description_ar (وصف قصير بالعربية)، '
                     . 'image_keyword (كلمة مفتاحية واحدة بالإنجليزية للبحث في Unsplash).'
                 ),
-                \App\Services\AIEngine\DeepSeekClient::userMessage("عنوان المقال: " . $title),
+                \App\Services\AIEngine\GeminiClient::userMessage("عنوان المقال: " . $title),
             ]);
 
             if (!$aiResponse) {

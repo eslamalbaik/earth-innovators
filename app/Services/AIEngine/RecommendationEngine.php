@@ -13,7 +13,7 @@ use App\Models\InnovationIndex;
 class RecommendationEngine
 {
     public function __construct(
-        private DeepSeekClient $client,
+        private GeminiClient $client,
     ) {}
 
     /**
@@ -31,7 +31,7 @@ class RecommendationEngine
         $prompt = $this->buildRecommendationPrompt($user, $index);
 
         $result = $this->client->chatWithJson([
-            DeepSeekClient::systemMessage(
+            GeminiClient::systemMessage(
                 'أنت مستشار تطوير مهني متخصص في تطوير المبتكرين. '
                 . 'بناءً على مؤشرات الطالب، قم بتوليد توصيات مخصصة لتحسين أدائه. '
                 . 'أجب بصيغة JSON مع الحقول: '
@@ -42,9 +42,10 @@ class RecommendationEngine
                 . 'collaborators_criteria (array of {skill, reason}), '
                 . 'strengths (array of strings), '
                 . 'weaknesses (array of strings), '
-                . 'overall_advice (string)'
+                . 'overall_advice (string), '
+                . 'student_level_profile (object with {current_level (e.g. L1 to L5), score, strengths (array), learning_gaps (array), acquired_skills (array), achieved_outcomes (array), next_challenge, target_level})'
             ),
-            DeepSeekClient::userMessage($prompt),
+            GeminiClient::userMessage($prompt),
         ], temperature: 0.4, maxTokens: 4000);
 
         return $result ?? [
@@ -56,6 +57,7 @@ class RecommendationEngine
             'strengths'               => [],
             'weaknesses'              => [],
             'overall_advice'          => 'تعذر توليد التوصيات حالياً.',
+            'student_level_profile'   => null,
         ];
     }
 

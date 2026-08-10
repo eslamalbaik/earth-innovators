@@ -92,7 +92,7 @@ class SchoolChallengeController extends Controller
     /**
      * توليد أفكار وتفاصيل التحدي بالذكاء الاصطناعي
      */
-    public function generate(Request $request, \App\Services\AIEngine\DeepSeekClient $deepSeekClient)
+    public function generate(Request $request, \App\Services\AIEngine\GeminiClient $deepSeekClient)
     {
         $request->validate([
             'idea' => 'required|string|max:500',
@@ -102,7 +102,7 @@ class SchoolChallengeController extends Controller
 
         try {
             $aiResponse = $deepSeekClient->chatWithJson([
-                \App\Services\AIEngine\DeepSeekClient::systemMessage(
+                \App\Services\AIEngine\GeminiClient::systemMessage(
                     'أنت خبير في تصميم التحديات والمسابقات التعليمية والابتكارية للطلاب. '
                     . 'بناءً على الفكرة أو الوصف القصير الذي تقدمه المدرسة، قم بإنشاء تفاصيل تحدي كاملة ومحفزة. '
                     . 'قم باختيار إحدى الفئات التالية حصراً: science, technology, engineering, mathematics, arts, other. '
@@ -116,7 +116,7 @@ class SchoolChallengeController extends Controller
                     . 'category (إحدى الفئات المسموحة فقط باللغة الإنجليزية), '
                     . 'image_keyword (كلمة مفتاحية واحدة بالإنجليزية).'
                 ),
-                \App\Services\AIEngine\DeepSeekClient::userMessage("فكرة التحدي: " . $idea),
+                \App\Services\AIEngine\GeminiClient::userMessage("فكرة التحدي: " . $idea),
             ]);
 
             if (!$aiResponse) {

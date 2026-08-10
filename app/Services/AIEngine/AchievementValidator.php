@@ -14,7 +14,7 @@ use App\Models\User;
 class AchievementValidator
 {
     public function __construct(
-        private DeepSeekClient $client,
+        private GeminiClient $client,
     ) {}
 
     /**
@@ -27,14 +27,15 @@ class AchievementValidator
         $prompt = $this->buildValidationPrompt($achievement);
 
         $result = $this->client->chatWithJson([
-            DeepSeekClient::systemMessage(
-                'أنت محلل متخصص في تقييم الإنجازات الأكاديمية والمهنية. مهمتك تحليل الإنجاز وإعطاء تقييم شامل. '
+            GeminiClient::systemMessage(
+                'أنت محلل متخصص في تقييم الإنجازات الأكاديمية والمهنية. مهمتك تحليل الإنجاز وإعطاء تقييم شامل بناءً على المعايير الوطنية والدولية المعتمدة. '
                 . 'يجب أن تكون الإجابة بصيغة JSON تحتوي على الحقول التالية: '
                 . 'is_logical (boolean), has_duplicates (boolean), is_description_clear (boolean), '
                 . 'is_evidence_sufficient (boolean), confidence_score (number 0-100), '
-                . 'validation_status (validated/flagged), feedback (string), suggestions (array of strings)'
+                . 'validation_status (validated/flagged), feedback (string), suggestions (array of strings), '
+                . 'standards_alignment (array of strings - أسماء المعايير التي تتوافق مع هذا الإنجاز من القائمة المرجعية)'
             ),
-            DeepSeekClient::userMessage($prompt),
+            GeminiClient::userMessage($prompt),
         ]);
 
         if (!$result) {
@@ -43,10 +44,10 @@ class AchievementValidator
                 'confidence_score'  => 0,
                 'feedback'          => 'تعذر التحليل حالياً',
                 'suggestions'       => [],
+                'standards_alignment'=> [],
             ];
         }
 
-        // Update achievement with AI results
         $achievement->update([
             'ai_validation_status' => $result['validation_status'] ?? 'pending',
             'ai_confidence_score'  => $result['confidence_score'] ?? 0,
@@ -135,6 +136,12 @@ class AchievementValidator
             return "- نوع: {$a->file_type}, اسم: {$a->original_name}";
         })->implode("\n");
 
+        $standards = json_encode(config('standards'), JSON_UNESCAPED_UNICODE);
+
+        $externalLinks = $achievement->external_links
+            ? json_encode($achievement->external_links, JSON_UNESCAPED_UNICODE)
+            : 'لا يوجد';
+
         return <<<PROMPT
 قم بتحليل الإنجاز التالي وتقييمه:
 
@@ -147,7 +154,10 @@ class AchievementValidator
 المرفقات:
 {$attachmentsSummary}
 
-الروابط الخارجية: {$achievement->external_links ? json_encode($achievement->external_links, JSON_UNESCAPED_UNICODE) : 'لا يوجد'}
+الروابط الخارجية: {$externalLinks}
+
+قائمة المعايير المرجعية للاستدلال بها:
+{$standards}
 
 قم بتقييم:
 1. هل المحتوى منطقي ومتسق؟
@@ -155,6 +165,7 @@ class AchievementValidator
 3. هل الأدلة المرفقة كافية؟
 4. هل يوجد مؤشرات على تكرار أو نسخ؟
 5. ما درجة الثقة الإجمالية (0-100)؟
+6. ما هي المعايير من القائمة المرجعية التي تتوافق مع هذا الإنجاز أو يمكن قياسه من خلالها (standards_alignment)؟
 PROMPT;
     }
 }

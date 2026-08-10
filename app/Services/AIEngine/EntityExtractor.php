@@ -14,7 +14,7 @@ use App\Models\UserSkill;
 class EntityExtractor
 {
     public function __construct(
-        private DeepSeekClient $client,
+        private GeminiClient $client,
     ) {}
 
     /**
@@ -23,7 +23,7 @@ class EntityExtractor
     public function extractAll(string $content): array
     {
         $result = $this->client->chatWithJson([
-            DeepSeekClient::systemMessage(
+            GeminiClient::systemMessage(
                 'أنت خبير في استخراج الكيانات من النصوص. قم باستخراج الكيانات التالية من النص المقدم: '
                 . 'skills (مهارات)، technologies (تقنيات)، tools (أدوات)، '
                 . 'languages (لغات برمجة أو لغات طبيعية)، institutions (مؤسسات)، '
@@ -32,7 +32,7 @@ class EntityExtractor
                 . 'proficiency_level (beginner/intermediate/advanced/expert). '
                 . 'أجب بصيغة JSON فقط مع حقول: skills, technologies, tools, languages, institutions, specializations.'
             ),
-            DeepSeekClient::userMessage($content),
+            GeminiClient::userMessage($content),
         ]);
 
         return $result ?? [

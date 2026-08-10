@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\InnovationIndex;
 use App\Models\User;
-use App\Services\AIEngine\DeepSeekClient;
+use App\Services\AIEngine\GeminiClient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -17,7 +17,7 @@ use Inertia\Response;
 class AdminChatController extends Controller
 {
     public function __construct(
-        private DeepSeekClient $client,
+        private GeminiClient $client,
     ) {}
 
     /**
@@ -43,7 +43,7 @@ class AdminChatController extends Controller
             $context = $this->buildContext();
 
             $answer = $this->client->chat([
-                DeepSeekClient::systemMessage(
+                GeminiClient::systemMessage(
                     "أنت مساعد ذكي لمنصة \"مبتكرو الأرض\" التعليمية. "
                     . "تجيب على أسئلة المشرف (الأدمن) حول بيانات الطلاب ومؤشرات الابتكار والإحصائيات. "
                     . "أجب بالعربية بشكل مختصر وواضح. "
@@ -51,7 +51,7 @@ class AdminChatController extends Controller
                     . "لا تخترع بيانات. استخدم الأرقام الموجودة في السياق فقط.\n\n"
                     . "سياق البيانات الحالية:\n" . $context
                 ),
-                DeepSeekClient::userMessage($question),
+                GeminiClient::userMessage($question),
             ], temperature: 0.3, maxTokens: 1500);
 
             return response()->json([

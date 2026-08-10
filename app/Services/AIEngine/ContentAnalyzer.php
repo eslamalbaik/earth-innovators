@@ -10,7 +10,7 @@ namespace App\Services\AIEngine;
 class ContentAnalyzer
 {
     public function __construct(
-        private DeepSeekClient $client,
+        private GeminiClient $client,
     ) {}
 
     /**
@@ -19,15 +19,16 @@ class ContentAnalyzer
     public function analyze(string $content, string $type = 'general'): array
     {
         $result = $this->client->chatWithJson([
-            DeepSeekClient::systemMessage(
+            GeminiClient::systemMessage(
                 'أنت محلل محتوى متخصص. قم بتحليل النص المقدم وأعطِ تقييمات رقمية (0-100) لكل من: '
                 . 'originality (الأصالة)، impact (التأثير)، innovation_level (مستوى الابتكار)، '
                 . 'writing_quality (جودة الكتابة)، scientific_value (القيمة العلمية). '
-                . 'أيضاً استخرج keywords (كلمات مفتاحية كمصفوفة)، و summary (ملخص قصير). '
+                . 'أيضاً استخرج keywords (كلمات مفتاحية كمصفوفة)، و summary (ملخص قصير)، '
+                . 'و standards_alignment (مصفوفة بأسماء المعايير التي تتوافق مع النص بناءً على القائمة المرجعية). '
                 . 'أجب بصيغة JSON فقط.'
             ),
-            DeepSeekClient::userMessage(
-                "نوع المحتوى: {$type}\n\nالمحتوى:\n{$content}"
+            GeminiClient::userMessage(
+                "نوع المحتوى: {$type}\n\nالمحتوى:\n{$content}\n\nقائمة المعايير المرجعية للاستدلال بها:\n" . json_encode(config('standards'), JSON_UNESCAPED_UNICODE)
             ),
         ]);
 
@@ -39,6 +40,7 @@ class ContentAnalyzer
             'scientific_value' => 0,
             'keywords'         => [],
             'summary'          => '',
+            'standards_alignment' => [],
         ];
     }
 

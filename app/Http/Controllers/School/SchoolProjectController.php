@@ -64,7 +64,7 @@ class SchoolProjectController extends Controller
     /**
      * توليد أفكار ووصف المشروع بالذكاء الاصطناعي
      */
-    public function generate(Request $request, \App\Services\AIEngine\DeepSeekClient $deepSeekClient)
+    public function generate(Request $request, \App\Services\AIEngine\GeminiClient $deepSeekClient)
     {
         $request->validate([
             'idea' => 'required|string|max:500',
@@ -74,7 +74,7 @@ class SchoolProjectController extends Controller
 
         try {
             $aiResponse = $deepSeekClient->chatWithJson([
-                \App\Services\AIEngine\DeepSeekClient::systemMessage(
+                \App\Services\AIEngine\GeminiClient::systemMessage(
                     'أنت مستشار تخطيط مشاريع تعليمية وابتكارية. '
                     . 'بناءً على الفكرة أو الوصف القصير الذي تقدمه المدرسة، قم بإنشاء تفاصيل مشروع كاملة وجاهزة للنشر. '
                     . 'اقترح كلمة مفتاحية واحدة باللغة الإنجليزية للبحث عن صورة غلاف من Unsplash. '
@@ -92,7 +92,7 @@ class SchoolProjectController extends Controller
                     . 'instructional_approach (قيمة واحدة من الخيارات المتاحة), '
                     . 'image_keyword (كلمة مفتاحية واحدة بالإنجليزية).'
                 ),
-                \App\Services\AIEngine\DeepSeekClient::userMessage("فكرة المشروع: " . $idea),
+                \App\Services\AIEngine\GeminiClient::userMessage("فكرة المشروع: " . $idea),
             ]);
 
             if (!$aiResponse) {

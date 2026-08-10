@@ -106,7 +106,7 @@ class AdminProjectController extends Controller
     /**
      * توليد تفاصيل المشروع بالذكاء الاصطناعي
      */
-    public function generate(Request $request, \App\Services\AIEngine\DeepSeekClient $deepSeekClient)
+    public function generate(Request $request, \App\Services\AIEngine\GeminiClient $deepSeekClient)
     {
         $request->validate([
             'idea' => 'required|string|max:500',
@@ -116,7 +116,7 @@ class AdminProjectController extends Controller
 
         try {
             $aiResponse = $deepSeekClient->chatWithJson([
-                \App\Services\AIEngine\DeepSeekClient::systemMessage(
+                \App\Services\AIEngine\GeminiClient::systemMessage(
                     'أنت مستشار تخطيط مشاريع تعليمية وابتكارية. '
                     . 'بناءً على الفكرة أو الوصف القصير الذي يقدمه المستخدم، قم بإنشاء تفاصيل مشروع كاملة وجاهزة للنشر. '
                     . 'اختر واحدة من الفئات التالية حصراً: science, technology, engineering, mathematics, arts, other. '
@@ -127,7 +127,7 @@ class AdminProjectController extends Controller
                     . 'category (إحدى الفئات المسموحة فقط باللغة الإنجليزية), '
                     . 'image_keyword (كلمة مفتاحية واحدة بالإنجليزية).'
                 ),
-                \App\Services\AIEngine\DeepSeekClient::userMessage("فكرة المشروع: " . $idea),
+                \App\Services\AIEngine\GeminiClient::userMessage("فكرة المشروع: " . $idea),
             ]);
 
             if (!$aiResponse) {
@@ -181,11 +181,11 @@ class AdminProjectController extends Controller
     /**
      * تقييم المشروع بالذكاء الاصطناعي (عند المراجعة)
      */
-    public function evaluate(Project $project, \App\Services\AIEngine\DeepSeekClient $deepSeekClient)
+    public function evaluate(Project $project, \App\Services\AIEngine\GeminiClient $deepSeekClient)
     {
         try {
             $aiResponse = $deepSeekClient->chatWithJson([
-                \App\Services\AIEngine\DeepSeekClient::systemMessage(
+                \App\Services\AIEngine\GeminiClient::systemMessage(
                     'أنت محكّم خبير في تقييم المشاريع التعليمية والابتكارية للطلاب. '
                     . 'قيّم المشروع بناءً على عنوانه ووصفه من حيث: الأصالة والابتكار، الوضوح والتنظيم، القيمة التعليمية، وقابلية التطبيق. '
                     . 'كن موضوعياً وبنّاءً. '
@@ -197,7 +197,7 @@ class AdminProjectController extends Controller
                     . 'recommendation (واحدة فقط من: approve أو reject أو needs_revision), '
                     . 'recommendation_text (جملة قصيرة بالعربية تشرح سبب التوصية).'
                 ),
-                \App\Services\AIEngine\DeepSeekClient::userMessage(
+                \App\Services\AIEngine\GeminiClient::userMessage(
                     "عنوان المشروع: " . $project->title . "\n\n"
                     . "فئة المشروع: " . ($project->category ?? 'غير محددة') . "\n\n"
                     . "وصف المشروع: " . ($project->description ?? '')

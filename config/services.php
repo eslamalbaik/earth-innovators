@@ -56,10 +56,10 @@ return [
         'base_url' => env('ZIINA_BASE_URL', 'https://api-v2.ziina.com/api'),
     ],
 
-    'deepseek' => [
-        'api_key' => env('DEEPSEEK_API_KEY'),
-        'base_url' => env('DEEPSEEK_BASE_URL', 'https://api.deepseek.com'),
-        'model' => env('DEEPSEEK_MODEL', 'deepseek-chat'),
+    'gemini' => [
+        'api_key' => env('GEMINI_API_KEY'),
+        'base_url' => env('GEMINI_BASE_URL', 'https://generativelanguage.googleapis.com/v1beta'),
+        'model' => env('GEMINI_MODEL', 'gemini-2.5-flash'),
     ],
 
     'unsplash' => [

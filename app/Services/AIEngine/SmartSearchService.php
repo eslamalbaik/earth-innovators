@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 class SmartSearchService
 {
     public function __construct(
-        private DeepSeekClient $client,
+        private GeminiClient $client,
     ) {}
 
     /**
@@ -45,7 +45,7 @@ class SmartSearchService
     private function parseQuery(string $query): ?array
     {
         $result = $this->client->chatWithJson([
-            DeepSeekClient::systemMessage(
+            GeminiClient::systemMessage(
                 'أنت محلل استعلامات بحث. قم بتحليل استعلام البحث واستخراج المعايير. '
                 . 'أجب بصيغة JSON مع الحقول: '
                 . 'skills (array of strings), '
@@ -54,7 +54,7 @@ class SmartSearchService
                 . 'role (student/teacher/school or null), '
                 . 'keywords (array of strings)'
             ),
-            DeepSeekClient::userMessage("استعلام البحث: {$query}"),
+            GeminiClient::userMessage("استعلام البحث: {$query}"),
         ]);
 
         return $result;

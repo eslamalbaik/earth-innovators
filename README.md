@@ -10,7 +10,7 @@ Arabic-first (RTL), fully bilingual (ar / en).
 - **Frontend:** React 19 + Inertia.js 2 (SPA), Vite 7, Tailwind 3
 - **Data:** MySQL (prod), SQLite `:memory:` (tests), Redis (cache / queue in prod)
 - **Payments:** Ziina, Tamara
-- **AI & scoring:** DeepSeek API (content analysis, reports, recommendations) +
+- **AI & scoring:** Gemini API (content analysis, reports, recommendations) +
   in-house scoring engine (innovation indexes)
 - **Documents:** TCPDF + FPDI (certificates, invoices), maatwebsite/excel (exports),
   simple-qrcode (QR)
@@ -52,7 +52,7 @@ Copy `.env.example` to `.env` and fill in the relevant keys. Notable groups:
 | Database     | `DB_CONNECTION` (`sqlite` locally, `mysql` in prod) + `DB_*` |
 | Cache/Queue  | `CACHE_STORE`, `QUEUE_CONNECTION`, `REDIS_*` |
 | Payments     | `ZIINA_*`, `TAMARA_*` |
-| AI           | `DEEPSEEK_API_KEY`, `DEEPSEEK_BASE_URL`, `DEEPSEEK_MODEL` |
+| AI           | `GEMINI_API_KEY`, `GEMINI_BASE_URL`, `GEMINI_MODEL` |
 | Media        | `UNSPLASH_ACCESS_KEY` / `UNSPLASH_SECRET_KEY` |
 | Support info | `VITE_SUPPORT_*`, `SUPPORT_*` |
 

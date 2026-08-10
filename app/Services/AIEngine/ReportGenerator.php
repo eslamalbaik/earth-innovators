@@ -13,7 +13,7 @@ use App\Models\InnovationIndex;
 class ReportGenerator
 {
     public function __construct(
-        private DeepSeekClient $client,
+        private GeminiClient $client,
     ) {}
 
     /**
@@ -31,7 +31,7 @@ class ReportGenerator
         $prompt = $this->buildStudentReportPrompt($user, $index);
 
         $result = $this->client->chatWithJson([
-            DeepSeekClient::systemMessage(
+            GeminiClient::systemMessage(
                 'أنت كاتب تقارير أكاديمية محترف. قم بإنشاء تقرير شامل عن الطالب. '
                 . 'أجب بصيغة JSON مع الحقول: '
                 . 'title (string), summary (string), '
@@ -41,7 +41,7 @@ class ReportGenerator
                 . 'development_plan (array of {phase, duration, actions: array of strings}), '
                 . 'conclusion (string)'
             ),
-            DeepSeekClient::userMessage($prompt),
+            GeminiClient::userMessage($prompt),
         ], temperature: 0.3, maxTokens: 5000);
 
         return $result ?? [
@@ -102,12 +102,12 @@ class ReportGenerator
 PROMPT;
 
         $result = $this->client->chatWithJson([
-            DeepSeekClient::systemMessage(
+            GeminiClient::systemMessage(
                 'أنت خبير تحليل مؤسسي. قم بإنشاء تقرير شامل عن أداء المؤسسة التعليمية. '
                 . 'أجب بصيغة JSON مع: title, summary, index_averages_analysis, classification_distribution_analysis, '
                 . 'strengths, improvement_areas, recommendations (array), conclusion.'
             ),
-            DeepSeekClient::userMessage($prompt),
+            GeminiClient::userMessage($prompt),
         ], temperature: 0.3, maxTokens: 5000);
 
         return $result ?? ['report' => 'تعذر توليد التقرير المؤسسي.'];
