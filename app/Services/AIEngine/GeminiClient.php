@@ -47,11 +47,19 @@ class GeminiClient
         $decoded = json_decode($content, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            // Gemini sometimes emits raw control characters (literal newlines/tabs)
-            // inside JSON string values instead of escaping them; escape them
-            // within string literals only, leaving the surrounding structure intact.
+            // Gemini sometimes emits raw control characters (literal newlines, tabs,
+            // etc.) inside JSON string values instead of escaping them; escape any
+            // control character within string literals only, leaving the surrounding
+            // structure intact.
             $sanitized = preg_replace_callback('/"(?:[^"\\\\]|\\\\.)*"/s', function (array $m) {
-                return str_replace(["\r\n", "\n", "\r", "\t"], ['\\n', '\\n', '\\n', '\\t'], $m[0]);
+                return preg_replace_callback('/[\x00-\x1F]/', function (array $c) {
+                    return match ($c[0]) {
+                        "\n" => '\\n',
+                        "\r" => '\\r',
+                        "\t" => '\\t',
+                        default => sprintf('\\u%04x', ord($c[0])),
+                    };
+                }, $m[0]);
             }, $content);
 
             $decoded = json_decode($sanitized, true);
