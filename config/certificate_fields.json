@@ -2,7 +2,16 @@
     "_meta": {
         "design_width": 1920,
         "design_height": 1080,
-        "comment": "Coordinates in design pixels (1920x1080 landscape). Scaled automatically to PDF page size."
+        "comment": "Coordinates in design pixels (1920x1080 landscape). Scaled automatically to PDF page size.",
+        "anchors": {
+            "comment": "Measured from public/Certificate.pdf geometry, not estimated. Design-space values.",
+            "name_line": "dotted rule x 605.4 -> 1264.5, top edge y 282.4",
+            "membership_line": "dotted rule x 605.4 -> 995.0, top edge y 367.5",
+            "period_sentence_baseline": "y 709.7",
+            "period_brackets": "glyphs at x 717.6 and 554.9 (start pair), 415.7 and 208.1 (end pair)",
+            "signature_rule": "x 524.7 -> 709.8, top edge y 874.9",
+            "date_rule": "x 1188.6 -> 1373.6, top edge y 870.9"
+        }
     },
     "certificate_number": {
         "x": 72,
@@ -14,41 +23,43 @@
         "font_style": ""
     },
     "student_name": {
-        "x": 600,
-        "y": 200,
-        "width": 720,
+        "x": 605,
+        "y": 246,
+        "width": 659,
         "font_size": 44,
         "align": "center",
         "font_family": "dejavusans",
         "font_style": "B"
     },
     "membership_number": {
-        "x": 780,
-        "y": 328,
-        "width": 380,
+        "x": 605,
+        "y": 334,
+        "width": 390,
         "font_size": 34,
-        "align": "right",
+        "align": "center",
         "font_family": "dejavusans",
         "font_style": "",
         "rtl": false
     },
     "period_start": {
-        "x": 1105,
-        "y": 638,
-        "width": 140,
-        "font_size": 28,
+        "x": 561,
+        "y": 685,
+        "width": 150,
+        "font_size": 26,
         "align": "center",
         "font_family": "dejavusans",
-        "font_style": ""
+        "font_style": "",
+        "rtl": false
     },
     "period_end": {
-        "x": 1325,
-        "y": 638,
-        "width": 140,
-        "font_size": 28,
+        "x": 237,
+        "y": 685,
+        "width": 150,
+        "font_size": 26,
         "align": "center",
         "font_family": "dejavusans",
-        "font_style": ""
+        "font_style": "",
+        "rtl": false
     },
     "date": {
         "x": 1210,
