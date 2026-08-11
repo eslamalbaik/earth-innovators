@@ -207,11 +207,11 @@ class AdminInnovationController extends Controller
     public function smartSearch(Request $request, SmartSearchService $searchService): Response
     {
         $query = trim((string) $request->get('query', ''));
-        $results = $query !== '' ? $searchService->search($query, 30) : null;
+        $searchResult = $query !== '' ? $searchService->search($query, 30) : null;
 
         return Inertia::render('Admin/Innovation/SmartSearch', [
             'query'   => $query,
-            'results' => $results,
+            'results' => $searchResult['results'] ?? null,
         ]);
     }
 
