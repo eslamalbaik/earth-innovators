@@ -15,6 +15,12 @@ export default function TeacherPublications({ publications, auth }) {
         rejected: { label: t('teacherPublicationsPage.statuses.rejected'), color: 'bg-red-100 text-red-700 border-red-300', icon: FaTimesCircle },
     };
 
+    const getPublicationTitle = (publication) => (
+        language === 'ar'
+            ? (publication.title_ar || publication.title)
+            : (publication.title || publication.title_ar)
+    );
+
     const formatDate = (value) => {
         if (!value) return '-';
 
@@ -101,7 +107,7 @@ export default function TeacherPublications({ publications, auth }) {
                                         <div className="flex items-start justify-between">
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-3 mb-3">
-                                                    <h4 className="text-xl font-bold text-gray-900">{publication.title}</h4>
+                                                    <h4 className="text-xl font-bold text-gray-900">{getPublicationTitle(publication)}</h4>
                                                     <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${statusLabels[publication.status]?.color || statusLabels.pending.color}`}>
                                                         <StatusIcon className="inline text-xs ms-1" />
                                                         {statusLabels[publication.status]?.label || t('teacherPublicationsPage.statuses.pending')}

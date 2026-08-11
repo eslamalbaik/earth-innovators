@@ -19,6 +19,8 @@ import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 
 export default function AdminPublicationShow({ publication }) {
     const { confirm } = useConfirmDialog();
+    // هذه الصفحة عربية بالكامل، لذا نعرض العنوان العربي ونرجع للإنجليزي عند غيابه
+    const publicationTitle = publication.title_ar || publication.title;
     const [showRejectModal, setShowRejectModal] = useState(false);
     const { data, setData, post: submitReject, processing: rejecting, errors: rejectErrors } = useForm({
         reason: '',
@@ -27,7 +29,7 @@ export default function AdminPublicationShow({ publication }) {
     const handleApprove = async () => {
         const confirmed = await confirm({
             title: 'تأكيد الموافقة',
-            message: `هل أنت متأكد من الموافقة على المقال "${publication.title}"؟`,
+            message: `هل أنت متأكد من الموافقة على المقال "${publicationTitle}"؟`,
             confirmText: 'موافقة',
             cancelText: 'إلغاء',
             variant: 'info',
@@ -57,7 +59,7 @@ export default function AdminPublicationShow({ publication }) {
     const handleDelete = async () => {
         const confirmed = await confirm({
             title: 'تأكيد الحذف',
-            message: `هل أنت متأكد من حذف المقال "${publication.title}"؟ هذا الإجراء لا يمكن التراجع عنه.`,
+            message: `هل أنت متأكد من حذف المقال "${publicationTitle}"؟ هذا الإجراء لا يمكن التراجع عنه.`,
             confirmText: 'حذف',
             cancelText: 'إلغاء',
             variant: 'danger',
@@ -103,7 +105,7 @@ export default function AdminPublicationShow({ publication }) {
 
     return (
         <DashboardLayout header="تفاصيل المقال">
-            <Head title={`${publication.title} - تفاصيل المقال`} />
+            <Head title={`${publicationTitle} - تفاصيل المقال`} />
 
             <div className="mb-6">
                 <Link
@@ -122,7 +124,7 @@ export default function AdminPublicationShow({ publication }) {
                     <div className="bg-white rounded-xl shadow-lg p-6">
                         <div className="flex items-start justify-between mb-4">
                             <div>
-                                <h1 className="text-2xl font-bold text-gray-900 mb-2">{publication.title}</h1>
+                                <h1 className="text-2xl font-bold text-gray-900 mb-2">{publicationTitle}</h1>
                                 <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
                                     {getTypeLabel(publication.type)}
                                 </span>
@@ -135,7 +137,7 @@ export default function AdminPublicationShow({ publication }) {
                             <div className="mb-6">
                                 <img
                                     src={coverImage}
-                                    alt={publication.title}
+                                    alt={publicationTitle}
                                     className="w-full h-64 object-cover rounded-lg"
                                 />
                             </div>

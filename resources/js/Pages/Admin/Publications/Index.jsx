@@ -38,10 +38,16 @@ export default function AdminPublicationsIndex({
         });
     };
 
+    const getPublicationTitle = (publication) => (
+        language === 'ar'
+            ? (publication.title_ar || publication.title)
+            : (publication.title || publication.title_ar)
+    );
+
     const handleDelete = async (publication) => {
         const confirmed = await confirm({
             title: t('adminPublicationsIndexPage.deleteConfirm.title'),
-            message: t('adminPublicationsIndexPage.deleteConfirm.message', { title: publication.title }),
+            message: t('adminPublicationsIndexPage.deleteConfirm.message', { title: getPublicationTitle(publication) }),
             confirmText: t('common.delete'),
             cancelText: t('common.cancel'),
             variant: 'danger',
@@ -202,7 +208,7 @@ export default function AdminPublicationsIndex({
                                             {coverImage ? (
                                                 <img
                                                     src={coverImage}
-                                                    alt={publication.title}
+                                                    alt={getPublicationTitle(publication)}
                                                     className="w-full h-32 object-cover rounded-lg"
                                                 />
                                             ) : (
@@ -219,7 +225,7 @@ export default function AdminPublicationsIndex({
                                                         href={route('admin.publications.show', publication.id)}
                                                         className="text-lg font-bold text-blue-600 hover:text-blue-800 mb-1 block"
                                                     >
-                                                        {publication.title}
+                                                        {getPublicationTitle(publication)}
                                                         {publication.issue_number ? (
                                                             <span className="text-gray-600">{t('adminPublicationsIndexPage.issueNumber', { number: publication.issue_number })}</span>
                                                         ) : null}

@@ -17,7 +17,7 @@ import {
 } from 'react-icons/fa';
 
 export default function TeacherDashboard({ auth, teacher, stats, innovationStats = null, membershipSummary = null, activationBanner }) {
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
     const {
         projects = {},
         publications = {},
@@ -559,7 +559,11 @@ export default function TeacherDashboard({ auth, teacher, stats, innovationStats
                                     {recentPublications.map((publication) => (
                                         <div key={publication.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
                                             <div className="flex-1">
-                                                <p className="font-medium text-gray-900">{publication.title}</p>
+                                                <p className="font-medium text-gray-900">
+                                                    {language === 'ar'
+                                                        ? (publication.title_ar || publication.title)
+                                                        : (publication.title || publication.title_ar)}
+                                                </p>
                                                 <p className="text-sm text-gray-600 mt-1">
                                                     {publicationTypeLabels[publication.type] || publicationTypeLabels.other}
                                                 </p>
