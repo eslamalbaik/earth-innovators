@@ -46,7 +46,15 @@ class GeminiClient
 
         $decoded = json_decode($content, true);
 
-        return json_last_error() === JSON_ERROR_NONE ? $decoded : null;
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            Log::error('Gemini API returned invalid JSON', [
+                'json_error' => json_last_error_msg(),
+                'content'    => mb_substr($content, 0, 2000),
+            ]);
+            return null;
+        }
+
+        return $decoded;
     }
 
     /**
