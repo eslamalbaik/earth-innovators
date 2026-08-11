@@ -21,6 +21,7 @@ class Package extends Model
         'currency',
         'duration_type',
         'duration_months',
+        'students_count',
         'points_bonus',
         'projects_limit',
         'challenges_limit',

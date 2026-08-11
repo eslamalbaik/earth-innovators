@@ -15,6 +15,7 @@ export default function Recommendations({ recommendations }) {
         strengths = [],
         weaknesses = [],
         overall_advice = '',
+        student_level_profile = null,
     } = recommendations || {};
 
     const isEmpty = !recommendations
@@ -44,6 +45,98 @@ export default function Recommendations({ recommendations }) {
                         <div>
                             <h3 className="text-lg font-bold text-indigo-900 mb-1">النصيحة العامة</h3>
                             <p className="text-indigo-800/90 leading-relaxed text-sm">{overall_advice}</p>
+                        </div>
+                    </div>
+                )}
+
+                {/* Student Level Profile */}
+                {student_level_profile && (
+                    <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl shadow-xl overflow-hidden text-white mb-8">
+                        <div className="p-6 md:p-8">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 border-b border-white/20 pb-6">
+                                <div>
+                                    <h2 className="text-3xl font-black tracking-tight mb-2 flex items-center gap-3">
+                                        <span className="bg-white/20 p-2 rounded-xl text-yellow-300">🎓</span>
+                                        مستوى الطالب: {student_level_profile.current_level}
+                                    </h2>
+                                    <p className="text-indigo-100 font-medium">النتيجة: {student_level_profile.score}</p>
+                                </div>
+                                <div className="text-right">
+                                    <div className="inline-flex items-center justify-center px-4 py-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/20">
+                                        <span className="text-sm text-indigo-100 ml-2">المستوى المستهدف:</span>
+                                        <span className="text-xl font-bold text-yellow-300">{student_level_profile.target_level}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Strengths */}
+                                <div className="bg-white/10 backdrop-blur-md rounded-xl p-5 border border-white/10">
+                                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-emerald-300">
+                                        <span>💪</span> نقاط القوة
+                                    </h3>
+                                    <ul className="space-y-2">
+                                        {(student_level_profile.strengths || []).map((s, i) => (
+                                            <li key={i} className="flex items-start gap-2 text-sm text-indigo-50">
+                                                <span className="text-emerald-400 mt-0.5">✓</span> <span>{s}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                                
+                                {/* Learning Gaps */}
+                                <div className="bg-white/10 backdrop-blur-md rounded-xl p-5 border border-white/10">
+                                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-rose-300">
+                                        <span>🔍</span> فجوات التعلم
+                                    </h3>
+                                    <ul className="space-y-2">
+                                        {(student_level_profile.learning_gaps || []).map((g, i) => (
+                                            <li key={i} className="flex items-start gap-2 text-sm text-indigo-50">
+                                                <span className="text-rose-400 mt-0.5">!</span> <span>{g}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+                                {/* Acquired Skills */}
+                                <div className="bg-white/10 backdrop-blur-md rounded-xl p-5 border border-white/10">
+                                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-blue-300">
+                                        <span>⚙️</span> المهارات المكتسبة
+                                    </h3>
+                                    <ul className="space-y-2">
+                                        {(student_level_profile.acquired_skills || []).map((s, i) => (
+                                            <li key={i} className="flex items-start gap-2 text-sm text-indigo-50">
+                                                <span className="text-blue-400 mt-0.5">•</span> <span>{s}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+                                {/* Achieved Outcomes */}
+                                <div className="bg-white/10 backdrop-blur-md rounded-xl p-5 border border-white/10">
+                                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-yellow-300">
+                                        <span>🏆</span> مخرجات التعلم المحققة
+                                    </h3>
+                                    <ul className="space-y-2">
+                                        {(student_level_profile.achieved_outcomes || []).map((o, i) => (
+                                            <li key={i} className="flex items-start gap-2 text-sm text-indigo-50">
+                                                <span className="text-yellow-400 mt-0.5">★</span> <span>{o}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            {/* Next Challenge */}
+                            {student_level_profile.next_challenge && (
+                                <div className="mt-6 bg-yellow-400/20 rounded-xl p-5 border border-yellow-400/30 flex items-start gap-4">
+                                    <span className="text-2xl text-yellow-300">🚀</span>
+                                    <div>
+                                        <h3 className="text-lg font-bold text-yellow-300 mb-1">التحدي التالي / المهارة التالية</h3>
+                                        <p className="text-white text-sm">{student_level_profile.next_challenge}</p>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}

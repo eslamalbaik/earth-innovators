@@ -22,6 +22,7 @@ class StorePackageRequest extends FormRequest
             'currency' => 'required|in:SAR,USD,AED',
             'duration_type' => 'required|in:monthly,quarterly,yearly,lifetime',
             'duration_months' => 'nullable|integer|min:1',
+            'students_count' => 'nullable|integer|min:1',
             'points_bonus' => 'integer|min:0',
             'projects_limit' => 'nullable|integer|min:0',
             'challenges_limit' => 'nullable|integer|min:0',

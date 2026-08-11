@@ -102,7 +102,7 @@ class UserManagementController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'phone' => 'nullable|string|max:20',
             'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|in:admin,teacher,student,school,system_supervisor,school_support_coordinator',
+            'role' => 'required|in:admin,teacher,student,school,system_supervisor,school_support_coordinator,educational_institution',
             'school_id' => 'nullable|exists:users,id',
             'points' => 'nullable|integer|min:0',
             'account_type' => 'nullable|in:regular,project',
@@ -300,7 +300,7 @@ class UserManagementController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'phone' => 'nullable|string|max:20',
             'password' => 'nullable|string|min:8|confirmed',
-            'role' => 'required|in:admin,teacher,student,school,system_supervisor,school_support_coordinator',
+            'role' => 'required|in:admin,teacher,student,school,system_supervisor,school_support_coordinator,educational_institution',
             'school_id' => 'nullable|exists:users,id',
             'points' => 'nullable|integer|min:0',
             'account_type' => 'nullable|in:regular,project',
@@ -373,7 +373,7 @@ class UserManagementController extends Controller
     public function updateRole(Request $request, User $user)
     {
         $request->validate([
-            'role' => 'required|in:admin,teacher,student,school,system_supervisor,school_support_coordinator'
+            'role' => 'required|in:admin,teacher,student,school,system_supervisor,school_support_coordinator,educational_institution'
         ]);
         
         $user->update(['role' => $request->role]);
@@ -436,6 +436,7 @@ class UserManagementController extends Controller
                     'school' => 'مدرسة',
                     'system_supervisor' => 'مشرف النظام',
                     'school_support_coordinator' => 'منسق دعم المؤسسات تعليمية',
+                    'educational_institution' => 'مؤسسة تعليمية',
                 ];
                 
                 return [

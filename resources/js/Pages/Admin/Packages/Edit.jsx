@@ -10,8 +10,9 @@ export default function AdminPackagesEdit({ package: pkg }) {
     const [featuresAr, setFeaturesAr] = useState(pkg.features_ar && pkg.features_ar.length > 0 ? pkg.features_ar : ['']);
     const [baseMonthlyPrice, setBaseMonthlyPrice] = useState(() => {
         const months = Math.max(1, Number(pkg.duration_months) || 1);
+        const students = Math.max(1, Number(pkg.students_count) || 1);
         const totalPrice = Number(pkg.price) || 0;
-        return Number((totalPrice / months).toFixed(2));
+        return Number((totalPrice / (months * students)).toFixed(2));
     });
 
     const { data, setData, put, processing, errors } = useForm({
@@ -23,6 +24,7 @@ export default function AdminPackagesEdit({ package: pkg }) {
         currency: pkg.currency || 'AED',
         duration_type: pkg.duration_type || 'monthly',
         duration_months: pkg.duration_months || 1,
+        students_count: pkg.students_count || 1,
         points_bonus: pkg.points_bonus || 0,
         projects_limit: pkg.projects_limit || null,
         challenges_limit: pkg.challenges_limit || null,
@@ -44,10 +46,11 @@ export default function AdminPackagesEdit({ package: pkg }) {
         }
 
         const months = Math.max(1, Number(data.duration_months) || 1);
+        const students = Math.max(1, Number(data.students_count) || 1);
         const monthlyPrice = Math.max(0, Number(baseMonthlyPrice) || 0);
 
-        return Number((monthlyPrice * months).toFixed(2));
-    }, [baseMonthlyPrice, data.duration_months, isTrial]);
+        return Number((monthlyPrice * months * students).toFixed(2));
+    }, [baseMonthlyPrice, data.duration_months, data.students_count, isTrial]);
 
     useEffect(() => {
         setData('price', computedTotalPrice);
@@ -258,6 +261,25 @@ export default function AdminPackagesEdit({ package: pkg }) {
                                 disabled={isTrial}
                                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent border-gray-300 ${isTrial ? 'bg-gray-50 text-gray-400' : ''}`}
                             />
+                        </div>
+
+                        {/* عدد الطلبة */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                عدد الطلبة
+                            </label>
+                            <input
+                                type="number"
+                                min="1"
+                                value={data.students_count}
+                                onChange={(e) => setData('students_count', parseInt(e.target.value) || 1)}
+                                disabled={isTrial}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.students_count ? 'border-red-500' : 'border-gray-300'
+                                    } ${isTrial ? 'bg-gray-50 text-gray-400' : ''}`}
+                            />
+                            {errors.students_count && (
+                                <p className="mt-1 text-sm text-red-600">{errors.students_count}</p>
+                            )}
                         </div>
 
                         <div>
