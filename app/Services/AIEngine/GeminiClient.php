@@ -97,7 +97,7 @@ class GeminiClient
                 'Content-Type'   => 'application/json',
             ])
             ->timeout($asJson ? 90 : 60)
-            ->retry(4, [1000, 2000, 4000, 8000])
+            ->retry(4, fn (int $attempt) => min(1000 * (2 ** ($attempt - 1)), 8000))
             ->post("{$this->baseUrl}/models/{$this->model}:generateContent", $body);
 
             if ($response->successful()) {
