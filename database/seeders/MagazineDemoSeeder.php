@@ -70,7 +70,6 @@ class MagazineDemoSeeder extends Seeder
                 'stages' => json_encode($data['stages']),
                 'experience_years' => rand(5, 20),
                 'bio' => $data['bio'],
-                'school_id' => $school->id,
             ]);
 
             $teachers[] = $teacher;
