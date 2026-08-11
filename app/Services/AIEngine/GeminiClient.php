@@ -67,7 +67,8 @@ class GeminiClient
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             Log::error('Gemini API returned invalid JSON', [
-                'json_error' => json_last_error_msg(),
+                'json_error'     => json_last_error_msg(),
+                'content_base64' => base64_encode($content),
                 'content'    => mb_substr($content, 0, 2000),
             ]);
             return null;
