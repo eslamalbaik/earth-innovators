@@ -36,7 +36,7 @@ class GeminiClient
     /**
      * Send a chat request expecting JSON structured output
      */
-    public function chatWithJson(array $messages, float $temperature = 0.2, int $maxTokens = 3000): ?array
+    public function chatWithJson(array $messages, float $temperature = 0.2, int $maxTokens = 8192): ?array
     {
         $content = $this->request($messages, $temperature, $maxTokens, true);
 
