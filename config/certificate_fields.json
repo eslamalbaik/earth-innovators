@@ -11,16 +11,10 @@
             "period_brackets": "glyphs at x 717.6 and 554.9 (start pair), 415.7 and 208.1 (end pair)",
             "signature_rule": "x 524.7 -> 709.8, top edge y 874.9",
             "date_rule": "x 1188.6 -> 1373.6, top edge y 870.9"
+        },
+        "removed_fields": {
+            "certificate_number": "Was printed in the top-left corner (x 72, y 58, width 420, size 18, left). Removed on request; the number is still stored on the record and used for verification."
         }
-    },
-    "certificate_number": {
-        "x": 72,
-        "y": 58,
-        "width": 420,
-        "font_size": 18,
-        "align": "left",
-        "font_family": "dejavusans",
-        "font_style": ""
     },
     "student_name": {
         "x": 605,
