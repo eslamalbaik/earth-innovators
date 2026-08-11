@@ -28,9 +28,11 @@ class LeadershipIndexCalculator
         $avgReviewScore = 0;
         if (method_exists($user, 'bookings')) {
             $reviews = $user->bookings()
-                ->whereHas('review')
+                ->whereHas('reviews')
+                ->with('reviews')
                 ->get()
-                ->pluck('review')
+                ->pluck('reviews')
+                ->flatten()
                 ->filter();
             $avgReviewScore = $reviews->isNotEmpty() ? $reviews->avg('rating') : 0;
         }
