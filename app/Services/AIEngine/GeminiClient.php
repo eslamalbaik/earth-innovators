@@ -47,6 +47,17 @@ class GeminiClient
         $decoded = json_decode($content, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
+            // Gemini sometimes emits raw control characters (literal newlines/tabs)
+            // inside JSON string values instead of escaping them; escape them
+            // within string literals only, leaving the surrounding structure intact.
+            $sanitized = preg_replace_callback('/"(?:[^"\\\\]|\\\\.)*"/s', function (array $m) {
+                return str_replace(["\r\n", "\n", "\r", "\t"], ['\\n', '\\n', '\\n', '\\t'], $m[0]);
+            }, $content);
+
+            $decoded = json_decode($sanitized, true);
+        }
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
             Log::error('Gemini API returned invalid JSON', [
                 'json_error' => json_last_error_msg(),
                 'content'    => mb_substr($content, 0, 2000),
