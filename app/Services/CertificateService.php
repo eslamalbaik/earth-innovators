@@ -231,16 +231,28 @@ class CertificateService
             'certificate_number' => $certificateNumber,
         ];
 
+        // Join date: use created_at of the member as default.
+        $joinDate = isset($overrides['join_date'])
+            ? Carbon::parse($overrides['join_date'])
+            : ($student->created_at ? Carbon::parse($student->created_at) : $now);
+
+        // Achievement period (from/to). Filled for every certificate type so the
+        // "من [ ] إلى [ ]" brackets in the template are never left blank:
+        // it starts on the member's join date and runs for one month.
+        // Always Y-m-d — the bracket gap is too narrow for a long-form date.
+        $periodStart = $this->resolveDateOverride($overrides['period_start'] ?? null) ?? $joinDate;
+        $periodEnd = $this->resolveDateOverride($overrides['period_end'] ?? null)
+            ?? $periodStart->copy()->addMonth();
+
+        $data['period_start'] = $this->formatDate($periodStart, 'Y-m-d');
+        $data['period_end'] = $this->formatDate($periodEnd, 'Y-m-d');
+        $data['period_range'] = sprintf('من %s إلى %s', $data['period_start'], $data['period_end']);
+
         // Add membership certificate specific fields
         if ($certificateType === 'membership') {
-            // Join date: use created_at of user as default
-            $joinDate = isset($overrides['join_date']) 
-                ? Carbon::parse($overrides['join_date']) 
-                : ($student->created_at ? Carbon::parse($student->created_at) : $now);
-            
             // Issue time: current time
             $issueTime = $this->resolveDateOverride($overrides['issue_time'] ?? null) ?? $issueDate;
-            
+
             // Today's date: current date
             $todayDate = $this->resolveDateOverride($overrides['today_date'] ?? null) ?? $issueDate;
 
@@ -248,13 +260,6 @@ class CertificateService
             $data['issue_time'] = $issueTime->format('H:i:s'); // Time format: HH:MM:SS
             $data['today_date'] = $this->formatDate($todayDate, $dateFormat);
 
-            // Membership period (from/to) — used by newer templates.
-            $periodStart = $this->resolveDateOverride($overrides['period_start'] ?? null) ?? $joinDate;
-            $periodEnd = $this->resolveDateOverride($overrides['period_end'] ?? null) ?? $issueDate->copy()->addYear();
-            $data['period_start'] = $this->formatDate($periodStart, $pdfDateFormat);
-            $data['period_end'] = $this->formatDate($periodEnd, $pdfDateFormat);
-            $data['period_range'] = sprintf('من %s إلى %s', $data['period_start'], $data['period_end']);
-             
             // Override course_name for membership certificate
             $data['course_name'] = $overrides['course_name'] ?? 'شهادة عضوية';
         }
@@ -517,18 +522,19 @@ class CertificateService
             $overrides['join_date'] = optional($recipient->created_at)->toDateString() ?? $issueDate->toDateString();
             $overrides['today_date'] = $issueDate->toDateString();
             $overrides['issue_time'] = $issueDate->format('H:i:s');
+        }
 
-            // Membership period defaults:
-            // - For teachers: prefer contract dates if available.
-            // - Otherwise: use join_date -> issue_date + 1 year.
-            $periodStart = null;
-            $periodEnd = null;
-            if ($recipient->isTeacher() && $recipient->teacher) {
-                $periodStart = optional($recipient->teacher->contract_start_date)->toDateString();
-                $periodEnd = optional($recipient->teacher->contract_end_date)->toDateString();
+        // A teacher with a recorded contract uses its real dates; every other
+        // certificate falls back to the join-date -> +1 month default applied
+        // in prepareCertificateData, so the period is never left blank.
+        if ($recipient->isTeacher() && $recipient->teacher) {
+            $contractStart = optional($recipient->teacher->contract_start_date)->toDateString();
+            $contractEnd = optional($recipient->teacher->contract_end_date)->toDateString();
+
+            if ($contractStart && $contractEnd) {
+                $overrides['period_start'] = $contractStart;
+                $overrides['period_end'] = $contractEnd;
             }
-            $overrides['period_start'] = $periodStart ?? $overrides['join_date'];
-            $overrides['period_end'] = $periodEnd ?? Carbon::parse($issueDate)->addYear()->toDateString();
         }
 
         $templatePath = $this->resolveTemplatePath($certificate->template);
