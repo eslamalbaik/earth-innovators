@@ -9,6 +9,7 @@ class AcceptanceCriterion extends Model
 {
     protected $fillable = [
         'project_id',
+        'challenge_id',
         'name_ar',
         'description_ar',
         'weight',
@@ -28,6 +29,14 @@ class AcceptanceCriterion extends Model
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
+    }
+
+    /**
+     * Get the challenge that owns this criterion
+     */
+    public function challenge(): BelongsTo
+    {
+        return $this->belongsTo(Challenge::class);
     }
 
     /**
@@ -52,5 +61,13 @@ class AcceptanceCriterion extends Model
     public function scopeForProject($query, $projectId)
     {
         return $query->where('project_id', $projectId);
+    }
+
+    /**
+     * Scope to filter by challenge
+     */
+    public function scopeForChallenge($query, $challengeId)
+    {
+        return $query->where('challenge_id', $challengeId);
     }
 }

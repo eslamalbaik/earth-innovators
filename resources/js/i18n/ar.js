@@ -1672,6 +1672,7 @@ export const ar = {
         "sendBadge": "إرسال شارة",
         "certificates": "الشهادات",
         "users": "المستخدمون",
+        "customRoles": "الأدوار المخصصة",
         "badges": "الشارات",
         "packages": "الباقات",
         "storeRewards": "متجر النقاط",

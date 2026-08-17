@@ -139,6 +139,10 @@ class AdminChallengeController extends Controller
 
         $idea = $request->input('idea');
 
+        // توليد التحدي قد يستغرق حتى 360 ثانية (4 محاولات × 90 ثانية) بسبب إعادة المحاولة التلقائية
+        // في GeminiClient، بينما max_execution_time الافتراضي على السيرفر 30 ثانية فقط.
+        set_time_limit(300);
+
         try {
             $aiResponse = $deepSeekClient->chatWithJson([
                 \App\Services\AIEngine\GeminiClient::systemMessage(
@@ -153,7 +157,8 @@ class AdminChallengeController extends Controller
                     . 'description (وصف مفصل وشامل ومحفز للتحدي كنص عادي منسق بأسطر واضحة، يشمل الأهداف والمعايير), '
                     . 'instructions (خطوات تنفيذ التحدي بالتفصيل للطالب، كنص عادي منسق بأسطر واضحة), '
                     . 'category (إحدى الفئات المسموحة فقط باللغة الإنجليزية), '
-                    . 'image_keyword (كلمة مفتاحية واحدة بالإنجليزية).'
+                    . 'image_keyword (كلمة مفتاحية واحدة بالإنجليزية), '
+                    . 'criteria (مصفوفة من 3 إلى 5 معايير تقييم مبنية على محتوى التحدي تحديداً، كل عنصر فيها كائن يحتوي على name_ar (اسم معيار قصير بالعربية) وweight (وزن رقمي)، بحيث يكون مجموع كل الأوزان يساوي 100 بالضبط).'
                 ),
                 \App\Services\AIEngine\GeminiClient::userMessage("فكرة التحدي: " . $idea),
             ]);
@@ -174,6 +179,24 @@ class AdminChallengeController extends Controller
             $allowedCategories = ['science', 'technology', 'engineering', 'mathematics', 'arts', 'other'];
             if (!in_array(strtolower($category), $allowedCategories)) {
                 $category = 'other';
+            }
+
+            // معايير التقييم المقترحة، مربوطة بمحتوى التحدي تحديداً (وليست قائمة عامة ثابتة)
+            $suggestedCriteria = collect($aiResponse['criteria'] ?? [])
+                ->filter(fn ($c) => !empty($c['name_ar']))
+                ->map(fn ($c) => [
+                    'name_ar' => (string) $c['name_ar'],
+                    'weight' => (float) ($c['weight'] ?? 0),
+                ])
+                ->values();
+
+            // إعادة توزيع الأوزان بالتناسب إذا لم يكن مجموعها 100 بالضبط
+            $criteriaTotal = $suggestedCriteria->sum('weight');
+            if ($criteriaTotal > 0 && round($criteriaTotal, 2) !== 100.0) {
+                $suggestedCriteria = $suggestedCriteria->map(fn ($c) => [
+                    'name_ar' => $c['name_ar'],
+                    'weight' => round($c['weight'] / $criteriaTotal * 100, 2),
+                ]);
             }
 
             // Fields the AI failed to populate, so the frontend can flag them
@@ -209,10 +232,14 @@ class AdminChallengeController extends Controller
                 'category' => strtolower($category),
                 'image_url' => $imageUrl,
                 'incomplete_fields' => $incompleteFields,
+                'suggested_criteria' => $suggestedCriteria,
             ]);
 
-        } catch (\Exception $e) {
-            \Log::error('Error generating AI challenge (admin): ' . $e->getMessage());
+        } catch (\Throwable $e) {
+            \Log::error('Error generating AI challenge (admin): ' . $e->getMessage(), [
+                'exception' => get_class($e),
+                'trace' => $e->getTraceAsString(),
+            ]);
             return response()->json(['error' => 'حدث خطأ غير متوقع أثناء توليد تفاصيل التحدي.'], 500);
         }
     }
@@ -263,9 +290,11 @@ class AdminChallengeController extends Controller
 
             $challenge = $this->challengeService->createChallenge($data);
 
+            $this->saveChallengeCriteria($challenge, $request);
+
             \Illuminate\Support\Facades\Cache::forget('admin_challenge_stats');
             \Illuminate\Support\Facades\Cache::forget('admin_challenge_analytics');
-            
+
             Log::info('Admin challenge created successfully', [
                 'challenge_id' => $challenge->id,
                 'school_id' => $challenge->school_id,
@@ -283,7 +312,7 @@ class AdminChallengeController extends Controller
             return back()
                 ->withErrors($e->errors())
                 ->withInput();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Error creating admin challenge', [
                 'error' => $e->getMessage(),
                 'file' => $e->getFile(),
@@ -298,9 +327,41 @@ class AdminChallengeController extends Controller
         }
     }
 
+    /**
+     * حفظ معايير التقييم المرتبطة بمحتوى هذا التحدي (مقترحة من AI أو معدّلة يدوياً).
+     * تستبدل أي معايير محفوظة سابقاً لهذا التحدي بالكامل بالقائمة الجديدة.
+     */
+    private function saveChallengeCriteria(Challenge $challenge, Request $request): void
+    {
+        $criteria = $request->input('criteria', []);
+        $challenge->acceptanceCriteria()->delete();
+
+        if (!is_array($criteria) || empty($criteria)) {
+            return;
+        }
+
+        $rows = collect($criteria)
+            ->filter(fn ($c) => !empty($c['name_ar']))
+            ->values()
+            ->map(fn ($c, $index) => [
+                'challenge_id' => $challenge->id,
+                'name_ar' => (string) $c['name_ar'],
+                'description_ar' => $c['description_ar'] ?? null,
+                'weight' => (float) ($c['weight'] ?? 0),
+                'order' => $index,
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+        if ($rows->isNotEmpty()) {
+            \App\Models\AcceptanceCriterion::insert($rows->toArray());
+        }
+    }
+
     public function show(Challenge $challenge)
     {
-        $challenge->load(['school:id,name,email', 'creator:id,name,email', 'participants.user:id,name,email']);
+        $challenge->load(['school:id,name,email', 'creator:id,name,email', 'participants.user:id,name,email', 'acceptanceCriteria']);
 
         $assignedStudents = $challenge->participants->map(function ($participation) {
             return [
@@ -342,6 +403,11 @@ class AdminChallengeController extends Controller
                 'max_participants' => $challenge->max_participants,
                 'current_participants' => $challenge->current_participants ?? 0,
                 'assigned_students' => $assignedStudents,
+                'criteria' => $challenge->acceptanceCriteria->map(fn ($c) => [
+                    'id' => $c->id,
+                    'name_ar' => $c->name_ar,
+                    'weight' => (float) $c->weight,
+                ]),
                 'created_at' => $challenge->created_at->format('Y-m-d H:i'),
                 'updated_at' => $challenge->updated_at->format('Y-m-d H:i'),
             ],
@@ -357,6 +423,8 @@ class AdminChallengeController extends Controller
             ->select('id', 'name')
             ->orderBy('name')
             ->get();
+
+        $challenge->load('acceptanceCriteria');
 
         return Inertia::render('Admin/Challenges/Edit', [
             'challenge' => [
@@ -377,6 +445,10 @@ class AdminChallengeController extends Controller
                 'deadline' => $challenge->deadline->format('Y-m-d\TH:i'),
                 'points_reward' => $challenge->points_reward ?? 0,
                 'max_participants' => $challenge->max_participants,
+                'criteria' => $challenge->acceptanceCriteria->map(fn ($c) => [
+                    'name_ar' => $c->name_ar,
+                    'weight' => (float) $c->weight,
+                ]),
             ],
             'schools' => $schools,
         ]);
@@ -394,9 +466,10 @@ class AdminChallengeController extends Controller
 
         try {
             $this->challengeService->updateChallenge($challenge, $data);
+            $this->saveChallengeCriteria($challenge, $request);
             \Illuminate\Support\Facades\Cache::forget('admin_challenge_stats');
             \Illuminate\Support\Facades\Cache::forget('admin_challenge_analytics');
-            
+
             if ($request->wantsJson()) {
                 return response()->json(['message' => 'تم تحديث التحدي بنجاح']);
             }
@@ -404,7 +477,7 @@ class AdminChallengeController extends Controller
             return redirect()
                 ->route('admin.challenges.index')
                 ->with('success', 'تم تحديث التحدي بنجاح');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Error updating admin challenge: ' . $e->getMessage(), [
                 'challenge_id' => $challenge->id,
                 'trace' => $e->getTraceAsString(),

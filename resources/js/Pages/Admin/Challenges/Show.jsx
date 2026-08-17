@@ -1,6 +1,6 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link } from '@inertiajs/react';
-import { FaArrowRight, FaEdit, FaTrophy, FaUser, FaCalendar, FaFlag, FaClock, FaUsers, FaCoins, FaUserPlus, FaExclamationCircle, FaStar, FaCheckCircle, FaFile } from 'react-icons/fa';
+import { FaArrowRight, FaEdit, FaTrophy, FaUser, FaCalendar, FaFlag, FaClock, FaUsers, FaCoins, FaUserPlus, FaExclamationCircle, FaStar, FaCheckCircle, FaFile, FaClipboardCheck } from 'react-icons/fa';
 import { useTranslation } from '@/i18n';
 
 export default function AdminChallengesShow({ challenge }) {
@@ -118,6 +118,32 @@ export default function AdminChallengesShow({ challenge }) {
                             <p className="text-gray-700 whitespace-pre-wrap">{challenge.instructions}</p>
                         </div>
                     </div>
+
+                    {/* معايير التقييم */}
+                    {challenge.criteria && challenge.criteria.length > 0 && (
+                        <div className="bg-white rounded-xl shadow-lg p-6">
+                            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                <FaClipboardCheck className="text-[#A3C042]" />
+                                معايير التقييم
+                            </h2>
+                            <div className="space-y-3">
+                                {challenge.criteria.map((criterion) => (
+                                    <div key={criterion.id}>
+                                        <div className="flex items-center justify-between mb-1">
+                                            <span className="text-sm font-medium text-gray-700">{criterion.name_ar}</span>
+                                            <span className="text-sm font-bold text-gray-900">{criterion.weight}%</span>
+                                        </div>
+                                        <div className="w-full bg-gray-100 rounded-full h-2">
+                                            <div
+                                                className="bg-[#A3C042] h-2 rounded-full"
+                                                style={{ width: `${criterion.weight}%` }}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Sidebar */}

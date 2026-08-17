@@ -200,6 +200,29 @@ export default function SchoolChallengeShow({ auth, challenge }) {
                                 <p className="text-gray-700 leading-relaxed whitespace-pre-line">{challenge.instructions}</p>
                             </div>
                         )}
+
+                        {/* معايير التقييم */}
+                        {challenge?.acceptance_criteria && challenge.acceptance_criteria.length > 0 && (
+                            <div>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-3">معايير التقييم</h3>
+                                <div className="space-y-3">
+                                    {challenge.acceptance_criteria.map((criterion) => (
+                                        <div key={criterion.id}>
+                                            <div className="flex items-center justify-between mb-1">
+                                                <span className="text-sm font-medium text-gray-700">{criterion.name_ar}</span>
+                                                <span className="text-sm font-bold text-gray-900">{criterion.weight}%</span>
+                                            </div>
+                                            <div className="w-full bg-gray-100 rounded-full h-2">
+                                                <div
+                                                    className="bg-[#A3C042] h-2 rounded-full"
+                                                    style={{ width: `${criterion.weight}%` }}
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Actions */}

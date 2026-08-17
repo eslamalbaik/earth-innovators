@@ -99,6 +99,11 @@ class Challenge extends Model
         return $this->hasMany(ChallengeSubmission::class);
     }
 
+    public function acceptanceCriteria(): HasMany
+    {
+        return $this->hasMany(AcceptanceCriterion::class)->ordered();
+    }
+
     /**
      * Get all participants in this challenge
      */

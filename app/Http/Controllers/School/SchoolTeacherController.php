@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\School;
 
 use App\Http\Controllers\Controller;
+use App\Models\CustomRole;
+use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 
@@ -19,6 +22,7 @@ class SchoolTeacherController extends Controller
 
         $teachers = User::where('role', 'teacher')
             ->where('school_id', $school->id)
+            ->with(['teacher.subjectsRelation', 'customRole:id,name_ar'])
             ->when($request->get('search'), function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
@@ -37,6 +41,11 @@ class SchoolTeacherController extends Controller
                 'membership_number' => $teacher->membership_number,
                 'points'            => $teacher->points ?? 0,
                 'created_at'        => $teacher->created_at?->format('Y-m-d'),
+                'grade'             => $teacher->teacher?->grade,
+                'section'           => $teacher->teacher?->section,
+                'subject_id'        => $teacher->teacher?->subjectsRelation->first()?->id,
+                'custom_role_id'    => $teacher->custom_role_id,
+                'role_label'        => $teacher->roleLabel(),
             ])
             ->withQueryString();
 
@@ -56,12 +65,21 @@ class SchoolTeacherController extends Controller
         return Inertia::render('School/Teachers/Index', [
             'teachers'          => $teachers,
             'availableTeachers' => $availableTeachers,
+            'subjects'          => Subject::getActive(),
+            'customRoles'       => CustomRole::active()->forBaseRole('teacher')->get(['id', 'name_ar']),
         ]);
     }
 
     public function store(Request $request)
     {
         $school = Auth::user();
+
+        $assignment = $request->validate([
+            'subject_id'     => ['nullable', 'integer', 'exists:subjects,id'],
+            'grade'          => ['nullable', 'string', 'max:100'],
+            'section'        => ['nullable', 'string', 'max:100'],
+            'custom_role_id' => ['nullable', 'integer', Rule::exists('custom_roles', 'id')->where('base_role', 'teacher')],
+        ]);
 
         // Link existing teacher
         if ($request->filled('existing_teacher_id')) {
@@ -73,10 +91,13 @@ class SchoolTeacherController extends Controller
                 ->where('role', 'teacher')
                 ->firstOrFail();
 
-            $teacher->update(['school_id' => $school->id]);
+            $teacher->update([
+                'school_id' => $school->id,
+                'custom_role_id' => $assignment['custom_role_id'] ?? null,
+            ]);
 
             // المعلم المرتبط بمدرسة يُعتمد تلقائياً (المدرسة هي الضامن)
-            $this->ensureActiveTeacherProfile($teacher);
+            $this->ensureActiveTeacherProfile($teacher, $assignment);
 
             // منح التجربة المجانية تلقائياً (نفس ما يحصل عند التسجيل العادي) إن لم يسبق له اشتراك
             app(\App\Services\PackagePaymentService::class)->activateDefaultTrialForNewUser($teacher);
@@ -94,16 +115,17 @@ class SchoolTeacherController extends Controller
         ]);
 
         $teacher = User::create([
-            'name'      => $validated['name'],
-            'email'     => $validated['email'],
-            'phone'     => $validated['phone'] ?? null,
-            'password'  => Hash::make($validated['password']),
-            'role'      => 'teacher',
-            'school_id' => $school->id,
+            'name'           => $validated['name'],
+            'email'          => $validated['email'],
+            'phone'          => $validated['phone'] ?? null,
+            'password'       => Hash::make($validated['password']),
+            'role'           => 'teacher',
+            'school_id'      => $school->id,
+            'custom_role_id' => $assignment['custom_role_id'] ?? null,
         ]);
 
         // المعلم المُضاف من المدرسة يُعتمد تلقائياً (المدرسة هي الضامن)
-        $this->ensureActiveTeacherProfile($teacher);
+        $this->ensureActiveTeacherProfile($teacher, $assignment);
 
         // منح التجربة المجانية تلقائياً (نفس ما يحصل عند التسجيل العادي)
         app(\App\Services\PackagePaymentService::class)->activateDefaultTrialForNewUser($teacher);
@@ -116,7 +138,7 @@ class SchoolTeacherController extends Controller
      * تأكيد وجود ملف معلم نشط ومعتمد للمستخدم.
      * يُنشئ الملف إن لم يكن موجوداً، أو يفعّله إن كان غير نشط.
      */
-    private function ensureActiveTeacherProfile(User $teacher): void
+    private function ensureActiveTeacherProfile(User $teacher, array $assignment = []): void
     {
         $profile = Teacher::firstOrNew(['user_id' => $teacher->id]);
 
@@ -139,7 +161,40 @@ class SchoolTeacherController extends Controller
 
         $profile->is_verified = true;
         $profile->is_active = true;
+
+        if (array_key_exists('grade', $assignment) && $assignment['grade']) {
+            $profile->grade = $assignment['grade'];
+        }
+        if (array_key_exists('section', $assignment) && $assignment['section']) {
+            $profile->section = $assignment['section'];
+        }
+
         $profile->save();
+
+        if (!empty($assignment['subject_id'])) {
+            $this->assignSubject($profile, (int) $assignment['subject_id']);
+        }
+    }
+
+    /**
+     * ربط المعلم بمادة دراسية (نفس منطق TeacherProfileController::addSubject).
+     */
+    private function assignSubject(Teacher $profile, int $subjectId): void
+    {
+        $subject = Subject::find($subjectId);
+        if (!$subject) {
+            return;
+        }
+
+        if (!$profile->subjectsRelation()->where('subjects.id', $subject->id)->exists()) {
+            $profile->subjectsRelation()->attach($subject->id);
+        }
+
+        $currentSubjects = $profile->subjects ?? [];
+        if (!in_array($subject->name_ar, $currentSubjects)) {
+            $currentSubjects[] = $subject->name_ar;
+            $profile->update(['subjects' => $currentSubjects]);
+        }
     }
 
     public function update(Request $request, $id)
@@ -152,16 +207,21 @@ class SchoolTeacherController extends Controller
             ->firstOrFail();
 
         $validated = $request->validate([
-            'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $teacher->id],
-            'phone'    => ['nullable', 'string', 'max:30'],
-            'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
+            'name'           => ['required', 'string', 'max:255'],
+            'email'          => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $teacher->id],
+            'phone'          => ['nullable', 'string', 'max:30'],
+            'password'       => ['nullable', 'confirmed', Rules\Password::defaults()],
+            'subject_id'     => ['nullable', 'integer', 'exists:subjects,id'],
+            'grade'          => ['nullable', 'string', 'max:100'],
+            'section'        => ['nullable', 'string', 'max:100'],
+            'custom_role_id' => ['nullable', 'integer', Rule::exists('custom_roles', 'id')->where('base_role', 'teacher')],
         ]);
 
         $data = [
-            'name'  => $validated['name'],
-            'email' => $validated['email'],
-            'phone' => $validated['phone'] ?? null,
+            'name'           => $validated['name'],
+            'email'          => $validated['email'],
+            'phone'          => $validated['phone'] ?? null,
+            'custom_role_id' => $validated['custom_role_id'] ?? null,
         ];
 
         if (!empty($validated['password'])) {
@@ -169,6 +229,12 @@ class SchoolTeacherController extends Controller
         }
 
         $teacher->update($data);
+
+        $this->ensureActiveTeacherProfile($teacher, [
+            'subject_id' => $validated['subject_id'] ?? null,
+            'grade'      => $validated['grade'] ?? null,
+            'section'    => $validated['section'] ?? null,
+        ]);
 
         return redirect()->route('school.teachers.index')
             ->with('success', 'تم تحديث بيانات المعلم بنجاح');

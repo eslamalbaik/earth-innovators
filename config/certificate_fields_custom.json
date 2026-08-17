@@ -1,0 +1,73 @@
+{
+    "_meta": {
+        "design_width": 1920,
+        "design_height": 1080,
+        "comment": "Field map for public/CertificateCustom.pdf — the blank, school-customizable template (logo header, large empty body, signature bottom-left, seal bottom-center). Coordinates measured from a calibration-grid overlay generated with CertificateService::generateCalibrationGrid() against this exact template, not estimated.",
+        "anchors": {
+            "logo_header": "logo + 'Community Academy' wordmark + Arabic subtitle occupy y 100 -> 345",
+            "empty_body": "blank area available for title/name/description, y 350 -> 790",
+            "signature": "handwritten mark, x 100 -> 290, y ~850 -> 895",
+            "seal": "gold seal, x 380 -> 580, y ~790 -> 1010, center ~(480, 900)"
+        },
+        "colors": {
+            "title_green": "[42, 92, 45] — matches the platform's forest-green branding",
+            "gold_accent": "[184, 148, 60] — matches the seal's gold tone, used for the divider + border"
+        }
+    },
+    "course_name": {
+        "x": 160,
+        "y": 366,
+        "width": 1600,
+        "font_size": 44,
+        "align": "center",
+        "font_style": "EB",
+        "color": [42, 92, 45]
+    },
+    "student_name": {
+        "x": 160,
+        "y": 472,
+        "width": 1600,
+        "font_size": 36,
+        "align": "center",
+        "font_style": "B",
+        "color": [30, 30, 30]
+    },
+    "description": {
+        "x": 210,
+        "y": 558,
+        "width": 1500,
+        "font_size": 24,
+        "align": "center",
+        "font_style": "",
+        "type": "multiline",
+        "line_height": 36,
+        "color": [70, 70, 70]
+    },
+    "school_name": {
+        "x": 170,
+        "y": 758,
+        "width": 430,
+        "font_size": 15,
+        "align": "left",
+        "font_style": "",
+        "rtl": false
+    },
+    "date": {
+        "x": 1150,
+        "y": 758,
+        "width": 430,
+        "font_size": 15,
+        "align": "right",
+        "font_style": "",
+        "rtl": false
+    },
+    "certificate_number": {
+        "x": 1150,
+        "y": 788,
+        "width": 430,
+        "font_size": 13,
+        "align": "right",
+        "font_style": "",
+        "rtl": false
+    }
+}

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\CustomRole;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -16,8 +17,8 @@ class UserManagementController extends Controller
      */
     public function index(Request $request)
     {
-        $users = User::select('id', 'name', 'email', 'phone', 'role', 'school_id', 'points', 'created_at')
-            ->with('school:id,name')
+        $users = User::select('id', 'name', 'email', 'phone', 'role', 'custom_role_id', 'school_id', 'points', 'created_at')
+            ->with(['school:id,name', 'customRole:id,name_ar'])
             ->when($request->filled('search'), function ($q) use ($request) {
                 $s = $request->search;
                 $q->where(function ($query) use ($s) {
@@ -30,6 +31,9 @@ class UserManagementController extends Controller
             ->when($request->filled('role') && $request->role !== 'all', function ($q) use ($request) {
                 $q->where('role', $request->role);
             })
+            ->when($request->filled('custom_role_id'), function ($q) use ($request) {
+                $q->where('custom_role_id', $request->custom_role_id);
+            })
             ->orderBy('id', 'desc')
             ->paginate(20)
             ->withQueryString()
@@ -40,6 +44,8 @@ class UserManagementController extends Controller
                     'email' => $user->email,
                     'phone' => $user->phone,
                     'role' => $user->role,
+                    'role_label' => $user->roleLabel(),
+                    'custom_role_id' => $user->custom_role_id,
                     'school_id' => $user->school_id,
                     'school_name' => $user->school->name ?? '—',
                     'points' => $user->points ?? 0,
@@ -69,11 +75,14 @@ class UserManagementController extends Controller
             ->orderBy('name')
             ->get();
 
+        $customRoles = CustomRole::active()->get(['id', 'name_ar', 'base_role']);
+
         return Inertia::render('Admin/Users/Index', [
             'users' => $users,
             'stats' => $stats,
             'schools' => $schools,
-            'filters' => $request->only(['search', 'role'])
+            'customRoles' => $customRoles,
+            'filters' => $request->only(['search', 'role', 'custom_role_id'])
         ]);
     }
 
@@ -103,6 +112,7 @@ class UserManagementController extends Controller
             'phone' => 'nullable|string|max:20',
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|in:admin,teacher,student,school,system_supervisor,school_support_coordinator,educational_institution',
+            'custom_role_id' => 'nullable|exists:custom_roles,id',
             'school_id' => 'nullable|exists:users,id',
             'points' => 'nullable|integer|min:0',
             'account_type' => 'nullable|in:regular,project',
@@ -115,6 +125,7 @@ class UserManagementController extends Controller
             'phone' => $validated['phone'] ?? null,
             'password' => Hash::make($validated['password']),
             'role' => $validated['role'],
+            'custom_role_id' => $this->resolveCustomRoleId($validated['custom_role_id'] ?? null, $validated['role']),
             'school_id' => $validated['school_id'] ?? null,
             'points' => $validated['points'] ?? 0,
             'account_type' => $validated['account_type'] ?? 'regular',
@@ -125,6 +136,20 @@ class UserManagementController extends Controller
         return redirect()
             ->route('admin.users.index')
             ->with('success', 'تم إنشاء المستخدم بنجاح');
+    }
+
+    /**
+     * تتحقق أن الدور المخصص المُختار يطابق الدور الأساسي المُختار، وإلا تتجاهله.
+     */
+    private function resolveCustomRoleId(?int $customRoleId, string $role): ?int
+    {
+        if (!$customRoleId) {
+            return null;
+        }
+
+        $customRole = CustomRole::find($customRoleId);
+
+        return $customRole && $customRole->base_role === $role ? $customRole->id : null;
     }
 
     /**
@@ -272,6 +297,8 @@ class UserManagementController extends Controller
             ->orderBy('name')
             ->get();
 
+        $customRoles = CustomRole::active()->get(['id', 'name_ar', 'base_role']);
+
         return Inertia::render('Admin/Users/Edit', [
             'user' => [
                 'id' => $user->id,
@@ -279,6 +306,7 @@ class UserManagementController extends Controller
                 'email' => $user->email,
                 'phone' => $user->phone,
                 'role' => $user->role,
+                'custom_role_id' => $user->custom_role_id,
                 'school_id' => $user->school_id,
                 'points' => $user->points ?? 0,
                 'image' => $user->image,
@@ -286,6 +314,7 @@ class UserManagementController extends Controller
                 'membership_type' => $user->membership_type,
             ],
             'schools' => $schools,
+            'customRoles' => $customRoles,
         ]);
     }
 
@@ -301,6 +330,7 @@ class UserManagementController extends Controller
             'phone' => 'nullable|string|max:20',
             'password' => 'nullable|string|min:8|confirmed',
             'role' => 'required|in:admin,teacher,student,school,system_supervisor,school_support_coordinator,educational_institution',
+            'custom_role_id' => 'nullable|exists:custom_roles,id',
             'school_id' => 'nullable|exists:users,id',
             'points' => 'nullable|integer|min:0',
             'account_type' => 'nullable|in:regular,project',
@@ -312,6 +342,7 @@ class UserManagementController extends Controller
             'email' => $validated['email'],
             'phone' => $validated['phone'] ?? null,
             'role' => $validated['role'],
+            'custom_role_id' => $this->resolveCustomRoleId($validated['custom_role_id'] ?? null, $validated['role']),
             'school_id' => $validated['school_id'] ?? null,
             'points' => $validated['points'] ?? 0,
             'account_type' => $validated['account_type'] ?? $user->account_type ?? 'regular',
@@ -412,8 +443,8 @@ class UserManagementController extends Controller
      */
     public function export(Request $request)
     {
-        $users = User::select('id', 'name', 'email', 'phone', 'role', 'school_id', 'points', 'account_type', 'membership_type', 'created_at')
-            ->with('school:id,name')
+        $users = User::select('id', 'name', 'email', 'phone', 'role', 'custom_role_id', 'school_id', 'points', 'account_type', 'membership_type', 'created_at')
+            ->with(['school:id,name', 'customRole:id,name_ar'])
             ->when($request->filled('search'), function ($q) use ($request) {
                 $s = $request->search;
                 $q->where(function ($query) use ($s) {
@@ -429,22 +460,12 @@ class UserManagementController extends Controller
             ->orderBy('id', 'desc')
             ->get()
             ->map(function ($user) {
-                $roleMap = [
-                    'admin' => 'أدمن',
-                    'teacher' => 'معلم',
-                    'student' => 'طالب',
-                    'school' => 'مدرسة',
-                    'system_supervisor' => 'مشرف النظام',
-                    'school_support_coordinator' => 'منسق دعم المؤسسات تعليمية',
-                    'educational_institution' => 'مؤسسة تعليمية',
-                ];
-                
                 return [
                     'ID' => $user->id,
                     'الاسم' => $user->name,
                     'البريد الإلكتروني' => $user->email,
                     'الهاتف' => $user->phone ?? '—',
-                    'الدور' => $roleMap[$user->role] ?? $user->role,
+                    'الدور' => $user->roleLabel(),
                     'المدرسة' => $user->school->name ?? '—',
                     'النقاط' => $user->points ?? 0,
                     'تاريخ التسجيل' => $user->created_at->format('Y-m-d H:i'),

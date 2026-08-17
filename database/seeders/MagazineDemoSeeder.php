@@ -66,9 +66,17 @@ class MagazineDemoSeeder extends Seeder
                 'user_id' => $teacher->id,
                 'name_ar' => $data['name_ar'],
                 'name_en' => $data['name_en'],
+                'nationality' => 'Saudi Arabia',
+                'gender' => 'male',
+                'qualifications' => 'Demo qualifications',
                 'subjects' => json_encode($data['subjects']),
                 'stages' => json_encode($data['stages']),
                 'experience_years' => rand(5, 20),
+                'city' => 'Riyadh',
+                'neighborhoods' => json_encode(['Al Olaya']),
+                'price_per_hour' => 150,
+                'is_verified' => true,
+                'is_active' => true,
                 'bio' => $data['bio'],
             ]);
 
@@ -95,7 +103,15 @@ class MagazineDemoSeeder extends Seeder
 
             // Assign random 2-3 skills
             $studentSkills = array_slice($skills, 0, rand(2, 3));
-            $student->update(['skills' => json_encode($studentSkills)]);
+            foreach ($studentSkills as $skillName) {
+                \App\Models\UserSkill::create([
+                    'user_id' => $student->id,
+                    'name' => $skillName,
+                    'category' => 'technical',
+                    'source' => 'manual',
+                    'proficiency_level' => 'beginner',
+                ]);
+            }
 
             $students[] = $student;
         }
@@ -143,14 +159,14 @@ class MagazineDemoSeeder extends Seeder
                 'title_en' => 'Artificial Intelligence in Education',
                 'description_ar' => 'كيف يغير الذكاء الاصطناعي طرق التدريس',
                 'description_en' => 'How AI is changing teaching methods',
-                'type' => 'article',
+                'type' => 'magazine',
             ],
             [
                 'title_ar' => 'المشاريع البيئية والاستدامة',
                 'title_en' => 'Environmental Projects and Sustainability',
                 'description_ar' => 'مبادرات الطلاب نحو بيئة أخضر',
                 'description_en' => 'Student initiatives towards a greener environment',
-                'type' => 'article',
+                'type' => 'magazine',
             ],
             [
                 'title_ar' => 'فنون التواصل الفعال',
@@ -171,7 +187,7 @@ class MagazineDemoSeeder extends Seeder
                 'title_en' => 'Mathematics in Daily Life',
                 'description_ar' => 'تطبيقات عملية للمفاهيم الرياضية',
                 'description_en' => 'Practical applications of mathematical concepts',
-                'type' => 'article',
+                'type' => 'magazine',
             ],
             [
                 'title_ar' => 'أثر التعلم التعاوني على الإنجاز',
@@ -192,7 +208,7 @@ class MagazineDemoSeeder extends Seeder
                 'title_en' => 'Music and Science: A Creative Interaction',
                 'description_ar' => 'كيف تتقاطع الموسيقى والعلوم في الابتكار',
                 'description_en' => 'How music and science intersect in innovation',
-                'type' => 'article',
+                'type' => 'magazine',
             ],
             [
                 'title_ar' => 'القيادة الشابة والمسؤولية الاجتماعية',
@@ -213,7 +229,7 @@ class MagazineDemoSeeder extends Seeder
                 'title_en' => 'Living History: From Past to Present',
                 'description_ar' => 'دروس من التاريخ لفهم حاضرنا',
                 'description_en' => 'Lessons from history to understand our present',
-                'type' => 'article',
+                'type' => 'magazine',
             ],
             [
                 'title_ar' => 'الرياضة والصحة العقلية',
@@ -234,7 +250,7 @@ class MagazineDemoSeeder extends Seeder
                 'title_en' => 'Memory and Effective Learning',
                 'description_ar' => 'استراتيجيات لتحسين الذاكرة والفهم',
                 'description_en' => 'Strategies to improve memory and understanding',
-                'type' => 'article',
+                'type' => 'magazine',
             ],
             [
                 'title_ar' => 'مستقبل المهن: الاتجاهات الناشئة',
@@ -254,13 +270,10 @@ class MagazineDemoSeeder extends Seeder
                 'type' => $topic['type'],
                 'title' => $topic['title_ar'],
                 'title_ar' => $topic['title_ar'],
-                'title_en' => $topic['title_en'],
                 'description' => $topic['description_ar'],
                 'description_ar' => $topic['description_ar'],
-                'description_en' => $topic['description_en'],
                 'content' => '<p>' . $topic['description_ar'] . '</p><p>هذا نص توضيحي يمثل محتوى المنشور الفعلي...</p>',
                 'content_ar' => '<p>' . $topic['description_ar'] . '</p><p>هذا نص توضيحي يمثل محتوى المنشور الفعلي...</p>',
-                'content_en' => '<p>' . $topic['description_en'] . '</p><p>This is a placeholder text representing the actual publication content...</p>',
                 'status' => 'approved',
                 'approved_by' => $teachers[array_rand($teachers)]->id,
                 'approved_at' => Carbon::now()->subDays(rand(1, 60)),

@@ -189,12 +189,7 @@ class AdminPermissionsController extends Controller
      */
     private function getRoleLabel($role): string
     {
-        return match ($role) {
-            'system_supervisor' => 'مشرف النظام',
-            'school_support_coordinator' => 'منسق دعم المؤسسات تعليمية',
-            'admin' => 'مدير',
-            default => $role,
-        };
+        return \App\Support\RoleLabels::label($role);
     }
 }
 

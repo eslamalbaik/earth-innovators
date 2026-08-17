@@ -25,11 +25,12 @@ import PhoneInput from '@/Components/PhoneInput';
 import PasswordInput from '@/Components/PasswordInput';
 import { useToast } from '@/Contexts/ToastContext';
 
-export default function UsersIndex({ users, stats, filters, auth, schools: initialSchools }) {
+export default function UsersIndex({ users, stats, filters, auth, schools: initialSchools, customRoles = [] }) {
     const { t, language } = useTranslation();
     const { showSuccess } = useToast();
     const [search, setSearch] = useState(filters?.search || '');
     const [roleFilter, setRoleFilter] = useState(filters?.role || 'all');
+    const [customRoleFilter, setCustomRoleFilter] = useState(filters?.custom_role_id || 'all');
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
@@ -46,6 +47,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
         password: '',
         password_confirmation: '',
         role: 'student',
+        custom_role_id: '',
         school_id: '',
         points: 0,
         account_type: 'regular',
@@ -89,13 +91,14 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
         router.get(route('admin.users.index'), {
             search: search || undefined,
             role: roleFilter !== 'all' ? roleFilter : undefined,
+            custom_role_id: customRoleFilter !== 'all' ? customRoleFilter : undefined,
         }, {
             preserveState: true,
             preserveScroll: true,
             replace: true,
             only: ['users', 'filters'], // PARTIAL RELOAD: Only refresh users and filters
         });
-    }, [search, roleFilter]);
+    }, [search, roleFilter, customRoleFilter]);
 
     const handleDelete = useCallback((user) => {
         setUserToDelete(user);
@@ -188,6 +191,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
             password: '',
             password_confirmation: '',
             role: user.role || 'student',
+            custom_role_id: user.custom_role_id || '',
             school_id: user.school_id || '',
             points: user.points || 0,
             account_type: user.account_type || 'regular',
@@ -216,7 +220,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
         resetEditForm();
     };
 
-    const getRoleBadge = (role, accountType) => {
+    const getRoleBadge = (role, accountType, roleLabel) => {
         const roleMap = {
             admin: { bg: 'bg-red-100', text: 'text-red-800', label: t('adminUsersIndexPage.roles.admin'), icon: FaUser },
             teacher: { bg: 'bg-purple-100', text: 'text-purple-800', label: t('adminUsersIndexPage.roles.teacher'), icon: FaChalkboardTeacher },
@@ -227,6 +231,10 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
             school_support_coordinator: { bg: 'bg-indigo-100', text: 'text-indigo-800', label: t('adminUsersIndexPage.roles.schoolSupportCoordinator'), icon: FaUser },
         };
         const roleConfig = roleMap[role] || { bg: 'bg-gray-100', text: 'text-gray-800', label: role, icon: FaUser };
+        // A custom role label (e.g. "المدرب") overrides the base label but keeps the base role's color/icon.
+        if (roleLabel && roleLabel !== roleConfig.label) {
+            roleConfig.label = roleLabel;
+        }
         const Icon = roleConfig.icon;
         return (
             <div className="flex items-center gap-2">
@@ -331,6 +339,20 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                 <option value="school_support_coordinator">{t('adminUsersIndexPage.roles.schoolSupportCoordinator')}</option>
                             </select>
                         </div>
+                        {customRoles.length > 0 && (
+                            <div className="md:w-48">
+                                <select
+                                    value={customRoleFilter}
+                                    onChange={(e) => setCustomRoleFilter(e.target.value)}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                >
+                                    <option value="all">كل الأدوار المخصصة</option>
+                                    {customRoles.map((role) => (
+                                        <option key={role.id} value={role.id}>{role.name_ar}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
                         <button
                             onClick={handleSearch}
                             className="px-6 py-2 bg-[#A3C042] hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
@@ -419,7 +441,7 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                                 </div>
                                             </td>
                                             <td className="py-4 px-6 text-sm text-gray-700">{user.email}</td>
-                                            <td className="py-4 px-6">{getRoleBadge(user.role, user.account_type)}</td>
+                                            <td className="py-4 px-6">{getRoleBadge(user.role, user.account_type, user.role_label)}</td>
                                             <td className="py-4 px-6 text-sm text-gray-700">{user.school_name}</td>
                                             <td className="py-4 px-6">
                                                 <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
@@ -589,7 +611,10 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                     </label>
                                     <select
                                         value={editData.role}
-                                        onChange={(e) => setEditData('role', e.target.value)}
+                                        onChange={(e) => {
+                                            setEditData('role', e.target.value);
+                                            setEditData('custom_role_id', '');
+                                        }}
                                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.role ? 'border-red-500' : 'border-gray-300'
                                             }`}
                                         required
@@ -610,6 +635,28 @@ export default function UsersIndex({ users, stats, filters, auth, schools: initi
                                         <p className="mt-1 text-sm text-red-600">{editErrors.role}</p>
                                     )}
                                 </div>
+
+                                {/* Custom Role Label */}
+                                {customRoles.filter((r) => r.base_role === editData.role).length > 0 && (
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            الدور المخصص (اختياري)
+                                        </label>
+                                        <select
+                                            value={editData.custom_role_id}
+                                            onChange={(e) => setEditData('custom_role_id', e.target.value)}
+                                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.custom_role_id ? 'border-red-500' : 'border-gray-300'}`}
+                                        >
+                                            <option value="">بدون (استخدم الاسم الافتراضي)</option>
+                                            {customRoles.filter((r) => r.base_role === editData.role).map((r) => (
+                                                <option key={r.id} value={r.id}>{r.name_ar}</option>
+                                            ))}
+                                        </select>
+                                        {editErrors.custom_role_id && (
+                                            <p className="mt-1 text-sm text-red-600">{editErrors.custom_role_id}</p>
+                                        )}
+                                    </div>
+                                )}
 
                                 {/* Membership Type */}
                                 {editData.account_type === 'regular' && (

@@ -100,7 +100,7 @@ class CertificateController extends Controller
     {
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
-            'type' => 'required|string|in:student,teacher,school,achievement,membership',
+            'type' => 'required|string|in:student,teacher,school,achievement,membership,general_completion,academic_excellence,motivation,innovation',
             'title' => 'required|string|max:255',
             'title_ar' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -182,7 +182,7 @@ class CertificateController extends Controller
     {
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
-            'type' => 'required|string|in:student,teacher,school,achievement,membership',
+            'type' => 'required|string|in:student,teacher,school,achievement,membership,general_completion,academic_excellence,motivation,innovation',
             'title' => 'required|string|max:255',
             'title_ar' => 'required|string|max:255',
             'description' => 'nullable|string',

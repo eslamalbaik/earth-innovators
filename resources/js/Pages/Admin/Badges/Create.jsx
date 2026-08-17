@@ -1,7 +1,7 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { useTranslation } from '@/i18n';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { FaArrowRight, FaSave, FaTimes, FaUpload } from 'react-icons/fa';
+import { FaArrowRight, FaSave, FaTimes, FaUpload, FaRobot, FaSpinner } from 'react-icons/fa';
 import { useState } from 'react';
 
 const badgeTypeOptions = [
@@ -16,6 +16,8 @@ const badgeTypeOptions = [
 export default function AdminBadgesCreate() {
     const { t } = useTranslation();
     const [imagePreview, setImagePreview] = useState(null);
+    const [aiIdea, setAiIdea] = useState('');
+    const [isGenerating, setIsGenerating] = useState(false);
 
     const { data, setData, post, processing, errors } = useForm({
         name: '',
@@ -27,6 +29,52 @@ export default function AdminBadgesCreate() {
         points_required: 0,
         is_active: true,
     });
+
+    const handleAIGenerate = async () => {
+        if (!aiIdea) {
+            alert('يرجى إدخال فكرة الشارة أولاً.');
+            return;
+        }
+
+        setIsGenerating(true);
+        try {
+            const axios = (await import('axios')).default;
+            const response = await axios.post(route('admin.badges.generate'), { idea: aiIdea });
+            const result = response.data;
+
+            setData((prev) => ({
+                ...prev,
+                name: result.name || prev.name,
+                name_ar: result.name_ar || prev.name_ar,
+                description_ar: result.description_ar || prev.description_ar,
+                icon: result.icon || prev.icon,
+                type: result.type || prev.type,
+                points_required: result.points_required ?? prev.points_required,
+            }));
+
+            if (result.image_url) {
+                try {
+                    const imgRes = await fetch(result.image_url);
+                    const blob = await imgRes.blob();
+                    const file = new File([blob], 'ai_generated_badge.jpg', { type: blob.type });
+                    setData('image', file);
+                    const reader = new FileReader();
+                    reader.onloadend = () => setImagePreview(reader.result);
+                    reader.readAsDataURL(file);
+                } catch (imgError) {
+                    console.error('Error fetching AI image', imgError);
+                }
+            }
+
+            if (result.incomplete_fields && result.incomplete_fields.length > 0) {
+                alert('تم توليد الشارة. يرجى مراجعة الحقول التالية وإكمالها: ' + result.incomplete_fields.join('، '));
+            }
+        } catch (error) {
+            alert(error.response?.data?.error || 'حدث خطأ أثناء توليد تفاصيل الشارة');
+        } finally {
+            setIsGenerating(false);
+        }
+    };
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -71,6 +119,40 @@ export default function AdminBadgesCreate() {
                 </h2>
 
                 <form onSubmit={submit} className="space-y-6" encType="multipart/form-data">
+                    {/* مساعد الذكاء الاصطناعي */}
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100 flex flex-col md:flex-row md:items-center gap-4 justify-between">
+                        <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                                <FaRobot className="text-blue-600 text-xl" />
+                                <h3 className="font-bold text-blue-800 text-base">مساعد الذكاء الاصطناعي للشارات</h3>
+                            </div>
+                            <p className="text-sm text-blue-600">
+                                اكتب فكرة مبسطة وسيقوم المساعد بتوليد اسم الشارة، الوصف، الرمز التعبيري، النوع، عدد النقاط المقترح، وصورة مناسبة.
+                            </p>
+                        </div>
+                        <div className="flex-1 flex gap-2 w-full md:w-auto">
+                            <input
+                                type="text"
+                                value={aiIdea}
+                                onChange={(e) => setAiIdea(e.target.value)}
+                                placeholder="مثال: شارة لأكثر طالب مشارك في التحديات..."
+                                className="flex-1 text-sm rounded-lg border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+                            />
+                            <button
+                                type="button"
+                                onClick={handleAIGenerate}
+                                disabled={isGenerating || !aiIdea}
+                                className="bg-blue-600 text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-blue-700 disabled:opacity-50 transition flex justify-center items-center gap-2 whitespace-nowrap"
+                            >
+                                {isGenerating ? (
+                                    <><FaSpinner className="animate-spin" /> جاري التوليد...</>
+                                ) : (
+                                    <><FaRobot /> توليد التفاصيل</>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">

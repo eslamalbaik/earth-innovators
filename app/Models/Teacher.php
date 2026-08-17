@@ -23,6 +23,8 @@ class Teacher extends Model
         'image',
         'subjects',
         'stages',
+        'grade',
+        'section',
         'experience_years',
         'city',
         'neighborhoods',

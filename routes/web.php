@@ -715,6 +715,10 @@ Route::middleware(['auth', 'school', 'membership_active'])->prefix('school')->na
     Route::get('/reports/export/excel', [\App\Http\Controllers\School\SchoolReportController::class, 'exportExcel'])->name('reports.export.excel');
     Route::get('/reports/create', [\App\Http\Controllers\School\SchoolReportController::class, 'create'])->name('reports.create');
     Route::post('/reports', [\App\Http\Controllers\School\SchoolReportController::class, 'store'])->name('reports.store');
+
+    // الوكيل الذكي
+    Route::get('/innovation/chat', [\App\Http\Controllers\School\SchoolChatController::class, 'index'])->name('innovation.chat');
+    Route::post('/innovation/chat/ask', [\App\Http\Controllers\School\SchoolChatController::class, 'ask'])->name('innovation.chat.ask');
 });
 
 Route::middleware(['auth', 'teacher', 'membership_active'])->group(function () {
@@ -863,9 +867,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // إدارة الصلاحيات - CRUD كامل للمستخدمين الإداريين
     Route::resource('permissions', \App\Http\Controllers\Admin\AdminPermissionsController::class)->except(['show']);
 
+    // إدارة الأدوار المخصصة (تسميات إضافية فوق الأدوار الأساسية)
+    Route::resource('custom-roles', \App\Http\Controllers\Admin\CustomRoleController::class)->except(['show']);
+
     Route::get('/teachers/{teacher}/report', [\App\Http\Controllers\Admin\TeacherReportController::class, 'show'])->name('teachers.report');
 
     // Badges Management
+    Route::post('/badges/generate', [\App\Http\Controllers\Admin\BadgeController::class, 'generate'])->name('badges.generate');
     Route::resource('badges', \App\Http\Controllers\Admin\BadgeController::class);
     Route::post('/badges/{badge}/award', [\App\Http\Controllers\Admin\BadgeController::class, 'award'])->name('badges.award');
 

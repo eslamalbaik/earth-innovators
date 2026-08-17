@@ -5217,6 +5217,7 @@ export const en = {
         "sendBadge": "Send Badge",
         "certificates": "Certificates",
         "users": "Users",
+        "customRoles": "Custom Roles",
         "badges": "Badges",
         "packages": "Packages",
         "storeRewards": "Point store",

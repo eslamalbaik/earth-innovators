@@ -1,6 +1,6 @@
 import DashboardLayout from '../../../Layouts/DashboardLayout';
 import { Head, useForm } from '@inertiajs/react';
-import { FaTrophy, FaSpinner, FaImage, FaTrash, FaRobot } from 'react-icons/fa';
+import { FaTrophy, FaSpinner, FaImage, FaTrash, FaRobot, FaPlus, FaClipboardCheck } from 'react-icons/fa';
 import TextInput from '../../../Components/TextInput';
 import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
@@ -32,7 +32,24 @@ export default function SchoolChallengeCreate({ auth }) {
         status: 'draft',
         points_reward: 0,
         max_participants: '',
+        criteria: [],
     });
+
+    const criteriaTotal = data.criteria.reduce((sum, c) => sum + (Number(c.weight) || 0), 0);
+
+    const updateCriterion = (index, field, value) => {
+        const next = [...data.criteria];
+        next[index] = { ...next[index], [field]: value };
+        setData('criteria', next);
+    };
+
+    const removeCriterion = (index) => {
+        setData('criteria', data.criteria.filter((_, i) => i !== index));
+    };
+
+    const addCriterion = () => {
+        setData('criteria', [...data.criteria, { name_ar: '', weight: 0 }]);
+    };
 
     const handleAIGenerate = async () => {
         if (!aiIdea) {
@@ -53,6 +70,9 @@ export default function SchoolChallengeCreate({ auth }) {
                 description: result.description || prev.description,
                 instructions: result.instructions || prev.instructions,
                 category: result.category || prev.category,
+                criteria: (result.suggested_criteria && result.suggested_criteria.length > 0)
+                    ? result.suggested_criteria
+                    : prev.criteria,
             }));
 
             setAiIncompleteFields(result.incomplete_fields || []);
@@ -168,7 +188,7 @@ export default function SchoolChallengeCreate({ auth }) {
                                     <h3 className="font-bold text-blue-800 text-base">مساعد الذكاء الاصطناعي للتحديات</h3>
                                 </div>
                                 <p className="text-sm text-blue-600">
-                                    اكتب فكرة مبسطة وسيقوم المساعد بتوليد عنوان احترافي، وصف شامل، وتحديد الفئة وصورة غلاف مناسبة.
+                                    اكتب فكرة مبسطة وسيقوم المساعد بتوليد عنوان احترافي، وصف شامل، تحديد الفئة، صورة غلاف، ومعايير تقييم مبنية على محتوى التحدي.
                                 </p>
                             </div>
                             <div className="flex-1 flex gap-2 w-full md:w-auto">
@@ -192,6 +212,61 @@ export default function SchoolChallengeCreate({ auth }) {
                                     )}
                                 </button>
                             </div>
+                        </div>
+
+                        {/* معايير التقييم المرتبطة بمحتوى التحدي */}
+                        <div className="bg-white rounded-xl p-5 border border-gray-200">
+                            <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-2">
+                                    <FaClipboardCheck className="text-[#A3C042]" />
+                                    <h3 className="font-bold text-gray-800 text-base">معايير التقييم</h3>
+                                </div>
+                                <span className={`text-xs font-bold px-2 py-1 rounded-full ${criteriaTotal === 100 ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
+                                    مجموع الأوزان: {criteriaTotal}%
+                                </span>
+                            </div>
+
+                            {data.criteria.length === 0 ? (
+                                <p className="text-sm text-gray-400">لا توجد معايير بعد. استخدم مساعد الذكاء الاصطناعي أعلاه لتوليدها تلقائياً حسب محتوى التحدي، أو أضفها يدوياً.</p>
+                            ) : (
+                                <div className="space-y-2">
+                                    {data.criteria.map((criterion, index) => (
+                                        <div key={index} className="flex items-center gap-2">
+                                            <input
+                                                type="text"
+                                                value={criterion.name_ar}
+                                                onChange={(e) => updateCriterion(index, 'name_ar', e.target.value)}
+                                                placeholder="اسم المعيار"
+                                                className="flex-1 text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            />
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                max="100"
+                                                value={criterion.weight}
+                                                onChange={(e) => updateCriterion(index, 'weight', Number.parseFloat(e.target.value) || 0)}
+                                                className="w-24 text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            />
+                                            <span className="text-xs text-gray-400">%</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => removeCriterion(index)}
+                                                className="text-red-500 hover:text-red-700 p-2"
+                                            >
+                                                <FaTrash />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            <button
+                                type="button"
+                                onClick={addCriterion}
+                                className="mt-3 text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                            >
+                                <FaPlus className="text-xs" /> إضافة معيار
+                            </button>
                         </div>
 
                         {/* Title */}

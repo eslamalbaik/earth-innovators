@@ -13,19 +13,30 @@ use Carbon\Carbon;
 
 class CertificateService
 {
+    /**
+     * Legacy/default field map (public/Certificate.pdf) — the pre-printed membership-style
+     * template with dotted rules and "من ___ إلى ___" brackets. Used for 'membership' certificates.
+     */
     protected $fieldMap;
     protected string $fieldMapPath;
+
+    /**
+     * Field map for public/CertificateCustom.pdf — the blank, school-customizable template
+     * with a large free body area for title/name/description. Used for every non-membership
+     * certificate type (student, teacher, school, achievement, general_completion, etc.).
+     */
+    protected string $customTemplatePath;
+    protected string $customFieldMapPath;
 
     public function __construct(
         private MembershipService $membershipService
     )
     {
         $this->fieldMapPath = config_path('certificate_fields.json');
-        if (file_exists($this->fieldMapPath)) {
-            $this->fieldMap = json_decode(file_get_contents($this->fieldMapPath), true);
-        } else {
-            $this->fieldMap = [];
-        }
+        $this->fieldMap = $this->loadFieldMapFile($this->fieldMapPath) ?? [];
+
+        $this->customTemplatePath = public_path('CertificateCustom.pdf');
+        $this->customFieldMapPath = config_path('certificate_fields_custom.json');
     }
 
     /**
@@ -39,8 +50,8 @@ class CertificateService
         ?string $dateFormat = 'Y-m-d',
         string $certificateType = 'student'
     ): string {
-        // Use default template if not provided
-        $templatePath = $templatePath ?? public_path('Certificate.pdf');
+        // Use the template that matches the certificate type when none is explicitly provided.
+        $templatePath = $templatePath ?? $this->defaultTemplatePathFor($certificateType);
 
         $this->assertGenerationReady($templatePath);
 
@@ -51,6 +62,22 @@ class CertificateService
         $pdfPath = $this->fillPdfTemplate($templatePath, $data);
 
         return $pdfPath;
+    }
+
+    /**
+     * Resolve which template file to use when the caller didn't pin one explicitly.
+     * 'membership' certificates keep using the pre-printed auto template; every other
+     * type uses the blank, school-customizable template so the description prints.
+     */
+    protected function defaultTemplatePathFor(string $certificateType): string
+    {
+        if ($certificateType === 'membership') {
+            return public_path('Certificate.pdf');
+        }
+
+        return file_exists($this->customTemplatePath)
+            ? $this->customTemplatePath
+            : public_path('Certificate.pdf');
     }
 
     /**
@@ -129,13 +156,14 @@ class CertificateService
 
     public function getGenerationHealth(?string $templatePath = null): array
     {
-        $resolvedTemplatePath = $templatePath ?? public_path('Certificate.pdf');
+        $resolvedTemplatePath = $templatePath ?? $this->defaultTemplatePathFor('student');
+        $resolvedFieldMapPath = $this->resolveFieldMapPath($resolvedTemplatePath);
         $tcpdfPath = base_path('vendor/tecnickcom/tcpdf/tcpdf.php');
-        $fieldMapLoaded = is_array($this->fieldMap) && !empty($this->fieldMap);
+        $fieldMapLoaded = is_array($this->loadFieldMapFile($resolvedFieldMapPath)) && !empty($this->loadFieldMapFile($resolvedFieldMapPath));
 
         $checks = [
             'template_exists' => file_exists($resolvedTemplatePath),
-            'field_map_exists' => file_exists($this->fieldMapPath),
+            'field_map_exists' => file_exists($resolvedFieldMapPath),
             'field_map_loaded' => $fieldMapLoaded,
             'tcpdf_available' => file_exists($tcpdfPath),
             'fpdi_available' => class_exists(Fpdi::class),
@@ -185,6 +213,41 @@ class CertificateService
     }
 
     /**
+     * Load a field-map JSON file, returning null if it doesn't exist or is invalid.
+     */
+    protected function loadFieldMapFile(string $path): ?array
+    {
+        if (!file_exists($path)) {
+            return null;
+        }
+
+        $decoded = json_decode(file_get_contents($path), true);
+
+        return is_array($decoded) ? $decoded : null;
+    }
+
+    /**
+     * Pick the field-map file that matches a given template path.
+     * Falls back to the legacy default map for any template it doesn't recognize.
+     */
+    protected function resolveFieldMapPath(string $templatePath): string
+    {
+        if (realpath($templatePath) === realpath($this->customTemplatePath)) {
+            return $this->customFieldMapPath;
+        }
+
+        return $this->fieldMapPath;
+    }
+
+    /**
+     * Resolve the actual field-map array for a given template path.
+     */
+    protected function resolveFieldMap(string $templatePath): array
+    {
+        return $this->loadFieldMapFile($this->resolveFieldMapPath($templatePath)) ?? $this->fieldMap;
+    }
+
+    /**
      * Prepare certificate data from student and overrides
      */
     protected function prepareCertificateData(
@@ -218,12 +281,17 @@ class CertificateService
 
         $pdfDateFormat = $certificateType === 'membership' ? 'Y-m-d' : $dateFormat;
 
+        // Description shown on the customizable template's body. Arabic takes priority
+        // since certificates render in Arabic; falls back to the plain 'description' key.
+        $description = $overrides['description_ar'] ?? $overrides['description'] ?? '';
+
         $data = [
             'student_name' => $overrides['student_name'] ?? $student->name,
             'student_id' => $overrides['student_id'] ?? (string) $student->id,
             'membership_number' => $membershipDisplay,
             'school_name' => $schoolName,
             'course_name' => $overrides['course_name'] ?? 'دورة تدريبية',
+            'description' => $description,
             'date' => $this->formatDate($issueDate, $pdfDateFormat),
             'issue_date' => $this->formatDate($issueDate, $pdfDateFormat),
             'signature' => $overrides['signature'] ?? '',
@@ -272,14 +340,15 @@ class CertificateService
      * Uses Tajawal (resources/fonts/Tajawal-Regular.ttf & Tajawal-Bold.ttf) when present,
      * registering it with TCPDF on first use; otherwise falls back to DejaVu Sans.
      *
-     * @return array{regular:string,bold:string}
+     * @return array{regular:string,bold:string,extrabold:string}
      */
     protected function resolveArabicFonts(): array
     {
-        $fallback = ['regular' => 'dejavusans', 'bold' => 'dejavusans'];
+        $fallback = ['regular' => 'dejavusans', 'bold' => 'dejavusansb', 'extrabold' => 'dejavusansb'];
 
         $regularTtf = resource_path('fonts/Tajawal-Regular.ttf');
         $boldTtf = resource_path('fonts/Tajawal-Bold.ttf');
+        $extraBoldTtf = resource_path('fonts/Tajawal-ExtraBold.ttf');
 
         if (!file_exists($regularTtf) || !class_exists('\TCPDF_FONTS')) {
             return $fallback;
@@ -291,14 +360,52 @@ class CertificateService
             $bold = file_exists($boldTtf)
                 ? \TCPDF_FONTS::addTTFfont($boldTtf, 'TrueTypeUnicode', '', 32)
                 : $regular;
+            $extraBold = file_exists($extraBoldTtf)
+                ? \TCPDF_FONTS::addTTFfont($extraBoldTtf, 'TrueTypeUnicode', '', 32)
+                : $bold;
 
             return [
                 'regular' => $regular ?: 'dejavusans',
                 'bold' => $bold ?: ($regular ?: 'dejavusans'),
+                'extrabold' => $extraBold ?: ($bold ?: ($regular ?: 'dejavusans')),
             ];
         } catch (\Throwable $exception) {
             return $fallback;
         }
+    }
+
+    /**
+     * Draw a tasteful double-line border frame on the custom (blank) template so it
+     * reads as an actual certificate rather than a plain page. Uses fixed point insets
+     * (not design-space scaling) so the border thickness stays consistent regardless
+     * of the page's own proportions.
+     */
+    protected function drawCustomTemplateFrame(\TCPDF $pdf, float $pageWidth, float $pageHeight): void
+    {
+        $gold = [184, 148, 60];
+        $green = [42, 92, 45];
+
+        $pdf->SetLineWidth(1.4);
+        $pdf->SetDrawColor(...$gold);
+        $pdf->Rect(22, 22, $pageWidth - 44, $pageHeight - 44);
+
+        $pdf->SetLineWidth(0.6);
+        $pdf->SetDrawColor(...$green);
+        $pdf->Rect(28, 28, $pageWidth - 56, $pageHeight - 56);
+    }
+
+    /**
+     * Draw a short gold rule centered beneath the certificate title.
+     */
+    protected function drawTitleDivider(\TCPDF $pdf, float $pageWidth, float $pageHeight, float $titleDesignY, float $titleFontSize): void
+    {
+        $y = CertificateLayout::scaleY($titleDesignY, $pageHeight) + ($titleFontSize * 1.6);
+        $width = 150;
+        $x = ($pageWidth - $width) / 2;
+
+        $pdf->SetLineWidth(1.2);
+        $pdf->SetDrawColor(184, 148, 60);
+        $pdf->Line($x, $y, $x + $width, $y);
     }
 
     /**
@@ -352,9 +459,16 @@ class CertificateService
         
         $pageWidth = (float) $templateSize['width'];
         $pageHeight = (float) $templateSize['height'];
+        $isCustomTemplate = realpath($templatePath) === realpath($this->customTemplatePath);
 
-        // Fill fields based on field map (design pixels → scaled to PDF)
-        foreach ($this->fieldMap as $fieldName => $fieldConfig) {
+        if ($isCustomTemplate) {
+            $this->drawCustomTemplateFrame($pdf, $pageWidth, $pageHeight);
+        }
+
+        // Fill fields based on the field map that matches this specific template
+        // (design pixels → scaled to PDF).
+        $fieldMap = $this->resolveFieldMap($templatePath);
+        foreach ($fieldMap as $fieldName => $fieldConfig) {
             if ($fieldName === '_meta' || str_starts_with($fieldName, '_')) {
                 continue;
             }
@@ -379,10 +493,16 @@ class CertificateService
             $height = max($fontSize * 1.5, 18);
             $value = (string) $data[$fieldName];
 
-            // Use Tajawal (regular/bold) when available; bold is a separate font file.
-            $isBold = stripos((string) $fontStyle, 'B') !== false;
-            $resolvedFamily = $isBold ? $fonts['bold'] : $fonts['regular'];
+            // Use Tajawal (regular/bold/extrabold) when available; each weight is a separate font file.
+            $resolvedFamily = match (true) {
+                stripos((string) $fontStyle, 'EB') !== false => $fonts['extrabold'],
+                stripos((string) $fontStyle, 'B') !== false => $fonts['bold'],
+                default => $fonts['regular'],
+            };
             $pdf->SetFont($resolvedFamily, '', $fontSize);
+
+            $color = $fieldConfig['color'] ?? [34, 34, 34];
+            $pdf->SetTextColor($color[0], $color[1], $color[2]);
 
             $alignMap = [
                 'left' => 'L',
@@ -396,7 +516,24 @@ class CertificateService
                 : $this->containsArabicCharacters($value);
             $pdf->setRTL($useRtl);
             $pdf->SetXY($x, $y);
-            $pdf->Cell($width, $height, $value, 0, 0, $textAlign, false, '', 0, false, 'T', 'M');
+
+            if (($fieldConfig['type'] ?? 'single') === 'multiline') {
+                // Free-text body (e.g. the certificate description) needs word-wrapping
+                // across several lines instead of the single-line Cell used elsewhere.
+                $lineHeight = CertificateLayout::scaleY(
+                    (float) ($fieldConfig['line_height'] ?? $fontSize * 1.6),
+                    $pageHeight
+                );
+                $pdf->MultiCell($width, $lineHeight, $value, 0, $textAlign, false, 1, '', '', true, 0, false, true, 0, 'T');
+            } else {
+                $pdf->Cell($width, $height, $value, 0, 0, $textAlign, false, '', 0, false, 'T', 'M');
+            }
+
+            // A short gold divider under the title separates it from the recipient's
+            // name, echoing the seal's gold tone instead of a plain wall of text.
+            if ($isCustomTemplate && $fieldName === 'course_name') {
+                $this->drawTitleDivider($pdf, $pageWidth, $pageHeight, $designY, $fontSize);
+            }
         }
 
         $pdf->setRTL(false);

@@ -14,7 +14,7 @@ import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 import { useTranslation } from '@/i18n';
 import PhoneInput from '@/Components/PhoneInput';
 
-export default function Index({ auth, teachers, availableTeachers = [] }) {
+export default function Index({ auth, teachers, availableTeachers = [], subjects = [], customRoles = [] }) {
     const { t, language } = useTranslation();
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
@@ -30,6 +30,10 @@ export default function Index({ auth, teachers, availableTeachers = [] }) {
         phone: '',
         password: '',
         password_confirmation: '',
+        subject_id: '',
+        grade: '',
+        section: '',
+        custom_role_id: '',
     });
 
     const editForm = useForm({
@@ -38,6 +42,10 @@ export default function Index({ auth, teachers, availableTeachers = [] }) {
         phone: '',
         password: '',
         password_confirmation: '',
+        subject_id: '',
+        grade: '',
+        section: '',
+        custom_role_id: '',
     });
 
     const handleCreate = (e) => {
@@ -65,6 +73,10 @@ export default function Index({ auth, teachers, availableTeachers = [] }) {
             phone: teacher.phone || '',
             password: '',
             password_confirmation: '',
+            subject_id: teacher.subject_id || '',
+            grade: teacher.grade || '',
+            section: teacher.section || '',
+            custom_role_id: teacher.custom_role_id || '',
         });
         setShowEditModal(true);
     };
@@ -191,7 +203,12 @@ export default function Index({ auth, teachers, availableTeachers = [] }) {
                                                     <div className="w-8 h-8 rounded-full bg-[#A3C042]/20 flex items-center justify-center">
                                                         <FaChalkboardTeacher className="text-[#A3C042] text-sm" />
                                                     </div>
-                                                    <div className="text-sm font-medium text-gray-900">{teacher.name}</div>
+                                                    <div>
+                                                        <div className="text-sm font-medium text-gray-900">{teacher.name}</div>
+                                                        {teacher.custom_role_id && (
+                                                            <span className="text-xs text-[#7E9B25] font-semibold">{teacher.role_label}</span>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
@@ -307,6 +324,68 @@ export default function Index({ auth, teachers, availableTeachers = [] }) {
                                 إنشاء معلم جديد
                             </button>
                         </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                                <InputLabel htmlFor="create_subject_id" value="المادة (اختياري)" />
+                                <select
+                                    id="create_subject_id"
+                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
+                                    value={createForm.data.subject_id}
+                                    onChange={(e) => createForm.setData('subject_id', e.target.value)}
+                                >
+                                    <option value="">بدون مادة</option>
+                                    {subjects.map((subject) => (
+                                        <option key={subject.id} value={subject.id}>
+                                            {subject.name_ar}
+                                        </option>
+                                    ))}
+                                </select>
+                                <InputError message={createForm.errors.subject_id} className="mt-2" />
+                            </div>
+
+                            <div>
+                                <InputLabel htmlFor="create_grade" value="الصف (اختياري)" />
+                                <TextInput
+                                    id="create_grade"
+                                    type="text"
+                                    className="mt-1 block w-full"
+                                    value={createForm.data.grade}
+                                    onChange={(e) => createForm.setData('grade', e.target.value)}
+                                />
+                                <InputError message={createForm.errors.grade} className="mt-2" />
+                            </div>
+
+                            <div>
+                                <InputLabel htmlFor="create_section" value="الشعبة (اختياري)" />
+                                <TextInput
+                                    id="create_section"
+                                    type="text"
+                                    className="mt-1 block w-full"
+                                    value={createForm.data.section}
+                                    onChange={(e) => createForm.setData('section', e.target.value)}
+                                />
+                                <InputError message={createForm.errors.section} className="mt-2" />
+                            </div>
+                        </div>
+
+                        {customRoles.length > 0 && (
+                            <div>
+                                <InputLabel htmlFor="create_custom_role_id" value="الدور المخصص (اختياري)" />
+                                <select
+                                    id="create_custom_role_id"
+                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
+                                    value={createForm.data.custom_role_id}
+                                    onChange={(e) => createForm.setData('custom_role_id', e.target.value)}
+                                >
+                                    <option value="">بدون (معلم)</option>
+                                    {customRoles.map((role) => (
+                                        <option key={role.id} value={role.id}>{role.name_ar}</option>
+                                    ))}
+                                </select>
+                                <InputError message={createForm.errors.custom_role_id} className="mt-2" />
+                            </div>
+                        )}
 
                         {createMode === 'existing' && (
                             <div>
@@ -498,6 +577,68 @@ export default function Index({ auth, teachers, availableTeachers = [] }) {
                                     autoComplete="new-password"
                                 />
                                 <InputError message={editForm.errors.password_confirmation} className="mt-2" />
+                            </div>
+                        )}
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                                <InputLabel htmlFor="edit_subject_id" value="المادة (اختياري)" />
+                                <select
+                                    id="edit_subject_id"
+                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
+                                    value={editForm.data.subject_id}
+                                    onChange={(e) => editForm.setData('subject_id', e.target.value)}
+                                >
+                                    <option value="">بدون مادة</option>
+                                    {subjects.map((subject) => (
+                                        <option key={subject.id} value={subject.id}>
+                                            {subject.name_ar}
+                                        </option>
+                                    ))}
+                                </select>
+                                <InputError message={editForm.errors.subject_id} className="mt-2" />
+                            </div>
+
+                            <div>
+                                <InputLabel htmlFor="edit_grade" value="الصف (اختياري)" />
+                                <TextInput
+                                    id="edit_grade"
+                                    type="text"
+                                    className="mt-1 block w-full"
+                                    value={editForm.data.grade}
+                                    onChange={(e) => editForm.setData('grade', e.target.value)}
+                                />
+                                <InputError message={editForm.errors.grade} className="mt-2" />
+                            </div>
+
+                            <div>
+                                <InputLabel htmlFor="edit_section" value="الشعبة (اختياري)" />
+                                <TextInput
+                                    id="edit_section"
+                                    type="text"
+                                    className="mt-1 block w-full"
+                                    value={editForm.data.section}
+                                    onChange={(e) => editForm.setData('section', e.target.value)}
+                                />
+                                <InputError message={editForm.errors.section} className="mt-2" />
+                            </div>
+                        </div>
+
+                        {customRoles.length > 0 && (
+                            <div>
+                                <InputLabel htmlFor="edit_custom_role_id" value="الدور المخصص (اختياري)" />
+                                <select
+                                    id="edit_custom_role_id"
+                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
+                                    value={editForm.data.custom_role_id}
+                                    onChange={(e) => editForm.setData('custom_role_id', e.target.value)}
+                                >
+                                    <option value="">بدون (معلم)</option>
+                                    {customRoles.map((role) => (
+                                        <option key={role.id} value={role.id}>{role.name_ar}</option>
+                                    ))}
+                                </select>
+                                <InputError message={editForm.errors.custom_role_id} className="mt-2" />
                             </div>
                         )}
                     </div>

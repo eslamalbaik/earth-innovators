@@ -6,7 +6,7 @@ import {
     FaCalendar, FaChartLine, FaUser, FaSignOutAlt,
     FaGraduationCap, FaCommentDots, FaTachometerAlt, FaBell, FaBook,
     FaChevronDown, FaCreditCard, FaTrophy, FaProjectDiagram, FaMedal, FaFile,
-    FaCheckCircle, FaGift, FaLightbulb, FaChalkboardTeacher, FaRobot, FaSearch
+    FaCheckCircle, FaGift, FaLightbulb, FaChalkboardTeacher, FaRobot, FaSearch, FaUserTag
 } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import ApplicationLogo from '@/Components/ApplicationLogo';
@@ -417,6 +417,7 @@ export default function DashboardLayout({ children, header }) {
             { name: 'الوكيل الذكي', href: '/admin/innovation/chat', icon: FaRobot },
             { name: 'البحث الذكي بالمواهب', href: '/admin/innovation/smart-search', icon: FaSearch },
             { name: t('sidebar.users'), href: '/admin/users', icon: FaUsers },
+            { name: t('sidebar.customRoles'), href: '/admin/custom-roles', icon: FaUserTag },
             { name: t('sidebar.badges'), href: '/admin/badges', icon: FaCommentDots },
             { name: t('sidebar.packages'), href: '/admin/packages', icon: FaCreditCard },
             { name: t('sidebar.storeRewards'), href: '/admin/store-rewards', icon: FaGift },
@@ -504,6 +505,7 @@ export default function DashboardLayout({ children, header }) {
             { name: t('sidebar.addReports'), href: '/school/reports', icon: FaFile },
             { name: t('sidebar.students'), href: '/school/students', icon: FaGraduationCap },
             { name: t('sidebar.innovationTracking'), href: '/teacher/innovation/dashboard', icon: FaChartLine },
+            { name: 'الوكيل الذكي', href: '/school/innovation/chat', icon: FaRobot },
             { name: 'إدارة المعلمين', href: '/school/teachers', icon: FaChalkboardTeacher },
             { name: t('sidebar.certificates'), href: '/school/certificates', icon: FaFile },
             { name: t('sidebar.packages'), href: '/packages', icon: FaCreditCard },
@@ -552,6 +554,7 @@ export default function DashboardLayout({ children, header }) {
             { name: t('sidebar.addReports'), href: '/school/reports', icon: FaFile },
             { name: t('sidebar.students'), href: '/school/students', icon: FaGraduationCap },
             { name: t('sidebar.innovationTracking'), href: '/teacher/innovation/dashboard', icon: FaChartLine },
+            { name: 'الوكيل الذكي', href: '/school/innovation/chat', icon: FaRobot },
             { name: 'إدارة المعلمين', href: '/school/teachers', icon: FaChalkboardTeacher },
             { name: t('sidebar.certificates'), href: '/school/certificates', icon: FaFile },
             { name: t('sidebar.packages'), href: '/packages', icon: FaCreditCard },
@@ -698,11 +701,7 @@ export default function DashboardLayout({ children, header }) {
                                     <div className="flex-1">
                                         <p className="text-sm font-semibold text-gray-900">{auth.user?.name}</p>
                                         <p className="text-xs text-gray-500">
-                                            {auth.user?.role === 'admin' && t('roles.admin')}
-                                            {auth.user?.role === 'teacher' && t('roles.teacher')}
-                                            {auth.user?.role === 'student' && t('roles.student')}
-                                            {auth.user?.role === 'school' && t('roles.school')}
-                                            {auth.user?.role === 'educational_institution' && t('roles.educationalInstitution')}
+                                            {auth.user?.role_label}
                                         </p>
                                     </div>
                                 </div>
@@ -962,11 +961,7 @@ export default function DashboardLayout({ children, header }) {
                                         <div className="hidden sm:block ">
                                             <div className="text-sm font-semibold text-gray-900">{auth.user?.name?.split(' ')[0] || t('roles.user')}</div>
                                             <div className="text-xs text-gray-500">
-                                                {auth.user?.role === 'admin' && t('roles.admin')}
-                                                {auth.user?.role === 'teacher' && t('roles.teacher')}
-                                                {auth.user?.role === 'student' && t('roles.student')}
-                                                {auth.user?.role === 'school' && t('roles.school')}
-                                                {auth.user?.role === 'educational_institution' && t('roles.educationalInstitution')}
+                                                {auth.user?.role_label}
                                             </div>
                                         </div>
                                         <FaChevronDown className={`text-gray-400 text-xs transition-transform duration-200 ${userDropdownOpen ? 'rotate-180' : ''}`} />

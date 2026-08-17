@@ -100,6 +100,10 @@ class SchoolChallengeController extends Controller
 
         $idea = $request->input('idea');
 
+        // توليد التحدي قد يستغرق حتى 360 ثانية (4 محاولات × 90 ثانية) بسبب إعادة المحاولة التلقائية
+        // في GeminiClient، بينما max_execution_time الافتراضي على السيرفر 30 ثانية فقط.
+        set_time_limit(300);
+
         try {
             $aiResponse = $deepSeekClient->chatWithJson([
                 \App\Services\AIEngine\GeminiClient::systemMessage(
@@ -114,7 +118,8 @@ class SchoolChallengeController extends Controller
                     . 'description (وصف مفصل وشامل ومحفز للتحدي كنص عادي منسق بأسطر واضحة، يشمل الأهداف والمعايير), '
                     . 'instructions (خطوات تنفيذ التحدي بالتفصيل للطالب، كنص عادي منسق بأسطر واضحة), '
                     . 'category (إحدى الفئات المسموحة فقط باللغة الإنجليزية), '
-                    . 'image_keyword (كلمة مفتاحية واحدة بالإنجليزية).'
+                    . 'image_keyword (كلمة مفتاحية واحدة بالإنجليزية), '
+                    . 'criteria (مصفوفة من 3 إلى 5 معايير تقييم مبنية على محتوى التحدي تحديداً، كل عنصر فيها كائن يحتوي على name_ar (اسم معيار قصير بالعربية) وweight (وزن رقمي)، بحيث يكون مجموع كل الأوزان يساوي 100 بالضبط).'
                 ),
                 \App\Services\AIEngine\GeminiClient::userMessage("فكرة التحدي: " . $idea),
             ]);
@@ -135,6 +140,24 @@ class SchoolChallengeController extends Controller
             $allowedCategories = ['science', 'technology', 'engineering', 'mathematics', 'arts', 'other'];
             if (!in_array(strtolower($category), $allowedCategories)) {
                 $category = 'other';
+            }
+
+            // معايير التقييم المقترحة، مربوطة بمحتوى التحدي تحديداً (وليست قائمة عامة ثابتة)
+            $suggestedCriteria = collect($aiResponse['criteria'] ?? [])
+                ->filter(fn ($c) => !empty($c['name_ar']))
+                ->map(fn ($c) => [
+                    'name_ar' => (string) $c['name_ar'],
+                    'weight' => (float) ($c['weight'] ?? 0),
+                ])
+                ->values();
+
+            // إعادة توزيع الأوزان بالتناسب إذا لم يكن مجموعها 100 بالضبط
+            $criteriaTotal = $suggestedCriteria->sum('weight');
+            if ($criteriaTotal > 0 && round($criteriaTotal, 2) !== 100.0) {
+                $suggestedCriteria = $suggestedCriteria->map(fn ($c) => [
+                    'name_ar' => $c['name_ar'],
+                    'weight' => round($c['weight'] / $criteriaTotal * 100, 2),
+                ]);
             }
 
             // Fields the AI failed to populate, so the frontend can flag them
@@ -171,10 +194,14 @@ class SchoolChallengeController extends Controller
                 'category' => strtolower($category),
                 'image_url' => $imageUrl,
                 'incomplete_fields' => $incompleteFields,
+                'suggested_criteria' => $suggestedCriteria,
             ]);
 
-        } catch (\Exception $e) {
-            \Log::error('Error generating AI challenge: ' . $e->getMessage());
+        } catch (\Throwable $e) {
+            \Log::error('Error generating AI challenge: ' . $e->getMessage(), [
+                'exception' => get_class($e),
+                'trace' => $e->getTraceAsString(),
+            ]);
             return response()->json(['error' => 'حدث خطأ غير متوقع أثناء توليد تفاصيل التحدي.'], 500);
         }
     }
@@ -207,6 +234,8 @@ class SchoolChallengeController extends Controller
         try {
             $challenge = $this->challengeService->createChallenge($data);
 
+            $this->saveChallengeCriteria($challenge, $request);
+
             // Force clear cache immediately after creation (double-clear to ensure)
             $this->challengeService->clearChallengeCache($user->id, $user->id);
 
@@ -220,7 +249,7 @@ class SchoolChallengeController extends Controller
             return redirect()
                 ->route('school.challenges.index')
                 ->with('success', 'تم إنشاء التحدي بنجاح!');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Error creating challenge: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
             ]);
@@ -228,6 +257,38 @@ class SchoolChallengeController extends Controller
             return back()
                 ->withErrors(['error' => 'حدث خطأ أثناء إنشاء التحدي: ' . $e->getMessage()])
                 ->withInput();
+        }
+    }
+
+    /**
+     * حفظ معايير التقييم المرتبطة بمحتوى هذا التحدي (مقترحة من AI أو معدّلة يدوياً).
+     * تستبدل أي معايير محفوظة سابقاً لهذا التحدي بالكامل بالقائمة الجديدة.
+     */
+    private function saveChallengeCriteria(Challenge $challenge, Request $request): void
+    {
+        $criteria = $request->input('criteria', []);
+        $challenge->acceptanceCriteria()->delete();
+
+        if (!is_array($criteria) || empty($criteria)) {
+            return;
+        }
+
+        $rows = collect($criteria)
+            ->filter(fn ($c) => !empty($c['name_ar']))
+            ->values()
+            ->map(fn ($c, $index) => [
+                'challenge_id' => $challenge->id,
+                'name_ar' => (string) $c['name_ar'],
+                'description_ar' => $c['description_ar'] ?? null,
+                'weight' => (float) ($c['weight'] ?? 0),
+                'order' => $index,
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+        if ($rows->isNotEmpty()) {
+            \App\Models\AcceptanceCriterion::insert($rows->toArray());
         }
     }
 
@@ -243,7 +304,7 @@ class SchoolChallengeController extends Controller
             abort(403, 'غير مصرح لك بالوصول إلى هذا التحدي');
         }
 
-        $challenge->load(['creator', 'school']);
+        $challenge->load(['creator', 'school', 'acceptanceCriteria']);
 
         // Load submission counts
         $challenge->loadCount([
@@ -284,7 +345,7 @@ class SchoolChallengeController extends Controller
             abort(403, 'غير مصرح لك بتعديل هذا التحدي');
         }
 
-        $challenge->load(['creator', 'school']);
+        $challenge->load(['creator', 'school', 'acceptanceCriteria']);
 
         return Inertia::render('School/Challenges/Edit', [
             'challenge' => $challenge,
@@ -318,12 +379,13 @@ class SchoolChallengeController extends Controller
 
         try {
             $this->challengeService->updateChallenge($challenge, $validated);
+            $this->saveChallengeCriteria($challenge, $request);
             $challenge->refresh();
 
             return redirect()
                 ->route('school.challenges.index')
                 ->with('success', 'تم تحديث التحدي بنجاح!');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Error updating challenge: ' . $e->getMessage(), [
                 'challenge_id' => $challenge->id,
                 'trace' => $e->getTraceAsString(),

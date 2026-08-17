@@ -25,6 +25,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'phone',
         'password',
         'role',
+        'custom_role_id',
         'image',
         'points',
         'school_id',
@@ -69,6 +70,22 @@ class User extends Authenticatable implements MustVerifyEmail
     public function teacher(): HasOne
     {
         return $this->hasOne(Teacher::class);
+    }
+
+    public function customRole(): BelongsTo
+    {
+        return $this->belongsTo(CustomRole::class);
+    }
+
+    /**
+     * Display label for the user's role: the admin-defined custom label
+     * (e.g. "المدرب") when set, otherwise the base role's default label.
+     * Permission checks (isTeacher() etc.) must keep reading `role` directly —
+     * this is display-only.
+     */
+    public function roleLabel(): string
+    {
+        return $this->customRole?->name_ar ?? \App\Support\RoleLabels::label($this->role);
     }
 
     public function getTeacherIdAttribute($value)

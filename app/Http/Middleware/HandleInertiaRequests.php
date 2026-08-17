@@ -51,6 +51,7 @@ class HandleInertiaRequests extends Middleware
                     'name' => $user->name,
                     'email' => $user->email,
                     'role' => $user->role,
+                    'role_label' => $user->roleLabel(),
                     'school_id' => $user->school_id,
                     // Only include image if it exists - avoid unnecessary data
                     'image' => $user->image ? (
