@@ -131,6 +131,12 @@ export const en = {
             "arts": "Arts",
             "other": "Other"
         },
+        "curricula": {
+            "british": "British",
+            "american": "American",
+            "ib": "IB",
+            "uaeMinistry": "UAE Ministry of Education"
+        },
         "publicationTypes": {
             "magazine": "Magazine",
             "booklet": "Booklet",
@@ -2175,6 +2181,7 @@ export const en = {
         "searchAndFilter": "Search & filter",
         "fields": {
             "category": "Category",
+            "curriculumType": "Curriculum type",
             "school": "Educational institution",
             "availableToAllSchools": "Available to all educational institutions"
         },
@@ -3107,6 +3114,8 @@ export const en = {
             "descriptionAr": "Description (Arabic)",
             "price": "Total price",
             "baseMonthlyPrice": "Base monthly price",
+            "grade": "Grade",
+            "classSection": "Class section",
             "totalPriceHint": "The final amount saved for the package after applying the selected number of months.",
             "totalPricePreview": "{monthly} × {months} month(s) = {total} {currency}",
             "trialPriceHint": "Trial packages are activated for free and always save as zero cost.",

@@ -40,6 +40,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
         title: '',
         description: '',
         category: '',
+        curriculum_type: '',
         school_id: '',
         for_all_schools: false,
         status: 'pending',
@@ -51,6 +52,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
         title: '',
         description: '',
         category: 'other',
+        curriculum_type: '',
         school_id: '',
         for_all_schools: false,
         status: 'pending',
@@ -90,6 +92,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                     title: project.title || '',
                     description: project.description || '',
                     category: project.category || '',
+                    curriculum_type: project.curriculum_type || '',
                     school_id: project.school_id || '',
                     for_all_schools: !project.school_id,
                     status: project.status || 'pending',
@@ -108,6 +111,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                 title: data.project.title || '',
                 description: data.project.description || '',
                 category: data.project.category || '',
+                curriculum_type: data.project.curriculum_type || '',
                 school_id: data.project.school_id || '',
                 for_all_schools: !data.project.school_id,
                 status: data.project.status || 'pending',
@@ -560,6 +564,28 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                     )}
                                 </div>
 
+                                {/* نوع المنهاج */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        {t('adminProjectsIndexPage.fields.curriculumType')}
+                                    </label>
+                                    <select
+                                        value={editData.curriculum_type}
+                                        onChange={(e) => setEditData('curriculum_type', e.target.value)}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.curriculum_type ? 'border-red-500' : 'border-gray-300'
+                                            }`}
+                                    >
+                                        <option value="">{t('common.selectOption')}</option>
+                                        <option value="بريطانية">{t('common.curricula.british')}</option>
+                                        <option value="أمريكية">{t('common.curricula.american')}</option>
+                                        <option value="IB">{t('common.curricula.ib')}</option>
+                                        <option value="التربية والتعليم">{t('common.curricula.uaeMinistry')}</option>
+                                    </select>
+                                    {editErrors.curriculum_type && (
+                                        <p className="mt-1 text-sm text-red-600">{editErrors.curriculum_type}</p>
+                                    )}
+                                </div>
+
                                 {/* الحالة */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -781,6 +807,28 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                     </select>
                                     {createErrors.category && (
                                         <p className="mt-1 text-sm text-red-600">{createErrors.category}</p>
+                                    )}
+                                </div>
+
+                                {/* نوع المنهاج */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        {t('adminProjectsIndexPage.fields.curriculumType')}
+                                    </label>
+                                    <select
+                                        value={createData.curriculum_type}
+                                        onChange={(e) => setCreateData('curriculum_type', e.target.value)}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${createErrors.curriculum_type ? 'border-red-500' : 'border-gray-300'
+                                            }`}
+                                    >
+                                        <option value="">{t('common.selectOption')}</option>
+                                        <option value="بريطانية">{t('common.curricula.british')}</option>
+                                        <option value="أمريكية">{t('common.curricula.american')}</option>
+                                        <option value="IB">{t('common.curricula.ib')}</option>
+                                        <option value="التربية والتعليم">{t('common.curricula.uaeMinistry')}</option>
+                                    </select>
+                                    {createErrors.curriculum_type && (
+                                        <p className="mt-1 text-sm text-red-600">{createErrors.curriculum_type}</p>
                                     )}
                                 </div>
 

@@ -20,6 +20,8 @@ export default function AdminPackagesCreate() {
         duration_type: 'monthly',
         duration_months: 1,
         students_count: 1,
+        grade: '',
+        class_section: '',
         points_bonus: 0,
         projects_limit: null,
         challenges_limit: null,
@@ -35,6 +37,7 @@ export default function AdminPackagesCreate() {
     });
 
     const isTrial = !!data.is_trial;
+    const isSchoolAudience = data.audience === 'school' || data.audience === 'educational_institution';
     const computedTotalPrice = useMemo(() => {
         if (isTrial) {
             return 0;
@@ -293,6 +296,43 @@ export default function AdminPackagesCreate() {
                                 <p className="mt-1 text-sm text-red-600">{errors.students_count}</p>
                             )}
                         </div>
+
+                        {/* الصف والشعبة (باقات المدارس) */}
+                        {isSchoolAudience && (
+                            <>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        {t('adminPackagesCreatePage.fields.grade')}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={data.grade}
+                                        onChange={(e) => setData('grade', e.target.value)}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.grade ? 'border-red-500' : 'border-gray-300'
+                                            }`}
+                                    />
+                                    {errors.grade && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.grade}</p>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        {t('adminPackagesCreatePage.fields.classSection')}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={data.class_section}
+                                        onChange={(e) => setData('class_section', e.target.value)}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.class_section ? 'border-red-500' : 'border-gray-300'
+                                            }`}
+                                    />
+                                    {errors.class_section && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.class_section}</p>
+                                    )}
+                                </div>
+                            </>
+                        )}
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">

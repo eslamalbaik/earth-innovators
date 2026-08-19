@@ -15,7 +15,7 @@ class AdminProjectController extends Controller
     public function index(Request $request)
     {
         $projects = Project::with(['user:id,name,email', 'school:id,name', 'teacher:id,name_ar'])
-            ->select('id', 'title', 'description', 'user_id', 'school_id', 'teacher_id', 'status', 'category', 'views', 'likes', 'created_at', 'approved_at')
+            ->select('id', 'title', 'description', 'user_id', 'school_id', 'teacher_id', 'status', 'category', 'curriculum_type', 'views', 'likes', 'created_at', 'approved_at')
             ->when($request->filled('search'), function ($q) use ($request) {
                 $search = $request->search;
                 $q->where(function ($query) use ($search) {
@@ -49,6 +49,7 @@ class AdminProjectController extends Controller
                     'teacher_id' => $project->teacher_id,
                     'status' => $project->status,
                     'category' => $project->category,
+                    'curriculum_type' => $project->curriculum_type,
                     'views' => $project->views ?? 0,
                     'likes' => $project->likes ?? 0,
                     'created_at' => $project->created_at->format('Y-m-d'),
@@ -242,6 +243,7 @@ class AdminProjectController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'category' => 'nullable|in:science,technology,engineering,mathematics,arts,other',
+            'curriculum_type' => 'nullable|in:بريطانية,أمريكية,IB,التربية والتعليم',
             'school_id' => 'nullable|exists:users,id',
             'for_all_schools' => 'nullable|boolean',
             'status' => 'required|in:pending,approved,rejected',
@@ -251,6 +253,7 @@ class AdminProjectController extends Controller
             'title.required' => 'عنوان المشروع مطلوب',
             'description.required' => 'وصف المشروع مطلوب',
             'category.in' => 'الفئة يجب أن تكون واحدة من: science, technology, engineering, mathematics, arts, other',
+            'curriculum_type.in' => 'نوع المنهاج غير صالح',
             'school_id.exists' => 'المدرسة المحددة غير موجودة',
         ]);
 
@@ -265,7 +268,8 @@ class AdminProjectController extends Controller
             'title' => $validated['title'],
             'description' => $validated['description'],
             'category' => $validated['category'] ?? 'other',
-            'user_id' => auth()->id(), 
+            'curriculum_type' => $validated['curriculum_type'] ?? null,
+            'user_id' => auth()->id(),
             'school_id' => $schoolId,
             'teacher_id' => null,
             'status' => $validated['status'],
@@ -335,6 +339,7 @@ class AdminProjectController extends Controller
                 'title' => $project->title,
                 'description' => $project->description,
                 'category' => $project->category,
+                'curriculum_type' => $project->curriculum_type,
                 'user_id' => $project->user_id,
                 'school_id' => $project->school_id,
                 'teacher_id' => $project->teacher_id,
@@ -361,6 +366,7 @@ class AdminProjectController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'category' => 'nullable|in:science,technology,engineering,mathematics,arts,other',
+            'curriculum_type' => 'nullable|in:بريطانية,أمريكية,IB,التربية والتعليم',
             'school_id' => 'nullable|exists:users,id',
             'for_all_schools' => 'nullable|boolean',
             'status' => 'required|in:pending,approved,rejected',
@@ -370,6 +376,7 @@ class AdminProjectController extends Controller
             'title.required' => 'عنوان المشروع مطلوب',
             'description.required' => 'وصف المشروع مطلوب',
             'category.in' => 'الفئة يجب أن تكون واحدة من: science, technology, engineering, mathematics, arts, other',
+            'curriculum_type.in' => 'نوع المنهاج غير صالح',
             'school_id.exists' => 'المدرسة المحددة غير موجودة',
         ]);
 
@@ -384,6 +391,7 @@ class AdminProjectController extends Controller
             'title' => $validated['title'],
             'description' => $validated['description'],
             'category' => $validated['category'] ?? null,
+            'curriculum_type' => $validated['curriculum_type'] ?? null,
             'school_id' => $schoolId,
             'teacher_id' => null,
             'status' => $validated['status'],
@@ -472,6 +480,7 @@ class AdminProjectController extends Controller
                 'title' => $project->title,
                 'description' => $project->description,
                 'category' => $project->category,
+                'curriculum_type' => $project->curriculum_type,
                 'status' => $project->status,
                 'files' => $files,
                 'images' => $images,

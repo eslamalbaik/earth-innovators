@@ -21,6 +21,7 @@ class Project extends Model
         'title',
         'description',
         'category',
+        'curriculum_type',
         'status',
         'files',
         'images',

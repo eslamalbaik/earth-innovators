@@ -22,6 +22,8 @@ class Package extends Model
         'duration_type',
         'duration_months',
         'students_count',
+        'grade',
+        'class_section',
         'points_bonus',
         'projects_limit',
         'challenges_limit',

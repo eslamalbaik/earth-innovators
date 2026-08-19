@@ -23,6 +23,8 @@ class StorePackageRequest extends FormRequest
             'duration_type' => 'required|in:monthly,quarterly,yearly,lifetime',
             'duration_months' => 'nullable|integer|min:1',
             'students_count' => 'nullable|integer|min:1',
+            'grade' => 'nullable|string|max:100',
+            'class_section' => 'nullable|string|max:100',
             'points_bonus' => 'integer|min:0',
             'projects_limit' => 'nullable|integer|min:0',
             'challenges_limit' => 'nullable|integer|min:0',

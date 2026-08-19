@@ -131,6 +131,12 @@ export const ar = {
             "arts": "فنون",
             "other": "أخرى"
         },
+        "curricula": {
+            "british": "بريطانية",
+            "american": "أمريكية",
+            "ib": "IB",
+            "uaeMinistry": "التربية والتعليم"
+        },
         "publicationTypes": {
             "magazine": "مجلة",
             "booklet": "كتيب",
@@ -2783,6 +2789,7 @@ export const ar = {
         "searchAndFilter": "البحث والتصفية",
         "fields": {
             "category": "الفئة",
+            "curriculumType": "نوع المنهاج",
             "school": "المؤسسة التعليمية",
             "availableToAllSchools": "متاح لجميع المؤسسات التعليمية"
         },
@@ -3715,6 +3722,8 @@ export const ar = {
             "descriptionAr": "الوصف (عربي)",
             "price": "السعر الإجمالي",
             "baseMonthlyPrice": "السعر الأساسي لكل شهر",
+            "grade": "الصف",
+            "classSection": "الشعبة",
             "totalPriceHint": "هذا هو المبلغ النهائي الذي سيُحفظ للباقة بعد تطبيق عدد الأشهر المحدد.",
             "totalPricePreview": "{monthly} × {months} شهر = {total} {currency}",
             "trialPriceHint": "الباقات التجريبية تُفعَّل مجانًا ويُحفظ سعرها بصفر دائمًا.",
