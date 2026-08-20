@@ -38,14 +38,14 @@ class ReviewController extends Controller
         $this->reviewService->createReview($data, Auth::id());
 
         return redirect()->back()
-            ->with('success', 'تم إضافة التقييم بنجاح');
+            ->with('success', __('messages.msg_118'));
     }
 
     public function publish(Review $review)
     {
         $this->reviewService->togglePublish($review);
 
-        return redirect()->back()->with('success', 'تم تحديث حالة التقييم بنجاح');
+        return redirect()->back()->with('success', __('messages.msg_119'));
     }
 
     public function reply(Request $request, Review $review)
@@ -56,13 +56,13 @@ class ReviewController extends Controller
 
         $this->reviewService->updateReview($review, ['teacher_response' => $validated['teacher_response']]);
 
-        return redirect()->back()->with('success', 'تم إرسال الرد بنجاح');
+        return redirect()->back()->with('success', __('messages.msg_120'));
     }
 
     public function destroy(Review $review)
     {
         $this->reviewService->deleteReview($review);
 
-        return redirect()->back()->with('success', 'تم حذف التقييم بنجاح');
+        return redirect()->back()->with('success', __('messages.msg_121'));
     }
 }

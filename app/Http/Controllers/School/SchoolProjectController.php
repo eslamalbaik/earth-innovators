@@ -302,7 +302,7 @@ class SchoolProjectController extends Controller
                 'reason' => !$isStudentProject && !$isTeacherProject ? 'not_authorized' : 'not_pending',
                 'status' => $project->status,
             ]);
-            abort(403, 'غير مصرح لك بقبول هذا المشروع');
+            abort(403, __('messages.msg_140'));
         }
 
         // تحديث المشروع
@@ -318,7 +318,7 @@ class SchoolProjectController extends Controller
                 'project_id' => $project->id,
                 'school_id' => $school->id,
             ]);
-            return redirect()->back()->with('error', 'حدث خطأ أثناء قبول المشروع');
+            return redirect()->back()->with('error', __('messages.msg_139'));
         }
 
         // تحديث المشروع للتأكد من الحفظ
@@ -332,7 +332,7 @@ class SchoolProjectController extends Controller
                 'status' => $project->status,
                 'expected' => 'approved',
             ]);
-            return redirect()->back()->with('error', 'حدث خطأ أثناء قبول المشروع');
+            return redirect()->back()->with('error', __('messages.msg_139'));
         }
 
         Log::info('Project approved successfully', [
@@ -404,7 +404,7 @@ class SchoolProjectController extends Controller
         $isTeacherProject = $project->teacher_id !== null && (int) $project->school_id === (int) $school->id;
 
         if (!$school->canAccessAllSchoolData() && ((!$isStudentProject && !$isTeacherProject) || $project->status !== 'pending')) {
-            abort(403, 'غير مصرح لك برفض هذا المشروع');
+            abort(403, __('messages.msg_141'));
         }
 
         $project->update([
@@ -432,7 +432,7 @@ class SchoolProjectController extends Controller
 
         // التحقق من الصلاحية
         if (!$school->canAccessAllSchoolData() && !in_array($project->user_id, $students->toArray()) && (int) $project->school_id !== (int) $school->id) {
-            abort(403, 'غير مصرح لك بعرض هذا المشروع');
+            abort(403, __('messages.msg_115'));
         }
 
         $project->load('user', 'challenges', 'school', 'approver');
@@ -453,7 +453,7 @@ class SchoolProjectController extends Controller
         $isStudentProject = in_array($project->user_id, $students) && (int) $project->school_id === (int) $school->id;
         $isTeacherProject = $project->teacher_id !== null && (int) $project->school_id === (int) $school->id;
         if (!$school->canAccessAllSchoolData() && !$isSchoolProject && !$isStudentProject && !$isTeacherProject) {
-            abort(403, 'غير مصرح لك بتعديل هذا المشروع');
+            abort(403, __('messages.msg_142'));
         }
 
         return Inertia::render('School/Projects/Edit', [
@@ -472,7 +472,7 @@ class SchoolProjectController extends Controller
         $isStudentProject = in_array($project->user_id, $students) && (int) $project->school_id === (int) $school->id;
         $isTeacherProject = $project->teacher_id !== null && (int) $project->school_id === (int) $school->id;
         if (!$school->canAccessAllSchoolData() && !$isSchoolProject && !$isStudentProject && !$isTeacherProject) {
-            abort(403, 'غير مصرح لك بتعديل هذا المشروع');
+            abort(403, __('messages.msg_142'));
         }
 
         $validated = $request->validate([
@@ -614,7 +614,7 @@ class SchoolProjectController extends Controller
         $isTeacherProject = $project->teacher_id !== null && (int) $project->school_id === (int) $school->id;
 
         if (!$school->canAccessAllSchoolData() && !$isSchoolProject && !$isStudentProject && !$isTeacherProject) {
-            abort(403, 'غير مصرح لك بحذف هذا المشروع');
+            abort(403, __('messages.msg_143'));
         }
 
         // حذف الملفات

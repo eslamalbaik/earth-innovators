@@ -16,17 +16,17 @@ class ChallengeSubmissionController extends Controller
         $user = Auth::user();
 
         if (!$user || !$user->isStudent()) {
-            abort(403, 'فقط الطلاب يمكنهم تسليم التحديات');
+            abort(403, __('messages.msg_090'));
         }
 
         if ($challenge->school_id !== $user->school_id) {
-            abort(403, 'هذا التحدي غير متاح لمدرستك');
+            abort(403, __('messages.msg_091'));
         }
 
         if ($challenge->status !== 'active' || 
             $challenge->start_date > now() || 
             $challenge->deadline < now()) {
-            abort(403, 'هذا التحدي غير متاح حالياً');
+            abort(403, __('messages.msg_092'));
         }
 
         $existingSubmission = ChallengeSubmission::where('challenge_id', $challenge->id)
@@ -34,13 +34,13 @@ class ChallengeSubmissionController extends Controller
             ->first();
 
         if ($existingSubmission) {
-            return back()->withErrors(['error' => 'لقد قمت بتسليم هذا التحدي مسبقاً']);
+            return back()->withErrors(['error' => __('messages.msg_087')]);
         }
 
         if ($challenge->max_participants) {
             $currentParticipants = ChallengeSubmission::where('challenge_id', $challenge->id)->count();
             if ($currentParticipants >= $challenge->max_participants) {
-                return back()->withErrors(['error' => 'تم الوصول إلى الحد الأقصى للمشاركين']);
+                return back()->withErrors(['error' => __('messages.msg_088')]);
             }
         }
 
@@ -72,7 +72,7 @@ class ChallengeSubmissionController extends Controller
 
             $challenge->increment('current_participants');
 
-            return back()->with('success', 'تم تسليم التحدي بنجاح!');
+            return back()->with('success', __('messages.msg_085'));
         } catch (\Exception $e) {
             Log::error('Error submitting challenge: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
@@ -90,11 +90,11 @@ class ChallengeSubmissionController extends Controller
         $user = Auth::user();
 
         if ($submission->student_id !== $user->id) {
-            abort(403, 'غير مصرح لك بتعديل هذا التسليم');
+            abort(403, __('messages.msg_093'));
         }
 
         if ($submission->status !== 'submitted') {
-            return back()->withErrors(['error' => 'لا يمكن تعديل تسليم تم تقييمه']);
+            return back()->withErrors(['error' => __('messages.msg_089')]);
         }
 
         $validated = $request->validate([
@@ -127,7 +127,7 @@ class ChallengeSubmissionController extends Controller
                 'files' => !empty($files) ? $files : null,
             ]);
 
-            return back()->with('success', 'تم تحديث التسليم بنجاح!');
+            return back()->with('success', __('messages.msg_086'));
         } catch (\Exception $e) {
             Log::error('Error updating challenge submission: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),

@@ -71,7 +71,7 @@ class AchievementController extends Controller
 
         return redirect()
             ->route('innovation.achievements.show', $achievement)
-            ->with('success', 'تم إضافة الإنجاز بنجاح! جاري التحليل بالذكاء الاصطناعي...');
+            ->with('success', __('messages.msg_001'));
     }
 
     /**
@@ -125,7 +125,7 @@ class AchievementController extends Controller
 
         return redirect()
             ->route('innovation.achievements.show', $achievement)
-            ->with('success', 'تم تعديل الإنجاز. جاري إعادة التحليل...');
+            ->with('success', __('messages.msg_002'));
     }
 
     /**
@@ -139,7 +139,7 @@ class AchievementController extends Controller
 
         return redirect()
             ->route('innovation.achievements.index')
-            ->with('success', 'تم حذف الإنجاز.');
+            ->with('success', __('messages.msg_003'));
     }
 
     /**
@@ -155,6 +155,6 @@ class AchievementController extends Controller
 
         $attachment = $this->achievementService->uploadAttachment($achievement, $request->file('file'));
 
-        return back()->with('success', 'تم رفع الملف بنجاح.');
+        return back()->with('success', __('messages.msg_004'));
     }
 }

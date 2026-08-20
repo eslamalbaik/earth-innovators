@@ -66,7 +66,7 @@ class SchoolStudentController extends Controller
             $this->studentService->attachExistingStudentToSchool((int) $request->validated()['existing_student_id'], $school->id);
 
             return redirect()->route('school.students.index')
-                ->with('success', 'تم ربط الطالب بالمدرسة بنجاح');
+                ->with('success', __('messages.msg_149'));
         }
 
         $dto = StoreStudentDTO::fromRequest($request->validated(), $school->id);
@@ -74,7 +74,7 @@ class SchoolStudentController extends Controller
         $this->studentService->storeStudent($dto);
 
         return redirect()->route('school.students.index')
-            ->with('success', 'تم إضافة الطالب بنجاح');
+            ->with('success', __('messages.msg_150'));
     }
 
     public function show($id)
@@ -99,7 +99,7 @@ class SchoolStudentController extends Controller
         $this->studentService->updateStudent($id, $school->id, $dto);
 
         return redirect()->route('school.students.index')
-            ->with('success', 'تم تحديث بيانات الطالب بنجاح');
+            ->with('success', __('messages.msg_061'));
     }
 
     public function destroy($id)
@@ -109,7 +109,7 @@ class SchoolStudentController extends Controller
         $this->studentService->deleteStudent($id, $school->id);
 
         return redirect()->route('school.students.index')
-            ->with('success', 'تم حذف الطالب بنجاح');
+            ->with('success', __('messages.msg_062'));
     }
 
     public function awardBadge(AwardBadgeRequest $request, $id)
@@ -124,7 +124,7 @@ class SchoolStudentController extends Controller
                 $request->validated()['reason'] ?? null
             );
 
-            return back()->with('success', 'تم منح الشارة للطالب بنجاح');
+            return back()->with('success', __('messages.msg_151'));
         } catch (\Exception $e) {
             return back()->withErrors(['badge_id' => $e->getMessage()]);
         }
@@ -149,6 +149,6 @@ class SchoolStudentController extends Controller
 
         $this->studentService->removeBadge($studentId, $school->id, $badgeId);
 
-        return back()->with('success', 'تم إزالة الشارة بنجاح');
+        return back()->with('success', __('messages.msg_152'));
     }
 }

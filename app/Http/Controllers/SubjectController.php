@@ -50,7 +50,7 @@ class SubjectController extends Controller
 
         $this->subjectService->createSubject($data);
 
-        return redirect()->back()->with('success', 'تم إضافة المادة بنجاح');
+        return redirect()->back()->with('success', __('messages.msg_174'));
     }
 
     public function show(string $id) {}
@@ -74,7 +74,7 @@ class SubjectController extends Controller
 
         $this->subjectService->updateSubject($subject, $data);
 
-        return redirect()->back()->with('success', 'تم تحديث المادة بنجاح');
+        return redirect()->back()->with('success', __('messages.msg_177'));
     }
 
     public function destroy(string $id)
@@ -82,6 +82,6 @@ class SubjectController extends Controller
         $subject = Subject::findOrFail($id);
         $this->subjectService->deleteSubject($subject);
 
-        return redirect()->back()->with('success', 'تم حذف المادة بنجاح');
+        return redirect()->back()->with('success', __('messages.msg_176'));
     }
 }

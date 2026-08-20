@@ -426,7 +426,7 @@ class TeacherController extends Controller
 
             DB::commit();
             return redirect()->route('admin.teachers.index')
-                ->with('success', 'تم إضافة المعلم بنجاح');
+                ->with('success', __('messages.msg_155'));
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withErrors(['error' => 'حدث خطأ أثناء إضافة المعلم: ' . $e->getMessage()]);
@@ -889,7 +889,7 @@ class TeacherController extends Controller
         }
 
         return redirect()->route('admin.teachers.index')
-            ->with('success', 'تم تحديث بيانات المعلم بنجاح');
+            ->with('success', __('messages.msg_156'));
     }
 
     public function destroy(string $id)
@@ -906,7 +906,7 @@ class TeacherController extends Controller
         $teacher->delete();
 
         return redirect()->route('admin.teachers.index')
-            ->with('success', 'تم حذف المعلم بنجاح');
+            ->with('success', __('messages.msg_189'));
     }
 
     public function verify(Teacher $teacher)
@@ -914,7 +914,7 @@ class TeacherController extends Controller
         $teacher->update(['is_verified' => true]);
 
         return redirect()->back()
-            ->with('success', 'تم توثيق المعلم بنجاح');
+            ->with('success', __('messages.msg_190'));
     }
 
     public function activate(Teacher $teacher)
@@ -922,7 +922,7 @@ class TeacherController extends Controller
         $teacher->update(['is_active' => !$teacher->is_active]);
 
         return redirect()->back()
-            ->with('success', 'تم تحديث حالة المعلم بنجاح');
+            ->with('success', __('messages.msg_191'));
     }
 
     public function availabilities(Teacher $teacher)
@@ -999,7 +999,7 @@ class TeacherController extends Controller
             $teachesSubject = $teacher->subjectsRelation()->where('subjects.id', $subjectId)->exists();
             if (!$teachesSubject) {
                 return redirect()->back()
-                    ->with('error', 'هذا المعلم لا يدرس هذه المادة')
+                    ->with('error', __('messages.msg_077'))
                     ->withInput();
             }
         }
@@ -1031,7 +1031,7 @@ class TeacherController extends Controller
 
         if ($overlapping) {
             return redirect()->back()
-                ->with('error', 'هذا الوقت متداخل مع موعد آخر موجود')
+                ->with('error', __('messages.msg_192'))
                 ->withInput();
         }
 
@@ -1045,7 +1045,7 @@ class TeacherController extends Controller
         ]);
 
         return redirect()->route('admin.teachers.availabilities', $teacher->id)
-            ->with('success', 'تم إضافة الوقت بنجاح');
+            ->with('success', __('messages.msg_193'));
     }
 
     public function updateAvailability(Request $request, Teacher $teacher, $id)
@@ -1063,7 +1063,7 @@ class TeacherController extends Controller
 
         if ($availability->status === 'booked') {
             return redirect()->back()
-                ->with('error', 'لا يمكن تعديل وقت محجوز');
+                ->with('error', __('messages.msg_194'));
         }
 
         $subjectId = null;
@@ -1073,7 +1073,7 @@ class TeacherController extends Controller
             $teachesSubject = $teacher->subjectsRelation()->where('subjects.id', $subjectId)->exists();
             if (!$teachesSubject) {
                 return redirect()->back()
-                    ->with('error', 'هذا المعلم لا يدرس هذه المادة')
+                    ->with('error', __('messages.msg_077'))
                     ->withInput();
             }
         }
@@ -1106,7 +1106,7 @@ class TeacherController extends Controller
 
         if ($overlapping) {
             return redirect()->back()
-                ->with('error', 'هذا الوقت متداخل مع موعد آخر موجود')
+                ->with('error', __('messages.msg_192'))
                 ->withInput();
         }
 
@@ -1118,7 +1118,7 @@ class TeacherController extends Controller
         ]);
 
         return redirect()->route('admin.teachers.availabilities', $teacher->id)
-            ->with('success', 'تم تحديث الوقت بنجاح');
+            ->with('success', __('messages.msg_195'));
     }
 
     public function destroyAvailability(Teacher $teacher, $id)
@@ -1129,13 +1129,13 @@ class TeacherController extends Controller
 
         if ($availability->status === 'booked') {
             return redirect()->back()
-                ->with('error', 'لا يمكن حذف وقت محجوز');
+                ->with('error', __('messages.msg_196'));
         }
 
         $availability->delete();
 
         return redirect()->route('admin.teachers.availabilities', $teacher->id)
-            ->with('success', 'تم حذف الوقت بنجاح');
+            ->with('success', __('messages.msg_197'));
     }
 
     public function export()

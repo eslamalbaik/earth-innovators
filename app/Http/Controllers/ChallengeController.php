@@ -342,7 +342,7 @@ class ChallengeController extends Controller
             }
 
             if ($userSchoolId && (int) $challenge->school_id !== (int) $userSchoolId && (int) $challenge->created_by !== (int) $user->id) {
-                abort(403, 'غير مصرح لك بالوصول إلى هذا التحدي');
+                abort(403, __('messages.msg_084'));
             }
         }
 

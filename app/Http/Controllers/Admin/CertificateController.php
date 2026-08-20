@@ -150,7 +150,7 @@ class CertificateController extends Controller
             $certificate = Certificate::create($validated);
 
             return redirect()->route('admin.certificates.index')
-                ->with('success', 'تم إنشاء الشهادة بنجاح');
+                ->with('success', __('messages.msg_043'));
         } catch (\Exception $e) {
             \Log::error('Certificate creation error: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
@@ -229,7 +229,7 @@ class CertificateController extends Controller
         $certificate->update($validated);
 
         return redirect()->route('admin.certificates.index')
-            ->with('success', 'تم تحديث الشهادة بنجاح');
+            ->with('success', __('messages.msg_044'));
     }
 
     public function destroy(Certificate $certificate)
@@ -242,13 +242,13 @@ class CertificateController extends Controller
         $certificate->delete();
 
         return redirect()->route('admin.certificates.index')
-            ->with('success', 'تم حذف الشهادة بنجاح');
+            ->with('success', __('messages.msg_045'));
     }
 
     public function download(Request $request, Certificate $certificate)
     {
         if (false && (!$certificate->file_path || !Storage::disk('public')->exists($certificate->file_path))) {
-            abort(404, 'ملف الشهادة غير موجود');
+            abort(404, __('messages.msg_046'));
         }
 
         try {

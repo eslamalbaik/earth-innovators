@@ -29,7 +29,7 @@ class PasswordResetOtpController extends Controller
 
         if (!$otp || $otp->purpose !== 'password_reset') {
             return redirect()->route('password.request')
-                ->withErrors(['token' => 'رمز التحقق غير صحيح أو منتهي الصلاحية.']);
+                ->withErrors(['token' => __('messages.msg_072')]);
         }
 
         return Inertia::render('Auth/ResetPasswordOtp', [
@@ -65,7 +65,7 @@ class PasswordResetOtpController extends Controller
 
             // Redirect to password reset form with verified token
             return redirect()->route('password.reset.form', ['token' => $request->token])
-                ->with('status', 'تم التحقق من الرمز بنجاح. يرجى إدخال كلمة المرور الجديدة.');
+                ->with('status', __('messages.msg_071'));
         } catch (ValidationException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -89,7 +89,7 @@ class PasswordResetOtpController extends Controller
 
         if (!$otp) {
             return redirect()->route('password.request')
-                ->withErrors(['token' => 'الرابط غير صحيح أو منتهي الصلاحية. يرجى طلب رمز جديد.']);
+                ->withErrors(['token' => __('messages.msg_073')]);
         }
 
         return Inertia::render('Auth/ResetPassword', [
@@ -132,7 +132,7 @@ class PasswordResetOtpController extends Controller
                 event(new PasswordReset($user));
             }
 
-            return redirect()->route('login')->with('status', 'تم إعادة تعيين كلمة المرور بنجاح.');
+            return redirect()->route('login')->with('status', __('messages.msg_068'));
         } catch (ValidationException $e) {
             throw $e;
         } catch (\Exception $e) {

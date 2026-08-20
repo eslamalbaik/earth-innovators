@@ -97,7 +97,7 @@ class AdminChallengeSubmissionController extends Controller
 
             return redirect()
                 ->route('admin.challenge-submissions.index', $submission->challenge_id)
-                ->with('success', 'تم إرسال التقييم بنجاح!');
+                ->with('success', __('messages.msg_015'));
         } catch (\Exception $e) {
             Log::error('Error evaluating submission (Admin): ' . $e->getMessage(), [
                 'submission_id' => $submission->id,

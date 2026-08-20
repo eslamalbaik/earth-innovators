@@ -248,7 +248,7 @@ class StudentProfileController extends Controller
 
         // Check if user is a student
         if (!$user || !$user->isStudent()) {
-            return redirect()->back()->with('error', 'غير مصرح لك بهذا الإجراء');
+            return redirect()->back()->with('error', __('messages.msg_099'));
         }
 
         $request->validate([
@@ -257,7 +257,7 @@ class StudentProfileController extends Controller
 
         $school = \App\Models\User::find($request->school_id);
         if (!$school || !$school->isSchool()) {
-            return redirect()->back()->with('error', 'المدرسة المحددة غير صحيحة');
+            return redirect()->back()->with('error', __('messages.msg_164'));
         }
 
         $user->update([
@@ -269,7 +269,7 @@ class StudentProfileController extends Controller
         $this->activityService->clearActivityCache($user->id);
 
         return redirect()->route('student.profile')
-            ->with('success', 'تم تحديث المدرسة بنجاح');
+            ->with('success', __('messages.msg_165'));
     }
 }
 

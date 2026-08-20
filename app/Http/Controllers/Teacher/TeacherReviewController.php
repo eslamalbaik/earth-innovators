@@ -23,7 +23,7 @@ class TeacherReviewController extends Controller
         $teacher = $user->teacher;
 
         if (!$teacher) {
-            return redirect()->route('dashboard')->with('error', 'لم يتم العثور على بيانات المعلم');
+            return redirect()->route('dashboard')->with('error', __('messages.msg_075'));
         }
 
         $reviews = Review::with(['student:id,name,image', 'booking:id,subject'])
@@ -68,7 +68,7 @@ class TeacherReviewController extends Controller
         $teacher = $user->teacher;
 
         if (!$teacher || $review->teacher_id !== $teacher->id) {
-            return back()->with('error', 'غير مصرح لك بالوصول إلى هذا التقييم');
+            return back()->with('error', __('messages.msg_188'));
         }
 
         $request->validate([
@@ -79,6 +79,6 @@ class TeacherReviewController extends Controller
             'teacher_response' => $request->teacher_response
         ]);
 
-        return redirect()->back()->with('success', 'تم إرسال الرد بنجاح');
+        return redirect()->back()->with('success', __('messages.msg_120'));
     }
 }

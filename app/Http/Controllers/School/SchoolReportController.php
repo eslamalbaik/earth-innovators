@@ -60,7 +60,7 @@ class SchoolReportController extends Controller
         ]);
 
         return redirect()->route('school.reports.index')
-            ->with('success', 'تم إنشاء التقرير بنجاح');
+            ->with('success', __('messages.msg_146'));
     }
 
     private function buildReportData(User $user, Request $request): array
@@ -133,7 +133,7 @@ class SchoolReportController extends Controller
             return (int) $user->teacher->school_id;
         }
 
-        abort(403, 'لا يمكن تحديد المدرسة المرتبطة بهذا الحساب.');
+        abort(403, __('messages.msg_147'));
     }
 
     private function applyDateFilters(Builder $query, int $year, ?int $month): void
@@ -190,7 +190,7 @@ class SchoolReportController extends Controller
         }
 
         if (!class_exists(\TCPDF::class)) {
-            abort(500, 'مكتبة PDF غير متاحة حاليًا.');
+            abort(500, __('messages.msg_148'));
         }
 
         $meta = $reportData['reportMeta'];

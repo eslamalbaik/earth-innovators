@@ -27,7 +27,7 @@ class TeacherSubmissionController extends Controller
 
         if (!$teacherModel) {
             return redirect()->route('teacher.dashboard')
-                ->with('error', 'لم يتم العثور على بيانات المعلم');
+                ->with('error', __('messages.msg_075'));
         }
 
         $submissions = $this->submissionService->getTeacherSubmissions(
@@ -51,12 +51,12 @@ class TeacherSubmissionController extends Controller
         $teacherModel = $user->teacher;
 
         if (!$teacherModel) {
-            abort(403, 'لم يتم العثور على بيانات المعلم');
+            abort(403, __('messages.msg_075'));
         }
 
         // التحقق من أن المشروع للمعلم
         if ($submission->project->teacher_id !== $teacherModel->id) {
-            abort(403, 'غير مصرح لك بعرض هذا التسليم');
+            abort(403, __('messages.msg_153'));
         }
 
         // المشاريع التي أنشأها المعلم
@@ -101,7 +101,7 @@ class TeacherSubmissionController extends Controller
         $teacherModel = $user->teacher;
 
         if (!$teacherModel) {
-            abort(403, 'لم يتم العثور على بيانات المعلم');
+            abort(403, __('messages.msg_075'));
         }
 
         $request->validate([
@@ -126,7 +126,7 @@ class TeacherSubmissionController extends Controller
                 $teacherModel->id
             );
 
-            return redirect()->back()->with('success', 'تم تقييم التسليم بنجاح!');
+            return redirect()->back()->with('success', __('messages.msg_034'));
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }

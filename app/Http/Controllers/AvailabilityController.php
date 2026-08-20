@@ -49,7 +49,7 @@ class AvailabilityController extends Controller
         $teacher = auth()->user()->teacher;
 
         if (!$teacher) {
-            return redirect()->route('dashboard')->with('error', 'تم رفض الوصول');
+            return redirect()->route('dashboard')->with('error', __('messages.msg_074'));
         }
 
         $availabilities = $this->availabilityService->getTeacherAvailabilities(
@@ -93,7 +93,7 @@ class AvailabilityController extends Controller
 
         $teacher = auth()->user()->teacher;
         if (!$teacher) {
-            return redirect()->route('teacher.availability.index')->with('error', 'لم يتم العثور على بيانات المعلم');
+            return redirect()->route('teacher.availability.index')->with('error', __('messages.msg_075'));
         }
 
         $subjectId = null;
@@ -105,7 +105,7 @@ class AvailabilityController extends Controller
         if ($subjectId) {
             $subjectModel = \App\Models\Subject::find($subjectId);
             if (!$subjectModel) {
-                return redirect()->route('teacher.availability.index')->with('error', 'المادة المحددة غير موجودة');
+                return redirect()->route('teacher.availability.index')->with('error', __('messages.msg_076'));
             }
 
             $teachesSubject = $teacher->subjectsRelation()->where('subjects.id', $subjectId)->exists();
@@ -118,7 +118,7 @@ class AvailabilityController extends Controller
                     in_array($subjectModel->name_en, $teacherSubjectsEn);
 
                 if (!$hasSubject) {
-                    return redirect()->route('teacher.availability.index')->with('error', 'هذا المعلم لا يدرس هذه المادة');
+                    return redirect()->route('teacher.availability.index')->with('error', __('messages.msg_077'));
                 }
             }
         }
@@ -180,7 +180,7 @@ class AvailabilityController extends Controller
             ]);
 
             \Log::info('Availability created successfully', ['id' => $availability->id]);
-            return redirect()->route('teacher.availability.index')->with('success', 'تم إضافة الموعد بنجاح');
+            return redirect()->route('teacher.availability.index')->with('success', __('messages.msg_078'));
         } catch (\Exception $e) {
             \Log::error('Error creating availability', [
                 'error' => $e->getMessage(),
@@ -197,7 +197,7 @@ class AvailabilityController extends Controller
         $userTeacher = auth()->user()->teacher;
 
         if (!auth()->user()->isAdmin() && (!$userTeacher || $userTeacher->id !== $availability->teacher_id)) {
-            return redirect()->route('teacher.availability.index')->with('error', 'غير مصرح لك بتعديل هذا الموعد');
+            return redirect()->route('teacher.availability.index')->with('error', __('messages.msg_079'));
         }
 
         try {
@@ -206,7 +206,7 @@ class AvailabilityController extends Controller
                 $request->validated(),
                 $availability->teacher_id
             );
-            return redirect()->route('teacher.availability.index')->with('success', 'تم تحديث الموعد بنجاح');
+            return redirect()->route('teacher.availability.index')->with('success', __('messages.msg_080'));
         } catch (\Exception $e) {
             return redirect()->route('teacher.availability.index')
                 ->with('error', $e->getMessage())
@@ -220,12 +220,12 @@ class AvailabilityController extends Controller
         $userTeacher = auth()->user()->teacher;
 
         if (!auth()->user()->isAdmin() && (!$userTeacher || $userTeacher->id !== $availability->teacher_id)) {
-            return redirect()->route('teacher.availability.index')->with('error', 'غير مصرح لك بحذف هذا الموعد');
+            return redirect()->route('teacher.availability.index')->with('error', __('messages.msg_081'));
         }
 
         try {
             $this->availabilityService->deleteAvailability($availability, $availability->teacher_id);
-            return redirect()->route('teacher.availability.index')->with('success', 'تم حذف الموعد بنجاح');
+            return redirect()->route('teacher.availability.index')->with('success', __('messages.msg_082'));
         } catch (\Exception $e) {
             return redirect()->route('teacher.availability.index')->with('error', $e->getMessage());
         }

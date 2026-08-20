@@ -58,7 +58,7 @@ class NewPasswordController extends Controller
                 event(new PasswordReset($user));
             }
 
-            return redirect()->route('login')->with('status', 'تم إعادة تعيين كلمة المرور بنجاح.');
+            return redirect()->route('login')->with('status', __('messages.msg_068'));
         } catch (\Exception $e) {
             throw ValidationException::withMessages([
                 'email' => ['حدث خطأ أثناء إعادة تعيين كلمة المرور. يرجى المحاولة مرة أخرى.'],

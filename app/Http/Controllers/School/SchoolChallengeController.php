@@ -28,7 +28,7 @@ class SchoolChallengeController extends Controller
 
         // التحقق من أن المستخدم لديه صلاحية المدرسة
         if (!$user || !$user->isSchool()) {
-            abort(403, 'غير مصرح لك بالوصول إلى هذه الصفحة. يجب أن تكون مسجلًا كمدرسة.');
+            abort(403, __('messages.msg_134'));
         }
 
         $challenges = $this->challengeService->getSchoolChallenges(
@@ -248,7 +248,7 @@ class SchoolChallengeController extends Controller
 
             return redirect()
                 ->route('school.challenges.index')
-                ->with('success', 'تم إنشاء التحدي بنجاح!');
+                ->with('success', __('messages.msg_131'));
         } catch (\Throwable $e) {
             Log::error('Error creating challenge: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
@@ -301,7 +301,7 @@ class SchoolChallengeController extends Controller
 
         // التحقق من أن التحدي للمدرسة الحالية
         if (!$user->canAccessAllSchoolData() && $challenge->school_id !== $user->id) {
-            abort(403, 'غير مصرح لك بالوصول إلى هذا التحدي');
+            abort(403, __('messages.msg_084'));
         }
 
         $challenge->load(['creator', 'school', 'acceptanceCriteria']);
@@ -342,7 +342,7 @@ class SchoolChallengeController extends Controller
 
         // التحقق من أن التحدي للمدرسة الحالية
         if (!$user->canAccessAllSchoolData() && $challenge->school_id !== $user->id) {
-            abort(403, 'غير مصرح لك بتعديل هذا التحدي');
+            abort(403, __('messages.msg_135'));
         }
 
         $challenge->load(['creator', 'school', 'acceptanceCriteria']);
@@ -364,7 +364,7 @@ class SchoolChallengeController extends Controller
 
         // التحقق من أن التحدي للمدرسة الحالية
         if (!$user->canAccessAllSchoolData() && $challenge->school_id !== $user->id) {
-            abort(403, 'غير مصرح لك بتعديل هذا التحدي');
+            abort(403, __('messages.msg_135'));
         }
 
         $validated = $request->validated();
@@ -384,7 +384,7 @@ class SchoolChallengeController extends Controller
 
             return redirect()
                 ->route('school.challenges.index')
-                ->with('success', 'تم تحديث التحدي بنجاح!');
+                ->with('success', __('messages.msg_132'));
         } catch (\Throwable $e) {
             Log::error('Error updating challenge: ' . $e->getMessage(), [
                 'challenge_id' => $challenge->id,
@@ -406,7 +406,7 @@ class SchoolChallengeController extends Controller
 
         // التحقق من أن التحدي للمدرسة الحالية
         if (!$user->canAccessAllSchoolData() && $challenge->school_id !== $user->id) {
-            abort(403, 'غير مصرح لك بحذف هذا التحدي');
+            abort(403, __('messages.msg_136'));
         }
 
         try {
@@ -414,7 +414,7 @@ class SchoolChallengeController extends Controller
 
             return redirect()
                 ->route('school.challenges.index')
-                ->with('success', 'تم حذف التحدي بنجاح!');
+                ->with('success', __('messages.msg_133'));
         } catch (\Exception $e) {
             Log::error('Error deleting challenge: ' . $e->getMessage(), [
                 'challenge_id' => $challenge->id,

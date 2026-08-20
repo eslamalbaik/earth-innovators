@@ -26,7 +26,7 @@ class TeacherProjectController extends Controller
         $teacher = $user ? $this->resolveTeacherProfile($user) : null;
 
         if (!$teacher) {
-            abort(403, 'لم يتم العثور على بيانات المعلم');
+            abort(403, __('messages.msg_075'));
         }
 
         $projects = $this->projectService->getTeacherProjects($teacher->id, 12)->withQueryString();
@@ -312,7 +312,7 @@ class TeacherProjectController extends Controller
         }
 
         return redirect()->route('teacher.projects.index')
-            ->with('success', 'تم إرسال المشروع بنجاح! سيتم مراجعته من قبل المدرسة قريباً.');
+            ->with('success', __('messages.msg_182'));
     }
 
     /**
@@ -350,12 +350,12 @@ class TeacherProjectController extends Controller
         $teacher = $user->teacher;
         
         if (!$teacher) {
-            abort(403, 'لم يتم العثور على بيانات المعلم');
+            abort(403, __('messages.msg_075'));
         }
         
         // التحقق من أن المشروع منشأ من قبل هذا المعلم
         if ($project->teacher_id !== $teacher->id) {
-            abort(403, 'غير مصرح لك بعرض هذا المشروع');
+            abort(403, __('messages.msg_115'));
         }
 
         $project->load(['school', 'approver', 'user', 'teacher', 'submissions.student']);
@@ -425,18 +425,18 @@ class TeacherProjectController extends Controller
         $teacher = $user->teacher;
         
         if (!$teacher) {
-            abort(403, 'لم يتم العثور على بيانات المعلم');
+            abort(403, __('messages.msg_075'));
         }
         
         // التحقق من أن المشروع منشأ من قبل هذا المعلم
         if ($project->teacher_id !== $teacher->id) {
-            abort(403, 'غير مصرح لك بتعديل هذا المشروع');
+            abort(403, __('messages.msg_142'));
         }
 
         // السماح بالتعديل فقط إذا كان المشروع في حالة pending
         if ($project->status !== 'pending') {
             return redirect()->route('teacher.projects.index')
-                ->with('error', 'لا يمكن تعديل المشروع بعد الموافقة عليه أو رفضه');
+                ->with('error', __('messages.msg_183'));
         }
 
         $project->load(['school']);
@@ -465,12 +465,12 @@ class TeacherProjectController extends Controller
         $teacher = $user->teacher;
         
         if (!$teacher) {
-            abort(403, 'لم يتم العثور على بيانات المعلم');
+            abort(403, __('messages.msg_075'));
         }
         
         // التحقق من أن المشروع منشأ من قبل هذا المعلم
         if ($project->teacher_id !== $teacher->id) {
-            abort(403, 'غير مصرح لك بتعديل هذا المشروع');
+            abort(403, __('messages.msg_142'));
         }
 
         // السماح بالتعديل فقط إذا كان المشروع في حالة pending
@@ -613,7 +613,7 @@ class TeacherProjectController extends Controller
         $this->projectService->clearProjectCache($project->id, null, $teacher->id, $schoolId);
 
         return redirect()->route('teacher.projects.index')
-            ->with('success', 'تم تحديث المشروع بنجاح!');
+            ->with('success', __('messages.msg_184'));
     }
 
     /**
@@ -625,7 +625,7 @@ class TeacherProjectController extends Controller
         $teacher = $user->teacher;
         
         if (!$teacher) {
-            abort(403, 'لم يتم العثور على بيانات المعلم');
+            abort(403, __('messages.msg_075'));
         }
 
         // البحث عن المشروع
@@ -639,7 +639,7 @@ class TeacherProjectController extends Controller
         
         // التحقق من أن المشروع منشأ من قبل هذا المعلم
         if ($project->teacher_id !== $teacher->id) {
-            abort(403, 'غير مصرح لك بحذف هذا المشروع');
+            abort(403, __('messages.msg_143'));
         }
 
         // السماح بالحذف فقط إذا كان المشروع في حالة pending
@@ -682,7 +682,7 @@ class TeacherProjectController extends Controller
             }
 
             return redirect()->route('teacher.projects.index')
-                ->with('success', 'تم حذف المشروع بنجاح!');
+                ->with('success', __('messages.msg_185'));
         } catch (\Exception $e) {
             \Log::error('Error deleting project: ' . $e->getMessage(), [
                 'project_id' => $project->id,

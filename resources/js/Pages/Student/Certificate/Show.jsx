@@ -1,4 +1,4 @@
-﻿import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { FaDownload, FaPrint, FaShare, FaCalendarAlt, FaProjectDiagram, FaMedal, FaLock } from 'react-icons/fa';
 import { useRef } from 'react';
 import { usePremiumGate } from '@/Hooks/usePremiumGate';
@@ -9,6 +9,7 @@ import DesktopFooter from '@/Components/Mobile/DesktopFooter';
 import { useTranslation } from '@/i18n';
 import { useToast } from '@/Contexts/ToastContext';
 import { downloadElementAsImage, printElementAsImage, shareElementAsImage } from '@/utils/downloadElementAsImage';
+import CertificateCard from '@/Components/Certificate/CertificateCard';
 
 export default function StudentCertificateShow({ auth, user, stats, certificate, membershipSummary = null }) {
     const { t, language } = useTranslation();
@@ -179,74 +180,13 @@ export default function StudentCertificateShow({ auth, user, stats, certificate,
                                 <h2 className="text-base font-bold text-gray-900 mb-4 no-print">{t('studentCertificateShowPage.certificate.title')}</h2>
 
                                 {/* Certificate Display */}
-                                <div ref={certificateRef} className="certificate-print bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-4 relative">
-                                    <div className="bg-white rounded-xl p-4">
-                                        {/* Certificate Header with Logo */}
-                                        <div className="flex items-center justify-between mb-4">
-                                            <div className="flex-1"></div>
-                                            <h1 className="text-lg font-extrabold text-orange-600 text-center flex-2">
-                                                {t('studentCertificateShowPage.certificate.heading')}
-                                            </h1>
-                                            <div className="flex-1 flex justify-end">
-                                                <img
-                                                    src="/images/logo-modified.png"
-                                                    alt="إرث المبتكرين - Innovators Legacy"
-                                                    className="w-16 h-16 object-contain"
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="h-0.5 bg-[#A3C042] mb-4"></div>
-
-                                        {/* Certificate Body */}
-                                        <div className="space-y-3 text-sm text-gray-800 leading-relaxed">
-                                            <p className="text-center">
-                                                <span className="font-bold text-[#A3C042] text-base">{user?.name || t('studentCertificateShowPage.certificate.studentFallback')}</span>
-                                            </p>
-
-                                            <p className="text-center text-xs text-gray-600 mb-3">
-                                                {t('studentCertificateShowPage.studentInfo.membershipNumber')}: <span className="font-bold">{user?.membership_number || t('common.notAvailable')}</span>
-                                            </p>
-
-                                            <p className="text-justify leading-relaxed text-xs mb-3">
-                                                {t('studentCertificateShowPage.certificate.bodyParagraph')}
-                                            </p>
-
-                                            {certificate?.achievement_period_start && certificate?.achievement_period_end && (
-                                                <p className="text-center text-xs text-gray-600 mb-3">
-                                                    {t('studentCertificateShowPage.certificate.achievementPeriodLine', {
-                                                        start: formatDateForCertificate(certificate.achievement_period_start),
-                                                        end: formatDateForCertificate(certificate.achievement_period_end),
-                                                    })}
-                                                </p>
-                                            )}
-
-                                            <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-3 my-4 shadow-sm">
-                                                <p className="text-center text-xs text-yellow-800 leading-relaxed font-medium">
-                                                    {t('studentCertificateShowPage.certificate.highlight')}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        {/* Certificate Footer */}
-                                        <div className="mt-6 pt-4 border-t border-gray-200">
-                                            <div className="flex items-center justify-between">
-                                                <div className="text-center flex-1">
-                                                    <div className="text-[10px] text-gray-500 mb-1">{t('studentCertificateShowPage.certificate.ceoTitle')}</div>
-                                                    <div className="text-xs font-bold text-gray-700">{t('studentCertificateShowPage.certificate.ceoName')}</div>
-                                                </div>
-                                                <div className="w-10 h-10 border-2 border-green-500 rounded-full flex items-center justify-center mx-3">
-                                                    <FaMedal className="text-green-500 text-sm" />
-                                                </div>
-                                                <div className="text-center flex-1">
-                                                    <div className="text-[10px] text-gray-500 mb-1">{t('studentCertificateShowPage.certificate.issueDate')}:</div>
-                                                    <div className="text-xs font-bold text-gray-700">
-                                                        {formatDate(certificate?.issue_date) || formatDate(new Date())}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <CertificateCard 
+                                    ref={certificateRef}
+                                    user={user}
+                                    role="student"
+                                    barcode={certificate?.barcode}
+                                    issueDate={certificate?.issue_date_formatted || new Date().toLocaleDateString('en-GB')}
+                                />
                                 {/* Premium gate notice */}
                                 {!canAccess && (
                                     <div className="no-print mt-3 flex items-center gap-2 rounded-xl bg-amber-50 border border-amber-200 px-3 py-2">
@@ -342,74 +282,13 @@ export default function StudentCertificateShow({ auth, user, stats, certificate,
                                     <h2 className="text-xl font-bold text-gray-900 mb-6 no-print">{t('studentCertificateShowPage.certificate.title')}</h2>
 
                                     {/* Certificate Display */}
-                                    <div ref={certificateRef} className="certificate-print bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-6 relative">
-                                        <div className="bg-white rounded-xl p-8">
-                                            {/* Certificate Header with Logo */}
-                                            <div className="flex items-center justify-between mb-6">
-                                                <div className="flex-1"></div>
-                                                <h1 className="text-2xl font-extrabold text-orange-600 text-center flex-2">
-                                                    {t('studentCertificateShowPage.certificate.heading')}
-                                                </h1>
-                                                <div className="flex-1 flex justify-end">
-                                                    <img
-                                                        src="/images/logo-modified.png"
-                                                        alt="إرث المبتكرين - Innovators Legacy"
-                                                        className="w-24 h-24 object-contain"
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="h-1 bg-[#A3C042] mb-6"></div>
-
-                                            {/* Certificate Body */}
-                                            <div className="space-y-4 text-base text-gray-800 leading-relaxed">
-                                                <p className="text-center">
-                                                    <span className="font-bold text-[#A3C042] text-2xl">{user?.name || t('studentCertificateShowPage.certificate.studentFallback')}</span>
-                                                </p>
-
-                                                <p className="text-center text-sm text-gray-600 mb-4">
-                                                    {t('studentCertificateShowPage.studentInfo.membershipNumber')}: <span className="font-bold">{user?.membership_number || t('common.notAvailable')}</span>
-                                                </p>
-
-                                                <p className="text-justify leading-relaxed text-base mb-4">
-                                                    {t('studentCertificateShowPage.certificate.bodyParagraph')}
-                                                </p>
-
-                                                {certificate?.achievement_period_start && certificate?.achievement_period_end && (
-                                                    <p className="text-center text-sm text-gray-600 mb-4">
-                                                        {t('studentCertificateShowPage.certificate.achievementPeriodLine', {
-                                                            start: formatDateForCertificate(certificate.achievement_period_start),
-                                                            end: formatDateForCertificate(certificate.achievement_period_end),
-                                                        })}
-                                                    </p>
-                                                )}
-
-                                                <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 my-6 shadow-sm">
-                                                    <p className="text-center text-sm text-yellow-800 leading-relaxed font-medium">
-                                                        {t('studentCertificateShowPage.certificate.highlight')}
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            {/* Certificate Footer */}
-                                            <div className="mt-8 pt-6 border-t border-gray-200">
-                                                <div className="flex items-center justify-between">
-                                                    <div className="text-center flex-1">
-                                                        <div className="text-sm text-gray-500 mb-2">{t('studentCertificateShowPage.certificate.ceoTitle')}</div>
-                                                        <div className="text-base font-bold text-gray-700">{t('studentCertificateShowPage.certificate.ceoName')}</div>
-                                                    </div>
-                                                    <div className="w-16 h-16 border-2 border-green-500 rounded-full flex items-center justify-center mx-6">
-                                                        <FaMedal className="text-green-500 text-xl" />
-                                                    </div>
-                                                    <div className="text-center flex-1">
-                                                        <div className="text-sm text-gray-500 mb-2">{t('studentCertificateShowPage.certificate.issueDate')}:</div>
-                                                        <div className="text-base font-bold text-gray-700">
-                                                            {formatDate(certificate?.issue_date) || formatDate(new Date())}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <CertificateCard 
+                                        ref={certificateRef}
+                                        user={user}
+                                        role="student"
+                                        barcode={certificate?.barcode}
+                                        issueDate={certificate?.issue_date_formatted || new Date().toLocaleDateString('en-GB')}
+                                    />
 
                                     {/* Action Buttons */}
                                     <div className="no-print mt-6 grid grid-cols-3 gap-4">

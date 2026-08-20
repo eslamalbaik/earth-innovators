@@ -75,11 +75,26 @@ class SchoolTeacherController extends Controller
         $school = Auth::user();
 
         $assignment = $request->validate([
-            'subject_id'     => ['nullable', 'integer', 'exists:subjects,id'],
+            'subject_id'     => ['nullable', function ($attribute, $value, $fail) {
+                if ($value !== 'custom' && !\App\Models\Subject::where('id', $value)->exists()) {
+                    $fail('المادة المحددة غير صالحة.');
+                }
+            }],
+            'custom_subject' => ['nullable', 'required_if:subject_id,custom', 'string', 'max:255'],
             'grade'          => ['nullable', 'string', 'max:100'],
             'section'        => ['nullable', 'string', 'max:100'],
             'custom_role_id' => ['nullable', 'integer', Rule::exists('custom_roles', 'id')->where('base_role', 'teacher')],
+        ], [
+            'custom_subject.required_if' => 'يرجى إدخال اسم المادة الجديدة.'
         ]);
+
+        if (isset($assignment['subject_id']) && $assignment['subject_id'] === 'custom' && !empty($assignment['custom_subject'])) {
+            $subject = \App\Models\Subject::firstOrCreate(
+                ['name_ar' => trim($assignment['custom_subject'])],
+                ['is_active' => true]
+            );
+            $assignment['subject_id'] = $subject->id;
+        }
 
         // Link existing teacher
         if ($request->filled('existing_teacher_id')) {
@@ -103,7 +118,7 @@ class SchoolTeacherController extends Controller
             app(\App\Services\PackagePaymentService::class)->activateDefaultTrialForNewUser($teacher);
 
             return redirect()->route('school.teachers.index')
-                ->with('success', 'تم ربط المعلم بالمدرسة بنجاح');
+                ->with('success', __('messages.msg_154'));
         }
 
         // Create new teacher
@@ -131,7 +146,7 @@ class SchoolTeacherController extends Controller
         app(\App\Services\PackagePaymentService::class)->activateDefaultTrialForNewUser($teacher);
 
         return redirect()->route('school.teachers.index')
-            ->with('success', 'تم إضافة المعلم بنجاح');
+            ->with('success', __('messages.msg_155'));
     }
 
     /**
@@ -211,11 +226,26 @@ class SchoolTeacherController extends Controller
             'email'          => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $teacher->id],
             'phone'          => ['nullable', 'string', 'max:30'],
             'password'       => ['nullable', 'confirmed', Rules\Password::defaults()],
-            'subject_id'     => ['nullable', 'integer', 'exists:subjects,id'],
+            'subject_id'     => ['nullable', function ($attribute, $value, $fail) {
+                if ($value !== 'custom' && !\App\Models\Subject::where('id', $value)->exists()) {
+                    $fail('المادة المحددة غير صالحة.');
+                }
+            }],
+            'custom_subject' => ['nullable', 'required_if:subject_id,custom', 'string', 'max:255'],
             'grade'          => ['nullable', 'string', 'max:100'],
             'section'        => ['nullable', 'string', 'max:100'],
             'custom_role_id' => ['nullable', 'integer', Rule::exists('custom_roles', 'id')->where('base_role', 'teacher')],
+        ], [
+            'custom_subject.required_if' => 'يرجى إدخال اسم المادة الجديدة.'
         ]);
+
+        if (isset($validated['subject_id']) && $validated['subject_id'] === 'custom' && !empty($validated['custom_subject'])) {
+            $subject = \App\Models\Subject::firstOrCreate(
+                ['name_ar' => trim($validated['custom_subject'])],
+                ['is_active' => true]
+            );
+            $validated['subject_id'] = $subject->id;
+        }
 
         $data = [
             'name'           => $validated['name'],
@@ -237,7 +267,7 @@ class SchoolTeacherController extends Controller
         ]);
 
         return redirect()->route('school.teachers.index')
-            ->with('success', 'تم تحديث بيانات المعلم بنجاح');
+            ->with('success', __('messages.msg_156'));
     }
 
     public function destroy($id)
@@ -253,6 +283,6 @@ class SchoolTeacherController extends Controller
         $teacher->update(['school_id' => null]);
 
         return redirect()->route('school.teachers.index')
-            ->with('success', 'تم إزالة المعلم من المدرسة بنجاح');
+            ->with('success', __('messages.msg_157'));
     }
 }

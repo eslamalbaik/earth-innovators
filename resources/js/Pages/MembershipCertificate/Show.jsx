@@ -168,19 +168,13 @@ export default function MembershipCertificateShow({ auth, certificate, eligibili
                     <div className="space-y-4">
                         {certificate ? (
                             <>
-                                <div ref={certificateRef} className="bg-gradient-to-br from-[#A3C042] to-[#8CA635] rounded-2xl p-6 text-white text-center shadow-lg">
-                                    <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <FaCertificate className="text-4xl" />
-                                    </div>
-                                    <h2 className="text-xl font-bold mb-2">{certificate.title}</h2>
-                                    <p className="text-sm opacity-90 mb-4">{certificate.description}</p>
-                                    <div className="text-xs opacity-75">
-                                        {t('membershipCertificatePage.certificateNumberLabel')}: {certificate.certificate_number}
-                                    </div>
-                                    <div className="text-xs opacity-75 mt-1">
-                                        {t('membershipCertificatePage.issueDateLabel')}: {certificate.issue_date_formatted}
-                                    </div>
-                                </div>
+                                <CertificateCard 
+                                    ref={certificateRef}
+                                    user={user}
+                                    role={user?.role}
+                                    barcode={certificate?.barcode}
+                                    issueDate={certificate?.issue_date_formatted || new Date().toLocaleDateString('en-GB')}
+                                />
 
                                 <button
                                     type="button"
@@ -267,41 +261,13 @@ export default function MembershipCertificateShow({ auth, certificate, eligibili
                     <div className="space-y-6">
                         {certificate ? (
                             <>
-                                <div ref={certificateRef} className="bg-gradient-to-br from-[#A3C042] to-[#6B8E23] rounded-2xl p-8 text-white text-center shadow-lg border-4 border-white/20">
-                                    <div className="flex items-center justify-center gap-3 mb-4">
-                                        <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-                                            <FaCertificate className="text-3xl" />
-                                        </div>
-                                    </div>
-                                    <h3 className="text-lg font-semibold opacity-80 mb-2">أكاديمية إرث المبتكرين</h3>
-                                    <h2 className="text-3xl font-bold mb-4">{certificate.title}</h2>
-                                    <div className="border-t border-b border-white/20 py-3 my-4">
-                                        <p className="text-lg">{certificate.description}</p>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4 text-sm">
-                                        <div>
-                                            <div className="opacity-75 mb-1">{t('membershipCertificatePage.certificateNumberLabel')}</div>
-                                            <div className="font-bold">{certificate.certificate_number}</div>
-                                        </div>
-                                        <div>
-                                            <div className="opacity-75 mb-1">{t('membershipCertificatePage.issueDateLabel')}</div>
-                                            <div className="font-bold">{certificate.issue_date_formatted}</div>
-                                        </div>
-                                    </div>
-                                    {certificate.barcode && (
-                                        <div className="mt-4 pt-4 border-t border-white/20">
-                                            <div className="flex items-center justify-center gap-2">
-                                                <FaBarcode className="text-2xl" />
-                                                <span className="text-sm">باركود العضوية</span>
-                                            </div>
-                                            <img 
-                                                src={`/storage/${certificate.barcode}`} 
-                                                alt="Barcode" 
-                                                className="mt-2 mx-auto h-16 bg-white/10 rounded"
-                                            />
-                                        </div>
-                                    )}
-                                </div>
+                                <CertificateCard 
+                                    ref={certificateRef}
+                                    user={user}
+                                    role={user?.role}
+                                    barcode={certificate?.barcode}
+                                    issueDate={certificate?.issue_date_formatted || new Date().toLocaleDateString('en-GB')}
+                                />
 
                                 <button
                                     type="button"

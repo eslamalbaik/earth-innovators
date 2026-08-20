@@ -157,7 +157,7 @@ class CertificateController extends Controller
         $user = Auth::user();
 
         if (!$this->canViewCertificate($user, $certificate)) {
-            abort(403, 'غير مصرح لك بتحميل هذه الشهادة');
+            abort(403, __('messages.msg_083'));
         }
 
         try {

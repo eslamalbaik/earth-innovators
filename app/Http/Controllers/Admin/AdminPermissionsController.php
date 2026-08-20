@@ -97,7 +97,7 @@ class AdminPermissionsController extends Controller
 
         return redirect()
             ->route('admin.permissions.index')
-            ->with('success', 'تم إضافة المستخدم الإداري بنجاح');
+            ->with('success', __('messages.msg_019'));
     }
 
     public function edit(User $user)
@@ -125,7 +125,7 @@ class AdminPermissionsController extends Controller
 
         if ($user->id === auth()->id() && $request->role !== $user->role) {
             return back()->withErrors([
-                'role' => 'لا يمكنك تعديل صلاحياتك الخاصة'
+                'role' => __('messages.msg_023')
             ]);
         }
 
@@ -161,7 +161,7 @@ class AdminPermissionsController extends Controller
 
         return redirect()
             ->route('admin.permissions.index')
-            ->with('success', 'تم تحديث المستخدم الإداري بنجاح');
+            ->with('success', __('messages.msg_020'));
     }
 
     /**
@@ -174,14 +174,14 @@ class AdminPermissionsController extends Controller
         }
 
         if ($user->id === auth()->id()) {
-            return back()->with('error', 'لا يمكنك حذف حسابك الخاص');
+            return back()->with('error', __('messages.msg_021'));
         }
 
         $user->delete();
 
         return redirect()
             ->route('admin.permissions.index')
-            ->with('success', 'تم حذف المستخدم الإداري بنجاح');
+            ->with('success', __('messages.msg_022'));
     }
 
     /**

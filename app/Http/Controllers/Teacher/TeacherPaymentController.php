@@ -21,7 +21,7 @@ class TeacherPaymentController extends Controller
         $teacher = $user->teacher;
 
         if (!$teacher) {
-            return redirect()->route('dashboard')->with('error', 'لم يتم العثور على بيانات المعلم');
+            return redirect()->route('dashboard')->with('error', __('messages.msg_075'));
         }
 
         $query = Payment::with(['booking:id,subject,student_id', 'booking.student:id,name,email', 'student:id,name,email'])
@@ -91,7 +91,7 @@ class TeacherPaymentController extends Controller
         $teacher = $user->teacher;
 
         if (!$teacher) {
-            return redirect()->route('dashboard')->with('error', 'لم يتم العثور على بيانات المعلم');
+            return redirect()->route('dashboard')->with('error', __('messages.msg_075'));
         }
 
         $payment = Payment::with(['booking'])
@@ -118,7 +118,7 @@ class TeacherPaymentController extends Controller
         $teacher = $user->teacher;
 
         if (!$teacher) {
-            return redirect()->route('dashboard')->with('error', 'لم يتم العثور على بيانات المعلم');
+            return redirect()->route('dashboard')->with('error', __('messages.msg_075'));
         }
 
         $payment = Payment::with(['booking.teacher'])

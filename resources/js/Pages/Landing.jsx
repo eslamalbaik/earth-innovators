@@ -216,8 +216,8 @@ export default function Landing({
                         {/* Testimonials / Stories Section */}
                         <div className="bg-white rounded-2xl border border-gray-100 p-4 md:p-6">
                             <TestimonialsSection
-                                title={language === 'ar' ? 'قصص من مجتمعنا' : 'Stories from Our Community'}
-                                subtitle={language === 'ar' ? 'تجارب حقيقية من طلابنا ومعلمينا ومبتكرينا' : 'Real experiences from our students, teachers and innovators'}
+                                title={t('sections.testimonials.title') || 'Stories from Our Community'}
+                                subtitle={t('sections.testimonials.subtitle') || 'Real experiences from our students, teachers and innovators'}
                                 testimonials={testimonials}
                                 compact={true}
                             />
@@ -439,8 +439,8 @@ export default function Landing({
                         {/* Testimonials / Stories Section */}
                         <section>
                             <TestimonialsSection
-                                title={language === 'ar' ? 'قصص من مجتمعنا' : 'Stories from Our Community'}
-                                subtitle={language === 'ar' ? 'تجارب حقيقية من طلابنا ومعلمينا ومبتكرينا' : 'Real experiences from our students, teachers and innovators'}
+                                title={t('sections.testimonials.title') || 'Stories from Our Community'}
+                                subtitle={t('sections.testimonials.subtitle') || 'Real experiences from our students, teachers and innovators'}
                                 testimonials={testimonials}
                                 compact={false}
                             />

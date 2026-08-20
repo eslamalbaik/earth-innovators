@@ -1,10 +1,13 @@
 import { Link } from '@inertiajs/react';
+import { useTranslation } from '@/i18n';
 
 /**
  * قسم "متابعة الابتكار" داخل لوحة المعلم الأصلية —
  * ملخص مؤشرات الطلاب وتوزيع تصنيفاتهم مع رابط لصفحة المتابعة التفصيلية
  */
 export default function CoachInnovationSummary({ innovationStats }) {
+    const { t } = useTranslation();
+
     if (!innovationStats) return null;
 
     const { totalStudents, statistics = {}, classifications = {} } = innovationStats;
@@ -16,14 +19,14 @@ export default function CoachInnovationSummary({ innovationStats }) {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
                 <div>
-                    <h2 className="text-xl font-bold text-gray-900">🚀 متابعة الابتكار</h2>
-                    <p className="text-sm text-gray-500 mt-0.5">مؤشرات الابتكار لطلابك وتصنيفاتهم</p>
+                    <h2 className="text-xl font-bold text-gray-900">🚀 {t('innovationSummary.title')}</h2>
+                    <p className="text-sm text-gray-500 mt-0.5">{t('innovationSummary.subtitle')}</p>
                 </div>
                 <Link
                     href="/teacher/innovation/dashboard"
                     className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl text-sm font-medium transition-all shadow-md"
                 >
-                    عرض التفاصيل ←
+                    {t('innovationSummary.viewDetails')} ←
                 </Link>
             </div>
 
@@ -31,19 +34,19 @@ export default function CoachInnovationSummary({ innovationStats }) {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
                 <div className="rounded-xl bg-gray-50 border border-gray-100 p-4 text-center">
                     <p className="text-2xl font-black text-indigo-600">{totalStudents}</p>
-                    <p className="text-xs text-gray-500 mt-1">إجمالي الطلاب</p>
+                    <p className="text-xs text-gray-500 mt-1">{t('innovationSummary.totalStudents')}</p>
                 </div>
                 <div className="rounded-xl bg-gray-50 border border-gray-100 p-4 text-center">
                     <p className="text-2xl font-black text-emerald-500">{statistics.avg_score ?? 0}</p>
-                    <p className="text-xs text-gray-500 mt-1">متوسط الدرجات</p>
+                    <p className="text-xs text-gray-500 mt-1">{t('innovationSummary.avgScore')}</p>
                 </div>
                 <div className="rounded-xl bg-gray-50 border border-gray-100 p-4 text-center">
                     <p className="text-2xl font-black text-amber-500">{needsAttention.length}</p>
-                    <p className="text-xs text-gray-500 mt-1">يحتاجون متابعة</p>
+                    <p className="text-xs text-gray-500 mt-1">{t('innovationSummary.needsAttention')}</p>
                 </div>
                 <div className="rounded-xl bg-gray-50 border border-gray-100 p-4 text-center">
                     <p className="text-2xl font-black text-purple-500">{topStudents.length}</p>
-                    <p className="text-xs text-gray-500 mt-1">المتميزون</p>
+                    <p className="text-xs text-gray-500 mt-1">{t('innovationSummary.topStudents')}</p>
                 </div>
             </div>
 

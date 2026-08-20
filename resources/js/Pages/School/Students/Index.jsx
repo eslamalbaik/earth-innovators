@@ -32,6 +32,8 @@ export default function Index({ auth, students, availableBadges, availableStuden
         phone: '',
         password: '',
         year: '',
+        grade: '',
+        section: '',
     });
 
     const editForm = useForm({
@@ -40,6 +42,8 @@ export default function Index({ auth, students, availableBadges, availableStuden
         phone: '',
         password: '',
         year: '',
+        grade: '',
+        section: '',
     });
 
     const badgeForm = useForm({
@@ -72,6 +76,8 @@ export default function Index({ auth, students, availableBadges, availableStuden
             phone: student.phone || '',
             password: '',
             year: student.year || '',
+            grade: student.grade || '',
+            section: student.section || '',
         });
         setShowEditModal(true);
     };
@@ -492,6 +498,30 @@ export default function Index({ auth, students, availableBadges, availableStuden
                             />
                             <InputError message={createForm.errors.year} className="mt-2" />
                         </div>
+
+                        <div>
+                            <InputLabel htmlFor="create_grade" value="الصف (اختياري)" />
+                            <TextInput
+                                id="create_grade"
+                                type="text"
+                                className="mt-1 block w-full"
+                                value={createForm.data.grade}
+                                onChange={(e) => createForm.setData('grade', e.target.value)}
+                            />
+                            <InputError message={createForm.errors.grade} className="mt-2" />
+                        </div>
+
+                        <div>
+                            <InputLabel htmlFor="create_section" value="الشعبة (اختياري)" />
+                            <TextInput
+                                id="create_section"
+                                type="text"
+                                className="mt-1 block w-full"
+                                value={createForm.data.section}
+                                onChange={(e) => createForm.setData('section', e.target.value)}
+                            />
+                            <InputError message={createForm.errors.section} className="mt-2" />
+                        </div>
                             </>
                         )}
                     </div>
@@ -580,6 +610,30 @@ export default function Index({ auth, students, availableBadges, availableStuden
                                 inputMode="numeric"
                             />
                             <InputError message={editForm.errors.year} className="mt-2" />
+                        </div>
+
+                        <div>
+                            <InputLabel htmlFor="edit_grade" value="الصف (اختياري)" />
+                            <TextInput
+                                id="edit_grade"
+                                type="text"
+                                className="mt-1 block w-full"
+                                value={editForm.data.grade}
+                                onChange={(e) => editForm.setData('grade', e.target.value)}
+                            />
+                            <InputError message={editForm.errors.grade} className="mt-2" />
+                        </div>
+
+                        <div>
+                            <InputLabel htmlFor="edit_section" value="الشعبة (اختياري)" />
+                            <TextInput
+                                id="edit_section"
+                                type="text"
+                                className="mt-1 block w-full"
+                                value={editForm.data.section}
+                                onChange={(e) => editForm.setData('section', e.target.value)}
+                            />
+                            <InputError message={editForm.errors.section} className="mt-2" />
                         </div>
 
                         <div>

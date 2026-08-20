@@ -285,7 +285,7 @@ class AdminProjectController extends Controller
 
         return redirect()
             ->route('admin.projects.index')
-            ->with('success', 'تم إنشاء المشروع بنجاح');
+            ->with('success', __('messages.msg_024'));
     }
 
     public function edit(Project $project)
@@ -413,7 +413,7 @@ class AdminProjectController extends Controller
 
         return redirect()
             ->route('admin.projects.index')
-            ->with('success', 'تم تحديث المشروع بنجاح');
+            ->with('success', __('messages.msg_025'));
     }
 
     public function show(Project $project)
@@ -535,7 +535,7 @@ class AdminProjectController extends Controller
             \App\Jobs\SendNewProjectNotification::dispatch($project);
         }
 
-        return back()->with('success', 'تم الموافقة على المشروع بنجاح');
+        return back()->with('success', __('messages.msg_026'));
     }
 
     public function reject(Request $request, Project $project)
@@ -549,7 +549,7 @@ class AdminProjectController extends Controller
             'approved_by' => auth()->id(),
         ]);
 
-        return back()->with('success', 'تم رفض المشروع');
+        return back()->with('success', __('messages.msg_027'));
     }
 
     /**
@@ -588,7 +588,7 @@ class AdminProjectController extends Controller
 
         return redirect()
             ->route('admin.projects.index')
-            ->with('success', 'تم حذف المشروع بنجاح');
+            ->with('success', __('messages.msg_028'));
     }
 }
 

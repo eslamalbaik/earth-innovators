@@ -200,7 +200,7 @@ class BookingController extends Controller
                 ]);
             }
 
-            return redirect()->back()->with('success', 'تم تحديث حالة الطلب بنجاح');
+            return redirect()->back()->with('success', __('messages.msg_039'));
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Failed to update booking status', [
@@ -216,7 +216,7 @@ class BookingController extends Controller
                 ], 500);
             }
 
-            return redirect()->back()->with('error', 'حدث خطأ أثناء تحديث حالة الطلب');
+            return redirect()->back()->with('error', __('messages.msg_040'));
         }
     }
 
@@ -422,7 +422,7 @@ class BookingController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.bookings.index')->with('success', 'تم حذف الحجز بنجاح');
+            return redirect()->route('admin.bookings.index')->with('success', __('messages.msg_041'));
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Failed to delete booking', [
@@ -430,7 +430,7 @@ class BookingController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return redirect()->back()->with('error', 'حدث خطأ أثناء حذف الحجز');
+            return redirect()->back()->with('error', __('messages.msg_042'));
         }
     }
 

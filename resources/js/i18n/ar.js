@@ -1690,7 +1690,10 @@ export const ar = {
         "students": "الطلاب",
         "ranking": "الترتيب والشارات",
         "addReports": "إضافة تقارير",
-        "points": "النقاط"
+        "points": "النقاط",
+        "smartAgent": "الوكيل الذكي",
+        "smartTalentSearch": "البحث الذكي بالمواهب",
+        "teachersManagement": "إدارة المعلمين"
     },
     "notifications": {
         "title": "الإشعارات",
@@ -2349,6 +2352,7 @@ export const ar = {
     },
     "schoolDashboardPage": {
         "pageTitle": "لوحة تحكم المدرسة - {appName}",
+        "openTeachers": "إدارة المعلمين",
         "totalProjects": "إجمالي المشاريع",
         "approvedShort": "موافق",
         "pendingReviewShort": "قيد المراجعة",
@@ -6667,6 +6671,21 @@ export const ar = {
         "writeReview": "اكتب تقييماً",
         "noReviews": "لا توجد تقييمات بعد",
         "loadMoreReviews": "تحميل المزيد من التقييمات"
+    },
+    "innovationSummary": {
+        "title": "متابعة الابتكار",
+        "subtitle": "مؤشرات الابتكار لطلابك وتصنيفاتهم",
+        "viewDetails": "عرض التفاصيل",
+        "totalStudents": "إجمالي الطلاب",
+        "avgScore": "متوسط الدرجات",
+        "needsAttention": "يحتاجون متابعة",
+        "topStudents": "المتميزون"
+    },
+    "sections": {
+        "testimonials": {
+            "title": "قصص من مجتمعنا",
+            "subtitle": "تجارب حقيقية من طلابنا ومعلمينا ومبتكرينا"
+        }
     }
 };
 

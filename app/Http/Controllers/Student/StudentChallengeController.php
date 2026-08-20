@@ -198,7 +198,7 @@ class StudentChallengeController extends Controller
             // Redirect to challenge page
             $redirectResponse = redirect()
                 ->route('student.challenges.show', $challenge)
-                ->with('success', 'تم الانضمام إلى التحدي بنجاح! يمكنك الآن تقديم حل.');
+                ->with('success', __('messages.msg_158'));
 
             // #region agent log
             $logData3 = json_encode([
@@ -234,7 +234,7 @@ class StudentChallengeController extends Controller
 
         // Challenges can be global (no school_id) or school-specific
         if ($challenge->school_id && $challenge->school_id !== $student->school_id) {
-            abort(403, 'غير مصرح لك بعرض هذا التحدي');
+            abort(403, __('messages.msg_161'));
         }
 
         $membershipSummary = $this->membershipAccessService->getMembershipSummary($student);
@@ -256,7 +256,7 @@ class StudentChallengeController extends Controller
         // Challenges can be global (no school_id) or school-specific
         // If challenge has school_id, verify it matches student's school
         if ($challenge->school_id && $challenge->school_id !== $student->school_id) {
-            abort(403, 'غير مصرح لك بتقديم حل لهذا التحدي');
+            abort(403, __('messages.msg_162'));
         }
 
         if (!$challenge->isActive()) {
@@ -300,7 +300,7 @@ class StudentChallengeController extends Controller
 
             return redirect()
                 ->route('student.challenges.submissions.show', [$challenge, $submission])
-                ->with('success', 'تم تقديم حل التحدي بنجاح!');
+                ->with('success', __('messages.msg_159'));
         } catch (\Exception $e) {
             Log::error('Error submitting challenge: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
@@ -321,12 +321,12 @@ class StudentChallengeController extends Controller
 
         // Verify ownership
         if ($submission->student_id !== $student->id || $submission->challenge_id !== $challenge->id) {
-            abort(403, 'غير مصرح لك بعرض هذا التقديم');
+            abort(403, __('messages.msg_137'));
         }
 
         // Verify challenge is available for student
         if ($challenge->school_id !== $student->school_id) {
-            abort(403, 'غير مصرح لك بعرض هذا التحدي');
+            abort(403, __('messages.msg_161'));
         }
 
         $submission->load(['challenge', 'student', 'reviewer']);
@@ -346,7 +346,7 @@ class StudentChallengeController extends Controller
 
         // Verify ownership
         if ($submission->student_id !== $student->id || $submission->challenge_id !== $challenge->id) {
-            abort(403, 'غير مصرح لك بتعديل هذا التقديم');
+            abort(403, __('messages.msg_163'));
         }
 
         if ($submission->status !== 'submitted') {
@@ -387,7 +387,7 @@ class StudentChallengeController extends Controller
 
             return redirect()
                 ->route('student.challenges.show', $challenge)
-                ->with('success', 'تم تحديث التقديم بنجاح!');
+                ->with('success', __('messages.msg_160'));
         } catch (\Exception $e) {
             Log::error('Error updating submission: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),

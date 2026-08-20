@@ -107,18 +107,18 @@ class StudentReviewController extends Controller
             }
 
             if (!$isStudentBooking) {
-                return back()->withErrors(['booking_id' => 'هذا الحجز لا ينتمي إليك']);
+                return back()->withErrors(['booking_id' => __('messages.msg_168')]);
             }
 
             if ($booking->status !== 'completed') {
-                return back()->withErrors(['booking_id' => 'يمكن التقييم فقط للحجوزات المكتملة']);
+                return back()->withErrors(['booking_id' => __('messages.msg_169')]);
             }
 
             if (Review::where('student_id', $user->id)
                 ->where('booking_id', $request->booking_id)
                 ->exists()
             ) {
-                return back()->withErrors(['booking_id' => 'تم التقييم على هذا الحجز مسبقاً']);
+                return back()->withErrors(['booking_id' => __('messages.msg_170')]);
             }
         }
 
@@ -131,7 +131,7 @@ class StudentReviewController extends Controller
             'is_published' => false,
         ], $user->id);
 
-        return redirect()->back()->with('success', 'تم إضافة التقييم بنجاح وانتظار الموافقة');
+        return redirect()->back()->with('success', __('messages.msg_166'));
     }
 
     public function update(Request $request, Review $review)
@@ -146,7 +146,7 @@ class StudentReviewController extends Controller
         }
 
         if (!$isOwner) {
-            return back()->withErrors(['error' => 'غير مصرح لك بتعديل هذا التقييم']);
+            return back()->withErrors(['error' => __('messages.msg_171')]);
         }
 
         $request->validate([
@@ -159,7 +159,7 @@ class StudentReviewController extends Controller
             'comment' => $request->comment,
         ]);
 
-        return redirect()->back()->with('success', 'تم تحديث التقييم بنجاح');
+        return redirect()->back()->with('success', __('messages.msg_167'));
     }
 
     public function destroy(Review $review)
@@ -174,11 +174,11 @@ class StudentReviewController extends Controller
         }
 
         if (!$isOwner) {
-            return back()->withErrors(['error' => 'غير مصرح لك بحذف هذا التقييم']);
+            return back()->withErrors(['error' => __('messages.msg_172')]);
         }
 
         $this->reviewService->deleteReview($review);
 
-        return redirect()->back()->with('success', 'تم حذف التقييم بنجاح');
+        return redirect()->back()->with('success', __('messages.msg_121'));
     }
 }

@@ -76,7 +76,7 @@ class StudentController extends Controller
             'updated' => array_keys($update),
         ]);
 
-        return redirect()->route('admin.students.index')->with('success', 'تم تحديث بيانات الطالب بنجاح');
+        return redirect()->route('admin.students.index')->with('success', __('messages.msg_061'));
     }
 
     public function destroy(string $id)
@@ -86,7 +86,7 @@ class StudentController extends Controller
 
         Activity::record(auth()->id(), 'student.deleted', User::class, $student->id);
 
-        return redirect()->back()->with('success', 'تم حذف الطالب بنجاح');
+        return redirect()->back()->with('success', __('messages.msg_062'));
     }
 
     public function export(Request $request)

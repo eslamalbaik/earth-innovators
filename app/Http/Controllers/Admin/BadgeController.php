@@ -150,7 +150,7 @@ class BadgeController extends Controller
         $this->badgeService->createBadge($request->validated());
 
         return redirect()->route('admin.badges.index')
-            ->with('success', 'تم إنشاء الشارة بنجاح');
+            ->with('success', __('messages.msg_035'));
     }
 
     public function edit(Badge $badge)
@@ -168,7 +168,7 @@ class BadgeController extends Controller
         $this->badgeService->updateBadge($badge, $request->validated());
 
         return redirect()->route('admin.badges.index')
-            ->with('success', 'تم تحديث الشارة بنجاح');
+            ->with('success', __('messages.msg_036'));
     }
 
     public function destroy(Badge $badge)
@@ -176,7 +176,7 @@ class BadgeController extends Controller
         $this->badgeService->deleteBadge($badge);
 
         return redirect()->route('admin.badges.index')
-            ->with('success', 'تم حذف الشارة بنجاح');
+            ->with('success', __('messages.msg_037'));
     }
 
     public function award(AwardBadgeRequest $request, Badge $badge)
@@ -193,6 +193,6 @@ class BadgeController extends Controller
         );
 
         return redirect()->back()
-            ->with('success', 'تم منح الشارة بنجاح');
+            ->with('success', __('messages.msg_038'));
     }
 }

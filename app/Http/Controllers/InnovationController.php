@@ -47,7 +47,7 @@ class InnovationController extends Controller
     {
         RecalculateIndexesJob::dispatch($request->user());
 
-        return back()->with('success', 'جاري إعادة حساب المؤشرات...');
+        return back()->with('success', __('messages.msg_095'));
     }
 
     /**
@@ -100,7 +100,7 @@ class InnovationController extends Controller
         $type = $request->get('type', 'student');
         GenerateAIReportJob::dispatch($request->user(), $type);
 
-        return back()->with('success', 'جاري إنشاء التقرير...');
+        return back()->with('success', __('messages.msg_096'));
     }
 
     /**

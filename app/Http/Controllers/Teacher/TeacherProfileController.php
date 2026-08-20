@@ -141,7 +141,7 @@ class TeacherProfileController extends Controller
 
         $user->refresh();
 
-        return redirect()->route('teacher.profile')->with('success', 'تم تحديث الملف الشخصي بنجاح');
+        return redirect()->route('teacher.profile')->with('success', __('messages.msg_181'));
     }
 
     public function subjects()
@@ -255,7 +255,7 @@ class TeacherProfileController extends Controller
             'stages' => $currentStages,
         ]);
 
-        return redirect()->back()->with('success', 'تم إضافة المادة بنجاح');
+        return redirect()->back()->with('success', __('messages.msg_174'));
     }
 
     public function updateSubject(Request $request, $id)
@@ -297,7 +297,7 @@ class TeacherProfileController extends Controller
             'stages' => $validated['stages'],
         ]);
 
-        return redirect()->back()->with('success', 'تم تحديث المادة بنجاح');
+        return redirect()->back()->with('success', __('messages.msg_177'));
     }
 
     public function deleteSubject($id)
@@ -330,7 +330,7 @@ class TeacherProfileController extends Controller
             'subjects' => $currentSubjects,
         ]);
 
-        return redirect()->back()->with('success', 'تم حذف المادة بنجاح');
+        return redirect()->back()->with('success', __('messages.msg_176'));
     }
 
     private function normalizeStages($stages)

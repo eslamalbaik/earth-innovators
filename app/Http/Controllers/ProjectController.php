@@ -67,7 +67,7 @@ class ProjectController extends Controller
                 ->first();
             
             if (!$projectModel) {
-                abort(404, 'المشروع غير موجود');
+                abort(404, __('messages.msg_113'));
             }
             
             $projectId = $projectModel->id;
@@ -76,7 +76,7 @@ class ProjectController extends Controller
         $project = $this->projectService->getProjectDetails($projectId, $user);
 
         if (!$project || $project->status !== 'approved') {
-            abort(404, 'المشروع غير موجود أو غير معتمد');
+            abort(404, __('messages.msg_114'));
         }
 
         if ($user && $user->isStudent() && $user->school_id) {
@@ -84,7 +84,7 @@ class ProjectController extends Controller
             $isAvailableForStudentSchool = $project->school_id === $user->school_id;
             
             if (!$isAvailableForAllSchools && !$isAvailableForStudentSchool) {
-                abort(403, 'غير مصرح لك بعرض هذا المشروع');
+                abort(403, __('messages.msg_115'));
             }
         }
 

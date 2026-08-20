@@ -33,7 +33,7 @@ class ProjectSubmissionController extends Controller
         $isAvailableForStudentSchool = $project->school_id === $student->school_id;
         
         if (!$isAvailableForAllSchools && !$isAvailableForStudentSchool) {
-            return back()->withErrors(['error' => 'غير مصرح لك بتسليم هذا المشروع']);
+            return back()->withErrors(['error' => __('messages.msg_117')]);
         }
 
         $request->validate([
@@ -61,7 +61,7 @@ class ProjectSubmissionController extends Controller
 
             $this->submissionService->createSubmission($data, $project->id, $student->id);
 
-            return redirect()->back()->with('success', 'تم تسليم المشروع بنجاح!');
+            return redirect()->back()->with('success', __('messages.msg_116'));
         } catch (\Exception $e) {
             \Log::error('Project submission error: ' . $e->getMessage(), [
                 'project_id' => $project->id,
@@ -98,7 +98,7 @@ class ProjectSubmissionController extends Controller
 
             $this->submissionService->updateSubmission($submission, $data, Auth::id());
 
-            return redirect()->back()->with('success', 'تم تحديث التسليم بنجاح!');
+            return redirect()->back()->with('success', __('messages.msg_086'));
         } catch (\Exception $e) {
             \Log::error('Project submission update error: ' . $e->getMessage(), [
                 'submission_id' => $submission->id,

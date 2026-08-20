@@ -93,7 +93,7 @@ class AdminSubmissionController extends Controller
                 true 
             );
 
-            return redirect()->back()->with('success', 'تم تقييم التسليم بنجاح!');
+            return redirect()->back()->with('success', __('messages.msg_034'));
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }

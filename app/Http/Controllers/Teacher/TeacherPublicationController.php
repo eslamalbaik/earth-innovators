@@ -178,7 +178,7 @@ class TeacherPublicationController extends Controller
 
             return redirect()
                 ->route('teacher.publications.index')
-                ->with('success', 'تم إنشاء المقال بنجاح! سيتم نشره بعد موافقة المدرسة.');
+                ->with('success', __('messages.msg_186'));
         } catch (\Exception $e) {
             \Log::error('Error creating publication: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
@@ -224,7 +224,7 @@ class TeacherPublicationController extends Controller
         if ($publication->status === 'approved') {
             return redirect()
                 ->route('teacher.publications.index')
-                ->with('error', 'لا يمكن تعديل المقال بعد الموافقة عليه.');
+                ->with('error', __('messages.msg_187'));
         }
 
         $publication->load(['school']);
@@ -254,7 +254,7 @@ class TeacherPublicationController extends Controller
         if ($publication->status === 'approved') {
             return redirect()
                 ->route('teacher.publications.index')
-                ->with('error', 'لا يمكن تعديل المقال بعد الموافقة عليه.');
+                ->with('error', __('messages.msg_187'));
         }
 
         $validated = $request->validated();
@@ -282,7 +282,7 @@ class TeacherPublicationController extends Controller
 
             return redirect()
                 ->route('teacher.publications.index')
-                ->with('success', 'تم تحديث المقال بنجاح!');
+                ->with('success', __('messages.msg_145'));
         } catch (\Exception $e) {
             \Log::error('Error updating publication: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
@@ -311,7 +311,7 @@ class TeacherPublicationController extends Controller
 
             return redirect()
                 ->route('teacher.publications.index')
-                ->with('success', 'تم حذف المقال بنجاح!');
+                ->with('success', __('messages.msg_033'));
         } catch (\Exception $e) {
             \Log::error('Error deleting publication: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),

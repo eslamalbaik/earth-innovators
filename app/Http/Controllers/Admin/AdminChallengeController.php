@@ -304,7 +304,7 @@ class AdminChallengeController extends Controller
 
             return redirect()
                 ->route('admin.challenges.index')
-                ->with('success', 'تم إنشاء التحدي بنجاح');
+                ->with('success', __('messages.msg_012'));
         } catch (\Illuminate\Validation\ValidationException $e) {
             Log::error('Validation error creating admin challenge', [
                 'errors' => $e->errors(),
@@ -476,7 +476,7 @@ class AdminChallengeController extends Controller
 
             return redirect()
                 ->route('admin.challenges.index')
-                ->with('success', 'تم تحديث التحدي بنجاح');
+                ->with('success', __('messages.msg_013'));
         } catch (\Throwable $e) {
             Log::error('Error updating admin challenge: ' . $e->getMessage(), [
                 'challenge_id' => $challenge->id,
@@ -501,12 +501,12 @@ class AdminChallengeController extends Controller
             \Illuminate\Support\Facades\Cache::forget('admin_challenge_analytics');
 
             if (request()->wantsJson() || request()->header('X-Inertia')) {
-                return back()->with('success', 'تم حذف التحدي بنجاح');
+                return back()->with('success', __('messages.msg_014'));
             }
 
             return redirect()
                 ->route('admin.challenges.index')
-                ->with('success', 'تم حذف التحدي بنجاح');
+                ->with('success', __('messages.msg_014'));
         } catch (\Exception $e) {
             Log::error('Error deleting admin challenge: ' . $e->getMessage(), [
                 'challenge_id' => $challenge->id,

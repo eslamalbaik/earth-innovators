@@ -22,6 +22,8 @@ class UpdateStudentRequest extends FormRequest
             'phone' => ['nullable', 'string', 'max:20', Rule::unique('users')->ignore($studentId)],
             'password' => 'nullable|string|min:8',
             'year' => 'nullable|integer|min:1900|max:2100',
+            'grade' => 'nullable|string|max:100',
+            'section' => 'nullable|string|max:100',
         ];
     }
 }

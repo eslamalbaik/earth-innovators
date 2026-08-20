@@ -187,7 +187,7 @@ class PackageSubscriptionController extends Controller
         $user = Auth::user();
 
         if ($userPackage->user_id !== $user->id) {
-            return redirect()->route('packages.index')->with('error', 'غير مصرح لك بهذا الإجراء');
+            return redirect()->route('packages.index')->with('error', __('messages.msg_099'));
         }
 
         try {

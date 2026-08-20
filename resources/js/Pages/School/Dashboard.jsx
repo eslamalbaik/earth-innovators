@@ -168,7 +168,7 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                                 {t('schoolDashboardPage.openPublications')}
                             </Link>
                             <Link href="/school/teachers" className="rounded-xl border border-[#A3C042]/30 bg-[#A3C042]/5 px-3 py-2 text-xs font-semibold text-[#5a7a00] hover:border-[#A3C042]/60">
-                                إدارة المعلمين
+                                {t('schoolDashboardPage.openTeachers') || 'إدارة المعلمين'}
                             </Link>
                             <Link href="/school/students" className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-800 hover:border-[#A3C042]/40">
                                 {t('schoolDashboardPage.openStudents') || 'إدارة الطلاب'}

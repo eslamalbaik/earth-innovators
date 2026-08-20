@@ -115,16 +115,16 @@ class SchoolCertificateController extends Controller
         }
 
         if (!$this->canReviewCertificate($school, $certificate)) {
-            abort(403, 'غير مصرح لك باعتماد هذه الشهادة.');
+            abort(403, __('messages.msg_129'));
         }
 
         if (!$this->membershipAccessService->hasCertificateAccess($school)) {
-            return redirect()->back()->with('error', 'عضوية المدرسة الحالية لا تسمح باعتماد أو إصدار الشهادات.');
+            return redirect()->back()->with('error', __('messages.msg_127'));
         }
 
         $recipient = $certificate->user;
         if (!$recipient) {
-            return redirect()->back()->with('error', 'تعذر العثور على صاحب الشهادة.');
+            return redirect()->back()->with('error', __('messages.msg_128'));
         }
 
         $issueDate = now()->toDateString();
@@ -194,7 +194,7 @@ class SchoolCertificateController extends Controller
         $school = Auth::user();
 
         if (!$this->canReviewCertificate($school, $certificate)) {
-            abort(403, 'غير مصرح لك برفض هذه الشهادة.');
+            abort(403, __('messages.msg_130'));
         }
 
         $validated = $request->validate([

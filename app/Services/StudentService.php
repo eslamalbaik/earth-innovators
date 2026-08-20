@@ -123,6 +123,8 @@ class StudentService extends BaseService
                     'email' => $student->email,
                     'phone' => $student->phone,
                     'year' => $student->year,
+                    'grade' => $student->grade,
+                    'section' => $student->section,
                     'school_id' => $student->school_id,
                     'membership_number' => $student->membership_number,
                     'points' => $student->points ?? 0,
@@ -182,6 +184,8 @@ class StudentService extends BaseService
             'school_id' => $dto->schoolId,
             'points' => $dto->points,
             'year' => $dto->year,
+            'grade' => $dto->grade,
+            'section' => $dto->section,
             'membership_number' => $this->membershipService->generateMembershipNumber('student'),
         ]);
 
@@ -227,6 +231,8 @@ class StudentService extends BaseService
             'email' => $dto->email,
             'phone' => $dto->phone,
             'year' => $dto->year,
+            'grade' => $dto->grade,
+            'section' => $dto->section,
         ];
 
         if ($dto->password) {

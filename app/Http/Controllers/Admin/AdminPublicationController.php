@@ -205,7 +205,7 @@ class AdminPublicationController extends Controller
 
             return redirect()
                 ->route('admin.publications.index')
-                ->with('success', 'تم نشر المقال بنجاح!');
+                ->with('success', __('messages.msg_029'));
         } catch (\Exception $e) {
             return back()
                 ->withErrors(['error' => 'حدث خطأ أثناء إنشاء المقال: ' . $e->getMessage()])
@@ -270,7 +270,7 @@ class AdminPublicationController extends Controller
 
         return redirect()
             ->route('admin.publications.show', $publication->id)
-            ->with('success', 'تم تحديث المنشور بنجاح!');
+            ->with('success', __('messages.msg_030'));
     }
 
     public function approve(Publication $publication)
@@ -281,7 +281,7 @@ class AdminPublicationController extends Controller
 
         return redirect()
             ->back()
-            ->with('success', 'تم الموافقة على المقال بنجاح!');
+            ->with('success', __('messages.msg_031'));
     }
 
     public function reject(Request $request, Publication $publication)
@@ -296,7 +296,7 @@ class AdminPublicationController extends Controller
 
         return redirect()
             ->back()
-            ->with('success', 'تم رفض المقال.');
+            ->with('success', __('messages.msg_032'));
     }
 
     public function destroy(Publication $publication)
@@ -315,6 +315,6 @@ class AdminPublicationController extends Controller
 
         return redirect()
             ->route('admin.publications.index')
-            ->with('success', 'تم حذف المقال بنجاح!');
+            ->with('success', __('messages.msg_033'));
     }
 }

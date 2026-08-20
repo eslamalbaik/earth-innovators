@@ -82,7 +82,7 @@ class CustomRoleController extends Controller
 
         return redirect()
             ->route('admin.custom-roles.index')
-            ->with('success', 'تم إضافة الدور بنجاح');
+            ->with('success', __('messages.msg_048'));
     }
 
     public function edit(CustomRole $customRole)
@@ -123,20 +123,20 @@ class CustomRoleController extends Controller
 
         return redirect()
             ->route('admin.custom-roles.index')
-            ->with('success', 'تم تحديث الدور بنجاح');
+            ->with('success', __('messages.msg_049'));
     }
 
     public function destroy(CustomRole $customRole)
     {
         if ($customRole->users()->count() > 0) {
-            return back()->with('error', 'لا يمكن حذف هذا الدور لأنه مرتبط بمستخدمين. عطّله بدلاً من ذلك.');
+            return back()->with('error', __('messages.msg_050'));
         }
 
         $customRole->delete();
 
         return redirect()
             ->route('admin.custom-roles.index')
-            ->with('success', 'تم حذف الدور بنجاح');
+            ->with('success', __('messages.msg_051'));
     }
 
     /**

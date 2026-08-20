@@ -135,7 +135,7 @@ class UserManagementController extends Controller
 
         return redirect()
             ->route('admin.users.index')
-            ->with('success', 'تم إنشاء المستخدم بنجاح');
+            ->with('success', __('messages.msg_063'));
     }
 
     /**
@@ -367,12 +367,12 @@ class UserManagementController extends Controller
 
         // If Inertia request (partial reload), return JSON response
         if ($request->wantsJson() || $request->header('X-Inertia')) {
-            return back()->with('success', 'تم تحديث المستخدم بنجاح');
+            return back()->with('success', __('messages.msg_064'));
         }
 
         return redirect()
             ->route('admin.users.index')
-            ->with('success', 'تم تحديث المستخدم بنجاح');
+            ->with('success', __('messages.msg_064'));
     }
 
     /**
@@ -383,19 +383,19 @@ class UserManagementController extends Controller
     {
         // منع حذف المستخدم الحالي
         if ($user->id === auth()->id()) {
-            return back()->with('error', 'لا يمكنك حذف حسابك الخاص');
+            return back()->with('error', __('messages.msg_021'));
         }
 
         $user->delete();
 
         // If Inertia request (partial reload), return JSON response
         if (request()->wantsJson() || request()->header('X-Inertia')) {
-            return back()->with('success', 'تم حذف المستخدم بنجاح');
+            return back()->with('success', __('messages.msg_065'));
         }
 
         return redirect()
             ->route('admin.users.index')
-            ->with('success', 'تم حذف المستخدم بنجاح');
+            ->with('success', __('messages.msg_065'));
     }
 
     /**
@@ -409,7 +409,7 @@ class UserManagementController extends Controller
         
         $user->update(['role' => $request->role]);
         
-        return back()->with('success', 'تم تحديث صلاحية المستخدم');
+        return back()->with('success', __('messages.msg_066'));
     }
 
     /**
@@ -428,14 +428,14 @@ class UserManagementController extends Controller
         });
 
         if (empty($userIds)) {
-            return back()->with('error', 'لا يمكنك حذف حسابك الخاص');
+            return back()->with('error', __('messages.msg_021'));
         }
 
         $deletedCount = User::whereIn('id', $userIds)->delete();
 
         return redirect()
             ->route('admin.users.index')
-            ->with('success', "تم حذف {$deletedCount} مستخدم بنجاح");
+            ->with('success', __('messages.msg_067'));
     }
 
     /**

@@ -21,7 +21,7 @@ class ProjectCommentController extends Controller
         // 1. Projects from their school (school_id matches)
         // 2. General projects (school_id is null - from teachers or admin)
         if ($user->isStudent() && $project->school_id !== null && $project->school_id !== $user->school_id) {
-            return back()->withErrors(['error' => 'غير مصرح لك بالتعليق على هذا المشروع']);
+            return back()->withErrors(['error' => __('messages.msg_112')]);
         }
 
         $request->validate([
@@ -43,7 +43,7 @@ class ProjectCommentController extends Controller
 
             $this->commentService->createComment($data, $project->id, $user->id);
 
-            return redirect()->back()->with('success', 'تم إضافة التعليق بنجاح!');
+            return redirect()->back()->with('success', __('messages.msg_109'));
         } catch (\Exception $e) {
             return back()->withErrors(['error' => $e->getMessage()]);
         }
@@ -61,7 +61,7 @@ class ProjectCommentController extends Controller
         try {
             $this->commentService->updateComment($comment, $request->only(['comment']), Auth::id());
 
-            return redirect()->back()->with('success', 'تم تحديث التعليق بنجاح!');
+            return redirect()->back()->with('success', __('messages.msg_110'));
         } catch (\Exception $e) {
             return back()->withErrors(['error' => $e->getMessage()]);
         }
@@ -75,7 +75,7 @@ class ProjectCommentController extends Controller
         try {
             $this->commentService->deleteComment($comment, Auth::id());
 
-            return redirect()->back()->with('success', 'تم حذف التعليق بنجاح!');
+            return redirect()->back()->with('success', __('messages.msg_111'));
         } catch (\Exception $e) {
             return back()->withErrors(['error' => $e->getMessage()]);
         }

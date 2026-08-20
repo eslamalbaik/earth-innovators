@@ -31,6 +31,7 @@ export default function Index({ auth, teachers, availableTeachers = [], subjects
         password: '',
         password_confirmation: '',
         subject_id: '',
+        custom_subject: '',
         grade: '',
         section: '',
         custom_role_id: '',
@@ -43,6 +44,7 @@ export default function Index({ auth, teachers, availableTeachers = [], subjects
         password: '',
         password_confirmation: '',
         subject_id: '',
+        custom_subject: '',
         grade: '',
         section: '',
         custom_role_id: '',
@@ -74,6 +76,7 @@ export default function Index({ auth, teachers, availableTeachers = [], subjects
             password: '',
             password_confirmation: '',
             subject_id: teacher.subject_id || '',
+            custom_subject: '',
             grade: teacher.grade || '',
             section: teacher.section || '',
             custom_role_id: teacher.custom_role_id || '',
@@ -340,9 +343,25 @@ export default function Index({ auth, teachers, availableTeachers = [], subjects
                                             {subject.name_ar}
                                         </option>
                                     ))}
+                                    <option value="custom">مادة أخرى (إضافة مادة جديدة)</option>
                                 </select>
                                 <InputError message={createForm.errors.subject_id} className="mt-2" />
                             </div>
+
+                            {createForm.data.subject_id === 'custom' && (
+                                <div>
+                                    <InputLabel htmlFor="create_custom_subject" value="اسم المادة الجديدة" />
+                                    <TextInput
+                                        id="create_custom_subject"
+                                        type="text"
+                                        className="mt-1 block w-full"
+                                        value={createForm.data.custom_subject}
+                                        onChange={(e) => createForm.setData('custom_subject', e.target.value)}
+                                        required
+                                    />
+                                    <InputError message={createForm.errors.custom_subject} className="mt-2" />
+                                </div>
+                            )}
 
                             <div>
                                 <InputLabel htmlFor="create_grade" value="الصف (اختياري)" />
@@ -595,9 +614,25 @@ export default function Index({ auth, teachers, availableTeachers = [], subjects
                                             {subject.name_ar}
                                         </option>
                                     ))}
+                                    <option value="custom">مادة أخرى (إضافة مادة جديدة)</option>
                                 </select>
                                 <InputError message={editForm.errors.subject_id} className="mt-2" />
                             </div>
+
+                            {editForm.data.subject_id === 'custom' && (
+                                <div>
+                                    <InputLabel htmlFor="edit_custom_subject" value="اسم المادة الجديدة" />
+                                    <TextInput
+                                        id="edit_custom_subject"
+                                        type="text"
+                                        className="mt-1 block w-full"
+                                        value={editForm.data.custom_subject}
+                                        onChange={(e) => editForm.setData('custom_subject', e.target.value)}
+                                        required
+                                    />
+                                    <InputError message={editForm.errors.custom_subject} className="mt-2" />
+                                </div>
+                            )}
 
                             <div>
                                 <InputLabel htmlFor="edit_grade" value="الصف (اختياري)" />

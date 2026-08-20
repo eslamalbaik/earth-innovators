@@ -49,7 +49,7 @@ class PaymentGatewayController extends Controller
         $envSyncResult = $this->updateConfigFile($paymentGateway);
 
         $redirect = redirect()->route('admin.payment-gateways.index')
-            ->with('success', 'تم تحديث إعدادات بوابة الدفع بنجاح');
+            ->with('success', __('messages.msg_059'));
 
         if (!$envSyncResult['success']) {
             $redirect->with('warning', $envSyncResult['message']);
@@ -102,7 +102,7 @@ class PaymentGatewayController extends Controller
         $this->removeConfigFileKeys($gatewayName);
 
         return redirect()->route('admin.payment-gateways.index')
-            ->with('success', "تم حذف بوابة الدفع {$displayName} بنجاح");
+            ->with('success', __('messages.msg_060'));
     }
 
     private function updateConfigFile(PaymentGatewaySetting $gateway): array

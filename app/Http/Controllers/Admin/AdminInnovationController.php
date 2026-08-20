@@ -117,7 +117,7 @@ class AdminInnovationController extends Controller
                 Cache::put("recalculating_user_{$student->id}", 'processing', 300);
                 RecalculateIndexesJob::dispatch($student);
             }
-            return back()->with('success', 'تم بدء إعادة حساب مؤشرات جميع الطلاب بنجاح.');
+            return back()->with('success', __('messages.msg_016'));
         }
 
         $request->validate([
@@ -128,7 +128,7 @@ class AdminInnovationController extends Controller
         Cache::put("recalculating_user_{$student->id}", 'processing', 300);
         RecalculateIndexesJob::dispatch($student);
 
-        return back()->with('success', "تم بدء إعادة حساب مؤشرات الطالب {$student->name} بنجاح.");
+        return back()->with('success', __('messages.msg_017'));
     }
 
     /**
@@ -198,7 +198,7 @@ class AdminInnovationController extends Controller
         Cache::put("generating_report_{$student->id}", 'processing', 300);
         GenerateAIReportJob::dispatch($student, 'student');
 
-        return back()->with('success', 'تم بدء توليد تقرير الذكاء الاصطناعي للطالب بنجاح.');
+        return back()->with('success', __('messages.msg_018'));
     }
 
     /**

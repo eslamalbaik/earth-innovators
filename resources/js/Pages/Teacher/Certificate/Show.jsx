@@ -9,6 +9,7 @@ import DesktopFooter from '@/Components/Mobile/DesktopFooter';
 import { useTranslation } from '@/i18n';
 import { useToast } from '@/Contexts/ToastContext';
 import { downloadElementAsImage, printElementAsImage, shareElementAsImage } from '@/utils/downloadElementAsImage';
+import CertificateCard from '@/Components/Certificate/CertificateCard';
 
 export default function TeacherCertificateShow({ auth, user, stats, certificate, membershipSummary = null, school = null, latestApprovedCertificates = [] }) {
     const { t, language } = useTranslation();
@@ -154,84 +155,16 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate,
                                 <h2 className="text-base font-bold text-gray-900 mb-4">{t('teacherCertificateShowPage.certificate.title')}</h2>
 
                                 {/* Certificate Display */}
-                                <div ref={certificateRef} className="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-4 relative">
-                                    <div className="bg-white rounded-xl p-4">
-                                        {/* Certificate Header with Logo */}
-                                        <div className="flex items-center justify-between mb-4">
-                                            <div className="flex-1"></div>
-                                            <h1 className="text-lg font-extrabold text-orange-600 text-center flex-2">
-                                                {t('teacherCertificateShowPage.certificate.heading')}
-                                            </h1>
-                                            <div className="flex-1 flex justify-end">
-                                                <img
-                                                    src="/images/logo-modified.png"
-                                                    alt={t('common.appName')}
-                                                    className="w-16 h-16 object-contain"
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="h-0.5 bg-[#A3C042] mb-4"></div>
-
-                                        {/* Certificate Body */}
-                                        <div className="space-y-3 text-sm text-gray-800 leading-relaxed">
-                                            <p className="text-center text-xs text-gray-600">
-                                                {t('teacherCertificateShowPage.certificate.platformCertifies', { appName: t('common.appName') })}
-                                            </p>
-
-                                            <p className="text-center">
-                                                <span className="font-bold text-[#A3C042] text-base">{t('teacherCertificateShowPage.certificate.nameLine', { name: user?.name || t('teacherCertificateShowPage.certificate.teacherFallback') })}</span>
-                                            </p>
-
-                                            <div className="border-b-2 border-dotted border-gray-300 my-2"></div>
-
-                                            <p className="text-center text-xs text-gray-600 mb-3">
-                                                {t('teacherCertificateShowPage.teacherInfo.membershipNumber')}: <span className="font-bold">{user?.membership_number || t('common.notAvailable')}</span>
-                                            </p>
-
-                                            <p className="text-justify leading-relaxed text-xs mb-2">
-                                                {t('teacherCertificateShowPage.certificate.committeeLinePrefix')}{' '}
-                                                <span className="font-bold text-[#A3C042]">{t('teacherCertificateShowPage.certificate.programName')}</span>
-                                            </p>
-
-                                            {certificate?.period_start && certificate?.period_end && (
-                                                <p className="text-center text-xs text-gray-600 mb-2">
-                                                    {t('teacherCertificateShowPage.certificate.periodLine', { start: formatDate(certificate.period_start), end: formatDate(certificate.period_end) })}
-                                                </p>
-                                            )}
-
-                                            <p className="text-justify leading-relaxed text-xs mb-3">
-                                                {t('teacherCertificateShowPage.certificate.excellenceParagraph')}
-                                            </p>
-
-                                            <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-3 my-4 shadow-sm">
-                                                <p className="text-center text-xs text-yellow-800 leading-relaxed font-medium">
-                                                    {t('teacherCertificateShowPage.certificate.motto')}
-                                                </p>
-                                            </div>
-
-                                        </div>
-
-                                        {/* Certificate Footer */}
-                                        <div className="mt-6 pt-4 border-t border-gray-200">
-                                            <div className="flex items-center justify-between">
-                                                <div className="text-center flex-1">
-                                                    <div className="text-[10px] text-gray-500 mb-1">{t('teacherCertificateShowPage.certificate.ceoTitle')}</div>
-                                                    <div className="text-xs font-bold text-gray-700">{t('teacherCertificateShowPage.certificate.ceoName')}</div>
-                                                    <div className="text-[10px] text-gray-500 mt-1">{t('teacherCertificateShowPage.certificate.ceoOrg')}</div>
-                                                </div>
-                                                <div className="w-10 h-10 border-2 border-green-500 rounded-full flex items-center justify-center mx-3">
-                                                    <FaMedal className="text-green-500 text-sm" />
-                                                </div>
-                                                <div className="text-center flex-1">
-                                                    <div className="text-[10px] text-gray-500 mb-1">{t('teacherCertificateShowPage.certificate.issueDate')}:</div>
-                                                    <div className="text-xs font-bold text-gray-700">
-                                                        {formatDate(certificate?.issue_date) || formatDate(new Date())}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <CertificateCard 
+                                    ref={certificateRef}
+                                    user={user}
+                                    role="teacher"
+                                    barcode={certificate?.barcode}
+                                    issueDate={certificate?.issue_date_formatted || new Date().toLocaleDateString('en-GB')}
+                                    membershipStatus={membershipSummary?.membership_type === 'subscription'
+                                        ? t('teacherCertificatesIndexPage.membershipStatus.subscription')
+                                        : t('teacherCertificatesIndexPage.membershipStatus.basic')}
+                                />
 
                                 {/* Action Buttons */}
                                 <div className="no-print mt-4 grid grid-cols-3 gap-3">
@@ -323,124 +256,16 @@ export default function TeacherCertificateShow({ auth, user, stats, certificate,
                                     <h2 className="text-xl font-bold text-gray-900 mb-6 no-print">{t('teacherCertificateShowPage.certificate.title')}</h2>
 
                                     {/* Certificate Display */}
-                                    <div
+                                    <CertificateCard 
                                         ref={certificateRef}
-                                        className="certificate-print relative rounded-2xl p-3"
-                                        style={{ background: 'linear-gradient(135deg, #d4af37 0%, #b8860b 50%, #d4af37 100%)' }}
-                                    >
-                                        <div
-                                            className="relative overflow-hidden rounded-xl bg-[#fffdf7] p-10"
-                                            style={{ boxShadow: 'inset 0 0 0 2px #d4af37, inset 0 0 0 9px #fffdf7, inset 0 0 0 11px rgba(212,175,55,0.45)' }}
-                                        >
-                                            {/* Corner ornaments */}
-                                            <span className="pointer-events-none absolute left-5 top-5 h-9 w-9 rounded-tl-lg border-l-4 border-t-4 border-[#d4af37]" />
-                                            <span className="pointer-events-none absolute right-5 top-5 h-9 w-9 rounded-tr-lg border-r-4 border-t-4 border-[#d4af37]" />
-                                            <span className="pointer-events-none absolute bottom-5 left-5 h-9 w-9 rounded-bl-lg border-b-4 border-l-4 border-[#d4af37]" />
-                                            <span className="pointer-events-none absolute bottom-5 right-5 h-9 w-9 rounded-br-lg border-b-4 border-r-4 border-[#d4af37]" />
-
-                                            {/* Watermark */}
-                                            <FaCertificate
-                                                className="pointer-events-none absolute left-1/2 top-1/2 text-[#A3C042]"
-                                                style={{ transform: 'translate(-50%, -50%)', fontSize: '240px', opacity: 0.05 }}
-                                            />
-
-                                            <div className="relative">
-                                                {/* Header */}
-                                                <div className="flex items-center justify-between">
-                                                    <img
-                                                        src="/images/logo-modified.png"
-                                                        alt={t('common.appName')}
-                                                        className="h-20 w-20 object-contain"
-                                                    />
-                                                    <div className="text-center">
-                                                        <p className="text-sm font-semibold tracking-wide text-[#b8860b]">أكاديمية إرث المبتكرين</p>
-                                                        <h1 className="mt-1 text-3xl font-extrabold text-[#8a6d1b]">
-                                                            {t('teacherCertificateShowPage.certificate.heading')}
-                                                        </h1>
-                                                    </div>
-                                                    <div
-                                                        className="flex h-20 w-20 items-center justify-center rounded-full"
-                                                        style={{ background: 'radial-gradient(circle, #ffffff 0%, #f3e9c7 100%)', boxShadow: '0 0 0 2px #d4af37' }}
-                                                    >
-                                                        <FaCertificate className="text-3xl text-[#b8860b]" />
-                                                    </div>
-                                                </div>
-
-                                                {/* Gold divider with diamond */}
-                                                <div className="my-6 flex items-center justify-center gap-2">
-                                                    <span className="h-[2px] flex-1" style={{ background: 'linear-gradient(to left, #d4af37, transparent)' }} />
-                                                    <span className="h-2.5 w-2.5 rotate-45 bg-[#d4af37]" />
-                                                    <span className="h-[2px] flex-1" style={{ background: 'linear-gradient(to right, #d4af37, transparent)' }} />
-                                                </div>
-
-                                                {/* Body */}
-                                                <div className="space-y-4 text-base leading-relaxed text-gray-800">
-                                                    <p className="text-center text-sm text-gray-500">
-                                                        {t('teacherCertificateShowPage.certificate.platformCertifies', { appName: t('common.appName') })}
-                                                    </p>
-
-                                                    <p className="text-center text-3xl font-extrabold text-[#5a7a00]">
-                                                        {t('teacherCertificateShowPage.certificate.nameLine', { name: user?.name || t('teacherCertificateShowPage.certificate.teacherFallback') })}
-                                                    </p>
-
-                                                    <div className="mx-auto flex w-2/3 items-center justify-center gap-2">
-                                                        <span className="h-px flex-1 bg-[#d4af37]/50" />
-                                                        <span className="inline-flex items-center gap-1 rounded-full border border-[#d4af37]/60 bg-[#fffaf0] px-3 py-1 text-xs font-bold text-[#8a6d1b]">
-                                                            {t('teacherCertificateShowPage.teacherInfo.membershipNumber')}: {user?.membership_number || t('common.notAvailable')}
-                                                        </span>
-                                                        <span className="h-px flex-1 bg-[#d4af37]/50" />
-                                                    </div>
-
-                                                    <p className="text-center leading-loose text-base">
-                                                        {t('teacherCertificateShowPage.certificate.committeeLinePrefix')}{' '}
-                                                        <span className="font-bold text-[#A3C042]">{t('teacherCertificateShowPage.certificate.programName')}</span>
-                                                    </p>
-
-                                                    {certificate?.period_start && certificate?.period_end && (
-                                                        <p className="text-center text-sm text-gray-600">
-                                                            {t('teacherCertificateShowPage.certificate.periodLine', { start: formatDate(certificate.period_start), end: formatDate(certificate.period_end) })}
-                                                        </p>
-                                                    )}
-
-                                                    <p className="text-center leading-loose text-sm text-gray-700">
-                                                        {t('teacherCertificateShowPage.certificate.excellenceParagraph')}
-                                                    </p>
-
-                                                    <div
-                                                        className="mx-auto my-6 max-w-md rounded-full px-6 py-2 text-center"
-                                                        style={{ background: 'linear-gradient(to right, transparent, #f7f0d8 50%, transparent)' }}
-                                                    >
-                                                        <p className="text-sm font-bold tracking-wide text-[#8a6d1b]">
-                                                            {t('teacherCertificateShowPage.certificate.motto')}
-                                                        </p>
-                                                    </div>
-                                                </div>
-
-                                                {/* Footer */}
-                                                <div className="mt-8 flex items-end justify-between">
-                                                    <div className="flex-1 text-center">
-                                                        <div className="mx-auto mb-1 h-px w-32 bg-gray-400" />
-                                                        <div className="text-xs text-gray-500">{t('teacherCertificateShowPage.certificate.ceoTitle')}</div>
-                                                        <div className="text-sm font-bold text-gray-800">{t('teacherCertificateShowPage.certificate.ceoName')}</div>
-                                                        <div className="mt-1 text-[10px] text-gray-500">{t('teacherCertificateShowPage.certificate.ceoOrg')}</div>
-                                                    </div>
-                                                    <div
-                                                        className="mx-6 flex h-16 w-16 items-center justify-center rounded-full"
-                                                        style={{ background: 'radial-gradient(circle, #fff9e6 0%, #f3e9c7 100%)', boxShadow: '0 0 0 3px #d4af37, 0 0 0 5px #fffdf7, 0 0 0 6px rgba(212,175,55,0.5)' }}
-                                                    >
-                                                        <FaMedal className="text-2xl text-[#b8860b]" />
-                                                    </div>
-                                                    <div className="flex-1 text-center">
-                                                        <div className="mx-auto mb-1 h-px w-32 bg-gray-400" />
-                                                        <div className="text-xs text-gray-500">{t('teacherCertificateShowPage.certificate.issueDate')}</div>
-                                                        <div className="text-sm font-bold text-gray-800">
-                                                            {formatDate(certificate?.issue_date) || formatDate(new Date())}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                        user={user}
+                                        role="teacher"
+                                        barcode={certificate?.barcode}
+                                        issueDate={certificate?.issue_date_formatted || new Date().toLocaleDateString('en-GB')}
+                                        membershipStatus={membershipSummary?.membership_type === 'subscription'
+                                            ? t('teacherCertificatesIndexPage.membershipStatus.subscription')
+                                            : t('teacherCertificatesIndexPage.membershipStatus.basic')}
+                                    />
 
                                     {/* Action Buttons */}
                                     <div className="no-print mt-6 grid grid-cols-3 gap-4">

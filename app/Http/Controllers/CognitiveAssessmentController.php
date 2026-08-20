@@ -79,7 +79,7 @@ class CognitiveAssessmentController extends Controller
 
         return redirect()
             ->route('teacher.innovation.student-report', $student)
-            ->with('success', 'تم حفظ التقييم المعرفي بنجاح.');
+            ->with('success', __('messages.msg_094'));
     }
 
     /**

@@ -13,6 +13,8 @@ class StoreStudentDTO extends BaseDTO
     public int $schoolId;
     public int $points = 0;
     public ?int $year = null;
+    public ?string $grade = null;
+    public ?string $section = null;
 
     public static function fromRequest(array $data, int $schoolId): self
     {
@@ -24,6 +26,8 @@ class StoreStudentDTO extends BaseDTO
         $dto->schoolId = $schoolId;
         $dto->points = 0;
         $dto->year = isset($data['year']) && $data['year'] ? (int) $data['year'] : null;
+        $dto->grade = $data['grade'] ?? null;
+        $dto->section = $data['section'] ?? null;
 
         return $dto;
     }

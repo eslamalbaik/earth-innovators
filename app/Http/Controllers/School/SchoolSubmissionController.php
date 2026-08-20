@@ -67,7 +67,7 @@ class SchoolSubmissionController extends Controller
                                    $submission->project->school_id === $school->id;
         
         if (!$school->canAccessAllSchoolData() && !$isSchoolProject && !$isAdminProjectForSchool) {
-            abort(403, 'غير مصرح لك بعرض هذا التسليم');
+            abort(403, __('messages.msg_153'));
         }
 
         // المشاريع المعتمدة للمدرسة (بما في ذلك مشاريع الإدارة المرتبطة بهذه المدرسة)

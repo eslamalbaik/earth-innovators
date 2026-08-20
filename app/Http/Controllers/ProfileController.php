@@ -50,16 +50,16 @@ class ProfileController extends Controller
 
         if ($user->isStudent()) {
             return Redirect::route('student.profile')
-                ->with('success', 'تم تحديث الملف الشخصي بنجاح.');
+                ->with('success', __('messages.msg_107'));
         }
 
         if ($user->isTeacher()) {
             return Redirect::route('teacher.profile')
-                ->with('success', 'تم تحديث الملف الشخصي بنجاح.');
+                ->with('success', __('messages.msg_107'));
         }
 
         return Redirect::route('profile.edit')
-            ->with('success', 'تم تحديث الملف الشخصي بنجاح.');
+            ->with('success', __('messages.msg_107'));
     }
 
     public function destroy(Request $request): RedirectResponse
@@ -76,6 +76,6 @@ class ProfileController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return Redirect::to('/')->with('success', 'تم حذف الحساب بنجاح.');
+        return Redirect::to('/')->with('success', __('messages.msg_108'));
     }
 }

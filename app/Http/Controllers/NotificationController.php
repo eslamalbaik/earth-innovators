@@ -76,7 +76,7 @@ class NotificationController extends Controller
             ]);
         }
 
-        return back()->with('success', 'تم تحديد الإشعار كمقروء');
+        return back()->with('success', __('messages.msg_097'));
     }
 
     /**
@@ -93,7 +93,7 @@ class NotificationController extends Controller
             ]);
         }
 
-        return back()->with('success', 'تم تحديد جميع الإشعارات كمقروءة');
+        return back()->with('success', __('messages.msg_098'));
     }
 
     /**

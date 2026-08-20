@@ -77,7 +77,7 @@ class PasswordResetLinkController extends Controller
             }
 
             return redirect()->route('password.reset.otp', ['token' => $otp->token])
-                ->with('status', 'تم إرسال رمز التحقق إلى بريدك الإلكتروني بنجاح.');
+                ->with('status', __('messages.msg_070'));
         } catch (ValidationException $e) {
             throw $e;
         } catch (\Exception $e) {

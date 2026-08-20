@@ -79,7 +79,7 @@ class SchoolBadgeController extends Controller
         $school = Auth::user();
         
         if (!$school->canAccessAllSchoolData() && ($badge->school_id !== $school->id || $badge->status !== 'pending')) {
-            abort(403, 'غير مصرح لك بقبول هذه الشارة');
+            abort(403, __('messages.msg_124'));
         }
         
         $badge->update([
@@ -89,7 +89,7 @@ class SchoolBadgeController extends Controller
             'is_active' => true,
         ]);
         
-        return redirect()->back()->with('success', 'تم قبول الشارة بنجاح');
+        return redirect()->back()->with('success', __('messages.msg_122'));
     }
 
     /**
@@ -100,7 +100,7 @@ class SchoolBadgeController extends Controller
         $school = Auth::user();
         
         if (!$school->canAccessAllSchoolData() && ($badge->school_id !== $school->id || $badge->status !== 'pending')) {
-            abort(403, 'غير مصرح لك برفض هذه الشارة');
+            abort(403, __('messages.msg_125'));
         }
         
         $validated = $request->validate([
@@ -114,7 +114,7 @@ class SchoolBadgeController extends Controller
             'rejection_reason' => $validated['rejection_reason'] ?? null,
         ]);
         
-        return redirect()->back()->with('success', 'تم رفض الشارة');
+        return redirect()->back()->with('success', __('messages.msg_123'));
     }
 
     /**
@@ -125,7 +125,7 @@ class SchoolBadgeController extends Controller
         $school = Auth::user();
         
         if (!$school->canAccessAllSchoolData() && $badge->school_id !== $school->id) {
-            abort(403, 'غير مصرح لك بعرض هذه الشارة');
+            abort(403, __('messages.msg_126'));
         }
         
         $badge->load(['creator', 'approver', 'school'])->loadCount('users');

@@ -214,7 +214,7 @@ class SchoolPublicationController extends Controller
 
             return redirect()
                 ->route('school.publications.index')
-                ->with('success', 'تم نشر المقال بنجاح!');
+                ->with('success', __('messages.msg_029'));
         } catch (\Exception $e) {
             \Log::error('Error creating publication: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
@@ -242,14 +242,14 @@ class SchoolPublicationController extends Controller
         if ($publication->status !== 'pending') {
             return redirect()
                 ->route('school.publications.pending')
-                ->with('error', 'هذا المقال غير معلق.');
+                ->with('error', __('messages.msg_144'));
         }
 
         $this->publicationService->approvePublication($publication, $user->id);
 
         return redirect()
             ->route('school.publications.pending')
-            ->with('success', 'تم الموافقة على المقال بنجاح!');
+            ->with('success', __('messages.msg_031'));
     }
 
     /**
@@ -272,7 +272,7 @@ class SchoolPublicationController extends Controller
 
         return redirect()
             ->route('school.publications.pending')
-            ->with('success', 'تم رفض المقال.');
+            ->with('success', __('messages.msg_032'));
     }
 
     /**
@@ -358,7 +358,7 @@ class SchoolPublicationController extends Controller
 
             return redirect()
                 ->route('school.publications.index')
-                ->with('success', 'تم تحديث المقال بنجاح!');
+                ->with('success', __('messages.msg_145'));
         } catch (\Exception $e) {
             \Log::error('Error updating publication: ' . $e->getMessage(), [
                 'publication_id' => $publication->id,
@@ -389,7 +389,7 @@ class SchoolPublicationController extends Controller
 
             return redirect()
                 ->route('school.publications.index')
-                ->with('success', 'تم حذف المقال بنجاح!');
+                ->with('success', __('messages.msg_033'));
         } catch (\Exception $e) {
             \Log::error('Error deleting publication: ' . $e->getMessage(), [
                 'publication_id' => $publication->id,

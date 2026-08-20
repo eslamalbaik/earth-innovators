@@ -82,7 +82,7 @@ class AcceptanceCriteriaController extends Controller
         // Check if weight exceeds 100% for single criterion
         if ($validated['weight'] > 100) {
             return back()->withErrors([
-                'weight' => "الوزن يجب ألا يتجاوز 100% للمعيار الواحد"
+                'weight' => __('messages.msg_009')
             ])->withInput();
         }
 
@@ -94,7 +94,7 @@ class AcceptanceCriteriaController extends Controller
         if ($newTotal > 100) {
             $maxAllowed = 100 - $currentTotal;
             return back()->withErrors([
-                'weight' => "مجموع الأوزان للمشروع المحدد سيكون {$newTotal}% وهو أكبر من 100%. المجموع الحالي: {$currentTotal}%. الحد الأقصى المسموح: {$maxAllowed}%"
+                'weight' => __('messages.msg_010')
             ])->withInput();
         }
 
@@ -112,7 +112,7 @@ class AcceptanceCriteriaController extends Controller
         }
 
         return redirect($redirectUrl)
-            ->with('success', 'تم إضافة المعيار بنجاح');
+            ->with('success', __('messages.msg_005'));
     }
 
     /**
@@ -138,7 +138,7 @@ class AcceptanceCriteriaController extends Controller
         // Check if weight exceeds 100% for single criterion
         if ($validated['weight'] > 100) {
             return back()->withErrors([
-                'weight' => "الوزن يجب ألا يتجاوز 100% للمعيار الواحد"
+                'weight' => __('messages.msg_009')
             ])->withInput();
         }
 
@@ -152,7 +152,7 @@ class AcceptanceCriteriaController extends Controller
         if ($newTotal > 100) {
             $maxAllowed = 100 - $currentTotal;
             return back()->withErrors([
-                'weight' => "مجموع الأوزان للمشروع المحدد سيكون {$newTotal}% وهو أكبر من 100%. المجموع الحالي (بدون هذا المعيار): {$currentTotal}%. الحد الأقصى المسموح: {$maxAllowed}%"
+                'weight' => __('messages.msg_011')
             ])->withInput();
         }
 
@@ -164,7 +164,7 @@ class AcceptanceCriteriaController extends Controller
         }
 
         return redirect($redirectUrl)
-            ->with('success', 'تم تحديث المعيار بنجاح');
+            ->with('success', __('messages.msg_006'));
     }
 
     /**
@@ -181,7 +181,7 @@ class AcceptanceCriteriaController extends Controller
         }
 
         return redirect($redirectUrl)
-            ->with('success', 'تم حذف المعيار بنجاح');
+            ->with('success', __('messages.msg_007'));
     }
 
     /**
@@ -203,6 +203,6 @@ class AcceptanceCriteriaController extends Controller
         });
 
         return redirect()->route('admin.acceptance-criteria.index')
-            ->with('success', 'تم تحديث ترتيب المعايير بنجاح');
+            ->with('success', __('messages.msg_008'));
     }
 }

@@ -98,7 +98,7 @@ class ChallengeStudentController extends Controller
 
             return redirect()
                 ->route('admin.challenges.show', $challenge->id)
-                ->with('success', 'تم تعيين الطلاب للتحدي بنجاح');
+                ->with('success', __('messages.msg_047'));
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withErrors(['error' => 'حدث خطأ أثناء تعيين الطلاب: ' . $e->getMessage()]);

@@ -125,7 +125,7 @@ class PackageController extends Controller
         $this->packageService->createPackage($request->validated());
 
         return redirect()->route('admin.packages.index')
-            ->with('success', 'تم إنشاء الباقة بنجاح');
+            ->with('success', __('messages.msg_052'));
     }
 
     /**
@@ -190,7 +190,7 @@ class PackageController extends Controller
         $this->packageService->updatePackage($package, $request->validated());
 
         return redirect()->route('admin.packages.index')
-            ->with('success', 'تم تحديث الباقة بنجاح');
+            ->with('success', __('messages.msg_053'));
     }
 
     /**
@@ -205,7 +205,7 @@ class PackageController extends Controller
             $this->packageService->deletePackage($package);
 
             return redirect()->route('admin.packages.index')
-                ->with('success', 'تم حذف الباقة بنجاح');
+                ->with('success', __('messages.msg_054'));
         } catch (\Exception $e) {
             return redirect()->route('admin.packages.index')
                 ->with('error', $e->getMessage());
@@ -223,7 +223,7 @@ class PackageController extends Controller
         $this->packageService->togglePackageStatus($package, !$package->is_active);
 
         return redirect()->back()
-            ->with('success', 'تم تحديث حالة الباقة بنجاح');
+            ->with('success', __('messages.msg_055'));
     }
 
     /**
@@ -293,7 +293,7 @@ class PackageController extends Controller
             $this->packageService->updateSubscriberStatus($userPackage, $request->status);
 
             return redirect()->back()
-                ->with('success', 'تم تحديث حالة المشترك بنجاح');
+                ->with('success', __('messages.msg_056'));
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', $e->getMessage());
@@ -312,7 +312,7 @@ class PackageController extends Controller
             $this->packageService->cancelSubscription($userPackage);
 
             return redirect()->back()
-                ->with('success', 'تم إلغاء الاشتراك بنجاح');
+                ->with('success', __('messages.msg_057'));
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', $e->getMessage());
@@ -336,7 +336,7 @@ class PackageController extends Controller
             $this->packageService->renewSubscription($userPackage, $request->months);
 
             return redirect()->back()
-                ->with('success', "تم تجديد الاشتراك لمدة {$request->months} شهر بنجاح");
+                ->with('success', __('messages.msg_058'));
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', $e->getMessage());

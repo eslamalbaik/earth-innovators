@@ -171,7 +171,7 @@ class StudentProjectController extends Controller
         $isAvailableForStudentSchool = $project->school_id === $student->school_id;
 
         if ($project->status !== 'approved' || (!$isAvailableForAllSchools && !$isAvailableForStudentSchool)) {
-            abort(403, 'غير مصرح لك بعرض هذا المشروع');
+            abort(403, __('messages.msg_115'));
         }
 
         // Get project details with optimized query (includes views increment inside the service)

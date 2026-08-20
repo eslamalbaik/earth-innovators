@@ -1741,6 +1741,7 @@ export const en = {
     },
     "schoolDashboardPage": {
         "pageTitle": "School Dashboard - {appName}",
+        "openTeachers": "Manage Teachers",
         "totalProjects": "Total Projects",
         "approvedShort": "Approved",
         "pendingReviewShort": "Pending Review",
@@ -2928,7 +2929,7 @@ export const en = {
             "motto": "We plant passion, we harvest success",
             "ceoTitle": "Chief Executive Officer",
             "ceoName": "A. Laila Ibrahim Al Jasmi",
-            "ceoOrg": "Owh Foundation for Publishing Cultural & Arts Prints",
+            "ceoOrg": "AWJ CULTURE & ARTS PUBLISHING",
             "issueDate": "Issue date"
         },
         "actions": {
@@ -3025,7 +3026,7 @@ export const en = {
             "studentFallback": "Student",
             "bodyParagraph": "They are an official and active member of the Innovators Legacy platform, and we present this recognition in appreciation of their outstanding achievement and leading educational efforts, reflecting diligence, commitment, and a sincere desire to develop oneself and the scientific community.",
             "achievementPeriodLine": "This achievement was completed during the period from [{start}] to [{end}].",
-            "highlight": "This achievement is a role model for excellence and innovation, and a source of pride for us all at Owh Foundation for Publishing Cultural & Arts Prints.",
+            "highlight": "This achievement is a role model for excellence and innovation, and a source of pride for us all at AWJ CULTURE & ARTS PUBLISHING.",
             "ceoTitle": "Chief Executive Officer",
             "ceoName": "A. Laila Ibrahim Al Jasmi",
             "issueDate": "Issue date"
@@ -5238,7 +5239,10 @@ export const en = {
         "students": "Students",
         "ranking": "Ranking & Badges",
         "addReports": "Add Reports",
-        "points": "Points"
+        "points": "Points",
+        "smartAgent": "Smart Agent",
+        "smartTalentSearch": "Smart Talent Search",
+        "teachersManagement": "Teachers Management"
     },
     "notifications": {
         "title": "Notifications",
@@ -6148,7 +6152,7 @@ export const en = {
             "supportParagraph": "Through this certificate, the platform confirms its continuous support for the member school and its commitment to the values and vision that foster innovation and knowledge development.",
             "ceoTitle": "Chief Executive Officer",
             "ceoName": "A. Laila Ibrahim Al Jasmi",
-            "ceoOrg": "Owh Foundation for Publishing Cultural & Arts Prints",
+            "ceoOrg": "AWJ CULTURE & ARTS PUBLISHING",
             "issueDate": "Issue date:"
         },
         "actions": {
@@ -6667,6 +6671,21 @@ export const en = {
         "uploaded": "The {attribute} failed to upload.",
         "url": "The {attribute} format is invalid.",
         "uuid": "The {attribute} must be a valid UUID."
+    },
+    "innovationSummary": {
+        "title": "Innovation Tracking",
+        "subtitle": "Innovation indexes and classifications for your students",
+        "viewDetails": "View Details",
+        "totalStudents": "Total Students",
+        "avgScore": "Average Score",
+        "needsAttention": "Needs Attention",
+        "topStudents": "Outstanding"
+    },
+    "sections": {
+        "testimonials": {
+            "title": "Stories from Our Community",
+            "subtitle": "Real experiences from our students, teachers and innovators"
+        }
     }
 };
 

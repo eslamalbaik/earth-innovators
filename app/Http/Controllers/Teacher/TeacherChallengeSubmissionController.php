@@ -80,7 +80,7 @@ class TeacherChallengeSubmissionController extends Controller
 
         // Verify submission belongs to teacher's challenge
         if ($submission->challenge->created_by !== $teacher->id) {
-            abort(403, 'غير مصرح لك بعرض هذا التقديم');
+            abort(403, __('messages.msg_137'));
         }
 
         $submission->load(['challenge', 'student', 'reviewer']);
@@ -108,7 +108,7 @@ class TeacherChallengeSubmissionController extends Controller
 
         // Verify submission belongs to teacher's challenge
         if ($submission->challenge->created_by !== $teacher->id) {
-            abort(403, 'غير مصرح لك بتقييم هذا التقديم');
+            abort(403, __('messages.msg_138'));
         }
 
         $validated = $request->validate([
@@ -149,7 +149,7 @@ class TeacherChallengeSubmissionController extends Controller
 
             return redirect()
                 ->route('teacher.challenge-submissions.index', ['challenge_id' => $submission->challenge_id])
-                ->with('success', 'تم إرسال التقييم بنجاح!');
+                ->with('success', __('messages.msg_015'));
         } catch (\Exception $e) {
             Log::error('Error evaluating submission: ' . $e->getMessage(), [
                 'submission_id' => $submission->id,

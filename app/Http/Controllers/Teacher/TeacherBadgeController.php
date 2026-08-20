@@ -94,7 +94,7 @@ class TeacherBadgeController extends Controller
         Badge::create($badgeData);
 
         return redirect()->route('teacher.badges.index')
-            ->with('success', 'تم إرسال الشارة للمراجعة بنجاح');
+            ->with('success', __('messages.msg_178'));
     }
 
     /**
@@ -106,7 +106,7 @@ class TeacherBadgeController extends Controller
         
         // التحقق من أن الشارة منشأة من قبل هذا المعلم
         if ($badge->created_by !== $teacher->id) {
-            abort(403, 'غير مصرح لك بعرض هذه الشارة');
+            abort(403, __('messages.msg_126'));
         }
 
         $badge->load(['school', 'approver', 'creator']);

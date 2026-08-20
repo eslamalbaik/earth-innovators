@@ -66,12 +66,12 @@ class StudentSubjectController extends Controller
         $subject = Subject::findOrFail($request->subject_id);
 
         if ($user->subjects()->where('subjects.id', $subject->id)->exists()) {
-            return redirect()->back()->with('error', 'هذه المادة موجودة بالفعل في قائمتك');
+            return redirect()->back()->with('error', __('messages.msg_173'));
         }
 
         $user->subjects()->attach($subject->id);
 
-        return redirect()->back()->with('success', 'تم إضافة المادة بنجاح');
+        return redirect()->back()->with('success', __('messages.msg_174'));
     }
 
     public function destroy($id)
@@ -80,11 +80,11 @@ class StudentSubjectController extends Controller
         $subject = Subject::findOrFail($id);
 
         if (!$user->subjects()->where('subjects.id', $subject->id)->exists()) {
-            return redirect()->back()->with('error', 'هذه المادة غير موجودة في قائمتك');
+            return redirect()->back()->with('error', __('messages.msg_175'));
         }
 
         $user->subjects()->detach($subject->id);
 
-        return redirect()->back()->with('success', 'تم حذف المادة بنجاح');
+        return redirect()->back()->with('success', __('messages.msg_176'));
     }
 }

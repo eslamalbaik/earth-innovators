@@ -159,13 +159,21 @@ class RegisteredUserController extends Controller
                 ]);
             }
 
-            event(new Registered($user));
+            try {
+                event(new Registered($user));
+            } catch (\Exception $emailException) {
+                Log::error('Registration email failed: ' . $emailException->getMessage());
+                // Set a warning message if you have a flash message system, otherwise the user still logs in successfully.
+                session()->flash('warning', 'تم إنشاء الحساب بنجاح، ولكن تعذر إرسال رسالة التفعيل. يرجى التواصل مع الدعم الفني.');
+            }
+
             Auth::login($user);
 
             return redirect(route('dashboard', absolute: false));
         } catch (\Exception $e) {
+            Log::error('Registration failed: ' . $e->getMessage(), ['exception' => $e]);
             return back()->withErrors([
-                'error' => 'حدث خطأ أثناء إنشاء الحساب: ' . $e->getMessage(),
+                'error' => 'حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة مرة أخرى لاحقاً.',
             ])->withInput();
         }
     }

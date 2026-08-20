@@ -41,6 +41,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'contract_end_date',
         'contract_status',
         'year',
+        'grade',
+        'section',
         'official_links',
         'supporting_documents',
         'innovator_classification',

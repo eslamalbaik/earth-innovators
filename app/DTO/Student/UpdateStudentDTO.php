@@ -11,6 +11,8 @@ class UpdateStudentDTO extends BaseDTO
     public ?string $phone;
     public ?string $password;
     public ?int $year = null;
+    public ?string $grade = null;
+    public ?string $section = null;
 
     public static function fromRequest(array $data): self
     {
@@ -20,6 +22,8 @@ class UpdateStudentDTO extends BaseDTO
         $dto->phone = $data['phone'] ?? null;
         $dto->password = $data['password'] ?? null;
         $dto->year = isset($data['year']) && $data['year'] ? (int) $data['year'] : null;
+        $dto->grade = $data['grade'] ?? null;
+        $dto->section = $data['section'] ?? null;
 
         return $dto;
     }

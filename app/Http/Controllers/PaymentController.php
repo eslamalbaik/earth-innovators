@@ -35,23 +35,23 @@ class PaymentController extends Controller
         $amount = $this->paymentService->resolveBookingAmount($booking);
 
         if ($amount <= 0) {
-            return redirect()->back()->with('error', 'المبلغ غير صحيح');
+            return redirect()->back()->with('error', __('messages.msg_100'));
         }
 
         $sessionsAvailable = $this->paymentService->ensureSessionsAvailable($booking);
 
         if (!$sessionsAvailable) {
-            return redirect()->route('bookings.student')->with('error', 'أحد المواعيد المختارة لم يعد متاحاً. يرجى اختيار مواعيد أخرى.');
+            return redirect()->route('bookings.student')->with('error', __('messages.msg_101'));
         }
 
         $phone = $this->paymentService->resolvePhoneNumber($booking, $user);
 
         if (!$phone) {
-            return redirect()->route('bookings.student')->with('error', 'لا يمكن البدء بعملية الدفع لعدم توفر رقم جوال في حسابك. يرجى إضافة رقم جوال من إعدادات الحساب.');
+            return redirect()->route('bookings.student')->with('error', __('messages.msg_102'));
         }
 
         if (!preg_match('/^\+971/', $phone)) {
-            return redirect()->route('bookings.student')->with('error', 'لا يمكن الدفع لأن رقم الجوال يجب أن يكون بمقدمة إماراتية (+971). يرجى تحديث رقم الجوال في إعدادات الحساب.');
+            return redirect()->route('bookings.student')->with('error', __('messages.msg_103'));
         }
 
         try {
@@ -70,7 +70,7 @@ class PaymentController extends Controller
 
             return redirect($checkoutResponse['checkout_url']);
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'حدث خطأ أثناء بدء عملية الدفع. يرجى المحاولة مرة أخرى.');
+            return redirect()->back()->with('error', __('messages.msg_104'));
         }
     }
 
@@ -92,26 +92,26 @@ class PaymentController extends Controller
             ->findOrFail($bookingId);
 
         if ($booking->payment && $booking->payment->isCompleted()) {
-            return back()->with('error', 'تم دفع هذا الحجز مسبقاً');
+            return back()->with('error', __('messages.msg_105'));
         }
 
         $amount = $this->paymentService->resolveBookingAmount($booking);
         if ($amount <= 0) {
-            return back()->with('error', 'المبلغ غير صحيح');
+            return back()->with('error', __('messages.msg_100'));
         }
 
         if (!$this->paymentService->ensureSessionsAvailable($booking)) {
-            return back()->with('error', 'أحد المواعيد المختارة لم يعد متاحاً. يرجى اختيار مواعيد أخرى.');
+            return back()->with('error', __('messages.msg_101'));
         }
 
         try {
             $phone = $this->paymentService->cleanPhoneNumber($request->phone);
             if (!$phone) {
-                return redirect()->route('bookings.student')->with('error', 'رقم الجوال غير صالح.');
+                return redirect()->route('bookings.student')->with('error', __('messages.msg_106'));
             }
 
             if (!preg_match('/^\+971/', $phone)) {
-                return redirect()->route('bookings.student')->with('error', 'لا يمكن الدفع لأن رقم الجوال يجب أن يكون بمقدمة إماراتية (+971). يرجى تحديث رقم الجوال في إعدادات الحساب.');
+                return redirect()->route('bookings.student')->with('error', __('messages.msg_103'));
             }
 
             $payment = $this->paymentService->preparePayment($booking, $user, $amount);

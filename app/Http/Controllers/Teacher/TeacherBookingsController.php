@@ -101,7 +101,7 @@ class TeacherBookingsController extends Controller
                 $teacher->id
             );
 
-            return redirect()->back()->with('success', 'تم تحديث حالة الطلب بنجاح');
+            return redirect()->back()->with('success', __('messages.msg_039'));
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }
@@ -123,6 +123,6 @@ class TeacherBookingsController extends Controller
             'payment_received_at' => now(),
         ]);
 
-        return redirect()->back()->with('success', 'تم تأكيد استلام الدفع');
+        return redirect()->back()->with('success', __('messages.msg_179'));
     }
 }
