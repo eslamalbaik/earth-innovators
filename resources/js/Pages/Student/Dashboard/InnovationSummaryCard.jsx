@@ -1,29 +1,26 @@
 import { Link } from '@inertiajs/react';
 import IndexRadarChart from '@/Components/Innovation/IndexRadarChart';
 import ClassificationBadge from '@/Components/Innovation/ClassificationBadge';
+import { useTranslation } from '@/i18n';
 
 const TYPE_ICONS = {
     project: '🏗️', research: '🔬', certificate: '📜', skill: '🎯',
     award: '🏅', patent: '💡', article: '📝', product: '📦',
 };
 
-const QUICK_LINKS = [
-    { href: '/innovation/achievements', icon: '🏆', label: 'إنجازاتي' },
-    { href: '/innovation/indexes', icon: '📊', label: 'المؤشرات' },
-    { href: '/innovation/recommendations', icon: '💡', label: 'التوصيات' },
-    { href: '/innovation/benchmarking', icon: '⚖️', label: 'المقارنات' },
-];
-
 /**
  * قسم "ملف الابتكار" داخل لوحة الطالب الأصلية —
  * يعرض الدرجة الكلية والتصنيف والمخطط الراداري للمؤشرات الثمانية
  */
 export default function InnovationSummaryCard({ innovation }) {
+    const { t } = useTranslation();
+
     if (!innovation) return null;
 
     const {
         hasIndex,
         overallScore,
+        classification,
         classificationDetails,
         indexes,
         indexNames,
@@ -31,15 +28,22 @@ export default function InnovationSummaryCard({ innovation }) {
         recentAchievements = [],
     } = innovation;
 
+    const QUICK_LINKS = [
+        { href: '/innovation/achievements', icon: '🏆', label: t('innovationSummaryCard.quickLinks.achievements') },
+        { href: '/innovation/indexes', icon: '📊', label: t('innovationSummaryCard.quickLinks.indexes') },
+        { href: '/innovation/recommendations', icon: '💡', label: t('innovationSummaryCard.quickLinks.recommendations') },
+        { href: '/innovation/benchmarking', icon: '⚖️', label: t('innovationSummaryCard.quickLinks.benchmarking') },
+    ];
+
     return (
         <div className="bg-white rounded-2xl p-5 shadow-md border border-gray-100">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                 <div>
-                    <h2 className="text-lg font-bold text-gray-900">🚀 ملف الابتكار</h2>
-                    <p className="text-sm text-gray-500 mt-0.5">مؤشراتك الثمانية وتصنيفك كمبتكر</p>
+                    <h2 className="text-lg font-bold text-gray-900">{t('innovationSummaryCard.heading')}</h2>
+                    <p className="text-sm text-gray-500 mt-0.5">{t('innovationSummaryCard.subtitle')}</p>
                 </div>
-                {hasIndex && <ClassificationBadge details={classificationDetails} size="lg" />}
+                {hasIndex && <ClassificationBadge details={classificationDetails} classificationKey={classification} size="lg" />}
             </div>
 
             {hasIndex ? (
@@ -47,23 +51,23 @@ export default function InnovationSummaryCard({ innovation }) {
                     {/* Overall score + achievements stats */}
                     <div className="lg:col-span-4 space-y-4">
                         <div className="rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 p-5 text-white text-center">
-                            <p className="text-sm opacity-90">الدرجة الكلية للابتكار</p>
+                            <p className="text-sm opacity-90">{t('innovationSummaryCard.totalScore')}</p>
                             <p className="text-5xl font-black mt-1">{Math.round(overallScore)}</p>
-                            <p className="text-xs opacity-75 mt-1">من 100</p>
+                            <p className="text-xs opacity-75 mt-1">{t('innovationSummaryCard.outOf100')}</p>
                         </div>
 
                         <div className="grid grid-cols-3 gap-2">
                             <div className="rounded-xl bg-gray-50 border border-gray-100 p-3 text-center">
                                 <p className="text-xl font-black text-indigo-600">{achievements?.total ?? 0}</p>
-                                <p className="text-[11px] text-gray-500 mt-0.5">إنجاز</p>
+                                <p className="text-[11px] text-gray-500 mt-0.5">{t('innovationSummaryCard.achievementsTotal')}</p>
                             </div>
                             <div className="rounded-xl bg-gray-50 border border-gray-100 p-3 text-center">
                                 <p className="text-xl font-black text-emerald-500">{achievements?.validated ?? 0}</p>
-                                <p className="text-[11px] text-gray-500 mt-0.5">مُتحقق</p>
+                                <p className="text-[11px] text-gray-500 mt-0.5">{t('innovationSummaryCard.achievementsValidated')}</p>
                             </div>
                             <div className="rounded-xl bg-gray-50 border border-gray-100 p-3 text-center">
                                 <p className="text-xl font-black text-amber-500">{achievements?.pending ?? 0}</p>
-                                <p className="text-[11px] text-gray-500 mt-0.5">قيد التحليل</p>
+                                <p className="text-[11px] text-gray-500 mt-0.5">{t('innovationSummaryCard.achievementsPending')}</p>
                             </div>
                         </div>
 
@@ -91,15 +95,15 @@ export default function InnovationSummaryCard({ innovation }) {
             ) : (
                 <div className="text-center py-8">
                     <span className="text-5xl block mb-3">🌱</span>
-                    <h3 className="text-lg font-bold text-gray-800 mb-1">ابدأ رحلة الابتكار!</h3>
+                    <h3 className="text-lg font-bold text-gray-800 mb-1">{t('innovationSummaryCard.emptyTitle')}</h3>
                     <p className="text-sm text-gray-500 mb-4">
-                        أضف إنجازك الأول (مشروع، شهادة، جائزة...) وسيقوم الذكاء الاصطناعي بتحليله وحساب مؤشراتك.
+                        {t('innovationSummaryCard.emptyDescription')}
                     </p>
                     <Link
                         href="/innovation/achievements/create"
                         className="inline-block px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-medium transition-all shadow-md"
                     >
-                        + إضافة أول إنجاز
+                        {t('innovationSummaryCard.addFirstAchievement')}
                     </Link>
                 </div>
             )}

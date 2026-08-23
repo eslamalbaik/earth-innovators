@@ -51,7 +51,9 @@ export default function EditSchoolProject({ auth, project }) {
 
     const { data, setData, processing, errors } = useForm({
         title: project?.title || '',
+        title_ar: project?.title_ar || '',
         description: project?.description || '',
+        description_ar: project?.description_ar || '',
         category: project?.category || 'other',
         thumbnail: null,
         project_document: null,
@@ -292,26 +294,60 @@ export default function EditSchoolProject({ auth, project }) {
 
                 <form onSubmit={handleSubmit} className="rounded-xl bg-white p-6 shadow-lg">
                     <div className="space-y-6">
+                        {/* Arabic Title */}
                         <div>
-                            <InputLabel htmlFor="title" value={t('schoolProjectsCreatePage.form.titleLabel')} />
+                            <InputLabel htmlFor="title_ar" value={t('teacherProjectsCreatePage.form.titleArLabel')} />
+                            <TextInput
+                                id="title_ar"
+                                type="text"
+                                value={data.title_ar}
+                                onChange={(event) => setData('title_ar', event.target.value)}
+                                className="mt-1 block w-full"
+                                placeholder={t('teacherProjectsCreatePage.form.titleArPlaceholder')}
+                                required
+                            />
+                            <InputError message={errors.title_ar} className="mt-2" />
+                        </div>
+
+                        {/* English Title */}
+                        <div>
+                            <InputLabel htmlFor="title" value={t('teacherProjectsCreatePage.form.titleEnLabel')} />
                             <TextInput
                                 id="title"
                                 type="text"
                                 value={data.title}
                                 onChange={(event) => setData('title', event.target.value)}
                                 className="mt-1 block w-full"
+                                placeholder={t('teacherProjectsCreatePage.form.titleEnPlaceholder')}
                                 required
                             />
                             <InputError message={errors.title} className="mt-2" />
                         </div>
 
+                        {/* Arabic Description */}
                         <div>
-                            <InputLabel htmlFor="description" value={t('schoolProjectsCreatePage.form.descriptionLabel')} />
+                            <InputLabel htmlFor="description_ar" value={t('teacherProjectsCreatePage.form.descriptionArLabel')} />
+                            <textarea
+                                id="description_ar"
+                                value={data.description_ar}
+                                onChange={(event) => setData('description_ar', event.target.value)}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring focus:ring-[#A3C042] focus:ring-opacity-50"
+                                placeholder={t('teacherProjectsCreatePage.form.descriptionArPlaceholder')}
+                                rows="6"
+                                required
+                            />
+                            <InputError message={errors.description_ar} className="mt-2" />
+                        </div>
+
+                        {/* English Description */}
+                        <div>
+                            <InputLabel htmlFor="description" value={t('teacherProjectsCreatePage.form.descriptionEnLabel')} />
                             <textarea
                                 id="description"
                                 value={data.description}
                                 onChange={(event) => setData('description', event.target.value)}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring focus:ring-[#A3C042] focus:ring-opacity-50"
+                                placeholder={t('teacherProjectsCreatePage.form.descriptionEnPlaceholder')}
                                 rows="6"
                                 required
                             />

@@ -37,6 +37,8 @@ export default function ShowSchoolProject({ project, auth }) {
     const BackIcon = useBackIcon();
     const { confirm } = useConfirmDialog();
     const { showError } = useToast();
+    const displayTitle = language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar);
+    const displayDescription = language === 'ar' ? (project.description_ar || project.description) : (project.description || project.description_ar);
 
     const canEdit = project.user_id === auth.user.id || project.school_id === auth.user.id || Boolean(project.teacher_id);
 
@@ -67,7 +69,7 @@ export default function ShowSchoolProject({ project, auth }) {
     };
 
     const pageTitle = t('schoolProjectShowPage.pageTitle', {
-        title: project.title,
+        title: displayTitle,
         appName: t('common.appName'),
     });
 
@@ -113,7 +115,7 @@ export default function ShowSchoolProject({ project, auth }) {
                     <div className="border-b border-gray-200 bg-gradient-to-r from-[#A3C042]/10 to-legacy-blue/10 px-6 py-4">
                         <div className="flex items-start justify-between gap-4">
                             <div className="flex-1">
-                                <h1 className="mb-3 text-3xl font-bold text-gray-900">{project.title}</h1>
+                                <h1 className="mb-3 text-3xl font-bold text-gray-900">{displayTitle}</h1>
                                 <div className="flex flex-wrap items-center gap-3">
                                     <span className={`rounded-full px-3 py-1 text-sm font-semibold ${CATEGORY_COLORS[project.category] || CATEGORY_COLORS.other}`}>
                                         <FaTag className="me-1 inline" />
@@ -157,7 +159,7 @@ export default function ShowSchoolProject({ project, auth }) {
                             <h2 className="mb-3 text-xl font-bold text-gray-900">
                                 {t('schoolProjectShowPage.details.descriptionTitle')}
                             </h2>
-                            <p className="whitespace-pre-wrap leading-relaxed text-gray-700">{project.description}</p>
+                            <p className="whitespace-pre-wrap leading-relaxed text-gray-700">{displayDescription}</p>
                         </div>
 
                         {project.report && (
@@ -185,7 +187,7 @@ export default function ShowSchoolProject({ project, auth }) {
                                             <div key={`${imageUrl}-${index}`} className="group relative">
                                                 <img
                                                     src={imageUrl}
-                                                    alt={`${project.title} ${index + 1}`}
+                                                    alt={`${displayTitle} ${index + 1}`}
                                                     className="h-48 w-full rounded-lg object-cover shadow-md transition hover:shadow-xl"
                                                 />
                                                 <a

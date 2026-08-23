@@ -213,6 +213,7 @@ export default function ProjectsIndex({ auth, projects, userRole, viewMode = 'pu
                         const likes = project.likes ?? 0;
                         const comments = project.comments_count ?? 0;
                         const isLiked = project.is_liked || false;
+                        const displayTitle = language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar);
 
                         return (
                             <Link
@@ -229,7 +230,7 @@ export default function ProjectsIndex({ auth, projects, userRole, viewMode = 'pu
                                 <div className="relative">
                                     <img
                                         src={projectImage}
-                                        alt={project.title}
+                                        alt={displayTitle}
                                         className="w-full h-32 object-cover"
                                     />
                                     {isWinner && (
@@ -243,7 +244,7 @@ export default function ProjectsIndex({ auth, projects, userRole, viewMode = 'pu
                                 </div>
                                 <div className="p-3">
                                     <h3 className="text-sm font-bold text-gray-900 mb-2 line-clamp-2 min-h-[2.5rem]">
-                                        {project.title || t('projects.innovationChallenge')}
+                                        {displayTitle || t('projects.innovationChallenge')}
                                     </h3>
                                     <div className="text-xs text-gray-600 mb-2">
                                         {ageRange} • {schoolName} • {teacherName}

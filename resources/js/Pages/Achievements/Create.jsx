@@ -1,8 +1,10 @@
 import { useForm } from '@inertiajs/react';
 import StudentPageShell from '@/Components/Innovation/StudentPageShell';
 import { useState, useRef } from 'react';
+import { useTranslation } from '@/i18n';
 
 export default function AchievementCreate({ types }) {
+    const { t } = useTranslation();
     const fileInputRef = useRef(null);
     const [dragActive, setDragActive] = useState(false);
     const [urlInputs, setUrlInputs] = useState(['']);
@@ -38,17 +40,17 @@ export default function AchievementCreate({ types }) {
     const removeFile = (idx) => setData('attachments', data.attachments.filter((_, i) => i !== idx));
 
     return (
-        <StudentPageShell title="إضافة إنجاز جديد" backHref="/innovation/achievements">
+        <StudentPageShell title={t('achievements.create.pageTitle')} backHref="/innovation/achievements">
             <div className="max-w-3xl mx-auto">
                 <div className="mb-6">
-                    <h1 className="text-2xl font-bold text-gray-900">➕ إضافة إنجاز جديد</h1>
-                    <p className="text-gray-500 mt-1">سيتم تحليل إنجازك بالذكاء الاصطناعي تلقائياً</p>
+                    <h1 className="text-2xl font-bold text-gray-900">{t('achievements.create.title')}</h1>
+                    <p className="text-gray-500 mt-1">{t('achievements.create.subtitle')}</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Type Selection */}
                     <div className="bg-white/70 backdrop-blur-xl rounded-2xl p-6 border border-gray-200 shadow-lg">
-                        <label className="block text-sm font-bold text-gray-700 mb-3">نوع الإنجاز *</label>
+                        <label className="block text-sm font-bold text-gray-700 mb-3">{t('achievements.create.typeLabel')}</label>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                             {Object.entries(types).map(([key, label]) => (
                                 <button
@@ -66,7 +68,7 @@ export default function AchievementCreate({ types }) {
                                          key === 'skill' ? '🎯' : key === 'award' ? '🏅' : key === 'patent' ? '💡' :
                                          key === 'article' ? '📝' : '📦'}
                                     </span>
-                                    <span className="text-xs font-medium">{label}</span>
+                                    <span className="text-xs font-medium">{t(`achievements.types.${key}`)}</span>
                                 </button>
                             ))}
                         </div>
@@ -76,42 +78,42 @@ export default function AchievementCreate({ types }) {
                     {/* Title & Description */}
                     <div className="bg-white/70 backdrop-blur-xl rounded-2xl p-6 border border-gray-200 shadow-lg space-y-4">
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">عنوان الإنجاز *</label>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">{t('achievements.create.titleLabel')}</label>
                             <input
                                 type="text"
                                 value={data.title}
                                 onChange={e => setData('title', e.target.value)}
                                 className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                                placeholder="مثال: تطبيق للذكاء الاصطناعي في التعليم"
+                                placeholder={t('achievements.create.titlePlaceholder')}
                             />
                             {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">الوصف</label>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">{t('achievements.create.descriptionLabel')}</label>
                             <textarea
                                 value={data.description}
                                 onChange={e => setData('description', e.target.value)}
                                 rows={5}
                                 className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                                placeholder="اكتب وصفاً تفصيلياً للإنجاز..."
+                                placeholder={t('achievements.create.descriptionPlaceholder')}
                             />
                             {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">الفئة</label>
+                                <label className="block text-sm font-bold text-gray-700 mb-2">{t('achievements.create.categoryLabel')}</label>
                                 <input
                                     type="text"
                                     value={data.category}
                                     onChange={e => setData('category', e.target.value)}
                                     className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-indigo-500 transition-all"
-                                    placeholder="مثال: تقنية المعلومات"
+                                    placeholder={t('achievements.create.categoryPlaceholder')}
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">التاريخ</label>
+                                <label className="block text-sm font-bold text-gray-700 mb-2">{t('achievements.create.dateLabel')}</label>
                                 <input
                                     type="date"
                                     value={data.date}
@@ -124,7 +126,7 @@ export default function AchievementCreate({ types }) {
 
                     {/* File Upload */}
                     <div className="bg-white/70 backdrop-blur-xl rounded-2xl p-6 border border-gray-200 shadow-lg">
-                        <label className="block text-sm font-bold text-gray-700 mb-3">📎 الملفات الداعمة</label>
+                        <label className="block text-sm font-bold text-gray-700 mb-3">{t('achievements.create.filesLabel')}</label>
 
                         <div
                             onDragEnter={handleDrag}
@@ -139,7 +141,7 @@ export default function AchievementCreate({ types }) {
                             }`}
                         >
                             <span className="text-4xl block mb-3">📁</span>
-                            <p className="text-gray-600 font-medium">اسحب الملفات هنا أو اضغط للرفع</p>
+                            <p className="text-gray-600 font-medium">{t('achievements.create.dragLabel')}</p>
                             <p className="text-sm text-gray-400 mt-1">PDF, Images, DOCX, Videos (حتى 20MB)</p>
                             <input
                                 ref={fileInputRef}
@@ -173,7 +175,7 @@ export default function AchievementCreate({ types }) {
 
                     {/* URL Links */}
                     <div className="bg-white/70 backdrop-blur-xl rounded-2xl p-6 border border-gray-200 shadow-lg">
-                        <label className="block text-sm font-bold text-gray-700 mb-3">🔗 روابط خارجية</label>
+                        <label className="block text-sm font-bold text-gray-700 mb-3">{t('achievements.create.linksLabel')}</label>
                         {urlInputs.map((url, idx) => (
                             <div key={idx} className="flex gap-2 mb-2">
                                 <input
@@ -198,7 +200,7 @@ export default function AchievementCreate({ types }) {
                             onClick={() => setUrlInputs([...urlInputs, ''])}
                             className="text-sm text-indigo-600 hover:text-indigo-700 font-medium mt-1"
                         >
-                            + إضافة رابط آخر
+                            {t('achievements.create.addMoreLinks')}
                         </button>
                     </div>
 
@@ -208,7 +210,7 @@ export default function AchievementCreate({ types }) {
                         disabled={processing}
                         className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-2xl font-bold text-lg transition-all shadow-lg hover:shadow-xl disabled:opacity-50"
                     >
-                        {processing ? '⏳ جاري الحفظ...' : '🚀 حفظ وتحليل بالذكاء الاصطناعي'}
+                        {processing ? t('achievements.create.saving') : t('achievements.create.submitBtn')}
                     </button>
                 </form>
             </div>

@@ -11,7 +11,7 @@ import { FaChevronLeft, FaStar, FaMedal, FaBookmark, FaHeart, FaAward, FaEdit, F
 import { getBadgeImageUrl, getColorFromName, getInitials, getUserImageUrl } from '@/utils/imageUtils';
 
 function StudentProfileContent({ user, stats = {}, badges = [], projects = [], activities = [], school, availableSchools = [], tags = [], onImageChange, imageInputRef, imagePreview, showPasswordModal, setShowPasswordModal, showDeleteModal, setShowDeleteModal, onSchoolChange, showSchoolModal, setShowSchoolModal, selectedSchoolId, setSelectedSchoolId }) {
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
     // Use real data from backend - no fallback to static data
     const displayStats = {
         points: stats?.points ?? 0,
@@ -402,7 +402,7 @@ function StudentProfileContent({ user, stats = {}, badges = [], projects = [], a
                         {displayProjects.slice(0, 2).map((project) => (
                             <div key={project.id} className="bg-gray-50 rounded-2xl p-3 border border-gray-100">
                                 <div className="flex items-center justify-between mb-2">
-                                    <span className="text-sm font-bold text-gray-900 line-clamp-1">{project.title}</span>
+                                    <span className="text-sm font-bold text-gray-900 line-clamp-1">{language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar)}</span>
                                     <span className={`text-[11px] font-bold px-2 py-1 rounded-full ${project.status === 'approved'
                                         ? 'bg-green-100 text-green-700'
                                         : 'bg-yellow-100 text-yellow-700'

@@ -3,9 +3,13 @@ import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { FaArrowRight, FaCheckCircle, FaTimesCircle, FaTrash, FaUser, FaSchool, FaChalkboardTeacher, FaEye, FaHeart, FaStar, FaFileAlt, FaCalendar, FaStar as FaStarIcon, FaRobot, FaSpinner, FaThumbsUp, FaExclamationTriangle } from 'react-icons/fa';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
+import { useTranslation } from '@/i18n';
 
 export default function AdminProjectShow({ project }) {
     const { confirm } = useConfirmDialog();
+    const { t, language } = useTranslation();
+    const displayTitle = language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar);
+    const displayDescription = language === 'ar' ? (project.description_ar || project.description) : (project.description || project.description_ar);
 
     const [isEvaluating, setIsEvaluating] = useState(false);
     const [evaluation, setEvaluation] = useState(null);
@@ -17,24 +21,24 @@ export default function AdminProjectShow({ project }) {
             const response = await axios.post(route('admin.projects.evaluate', project.id));
             setEvaluation(response.data);
         } catch (error) {
-            alert(error.response?.data?.error || 'حدث خطأ أثناء تقييم المشروع');
+            alert(error.response?.data?.error || t('adminProjectShowPage.aiEvaluation.error'));
         } finally {
             setIsEvaluating(false);
         }
     };
 
     const recommendationMeta = {
-        approve: { label: 'يُنصح بالاعتماد', className: 'bg-green-100 text-green-800' },
-        reject: { label: 'يُنصح بالرفض', className: 'bg-red-100 text-red-800' },
-        needs_revision: { label: 'يحتاج تعديلاً', className: 'bg-yellow-100 text-yellow-800' },
+        approve: { label: t('adminProjectShowPage.recommendation.approve'), className: 'bg-green-100 text-green-800' },
+        reject: { label: t('adminProjectShowPage.recommendation.reject'), className: 'bg-red-100 text-red-800' },
+        needs_revision: { label: t('adminProjectShowPage.recommendation.needsRevision'), className: 'bg-yellow-100 text-yellow-800' },
     };
 
     const handleApprove = async () => {
         const confirmed = await confirm({
-            title: 'تأكيد الموافقة',
-            message: `هل أنت متأكد من الموافقة على المشروع "${project.title}"؟`,
-            confirmText: 'موافقة',
-            cancelText: 'إلغاء',
+            title: t('adminProjectShowPage.confirm.approve.title'),
+            message: t('adminProjectShowPage.confirm.approve.message', { title: displayTitle }),
+            confirmText: t('adminProjectShowPage.confirm.approve.confirmText'),
+            cancelText: t('common.cancel'),
             variant: 'info',
         });
 
@@ -47,15 +51,15 @@ export default function AdminProjectShow({ project }) {
 
     const handleReject = async () => {
         const confirmed = await confirm({
-            title: 'تأكيد الرفض',
-            message: `هل أنت متأكد من رفض المشروع "${project.title}"؟ يمكنك إدخال سبب الرفض في الخطوة التالية.`,
-            confirmText: 'رفض',
-            cancelText: 'إلغاء',
+            title: t('adminProjectShowPage.confirm.reject.title'),
+            message: t('adminProjectShowPage.confirm.reject.message', { title: displayTitle }),
+            confirmText: t('adminProjectShowPage.confirm.reject.confirmText'),
+            cancelText: t('common.cancel'),
             variant: 'warning',
         });
 
         if (confirmed) {
-            const reason = prompt('يرجى إدخال سبب الرفض (اختياري):');
+            const reason = prompt(t('adminProjectShowPage.confirm.reject.reasonPrompt'));
             if (reason !== null) {
                 router.post(route('admin.projects.reject', project.id), {
                     reason: reason || '',
@@ -68,10 +72,10 @@ export default function AdminProjectShow({ project }) {
 
     const handleDelete = async () => {
         const confirmed = await confirm({
-            title: 'تأكيد الحذف',
-            message: `هل أنت متأكد من حذف المشروع "${project.title}"؟ هذا الإجراء لا يمكن التراجع عنه.`,
-            confirmText: 'حذف',
-            cancelText: 'إلغاء',
+            title: t('adminProjectShowPage.confirm.delete.title'),
+            message: t('adminProjectShowPage.confirm.delete.message', { title: displayTitle }),
+            confirmText: t('adminProjectShowPage.confirm.delete.confirmText'),
+            cancelText: t('common.cancel'),
             variant: 'danger',
         });
 
@@ -80,9 +84,16 @@ export default function AdminProjectShow({ project }) {
         }
     };
 
+    const submissionStatusLabel = (status) => {
+        if (status === 'approved') return t('adminProjectShowPage.submissions.status.approved');
+        if (status === 'rejected') return t('adminProjectShowPage.submissions.status.rejected');
+        if (status === 'reviewed') return t('adminProjectShowPage.submissions.status.reviewed');
+        return t('adminProjectShowPage.submissions.status.submitted');
+    };
+
     return (
-        <DashboardLayout header="تفاصيل المشروع">
-            <Head title={`${project.title} - تفاصيل المشروع`} />
+        <DashboardLayout header={t('adminProjectShowPage.headerTitle')}>
+            <Head title={`${displayTitle} - ${t('adminProjectShowPage.pageTitleSuffix')}`} />
 
             <div className="mb-6">
                 <Link
@@ -90,7 +101,7 @@ export default function AdminProjectShow({ project }) {
                     className="text-blue-600 hover:text-blue-800 flex items-center gap-2"
                 >
                     <FaArrowRight className="transform rotate-180" />
-                    العودة إلى قائمة المشاريع
+                    {t('adminProjectShowPage.backToList')}
                 </Link>
             </div>
 
@@ -101,7 +112,7 @@ export default function AdminProjectShow({ project }) {
                     <div className="bg-white rounded-xl shadow-lg p-6">
                         <div className="flex items-start justify-between mb-4">
                             <div>
-                                <h1 className="text-2xl font-bold text-gray-900 mb-2">{project.title}</h1>
+                                <h1 className="text-2xl font-bold text-gray-900 mb-2">{displayTitle}</h1>
                                 {project.category && (
                                     <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
                                         {project.category}
@@ -112,13 +123,13 @@ export default function AdminProjectShow({ project }) {
                                 project.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                                     'bg-red-100 text-red-800'
                                 }`}>
-                                {project.status === 'approved' ? 'معتمد' :
-                                    project.status === 'pending' ? 'قيد المراجعة' : 'مرفوض'}
+                                {project.status === 'approved' ? t('adminProjectShowPage.status.approved') :
+                                    project.status === 'pending' ? t('adminProjectShowPage.status.pending') : t('adminProjectShowPage.status.rejected')}
                             </span>
                         </div>
 
                         <div className="prose max-w-none mb-6">
-                            <p className="text-gray-700 whitespace-pre-wrap">{project.description}</p>
+                            <p className="text-gray-700 whitespace-pre-wrap">{displayDescription}</p>
                         </div>
 
                         {/* Stats */}
@@ -126,21 +137,21 @@ export default function AdminProjectShow({ project }) {
                             <div className="text-center">
                                 <div className="flex items-center justify-center gap-2 text-gray-600 mb-1">
                                     <FaEye />
-                                    <span className="text-sm">المشاهدات</span>
+                                    <span className="text-sm">{t('adminProjectShowPage.stats.views')}</span>
                                 </div>
                                 <p className="text-2xl font-bold text-gray-900">{project.views || 0}</p>
                             </div>
                             <div className="text-center">
                                 <div className="flex items-center justify-center gap-2 text-gray-600 mb-1">
                                     <FaHeart className="text-red-500" />
-                                    <span className="text-sm">الإعجابات</span>
+                                    <span className="text-sm">{t('adminProjectShowPage.stats.likes')}</span>
                                 </div>
                                 <p className="text-2xl font-bold text-gray-900">{project.likes || 0}</p>
                             </div>
                             <div className="text-center">
                                 <div className="flex items-center justify-center gap-2 text-gray-600 mb-1">
                                     <FaStar className="text-yellow-500" />
-                                    <span className="text-sm">التقييم</span>
+                                    <span className="text-sm">{t('adminProjectShowPage.stats.rating')}</span>
                                 </div>
                                 <p className="text-2xl font-bold text-gray-900">{project.rating || '—'}</p>
                             </div>
@@ -152,7 +163,7 @@ export default function AdminProjectShow({ project }) {
                         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
                             <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                                 <FaRobot className="text-blue-600" />
-                                التقييم بالذكاء الاصطناعي
+                                {t('adminProjectShowPage.aiEvaluation.title')}
                             </h2>
                             <button
                                 onClick={handleEvaluate}
@@ -160,16 +171,16 @@ export default function AdminProjectShow({ project }) {
                                 className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 transition flex items-center gap-2"
                             >
                                 {isEvaluating ? (
-                                    <><FaSpinner className="animate-spin" /> جاري التقييم...</>
+                                    <><FaSpinner className="animate-spin" /> {t('adminProjectShowPage.aiEvaluation.evaluating')}</>
                                 ) : (
-                                    <><FaRobot /> {evaluation ? 'إعادة التقييم' : 'قيّم المشروع'}</>
+                                    <><FaRobot /> {evaluation ? t('adminProjectShowPage.aiEvaluation.regenerateButton') : t('adminProjectShowPage.aiEvaluation.generateButton')}</>
                                 )}
                             </button>
                         </div>
 
                         {!evaluation && !isEvaluating && (
                             <p className="text-sm text-gray-500">
-                                اضغط "قيّم المشروع" ليحلّل الذكاء الاصطناعي المشروع ويقترح درجة وتوصية تساعدك في قرار المراجعة.
+                                {t('adminProjectShowPage.aiEvaluation.hint')}
                             </p>
                         )}
 
@@ -194,7 +205,7 @@ export default function AdminProjectShow({ project }) {
                                 {evaluation.strengths && evaluation.strengths.length > 0 && (
                                     <div>
                                         <h3 className="text-sm font-bold text-green-700 flex items-center gap-2 mb-2">
-                                            <FaThumbsUp /> نقاط القوة
+                                            <FaThumbsUp /> {t('adminProjectShowPage.aiEvaluation.strengthsTitle')}
                                         </h3>
                                         <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
                                             {evaluation.strengths.map((item, index) => (
@@ -207,7 +218,7 @@ export default function AdminProjectShow({ project }) {
                                 {evaluation.weaknesses && evaluation.weaknesses.length > 0 && (
                                     <div>
                                         <h3 className="text-sm font-bold text-amber-700 flex items-center gap-2 mb-2">
-                                            <FaExclamationTriangle /> نقاط تحتاج تحسيناً
+                                            <FaExclamationTriangle /> {t('adminProjectShowPage.aiEvaluation.weaknessesTitle')}
                                         </h3>
                                         <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
                                             {evaluation.weaknesses.map((item, index) => (
@@ -224,7 +235,7 @@ export default function AdminProjectShow({ project }) {
                                 )}
 
                                 <p className="text-xs text-gray-400">
-                                    * هذا التقييم استرشادي بالذكاء الاصطناعي، والقرار النهائي يعود للمراجِع.
+                                    {t('adminProjectShowPage.aiEvaluation.disclaimer')}
                                 </p>
                             </div>
                         )}
@@ -233,17 +244,17 @@ export default function AdminProjectShow({ project }) {
                     {/* Files and Images */}
                     {(project.files && project.files.length > 0) || (project.images && project.images.length > 0) ? (
                         <div className="bg-white rounded-xl shadow-lg p-6">
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">الملفات والصور</h2>
+                            <h2 className="text-xl font-bold text-gray-900 mb-4">{t('adminProjectShowPage.filesImages.title')}</h2>
 
                             {project.images && project.images.length > 0 && (
                                 <div className="mb-6">
-                                    <h3 className="text-lg font-semibold text-gray-700 mb-3">الصور</h3>
+                                    <h3 className="text-lg font-semibold text-gray-700 mb-3">{t('adminProjectShowPage.filesImages.imagesTitle')}</h3>
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                         {project.images.map((image, index) => (
                                             <img
                                                 key={index}
                                                 src={image}
-                                                alt={`صورة ${index + 1}`}
+                                                alt={t('adminProjectShowPage.filesImages.imageAlt', { n: index + 1 })}
                                                 className="w-full h-48 object-cover rounded-lg"
                                             />
                                         ))}
@@ -253,7 +264,7 @@ export default function AdminProjectShow({ project }) {
 
                             {project.files && project.files.length > 0 && (
                                 <div>
-                                    <h3 className="text-lg font-semibold text-gray-700 mb-3">الملفات</h3>
+                                    <h3 className="text-lg font-semibold text-gray-700 mb-3">{t('adminProjectShowPage.filesImages.filesTitle')}</h3>
                                     <div className="space-y-2">
                                         {project.files.map((file, index) => (
                                             <a
@@ -275,7 +286,7 @@ export default function AdminProjectShow({ project }) {
                     {/* Submissions Section */}
                     {project.submissions && project.submissions.length > 0 && (
                         <div className="bg-white rounded-xl shadow-lg p-6">
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">التسليمات ({project.submissions.length})</h2>
+                            <h2 className="text-xl font-bold text-gray-900 mb-4">{t('adminProjectShowPage.submissions.title', { count: project.submissions.length })}</h2>
                             <div className="space-y-4">
                                 {project.submissions.map((submission) => (
                                     <div key={submission.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition">
@@ -294,7 +305,7 @@ export default function AdminProjectShow({ project }) {
                                                 <div className="flex items-center gap-4 mt-3 text-sm text-gray-600">
                                                     <div className="flex items-center gap-1">
                                                         <FaCalendar />
-                                                        <span>{submission.submitted_at || 'غير محدد'}</span>
+                                                        <span>{submission.submitted_at || t('adminProjectShowPage.submissions.notSet')}</span>
                                                     </div>
                                                     {submission.rating && (
                                                         <div className="flex items-center gap-1">
@@ -307,9 +318,7 @@ export default function AdminProjectShow({ project }) {
                                                             submission.status === 'reviewed' ? 'bg-blue-100 text-blue-800' :
                                                                 'bg-gray-100 text-gray-800'
                                                         }`}>
-                                                        {submission.status === 'approved' ? 'معتمد' :
-                                                            submission.status === 'rejected' ? 'مرفوض' :
-                                                                submission.status === 'reviewed' ? 'تم المراجعة' : 'مقدم'}
+                                                        {submissionStatusLabel(submission.status)}
                                                     </span>
                                                 </div>
                                             </div>
@@ -318,7 +327,7 @@ export default function AdminProjectShow({ project }) {
                                                 className="me-4 px-4 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
                                             >
                                                 <FaEye />
-                                                {submission.status === 'submitted' ? 'تقييم' : 'عرض'}
+                                                {submission.status === 'submitted' ? t('adminProjectShowPage.submissions.actionEvaluate') : t('adminProjectShowPage.submissions.actionView')}
                                             </Link>
                                         </div>
                                     </div>
@@ -332,22 +341,22 @@ export default function AdminProjectShow({ project }) {
                 <div className="space-y-6">
                     {/* Project Details */}
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                        <h2 className="text-xl font-bold text-gray-900 mb-4">معلومات المشروع</h2>
+                        <h2 className="text-xl font-bold text-gray-900 mb-4">{t('adminProjectShowPage.sidebar.projectInfoTitle')}</h2>
 
                         <div className="space-y-4">
                             <div>
-                                <p className="text-sm text-gray-600 mb-1">تاريخ الإنشاء</p>
+                                <p className="text-sm text-gray-600 mb-1">{t('adminProjectShowPage.sidebar.createdAt')}</p>
                                 <p className="font-semibold text-gray-900">{project.created_at}</p>
                             </div>
                             {project.approved_at && (
                                 <div>
-                                    <p className="text-sm text-gray-600 mb-1">تاريخ الموافقة</p>
+                                    <p className="text-sm text-gray-600 mb-1">{t('adminProjectShowPage.sidebar.approvedAt')}</p>
                                     <p className="font-semibold text-gray-900">{project.approved_at}</p>
                                 </div>
                             )}
                             {project.points_earned > 0 && (
                                 <div>
-                                    <p className="text-sm text-gray-600 mb-1">النقاط المكتسبة</p>
+                                    <p className="text-sm text-gray-600 mb-1">{t('adminProjectShowPage.sidebar.pointsEarned')}</p>
                                     <p className="font-semibold text-green-600">{project.points_earned}</p>
                                 </div>
                             )}
@@ -358,7 +367,7 @@ export default function AdminProjectShow({ project }) {
                     <div className="bg-white rounded-xl shadow-lg p-6">
                         <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                             <FaUser className="text-blue-500" />
-                            {project.user?.role === 'admin' ? 'الناشر' : 'معلومات الطالب'}
+                            {project.user?.role === 'admin' ? t('adminProjectShowPage.sidebar.publisherTitle') : t('adminProjectShowPage.sidebar.studentInfoTitle')}
                         </h2>
                         <div className="space-y-2">
                             <p className="font-semibold text-gray-900">{project.student?.name || project.user?.name}</p>
@@ -371,7 +380,7 @@ export default function AdminProjectShow({ project }) {
                         <div className="bg-white rounded-xl shadow-lg p-6">
                             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                                 <FaSchool className="text-green-500" />
-                                تابع لمدرسة
+                                {t('adminProjectShowPage.sidebar.belongsToSchoolTitle')}
                             </h2>
                             <p className="font-semibold text-gray-900">{project.school.name}</p>
                         </div>
@@ -379,9 +388,9 @@ export default function AdminProjectShow({ project }) {
                         <div className="bg-white rounded-xl shadow-lg p-6">
                             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                                 <FaSchool className="text-purple-500" />
-                                المصدر
+                                {t('adminProjectShowPage.sidebar.sourceTitle')}
                             </h2>
-                            <p className="font-semibold text-gray-900">من إدارة مجتمع إرث المبتكرين</p>
+                            <p className="font-semibold text-gray-900">{t('adminProjectShowPage.sidebar.fromAdminCommunity')}</p>
                         </div>
                     ) : null}
 
@@ -390,7 +399,7 @@ export default function AdminProjectShow({ project }) {
                         <div className="bg-white rounded-xl shadow-lg p-6">
                             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                                 <FaChalkboardTeacher className="text-purple-500" />
-                                المعلم
+                                {t('adminProjectShowPage.sidebar.teacherTitle')}
                             </h2>
                             <p className="font-semibold text-gray-900">{project.teacher.name}</p>
                         </div>
@@ -399,7 +408,7 @@ export default function AdminProjectShow({ project }) {
                     {/* Actions */}
                     {project.status !== 'approved' && (
                         <div className="bg-white rounded-xl shadow-lg p-6">
-                            <h2 className="text-xl font-bold text-gray-900 mb-4">الإجراءات</h2>
+                            <h2 className="text-xl font-bold text-gray-900 mb-4">{t('adminProjectShowPage.actions.title')}</h2>
                             <div className="space-y-3">
                                 {project.status === 'pending' && (
                                     <button
@@ -407,7 +416,7 @@ export default function AdminProjectShow({ project }) {
                                         className="w-full bg-[#A3C042] hover:bg-[#8CA635] text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
                                     >
                                         <FaCheckCircle />
-                                        الموافقة على المشروع
+                                        {t('adminProjectShowPage.actions.approve')}
                                     </button>
                                 )}
                                 {project.status === 'pending' && (
@@ -416,7 +425,7 @@ export default function AdminProjectShow({ project }) {
                                         className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
                                     >
                                         <FaTimesCircle />
-                                        رفض المشروع
+                                        {t('adminProjectShowPage.actions.reject')}
                                     </button>
                                 )}
                                 <button
@@ -424,7 +433,7 @@ export default function AdminProjectShow({ project }) {
                                     className="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
                                 >
                                     <FaTrash />
-                                    حذف المشروع
+                                    {t('adminProjectShowPage.actions.delete')}
                                 </button>
                             </div>
                         </div>
@@ -434,4 +443,3 @@ export default function AdminProjectShow({ project }) {
         </DashboardLayout>
     );
 }
-

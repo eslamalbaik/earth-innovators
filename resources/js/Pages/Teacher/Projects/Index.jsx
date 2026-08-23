@@ -85,7 +85,7 @@ export default function TeacherProjects({ projects, auth }) {
                     className="flex items-center gap-2 px-4 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-[#8fa832] transition"
                 >
                     <FaPlus />
-                    <span className="text-sm font-bold">{t('teacherProjectsPage.createButton') || 'إنشاء مشروع'}</span>
+                    <span className="text-sm font-bold">{t('teacherProjectsPage.createButton')}</span>
                 </Link>
             </div>
 
@@ -149,9 +149,9 @@ export default function TeacherProjects({ projects, auth }) {
                                         </div>
 
                                         <div className="mt-2 text-base font-extrabold text-gray-900 line-clamp-1">
-                                            {project.title}
+                                            {language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar)}
                                         </div>
-                                        <div className="mt-1 text-sm text-gray-500 line-clamp-1">{project.description}</div>
+                                        <div className="mt-1 text-sm text-gray-500 line-clamp-1">{language === 'ar' ? (project.description_ar || project.description) : (project.description || project.description_ar)}</div>
 
                                         <div className="mt-3 flex items-center gap-2">
                                             <span className="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700">
@@ -166,7 +166,7 @@ export default function TeacherProjects({ projects, auth }) {
                                     <div className="relative w-28">
                                         <img
                                             src="/images/hero.png"
-                                            alt={project.title}
+                                            alt={language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar)}
                                             className="h-full w-full object-cover"
                                             loading="lazy"
                                         />
@@ -175,7 +175,7 @@ export default function TeacherProjects({ projects, auth }) {
                                             <div className="absolute left-2 top-1/2 -translate-y-1/2 flex flex-col gap-2">
                                                 <button
                                                     type="button"
-                                                    onClick={(e) => handleDelete(project.id, project.title, e)}
+                                                    onClick={(e) => handleDelete(project.id, language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar), e)}
                                                     className="h-9 w-9 rounded-full bg-white shadow border border-gray-100 flex items-center justify-center text-red-500"
                                                     aria-label={t('teacherProjectsPage.deleteAction')}
                                                 >

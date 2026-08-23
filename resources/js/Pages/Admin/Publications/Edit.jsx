@@ -57,8 +57,8 @@ export default function AdminPublicationEdit({ publication, schools }) {
     };
 
     return (
-        <DashboardLayout header={t('adminPublicationCreatePage.title') + ' — تعديل'}>
-            <Head title={`تعديل: ${publication?.title || ''} — ${t('common.appName')}`} />
+        <DashboardLayout header={t('adminPublicationEditPage.headerTitle')}>
+            <Head title={t('adminPublicationEditPage.pageTitle', { title: publication?.title || '', appName: t('common.appName') })} />
 
             <div className="py-6">
                 <div className="mx-auto max-w-4xl sm:px-6 lg:px-8">
@@ -67,7 +67,7 @@ export default function AdminPublicationEdit({ publication, schools }) {
                         className="mb-6 inline-flex items-center gap-2 text-gray-600 hover:text-gray-900"
                     >
                         <FaArrowRight className="rotate-180" />
-                        <span>العودة إلى تفاصيل المنشور</span>
+                        <span>{t('adminPublicationEditPage.backToDetails')}</span>
                     </Link>
 
                     <form onSubmit={submit} className="mt-4 space-y-6 rounded-lg bg-white p-6 shadow-sm">
@@ -150,14 +150,14 @@ export default function AdminPublicationEdit({ publication, schools }) {
                                 />
                                 {publication?.file && !fileName && (
                                     <div className="mt-2 rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-600">
-                                        <p>الملف الحالي متاح —{' '}
+                                        <p>{t('adminPublicationEditPage.currentFileAvailable')}{' '}
                                             <a
                                                 href={getPublicationFileUrl(publication.file) || '#'}
                                                 target="_blank"
                                                 rel="noreferrer"
                                                 className="font-medium text-[#A3C042] hover:underline"
                                             >
-                                                تحميل
+                                                {t('adminPublicationEditPage.download')}
                                             </a>
                                         </p>
                                     </div>
@@ -207,7 +207,7 @@ export default function AdminPublicationEdit({ publication, schools }) {
 
                         {/* Publish Date */}
                         <div>
-                            <InputLabel htmlFor="publish_date" value="تاريخ النشر" />
+                            <InputLabel htmlFor="publish_date" value={t('adminPublicationEditPage.publishDateLabel')} />
                             <TextInput
                                 id="publish_date"
                                 type="date"
@@ -220,7 +220,7 @@ export default function AdminPublicationEdit({ publication, schools }) {
 
                         {/* Publisher Name */}
                         <div>
-                            <InputLabel htmlFor="publisher_name" value="اسم الناشر" />
+                            <InputLabel htmlFor="publisher_name" value={t('adminPublicationEditPage.publisherNameLabel')} />
                             <TextInput
                                 id="publisher_name"
                                 type="text"
@@ -248,7 +248,7 @@ export default function AdminPublicationEdit({ publication, schools }) {
                                 ) : (
                                     <>
                                         <FaUpload className="me-2 inline-block" />
-                                        حفظ التعديلات
+                                        {t('adminPublicationEditPage.saveChanges')}
                                     </>
                                 )}
                             </PrimaryButton>

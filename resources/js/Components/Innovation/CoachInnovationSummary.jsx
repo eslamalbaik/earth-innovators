@@ -63,7 +63,7 @@ export default function CoachInnovationSummary({ innovationStats }) {
                                 style={{ backgroundColor: `${details.color}33`, borderColor: details.color }}
                             >
                                 <span>{details.icon}</span>
-                                <span>{details.label}</span>
+                                <span>{t(`innovationIndex.classifications.${key}`)}</span>
                                 <span className="font-black">{count}</span>
                             </span>
                         );
@@ -74,7 +74,7 @@ export default function CoachInnovationSummary({ innovationStats }) {
             {/* Needs attention */}
             {needsAttention.length > 0 && (
                 <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-xl">
-                    <p className="text-sm font-bold text-amber-700 mb-2">⚠️ طلاب يحتاجون متابعة:</p>
+                    <p className="text-sm font-bold text-amber-700 mb-2">{t('innovationSummary.needsAttentionList')}</p>
                     <div className="flex flex-wrap gap-2">
                         {needsAttention.map((s) => (
                             <Link

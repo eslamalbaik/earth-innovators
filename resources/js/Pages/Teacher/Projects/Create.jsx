@@ -16,7 +16,9 @@ export default function CreateProject({ auth, school, schools = [] }) {
     const { t, language } = useTranslation();
     const { data, setData, post, processing, errors } = useForm({
         title: '',
+        title_ar: '',
         description: '',
+        description_ar: '',
         category: 'other',
         school_id: school?.id || null,
         thumbnail: null,
@@ -42,7 +44,7 @@ export default function CreateProject({ auth, school, schools = [] }) {
 
     const handleAIGenerate = async () => {
         if (!aiIdea) {
-            showError("يرجى إدخال فكرة المشروع أولاً.", { title: t('common.error') });
+            showError(t('teacherProjectsCreatePage.aiAssistant.ideaRequired'), { title: t('common.error') });
             return;
         }
 
@@ -55,7 +57,9 @@ export default function CreateProject({ auth, school, schools = [] }) {
             setData(prev => ({
                 ...prev,
                 title: result.title || prev.title,
+                title_ar: result.title_ar || prev.title_ar,
                 description: result.description || prev.description,
+                description_ar: result.description_ar || prev.description_ar,
                 category: result.category || prev.category,
             }));
 
@@ -71,7 +75,7 @@ export default function CreateProject({ auth, school, schools = [] }) {
                 }
             }
         } catch (error) {
-            showError(error.response?.data?.error || 'حدث خطأ أثناء توليد تفاصيل المشروع', { title: t('common.error') });
+            showError(error.response?.data?.error || t('teacherProjectsCreatePage.aiAssistant.error'), { title: t('common.error') });
         } finally {
             setIsGenerating(false);
         }
@@ -276,17 +280,17 @@ export default function CreateProject({ auth, school, schools = [] }) {
                             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100 mb-2">
                                 <div className="flex items-center gap-2 mb-3">
                                     <FaRobot className="text-blue-600 text-lg" />
-                                    <h3 className="font-bold text-blue-800 text-sm">مساعد الذكاء الاصطناعي للمشاريع</h3>
+                                    <h3 className="font-bold text-blue-800 text-sm">{t('teacherProjectsCreatePage.aiAssistant.title')}</h3>
                                 </div>
                                 <p className="text-xs text-blue-600 mb-3">
-                                    اكتب فكرة مبسطة وسيقوم المساعد بتوليد عنوان، وصف مفصل، واختيار صورة غلاف مناسبة.
+                                    {t('teacherProjectsCreatePage.aiAssistant.description')}
                                 </p>
                                 <div className="flex flex-col gap-2">
                                     <input
                                         type="text"
                                         value={aiIdea}
                                         onChange={(e) => setAiIdea(e.target.value)}
-                                        placeholder="مثال: مشروع عن تدوير البلاستيك في المدرسة..."
+                                        placeholder={t('teacherProjectsCreatePage.aiAssistant.placeholder')}
                                         className="w-full text-sm rounded-lg border-blue-200 focus:border-blue-400 focus:ring-blue-400"
                                     />
                                     <button
@@ -296,9 +300,9 @@ export default function CreateProject({ auth, school, schools = [] }) {
                                         className="bg-blue-600 text-white w-full py-2.5 rounded-lg text-sm font-bold hover:bg-blue-700 disabled:opacity-50 transition flex justify-center items-center gap-2"
                                     >
                                         {isGenerating ? (
-                                            <><FaSpinner className="animate-spin" /> جاري التوليد...</>
+                                            <><FaSpinner className="animate-spin" /> {t('teacherProjectsCreatePage.aiAssistant.generating')}</>
                                         ) : (
-                                            <><FaRobot /> توليد تفاصيل المشروع</>
+                                            <><FaRobot /> {t('teacherProjectsCreatePage.aiAssistant.generateButton')}</>
                                         )}
                                     </button>
                                 </div>
@@ -438,7 +442,7 @@ export default function CreateProject({ auth, school, schools = [] }) {
                                         {t('teacherProjectsCreatePage.form.dropzoneSubtitle')}
                                     </p>
                                     <p className="text-xs text-gray-400 mt-2">
-                                        📏 الحد الأقصى: 10MB للملف الواحد | 📁 الأنواع المدعومة: صور (JPG, PNG, GIF), فيديوهات (MP4, AVI, MOV), مستندات (PDF, DOC, DOCX)
+                                        {t('teacherProjectsCreatePage.form.dropzoneFileHint')}
                                     </p>
                                     <button
                                         type="button"
@@ -608,10 +612,10 @@ export default function CreateProject({ auth, school, schools = [] }) {
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2 mb-2">
                                             <FaRobot className="text-blue-600 text-xl" />
-                                            <h3 className="font-bold text-blue-800 text-base">مساعد الذكاء الاصطناعي للمشاريع</h3>
+                                            <h3 className="font-bold text-blue-800 text-base">{t('teacherProjectsCreatePage.aiAssistant.title')}</h3>
                                         </div>
                                         <p className="text-sm text-blue-600">
-                                            اكتب فكرة مبسطة وسيقوم المساعد بتوليد عنوان احترافي، وصف شامل، وتحديد الفئة وصورة غلاف مناسبة.
+                                            {t('teacherProjectsCreatePage.aiAssistant.description')}
                                         </p>
                                     </div>
                                     <div className="flex-1 flex gap-2 w-full md:w-auto">
@@ -619,7 +623,7 @@ export default function CreateProject({ auth, school, schools = [] }) {
                                             type="text"
                                             value={aiIdea}
                                             onChange={(e) => setAiIdea(e.target.value)}
-                                            placeholder="مثال: مشروع عن تدوير البلاستيك في المدرسة..."
+                                            placeholder={t('teacherProjectsCreatePage.aiAssistant.placeholder')}
                                             className="flex-1 text-sm rounded-lg border-blue-200 focus:border-blue-400 focus:ring-blue-400"
                                         />
                                         <button
@@ -629,9 +633,9 @@ export default function CreateProject({ auth, school, schools = [] }) {
                                             className="bg-blue-600 text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-blue-700 disabled:opacity-50 transition flex justify-center items-center gap-2 whitespace-nowrap"
                                         >
                                             {isGenerating ? (
-                                                <><FaSpinner className="animate-spin" /> جاري التوليد...</>
+                                                <><FaSpinner className="animate-spin" /> {t('teacherProjectsCreatePage.aiAssistant.generating')}</>
                                             ) : (
-                                                <><FaRobot /> توليد التفاصيل</>
+                                                <><FaRobot /> {t('teacherProjectsCreatePage.aiAssistant.generateButton')}</>
                                             )}
                                         </button>
                                     </div>
@@ -672,31 +676,61 @@ export default function CreateProject({ auth, school, schools = [] }) {
                                     <InputError message={errors.thumbnail} className="mt-2" />
                                 </div>
 
-                                {/* Title */}
+                                {/* Arabic Title */}
                                 <div>
-                                        <InputLabel htmlFor="title" value={t('teacherProjectsCreatePage.form.titleLabel')} className="text-sm font-medium text-gray-700 mb-2" />
+                                    <InputLabel htmlFor="title_ar" value={t('teacherProjectsCreatePage.form.titleArLabel')} className="text-sm font-medium text-gray-700 mb-2" />
+                                    <input
+                                        id="title_ar"
+                                        type="text"
+                                        value={data.title_ar}
+                                        onChange={(e) => setData('title_ar', e.target.value)}
+                                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
+                                        placeholder={t('teacherProjectsCreatePage.form.titleArPlaceholder')}
+                                        required
+                                    />
+                                    <InputError message={errors.title_ar} className="mt-2" />
+                                </div>
+
+                                {/* English Title */}
+                                <div>
+                                    <InputLabel htmlFor="title" value={t('teacherProjectsCreatePage.form.titleEnLabel')} className="text-sm font-medium text-gray-700 mb-2" />
                                     <input
                                         id="title"
                                         type="text"
                                         value={data.title}
                                         onChange={(e) => setData('title', e.target.value)}
                                         className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
-                                            placeholder={t('teacherProjectsCreatePage.form.titlePlaceholder')}
+                                        placeholder={t('teacherProjectsCreatePage.form.titleEnPlaceholder')}
                                         required
                                     />
                                     <InputError message={errors.title} className="mt-2" />
                                 </div>
 
-                                {/* Description */}
+                                {/* Arabic Description */}
                                 <div>
-                                        <InputLabel htmlFor="description" value={t('teacherProjectsCreatePage.form.descriptionLabel')} className="text-sm font-medium text-gray-700 mb-2" />
+                                    <InputLabel htmlFor="description_ar" value={t('teacherProjectsCreatePage.form.descriptionArLabel')} className="text-sm font-medium text-gray-700 mb-2" />
+                                    <textarea
+                                        id="description_ar"
+                                        value={data.description_ar}
+                                        onChange={(e) => setData('description_ar', e.target.value)}
+                                        rows={6}
+                                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
+                                        placeholder={t('teacherProjectsCreatePage.form.descriptionArPlaceholder')}
+                                        required
+                                    />
+                                    <InputError message={errors.description_ar} className="mt-2" />
+                                </div>
+
+                                {/* English Description */}
+                                <div>
+                                    <InputLabel htmlFor="description" value={t('teacherProjectsCreatePage.form.descriptionEnLabel')} className="text-sm font-medium text-gray-700 mb-2" />
                                     <textarea
                                         id="description"
                                         value={data.description}
                                         onChange={(e) => setData('description', e.target.value)}
                                         rows={6}
                                         className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
-                                            placeholder={t('teacherProjectsCreatePage.form.descriptionPlaceholder')}
+                                        placeholder={t('teacherProjectsCreatePage.form.descriptionEnPlaceholder')}
                                         required
                                     />
                                     <InputError message={errors.description} className="mt-2" />

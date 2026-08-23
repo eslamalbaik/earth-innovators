@@ -504,7 +504,7 @@ export default function TeacherDashboard({ auth, teacher, stats, innovationStats
                                     {recentProjects.map((project) => (
                                         <div key={project.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
                                             <div className="flex-1">
-                                                <p className="font-medium text-gray-900">{project.title}</p>
+                                                <p className="font-medium text-gray-900">{language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar)}</p>
                                                 <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
                                                     <span className="flex items-center gap-1">
                                                         <FaEye className="text-gray-400" />

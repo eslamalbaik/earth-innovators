@@ -17,7 +17,7 @@ class AcceptanceCriteriaController extends Controller
     {
         $projectId = $request->get('project_id');
         
-        $query = AcceptanceCriterion::with('project:id,title')
+        $query = AcceptanceCriterion::with('project:id,title,title_ar')
             ->ordered();
         
         if ($projectId) {
@@ -33,6 +33,7 @@ class AcceptanceCriteriaController extends Controller
                     'id' => $criterion->id,
                     'project_id' => $criterion->project_id,
                     'project_title' => $criterion->project->title ?? 'عام',
+                    'project_title_ar' => $criterion->project->title_ar ?? $criterion->project->title ?? 'عام',
                     'name_ar' => $criterion->name_ar,
                     'description_ar' => $criterion->description_ar,
                     'weight' => $criterion->weight,
@@ -46,9 +47,9 @@ class AcceptanceCriteriaController extends Controller
         $totalWeight = $projectId 
             ? AcceptanceCriterion::where('project_id', $projectId)->sum('weight')
             : AcceptanceCriterion::whereNull('project_id')->sum('weight');
-
+        
         // Get all projects for dropdown
-        $projects = \App\Models\Project::select('id', 'title')
+        $projects = \App\Models\Project::select('id', 'title', 'title_ar')
             ->orderBy('title')
             ->get();
 

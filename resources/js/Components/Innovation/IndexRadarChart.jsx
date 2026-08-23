@@ -21,12 +21,13 @@ export default function IndexRadarChart({
     color = '#6366f1',
     name,
     maxValue = 100,
+    namespace = 'innovationIndex.names',
 }) {
     const { t } = useTranslation();
     const chartName = name || t('dashboard.indexes') || 'المؤشرات';
 
-    const data = Object.entries(indexNames).map(([key, label]) => ({
-        subject: label,
+    const data = Object.keys(indexNames).map((key) => ({
+        subject: t(`${namespace}.${key}`),
         value: Number(indexes?.[key] ?? 0),
         fullMark: maxValue,
     }));

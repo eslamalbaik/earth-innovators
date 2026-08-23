@@ -1,4 +1,265 @@
 export const ar = {
+    "innovationIndex": {
+        "names": {
+            "skills": "المهارات",
+            "innovation": "الابتكار",
+            "intelligence": "الذكاء",
+            "creativity": "الإبداع",
+            "projects": "المشاريع",
+            "leadership": "القيادة",
+            "ip": "الملكية الفكرية",
+            "future_readiness": "الجاهزية المستقبلية"
+        },
+        "classifications": {
+            "diamond": "ماسي",
+            "platinum": "بلاتيني",
+            "gold": "ذهبي",
+            "silver": "فضي",
+            "bronze": "برونزي",
+            "developing": "نامٍ"
+        }
+    },
+    "coachDashboard": {
+        "pageTitle": "متابعة الابتكار",
+        "heading": "🚀 متابعة الابتكار",
+        "subtitle": "إدارة ومتابعة {count} طالب",
+        "compareButton": "⚖️ مقارنة {count} طلاب",
+        "stats": {
+            "totalStudents": "إجمالي الطلاب",
+            "avgScore": "متوسط الدرجات",
+            "needsAttention": "يحتاجون متابعة",
+            "topStudents": "المتميزون"
+        },
+        "studentsList": "📋 قائمة الطلاب",
+        "sortByScore": "ترتيب حسب الدرجة",
+        "sortByName": "ترتيب حسب الاسم",
+        "selectForCompare": "اختر للمقارنة",
+        "strongest": "الأقوى:",
+        "aiReport": "تقرير AI",
+        "selectStudentPrompt": "اختر طالباً لعرض تفاصيله",
+        "weakness": "⚠️ نقطة ضعف:",
+        "classificationDistribution": "📊 توزيع التصنيفات",
+        "noData": "لا توجد بيانات",
+        "outOf100": "/100"
+    },
+    "innovationSummaryCard": {
+        "heading": "🚀 ملف الابتكار",
+        "subtitle": "مؤشراتك الثمانية وتصنيفك كمبتكر",
+        "totalScore": "الدرجة الكلية للابتكار",
+        "outOf100": "من 100",
+        "achievementsTotal": "إنجاز",
+        "achievementsValidated": "مُتحقق",
+        "achievementsPending": "قيد التحليل",
+        "emptyTitle": "ابدأ رحلة الابتكار!",
+        "emptyDescription": "أضف إنجازك الأول (مشروع، شهادة، جائزة...) وسيقوم الذكاء الاصطناعي بتحليله وحساب مؤشراتك.",
+        "addFirstAchievement": "+ إضافة أول إنجاز",
+        "quickLinks": {
+            "achievements": "إنجازاتي",
+            "indexes": "المؤشرات",
+            "recommendations": "التوصيات",
+            "benchmarking": "المقارنات"
+        }
+    },
+    "achievements": {
+        "index": {
+            "pageTitle": "إنجازاتي",
+            "title": "🏆 إنجازاتي",
+            "subtitle": "إدارة وتتبع جميع إنجازاتك",
+            "addNew": "+ إضافة إنجاز جديد",
+            "stats": {
+                "total": "إجمالي الإنجازات",
+                "validated": "مُتحقق منها",
+                "pending": "قيد التحليل",
+                "confidence": "متوسط الثقة"
+            },
+            "attachments": "{count} مرفق",
+            "empty": {
+                "title": "لا توجد إنجازات",
+                "description": "ابدأ بإضافة إنجازاتك لبناء ملفك!",
+                "action": "إضافة أول إنجاز"
+            }
+        },
+        "status": {
+            "validated": "✅ مُتحقق",
+            "flagged": "⚠️ مُعلّم",
+            "pending": "⏳ قيد التحليل"
+        },
+        "types": {
+            "project": "مشروع",
+            "research": "بحث",
+            "certificate": "شهادة",
+            "skill": "مهارة",
+            "award": "جائزة",
+            "patent": "براءة اختراع",
+            "article": "مقال",
+            "product": "منتج"
+        },
+        "show": {
+            "back": "→ العودة للإنجازات",
+            "edit": "✏️ تعديل",
+            "validated": "تم التحقق بنجاح",
+            "flagged": "يحتاج مراجعة",
+            "pending": "قيد التحليل",
+            "confidence": "درجة الثقة",
+            "evidence": "جودة الأدلة",
+            "description": "📝 الوصف",
+            "aiAnalysis": "🤖 تحليل الذكاء الاصطناعي",
+            "suggestions": "💡 اقتراحات:",
+            "attachments": "📎 المرفقات ({count})",
+            "attachmentFallback": "مرفق",
+            "skills": "🎯 مهارات مستخرجة بالـ AI"
+        },
+        "create": {
+            "pageTitle": "إضافة إنجاز جديد",
+            "title": "➕ إضافة إنجاز جديد",
+            "subtitle": "سيتم تحليل إنجازك بالذكاء الاصطناعي تلقائياً",
+            "typeLabel": "نوع الإنجاز *",
+            "titleLabel": "عنوان الإنجاز *",
+            "titlePlaceholder": "مثال: تطبيق للذكاء الاصطناعي في التعليم",
+            "descriptionLabel": "الوصف",
+            "descriptionPlaceholder": "اكتب وصفاً تفصيلياً للإنجاز...",
+            "categoryLabel": "الفئة",
+            "categoryPlaceholder": "مثال: تقنية المعلومات",
+            "dateLabel": "التاريخ",
+            "link": "رابط الإنجاز (اختياري)",
+            "linkPlaceholder": "https://example.com/achievement",
+            "attachmentsLabel": "📎 المرفقات (اختياري)",
+            "save": "💾 حفظ الإنجاز",
+            "saving": "⏳ جاري الحفظ...",
+            "filesLabel": "📎 الملفات الداعمة",
+            "dragLabel": "اسحب الملفات هنا أو اضغط للرفع",
+            "linksLabel": "🔗 روابط خارجية",
+            "addMoreLinks": "+ إضافة رابط آخر",
+            "submitBtn": "🚀 حفظ وتحليل بالذكاء الاصطناعي"
+        },
+        "edit": {
+            "confirmDelete": "هل أنت متأكد من حذف هذا الإنجاز؟ لا يمكن التراجع.",
+            "pageTitle": "تعديل الإنجاز",
+            "title": "✏️ تعديل الإنجاز",
+            "subtitle": "سيُعاد تحليل الإنجاز بالذكاء الاصطناعي بعد الحفظ",
+            "typeLabel": "نوع الإنجاز *",
+            "titleLabel": "عنوان الإنجاز *",
+            "descriptionLabel": "الوصف",
+            "categoryLabel": "الفئة",
+            "categoryPlaceholder": "مثال: تقنية المعلومات",
+            "dateLabel": "التاريخ",
+            "currentAttachments": "📎 المرفقات الحالية",
+            "saveChanges": "💾 حفظ التعديلات",
+            "delete": "🗑️ حذف",
+            "saving": "⏳ جاري الحفظ..."
+        }
+    },
+    "innovation": {
+        "benchmarking": {
+            "pageTitle": "المقارنات المرجعية",
+            "title": "⚖️ المقارنات المرجعية",
+            "subtitle": "موقعك مقارنة بزملائك في {scope}",
+            "cohort": "الدفعة",
+            "empty": {
+                "title": "لا توجد بيانات للمقارنة",
+                "description": "أضف إنجازاتك واحسب مؤشراتك أولاً."
+            },
+            "rank": "ترتيبك",
+            "percentile": "الرتبة المئينية",
+            "totalUsers": "إجمالي {scope}",
+            "cohortComparison": "مقارنة المؤشرات مع متوسط {scope}",
+            "difference": {
+                "above": "أعلى من المتوسط",
+                "below": "أقل من المتوسط"
+            },
+            "you": "أنت",
+            "average": "المتوسط"
+        },
+        "indexes": {
+            "pageTitle": "مؤشرات الابتكار",
+            "title": "📊 مؤشرات الابتكار الثمانية",
+            "subtitle": "تفاصيل كل مؤشر وكيفية احتسابه",
+            "recalculate": "🔄 إعادة احتساب المؤشرات",
+            "overallScore": "الدرجة الكلية",
+            "outOf100": "من 100",
+            "lastCalculated": "آخر احتساب: {date}",
+            "empty": {
+                "title": "لم تُحسب مؤشراتك بعد",
+                "description": "أضف إنجازاتك أولاً ثم اضغط \"إعادة احتساب المؤشرات\".",
+                "action": "🔄 احتساب المؤشرات الآن"
+            },
+            "types": {
+                "skills": "المهارات",
+                "innovation": "الابتكار",
+                "intelligence": "الذكاء",
+                "creativity": "الإبداع",
+                "projects": "المشاريع",
+                "leadership": "القيادة",
+                "ip": "الملكية الفكرية",
+                "future_readiness": "الجاهزية المستقبلية"
+            }
+        },
+        "history": {
+            "pageTitle": "تطور المؤشرات",
+            "title": "📈 تطور المؤشرات عبر الزمن",
+            "subtitle": "تتبع رحلة تقدمك في كل مؤشر",
+            "empty": {
+                "title": "لا يوجد سجل بعد",
+                "description": "سيظهر هنا تطور مؤشراتك كلما أضفت إنجازات جديدة."
+            },
+            "changelog": "🗓️ سجل التغييرات",
+            "triggers": {
+                "achievement_added": "إضافة إنجاز",
+                "achievement_updated": "تعديل إنجاز",
+                "achievement_deleted": "حذف إنجاز",
+                "skill_added": "إضافة مهارة",
+                "manual_recalc": "إعادة احتساب يدوية",
+                "system_recalc": "إعادة احتساب تلقائية"
+            }
+        },
+        "recommendations": {
+            "pageTitle": "التوصيات الذكية",
+            "title": "🤖 توصيات الذكاء الاصطناعي",
+            "subtitle": "توصيات مخصصة بناءً على تحليل مؤشراتك",
+            "empty": {
+                "title": "لا توجد توصيات بعد",
+                "description": "أضف المزيد من الإنجازات ليتمكن الذكاء الاصطناعي من تحليل ملفك وتوليد توصيات مخصصة."
+            },
+            "generalAdvice": "النصيحة العامة",
+            "studentLevel": "مستوى الطالب: {level}",
+            "score": "النتيجة: {score}",
+            "targetLevel": "المستوى المستهدف:",
+            "strengths": "💪 نقاط القوة",
+            "gaps": "🔍 فجوات التعلم",
+            "skills": "⚙️ المهارات المكتسبة",
+            "outcomes": "🏆 مخرجات التعلم المحققة",
+            "nextChallenge": "التحدي التالي / المهارة التالية",
+            "strengthsLabel": "نقاط القوة",
+            "improvementsLabel": "نقاط التحسين",
+            "generalRecs": "📋 التوصيات العامة",
+            "priority": {
+                "high": "أولوية عالية",
+                "medium": "أولوية متوسطة",
+                "low": "أولوية منخفضة"
+            },
+            "suggestedCourses": "📚 دورات مقترحة",
+            "suggestedCompetitions": "🏆 مسابقات مقترحة",
+            "suggestedProjects": "🏗️ مشاريع مقترحة"
+        },
+        "smartSearch": {
+            "pageTitle": "البحث الذكي",
+            "title": "🔍 البحث الذكي",
+            "subtitle": "ابحث بلغة طبيعية — مثال: \"طالب لديه قيادة عالية ويجيد Python\"",
+            "placeholder": "اكتب ما تبحث عنه...",
+            "searching": "⏳ جاري البحث...",
+            "search": "🔍 بحث",
+            "results": "النتائج: {total}",
+            "noResults": "لا توجد نتائج مطابقة لبحثك.",
+            "levels": {
+                "diamond": "ماسي",
+                "platinum": "بلاتيني",
+                "gold": "ذهبي",
+                "silver": "فضي",
+                "bronze": "برونزي",
+                "developing": "نامٍ"
+            }
+        }
+    },
     "common": {
         "appName": "إرث المبتكرين",
         "welcomeBack": "مرحباً بعودتك",
@@ -830,6 +1091,21 @@ export const ar = {
                 "generic": "حدث خطأ أثناء إرسال العمل.",
                 "fileTooLarge": "الملف «{name}» أكبر من 10 ميجابايت.",
                 "fileTypeUnsupported": "نوع الملف «{name}» غير مدعوم."
+            },
+            "pickerSubtitle": "استخدم هذه الصفحة لاختيار المشروع، ثم أكمل التسليم من صفحة المشروع نفسها.",
+            "backToList": "العودة للقائمة",
+            "startSubmissionFromProject": "ابدأ التسليم من صفحة المشروع",
+            "noProjectsAvailable": "لا توجد مشاريع متاحة لبدء تسليم جديد الآن.",
+            "history": {
+                "title": "متابعة التسليمات",
+                "subtitle": "كل تسليم يفتح مشروعه الأصلي لمراجعته أو تعديله من نفس المكان.",
+                "backToProjects": "صفحة المشاريع",
+                "previousSubmissions": "التسليمات السابقة",
+                "attachedFiles": "الملفات المرفقة",
+                "fileFallback": "ملف",
+                "yourComment": "ملاحظتك",
+                "feedback": "التقييم أو الملاحظات",
+                "openProjectPage": "افتح صفحة المشروع"
             }
         },
         "evaluation": {
@@ -2284,17 +2560,35 @@ export const ar = {
         "form": {
             "titleLabel": "عنوان المشروع",
             "titlePlaceholder": "أدخل عنوان المشروع",
+            "titleArLabel": "عنوان المشروع (بالعربية) *",
+            "titleArPlaceholder": "أدخل عنوان المشروع باللغة العربية",
+            "titleEnLabel": "عنوان المشروع (بالإنجليزية) *",
+            "titleEnPlaceholder": "أدخل عنوان المشروع باللغة الإنجليزية",
             "descriptionLabel": "وصف المشروع",
             "descriptionPlaceholder": "أدخل وصفاً للمشروع",
+            "descriptionArLabel": "وصف المشروع (بالعربية) *",
+            "descriptionArPlaceholder": "أدخل وصفاً للمشروع باللغة العربية",
+            "descriptionEnLabel": "وصف المشروع (بالإنجليزية) *",
+            "descriptionEnPlaceholder": "أدخل وصفاً للمشروع باللغة الإنجليزية",
             "categoryLabel": "فئة المشروع",
             "schoolLabel": "المدرسة",
             "schoolPlaceholder": "اختر مدرسة (اختياري)",
             "filesLabel": "الملفات",
             "dropzoneTitle": "اسحب وأفلت الملفات هنا أو انقر للاختيار",
             "dropzoneSubtitle": "صور، فيديو، PDF (الحد الأقصى: 10 ميجابايت لكل ملف)",
+            "dropzoneFileHint": "📏 الحد الأقصى: 10MB للملف الواحد | 📁 الأنواع المدعومة: صور (JPG, PNG, GIF), فيديوهات (MP4, AVI, MOV), مستندات (PDF, DOC, DOCX)",
             "coverImageLabel": "صورة الغلاف *",
             "uploadCoverImage": "اضغط لرفع صورة الغلاف",
             "coverImageHint": "JPG, PNG — بحد أقصى 5 MB"
+        },
+        "aiAssistant": {
+            "title": "مساعد الذكاء الاصطناعي للمشاريع",
+            "description": "اكتب فكرة مبسطة وسيقوم المساعد بتوليد عنوان احترافي، وصف شامل، وتحديد الفئة وصورة غلاف مناسبة.",
+            "placeholder": "مثال: مشروع عن تدوير البلاستيك في المدرسة...",
+            "generating": "جاري التوليد...",
+            "generateButton": "توليد تفاصيل المشروع",
+            "ideaRequired": "يرجى إدخال فكرة المشروع أولاً.",
+            "error": "حدث خطأ أثناء توليد تفاصيل المشروع"
         },
         "schoolInfo": {
             "linkedSchool": "المدرسة المرتبطة",
@@ -2349,6 +2643,30 @@ export const ar = {
             "fileTooLarge": "الملف {name} أكبر من 10 ميجابايت",
             "fileTypeNotSupported": "نوع الملف {name} غير مدعوم"
         }
+    },
+    "teacherProjectsEditPage": {
+        "pageTitle": "تعديل المشروع - {appName}",
+        "headerTitle": "تعديل المشروع",
+        "alerts": {
+            "coverTooLarge": "حجم صورة الغلاف يجب ألا يتجاوز 5 ميجابايت",
+            "coverMustBeImage": "الملف يجب أن يكون صورة",
+            "fileTooLarge": "الملف {name} أكبر من 10 ميجابايت",
+            "fileTypeNotSupported": "نوع الملف {name} غير مدعوم",
+            "requiredFields": "يرجى ملء جميع الحقول المطلوبة",
+            "cannotEditAfterReview": "لا يمكن تعديل المشروع بعد الموافقة عليه أو رفضه",
+            "saveError": "حدث خطأ أثناء حفظ التعديلات",
+            "errorPrefix": "خطأ: "
+        },
+        "coverImageLabel": "صورة الغلاف (مطلوبة عند التحديث)",
+        "maxSize": "حد أقصى 5MB",
+        "chooseImage": "اختيار صورة",
+        "noCoverImage": "لا توجد صورة غلاف حالياً",
+        "existingFilesLabel": "الملفات الحالية",
+        "viewFile": "عرض الملف",
+        "addNewFilesLabel": "إضافة ملفات جديدة",
+        "statusWarning": "لا يمكن تعديل المشروع بعد الموافقة عليه أو رفضه",
+        "updating": "جاري التحديث...",
+        "saveChanges": "حفظ التعديلات"
     },
     "schoolDashboardPage": {
         "pageTitle": "لوحة تحكم المدرسة - {appName}",
@@ -2784,6 +3102,7 @@ export const ar = {
     "adminProjectsIndexPage": {
         "pageTitle": "إدارة المشاريع - {appName}",
         "title": "إدارة المشاريع",
+        "aiCoverImageLabel": "صورة الغلاف (من الذكاء الاصطناعي)",
         "stats": {
             "total": "إجمالي المشاريع",
             "approved": "معتمدة",
@@ -2843,6 +3162,91 @@ export const ar = {
         "schoolAvailability": {
             "allSchools": "جميع المؤسسات التعليمية",
             "selectedSchool": "المؤسسة التعليمية المحددة"
+        }
+    },
+    "adminProjectShowPage": {
+        "pageTitleSuffix": "تفاصيل المشروع",
+        "headerTitle": "تفاصيل المشروع",
+        "backToList": "العودة إلى قائمة المشاريع",
+        "status": {
+            "approved": "معتمد",
+            "pending": "قيد المراجعة",
+            "rejected": "مرفوض"
+        },
+        "stats": {
+            "views": "المشاهدات",
+            "likes": "الإعجابات",
+            "rating": "التقييم"
+        },
+        "aiEvaluation": {
+            "title": "التقييم بالذكاء الاصطناعي",
+            "generateButton": "قيّم المشروع",
+            "regenerateButton": "إعادة التقييم",
+            "evaluating": "جاري التقييم...",
+            "hint": "اضغط \"قيّم المشروع\" ليحلّل الذكاء الاصطناعي المشروع ويقترح درجة وتوصية تساعدك في قرار المراجعة.",
+            "strengthsTitle": "نقاط القوة",
+            "weaknessesTitle": "نقاط تحتاج تحسيناً",
+            "disclaimer": "* هذا التقييم استرشادي بالذكاء الاصطناعي، والقرار النهائي يعود للمراجِع.",
+            "error": "حدث خطأ أثناء تقييم المشروع"
+        },
+        "recommendation": {
+            "approve": "يُنصح بالاعتماد",
+            "reject": "يُنصح بالرفض",
+            "needsRevision": "يحتاج تعديلاً"
+        },
+        "filesImages": {
+            "title": "الملفات والصور",
+            "imagesTitle": "الصور",
+            "filesTitle": "الملفات",
+            "imageAlt": "صورة {n}"
+        },
+        "submissions": {
+            "title": "التسليمات ({count})",
+            "notSet": "غير محدد",
+            "status": {
+                "submitted": "مقدم",
+                "reviewed": "تم المراجعة",
+                "approved": "معتمد",
+                "rejected": "مرفوض"
+            },
+            "actionEvaluate": "تقييم",
+            "actionView": "عرض"
+        },
+        "sidebar": {
+            "projectInfoTitle": "معلومات المشروع",
+            "createdAt": "تاريخ الإنشاء",
+            "approvedAt": "تاريخ الموافقة",
+            "pointsEarned": "النقاط المكتسبة",
+            "publisherTitle": "الناشر",
+            "studentInfoTitle": "معلومات الطالب",
+            "belongsToSchoolTitle": "تابع لمدرسة",
+            "sourceTitle": "المصدر",
+            "fromAdminCommunity": "من إدارة مجتمع إرث المبتكرين",
+            "teacherTitle": "المعلم"
+        },
+        "actions": {
+            "title": "الإجراءات",
+            "approve": "الموافقة على المشروع",
+            "reject": "رفض المشروع",
+            "delete": "حذف المشروع"
+        },
+        "confirm": {
+            "approve": {
+                "title": "تأكيد الموافقة",
+                "message": "هل أنت متأكد من الموافقة على المشروع \"{title}\"؟",
+                "confirmText": "موافقة"
+            },
+            "reject": {
+                "title": "تأكيد الرفض",
+                "message": "هل أنت متأكد من رفض المشروع \"{title}\"؟ يمكنك إدخال سبب الرفض في الخطوة التالية.",
+                "confirmText": "رفض",
+                "reasonPrompt": "يرجى إدخال سبب الرفض (اختياري):"
+            },
+            "delete": {
+                "title": "تأكيد الحذف",
+                "message": "هل أنت متأكد من حذف المشروع \"{title}\"؟ هذا الإجراء لا يمكن التراجع عنه.",
+                "confirmText": "حذف"
+            }
         }
     },
     "adminBookingsShowPage": {
@@ -3468,7 +3872,8 @@ export const ar = {
             "dates": "التواريخ",
             "stats": "الإحصائيات",
             "assignedStudents": "الطلاب المعينون",
-            "moreInfo": "معلومات إضافية"
+            "moreInfo": "معلومات إضافية",
+            "evaluationCriteria": "معايير التقييم"
         },
         "points": "{count} نقطة",
         "unlimited": "غير محدود",
@@ -3513,6 +3918,49 @@ export const ar = {
         "errors": {
             "imageTooLarge": "الصورة أكبر من {maxMb} ميجابايت",
             "imageTypeNotSupported": "نوع الصورة غير مدعوم. يرجى اختيار صورة بصيغة JPEG, PNG, GIF, أو WebP"
+        },
+        "evaluationCriteria": {
+            "title": "معايير التقييم",
+            "totalWeight": "مجموع الأوزان: {total}%",
+            "empty": "لا توجد معايير لهذا التحدي بعد.",
+            "emptyWithAiHint": "لا توجد معايير بعد. استخدم مساعد الذكاء الاصطناعي أعلاه لتوليدها تلقائياً حسب محتوى التحدي، أو أضفها يدوياً.",
+            "namePlaceholder": "اسم المعيار",
+            "addCriterion": "إضافة معيار"
+        },
+        "aiAssistant": {
+            "title": "مساعد الذكاء الاصطناعي للتحديات",
+            "description": "اكتب فكرة مبسطة وسيقوم المساعد بتوليد عنوان احترافي، وصف شامل، تحديد الفئة، صورة غلاف، ومعايير تقييم مبنية على محتوى التحدي.",
+            "placeholder": "مثال: تحدي عن ابتكار حلول لترشيد المياه...",
+            "generating": "جاري التوليد...",
+            "generateButton": "توليد التفاصيل",
+            "ideaRequired": "يرجى إدخال فكرة التحدي أولاً.",
+            "error": "حدث خطأ أثناء توليد تفاصيل التحدي"
+        },
+        "aiFieldNotGenerated": "لم يتمكن الذكاء الاصطناعي من توليد هذا الحقل تلقائياً — يرجى تعبئته يدوياً."
+    },
+    "schoolChallengesShowPage": {
+        "headerTitle": "تفاصيل التحدي",
+        "pageTitleFallback": "التحدي",
+        "pageTitleSuffix": "لوحة المدرسة",
+        "backToList": "العودة إلى قائمة التحديات",
+        "meta": {
+            "challengeType": "نوع التحدي",
+            "category": "الفئة",
+            "startDate": "تاريخ البدء",
+            "endDate": "تاريخ الانتهاء",
+            "participants": "المشاركون",
+            "pointsReward": "نقاط المكافأة",
+            "difficultyLevel": "مستوى الصعوبة"
+        },
+        "sections": {
+            "objective": "الهدف من التحدي",
+            "description": "وصف التحدي",
+            "instructions": "كيفية التنفيذ"
+        },
+        "actions": {
+            "title": "الإجراءات",
+            "viewSubmissions": "عرض التسليمات",
+            "editChallenge": "تعديل التحدي"
         }
     },
     "teacherCertificateShowPage": {
@@ -3975,7 +4423,15 @@ export const ar = {
     },
     "adminChallengesCreatePage": {
         "pageTitle": "إضافة تحدٍ جديد - {appName}",
-        "title": "إضافة تحدٍ جديد"
+        "title": "إضافة تحدٍ جديد",
+        "aiAssistant": {
+            "title": "مساعد الذكاء الاصطناعي للتحديات",
+            "description": "اكتب فكرة مبسطة وسيقوم المساعد بتوليد عنوان، هدف، وصف، خطوات تنفيذ، تحديد الفئة، صورة غلاف، ومعايير تقييم مبنية على محتوى التحدي.",
+            "placeholder": "مثال: تحدي لتصميم روبوت يفرز النفايات...",
+            "ideaRequired": "يرجى إدخال فكرة التحدي أولاً.",
+            "error": "حدث خطأ أثناء توليد تفاصيل التحدي",
+            "incompleteFieldsPrefix": "تم توليد التحدي. يرجى مراجعة الحقول التالية وإكمالها: "
+        }
     },
     "schoolCertificatesIndexPage": {
         "summary": {
@@ -4529,6 +4985,16 @@ export const ar = {
         "badgesList": "قائمة الشارات",
         "addNew": "إضافة شارة جديدة",
         "backToList": "العودة إلى قائمة الشارات",
+        "aiAssistant": {
+            "title": "مساعد الذكاء الاصطناعي للشارات",
+            "description": "اكتب فكرة مبسطة وسيقوم المساعد بتوليد اسم الشارة، الوصف، الرمز التعبيري، النوع، عدد النقاط المقترح، وصورة مناسبة.",
+            "placeholder": "مثال: شارة لأكثر طالب مشارك في التحديات...",
+            "generating": "جاري التوليد...",
+            "generateButton": "توليد التفاصيل",
+            "ideaRequired": "يرجى إدخال فكرة الشارة أولاً.",
+            "error": "حدث خطأ أثناء توليد تفاصيل الشارة",
+            "incompleteFieldsPrefix": "تم توليد الشارة. يرجى مراجعة الحقول التالية وإكمالها: "
+        },
         "searchPlaceholder": "ابحث عن شارة...",
         "empty": "لا توجد شارات",
         "badgeUnit": "شارة",
@@ -4912,6 +5378,59 @@ export const ar = {
         "reviewedDateLabel": "تاريخ المراجعة:",
         "reviewerLabel": "المقيّم:",
         "downloadAttachment": "تحميل المرفق"
+    },
+    "schoolChallengeSubmissionsListPage": {
+        "pageTitle": "تسليمات: {title}",
+        "backToList": "العودة إلى قائمة التحديات",
+        "subtitle": "عرض وتقييم تسليمات الطلاب لهذا التحدي",
+        "filters": {
+            "all": "الكل",
+            "submitted": "مُسلم",
+            "reviewed": "تم المراجعة",
+            "approved": "مقبول",
+            "rejected": "مرفوض"
+        },
+        "table": {
+            "student": "الطالب",
+            "submittedAt": "تاريخ التقديم",
+            "status": "الحالة",
+            "rating": "التقييم",
+            "actions": "الإجراءات"
+        },
+        "unknownStudent": "غير معروف",
+        "view": "عرض",
+        "empty": "لا توجد تسليمات لهذا التحدي"
+    },
+    "studentChallengeSubmissionShowPage": {
+        "pageTitleFallback": "تفاصيل التسليم",
+        "pageTitle": "حالة التقديم - {title}",
+        "challengeFallback": "التحدي",
+        "backToChallenge": "العودة إلى التحدي",
+        "status": {
+            "submitted": { "label": "تم التقديم", "description": "تم استلام تسليمك وسيتم مراجعته قريباً" },
+            "reviewed": { "label": "قيد المراجعة", "description": "يتم حالياً مراجعة تسليمك" },
+            "approved": { "label": "مقبول", "description": "تم قبول تسليمك! تهانينا" },
+            "rejected": { "label": "مرفوض", "description": "تم رفض تسليمك" }
+        },
+        "sections": {
+            "submissionStatus": "حالة التقديم",
+            "submissionContent": "محتوى التقديم",
+            "reviewerFeedback": "تعليق المراجع"
+        },
+        "meta": {
+            "submittedAt": "تاريخ التقديم",
+            "reviewedAt": "تاريخ المراجعة",
+            "reviewer": "المراجع",
+            "rating": "التقييم",
+            "pointsEarned": "النقاط المكتسبة"
+        },
+        "content": {
+            "answer": "الإجابة",
+            "yourComment": "تعليقك",
+            "attachedFiles": "الملفات المرفقة",
+            "fileFallback": "ملف {n}",
+            "download": "تحميل"
+        }
     },
     "schoolChallengesIndexPage": {
         "pageTitle": "التحديات الابتكارية - لوحة المدرسة - {appName}",
@@ -5989,8 +6508,21 @@ export const ar = {
         "submit": "نشر المقال",
         "alerts": {
             "invalidImageType": "يرجى اختيار ملف صورة صحيح",
-            "imageTooLarge": "حجم الصورة يجب ألا يتجاوز 2 ميجابايت"
+            "imageTooLarge": "حجم الصورة يجب ألا يتجاوز 2 ميجابايت",
+            "pdfRequired": "الملف المرفق يجب أن يكون بصيغة PDF.",
+            "pdfTooLarge": "حجم الملف يجب ألا يتجاوز 10 ميجابايت.",
+            "titleRequiredForAI": "يرجى إدخال عنوان المقال (بالعربية أو الإنجليزية) أولاً لتوليد المحتوى.",
+            "aiGenerateError": "حدث خطأ أثناء توليد المحتوى"
         },
+        "aiAssistant": {
+            "title": "توليد المحتوى بالذكاء الاصطناعي",
+            "description": "اكتب العنوان فقط (بالعربية أو الإنجليزية) وسيقوم الذكاء الاصطناعي بكتابة المقال واختيار صورة مناسبة.",
+            "generating": "جاري التوليد...",
+            "generateButton": "توليد الآن"
+        },
+        "pdfFileLabel": "مرفق PDF (اختياري)",
+        "pdfHintBooklet": "أرفق ملف الكتيب بصيغة PDF (بحد أقصى 10 ميجابايت).",
+        "pdfHintGeneral": "يمكنك إرفاق ملف PDF للإصدار (كتيب/مجلة) بحد أقصى 10 ميجابايت.",
         "youtubeUrlLabel": "رابط يوتيوب",
         "youtubeUrlHint": "رابط اختياري لفيديو يوتيوب مرتبط بالمقال."
     },
@@ -6299,6 +6831,66 @@ export const ar = {
         "actions": {
             "saving": "جاري الحفظ...",
             "publish": "نشر المنشور"
+        }
+    },
+    "adminPublicationEditPage": {
+        "headerTitle": "تعديل المنشور",
+        "pageTitle": "تعديل: {title} — {appName}",
+        "backToDetails": "العودة إلى تفاصيل المنشور",
+        "currentFileAvailable": "الملف الحالي متاح —",
+        "download": "تحميل",
+        "publishDateLabel": "تاريخ النشر",
+        "publisherNameLabel": "اسم الناشر",
+        "saveChanges": "حفظ التعديلات"
+    },
+    "adminPublicationShowPage": {
+        "headerTitle": "تفاصيل المقال",
+        "backToList": "العودة إلى قائمة المقالات",
+        "descriptionTitle": "الوصف",
+        "contentTitle": "المحتوى",
+        "downloadFile": "تحميل الملف",
+        "status": {
+            "approved": "معتمد",
+            "pending": "قيد المراجعة",
+            "rejected": "مرفوض"
+        },
+        "sidebar": {
+            "infoTitle": "معلومات المقال",
+            "createdAt": "تاريخ الإنشاء",
+            "approvedAt": "تاريخ الموافقة",
+            "issueNumber": "رقم العدد",
+            "publishDate": "تاريخ النشر",
+            "publisherName": "الناشر",
+            "authorInfoTitle": "معلومات المؤلف",
+            "schoolTitle": "المدرسة",
+            "approverTitle": "من وافق"
+        },
+        "actions": {
+            "title": "الإجراءات",
+            "approve": "الموافقة على المقال",
+            "reject": "رفض المقال",
+            "view": "عرض المقال",
+            "edit": "تعديل المنشور",
+            "delete": "حذف المقال"
+        },
+        "confirm": {
+            "approve": {
+                "title": "تأكيد الموافقة",
+                "message": "هل أنت متأكد من الموافقة على المقال \"{title}\"؟",
+                "confirmText": "موافقة"
+            },
+            "delete": {
+                "title": "تأكيد الحذف",
+                "message": "هل أنت متأكد من حذف المقال \"{title}\"؟ هذا الإجراء لا يمكن التراجع عنه.",
+                "confirmText": "حذف"
+            }
+        },
+        "rejectModal": {
+            "title": "رفض المقال",
+            "reasonLabel": "سبب الرفض (اختياري)",
+            "reasonPlaceholder": "أدخل سبب الرفض...",
+            "rejecting": "جاري الرفض...",
+            "rejectButton": "رفض"
         }
     },
     "adminSubscriptionShowPage": {
@@ -6679,7 +7271,64 @@ export const ar = {
         "totalStudents": "إجمالي الطلاب",
         "avgScore": "متوسط الدرجات",
         "needsAttention": "يحتاجون متابعة",
-        "topStudents": "المتميزون"
+        "topStudents": "المتميزون",
+        "needsAttentionList": "⚠️ طلاب يحتاجون متابعة:"
+    },
+    "compareStudents": {
+        "pageTitle": "مقارنة الطلاب",
+        "heading": "⚖️ مقارنة الطلاب",
+        "subtitle": "مقارنة المؤشرات الثمانية بين {count} طلاب",
+        "backLink": "→ العودة لمتابعة الابتكار",
+        "selectAtLeastTwo": "اختر طالبين على الأقل",
+        "selectAtLeastTwoDescription": "حدد الطلاب من صفحة متابعة الابتكار ثم اضغط \"مقارنة\".",
+        "overallScore": "الدرجة الكلية",
+        "sideBySide": "📊 المؤشرات جنباً إلى جنب",
+        "indexColumn": "المؤشر"
+    },
+    "cognitiveAssessment": {
+        "factors": {
+            "fluid_reasoning": "الاستدلال السائل",
+            "knowledge": "المعرفة",
+            "quantitative_reasoning": "الاستدلال الكمي",
+            "visual_spatial": "المعالجة البصرية المكانية",
+            "working_memory": "الذاكرة العاملة"
+        },
+        "scoreLabels": {
+            "verySuperior": "متفوق جداً",
+            "superior": "متفوق",
+            "aboveAverage": "فوق المتوسط",
+            "average": "متوسط",
+            "belowAverage": "أقل من المتوسط",
+            "borderline": "ضعف بيني",
+            "delayed": "متأخر"
+        },
+        "standardScore": "الدرجة المعيارية"
+    },
+    "studentReport": {
+        "pageTitlePrefix": "تقرير",
+        "studentFallback": "الطالب",
+        "subtitle": "تقرير شامل مولّد بالذكاء الاصطناعي",
+        "backLink": "→ العودة لمتابعة الابتكار",
+        "overallScore": "الدرجة الكلية",
+        "indexesNotCalculated": "لم تُحسب المؤشرات بعد",
+        "cognitiveMapHeading": "🧠 خريطة القدرات المعرفية (ستانفورد-بينيه)",
+        "cognitiveMapSubtitle": "العوامل الخمسة الكبرى — درجات معيارية (متوسط 100)",
+        "updateAssessment": "✏️ تحديث التقييم",
+        "addAssessment": "+ إدخال تقييم معرفي",
+        "fullScaleIq": "نسبة الذكاء الكلية",
+        "verbalIq": "اللفظية",
+        "nonverbalIq": "غير اللفظية",
+        "strengthsHeading": "💪 نقاط القوة",
+        "weaknessesHeading": "📌 نقاط الضعف",
+        "examinerNotes": "📝 ملاحظات الفاحص",
+        "noCognitiveAssessment": "لم يُدخل تقييم معرفي لهذا الطالب بعد.",
+        "summaryHeading": "📄 الملخص",
+        "strengthsAnalysisHeading": "💪 تحليل نقاط القوة",
+        "weaknessesAnalysisHeading": "📌 تحليل نقاط التحسين",
+        "indexAnalysisHeading": "📊 تحليل المؤشرات",
+        "developmentPlanHeading": "🗺️ خطة التطوير",
+        "overallAssessmentHeading": "⚖️ التقييم العام",
+        "conclusionHeading": "🏁 الخاتمة"
     },
     "sections": {
         "testimonials": {

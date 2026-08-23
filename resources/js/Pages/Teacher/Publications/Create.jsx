@@ -37,11 +37,11 @@ export default function CreatePublication({ auth, school }) {
             return;
         }
         if (selected.type !== 'application/pdf') {
-            alert('الملف المرفق يجب أن يكون بصيغة PDF.');
+            alert(t('teacherPublicationCreatePage.alerts.pdfRequired'));
             return;
         }
         if (selected.size > 10 * 1024 * 1024) {
-            alert('حجم الملف يجب ألا يتجاوز 10 ميجابايت.');
+            alert(t('teacherPublicationCreatePage.alerts.pdfTooLarge'));
             return;
         }
         setData('file', selected);
@@ -51,7 +51,7 @@ export default function CreatePublication({ auth, school }) {
     const handleAIGenerate = async () => {
         const titleToUse = data.title || data.title_ar;
         if (!titleToUse) {
-            alert("يرجى إدخال عنوان المقال (بالعربية أو الإنجليزية) أولاً لتوليد المحتوى.");
+            alert(t('teacherPublicationCreatePage.alerts.titleRequiredForAI'));
             return;
         }
 
@@ -83,7 +83,7 @@ export default function CreatePublication({ auth, school }) {
                 }
             }
         } catch (error) {
-            alert(error.response?.data?.error || 'حدث خطأ أثناء توليد المحتوى');
+            alert(error.response?.data?.error || t('teacherPublicationCreatePage.alerts.aiGenerateError'));
         } finally {
             setIsGenerating(false);
         }
@@ -164,10 +164,10 @@ export default function CreatePublication({ auth, school }) {
                             <div>
                                 <h3 className="font-semibold text-blue-800 text-sm flex items-center gap-2">
                                     <FaRobot className="text-blue-600" />
-                                    توليد المحتوى بالذكاء الاصطناعي
+                                    {t('teacherPublicationCreatePage.aiAssistant.title')}
                                 </h3>
                                 <p className="text-xs text-blue-600 mt-1">
-                                    اكتب العنوان فقط (بالعربية أو الإنجليزية) وسيقوم الذكاء الاصطناعي بكتابة المقال واختيار صورة مناسبة.
+                                    {t('teacherPublicationCreatePage.aiAssistant.description')}
                                 </p>
                             </div>
                             <button
@@ -177,9 +177,9 @@ export default function CreatePublication({ auth, school }) {
                                 className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition flex items-center gap-2"
                             >
                                 {isGenerating ? (
-                                    <><FaSpinner className="animate-spin" /> جاري التوليد...</>
+                                    <><FaSpinner className="animate-spin" /> {t('teacherPublicationCreatePage.aiAssistant.generating')}</>
                                 ) : (
-                                    <><FaRobot /> توليد الآن</>
+                                    <><FaRobot /> {t('teacherPublicationCreatePage.aiAssistant.generateButton')}</>
                                 )}
                             </button>
                         </div>
@@ -267,7 +267,7 @@ export default function CreatePublication({ auth, school }) {
 
                         {/* مرفق PDF (كتيب/مجلة) */}
                         <div>
-                            <InputLabel htmlFor="file" value="مرفق PDF (اختياري)" className="text-sm font-medium text-gray-700 mb-2" />
+                            <InputLabel htmlFor="file" value={t('teacherPublicationCreatePage.pdfFileLabel')} className="text-sm font-medium text-gray-700 mb-2" />
                             <input
                                 id="file"
                                 type="file"
@@ -280,8 +280,8 @@ export default function CreatePublication({ auth, school }) {
                             ) : null}
                             <p className="mt-1 text-xs text-gray-500">
                                 {data.type === 'booklet'
-                                    ? 'أرفق ملف الكتيب بصيغة PDF (بحد أقصى 10 ميجابايت).'
-                                    : 'يمكنك إرفاق ملف PDF للإصدار (كتيب/مجلة) بحد أقصى 10 ميجابايت.'}
+                                    ? t('teacherPublicationCreatePage.pdfHintBooklet')
+                                    : t('teacherPublicationCreatePage.pdfHintGeneral')}
                             </p>
                             <InputError message={errors.file} className="mt-2" />
                         </div>

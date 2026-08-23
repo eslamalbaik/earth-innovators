@@ -32,6 +32,8 @@ import PrimaryButton from '../../Components/PrimaryButton';
 export default function ProjectShow({ auth, project, existingSubmission, userRole, canSubmit }) {
     const { showError } = useToast();
     const { t, language } = useTranslation();
+    const displayTitle = language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar);
+    const displayDescription = language === 'ar' ? (project.description_ar || project.description) : (project.description || project.description_ar);
     const [activeTab, setActiveTab] = useState('details'); // 'details', 'submit', 'comments'
     const [fileList, setFileList] = useState([]);
     const [dragActive, setDragActive] = useState(false);
@@ -195,7 +197,7 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
             {activeTab === 'details' && (
                 <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-4">
                     <div>
-                        <h1 className="text-xl font-extrabold text-gray-900 mb-3">{project.title}</h1>
+                        <h1 className="text-xl font-extrabold text-gray-900 mb-3">{displayTitle}</h1>
                         <div className="flex items-center gap-2 flex-wrap mb-3">
                             <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold border border-green-300">
                                 {t('common.approved')}
@@ -218,7 +220,7 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
                         </div>
 
                         <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
-                            {project.description}
+                            {displayDescription}
                         </p>
                     </div>
 
@@ -549,7 +551,7 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
 
     return (
         <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
-            <Head title={project.title} />
+            <Head title={displayTitle} />
 
             {/* Mobile View */}
             <div className="block md:hidden">

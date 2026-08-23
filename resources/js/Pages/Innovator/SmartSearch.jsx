@@ -1,18 +1,20 @@
 import { useForm } from '@inertiajs/react';
 import StudentPageShell from '@/Components/Innovation/StudentPageShell';
 import ClassificationBadge from '@/Components/Innovation/ClassificationBadge';
-
-const CLASSIFICATION_DETAILS = {
-    diamond:    { label: 'ماسي',    color: '#b9f2ff', icon: '💎' },
-    platinum:   { label: 'بلاتيني', color: '#e5e4e2', icon: '🏆' },
-    gold:       { label: 'ذهبي',    color: '#ffd700', icon: '🥇' },
-    silver:     { label: 'فضي',     color: '#c0c0c0', icon: '🥈' },
-    bronze:     { label: 'برونزي',  color: '#cd7f32', icon: '🥉' },
-    developing: { label: 'نامٍ',     color: '#90ee90', icon: '🌱' },
-};
+import { useTranslation } from '@/i18n';
 
 export default function SmartSearch({ searchResults = null, query = '' }) {
+    const { t } = useTranslation();
     const { data, setData, post, processing } = useForm({ query: query || '' });
+
+    const CLASSIFICATION_DETAILS = {
+        diamond:    { label: t('innovation.smartSearch.levels.diamond') || 'Diamond',    color: '#b9f2ff', icon: '💎' },
+        platinum:   { label: t('innovation.smartSearch.levels.platinum') || 'Platinum', color: '#e5e4e2', icon: '🏆' },
+        gold:       { label: t('innovation.smartSearch.levels.gold') || 'Gold',    color: '#ffd700', icon: '🥇' },
+        silver:     { label: t('innovation.smartSearch.levels.silver') || 'Silver',     color: '#c0c0c0', icon: '🥈' },
+        bronze:     { label: t('innovation.smartSearch.levels.bronze') || 'Bronze',  color: '#cd7f32', icon: '🥉' },
+        developing: { label: t('innovation.smartSearch.levels.developing') || 'Developing',     color: '#90ee90', icon: '🌱' },
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -23,12 +25,12 @@ export default function SmartSearch({ searchResults = null, query = '' }) {
     const results = searchResults?.results || [];
 
     return (
-        <StudentPageShell title="البحث الذكي">
+        <StudentPageShell title={t('innovation.smartSearch.pageTitle')}>
             <div className="space-y-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">🔍 البحث الذكي</h1>
+                    <h1 className="text-2xl font-bold text-gray-900">{t('innovation.smartSearch.title')}</h1>
                     <p className="text-gray-500 mt-1">
-                        ابحث بلغة طبيعية — مثال: "طالب لديه قيادة عالية ويجيد Python"
+                        {t('innovation.smartSearch.subtitle')}
                     </p>
                 </div>
 
@@ -38,14 +40,14 @@ export default function SmartSearch({ searchResults = null, query = '' }) {
                         value={data.query}
                         onChange={(e) => setData('query', e.target.value)}
                         className="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                        placeholder="اكتب ما تبحث عنه..."
+                        placeholder={t('innovation.smartSearch.placeholder')}
                     />
                     <button
                         type="submit"
                         disabled={processing || !data.query.trim()}
                         className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-medium transition-all shadow-md disabled:opacity-50"
                     >
-                        {processing ? '⏳' : '🔍 بحث'}
+                        {processing ? t('innovation.smartSearch.searching') : t('innovation.smartSearch.search')}
                     </button>
                 </form>
 
@@ -57,7 +59,9 @@ export default function SmartSearch({ searchResults = null, query = '' }) {
 
                 {results.length > 0 && (
                     <div className="space-y-3">
-                        <p className="text-sm text-gray-500">النتائج: {searchResults.total}</p>
+                        <p className="text-sm text-gray-500">
+                            {t('innovation.smartSearch.results', { total: searchResults.total })}
+                        </p>
                         {results.map((user) => (
                             <div key={user.id} className="bg-white rounded-2xl p-5 shadow-md border border-gray-100">
                                 <div className="flex items-start justify-between gap-3">
@@ -69,7 +73,7 @@ export default function SmartSearch({ searchResults = null, query = '' }) {
                                         {user.skills?.length > 0 && (
                                             <div className="flex flex-wrap gap-1.5 mt-2">
                                                 {user.skills.slice(0, 6).map((skill, i) => (
-                                                    <span key={i} className="px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-medium">
+                                                    <span key={i} className="px-2.5 py-0.5 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-medium">
                                                         {skill}
                                                     </span>
                                                 ))}
@@ -92,7 +96,7 @@ export default function SmartSearch({ searchResults = null, query = '' }) {
                 {searchResults && !searchResults.message && results.length === 0 && (
                     <div className="text-center py-12 bg-white rounded-2xl shadow-md">
                         <span className="text-5xl block mb-3">🔍</span>
-                        <p className="text-gray-500">لا توجد نتائج مطابقة لبحثك.</p>
+                        <p className="text-gray-500">{t('innovation.smartSearch.noResults')}</p>
                     </div>
                 )}
             </div>

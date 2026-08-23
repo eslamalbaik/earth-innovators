@@ -1,6 +1,7 @@
 import { Link, router } from '@inertiajs/react';
 import StudentPageShell from '@/Components/Innovation/StudentPageShell';
 import { useState } from 'react';
+import { useTranslation } from '@/i18n';
 import '../../../css/whiteTheme.css';
 
 const TYPE_ICONS = {
@@ -9,12 +10,13 @@ const TYPE_ICONS = {
 };
 
 const STATUS_STYLES = {
-    validated: { bg: 'bg-emerald-100 text-emerald-700', label: '✅ مُتحقق' },
-    flagged:   { bg: 'bg-red-100 text-red-700',         label: '⚠️ مُعلّم' },
-    pending:   { bg: 'bg-amber-100 text-amber-700',     label: '⏳ قيد التحليل' },
+    validated: { bg: 'bg-emerald-100 text-emerald-700' },
+    flagged:   { bg: 'bg-red-100 text-red-700' },
+    pending:   { bg: 'bg-amber-100 text-amber-700' },
 };
 
 export default function AchievementsIndex({ achievements, statistics, types, filters }) {
+    const { t } = useTranslation();
     const [activeType, setActiveType] = useState(filters.type || '');
     const [activeStatus, setActiveStatus] = useState(filters.status || '');
 
@@ -26,19 +28,19 @@ export default function AchievementsIndex({ achievements, statistics, types, fil
     };
 
     return (
-        <StudentPageShell title="إنجازاتي">
+        <StudentPageShell title={t('achievements.index.pageTitle')}>
             <div className="space-y-6">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">🏆 إنجازاتي</h1>
-                        <p className="text-gray-500 mt-1">إدارة وتتبع جميع إنجازاتك</p>
+                        <h1 className="text-2xl font-bold text-gray-900">{t('achievements.index.title')}</h1>
+                        <p className="text-gray-500 mt-1">{t('achievements.index.subtitle')}</p>
                     </div>
                     <Link
                         href={route('innovation.achievements.create')}
                         className="px-5 py-2.5 bg-accent text-white rounded-xl font-medium transition-all shadow-lg hover:shadow-xl"
                     >
-                        + إضافة إنجاز جديد
+                        {t('achievements.index.addNew')}
                     </Link>
                 </div>
 
@@ -46,19 +48,19 @@ export default function AchievementsIndex({ achievements, statistics, types, fil
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     <div className="bg-card border-light rounded-2xl p-4 shadow-sm">
                         <p className="text-3xl font-black text-accent">{statistics.total}</p>
-                        <p className="text-sm text-gray-500 mt-1">إجمالي الإنجازات</p>
+                        <p className="text-sm text-gray-500 mt-1">{t('achievements.index.stats.total')}</p>
                     </div>
                     <div className="bg-card border-light rounded-2xl p-4 shadow-sm">
                         <p className="text-3xl font-black text-accent">{statistics.validated}</p>
-                        <p className="text-sm text-gray-500 mt-1">مُتحقق منها</p>
+                        <p className="text-sm text-gray-500 mt-1">{t('achievements.index.stats.validated')}</p>
                     </div>
                     <div className="bg-card border-light rounded-2xl p-4 shadow-sm">
                         <p className="text-3xl font-black text-accent">{statistics.pending}</p>
-                        <p className="text-sm text-gray-500 mt-1">قيد التحليل</p>
+                        <p className="text-sm text-gray-500 mt-1">{t('achievements.index.stats.pending')}</p>
                     </div>
                     <div className="bg-card border-light rounded-2xl p-4 shadow-sm">
                         <p className="text-3xl font-black text-accent">{statistics.avg_confidence}%</p>
-                        <p className="text-sm text-gray-500 mt-1">متوسط الثقة</p>
+                        <p className="text-sm text-gray-500 mt-1">{t('achievements.index.stats.confidence')}</p>
                     </div>
                 </div>
 
@@ -70,7 +72,7 @@ export default function AchievementsIndex({ achievements, statistics, types, fil
                             !activeType ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                         }`}
                     >
-                        الكل
+                        {t('common.all')}
                     </button>
                     {Object.entries(types).map(([key, label]) => (
                         <button
@@ -80,7 +82,7 @@ export default function AchievementsIndex({ achievements, statistics, types, fil
                                 activeType === key ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                             }`}
                         >
-                            {TYPE_ICONS[key]} {label}
+                            {TYPE_ICONS[key]} {t(`achievements.types.${key}`)}
                         </button>
                     ))}
                 </div>
@@ -113,20 +115,23 @@ export default function AchievementsIndex({ achievements, statistics, types, fil
                                                          achievement.ai_validation_status === 'flagged' ? '⚠️' : '⏳'}
                                                     </span>
                                                     {achievement.attachments?.length > 0 && (
-                                                        <span className="text-xs text-gray-400">📎 {achievement.attachments.length} مرفق</span>
+                                                        <span className="text-xs text-gray-400">
+                                                            📎 {t('achievements.index.attachments', { count: achievement.attachments.length })}
+                                                        </span>
                                                     )}
                                                 </div>
                                             </div>
                                         </div>
-<span className={`px-3 py-1 rounded-full text-xs font-medium ${statusStyle.bg}`}>{statusStyle.label}</span>
+                                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusStyle.bg}`}>
+                                            {t(`achievements.status.${achievement.ai_validation_status}`)}
+                                        </span>
                                             
-                                            {achievement.ai_confidence_score && (
-                                                <span className="text-lg font-bold text-gray-600 dark:text-gray-300">
-                                                    {Math.round(achievement.ai_confidence_score)}%
-                                                </span>
-                                            )}
-                                        </div>
-                                    
+                                        {achievement.ai_confidence_score && (
+                                            <span className="text-lg font-bold text-gray-600 dark:text-gray-300">
+                                                {Math.round(achievement.ai_confidence_score)}%
+                                            </span>
+                                        )}
+                                    </div>
                                 </Link>
                             );
                         })}
@@ -134,13 +139,13 @@ export default function AchievementsIndex({ achievements, statistics, types, fil
                 ) : (
                     <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow-md">
                         <span className="text-6xl block mb-4">🎯</span>
-                        <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">لا توجد إنجازات</h3>
-                        <p className="text-gray-500 mb-6">ابدأ بإضافة إنجازاتك لبناء ملفك!</p>
+                        <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{t('achievements.index.empty.title')}</h3>
+                        <p className="text-gray-500 mb-6">{t('achievements.index.empty.description')}</p>
                         <Link
                             href={route('innovation.achievements.create')}
                             className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium transition-colors"
                         >
-                            إضافة أول إنجاز
+                            {t('achievements.index.empty.action')}
                         </Link>
                     </div>
                 )}

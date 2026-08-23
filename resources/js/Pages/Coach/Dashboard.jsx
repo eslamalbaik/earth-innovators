@@ -1,6 +1,7 @@
 import { Head, Link } from "@inertiajs/react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import { useState } from "react";
+import { useTranslation } from "@/i18n";
 import {
     Radar,
     RadarChart,
@@ -34,6 +35,7 @@ export default function CoachDashboard({
     classifications,
     statistics,
 }) {
+    const { t } = useTranslation();
     const [compareIds, setCompareIds] = useState([]);
     const [selectedStudent, setSelectedStudent] = useState(null);
     const [sortBy, setSortBy] = useState("overall_score");
@@ -47,7 +49,7 @@ export default function CoachDashboard({
     const classificationData = Object.entries(
         statistics.classifications || {},
     ).map(([key, count]) => ({
-        name: classifications[key]?.label || key,
+        name: t(`innovationIndex.classifications.${key}`),
         count,
         fill: CLASSIFICATION_COLORS[key] || "#A3C042",
     }));
@@ -62,17 +64,17 @@ export default function CoachDashboard({
 
     return (
         <DashboardLayout auth={auth}>
-            <Head title="متابعة الابتكار" />
+            <Head title={t('coachDashboard.pageTitle')} />
 
             <div className="py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900">
-                            🚀 متابعة الابتكار
+                            {t('coachDashboard.heading')}
                         </h1>
                         <p className="text-gray-500 mt-1">
-                            إدارة ومتابعة {totalStudents} طالب
+                            {t('coachDashboard.subtitle', { count: totalStudents })}
                         </p>
                     </div>
                     {compareIds.length >= 2 && (
@@ -82,7 +84,7 @@ export default function CoachDashboard({
                             })}
                             className="px-5 py-2.5 bg-gradient-to-r from-[#A3C042] to-[#8da835] hover:from-[#8da835] hover:to-[#768e2a] text-white rounded-xl text-sm font-medium transition-all shadow-md"
                         >
-                            ⚖️ مقارنة {compareIds.length} طلاب
+                            {t('coachDashboard.compareButton', { count: compareIds.length })}
                         </Link>
                     )}
                 </div>
@@ -94,7 +96,7 @@ export default function CoachDashboard({
                             {totalStudents}
                         </p>
                         <p className="text-sm text-gray-500 mt-1">
-                            إجمالي الطلاب
+                            {t('coachDashboard.stats.totalStudents')}
                         </p>
                     </div>
                     <div className="bg-white/70 backdrop-blur-xl rounded-2xl p-5 shadow-lg border border-gray-200">
@@ -102,7 +104,7 @@ export default function CoachDashboard({
                             {statistics.avg_score}
                         </p>
                         <p className="text-sm text-gray-500 mt-1">
-                            متوسط الدرجات
+                            {t('coachDashboard.stats.avgScore')}
                         </p>
                     </div>
                     <div className="bg-white/70 backdrop-blur-xl rounded-2xl p-5 shadow-lg border border-gray-200">
@@ -110,14 +112,14 @@ export default function CoachDashboard({
                             {statistics.needs_attention?.length || 0}
                         </p>
                         <p className="text-sm text-gray-500 mt-1">
-                            يحتاجون متابعة
+                            {t('coachDashboard.stats.needsAttention')}
                         </p>
                     </div>
                     <div className="bg-white/70 backdrop-blur-xl rounded-2xl p-5 shadow-lg border border-gray-200">
                         <p className="text-3xl font-black text-[#A3C042]">
                             {statistics.top_students?.length || 0}
                         </p>
-                        <p className="text-sm text-gray-500 mt-1">المتميزون</p>
+                        <p className="text-sm text-gray-500 mt-1">{t('coachDashboard.stats.topStudents')}</p>
                     </div>
                 </div>
 
@@ -126,7 +128,7 @@ export default function CoachDashboard({
                     <div className="lg:col-span-2 bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
                         <div className="p-4 border-b border-gray-100 flex items-center justify-between">
                             <h3 className="font-bold text-gray-800">
-                                📋 قائمة الطلاب
+                                {t('coachDashboard.studentsList')}
                             </h3>
                             <select
                                 value={sortBy}
@@ -134,9 +136,9 @@ export default function CoachDashboard({
                                 className="text-sm px-3 py-1.5 rounded-lg border border-gray-300"
                             >
                                 <option value="overall_score">
-                                    ترتيب حسب الدرجة
+                                    {t('coachDashboard.sortByScore')}
                                 </option>
-                                <option value="name">ترتيب حسب الاسم</option>
+                                <option value="name">{t('coachDashboard.sortByName')}</option>
                             </select>
                         </div>
                         <div className="divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
@@ -161,7 +163,7 @@ export default function CoachDashboard({
                                             }
                                             onClick={(e) => e.stopPropagation()}
                                             className="w-4 h-4 rounded border-gray-300 text-[#A3C042] focus:ring-[#A3C042]"
-                                            title="اختر للمقارنة"
+                                            title={t('coachDashboard.selectForCompare')}
                                         />
                                         <span className="w-8 h-8 rounded-full bg-gradient-to-br from-[#A3C042] to-[#8da835] flex items-center justify-center text-white font-bold text-sm">
                                             {idx + 1}
@@ -176,20 +178,12 @@ export default function CoachDashboard({
                                                         .classification_details
                                                         ?.icon
                                                 }
-                                                {
-                                                    student
-                                                        .classification_details
-                                                        ?.label
-                                                }
+                                                {t(`innovationIndex.classifications.${student.classification}`)}
                                             </p>
                                             {student.strongest && (
                                                 <p className="text-sm text-[#A3C042]">
-                                                    &#8226; الأقوى:{" "}
-                                                    {
-                                                        indexNames[
-                                                            student.strongest
-                                                        ]
-                                                    }
+                                                    &#8226; {t('coachDashboard.strongest')}{" "}
+                                                    {t(`innovationIndex.names.${student.strongest}`)}
                                                 </p>
                                             )}
                                             <Link
@@ -202,7 +196,7 @@ export default function CoachDashboard({
                                                     e.stopPropagation()
                                                 }
                                             >
-                                                تقرير AI
+                                                {t('coachDashboard.aiReport')}
                                             </Link>
                                         </div>
                                     </div>
@@ -224,18 +218,15 @@ export default function CoachDashboard({
                                             ?.icon
                                     }
                                     {""}
-                                    {
-                                        selectedStudent.classification_details
-                                            ?.label
-                                    }
-                                    {""}— {selectedStudent.overall_score}/100
+                                    {t(`innovationIndex.classifications.${selectedStudent.classification}`)}
+                                    {""}— {selectedStudent.overall_score}{t('coachDashboard.outOf100')}
                                 </p>
 
                                 <ResponsiveContainer width="100%" height={250}>
                                     <RadarChart
-                                        data={Object.entries(indexNames).map(
-                                            ([key, label]) => ({
-                                                index: label,
+                                        data={Object.keys(indexNames).map(
+                                            (key) => ({
+                                                index: t(`innovationIndex.names.${key}`),
                                                 value:
                                                     selectedStudent.indexes?.[
                                                         key
@@ -267,14 +258,10 @@ export default function CoachDashboard({
                                 {selectedStudent.weakest && (
                                     <div className="mt-3 p-3 bg-amber-50 rounded-xl text-sm">
                                         <span className="font-bold text-amber-700">
-                                            ⚠️ نقطة ضعف:
+                                            {t('coachDashboard.weakness')}
                                         </span>
                                         <span className="text-amber-600 mr-1">
-                                            {
-                                                indexNames[
-                                                    selectedStudent.weakest
-                                                ]
-                                            }
+                                            {t(`innovationIndex.names.${selectedStudent.weakest}`)}
                                         </span>
                                     </div>
                                 )}
@@ -282,14 +269,14 @@ export default function CoachDashboard({
                         ) : (
                             <div className="bg-white rounded-2xl p-8 shadow-md border border-gray-100 text-center text-gray-400">
                                 <span className="text-4xl block mb-3">👆</span>
-                                <p>اختر طالباً لعرض تفاصيله</p>
+                                <p>{t('coachDashboard.selectStudentPrompt')}</p>
                             </div>
                         )}
 
                         {/* Classification Distribution */}
                         <div className="bg-white rounded-2xl p-5 shadow-md border border-gray-100">
                             <h3 className="font-bold text-gray-800 mb-3">
-                                📊 توزيع التصنيفات
+                                {t('coachDashboard.classificationDistribution')}
                             </h3>
                             {classificationData.length > 0 ? (
                                 <ResponsiveContainer width="100%" height={200}>
@@ -332,7 +319,7 @@ export default function CoachDashboard({
                                 </ResponsiveContainer>
                             ) : (
                                 <p className="text-center text-gray-400 py-6">
-                                    لا توجد بيانات
+                                    {t('coachDashboard.noData')}
                                 </p>
                             )}
                         </div>

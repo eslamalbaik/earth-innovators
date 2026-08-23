@@ -47,6 +47,10 @@ class CoachDashboardController extends Controller
         $this->ensureCoach($coach);
         $this->ensureStudentInScope($coach, $student);
 
+        // توليد التقرير قد يستغرق وقتاً طويلاً بسبب إعادة المحاولة التلقائية في
+        // GeminiClient، بينما max_execution_time الافتراضي على السيرفر أقل من ذلك.
+        set_time_limit(300);
+
         $report = $this->reportGenerator->generateStudentReport($student);
         $student->load(['latestInnovationIndex', 'achievements', 'userSkills']);
 

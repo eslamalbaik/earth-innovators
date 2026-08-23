@@ -1,4 +1,5 @@
 import StudentPageShell from '@/Components/Innovation/StudentPageShell';
+import { useTranslation } from '@/i18n';
 
 const PRIORITY_STYLES = {
     high:   { bg: 'bg-gray-50/50', border: 'border-gray-100', text: 'text-gray-900', badge: 'bg-red-50 text-red-600 border border-red-100' },
@@ -7,6 +8,7 @@ const PRIORITY_STYLES = {
 };
 
 export default function Recommendations({ recommendations }) {
+    const { t } = useTranslation();
     const {
         general_recommendations = [],
         courses = [],
@@ -23,18 +25,18 @@ export default function Recommendations({ recommendations }) {
             && competitions.length === 0 && projects.length === 0 && !overall_advice);
 
     return (
-        <StudentPageShell title="التوصيات الذكية">
+        <StudentPageShell title={t('innovation.recommendations.pageTitle')}>
             <div className="max-w-5xl mx-auto space-y-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">🤖 توصيات الذكاء الاصطناعي</h1>
-                    <p className="text-gray-500 mt-1">توصيات مخصصة بناءً على تحليل مؤشراتك</p>
+                    <h1 className="text-2xl font-bold text-gray-900">{t('innovation.recommendations.title')}</h1>
+                    <p className="text-gray-500 mt-1">{t('innovation.recommendations.subtitle')}</p>
                 </div>
 
                 {isEmpty && (
                     <div className="text-center py-16 bg-white/70 backdrop-blur-xl rounded-2xl border border-gray-200 shadow-lg">
                         <span className="text-6xl block mb-4">🤖</span>
-                        <h3 className="text-xl font-bold text-gray-800 mb-2">لا توجد توصيات بعد</h3>
-                        <p className="text-gray-500">أضف المزيد من الإنجازات ليتمكن الذكاء الاصطناعي من تحليل ملفك وتوليد توصيات مخصصة.</p>
+                        <h3 className="text-xl font-bold text-gray-800 mb-2">{t('innovation.recommendations.empty.title')}</h3>
+                        <p className="text-gray-500">{t('innovation.recommendations.empty.description')}</p>
                     </div>
                 )}
 
@@ -43,7 +45,7 @@ export default function Recommendations({ recommendations }) {
                     <div className="bg-indigo-50/50 rounded-2xl p-6 border border-indigo-100 shadow-sm flex items-start gap-4">
                         <span className="text-3xl">💬</span>
                         <div>
-                            <h3 className="text-lg font-bold text-indigo-900 mb-1">النصيحة العامة</h3>
+                            <h3 className="text-lg font-bold text-indigo-900 mb-1">{t('innovation.recommendations.generalAdvice')}</h3>
                             <p className="text-indigo-800/90 leading-relaxed text-sm">{overall_advice}</p>
                         </div>
                     </div>
@@ -57,14 +59,18 @@ export default function Recommendations({ recommendations }) {
                                 <div>
                                     <h2 className="text-3xl font-black tracking-tight mb-2 flex items-center gap-3">
                                         <span className="bg-white/20 p-2 rounded-xl text-yellow-300">🎓</span>
-                                        مستوى الطالب: {student_level_profile.current_level}
+                                        {t('innovation.recommendations.studentLevel', { level: t(`innovation.smartSearch.levels.${student_level_profile.current_level?.toLowerCase()}`) || student_level_profile.current_level })}
                                     </h2>
-                                    <p className="text-indigo-100 font-medium">النتيجة: {student_level_profile.score}</p>
+                                    <p className="text-indigo-100 font-medium">
+                                        {t('innovation.recommendations.score', { score: student_level_profile.score })}
+                                    </p>
                                 </div>
                                 <div className="text-right">
                                     <div className="inline-flex items-center justify-center px-4 py-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/20">
-                                        <span className="text-sm text-indigo-100 ml-2">المستوى المستهدف:</span>
-                                        <span className="text-xl font-bold text-yellow-300">{student_level_profile.target_level}</span>
+                                        <span className="text-sm text-indigo-100 ml-2">{t('innovation.recommendations.targetLevel')}</span>
+                                        <span className="text-xl font-bold text-yellow-300">
+                                            {t(`innovation.smartSearch.levels.${student_level_profile.target_level?.toLowerCase()}`) || student_level_profile.target_level}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -73,7 +79,7 @@ export default function Recommendations({ recommendations }) {
                                 {/* Strengths */}
                                 <div className="bg-white/10 backdrop-blur-md rounded-xl p-5 border border-white/10">
                                     <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-emerald-300">
-                                        <span>💪</span> نقاط القوة
+                                        <span>💪</span> {t('innovation.recommendations.strengths')}
                                     </h3>
                                     <ul className="space-y-2">
                                         {(student_level_profile.strengths || []).map((s, i) => (
@@ -87,7 +93,7 @@ export default function Recommendations({ recommendations }) {
                                 {/* Learning Gaps */}
                                 <div className="bg-white/10 backdrop-blur-md rounded-xl p-5 border border-white/10">
                                     <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-rose-300">
-                                        <span>🔍</span> فجوات التعلم
+                                        <span>🔍</span> {t('innovation.recommendations.gaps')}
                                     </h3>
                                     <ul className="space-y-2">
                                         {(student_level_profile.learning_gaps || []).map((g, i) => (
@@ -101,7 +107,7 @@ export default function Recommendations({ recommendations }) {
                                 {/* Acquired Skills */}
                                 <div className="bg-white/10 backdrop-blur-md rounded-xl p-5 border border-white/10">
                                     <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-blue-300">
-                                        <span>⚙️</span> المهارات المكتسبة
+                                        <span>⚙️</span> {t('innovation.recommendations.skills')}
                                     </h3>
                                     <ul className="space-y-2">
                                         {(student_level_profile.acquired_skills || []).map((s, i) => (
@@ -115,7 +121,7 @@ export default function Recommendations({ recommendations }) {
                                 {/* Achieved Outcomes */}
                                 <div className="bg-white/10 backdrop-blur-md rounded-xl p-5 border border-white/10">
                                     <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-yellow-300">
-                                        <span>🏆</span> مخرجات التعلم المحققة
+                                        <span>🏆</span> {t('innovation.recommendations.outcomes')}
                                     </h3>
                                     <ul className="space-y-2">
                                         {(student_level_profile.achieved_outcomes || []).map((o, i) => (
@@ -132,7 +138,7 @@ export default function Recommendations({ recommendations }) {
                                 <div className="mt-6 bg-yellow-400/20 rounded-xl p-5 border border-yellow-400/30 flex items-start gap-4">
                                     <span className="text-2xl text-yellow-300">🚀</span>
                                     <div>
-                                        <h3 className="text-lg font-bold text-yellow-300 mb-1">التحدي التالي / المهارة التالية</h3>
+                                        <h3 className="text-lg font-bold text-yellow-300 mb-1">{t('innovation.recommendations.nextChallenge')}</h3>
                                         <p className="text-white text-sm">{student_level_profile.next_challenge}</p>
                                     </div>
                                 </div>
@@ -146,7 +152,7 @@ export default function Recommendations({ recommendations }) {
                     <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
                         <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
                             <span className="bg-emerald-50 text-emerald-600 p-2 rounded-xl">💪</span> 
-                            نقاط القوة
+                            {t('innovation.recommendations.strengthsLabel')}
                         </h3>
                         <ul className="space-y-3">
                             {strengths.map((s, i) => (
@@ -159,7 +165,7 @@ export default function Recommendations({ recommendations }) {
                     <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
                         <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
                             <span className="bg-rose-50 text-rose-600 p-2 rounded-xl">📌</span> 
-                            نقاط التحسين
+                            {t('innovation.recommendations.improvementsLabel')}
                         </h3>
                         <ul className="space-y-3">
                             {weaknesses.map((w, i) => (
@@ -174,7 +180,7 @@ export default function Recommendations({ recommendations }) {
                 {/* General Recommendations */}
                 {general_recommendations.length > 0 && (
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                        <h3 className="font-bold text-gray-900 mb-4">📋 التوصيات العامة</h3>
+                        <h3 className="font-bold text-gray-900 mb-4">{t('innovation.recommendations.generalRecs')}</h3>
                         <div className="space-y-3">
                             {general_recommendations.map((rec, i) => {
                                 const style = PRIORITY_STYLES[rec.priority] || PRIORITY_STYLES.medium;
@@ -183,7 +189,7 @@ export default function Recommendations({ recommendations }) {
                                         <div className="flex items-center justify-between mb-2">
                                             <h4 className={`font-semibold ${style.text}`}>{rec.title}</h4>
                                             <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${style.badge}`}>
-                                                {rec.priority === 'high' ? 'أولوية عالية' : rec.priority === 'medium' ? 'أولوية متوسطة' : 'أولوية منخفضة'}
+                                                {t(`innovation.recommendations.priority.${rec.priority}`)}
                                             </span>
                                         </div>
                                         <p className="text-sm text-gray-600">{rec.description}</p>
@@ -197,7 +203,7 @@ export default function Recommendations({ recommendations }) {
                 {/* Courses */}
                 {courses.length > 0 && (
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                        <h3 className="font-bold text-gray-900 mb-4">📚 دورات مقترحة</h3>
+                        <h3 className="font-bold text-gray-900 mb-4">{t('innovation.recommendations.suggestedCourses')}</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {courses.map((course, i) => (
                                 <div key={i} className="p-5 bg-gray-50/50 rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all">
@@ -213,7 +219,7 @@ export default function Recommendations({ recommendations }) {
                 {/* Competitions */}
                 {competitions.length > 0 && (
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                        <h3 className="font-bold text-gray-900 mb-4">🏆 مسابقات مقترحة</h3>
+                        <h3 className="font-bold text-gray-900 mb-4">{t('innovation.recommendations.suggestedCompetitions')}</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {competitions.map((comp, i) => (
                                 <div key={i} className="p-5 bg-gray-50/50 rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all">
@@ -228,7 +234,7 @@ export default function Recommendations({ recommendations }) {
                 {/* Projects */}
                 {projects.length > 0 && (
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                        <h3 className="font-bold text-gray-900 mb-4">🏗️ مشاريع مقترحة</h3>
+                        <h3 className="font-bold text-gray-900 mb-4">{t('innovation.recommendations.suggestedProjects')}</h3>
                         <div className="space-y-3">
                             {projects.map((project, i) => (
                                 <div key={i} className="p-5 bg-gray-50/50 rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all">

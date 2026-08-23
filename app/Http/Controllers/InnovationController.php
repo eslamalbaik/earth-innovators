@@ -111,6 +111,13 @@ class InnovationController extends Controller
         $request->validate(['query' => 'nullable|string|max:500']);
 
         $query = trim((string) $request->get('query', ''));
+
+        if ($query !== '') {
+            // البحث قد يستغرق وقتاً طويلاً بسبب إعادة المحاولة التلقائية في
+            // GeminiClient، بينما max_execution_time الافتراضي على السيرفر أقل من ذلك.
+            set_time_limit(300);
+        }
+
         $results = $query !== '' ? $searchService->search($query) : null;
 
         if ($request->wantsJson()) {
@@ -136,6 +143,10 @@ class InnovationController extends Controller
         $user = $request->user();
         $type = $request->get('type');
         $topic = $request->get('topic', '');
+
+        // التوليد قد يستغرق وقتاً طويلاً بسبب إعادة المحاولة التلقائية في
+        // GeminiClient، بينما max_execution_time الافتراضي على السيرفر أقل من ذلك.
+        set_time_limit(300);
 
         $content = match ($type) {
             'article'               => $generator->generateArticle($topic, $user),

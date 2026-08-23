@@ -35,7 +35,7 @@ class ProjectService extends BaseService
                     'approver:id,name'
                 ])
                 ->withCount('comments')
-                ->select('id', 'title', 'description', 'category', 'status', 'teacher_id', 'user_id', 'school_id', 'approved_by', 'views', 'likes', 'rating', 'points_earned', 'images', 'thumbnail', 'project_document', 'created_at');
+                ->select('id', 'title', 'title_ar', 'description', 'description_ar', 'category', 'status', 'teacher_id', 'user_id', 'school_id', 'approved_by', 'views', 'likes', 'rating', 'points_earned', 'images', 'thumbnail', 'project_document', 'created_at');
 
             if ($search) {
                 $query->where(function ($q) use ($search) {
@@ -81,7 +81,7 @@ class ProjectService extends BaseService
                 },
             ])
             ->withCount('comments')
-            ->select('id', 'title', 'description', 'category', 'status', 'teacher_id', 'user_id', 'school_id', 'approved_by', 'views', 'likes', 'rating', 'files', 'images', 'thumbnail', 'project_document', 'created_at')
+            ->select('id', 'title', 'title_ar', 'description', 'description_ar', 'category', 'status', 'teacher_id', 'user_id', 'school_id', 'approved_by', 'views', 'likes', 'rating', 'files', 'images', 'thumbnail', 'project_document', 'created_at')
             ->find($projectId);
         }, 600); // Cache for 10 minutes
 
@@ -109,7 +109,7 @@ class ProjectService extends BaseService
         return $this->cacheTags($cacheTag, $cacheKey, function () use ($userId, $status, $perPage) {
             $query = Project::where('user_id', $userId)
                 ->withCount('comments')
-                ->select('id', 'title', 'description', 'category', 'status', 'rating', 'likes', 'views', 'points_earned', 'thumbnail', 'project_document', 'created_at')
+                ->select('id', 'title', 'title_ar', 'description', 'description_ar', 'category', 'status', 'rating', 'likes', 'views', 'points_earned', 'thumbnail', 'project_document', 'created_at')
                 ->latest();
 
             if ($status) {
@@ -129,7 +129,7 @@ class ProjectService extends BaseService
             return Project::where('teacher_id', $teacherId)
                 ->with(['school:id,name', 'approver:id,name', 'user:id,name'])
                 ->withCount('comments')
-                ->select('id', 'title', 'description', 'category', 'status', 'school_id', 'approved_by', 'approved_at', 'user_id', 'thumbnail', 'project_document', 'created_at')
+                ->select('id', 'title', 'title_ar', 'description', 'description_ar', 'category', 'status', 'school_id', 'approved_by', 'approved_at', 'user_id', 'thumbnail', 'project_document', 'created_at')
                 ->orderBy('created_at', 'desc')
                 ->paginate($perPage);
         }, 60); // تقليل وقت الكاش إلى دقيقة واحدة
@@ -176,7 +176,7 @@ class ProjectService extends BaseService
                 'teacher.user:id,name'
             ])
             ->withCount('comments')
-            ->select('id', 'title', 'description', 'category', 'status', 'user_id', 'teacher_id', 'thumbnail', 'project_document', 'created_at');
+            ->select('id', 'title', 'title_ar', 'description', 'description_ar', 'category', 'status', 'user_id', 'teacher_id', 'thumbnail', 'project_document', 'created_at');
 
             if ($search) {
                 $query->where(function ($q) use ($search) {
@@ -235,7 +235,7 @@ class ProjectService extends BaseService
                 'school:id,name'
             ])
             ->withCount('comments')
-            ->select('id', 'title', 'description', 'category', 'status', 'user_id', 'teacher_id', 'school_id', 'thumbnail', 'project_document', 'created_at');
+            ->select('id', 'title', 'title_ar', 'description', 'description_ar', 'category', 'status', 'user_id', 'teacher_id', 'school_id', 'thumbnail', 'project_document', 'created_at');
 
             if ($search) {
                 $query->where(function ($q) use ($search) {

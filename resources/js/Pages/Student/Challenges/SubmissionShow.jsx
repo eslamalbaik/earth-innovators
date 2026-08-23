@@ -13,44 +13,48 @@ import {
     FaDownload
 } from 'react-icons/fa';
 import { getProjectFileUrl } from '@/utils/imageUtils';
+import { useTranslation } from '@/i18n';
+
+const MONTH_KEYS = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
 
 export default function StudentChallengeSubmissionShow({ auth, challenge, submission }) {
+    const { t } = useTranslation();
+
     const formatDate = (date) => {
         if (!date) return '';
         const d = new Date(date);
-        const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
-        return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()} - ${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+        return `${d.getDate()} ${t(`common.${MONTH_KEYS[d.getMonth()]}`)} ${d.getFullYear()} - ${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
     };
 
     const getStatusBadge = (status) => {
         const badges = {
-            submitted: { 
-                bg: 'bg-yellow-100', 
-                text: 'text-yellow-800', 
-                label: 'تم التقديم', 
+            submitted: {
+                bg: 'bg-yellow-100',
+                text: 'text-yellow-800',
+                label: t('studentChallengeSubmissionShowPage.status.submitted.label'),
                 icon: FaClock,
-                description: 'تم استلام تسليمك وسيتم مراجعته قريباً'
+                description: t('studentChallengeSubmissionShowPage.status.submitted.description')
             },
-            reviewed: { 
-                bg: 'bg-blue-100', 
-                text: 'text-blue-800', 
-                label: 'قيد المراجعة', 
+            reviewed: {
+                bg: 'bg-blue-100',
+                text: 'text-blue-800',
+                label: t('studentChallengeSubmissionShowPage.status.reviewed.label'),
                 icon: FaClock,
-                description: 'يتم حالياً مراجعة تسليمك'
+                description: t('studentChallengeSubmissionShowPage.status.reviewed.description')
             },
-            approved: { 
-                bg: 'bg-green-100', 
-                text: 'text-green-800', 
-                label: 'مقبول', 
+            approved: {
+                bg: 'bg-green-100',
+                text: 'text-green-800',
+                label: t('studentChallengeSubmissionShowPage.status.approved.label'),
                 icon: FaCheckCircle,
-                description: 'تم قبول تسليمك! تهانينا'
+                description: t('studentChallengeSubmissionShowPage.status.approved.description')
             },
-            rejected: { 
-                bg: 'bg-red-100', 
-                text: 'text-red-800', 
-                label: 'مرفوض', 
+            rejected: {
+                bg: 'bg-red-100',
+                text: 'text-red-800',
+                label: t('studentChallengeSubmissionShowPage.status.rejected.label'),
                 icon: FaTimesCircle,
-                description: 'تم رفض تسليمك'
+                description: t('studentChallengeSubmissionShowPage.status.rejected.description')
             },
         };
         const badge = badges[status] || badges.submitted;
@@ -74,12 +78,12 @@ export default function StudentChallengeSubmissionShow({ auth, challenge, submis
     return (
         <StudentLayout
             auth={auth}
-            title={challenge?.title || 'Submission Details'}
+            title={challenge?.title || t('studentChallengeSubmissionShowPage.pageTitleFallback')}
             activeNav="challenges"
             onBack={() => window.history.back()}
             desktopMainClassName="mx-auto w-full max-w-4xl px-4 pb-24 pt-4"
         >
-            <Head title={`حالة التقديم - ${challenge?.title || 'التحدي'}`} />
+            <Head title={t('studentChallengeSubmissionShowPage.pageTitle', { title: challenge?.title || t('studentChallengeSubmissionShowPage.challengeFallback') })} />
 
             <div className="py-4 sm:px-2 lg:px-0">
                 {/* Back Button */}
@@ -89,7 +93,7 @@ export default function StudentChallengeSubmissionShow({ auth, challenge, submis
                         className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition"
                     >
                         <FaArrowLeft />
-                        العودة إلى التحدي
+                        {t('studentChallengeSubmissionShowPage.backToChallenge')}
                     </Link>
                 </div>
 
@@ -103,7 +107,7 @@ export default function StudentChallengeSubmissionShow({ auth, challenge, submis
 
                 {/* Submission Status Card */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-                    <h2 className="text-xl font-bold text-gray-900 mb-4">حالة التقديم</h2>
+                    <h2 className="text-xl font-bold text-gray-900 mb-4">{t('studentChallengeSubmissionShowPage.sections.submissionStatus')}</h2>
                     <div className="mb-6">
                         {getStatusBadge(submission?.status)}
                     </div>
@@ -112,14 +116,14 @@ export default function StudentChallengeSubmissionShow({ auth, challenge, submis
                     <div className="space-y-4">
                         <div className="flex items-center gap-2 text-gray-600">
                             <FaCalendar className="text-sm" />
-                            <span className="font-semibold">تاريخ التقديم:</span>
+                            <span className="font-semibold">{t('studentChallengeSubmissionShowPage.meta.submittedAt')}:</span>
                             <span>{formatDate(submission?.submitted_at)}</span>
                         </div>
 
                         {submission?.reviewed_at && (
                             <div className="flex items-center gap-2 text-gray-600">
                                 <FaCalendar className="text-sm" />
-                                <span className="font-semibold">تاريخ المراجعة:</span>
+                                <span className="font-semibold">{t('studentChallengeSubmissionShowPage.meta.reviewedAt')}:</span>
                                 <span>{formatDate(submission?.reviewed_at)}</span>
                             </div>
                         )}
@@ -127,7 +131,7 @@ export default function StudentChallengeSubmissionShow({ auth, challenge, submis
                         {submission?.reviewer && (
                             <div className="flex items-center gap-2 text-gray-600">
                                 <FaUser className="text-sm" />
-                                <span className="font-semibold">المراجع:</span>
+                                <span className="font-semibold">{t('studentChallengeSubmissionShowPage.meta.reviewer')}:</span>
                                 <span>{submission.reviewer.name}</span>
                             </div>
                         )}
@@ -135,7 +139,7 @@ export default function StudentChallengeSubmissionShow({ auth, challenge, submis
                         {submission?.rating !== null && (
                             <div className="flex items-center gap-2 text-gray-600">
                                 <FaStar className="text-yellow-500" />
-                                <span className="font-semibold">التقييم:</span>
+                                <span className="font-semibold">{t('studentChallengeSubmissionShowPage.meta.rating')}:</span>
                                 <div className="flex items-center gap-1">
                                     {[1, 2, 3, 4, 5].map((star) => (
                                         <FaStar
@@ -151,7 +155,7 @@ export default function StudentChallengeSubmissionShow({ auth, challenge, submis
                         {submission?.points_earned > 0 && (
                             <div className="flex items-center gap-2 text-gray-600">
                                 <FaAward className="text-green-500" />
-                                <span className="font-semibold">النقاط المكتسبة:</span>
+                                <span className="font-semibold">{t('studentChallengeSubmissionShowPage.meta.pointsEarned')}:</span>
                                 <span className="text-green-600 font-bold">{submission.points_earned}</span>
                             </div>
                         )}
@@ -160,11 +164,11 @@ export default function StudentChallengeSubmissionShow({ auth, challenge, submis
 
                 {/* Submission Content */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-                    <h2 className="text-xl font-bold text-gray-900 mb-4">محتوى التقديم</h2>
+                    <h2 className="text-xl font-bold text-gray-900 mb-4">{t('studentChallengeSubmissionShowPage.sections.submissionContent')}</h2>
 
                     {submission?.answer && (
                         <div className="mb-6">
-                            <h3 className="font-semibold text-gray-900 mb-2">الإجابة</h3>
+                            <h3 className="font-semibold text-gray-900 mb-2">{t('studentChallengeSubmissionShowPage.content.answer')}</h3>
                             <div className="bg-gray-50 rounded-lg p-4 text-gray-700 whitespace-pre-line">
                                 {submission.answer}
                             </div>
@@ -173,7 +177,7 @@ export default function StudentChallengeSubmissionShow({ auth, challenge, submis
 
                     {submission?.comment && (
                         <div className="mb-6">
-                            <h3 className="font-semibold text-gray-900 mb-2">تعليقك</h3>
+                            <h3 className="font-semibold text-gray-900 mb-2">{t('studentChallengeSubmissionShowPage.content.yourComment')}</h3>
                             <div className="bg-gray-50 rounded-lg p-4 text-gray-700 whitespace-pre-line">
                                 {submission.comment}
                             </div>
@@ -182,11 +186,11 @@ export default function StudentChallengeSubmissionShow({ auth, challenge, submis
 
                     {submission?.files && Array.isArray(submission.files) && submission.files.length > 0 && (
                         <div>
-                            <h3 className="font-semibold text-gray-900 mb-2">الملفات المرفقة</h3>
+                            <h3 className="font-semibold text-gray-900 mb-2">{t('studentChallengeSubmissionShowPage.content.attachedFiles')}</h3>
                             <div className="space-y-2">
                                 {submission.files.map((file, index) => {
                                     const fileUrl = getFileUrl(file);
-                                    const fileName = typeof file === 'string' ? file.split('/').pop() : `ملف ${index + 1}`;
+                                    const fileName = typeof file === 'string' ? file.split('/').pop() : t('studentChallengeSubmissionShowPage.content.fileFallback', { n: index + 1 });
                                     return (
                                         <div key={index} className="flex items-center justify-between bg-gray-50 rounded-lg p-3">
                                             <div className="flex items-center gap-2">
@@ -201,7 +205,7 @@ export default function StudentChallengeSubmissionShow({ auth, challenge, submis
                                                     className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition text-sm"
                                                 >
                                                     <FaDownload />
-                                                    تحميل
+                                                    {t('studentChallengeSubmissionShowPage.content.download')}
                                                 </a>
                                             )}
                                         </div>
@@ -215,7 +219,7 @@ export default function StudentChallengeSubmissionShow({ auth, challenge, submis
                 {/* Feedback */}
                 {submission?.feedback && (
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                        <h2 className="text-xl font-bold text-gray-900 mb-4">تعليق المراجع</h2>
+                        <h2 className="text-xl font-bold text-gray-900 mb-4">{t('studentChallengeSubmissionShowPage.sections.reviewerFeedback')}</h2>
                         <div className="bg-blue-50 rounded-lg p-4 text-gray-700 whitespace-pre-line border-r-4 border-blue-500">
                             {submission.feedback}
                         </div>

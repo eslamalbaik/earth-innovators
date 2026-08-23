@@ -6,7 +6,7 @@ import { FaPlus, FaEdit, FaTrash, FaInfoCircle, FaSave, FaTimes } from 'react-ic
 import { useTranslation } from '@/i18n';
 
 export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0, projects = [], selectedProjectId = null }) {
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
     const { confirm } = useConfirmDialog();
     const [editingId, setEditingId] = useState(null);
     const [showAddForm, setShowAddForm] = useState(false);
@@ -217,14 +217,17 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                         <option value="">{t('acceptanceCriteriaPage.projectAllOption')}</option>
                         {projects.map((project) => (
                             <option key={project.id} value={project.id}>
-                                {project.title}
+                                {language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar)}
                             </option>
                         ))}
                     </select>
                     {selectedProjectId && (
                         <p className="mt-2 text-sm text-gray-600">
                             {t('acceptanceCriteriaPage.projectCriteriaLabel', {
-                                title: projects.find(p => p.id == selectedProjectId)?.title,
+                                title: (() => {
+                                    const proj = projects.find(p => p.id == selectedProjectId);
+                                    return proj ? (language === 'ar' ? (proj.title_ar || proj.title) : (proj.title || proj.title_ar)) : '';
+                                })(),
                             })}
                         </p>
                     )}
@@ -258,7 +261,7 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                     <option value="">{t('acceptanceCriteriaPage.projectGeneralOption')}</option>
                                     {projects.map((project) => (
                                         <option key={project.id} value={project.id}>
-                                            {project.title}
+                                            {language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar)}
                                         </option>
                                     ))}
                                 </select>
@@ -392,7 +395,7 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                                 <option value="">{t('acceptanceCriteriaPage.projectGeneralOption')}</option>
                                                 {projects.map((project) => (
                                                     <option key={project.id} value={project.id}>
-                                                        {project.title}
+                                                        {language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar)}
                                                     </option>
                                                 ))}
                                             </select>
@@ -483,7 +486,9 @@ export default function AcceptanceCriteriaIndex({ criteria = [], totalWeight = 0
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2 mb-1">
                                             <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                                {criterion.project_title || t('acceptanceCriteriaPage.generalLabel')}
+                                                {criterion.project_id
+                                                    ? (language === 'ar' ? (criterion.project_title_ar || criterion.project_title) : (criterion.project_title || criterion.project_title_ar))
+                                                    : t('acceptanceCriteriaPage.generalLabel')}
                                             </span>
                                         </div>
                                         <h3 className="text-xl font-bold text-gray-900 mb-2">

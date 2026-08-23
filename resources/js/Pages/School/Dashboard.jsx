@@ -11,7 +11,7 @@ import {
 import { toHijriDate } from '@/utils/dateUtils';
 
 export default function SchoolDashboard({ auth, stats = {}, pendingProjects = [], recentApprovedProjects = [], membershipSummary = null }) {
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
     const user = auth.user;
     const { confirm } = useConfirmDialog();
     const workflow = stats.workflow || {};
@@ -311,7 +311,7 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                                     <div className="flex items-start justify-between">
                                         <div className="flex-1">
                                             <div className="flex items-center gap-3 mb-2">
-                                                <h4 className="text-lg font-semibold text-gray-900">{project.title}</h4>
+                                                <h4 className="text-lg font-semibold text-gray-900">{language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar)}</h4>
                                                 <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${categoryColors[project.category] || categoryColors.other}`}>
                                                     {categoryLabels[project.category] || t('common.categories.other')}
                                                 </span>
@@ -321,14 +321,14 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                                         </div>
                                         <div className="flex items-center gap-2 ms-4">
                                             <button
-                                                onClick={() => handleApprove(project.id, project.title)}
+                                                onClick={() => handleApprove(project.id, language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar))}
                                                 className="bg-[#A3C042] hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center gap-2 shadow-md"
                                             >
                                                 <FaCheckCircle />
                                                 {t('schoolDashboardPage.approveAction')}
                                             </button>
                                             <button
-                                                onClick={() => handleReject(project.id, project.title)}
+                                                onClick={() => handleReject(project.id, language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar))}
                                                 className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center gap-2 shadow-md"
                                             >
                                                 <FaTimesCircle />
@@ -367,7 +367,7 @@ export default function SchoolDashboard({ auth, stats = {}, pendingProjects = []
                             {recentApprovedProjects.map((project) => (
                                 <div key={project.id} className="border border-gray-100 rounded-xl p-4 hover:shadow-sm transition bg-gray-50/50">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <h4 className="text-lg font-semibold text-gray-900">{project.title}</h4>
+                                        <h4 className="text-lg font-semibold text-gray-900">{language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar)}</h4>
                                         <span className={`px-2 py-1 rounded-full text-xs font-semibold border ${categoryColors[project.category] || categoryColors.other}`}>
                                             {categoryLabels[project.category] || t('common.categories.other')}
                                         </span>

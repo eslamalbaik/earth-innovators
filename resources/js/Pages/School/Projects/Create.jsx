@@ -12,7 +12,9 @@ export default function CreateSchoolProject({ auth }) {
     const { t, language } = useTranslation();
     const { data, setData, post, processing, errors } = useForm({
         title: '',
+        title_ar: '',
         description: '',
+        description_ar: '',
         category: 'other',
         instructional_approach: '',
         grade: '',
@@ -39,7 +41,7 @@ export default function CreateSchoolProject({ auth }) {
 
     const handleAIGenerate = async () => {
         if (!aiIdea) {
-            alert(t('common.error') + ": يرجى إدخال فكرة المشروع أولاً.");
+            alert(t('common.error') + ': ' + t('teacherProjectsCreatePage.aiAssistant.ideaRequired'));
             return;
         }
 
@@ -52,7 +54,9 @@ export default function CreateSchoolProject({ auth }) {
             setData(prev => ({
                 ...prev,
                 title: result.title || prev.title,
+                title_ar: result.title_ar || prev.title_ar,
                 description: result.description || prev.description,
+                description_ar: result.description_ar || prev.description_ar,
                 category: result.category || prev.category,
                 grade: result.grade || prev.grade,
                 subject: result.subject || prev.subject,
@@ -71,7 +75,7 @@ export default function CreateSchoolProject({ auth }) {
                 }
             }
         } catch (error) {
-            alert(error.response?.data?.error || t('common.error') + ': حدث خطأ أثناء توليد تفاصيل المشروع');
+            alert(error.response?.data?.error || t('common.error') + ': ' + t('teacherProjectsCreatePage.aiAssistant.error'));
         } finally {
             setIsGenerating(false);
         }
@@ -285,10 +289,10 @@ export default function CreateSchoolProject({ auth }) {
                             <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-2">
                                     <FaRobot className="text-blue-600 text-xl" />
-                                    <h3 className="font-bold text-blue-800 text-base">مساعد الذكاء الاصطناعي للمشاريع</h3>
+                                    <h3 className="font-bold text-blue-800 text-base">{t('teacherProjectsCreatePage.aiAssistant.title')}</h3>
                                 </div>
                                 <p className="text-sm text-blue-600">
-                                    اكتب فكرة مبسطة وسيقوم المساعد بتوليد عنوان احترافي، وصف شامل، وتحديد الفئة وصورة غلاف مناسبة.
+                                    {t('teacherProjectsCreatePage.aiAssistant.description')}
                                 </p>
                             </div>
                             <div className="flex-1 flex gap-2 w-full md:w-auto">
@@ -296,7 +300,7 @@ export default function CreateSchoolProject({ auth }) {
                                     type="text"
                                     value={aiIdea}
                                     onChange={(e) => setAiIdea(e.target.value)}
-                                    placeholder="مثال: مشروع عن تدوير النفايات المدرسية..."
+                                    placeholder={t('teacherProjectsCreatePage.aiAssistant.placeholder')}
                                     className="flex-1 text-sm rounded-lg border-blue-200 focus:border-blue-400 focus:ring-blue-400"
                                 />
                                 <button
@@ -306,36 +310,68 @@ export default function CreateSchoolProject({ auth }) {
                                     className="bg-blue-600 text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-blue-700 disabled:opacity-50 transition flex justify-center items-center gap-2 whitespace-nowrap"
                                 >
                                     {isGenerating ? (
-                                        <><FaSpinner className="animate-spin" /> جاري التوليد...</>
+                                        <><FaSpinner className="animate-spin" /> {t('teacherProjectsCreatePage.aiAssistant.generating')}</>
                                     ) : (
-                                        <><FaRobot /> توليد التفاصيل</>
+                                        <><FaRobot /> {t('teacherProjectsCreatePage.aiAssistant.generateButton')}</>
                                     )}
                                 </button>
                             </div>
                         </div>
 
-                        {/* العنوان */}
+                        {/* Arabic Title */}
                         <div>
-                            <InputLabel htmlFor="title" value={t('schoolProjectsCreatePage.form.titleLabel')} />
+                            <InputLabel htmlFor="title_ar" value={t('teacherProjectsCreatePage.form.titleArLabel')} />
+                            <TextInput
+                                id="title_ar"
+                                type="text"
+                                value={data.title_ar}
+                                onChange={(e) => setData('title_ar', e.target.value)}
+                                className="mt-1 block w-full"
+                                placeholder={t('teacherProjectsCreatePage.form.titleArPlaceholder')}
+                                required
+                            />
+                            <InputError message={errors.title_ar} className="mt-2" />
+                        </div>
+
+                        {/* English Title */}
+                        <div>
+                            <InputLabel htmlFor="title" value={t('teacherProjectsCreatePage.form.titleEnLabel')} />
                             <TextInput
                                 id="title"
                                 type="text"
                                 value={data.title}
                                 onChange={(e) => setData('title', e.target.value)}
                                 className="mt-1 block w-full"
+                                placeholder={t('teacherProjectsCreatePage.form.titleEnPlaceholder')}
                                 required
                             />
                             <InputError message={errors.title} className="mt-2" />
                         </div>
 
-                        {/* الوصف */}
+                        {/* Arabic Description */}
                         <div>
-                            <InputLabel htmlFor="description" value={t('schoolProjectsCreatePage.form.descriptionLabel')} />
+                            <InputLabel htmlFor="description_ar" value={t('teacherProjectsCreatePage.form.descriptionArLabel')} />
+                            <textarea
+                                id="description_ar"
+                                value={data.description_ar}
+                                onChange={(e) => setData('description_ar', e.target.value)}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring focus:ring-[#A3C042] focus:ring-opacity-50"
+                                placeholder={t('teacherProjectsCreatePage.form.descriptionArPlaceholder')}
+                                rows="6"
+                                required
+                            />
+                            <InputError message={errors.description_ar} className="mt-2" />
+                        </div>
+
+                        {/* English Description */}
+                        <div>
+                            <InputLabel htmlFor="description" value={t('teacherProjectsCreatePage.form.descriptionEnLabel')} />
                             <textarea
                                 id="description"
                                 value={data.description}
                                 onChange={(e) => setData('description', e.target.value)}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring focus:ring-[#A3C042] focus:ring-opacity-50"
+                                placeholder={t('teacherProjectsCreatePage.form.descriptionEnPlaceholder')}
                                 rows="6"
                                 required
                             />

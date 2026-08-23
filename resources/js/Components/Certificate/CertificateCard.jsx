@@ -59,7 +59,7 @@ const CertificateCard = forwardRef(({ user, role, barcode, issueDate, membership
                         <h2 className="text-lg font-semibold text-[#8CA635]">إرث المبتكرين | Earth Innovators</h2>
                     </div>
                     <div>
-                        <img src="/images/logo-modified.png" alt="Logo" className="w-20 h-20 object-contain" />
+                        <img src="/images/logo-icon.png" alt="Logo" className="w-20 h-20 object-contain" />
                     </div>
                 </div>
 

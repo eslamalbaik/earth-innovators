@@ -1,20 +1,20 @@
 import { router } from '@inertiajs/react';
 import StudentPageShell from '@/Components/Innovation/StudentPageShell';
+import { useTranslation } from '@/i18n';
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
 
-const TRIGGER_LABELS = {
-    achievement_added: 'إضافة إنجاز',
-    achievement_updated: 'تعديل إنجاز',
-    achievement_deleted: 'حذف إنجاز',
-    skill_added: 'إضافة مهارة',
-    manual_recalc: 'إعادة احتساب يدوية',
-    system_recalc: 'إعادة احتساب تلقائية',
-};
-
 export default function History({ history = [], indexNames = {}, filter = null }) {
+    const { t } = useTranslation();
     const activeFilter = filter || 'overall';
+
+    const localizedIndexNames = Object.keys(indexNames).reduce((acc, key) => {
+        acc[key] = t(`innovation.indexes.types.${key}`) || indexNames[key];
+        return acc;
+    }, {});
+
+    const allNames = { overall: t('innovation.indexes.overallScore'), ...localizedIndexNames };
 
     // chronological order for the chart
     const chartData = [...history]
@@ -29,14 +29,12 @@ export default function History({ history = [], indexNames = {}, filter = null }
         router.get(route('innovation.history'), { index: indexKey }, { preserveState: true });
     };
 
-    const allNames = { overall: 'الدرجة الكلية', ...indexNames };
-
     return (
-        <StudentPageShell title="تطور المؤشرات">
+        <StudentPageShell title={t('innovation.history.pageTitle')}>
             <div className="space-y-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">📈 تطور المؤشرات عبر الزمن</h1>
-                    <p className="text-gray-500 mt-1">تتبع رحلة تقدمك في كل مؤشر</p>
+                    <h1 className="text-2xl font-bold text-gray-900">{t('innovation.history.title')}</h1>
+                    <p className="text-gray-500 mt-1">{t('innovation.history.subtitle')}</p>
                 </div>
 
                 {/* Filter chips */}
@@ -73,15 +71,15 @@ export default function History({ history = [], indexNames = {}, filter = null }
                 ) : (
                     <div className="text-center py-16 bg-white rounded-2xl shadow-md">
                         <span className="text-6xl block mb-4">📈</span>
-                        <h3 className="text-xl font-bold text-gray-800 mb-2">لا يوجد سجل بعد</h3>
-                        <p className="text-gray-500">سيظهر هنا تطور مؤشراتك كلما أضفت إنجازات جديدة.</p>
+                        <h3 className="text-xl font-bold text-gray-800 mb-2">{t('innovation.history.empty.title')}</h3>
+                        <p className="text-gray-500">{t('innovation.history.empty.description')}</p>
                     </div>
                 )}
 
                 {/* Change log */}
                 {history.length > 0 && (
                     <div className="bg-white rounded-2xl p-5 shadow-md border border-gray-100">
-                        <h3 className="font-bold text-gray-800 mb-4">🗓️ سجل التغييرات</h3>
+                        <h3 className="font-bold text-gray-800 mb-4">{t('innovation.history.changelog')}</h3>
                         <div className="space-y-2">
                             {history.slice(0, 20).map((h, i) => {
                                 const diff = Number(h.new_value) - Number(h.old_value);
@@ -97,7 +95,7 @@ export default function History({ history = [], indexNames = {}, filter = null }
                                                     {allNames[h.index_name] || h.index_name}
                                                 </p>
                                                 <p className="text-xs text-gray-400">
-                                                    {TRIGGER_LABELS[h.trigger_type] || h.trigger_type}
+                                                    {t(`innovation.history.triggers.${h.trigger_type}`) || h.trigger_type}
                                                     {' • '}
                                                     {new Date(h.created_at).toLocaleDateString('ar')}
                                                 </p>

@@ -15,7 +15,7 @@ class AdminProjectController extends Controller
     public function index(Request $request)
     {
         $projects = Project::with(['user:id,name,email', 'school:id,name', 'teacher:id,name_ar'])
-            ->select('id', 'title', 'description', 'user_id', 'school_id', 'teacher_id', 'status', 'category', 'curriculum_type', 'views', 'likes', 'created_at', 'approved_at')
+            ->select('id', 'title', 'title_ar', 'description', 'description_ar', 'user_id', 'school_id', 'teacher_id', 'status', 'category', 'curriculum_type', 'views', 'likes', 'created_at', 'approved_at')
             ->when($request->filled('search'), function ($q) use ($request) {
                 $search = $request->search;
                 $q->where(function ($query) use ($search) {
@@ -39,7 +39,9 @@ class AdminProjectController extends Controller
                 return [
                     'id' => $project->id,
                     'title' => $project->title,
+                    'title_ar' => $project->title_ar,
                     'description' => $project->description,
+                    'description_ar' => $project->description_ar,
                     'student_name' => $project->user->name ?? 'غير معروف',
                     'student_email' => $project->user->email ?? '—',
                     'school_name' => $project->school->name ?? 'غير محدد',
@@ -115,16 +117,21 @@ class AdminProjectController extends Controller
 
         $idea = $request->input('idea');
 
+        // التوليد قد يستغرق وقتاً طويلاً بسبب إعادة المحاولة التلقائية في
+        // GeminiClient، بينما max_execution_time الافتراضي على السيرفر أقل من ذلك.
+        set_time_limit(300);
+
         try {
             $aiResponse = $deepSeekClient->chatWithJson([
                 \App\Services\AIEngine\GeminiClient::systemMessage(
                     'أنت مستشار تخطيط مشاريع تعليمية وابتكارية. '
-                    . 'بناءً على الفكرة أو الوصف القصير الذي يقدمه المستخدم، قم بإنشاء تفاصيل مشروع كاملة وجاهزة للنشر. '
+                    . 'بناءً على الفكرة أو الوصف القصير الذي يقدمه المستخدم، قم بإنشاء تفاصيل مشروع كاملة وجاهزة للنشر باللغتين العربية والإنجليزية. '
                     . 'اختر واحدة من الفئات التالية حصراً: science, technology, engineering, mathematics, arts, other. '
                     . 'اقترح أيضاً كلمة مفتاحية واحدة باللغة الإنجليزية للبحث عن صورة غلاف من Unsplash تمثل المشروع. '
                     . 'أجب بصيغة JSON فقط مع الحقول التالية: '
-                    . 'title (عنوان احترافي وجذاب للمشروع بالعربية), '
-                    . 'description (وصف مفصل وشامل للمشروع يشمل الأهداف والخطوات، لا يقل عن 150 كلمة), '
+                    . 'title (عنوان احترافي وجذاب للمشروع بالإنجليزية), title_ar (نفس العنوان بالعربية), '
+                    . 'description (وصف مفصل وشامل للمشروع بالإنجليزية يشمل الأهداف والخطوات، لا يقل عن 150 كلمة), '
+                    . 'description_ar (نفس الوصف بالعربية بنفس مستوى التفصيل), '
                     . 'category (إحدى الفئات المسموحة فقط باللغة الإنجليزية), '
                     . 'image_keyword (كلمة مفتاحية واحدة بالإنجليزية).'
                 ),
@@ -136,8 +143,10 @@ class AdminProjectController extends Controller
             }
 
             // Fallbacks for structure
-            $title = $aiResponse['title'] ?? 'مشروع مبتكر';
+            $title = $aiResponse['title'] ?? $idea;
+            $title_ar = $aiResponse['title_ar'] ?? $title;
             $description = $aiResponse['description'] ?? $idea;
+            $description_ar = $aiResponse['description_ar'] ?? $description;
             $category = $aiResponse['category'] ?? 'other';
             $keyword = $aiResponse['image_keyword'] ?? 'innovation education';
 
@@ -168,7 +177,9 @@ class AdminProjectController extends Controller
 
             return response()->json([
                 'title' => $title,
+                'title_ar' => $title_ar,
                 'description' => $description,
+                'description_ar' => $description_ar,
                 'category' => strtolower($category),
                 'image_url' => $imageUrl
             ]);
@@ -184,6 +195,10 @@ class AdminProjectController extends Controller
      */
     public function evaluate(Project $project, \App\Services\AIEngine\GeminiClient $deepSeekClient)
     {
+        // التقييم قد يستغرق وقتاً طويلاً بسبب إعادة المحاولة التلقائية في
+        // GeminiClient، بينما max_execution_time الافتراضي على السيرفر أقل من ذلك.
+        set_time_limit(300);
+
         try {
             $aiResponse = $deepSeekClient->chatWithJson([
                 \App\Services\AIEngine\GeminiClient::systemMessage(
@@ -241,7 +256,9 @@ class AdminProjectController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'title_ar' => 'required|string|max:255',
             'description' => 'required|string',
+            'description_ar' => 'required|string',
             'category' => 'nullable|in:science,technology,engineering,mathematics,arts,other',
             'curriculum_type' => 'nullable|in:بريطانية,أمريكية,IB,التربية والتعليم',
             'school_id' => 'nullable|exists:users,id',
@@ -250,8 +267,10 @@ class AdminProjectController extends Controller
             'files' => 'nullable|array',
             'images' => 'nullable|array',
         ], [
-            'title.required' => 'عنوان المشروع مطلوب',
-            'description.required' => 'وصف المشروع مطلوب',
+            'title.required' => 'عنوان المشروع (بالإنجليزية) مطلوب',
+            'title_ar.required' => 'عنوان المشروع (بالعربية) مطلوب',
+            'description.required' => 'وصف المشروع (بالإنجليزية) مطلوب',
+            'description_ar.required' => 'وصف المشروع (بالعربية) مطلوب',
             'category.in' => 'الفئة يجب أن تكون واحدة من: science, technology, engineering, mathematics, arts, other',
             'curriculum_type.in' => 'نوع المنهاج غير صالح',
             'school_id.exists' => 'المدرسة المحددة غير موجودة',
@@ -266,7 +285,9 @@ class AdminProjectController extends Controller
 
         $project = Project::create([
             'title' => $validated['title'],
+            'title_ar' => $validated['title_ar'],
             'description' => $validated['description'],
+            'description_ar' => $validated['description_ar'],
             'category' => $validated['category'] ?? 'other',
             'curriculum_type' => $validated['curriculum_type'] ?? null,
             'user_id' => auth()->id(),
@@ -337,7 +358,9 @@ class AdminProjectController extends Controller
             'project' => [
                 'id' => $project->id,
                 'title' => $project->title,
+                'title_ar' => $project->title_ar,
                 'description' => $project->description,
+                'description_ar' => $project->description_ar,
                 'category' => $project->category,
                 'curriculum_type' => $project->curriculum_type,
                 'user_id' => $project->user_id,
@@ -364,7 +387,9 @@ class AdminProjectController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'title_ar' => 'required|string|max:255',
             'description' => 'required|string',
+            'description_ar' => 'required|string',
             'category' => 'nullable|in:science,technology,engineering,mathematics,arts,other',
             'curriculum_type' => 'nullable|in:بريطانية,أمريكية,IB,التربية والتعليم',
             'school_id' => 'nullable|exists:users,id',
@@ -373,8 +398,10 @@ class AdminProjectController extends Controller
             'files' => 'nullable|array',
             'images' => 'nullable|array',
         ], [
-            'title.required' => 'عنوان المشروع مطلوب',
-            'description.required' => 'وصف المشروع مطلوب',
+            'title.required' => 'عنوان المشروع (بالإنجليزية) مطلوب',
+            'title_ar.required' => 'عنوان المشروع (بالعربية) مطلوب',
+            'description.required' => 'وصف المشروع (بالإنجليزية) مطلوب',
+            'description_ar.required' => 'وصف المشروع (بالعربية) مطلوب',
             'category.in' => 'الفئة يجب أن تكون واحدة من: science, technology, engineering, mathematics, arts, other',
             'curriculum_type.in' => 'نوع المنهاج غير صالح',
             'school_id.exists' => 'المدرسة المحددة غير موجودة',
@@ -389,7 +416,9 @@ class AdminProjectController extends Controller
 
         $updateData = [
             'title' => $validated['title'],
+            'title_ar' => $validated['title_ar'],
             'description' => $validated['description'],
+            'description_ar' => $validated['description_ar'],
             'category' => $validated['category'] ?? null,
             'curriculum_type' => $validated['curriculum_type'] ?? null,
             'school_id' => $schoolId,
@@ -478,7 +507,9 @@ class AdminProjectController extends Controller
             'project' => [
                 'id' => $project->id,
                 'title' => $project->title,
+                'title_ar' => $project->title_ar,
                 'description' => $project->description,
+                'description_ar' => $project->description_ar,
                 'category' => $project->category,
                 'curriculum_type' => $project->curriculum_type,
                 'status' => $project->status,

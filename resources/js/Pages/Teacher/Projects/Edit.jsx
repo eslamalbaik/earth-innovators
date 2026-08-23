@@ -7,11 +7,15 @@ import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
 import PrimaryButton from '../../../Components/PrimaryButton';
 import { getProjectFileUrl, getProjectImageUrl } from '@/utils/imageUtils';
+import { useTranslation } from '@/i18n';
 
 export default function EditProject({ auth, project, school, schools = [] }) {
+    const { t, language } = useTranslation();
     const { data, setData, put, processing, errors } = useForm({
         title: project?.title || '',
+        title_ar: project?.title_ar || '',
         description: project?.description || '',
+        description_ar: project?.description_ar || '',
         category: project?.category || 'other',
         school_id: project?.school_id || school?.id || null,
         thumbnail: null,
@@ -35,7 +39,9 @@ export default function EditProject({ auth, project, school, schools = [] }) {
         if (project) {
             setData({
                 title: project.title || '',
+                title_ar: project.title_ar || '',
                 description: project.description || '',
+                description_ar: project.description_ar || '',
                 category: project.category || 'other',
                 school_id: project.school_id || school?.id || null,
                 thumbnail: null,
@@ -59,12 +65,12 @@ export default function EditProject({ auth, project, school, schools = [] }) {
         if (!file) return;
 
         if (file.size > 5 * 1024 * 1024) {
-            alert('حجم صورة الغلاف يجب ألا يتجاوز 5 ميجابايت');
+            alert(t('teacherProjectsEditPage.alerts.coverTooLarge'));
             return;
         }
 
         if (!file.type.startsWith('image/')) {
-            alert('الملف يجب أن يكون صورة');
+            alert(t('teacherProjectsEditPage.alerts.coverMustBeImage'));
             return;
         }
 
@@ -83,12 +89,12 @@ export default function EditProject({ auth, project, school, schools = [] }) {
             ];
 
             if (file.size > maxSize) {
-                alert(`الملف ${file.name} أكبر من 10 ميجابايت`);
+                alert(t('teacherProjectsEditPage.alerts.fileTooLarge', { name: file.name }));
                 return false;
             }
 
             if (!validTypes.includes(file.type)) {
-                alert(`نوع الملف ${file.name} غير مدعوم`);
+                alert(t('teacherProjectsEditPage.alerts.fileTypeNotSupported', { name: file.name }));
                 return false;
             }
 
@@ -169,19 +175,13 @@ export default function EditProject({ auth, project, school, schools = [] }) {
 
         // التحقق من البيانات الأساسية
         if (!data.title || !data.description) {
-            alert('يرجى ملء جميع الحقول المطلوبة');
-            return;
-        }
-
-        // حسب متطلبات النظام: صورة الغلاف مطلوبة عند كل تحديث.
-        if (false) {
-            alert('يرجى رفع صورة غلاف جديدة قبل الحفظ');
+            alert(t('teacherProjectsEditPage.alerts.requiredFields'));
             return;
         }
 
         // التحقق من حالة المشروع
         if (project?.status !== 'pending') {
-            alert('لا يمكن تعديل المشروع بعد الموافقة عليه أو رفضه');
+            alert(t('teacherProjectsEditPage.alerts.cannotEditAfterReview'));
             return;
         }
 
@@ -227,7 +227,7 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                 router.visit('/teacher/projects');
             },
             onError: (errors) => {
-                let errorMessage = 'حدث خطأ أثناء حفظ التعديلات';
+                let errorMessage = t('teacherProjectsEditPage.alerts.saveError');
                 if (errors.message) {
                     errorMessage = errors.message;
                 } else if (typeof errors === 'object' && Object.keys(errors).length > 0) {
@@ -238,7 +238,7 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                         errorMessage = firstError;
                     }
                 }
-                alert('خطأ: ' + errorMessage);
+                alert(t('teacherProjectsEditPage.alerts.errorPrefix') + errorMessage);
             },
         });
     };
@@ -251,40 +251,70 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                     <Link href="/teacher/projects" className="text-gray-600 hover:text-[#A3C042]">
                         <FaArrowLeft className="text-xl" />
                     </Link>
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">تعديل المشروع</h2>
+                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">{t('teacherProjectsEditPage.headerTitle')}</h2>
                 </div>
             }
         >
-            <Head title="تعديل المشروع - لوحة المعلم" />
+            <Head title={t('teacherProjectsEditPage.pageTitle', { appName: t('common.appName') })} />
 
             <div className="py-6">
                 <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
                     <form onSubmit={submit} className="bg-white rounded-xl shadow-lg p-6 space-y-6">
-                        {/* Title */}
+                        {/* Arabic Title */}
                         <div>
-                            <InputLabel htmlFor="title" value="عنوان المشروع" className="text-sm font-medium text-gray-700 mb-2" />
+                            <InputLabel htmlFor="title_ar" value={t('teacherProjectsCreatePage.form.titleArLabel')} className="text-sm font-medium text-gray-700 mb-2" />
+                            <TextInput
+                                id="title_ar"
+                                type="text"
+                                value={data.title_ar}
+                                onChange={(e) => setData('title_ar', e.target.value)}
+                                className="block w-full"
+                                placeholder={t('teacherProjectsCreatePage.form.titleArPlaceholder')}
+                                required
+                            />
+                            <InputError message={errors.title_ar} className="mt-2" />
+                        </div>
+
+                        {/* English Title */}
+                        <div>
+                            <InputLabel htmlFor="title" value={t('teacherProjectsCreatePage.form.titleEnLabel')} className="text-sm font-medium text-gray-700 mb-2" />
                             <TextInput
                                 id="title"
                                 type="text"
                                 value={data.title}
                                 onChange={(e) => setData('title', e.target.value)}
                                 className="block w-full"
-                                placeholder="أدخل عنوان المشروع"
+                                placeholder={t('teacherProjectsCreatePage.form.titleEnPlaceholder')}
                                 required
                             />
                             <InputError message={errors.title} className="mt-2" />
                         </div>
 
-                        {/* Description */}
+                        {/* Arabic Description */}
                         <div>
-                            <InputLabel htmlFor="description" value="وصف المشروع" className="text-sm font-medium text-gray-700 mb-2" />
+                            <InputLabel htmlFor="description_ar" value={t('teacherProjectsCreatePage.form.descriptionArLabel')} className="text-sm font-medium text-gray-700 mb-2" />
+                            <textarea
+                                id="description_ar"
+                                value={data.description_ar}
+                                onChange={(e) => setData('description_ar', e.target.value)}
+                                rows={6}
+                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
+                                placeholder={t('teacherProjectsCreatePage.form.descriptionArPlaceholder')}
+                                required
+                            />
+                            <InputError message={errors.description_ar} className="mt-2" />
+                        </div>
+
+                        {/* English Description */}
+                        <div>
+                            <InputLabel htmlFor="description" value={t('teacherProjectsCreatePage.form.descriptionEnLabel')} className="text-sm font-medium text-gray-700 mb-2" />
                             <textarea
                                 id="description"
                                 value={data.description}
                                 onChange={(e) => setData('description', e.target.value)}
                                 rows={6}
                                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
-                                placeholder="أدخل وصفاً للمشروع"
+                                placeholder={t('teacherProjectsCreatePage.form.descriptionEnPlaceholder')}
                                 required
                             />
                             <InputError message={errors.description} className="mt-2" />
@@ -296,16 +326,16 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                                 <div>
                                     <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
                                         <FaImage className="text-gray-400" />
-                                        صورة الغلاف (مطلوبة عند التحديث)
+                                        {t('teacherProjectsEditPage.coverImageLabel')}
                                     </div>
-                                    <p className="mt-1 text-xs text-gray-500">حد أقصى 5MB</p>
+                                    <p className="mt-1 text-xs text-gray-500">{t('teacherProjectsEditPage.maxSize')}</p>
                                 </div>
                                 <button
                                     type="button"
                                     onClick={() => thumbnailInputRef.current?.click()}
                                     className="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-200"
                                 >
-                                    اختيار صورة
+                                    {t('teacherProjectsEditPage.chooseImage')}
                                 </button>
                             </div>
 
@@ -327,7 +357,7 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                                     />
                                 ) : (
                                     <div className="flex h-48 items-center justify-center text-sm text-gray-500">
-                                        لا توجد صورة غلاف حالياً
+                                        {t('teacherProjectsEditPage.noCoverImage')}
                                     </div>
                                 )}
                             </div>
@@ -336,19 +366,19 @@ export default function EditProject({ auth, project, school, schools = [] }) {
 
                         {/* Category */}
                         <div>
-                            <InputLabel htmlFor="category" value="فئة المشروع" className="text-sm font-medium text-gray-700 mb-2" />
+                            <InputLabel htmlFor="category" value={t('teacherProjectsCreatePage.form.categoryLabel')} className="text-sm font-medium text-gray-700 mb-2" />
                             <select
                                 id="category"
                                 value={data.category}
                                 onChange={(e) => setData('category', e.target.value)}
                                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                             >
-                                <option value="science">علوم</option>
-                                <option value="technology">تقنية</option>
-                                <option value="engineering">هندسة</option>
-                                <option value="mathematics">رياضيات</option>
-                                <option value="arts">فنون</option>
-                                <option value="other">أخرى</option>
+                                <option value="science">{t('common.categories.science')}</option>
+                                <option value="technology">{t('common.categories.technology')}</option>
+                                <option value="engineering">{t('common.categories.engineering')}</option>
+                                <option value="mathematics">{t('common.categories.mathematics')}</option>
+                                <option value="arts">{t('common.categories.arts')}</option>
+                                <option value="other">{t('common.categories.other')}</option>
                             </select>
                             <InputError message={errors.category} className="mt-2" />
                         </div>
@@ -356,14 +386,14 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                         {/* School Selection */}
                         {schools && schools.length > 0 && (
                             <div>
-                                <InputLabel htmlFor="school_id" value="المدرسة" className="text-sm font-medium text-gray-700 mb-2" />
+                                <InputLabel htmlFor="school_id" value={t('teacherProjectsCreatePage.form.schoolLabel')} className="text-sm font-medium text-gray-700 mb-2" />
                                 <select
                                     id="school_id"
                                     value={data.school_id || ''}
                                     onChange={(e) => setData('school_id', e.target.value || null)}
                                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
                                 >
-                                    <option value="">اختر مدرسة (اختياري)</option>
+                                    <option value="">{t('teacherProjectsCreatePage.form.schoolPlaceholder')}</option>
                                     {schools.map((sch) => (
                                         <option key={sch.id} value={sch.id}>
                                             {sch.name}
@@ -377,7 +407,7 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                         {/* Existing Files */}
                         {existingFiles.length > 0 && (
                             <div>
-                                <InputLabel value="الملفات الحالية" className="text-sm font-medium text-gray-700 mb-2" />
+                                <InputLabel value={t('teacherProjectsEditPage.existingFilesLabel')} className="text-sm font-medium text-gray-700 mb-2" />
                                 <div className="space-y-2">
                                     {existingFiles.map((filePath, index) => (
                                         <div
@@ -394,7 +424,7 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                                                         rel="noopener noreferrer"
                                                         className="text-xs text-blue-600 hover:text-blue-800"
                                                     >
-                                                        عرض الملف
+                                                        {t('teacherProjectsEditPage.viewFile')}
                                                     </a>
                                                 </div>
                                             </div>
@@ -413,7 +443,7 @@ export default function EditProject({ auth, project, school, schools = [] }) {
 
                         {/* File Upload */}
                         <div>
-                            <InputLabel value="إضافة ملفات جديدة" className="text-sm font-medium text-gray-700 mb-2" />
+                            <InputLabel value={t('teacherProjectsEditPage.addNewFilesLabel')} className="text-sm font-medium text-gray-700 mb-2" />
                             <div
                                 onDragEnter={handleDrag}
                                 onDragLeave={handleDrag}
@@ -434,17 +464,17 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                                 />
                                 <FaCloudUploadAlt className="mx-auto text-6xl text-gray-400 mb-4" />
                                 <p className="text-gray-700 mb-2">
-                                    اسحب وأفلت الملفات هنا أو انقر للاختيار
+                                    {t('teacherProjectsCreatePage.form.dropzoneTitle')}
                                 </p>
                                 <p className="text-sm text-gray-500">
-                                    صور، فيديو، PDF (الحد الأقصى: 10 ميجابايت لكل ملف)
+                                    {t('teacherProjectsCreatePage.form.dropzoneSubtitle')}
                                 </p>
                                 <button
                                     type="button"
                                     onClick={() => fileInputRef.current?.click()}
                                     className="mt-4 px-6 py-2 bg-[#A3C042] text-white rounded-lg hover:bg-[#A3C042] transition"
                                 >
-                                    اختر ملفات
+                                    {t('teacherProjectsCreatePage.actions.chooseFiles')}
                                 </button>
                             </div>
                             <InputError message={errors.files} className="mt-2" />
@@ -481,7 +511,7 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                         {project?.status !== 'pending' && (
                             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                                 <p className="text-sm text-yellow-800">
-                                    ⚠️ لا يمكن تعديل المشروع بعد الموافقة عليه أو رفضه
+                                    ⚠️ {t('teacherProjectsEditPage.statusWarning')}
                                 </p>
                             </div>
                         )}
@@ -492,7 +522,7 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                                 href="/teacher/projects"
                                 className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
                             >
-                                إلغاء
+                                {t('common.cancel')}
                             </Link>
                             <PrimaryButton
                                 type="submit"
@@ -502,12 +532,12 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                                 {processing ? (
                                     <>
                                         <FaSpinner className="animate-spin" />
-                                        جاري التحديث...
+                                        {t('teacherProjectsEditPage.updating')}
                                     </>
                                 ) : (
                                     <>
                                         <FaUpload />
-                                        حفظ التعديلات
+                                        {t('teacherProjectsEditPage.saveChanges')}
                                     </>
                                 )}
                             </PrimaryButton>

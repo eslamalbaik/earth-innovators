@@ -34,7 +34,7 @@ export default function AdminPublicationCreate({ schools }) {
     const handleAIGenerate = async () => {
         const titleToUse = data.title || data.title_ar;
         if (!titleToUse) {
-            alert('يرجى إدخال عنوان المقال (بالعربية أو الإنجليزية) أولاً لتوليد المحتوى.');
+            alert(t('teacherPublicationCreatePage.alerts.titleRequiredForAI'));
             return;
         }
 
@@ -65,7 +65,7 @@ export default function AdminPublicationCreate({ schools }) {
                 }
             }
         } catch (error) {
-            alert(error.response?.data?.error || 'حدث خطأ أثناء توليد المحتوى');
+            alert(error.response?.data?.error || t('teacherPublicationCreatePage.alerts.aiGenerateError'));
         } finally {
             setIsGenerating(false);
         }
@@ -126,10 +126,10 @@ export default function AdminPublicationCreate({ schools }) {
                             <div>
                                 <h3 className="font-semibold text-blue-800 text-sm flex items-center gap-2">
                                     <FaRobot className="text-blue-600" />
-                                    توليد المحتوى بالذكاء الاصطناعي
+                                    {t('teacherPublicationCreatePage.aiAssistant.title')}
                                 </h3>
                                 <p className="text-xs text-blue-600 mt-1">
-                                    اكتب العنوان فقط (بالعربية أو الإنجليزية) وسيقوم الذكاء الاصطناعي بكتابة المقال واختيار صورة مناسبة.
+                                    {t('teacherPublicationCreatePage.aiAssistant.description')}
                                 </p>
                             </div>
                             <button
@@ -139,9 +139,9 @@ export default function AdminPublicationCreate({ schools }) {
                                 className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition flex items-center gap-2 shrink-0"
                             >
                                 {isGenerating ? (
-                                    <><FaSpinner className="animate-spin" /> جاري التوليد...</>
+                                    <><FaSpinner className="animate-spin" /> {t('teacherPublicationCreatePage.aiAssistant.generating')}</>
                                 ) : (
-                                    <><FaRobot /> توليد الآن</>
+                                    <><FaRobot /> {t('teacherPublicationCreatePage.aiAssistant.generateButton')}</>
                                 )}
                             </button>
                         </div>

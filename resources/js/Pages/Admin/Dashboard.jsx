@@ -613,7 +613,7 @@ export default function AdminDashboard({
                                                 href={route('admin.projects.show', project.id)}
                                                 className="text-blue-600 hover:text-blue-700 font-medium"
                                             >
-                                                {project.title}
+                                                {language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar)}
                                             </Link>
                                         </td>
                                         <td className="py-3 px-4 text-sm text-gray-700">{project.student_name}</td>

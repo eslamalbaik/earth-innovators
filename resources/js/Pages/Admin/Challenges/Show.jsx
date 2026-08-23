@@ -124,7 +124,7 @@ export default function AdminChallengesShow({ challenge }) {
                         <div className="bg-white rounded-xl shadow-lg p-6">
                             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                                 <FaClipboardCheck className="text-[#A3C042]" />
-                                معايير التقييم
+                                {t('adminChallengesShowPage.sections.evaluationCriteria')}
                             </h2>
                             <div className="space-y-3">
                                 {challenge.criteria.map((criterion) => (
@@ -163,7 +163,7 @@ export default function AdminChallengesShow({ challenge }) {
                             <div className="flex items-center gap-3">
                                 <FaFlag className="text-green-500" />
                                 <div>
-                                    <p className="text-sm text-gray-600">الفئة</p>
+                                    <p className="text-sm text-gray-600">{t('adminChallengesShowPage.labels.category')}</p>
                                     <p className="font-semibold text-gray-900">{getCategoryLabel(challenge.category)}</p>
                                 </div>
                             </div>

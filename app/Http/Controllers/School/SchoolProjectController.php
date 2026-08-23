@@ -72,11 +72,15 @@ class SchoolProjectController extends Controller
 
         $idea = $request->input('idea');
 
+        // التوليد قد يستغرق وقتاً طويلاً بسبب إعادة المحاولة التلقائية في
+        // GeminiClient، بينما max_execution_time الافتراضي على السيرفر أقل من ذلك.
+        set_time_limit(300);
+
         try {
             $aiResponse = $deepSeekClient->chatWithJson([
                 \App\Services\AIEngine\GeminiClient::systemMessage(
                     'أنت مستشار تخطيط مشاريع تعليمية وابتكارية. '
-                    . 'بناءً على الفكرة أو الوصف القصير الذي تقدمه المدرسة، قم بإنشاء تفاصيل مشروع كاملة وجاهزة للنشر. '
+                    . 'بناءً على الفكرة أو الوصف القصير الذي تقدمه المدرسة، قم بإنشاء تفاصيل مشروع كاملة وجاهزة للنشر باللغتين العربية والإنجليزية. '
                     . 'اقترح كلمة مفتاحية واحدة باللغة الإنجليزية للبحث عن صورة غلاف من Unsplash. '
                     . 'اختر القيم الإلزامية التالية من الخيارات المتاحة حصراً باللغة الإنجليزية: '
                     . 'category: (science, technology, engineering, mathematics, arts, other). '
@@ -84,8 +88,9 @@ class SchoolProjectController extends Controller
                     . 'subject: (math, arabic, english, social_studies, arts_subject, sports, engineering_subject, science_subject, technology_subject, physics_chem_bio). '
                     . 'instructional_approach: (play_based, problem_based, pbl, transformative, accelerated, improvement). '
                     . 'أجب بصيغة JSON فقط مع الحقول التالية: '
-                    . 'title (عنوان احترافي وجذاب للمشروع بالعربية), '
-                    . 'description (وصف مفصل وشامل للمشروع يشمل الأهداف والخطوات، لا يقل عن 150 كلمة), '
+                    . 'title (عنوان احترافي وجذاب للمشروع بالإنجليزية), title_ar (نفس العنوان بالعربية), '
+                    . 'description (وصف مفصل وشامل للمشروع بالإنجليزية يشمل الأهداف والخطوات، لا يقل عن 150 كلمة), '
+                    . 'description_ar (نفس الوصف بالعربية بنفس مستوى التفصيل), '
                     . 'category (قيمة واحدة من الخيارات المتاحة), '
                     . 'grade (قيمة واحدة من الخيارات المتاحة), '
                     . 'subject (قيمة واحدة من الخيارات المتاحة), '
@@ -100,8 +105,10 @@ class SchoolProjectController extends Controller
             }
 
             // Fallbacks for structure
-            $title = $aiResponse['title'] ?? 'مشروع مبتكر';
+            $title = $aiResponse['title'] ?? $idea;
+            $title_ar = $aiResponse['title_ar'] ?? $title;
             $description = $aiResponse['description'] ?? $idea;
+            $description_ar = $aiResponse['description_ar'] ?? $description;
             $category = $aiResponse['category'] ?? 'other';
             $grade = $aiResponse['grade'] ?? 'grade_1';
             $subject = $aiResponse['subject'] ?? 'science_subject';
@@ -150,7 +157,9 @@ class SchoolProjectController extends Controller
 
             return response()->json([
                 'title' => $title,
+                'title_ar' => $title_ar,
                 'description' => $description,
+                'description_ar' => $description_ar,
                 'category' => strtolower($category),
                 'grade' => strtolower($grade),
                 'subject' => strtolower($subject),
@@ -168,7 +177,9 @@ class SchoolProjectController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'title_ar' => 'required|string|max:255',
             'description' => 'required|string',
+            'description_ar' => 'required|string',
             'category' => 'required|in:science,technology,engineering,mathematics,arts,other',
             'files' => 'nullable|array',
             'files.*' => 'file|max:10240',
@@ -185,7 +196,9 @@ class SchoolProjectController extends Controller
             'user_id' => $school->id,
             'school_id' => $school->id,
             'title' => $validated['title'],
+            'title_ar' => $validated['title_ar'],
             'description' => $validated['description'],
+            'description_ar' => $validated['description_ar'],
             'category' => $validated['category'],
             'status' => 'approved',
             'approved_by' => $school->id,
@@ -477,7 +490,9 @@ class SchoolProjectController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'title_ar' => 'required|string|max:255',
             'description' => 'required|string',
+            'description_ar' => 'required|string',
             'category' => 'required|in:science,technology,engineering,mathematics,arts,other',
             'files' => 'nullable|array',
             'files.*' => 'file|max:10240',
@@ -496,7 +511,9 @@ class SchoolProjectController extends Controller
 
         $project->update([
             'title' => $validated['title'],
+            'title_ar' => $validated['title_ar'],
             'description' => $validated['description'],
+            'description_ar' => $validated['description_ar'],
             'category' => $validated['category'],
             'report' => $validated['report'] ?? null,
         ]);

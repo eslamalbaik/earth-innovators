@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import DashboardLayout from '@/Layouts/DashboardLayout';
+import { useTranslation } from '@/i18n';
 import {
     Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
     ResponsiveContainer, Legend, Tooltip,
@@ -8,9 +9,11 @@ import {
 const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444'];
 
 export default function CompareStudents({ auth, students = [], indexNames = {} }) {
+    const { t } = useTranslation();
+
     // بيانات الرادار: صف لكل مؤشر وعمود لكل طالب
-    const radarData = Object.entries(indexNames).map(([key, label]) => {
-        const row = { subject: label };
+    const radarData = Object.keys(indexNames).map((key) => {
+        const row = { subject: t(`innovationIndex.names.${key}`) };
         students.forEach((s) => {
             row[s.name] = Number(s.indexes?.[key] ?? 0);
         });
@@ -19,27 +22,27 @@ export default function CompareStudents({ auth, students = [], indexNames = {} }
 
     return (
         <DashboardLayout auth={auth}>
-            <Head title="مقارنة الطلاب" />
+            <Head title={t('compareStudents.pageTitle')} />
 
             <div className="py-6 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto space-y-6">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">⚖️ مقارنة الطلاب</h1>
-                        <p className="text-gray-500 mt-1">مقارنة المؤشرات الثمانية بين {students.length} طلاب</p>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('compareStudents.heading')}</h1>
+                        <p className="text-gray-500 mt-1">{t('compareStudents.subtitle', { count: students.length })}</p>
                     </div>
                     <Link
                         href={route('teacher.innovation.dashboard')}
                         className="text-indigo-600 hover:text-indigo-700 font-medium text-sm"
                     >
-                        → العودة لمتابعة الابتكار
+                        {t('compareStudents.backLink')}
                     </Link>
                 </div>
 
                 {students.length < 2 ? (
                     <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow-md">
                         <span className="text-6xl block mb-4">⚖️</span>
-                        <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">اختر طالبين على الأقل</h3>
-                        <p className="text-gray-500">حدد الطلاب من صفحة متابعة الابتكار ثم اضغط "مقارنة".</p>
+                        <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{t('compareStudents.selectAtLeastTwo')}</h3>
+                        <p className="text-gray-500">{t('compareStudents.selectAtLeastTwoDescription')}</p>
                     </div>
                 ) : (
                     <>
@@ -55,14 +58,14 @@ export default function CompareStudents({ auth, students = [], indexNames = {} }
                                     <p className="text-3xl font-black mt-1" style={{ color: COLORS[i % COLORS.length] }}>
                                         {Math.round(s.overall_score)}
                                     </p>
-                                    <p className="text-xs text-gray-400 mt-0.5">الدرجة الكلية</p>
+                                    <p className="text-xs text-gray-400 mt-0.5">{t('compareStudents.overallScore')}</p>
                                 </div>
                             ))}
                         </div>
 
                         {/* Combined radar */}
                         <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-md border border-gray-100 dark:border-gray-700">
-                            <h3 className="font-bold text-gray-800 dark:text-white mb-4">📊 المؤشرات جنباً إلى جنب</h3>
+                            <h3 className="font-bold text-gray-800 dark:text-white mb-4">{t('compareStudents.sideBySide')}</h3>
                             <ResponsiveContainer width="100%" height={400}>
                                 <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="70%">
                                     <PolarGrid stroke="#e5e7eb" />
@@ -89,7 +92,7 @@ export default function CompareStudents({ auth, students = [], indexNames = {} }
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className="border-b border-gray-100 dark:border-gray-700">
-                                        <th className="text-start p-4 font-bold text-gray-600 dark:text-gray-300">المؤشر</th>
+                                        <th className="text-start p-4 font-bold text-gray-600 dark:text-gray-300">{t('compareStudents.indexColumn')}</th>
                                         {students.map((s, i) => (
                                             <th key={s.id} className="p-4 font-bold" style={{ color: COLORS[i % COLORS.length] }}>
                                                 {s.name}
@@ -98,12 +101,12 @@ export default function CompareStudents({ auth, students = [], indexNames = {} }
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                                    {Object.entries(indexNames).map(([key, label]) => {
+                                    {Object.keys(indexNames).map((key) => {
                                         const values = students.map((s) => Number(s.indexes?.[key] ?? 0));
                                         const max = Math.max(...values);
                                         return (
                                             <tr key={key}>
-                                                <td className="p-4 font-medium text-gray-700 dark:text-gray-300">{label}</td>
+                                                <td className="p-4 font-medium text-gray-700 dark:text-gray-300">{t(`innovationIndex.names.${key}`)}</td>
                                                 {values.map((v, i) => (
                                                     <td
                                                         key={i}

@@ -7,7 +7,7 @@ import { useDirection, getDropdownPosition } from '@/utils/directionUtils';
 import { useTranslation } from '@/i18n';
 
 export default function StudentProjectsIndex({ auth, projects, message, noticeKey, canStartNewSubmission = false }) {
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
     const { dir } = useDirection();
     const isRtl = dir === 'rtl';
     const [filter, setFilter] = useState('all'); // all | pending | evaluated | winners
@@ -188,7 +188,7 @@ export default function StudentProjectsIndex({ auth, projects, message, noticeKe
                                     {project.image || project.thumbnail ? (
                                         <img
                                             src={project.image || project.thumbnail || '/images/hero.png'}
-                                            alt={project.title || t('studentProjects.imageAlt')}
+                                            alt={(language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar)) || t('studentProjects.imageAlt')}
                                             className="w-20 h-20 rounded-xl object-cover"
                                         />
                                     ) : (
@@ -203,7 +203,7 @@ export default function StudentProjectsIndex({ auth, projects, message, noticeKe
                                     <div className="flex items-start justify-between gap-2 mb-2">
                                         <div className="flex-1">
                                             <h3 className="text-sm font-bold text-gray-900 mb-1 line-clamp-1">
-                                                {project.title || t('studentProjects.defaultProjectTitle')}
+                                                {(language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar)) || t('studentProjects.defaultProjectTitle')}
                                             </h3>
                                             <p className="text-xs text-gray-500">{projectDate}</p>
                                         </div>

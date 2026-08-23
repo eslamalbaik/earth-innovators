@@ -34,6 +34,10 @@ class SchoolChatController extends Controller
 
         $question = $request->input('question');
 
+        // الرد قد يستغرق وقتاً طويلاً بسبب إعادة المحاولة التلقائية في
+        // GeminiClient، بينما max_execution_time الافتراضي على السيرفر أقل من ذلك.
+        set_time_limit(300);
+
         try {
             $context = $this->buildContext();
 

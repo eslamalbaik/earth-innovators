@@ -32,6 +32,8 @@ import PrimaryButton from '../../../Components/PrimaryButton';
 
 export default function StudentProjectShow({ auth, project, existingSubmission, initialTab = 'details', backTo = '/student/projects' }) {
     const { t, language } = useTranslation();
+    const displayTitle = language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar);
+    const displayDescription = language === 'ar' ? (project.description_ar || project.description) : (project.description || project.description_ar);
     const [activeTab, setActiveTab] = useState(initialTab); // 'details', 'submit', 'comments'
     const [fileList, setFileList] = useState([]);
     const [dragActive, setDragActive] = useState(false);
@@ -244,7 +246,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission, 
         <div className="space-y-4">
             {/* Header */}
             <div className="mb-4">
-                <h1 className="text-lg font-extrabold text-gray-900 mb-2">{project.title}</h1>
+                <h1 className="text-lg font-extrabold text-gray-900 mb-2">{displayTitle}</h1>
                 <div className="flex items-center gap-2 flex-wrap">
                     <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
                         {t('common.approved')}
@@ -295,7 +297,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission, 
                 <div className="space-y-4">
                     <div className="bg-white rounded-2xl border border-gray-100 p-4">
                         <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line mb-4">
-                            {project.description}
+                            {displayDescription}
                         </p>
 
                         {/* Project Info */}
@@ -746,13 +748,13 @@ export default function StudentProjectShow({ auth, project, existingSubmission, 
 
     return (
         <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
-            <Head title={project.title} />
+            <Head title={displayTitle} />
 
             {/* Mobile View */}
             <div className="block md:hidden">
                 <MobileAppLayout
                     auth={auth}
-                    title={project.title}
+                    title={displayTitle}
                     activeNav="projects"
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
@@ -765,7 +767,7 @@ export default function StudentProjectShow({ auth, project, existingSubmission, 
             {/* Desktop View */}
             <div className="hidden md:block">
                 <MobileTopBar
-                    title={project.title}
+                    title={displayTitle}
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
                     onBack={() => router.visit(backTo)}

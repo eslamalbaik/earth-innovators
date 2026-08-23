@@ -27,6 +27,8 @@ import { getProjectFileUrl, getProjectImageUrl } from '@/utils/imageUtils';
 export default function TeacherProjectShow({ project }) {
     const { t, language } = useTranslation();
     const { confirm } = useConfirmDialog();
+    const displayTitle = language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar);
+    const displayDescription = language === 'ar' ? (project.description_ar || project.description) : (project.description || project.description_ar);
 
     const getStatusBadge = (status) => {
         const statusMap = {
@@ -76,7 +78,7 @@ export default function TeacherProjectShow({ project }) {
     const handleDelete = async () => {
         const confirmed = await confirm({
             title: t('teacherProjectsPage.deleteConfirm.title'),
-            message: t('teacherProjectsPage.deleteConfirm.message', { title: project.title }),
+            message: t('teacherProjectsPage.deleteConfirm.message', { title: displayTitle }),
             confirmText: t('common.delete'),
             cancelText: t('common.cancel'),
             variant: 'danger',
@@ -89,7 +91,7 @@ export default function TeacherProjectShow({ project }) {
 
     return (
         <DashboardLayout header={t('teacherProjectShowPage.title')}>
-            <Head title={t('teacherProjectShowPage.pageTitle', { title: project.title, appName: t('common.appName') })} />
+            <Head title={t('teacherProjectShowPage.pageTitle', { title: displayTitle, appName: t('common.appName') })} />
 
             <div className="mb-6">
                 <Link
@@ -106,7 +108,7 @@ export default function TeacherProjectShow({ project }) {
                     <div className="bg-white rounded-xl shadow-lg p-6">
                         <div className="flex items-start justify-between mb-4">
                             <div className="flex-1">
-                                <h1 className="text-2xl font-bold text-gray-900 mb-3">{project.title}</h1>
+                                <h1 className="text-2xl font-bold text-gray-900 mb-3">{displayTitle}</h1>
                                 <div className="flex items-center gap-3 flex-wrap">
                                     {getStatusBadge(project.status)}
                                     <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-semibold">
@@ -138,7 +140,7 @@ export default function TeacherProjectShow({ project }) {
                         </div>
 
                         <div className="prose max-w-none mb-6">
-                            <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">{project.description}</p>
+                            <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">{displayDescription}</p>
                         </div>
 
                         <div className="grid grid-cols-3 gap-4 pt-6 border-t border-gray-200">
@@ -208,7 +210,7 @@ export default function TeacherProjectShow({ project }) {
                                         <div key={index} className="relative group">
                                             <img
                                                 src={imageUrl}
-                                                alt={t('teacherProjectShowPage.imageAlt', { title: project.title, index: index + 1 })}
+                                                alt={t('teacherProjectShowPage.imageAlt', { title: displayTitle, index: index + 1 })}
                                                 className="w-full h-48 object-cover rounded-lg border border-gray-200"
                                             />
                                             <a

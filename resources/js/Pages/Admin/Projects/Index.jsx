@@ -38,7 +38,9 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
 
     const { data: editData, setData: setEditData, put: updateProject, processing: editProcessing, errors: editErrors, reset: resetEditForm } = useForm({
         title: '',
+        title_ar: '',
         description: '',
+        description_ar: '',
         category: '',
         curriculum_type: '',
         school_id: '',
@@ -50,7 +52,9 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
 
     const { data: createData, setData: setCreateData, post: createProject, processing: createProcessing, errors: createErrors, reset: resetCreateForm } = useForm({
         title: '',
+        title_ar: '',
         description: '',
+        description_ar: '',
         category: 'other',
         curriculum_type: '',
         school_id: '',
@@ -90,7 +94,9 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                 // Use existing project data
                 setEditData({
                     title: project.title || '',
+                    title_ar: project.title_ar || '',
                     description: project.description || '',
+                    description_ar: project.description_ar || '',
                     category: project.category || '',
                     curriculum_type: project.curriculum_type || '',
                     school_id: project.school_id || '',
@@ -109,7 +115,9 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
             const data = await response.json();
             setEditData({
                 title: data.project.title || '',
+                title_ar: data.project.title_ar || '',
                 description: data.project.description || '',
+                description_ar: data.project.description_ar || '',
                 category: data.project.category || '',
                 curriculum_type: data.project.curriculum_type || '',
                 school_id: data.project.school_id || '',
@@ -147,7 +155,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
      */
     const handleAIGenerate = useCallback(async () => {
         if (!aiIdea) {
-            alert('يرجى إدخال فكرة المشروع أولاً.');
+            alert(t('teacherProjectsCreatePage.aiAssistant.ideaRequired'));
             return;
         }
 
@@ -160,14 +168,16 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
             setCreateData((prev) => ({
                 ...prev,
                 title: result.title || prev.title,
+                title_ar: result.title_ar || prev.title_ar,
                 description: result.description || prev.description,
+                description_ar: result.description_ar || prev.description_ar,
                 category: result.category || prev.category,
                 images: result.image_url ? [result.image_url] : prev.images,
             }));
 
             setAiImagePreview(result.image_url || null);
         } catch (error) {
-            alert(error.response?.data?.error || 'حدث خطأ أثناء توليد تفاصيل المشروع');
+            alert(error.response?.data?.error || t('teacherProjectsCreatePage.aiAssistant.error'));
         } finally {
             setIsGenerating(false);
         }
@@ -214,7 +224,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
     const handleDelete = useCallback(async (project) => {
         const confirmed = await confirm({
             title: t('adminProjectsIndexPage.deleteConfirm.title'),
-            message: t('adminProjectsIndexPage.deleteConfirm.message', { title: project.title }),
+            message: t('adminProjectsIndexPage.deleteConfirm.message', { title: language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar) }),
             confirmText: t('common.delete'),
             cancelText: t('common.cancel'),
             variant: 'danger',
@@ -396,7 +406,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                                         href={route('admin.projects.show', project.id)}
                                                         className="font-semibold text-blue-600 hover:text-blue-800"
                                                     >
-                                                        {project.title}
+                                                        {language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar)}
                                                     </Link>
                                                     {project.category && (
                                                         <p className="text-sm text-gray-500 mt-1">{project.category}</p>
@@ -504,10 +514,28 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
 
                         <form onSubmit={handleEditSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {/* العنوان */}
+                                {/* Arabic Title */}
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        {t('common.title')} <span className="text-red-500">*</span>
+                                        {t('teacherProjectsCreatePage.form.titleArLabel')}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={editData.title_ar}
+                                        onChange={(e) => setEditData('title_ar', e.target.value)}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.title_ar ? 'border-red-500' : 'border-gray-300'
+                                            }`}
+                                        required
+                                    />
+                                    {editErrors.title_ar && (
+                                        <p className="mt-1 text-sm text-red-600">{editErrors.title_ar}</p>
+                                    )}
+                                </div>
+
+                                {/* English Title */}
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        {t('teacherProjectsCreatePage.form.titleEnLabel')}
                                     </label>
                                     <input
                                         type="text"
@@ -522,10 +550,28 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                     )}
                                 </div>
 
-                                {/* الوصف */}
+                                {/* Arabic Description */}
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        {t('common.description')} <span className="text-red-500">*</span>
+                                        {t('teacherProjectsCreatePage.form.descriptionArLabel')}
+                                    </label>
+                                    <textarea
+                                        value={editData.description_ar}
+                                        onChange={(e) => setEditData('description_ar', e.target.value)}
+                                        rows="4"
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${editErrors.description_ar ? 'border-red-500' : 'border-gray-300'
+                                            }`}
+                                        required
+                                    />
+                                    {editErrors.description_ar && (
+                                        <p className="mt-1 text-sm text-red-600">{editErrors.description_ar}</p>
+                                    )}
+                                </div>
+
+                                {/* English Description */}
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        {t('teacherProjectsCreatePage.form.descriptionEnLabel')}
                                     </label>
                                     <textarea
                                         value={editData.description}
@@ -709,10 +755,10 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                 <div className="flex-1">
                                     <div className="flex items-center gap-2 mb-2">
                                         <FaRobot className="text-blue-600 text-xl" />
-                                        <h3 className="font-bold text-blue-800 text-base">مساعد الذكاء الاصطناعي للمشاريع</h3>
+                                        <h3 className="font-bold text-blue-800 text-base">{t('teacherProjectsCreatePage.aiAssistant.title')}</h3>
                                     </div>
                                     <p className="text-sm text-blue-600">
-                                        اكتب فكرة مبسطة وسيقوم المساعد بتوليد عنوان احترافي، وصف شامل، وتحديد الفئة وصورة غلاف مناسبة.
+                                        {t('teacherProjectsCreatePage.aiAssistant.description')}
                                     </p>
                                 </div>
                                 <div className="flex-1 flex gap-2 w-full md:w-auto">
@@ -720,7 +766,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                         type="text"
                                         value={aiIdea}
                                         onChange={(e) => setAiIdea(e.target.value)}
-                                        placeholder="مثال: مشروع عن تدوير النفايات المدرسية..."
+                                        placeholder={t('teacherProjectsCreatePage.aiAssistant.placeholder')}
                                         className="flex-1 text-sm rounded-lg border-blue-200 focus:border-blue-400 focus:ring-blue-400"
                                     />
                                     <button
@@ -730,9 +776,9 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                         className="bg-blue-600 text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-blue-700 disabled:opacity-50 transition flex justify-center items-center gap-2 whitespace-nowrap"
                                     >
                                         {isGenerating ? (
-                                            <><FaSpinner className="animate-spin" /> جاري التوليد...</>
+                                            <><FaSpinner className="animate-spin" /> {t('teacherProjectsCreatePage.aiAssistant.generating')}</>
                                         ) : (
-                                            <><FaRobot /> توليد التفاصيل</>
+                                            <><FaRobot /> {t('teacherProjectsCreatePage.aiAssistant.generateButton')}</>
                                         )}
                                     </button>
                                 </div>
@@ -740,20 +786,38 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
 
                             {aiImagePreview && (
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">صورة الغلاف (من الذكاء الاصطناعي)</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('adminProjectsIndexPage.aiCoverImageLabel')}</label>
                                     <img
                                         src={aiImagePreview}
-                                        alt="صورة الغلاف"
+                                        alt={t('adminProjectsIndexPage.aiCoverImageLabel')}
                                         className="w-full max-w-sm h-40 object-cover rounded-lg border border-gray-300"
                                     />
                                 </div>
                             )}
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {/* العنوان */}
+                                {/* Arabic Title */}
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        {t('common.title')} <span className="text-red-500">*</span>
+                                        {t('teacherProjectsCreatePage.form.titleArLabel')}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={createData.title_ar}
+                                        onChange={(e) => setCreateData('title_ar', e.target.value)}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${createErrors.title_ar ? 'border-red-500' : 'border-gray-300'
+                                            }`}
+                                        required
+                                    />
+                                    {createErrors.title_ar && (
+                                        <p className="mt-1 text-sm text-red-600">{createErrors.title_ar}</p>
+                                    )}
+                                </div>
+
+                                {/* English Title */}
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        {t('teacherProjectsCreatePage.form.titleEnLabel')}
                                     </label>
                                     <input
                                         type="text"
@@ -768,10 +832,28 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                     )}
                                 </div>
 
-                                {/* الوصف */}
+                                {/* Arabic Description */}
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        {t('common.description')} <span className="text-red-500">*</span>
+                                        {t('teacherProjectsCreatePage.form.descriptionArLabel')}
+                                    </label>
+                                    <textarea
+                                        value={createData.description_ar}
+                                        onChange={(e) => setCreateData('description_ar', e.target.value)}
+                                        rows="4"
+                                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${createErrors.description_ar ? 'border-red-500' : 'border-gray-300'
+                                            }`}
+                                        required
+                                    />
+                                    {createErrors.description_ar && (
+                                        <p className="mt-1 text-sm text-red-600">{createErrors.description_ar}</p>
+                                    )}
+                                </div>
+
+                                {/* English Description */}
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        {t('teacherProjectsCreatePage.form.descriptionEnLabel')}
                                     </label>
                                     <textarea
                                         value={createData.description}

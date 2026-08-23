@@ -3,9 +3,10 @@ import { useTranslation } from '@/i18n';
 import { getProjectImageUrl } from '@/utils/imageUtils';
 
 function ProjectCard({ project, onOpen, t }) {
+    const { language } = useTranslation();
     if (!project) return null;
 
-    const title = project.title || t('homePage.projectUntitled');
+    const title = (language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar)) || t('homePage.projectUntitled');
     const views = project.views ?? 0;
     const likes = project.likes ?? 0;
     const rating = project.rating == null ? null : Number(project.rating);

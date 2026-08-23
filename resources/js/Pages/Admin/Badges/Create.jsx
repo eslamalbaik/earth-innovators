@@ -32,7 +32,7 @@ export default function AdminBadgesCreate() {
 
     const handleAIGenerate = async () => {
         if (!aiIdea) {
-            alert('يرجى إدخال فكرة الشارة أولاً.');
+            alert(t('adminBadgesPage.aiAssistant.ideaRequired'));
             return;
         }
 
@@ -67,10 +67,10 @@ export default function AdminBadgesCreate() {
             }
 
             if (result.incomplete_fields && result.incomplete_fields.length > 0) {
-                alert('تم توليد الشارة. يرجى مراجعة الحقول التالية وإكمالها: ' + result.incomplete_fields.join('، '));
+                alert(t('adminBadgesPage.aiAssistant.incompleteFieldsPrefix') + result.incomplete_fields.join('، '));
             }
         } catch (error) {
-            alert(error.response?.data?.error || 'حدث خطأ أثناء توليد تفاصيل الشارة');
+            alert(error.response?.data?.error || t('adminBadgesPage.aiAssistant.error'));
         } finally {
             setIsGenerating(false);
         }
@@ -124,10 +124,10 @@ export default function AdminBadgesCreate() {
                         <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                                 <FaRobot className="text-blue-600 text-xl" />
-                                <h3 className="font-bold text-blue-800 text-base">مساعد الذكاء الاصطناعي للشارات</h3>
+                                <h3 className="font-bold text-blue-800 text-base">{t('adminBadgesPage.aiAssistant.title')}</h3>
                             </div>
                             <p className="text-sm text-blue-600">
-                                اكتب فكرة مبسطة وسيقوم المساعد بتوليد اسم الشارة، الوصف، الرمز التعبيري، النوع، عدد النقاط المقترح، وصورة مناسبة.
+                                {t('adminBadgesPage.aiAssistant.description')}
                             </p>
                         </div>
                         <div className="flex-1 flex gap-2 w-full md:w-auto">
@@ -135,7 +135,7 @@ export default function AdminBadgesCreate() {
                                 type="text"
                                 value={aiIdea}
                                 onChange={(e) => setAiIdea(e.target.value)}
-                                placeholder="مثال: شارة لأكثر طالب مشارك في التحديات..."
+                                placeholder={t('adminBadgesPage.aiAssistant.placeholder')}
                                 className="flex-1 text-sm rounded-lg border-blue-200 focus:border-blue-400 focus:ring-blue-400"
                             />
                             <button
@@ -145,9 +145,9 @@ export default function AdminBadgesCreate() {
                                 className="bg-blue-600 text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-blue-700 disabled:opacity-50 transition flex justify-center items-center gap-2 whitespace-nowrap"
                             >
                                 {isGenerating ? (
-                                    <><FaSpinner className="animate-spin" /> جاري التوليد...</>
+                                    <><FaSpinner className="animate-spin" /> {t('adminBadgesPage.aiAssistant.generating')}</>
                                 ) : (
-                                    <><FaRobot /> توليد التفاصيل</>
+                                    <><FaRobot /> {t('adminBadgesPage.aiAssistant.generateButton')}</>
                                 )}
                             </button>
                         </div>

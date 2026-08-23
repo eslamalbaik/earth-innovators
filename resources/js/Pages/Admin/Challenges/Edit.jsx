@@ -121,15 +121,15 @@ export default function AdminChallengesEdit({ challenge, schools = [] }) {
                             <div className="flex items-center justify-between mb-3">
                                 <div className="flex items-center gap-2">
                                     <FaClipboardCheck className="text-[#A3C042]" />
-                                    <h3 className="font-bold text-gray-800 text-base">معايير التقييم</h3>
+                                    <h3 className="font-bold text-gray-800 text-base">{t('schoolChallengesCreatePage.evaluationCriteria.title')}</h3>
                                 </div>
                                 <span className={`text-xs font-bold px-2 py-1 rounded-full ${criteriaTotal === 100 ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
-                                    مجموع الأوزان: {criteriaTotal}%
+                                    {t('schoolChallengesCreatePage.evaluationCriteria.totalWeight', { total: criteriaTotal })}
                                 </span>
                             </div>
 
                             {data.criteria.length === 0 ? (
-                                <p className="text-sm text-gray-400">لا توجد معايير لهذا التحدي بعد.</p>
+                                <p className="text-sm text-gray-400">{t('schoolChallengesCreatePage.evaluationCriteria.empty')}</p>
                             ) : (
                                 <div className="space-y-2">
                                     {data.criteria.map((criterion, index) => (
@@ -138,7 +138,7 @@ export default function AdminChallengesEdit({ challenge, schools = [] }) {
                                                 type="text"
                                                 value={criterion.name_ar}
                                                 onChange={(e) => updateCriterion(index, 'name_ar', e.target.value)}
-                                                placeholder="اسم المعيار"
+                                                placeholder={t('schoolChallengesCreatePage.evaluationCriteria.namePlaceholder')}
                                                 className="flex-1 text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                             />
                                             <input
@@ -167,7 +167,7 @@ export default function AdminChallengesEdit({ challenge, schools = [] }) {
                                 onClick={addCriterion}
                                 className="mt-3 text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
                             >
-                                <FaPlus className="text-xs" /> إضافة معيار
+                                <FaPlus className="text-xs" /> {t('schoolChallengesCreatePage.evaluationCriteria.addCriterion')}
                             </button>
                         </div>
 

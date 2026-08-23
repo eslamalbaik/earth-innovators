@@ -137,7 +137,7 @@ export default function StudentProjectCreate({
                 <div>
                     <h2 className="text-lg font-extrabold text-gray-900">{t('studentProjects.create.topBarTitle')}</h2>
                     <p className="mt-1 text-sm text-gray-500">
-                        استخدم هذه الصفحة لاختيار المشروع، ثم أكمل التسليم من صفحة المشروع نفسها.
+                        {t('studentProjects.create.pickerSubtitle')}
                     </p>
                 </div>
                 <button
@@ -146,7 +146,7 @@ export default function StudentProjectCreate({
                     className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
                 >
                     <FaArrowLeft />
-                    العودة للقائمة
+                    {t('studentProjects.create.backToList')}
                 </button>
             </div>
 
@@ -175,7 +175,7 @@ export default function StudentProjectCreate({
                             {project.thumbnail ? (
                                 <img
                                     src={project.thumbnail}
-                                    alt={project.title}
+                                    alt={language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar)}
                                     className="h-20 w-20 rounded-2xl object-cover"
                                 />
                             ) : (
@@ -185,11 +185,11 @@ export default function StudentProjectCreate({
                             )}
                             <div className="min-w-0 flex-1">
                                 <div className="flex items-start justify-between gap-3">
-                                    <h3 className="line-clamp-1 text-sm font-bold text-gray-900">{project.title}</h3>
+                                    <h3 className="line-clamp-1 text-sm font-bold text-gray-900">{language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar)}</h3>
                                     <FaChevronRight className="mt-1 text-xs text-gray-400" />
                                 </div>
                                 <p className="mt-2 line-clamp-3 text-sm text-gray-600">
-                                    {project.description || t('studentProjects.create.preview.noProjectDescription')}
+                                    {(language === 'ar' ? (project.description_ar || project.description) : (project.description || project.description_ar)) || t('studentProjects.create.preview.noProjectDescription')}
                                 </p>
                                 <div className="mt-3 flex items-center gap-3 text-xs text-gray-500">
                                     <span className="inline-flex items-center gap-1">
@@ -207,7 +207,7 @@ export default function StudentProjectCreate({
                         </div>
                         <div className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#A3C042] px-3 py-2 text-sm font-bold text-white">
                             <FaPlus className="text-xs" />
-                            ابدأ التسليم من صفحة المشروع
+                            {t('studentProjects.create.startSubmissionFromProject')}
                         </div>
                     </button>
                 ))}
@@ -215,7 +215,7 @@ export default function StudentProjectCreate({
 
             {!projects.length && (
                 <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center text-sm text-gray-500">
-                    لا توجد مشاريع متاحة لبدء تسليم جديد الآن.
+                    {t('studentProjects.create.noProjectsAvailable')}
                 </div>
             )}
         </div>
@@ -230,8 +230,8 @@ export default function StudentProjectCreate({
                 <div className="rounded-2xl border border-gray-100 bg-white p-4">
                     <div className="flex items-center justify-between gap-3">
                         <div>
-                            <h2 className="text-lg font-extrabold text-gray-900">متابعة التسليمات</h2>
-                            <p className="mt-1 text-sm text-gray-500">كل تسليم يفتح مشروعه الأصلي لمراجعته أو تعديله من نفس المكان.</p>
+                            <h2 className="text-lg font-extrabold text-gray-900">{t('studentProjects.create.history.title')}</h2>
+                            <p className="mt-1 text-sm text-gray-500">{t('studentProjects.create.history.subtitle')}</p>
                         </div>
                         <button
                             type="button"
@@ -239,7 +239,7 @@ export default function StudentProjectCreate({
                             className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
                         >
                             <FaArrowLeft />
-                            صفحة المشاريع
+                            {t('studentProjects.create.history.backToProjects')}
                         </button>
                     </div>
                 </div>
@@ -252,7 +252,7 @@ export default function StudentProjectCreate({
                     <div className="grid gap-4 lg:grid-cols-12">
                         <div className="lg:col-span-4">
                             <div className="rounded-2xl border border-gray-100 bg-white p-4">
-                                <div className="mb-3 text-sm font-bold text-gray-900">التسليمات السابقة</div>
+                                <div className="mb-3 text-sm font-bold text-gray-900">{t('studentProjects.create.history.previousSubmissions')}</div>
                                 <div className="space-y-2">
                                     {submissions.map((submission) => {
                                         const pill = statusPill(submission);
@@ -319,10 +319,10 @@ export default function StudentProjectCreate({
 
                                     {currentFiles.length > 0 && (
                                         <div className="mt-5">
-                                            <div className="mb-2 text-sm font-bold text-gray-900">الملفات المرفقة</div>
+                                            <div className="mb-2 text-sm font-bold text-gray-900">{t('studentProjects.create.history.attachedFiles')}</div>
                                             <div className="space-y-2">
                                                 {currentFiles.map((file, index) => {
-                                                    const fileName = resolveSubmissionFileName(file) || 'ملف';
+                                                    const fileName = resolveSubmissionFileName(file) || t('studentProjects.create.history.fileFallback');
                                                     return (
                                                         <div
                                                             key={`${fileName}-${index}`}
@@ -347,13 +347,13 @@ export default function StudentProjectCreate({
 
                                     <div className="mt-5 grid gap-4 md:grid-cols-2">
                                         <div className="rounded-xl border border-gray-100 bg-gray-50 p-4">
-                                            <div className="mb-2 text-sm font-bold text-gray-900">ملاحظتك</div>
+                                            <div className="mb-2 text-sm font-bold text-gray-900">{t('studentProjects.create.history.yourComment')}</div>
                                             <p className="whitespace-pre-line text-sm text-gray-700">
                                                 {selectedSubmission.comment || t('studentProjects.create.preview.noComment')}
                                             </p>
                                         </div>
                                         <div className="rounded-xl border border-gray-100 bg-gray-50 p-4">
-                                            <div className="mb-2 text-sm font-bold text-gray-900">التقييم أو الملاحظات</div>
+                                            <div className="mb-2 text-sm font-bold text-gray-900">{t('studentProjects.create.history.feedback')}</div>
                                             <p className="whitespace-pre-line text-sm text-gray-700">
                                                 {selectedSubmission.feedback || t('studentProjects.evaluation.noCommentsYet')}
                                             </p>
@@ -365,7 +365,7 @@ export default function StudentProjectCreate({
                                         onClick={() => openSubmissionDetails(selectedSubmission)}
                                         className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#A3C042] px-4 py-3 text-sm font-bold text-white transition hover:bg-[#8CA635]"
                                     >
-                                        افتح صفحة المشروع
+                                        {t('studentProjects.create.history.openProjectPage')}
                                         <FaChevronRight className="text-xs" />
                                     </button>
                                 </div>

@@ -2,6 +2,7 @@ import { Head, Link } from '@inertiajs/react';
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import IndexRadarChart from '@/Components/Innovation/IndexRadarChart';
 import ClassificationBadge from '@/Components/Innovation/ClassificationBadge';
+import { useTranslation } from '@/i18n';
 
 const COGNITIVE_FACTOR_NAMES = {
     fluid_reasoning: 'الاستدلال السائل',
@@ -13,16 +14,17 @@ const COGNITIVE_FACTOR_NAMES = {
 
 // تصنيف الدرجة المعيارية (متوسط 100، انحراف 15) وفق مقياس ستانفورد-بينيه
 const classifyStandardScore = (score) => {
-    if (score >= 130) return { label: 'متفوق جداً', color: 'text-emerald-600' };
-    if (score >= 120) return { label: 'متفوق', color: 'text-emerald-500' };
-    if (score >= 110) return { label: 'فوق المتوسط', color: 'text-blue-500' };
-    if (score >= 90) return { label: 'متوسط', color: 'text-gray-600' };
-    if (score >= 80) return { label: 'أقل من المتوسط', color: 'text-amber-500' };
-    if (score >= 70) return { label: 'ضعف بيني', color: 'text-orange-500' };
-    return { label: 'متأخر', color: 'text-red-500' };
+    if (score >= 130) return { key: 'verySuperior', color: 'text-emerald-600' };
+    if (score >= 120) return { key: 'superior', color: 'text-emerald-500' };
+    if (score >= 110) return { key: 'aboveAverage', color: 'text-blue-500' };
+    if (score >= 90) return { key: 'average', color: 'text-gray-600' };
+    if (score >= 80) return { key: 'belowAverage', color: 'text-amber-500' };
+    if (score >= 70) return { key: 'borderline', color: 'text-orange-500' };
+    return { key: 'delayed', color: 'text-red-500' };
 };
 
 export default function StudentReport({ auth, student, report = {}, index, indexNames, cognitiveAssessment = null }) {
+    const { t } = useTranslation();
     const {
         title,
         summary,
@@ -51,20 +53,20 @@ export default function StudentReport({ auth, student, report = {}, index, index
 
     return (
         <DashboardLayout auth={auth}>
-            <Head title={`تقرير ${student?.name || 'الطالب'}`} />
+            <Head title={`${t('studentReport.pageTitlePrefix')} ${student?.name || t('studentReport.studentFallback')}`} />
 
             <div className="py-6 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto space-y-6">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">📋 {title || `تقرير ${student?.name}`}</h1>
-                        <p className="text-gray-500 mt-1">تقرير شامل مولّد بالذكاء الاصطناعي</p>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">📋 {title || `${t('studentReport.pageTitlePrefix')} ${student?.name}`}</h1>
+                        <p className="text-gray-500 mt-1">{t('studentReport.subtitle')}</p>
                     </div>
                     <Link
                         href={route('teacher.innovation.dashboard')}
                         className="text-indigo-600 hover:text-indigo-700 font-medium text-sm"
                     >
-                        → العودة لمتابعة الابتكار
+                        {t('studentReport.backLink')}
                     </Link>
                 </div>
 
@@ -76,11 +78,11 @@ export default function StudentReport({ auth, student, report = {}, index, index
                             {index && (
                                 <>
                                     <div className="rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 p-5 text-white">
-                                        <p className="text-sm opacity-90">الدرجة الكلية</p>
+                                        <p className="text-sm opacity-90">{t('studentReport.overallScore')}</p>
                                         <p className="text-4xl font-black mt-1">{Math.round(index.overall_score)}</p>
                                     </div>
                                     {index.classification_details && (
-                                        <ClassificationBadge details={index.classification_details} size="lg" />
+                                        <ClassificationBadge details={index.classification_details} classificationKey={index.classification} size="lg" />
                                     )}
                                 </>
                             )}
@@ -89,7 +91,7 @@ export default function StudentReport({ auth, student, report = {}, index, index
                             {Object.keys(indexes).length > 0 ? (
                                 <IndexRadarChart indexes={indexes} indexNames={indexNames} height={280} />
                             ) : (
-                                <p className="text-center text-gray-400 py-10">لم تُحسب المؤشرات بعد</p>
+                                <p className="text-center text-gray-400 py-10">{t('studentReport.indexesNotCalculated')}</p>
                             )}
                         </div>
                     </div>
@@ -99,14 +101,14 @@ export default function StudentReport({ auth, student, report = {}, index, index
                 <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-md border border-gray-100 dark:border-gray-700">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                         <div>
-                            <h3 className="font-bold text-gray-800 dark:text-white">🧠 خريطة القدرات المعرفية (ستانفورد-بينيه)</h3>
-                            <p className="text-sm text-gray-500 mt-0.5">العوامل الخمسة الكبرى — درجات معيارية (متوسط 100)</p>
+                            <h3 className="font-bold text-gray-800 dark:text-white">{t('studentReport.cognitiveMapHeading')}</h3>
+                            <p className="text-sm text-gray-500 mt-0.5">{t('studentReport.cognitiveMapSubtitle')}</p>
                         </div>
                         <Link
                             href={route('teacher.innovation.cognitive-assessment.form', student?.id)}
                             className="px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl text-sm font-medium hover:bg-indigo-100 transition-colors"
                         >
-                            {cognitiveAssessment ? '✏️ تحديث التقييم' : '+ إدخال تقييم معرفي'}
+                            {cognitiveAssessment ? t('studentReport.updateAssessment') : t('studentReport.addAssessment')}
                         </Link>
                     </div>
 
@@ -116,9 +118,10 @@ export default function StudentReport({ auth, student, report = {}, index, index
                                 <IndexRadarChart
                                     indexes={cognitiveFactors}
                                     indexNames={COGNITIVE_FACTOR_NAMES}
+                                    namespace="cognitiveAssessment.factors"
                                     height={260}
                                     color="#0ea5e9"
-                                    name="الدرجة المعيارية"
+                                    name={t('cognitiveAssessment.standardScore')}
                                     maxValue={160}
                                 />
                             </div>
@@ -126,28 +129,28 @@ export default function StudentReport({ auth, student, report = {}, index, index
                                 <div className="grid grid-cols-3 gap-2">
                                     <div className="rounded-xl bg-sky-50 dark:bg-sky-900/20 border border-sky-100 p-3 text-center">
                                         <p className="text-2xl font-black text-sky-600">{cognitiveAssessment.full_scale_iq ?? '—'}</p>
-                                        <p className="text-[11px] text-gray-500 mt-0.5">نسبة الذكاء الكلية</p>
+                                        <p className="text-[11px] text-gray-500 mt-0.5">{t('studentReport.fullScaleIq')}</p>
                                     </div>
                                     <div className="rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-100 p-3 text-center">
                                         <p className="text-2xl font-black text-gray-700 dark:text-gray-200">{cognitiveAssessment.verbal_iq ?? '—'}</p>
-                                        <p className="text-[11px] text-gray-500 mt-0.5">اللفظية</p>
+                                        <p className="text-[11px] text-gray-500 mt-0.5">{t('studentReport.verbalIq')}</p>
                                     </div>
                                     <div className="rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-100 p-3 text-center">
                                         <p className="text-2xl font-black text-gray-700 dark:text-gray-200">{cognitiveAssessment.nonverbal_iq ?? '—'}</p>
-                                        <p className="text-[11px] text-gray-500 mt-0.5">غير اللفظية</p>
+                                        <p className="text-[11px] text-gray-500 mt-0.5">{t('studentReport.nonverbalIq')}</p>
                                     </div>
                                 </div>
 
                                 <div className="divide-y divide-gray-100 dark:divide-gray-700 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
-                                    {Object.entries(COGNITIVE_FACTOR_NAMES).map(([key, label]) => {
+                                    {Object.keys(COGNITIVE_FACTOR_NAMES).map((key) => {
                                         const score = cognitiveFactors[key];
                                         if (score == null) return null;
                                         const cls = classifyStandardScore(score);
                                         return (
                                             <div key={key} className="flex items-center justify-between px-4 py-2.5 bg-white dark:bg-gray-800">
-                                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</span>
+                                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t(`cognitiveAssessment.factors.${key}`)}</span>
                                                 <div className="flex items-center gap-3">
-                                                    <span className={`text-xs font-semibold ${cls.color}`}>{cls.label}</span>
+                                                    <span className={`text-xs font-semibold ${cls.color}`}>{t(`cognitiveAssessment.scoreLabels.${cls.key}`)}</span>
                                                     <span className="text-lg font-black text-gray-800 dark:text-white w-10 text-end">{score}</span>
                                                 </div>
                                             </div>
@@ -159,7 +162,7 @@ export default function StudentReport({ auth, student, report = {}, index, index
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         {cognitiveAssessment.strengths?.length > 0 && (
                                             <div className="p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl">
-                                                <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300 mb-1">💪 نقاط القوة</p>
+                                                <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300 mb-1">{t('studentReport.strengthsHeading')}</p>
                                                 <ul className="text-xs text-emerald-600 dark:text-emerald-200 space-y-0.5">
                                                     {cognitiveAssessment.strengths.map((s, i) => <li key={i}>• {s}</li>)}
                                                 </ul>
@@ -167,7 +170,7 @@ export default function StudentReport({ auth, student, report = {}, index, index
                                         )}
                                         {cognitiveAssessment.weaknesses?.length > 0 && (
                                             <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl">
-                                                <p className="text-xs font-bold text-amber-700 dark:text-amber-300 mb-1">📌 نقاط الضعف</p>
+                                                <p className="text-xs font-bold text-amber-700 dark:text-amber-300 mb-1">{t('studentReport.weaknessesHeading')}</p>
                                                 <ul className="text-xs text-amber-600 dark:text-amber-200 space-y-0.5">
                                                     {cognitiveAssessment.weaknesses.map((w, i) => <li key={i}>• {w}</li>)}
                                                 </ul>
@@ -178,7 +181,7 @@ export default function StudentReport({ auth, student, report = {}, index, index
 
                                 {cognitiveAssessment.notes && (
                                     <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                                        <p className="text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">📝 ملاحظات الفاحص</p>
+                                        <p className="text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">{t('studentReport.examinerNotes')}</p>
                                         <p className="text-xs text-gray-500 dark:text-gray-400 whitespace-pre-wrap">{cognitiveAssessment.notes}</p>
                                     </div>
                                 )}
@@ -187,7 +190,7 @@ export default function StudentReport({ auth, student, report = {}, index, index
                     ) : (
                         <div className="text-center py-8 text-gray-400">
                             <span className="text-4xl block mb-2">🧠</span>
-                            <p className="text-sm">لم يُدخل تقييم معرفي لهذا الطالب بعد.</p>
+                            <p className="text-sm">{t('studentReport.noCognitiveAssessment')}</p>
                         </div>
                     )}
                 </div>
@@ -195,7 +198,7 @@ export default function StudentReport({ auth, student, report = {}, index, index
                 {/* AI Report sections */}
                 {summary && (
                     <div className="bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl p-6 text-white shadow-xl">
-                        <h3 className="text-lg font-bold mb-2">📄 الملخص</h3>
+                        <h3 className="text-lg font-bold mb-2">{t('studentReport.summaryHeading')}</h3>
                         <p className="text-white/90 leading-relaxed">{summary}</p>
                     </div>
                 )}
@@ -204,13 +207,13 @@ export default function StudentReport({ auth, student, report = {}, index, index
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {strengths_analysis && (
                             <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl p-5 border border-emerald-200 dark:border-emerald-700">
-                                <h3 className="font-bold text-emerald-800 dark:text-emerald-300 mb-2">💪 تحليل نقاط القوة</h3>
+                                <h3 className="font-bold text-emerald-800 dark:text-emerald-300 mb-2">{t('studentReport.strengthsAnalysisHeading')}</h3>
                                 <p className="text-sm text-emerald-700 dark:text-emerald-200 leading-relaxed">{strengths_analysis}</p>
                             </div>
                         )}
                         {weaknesses_analysis && (
                             <div className="bg-amber-50 dark:bg-amber-900/20 rounded-2xl p-5 border border-amber-200 dark:border-amber-700">
-                                <h3 className="font-bold text-amber-800 dark:text-amber-300 mb-2">📌 تحليل نقاط التحسين</h3>
+                                <h3 className="font-bold text-amber-800 dark:text-amber-300 mb-2">{t('studentReport.weaknessesAnalysisHeading')}</h3>
                                 <p className="text-sm text-amber-700 dark:text-amber-200 leading-relaxed">{weaknesses_analysis}</p>
                             </div>
                         )}
@@ -219,7 +222,7 @@ export default function StudentReport({ auth, student, report = {}, index, index
 
                 {index_analysis.length > 0 && (
                     <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-md border border-gray-100 dark:border-gray-700">
-                        <h3 className="font-bold text-gray-800 dark:text-white mb-4">📊 تحليل المؤشرات</h3>
+                        <h3 className="font-bold text-gray-800 dark:text-white mb-4">{t('studentReport.indexAnalysisHeading')}</h3>
                         <div className="space-y-3">
                             {index_analysis.map((item, i) => (
                                 <div key={i} className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
@@ -239,7 +242,7 @@ export default function StudentReport({ auth, student, report = {}, index, index
 
                 {development_plan.length > 0 && (
                     <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-md border border-gray-100 dark:border-gray-700">
-                        <h3 className="font-bold text-gray-800 dark:text-white mb-4">🗺️ خطة التطوير</h3>
+                        <h3 className="font-bold text-gray-800 dark:text-white mb-4">{t('studentReport.developmentPlanHeading')}</h3>
                         <div className="space-y-3">
                             {development_plan.map((phase, i) => (
                                 <div key={i} className="flex gap-4">
@@ -272,13 +275,13 @@ export default function StudentReport({ auth, student, report = {}, index, index
                     <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-md border border-gray-100 dark:border-gray-700 space-y-4">
                         {overall_assessment && (
                             <div>
-                                <h3 className="font-bold text-gray-800 dark:text-white mb-2">⚖️ التقييم العام</h3>
+                                <h3 className="font-bold text-gray-800 dark:text-white mb-2">{t('studentReport.overallAssessmentHeading')}</h3>
                                 <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{overall_assessment}</p>
                             </div>
                         )}
                         {conclusion && (
                             <div>
-                                <h3 className="font-bold text-gray-800 dark:text-white mb-2">🏁 الخاتمة</h3>
+                                <h3 className="font-bold text-gray-800 dark:text-white mb-2">{t('studentReport.conclusionHeading')}</h3>
                                 <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{conclusion}</p>
                             </div>
                         )}

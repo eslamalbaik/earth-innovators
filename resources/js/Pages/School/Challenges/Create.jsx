@@ -53,7 +53,7 @@ export default function SchoolChallengeCreate({ auth }) {
 
     const handleAIGenerate = async () => {
         if (!aiIdea) {
-            alert(t('common.error') + ": يرجى إدخال فكرة التحدي أولاً.");
+            alert(t('common.error') + ': ' + t('schoolChallengesCreatePage.aiAssistant.ideaRequired'));
             return;
         }
 
@@ -89,7 +89,7 @@ export default function SchoolChallengeCreate({ auth }) {
                 }
             }
         } catch (error) {
-            alert(error.response?.data?.error || t('common.error') + ': حدث خطأ أثناء توليد تفاصيل التحدي');
+            alert(error.response?.data?.error || t('common.error') + ': ' + t('schoolChallengesCreatePage.aiAssistant.error'));
         } finally {
             setIsGenerating(false);
         }
@@ -185,10 +185,10 @@ export default function SchoolChallengeCreate({ auth }) {
                             <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-2">
                                     <FaRobot className="text-blue-600 text-xl" />
-                                    <h3 className="font-bold text-blue-800 text-base">مساعد الذكاء الاصطناعي للتحديات</h3>
+                                    <h3 className="font-bold text-blue-800 text-base">{t('schoolChallengesCreatePage.aiAssistant.title')}</h3>
                                 </div>
                                 <p className="text-sm text-blue-600">
-                                    اكتب فكرة مبسطة وسيقوم المساعد بتوليد عنوان احترافي، وصف شامل، تحديد الفئة، صورة غلاف، ومعايير تقييم مبنية على محتوى التحدي.
+                                    {t('schoolChallengesCreatePage.aiAssistant.description')}
                                 </p>
                             </div>
                             <div className="flex-1 flex gap-2 w-full md:w-auto">
@@ -196,7 +196,7 @@ export default function SchoolChallengeCreate({ auth }) {
                                     type="text"
                                     value={aiIdea}
                                     onChange={(e) => setAiIdea(e.target.value)}
-                                    placeholder="مثال: تحدي عن ابتكار حلول لترشيد المياه..."
+                                    placeholder={t('schoolChallengesCreatePage.aiAssistant.placeholder')}
                                     className="flex-1 text-sm rounded-lg border-blue-200 focus:border-blue-400 focus:ring-blue-400"
                                 />
                                 <button
@@ -206,9 +206,9 @@ export default function SchoolChallengeCreate({ auth }) {
                                     className="bg-blue-600 text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-blue-700 disabled:opacity-50 transition flex justify-center items-center gap-2 whitespace-nowrap"
                                 >
                                     {isGenerating ? (
-                                        <><FaSpinner className="animate-spin" /> جاري التوليد...</>
+                                        <><FaSpinner className="animate-spin" /> {t('schoolChallengesCreatePage.aiAssistant.generating')}</>
                                     ) : (
-                                        <><FaRobot /> توليد التفاصيل</>
+                                        <><FaRobot /> {t('schoolChallengesCreatePage.aiAssistant.generateButton')}</>
                                     )}
                                 </button>
                             </div>
@@ -219,15 +219,15 @@ export default function SchoolChallengeCreate({ auth }) {
                             <div className="flex items-center justify-between mb-3">
                                 <div className="flex items-center gap-2">
                                     <FaClipboardCheck className="text-[#A3C042]" />
-                                    <h3 className="font-bold text-gray-800 text-base">معايير التقييم</h3>
+                                    <h3 className="font-bold text-gray-800 text-base">{t('schoolChallengesCreatePage.evaluationCriteria.title')}</h3>
                                 </div>
                                 <span className={`text-xs font-bold px-2 py-1 rounded-full ${criteriaTotal === 100 ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
-                                    مجموع الأوزان: {criteriaTotal}%
+                                    {t('schoolChallengesCreatePage.evaluationCriteria.totalWeight', { total: criteriaTotal })}
                                 </span>
                             </div>
 
                             {data.criteria.length === 0 ? (
-                                <p className="text-sm text-gray-400">لا توجد معايير بعد. استخدم مساعد الذكاء الاصطناعي أعلاه لتوليدها تلقائياً حسب محتوى التحدي، أو أضفها يدوياً.</p>
+                                <p className="text-sm text-gray-400">{t('schoolChallengesCreatePage.evaluationCriteria.emptyWithAiHint')}</p>
                             ) : (
                                 <div className="space-y-2">
                                     {data.criteria.map((criterion, index) => (
@@ -236,7 +236,7 @@ export default function SchoolChallengeCreate({ auth }) {
                                                 type="text"
                                                 value={criterion.name_ar}
                                                 onChange={(e) => updateCriterion(index, 'name_ar', e.target.value)}
-                                                placeholder="اسم المعيار"
+                                                placeholder={t('schoolChallengesCreatePage.evaluationCriteria.namePlaceholder')}
                                                 className="flex-1 text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                             />
                                             <input
@@ -265,7 +265,7 @@ export default function SchoolChallengeCreate({ auth }) {
                                 onClick={addCriterion}
                                 className="mt-3 text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
                             >
-                                <FaPlus className="text-xs" /> إضافة معيار
+                                <FaPlus className="text-xs" /> {t('schoolChallengesCreatePage.evaluationCriteria.addCriterion')}
                             </button>
                         </div>
 
@@ -300,7 +300,7 @@ export default function SchoolChallengeCreate({ auth }) {
                             />
                             {aiIncompleteFields.includes('objective') && (
                                 <p className="mt-1 text-sm text-amber-600">
-                                    لم يتمكن الذكاء الاصطناعي من توليد هذا الحقل تلقائياً — يرجى تعبئته يدوياً.
+                                    {t('schoolChallengesCreatePage.aiFieldNotGenerated')}
                                 </p>
                             )}
                             <InputError message={errors.objective} className="mt-2" />
@@ -378,7 +378,7 @@ export default function SchoolChallengeCreate({ auth }) {
                             />
                             {aiIncompleteFields.includes('instructions') && (
                                 <p className="mt-1 text-sm text-amber-600">
-                                    لم يتمكن الذكاء الاصطناعي من توليد هذا الحقل تلقائياً — يرجى تعبئته يدوياً.
+                                    {t('schoolChallengesCreatePage.aiFieldNotGenerated')}
                                 </p>
                             )}
                             <InputError message={errors.instructions} className="mt-2" />

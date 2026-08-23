@@ -88,16 +88,21 @@ class TeacherProjectController extends Controller
 
         $idea = $request->input('idea');
 
+        // التوليد قد يستغرق وقتاً طويلاً بسبب إعادة المحاولة التلقائية في
+        // GeminiClient، بينما max_execution_time الافتراضي على السيرفر أقل من ذلك.
+        set_time_limit(300);
+
         try {
             $aiResponse = $deepSeekClient->chatWithJson([
                 \App\Services\AIEngine\GeminiClient::systemMessage(
                     'أنت مستشار تخطيط مشاريع تعليمية وابتكارية. '
-                    . 'بناءً على الفكرة أو الوصف القصير الذي يقدمه المعلم، قم بإنشاء تفاصيل مشروع كاملة وجاهزة للنشر. '
+                    . 'بناءً على الفكرة أو الوصف القصير الذي يقدمه المعلم، قم بإنشاء تفاصيل مشروع كاملة وجاهزة للنشر باللغتين العربية والإنجليزية. '
                     . 'اختر واحدة من الفئات التالية حصراً: science, technology, engineering, mathematics, arts, other. '
                     . 'اقترح أيضاً كلمة مفتاحية واحدة باللغة الإنجليزية للبحث عن صورة غلاف من Unsplash تمثل المشروع. '
                     . 'أجب بصيغة JSON فقط مع الحقول التالية: '
-                    . 'title (عنوان احترافي وجذاب للمشروع بالعربية), '
-                    . 'description (وصف مفصل وشامل للمشروع يشمل الأهداف والخطوات، لا يقل عن 150 كلمة), '
+                    . 'title (عنوان احترافي وجذاب للمشروع بالإنجليزية), title_ar (نفس العنوان بالعربية), '
+                    . 'description (وصف مفصل وشامل للمشروع بالإنجليزية يشمل الأهداف والخطوات، لا يقل عن 150 كلمة), '
+                    . 'description_ar (نفس الوصف بالعربية بنفس مستوى التفصيل), '
                     . 'category (إحدى الفئات المسموحة فقط باللغة الإنجليزية), '
                     . 'image_keyword (كلمة مفتاحية واحدة بالإنجليزية).'
                 ),
@@ -109,8 +114,10 @@ class TeacherProjectController extends Controller
             }
 
             // Fallbacks for structure
-            $title = $aiResponse['title'] ?? 'مشروع مبتكر';
+            $title = $aiResponse['title'] ?? $idea;
+            $title_ar = $aiResponse['title_ar'] ?? $title;
             $description = $aiResponse['description'] ?? $idea;
+            $description_ar = $aiResponse['description_ar'] ?? $description;
             $category = $aiResponse['category'] ?? 'other';
             $keyword = $aiResponse['image_keyword'] ?? 'innovation education';
 
@@ -141,7 +148,9 @@ class TeacherProjectController extends Controller
 
             return response()->json([
                 'title' => $title,
+                'title_ar' => $title_ar,
                 'description' => $description,
+                'description_ar' => $description_ar,
                 'category' => strtolower($category),
                 'image_url' => $imageUrl
             ]);
@@ -168,7 +177,9 @@ class TeacherProjectController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'title_ar' => 'required|string|max:255',
             'description' => 'required|string',
+            'description_ar' => 'required|string',
             'category' => 'nullable|in:science,technology,engineering,mathematics,arts,other',
             'school_id' => 'nullable|exists:users,id',
             'files' => 'nullable|array',
@@ -177,8 +188,10 @@ class TeacherProjectController extends Controller
             'project_document' => 'nullable|file|max:10240|mimes:pdf,doc,docx',
             'evaluation' => 'nullable|array',
         ], [
-            'title.required' => 'عنوان المشروع مطلوب',
-            'description.required' => 'وصف المشروع مطلوب',
+            'title.required' => 'عنوان المشروع (بالإنجليزية) مطلوب',
+            'title_ar.required' => 'عنوان المشروع (بالعربية) مطلوب',
+            'description.required' => 'وصف المشروع (بالإنجليزية) مطلوب',
+            'description_ar.required' => 'وصف المشروع (بالعربية) مطلوب',
             'category.in' => 'فئة المشروع غير صحيحة',
             'school_id.exists' => 'المدرسة المحددة غير موجودة',
             'files.*.max' => 'حجم الملف يجب ألا يتجاوز 10 ميجابايت',
@@ -209,7 +222,9 @@ class TeacherProjectController extends Controller
             'teacher_id' => $teacher->id,
             'school_id' => $schoolId,
             'title' => $validated['title'],
+            'title_ar' => $validated['title_ar'],
             'description' => $validated['description'],
+            'description_ar' => $validated['description_ar'],
             'category' => $validated['category'] ?? 'other',
             'self_evaluation' => $validated['evaluation'] ?? null,
             'status' => 'pending', // بانتظار موافقة المدرسة (إن وجدت)
@@ -385,7 +400,9 @@ class TeacherProjectController extends Controller
             'project' => [
                 'id' => $project->id,
                 'title' => $project->title,
+                'title_ar' => $project->title_ar,
                 'description' => $project->description,
+                'description_ar' => $project->description_ar,
                 'category' => $project->category,
                 'status' => $project->status,
                 'files' => $files,
@@ -482,7 +499,9 @@ class TeacherProjectController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'title_ar' => 'required|string|max:255',
             'description' => 'required|string',
+            'description_ar' => 'required|string',
             'category' => 'nullable|in:science,technology,engineering,mathematics,arts,other',
             'school_id' => 'nullable|exists:users,id',
             'files' => 'nullable|array',
@@ -493,8 +512,10 @@ class TeacherProjectController extends Controller
             'remove_files.*' => 'string',
             'evaluation' => 'nullable|array',
         ], [
-            'title.required' => 'عنوان المشروع مطلوب',
-            'description.required' => 'وصف المشروع مطلوب',
+            'title.required' => 'عنوان المشروع (بالإنجليزية) مطلوب',
+            'title_ar.required' => 'عنوان المشروع (بالعربية) مطلوب',
+            'description.required' => 'وصف المشروع (بالإنجليزية) مطلوب',
+            'description_ar.required' => 'وصف المشروع (بالعربية) مطلوب',
             'category.in' => 'فئة المشروع غير صحيحة',
             'school_id.exists' => 'المدرسة المحددة غير موجودة',
             'files.*.max' => 'حجم الملف يجب ألا يتجاوز 10 ميجابايت',
@@ -599,7 +620,9 @@ class TeacherProjectController extends Controller
         // تحديث بيانات المشروع
         $project->update([
             'title' => $validated['title'],
+            'title_ar' => $validated['title_ar'],
             'description' => $validated['description'],
+            'description_ar' => $validated['description_ar'],
             'category' => $validated['category'] ?? 'other',
             'school_id' => $schoolId,
         ]);

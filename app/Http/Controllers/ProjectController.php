@@ -147,7 +147,7 @@ class ProjectController extends Controller
                 'school:id,name',
                 'approver:id,name',
             ])
-            ->select('id', 'title', 'description', 'category', 'status', 'teacher_id', 'user_id', 'school_id', 'approved_by', 'views', 'likes', 'rating', 'points_earned', 'images', 'thumbnail', 'project_document', 'created_at')
+            ->select('id', 'title', 'title_ar', 'description', 'description_ar', 'category', 'status', 'teacher_id', 'user_id', 'school_id', 'approved_by', 'views', 'likes', 'rating', 'points_earned', 'images', 'thumbnail', 'project_document', 'created_at')
             ->latest();
 
         if ($search) {

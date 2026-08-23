@@ -1,4 +1,265 @@
 export const en = {
+    "innovationIndex": {
+        "names": {
+            "skills": "Skills",
+            "innovation": "Innovation",
+            "intelligence": "Intelligence",
+            "creativity": "Creativity",
+            "projects": "Projects",
+            "leadership": "Leadership",
+            "ip": "Intellectual Property",
+            "future_readiness": "Future Readiness"
+        },
+        "classifications": {
+            "diamond": "Diamond",
+            "platinum": "Platinum",
+            "gold": "Gold",
+            "silver": "Silver",
+            "bronze": "Bronze",
+            "developing": "Developing"
+        }
+    },
+    "coachDashboard": {
+        "pageTitle": "Innovation Tracking",
+        "heading": "🚀 Innovation Tracking",
+        "subtitle": "Managing and tracking {count} students",
+        "compareButton": "⚖️ Compare {count} students",
+        "stats": {
+            "totalStudents": "Total students",
+            "avgScore": "Average score",
+            "needsAttention": "Need attention",
+            "topStudents": "Top performers"
+        },
+        "studentsList": "📋 Students list",
+        "sortByScore": "Sort by score",
+        "sortByName": "Sort by name",
+        "selectForCompare": "Select to compare",
+        "strongest": "Strongest:",
+        "aiReport": "AI report",
+        "selectStudentPrompt": "Select a student to view their details",
+        "weakness": "⚠️ Weakness:",
+        "classificationDistribution": "📊 Classification distribution",
+        "noData": "No data",
+        "outOf100": "/100"
+    },
+    "innovationSummaryCard": {
+        "heading": "🚀 Innovation Profile",
+        "subtitle": "Your eight indexes and innovator classification",
+        "totalScore": "Total innovation score",
+        "outOf100": "out of 100",
+        "achievementsTotal": "Achievement",
+        "achievementsValidated": "Validated",
+        "achievementsPending": "Under analysis",
+        "emptyTitle": "Start your innovation journey!",
+        "emptyDescription": "Add your first achievement (project, certificate, award...) and AI will analyze it and calculate your indexes.",
+        "addFirstAchievement": "+ Add first achievement",
+        "quickLinks": {
+            "achievements": "My achievements",
+            "indexes": "Indexes",
+            "recommendations": "Recommendations",
+            "benchmarking": "Comparisons"
+        }
+    },
+    "achievements": {
+        "index": {
+            "pageTitle": "My Achievements",
+            "title": "🏆 My Achievements",
+            "subtitle": "Manage and track all your achievements",
+            "addNew": "+ Add New Achievement",
+            "stats": {
+                "total": "Total Achievements",
+                "validated": "Validated",
+                "pending": "Pending Analysis",
+                "confidence": "Avg Confidence"
+            },
+            "attachments": "{count} attachments",
+            "empty": {
+                "title": "No achievements yet",
+                "description": "Start adding your achievements to build your profile!",
+                "action": "Add First Achievement"
+            }
+        },
+        "status": {
+            "validated": "✅ Validated",
+            "flagged": "⚠️ Flagged",
+            "pending": "⏳ Pending Analysis"
+        },
+        "types": {
+            "project": "Project",
+            "research": "Research",
+            "certificate": "Certificate",
+            "skill": "Skill",
+            "award": "Award",
+            "patent": "Patent",
+            "article": "Article",
+            "product": "Product"
+        },
+        "show": {
+            "back": "→ Back to Achievements",
+            "edit": "✏️ Edit",
+            "validated": "Validated successfully",
+            "flagged": "Needs review",
+            "pending": "Pending analysis",
+            "confidence": "Confidence score",
+            "evidence": "Evidence quality",
+            "description": "📝 Description",
+            "aiAnalysis": "🤖 AI Analysis",
+            "suggestions": "💡 Suggestions:",
+            "attachments": "📎 Attachments ({count})",
+            "attachmentFallback": "Attachment",
+            "skills": "🎯 Skills Extracted by AI"
+        },
+        "create": {
+            "pageTitle": "Add New Achievement",
+            "title": "➕ Add New Achievement",
+            "subtitle": "Your achievement will be automatically analyzed by AI",
+            "typeLabel": "Achievement Type *",
+            "titleLabel": "Achievement Title *",
+            "titlePlaceholder": "Example: AI Application in Education",
+            "descriptionLabel": "Description",
+            "descriptionPlaceholder": "Write a detailed description of the achievement...",
+            "categoryLabel": "Category",
+            "categoryPlaceholder": "Example: Information Technology",
+            "dateLabel": "Date",
+            "link": "Achievement Link (Optional)",
+            "linkPlaceholder": "https://example.com/achievement",
+            "attachmentsLabel": "📎 Attachments (Optional)",
+            "save": "💾 Save Achievement",
+            "saving": "⏳ Saving...",
+            "filesLabel": "📎 Supporting Files",
+            "dragLabel": "Drag files here or click to upload",
+            "linksLabel": "🔗 External Links",
+            "addMoreLinks": "+ Add another link",
+            "submitBtn": "🚀 Save and Analyze with AI"
+        },
+        "edit": {
+            "confirmDelete": "Are you sure you want to delete this achievement? This action cannot be undone.",
+            "pageTitle": "Edit Achievement",
+            "title": "✏️ Edit Achievement",
+            "subtitle": "The achievement will be re-analyzed by AI after saving",
+            "typeLabel": "Achievement Type *",
+            "titleLabel": "Achievement Title *",
+            "descriptionLabel": "Description",
+            "categoryLabel": "Category",
+            "categoryPlaceholder": "Example: Information Technology",
+            "dateLabel": "Date",
+            "currentAttachments": "📎 Current Attachments",
+            "saveChanges": "💾 Save Changes",
+            "delete": "🗑️ Delete",
+            "saving": "⏳ Saving..."
+        }
+    },
+    "innovation": {
+        "benchmarking": {
+            "pageTitle": "Benchmarking",
+            "title": "⚖️ Benchmarking",
+            "subtitle": "Your position compared to your peers in {scope}",
+            "cohort": "Cohort",
+            "empty": {
+                "title": "No data for comparison",
+                "description": "Add your achievements and calculate your indexes first."
+            },
+            "rank": "Rank",
+            "percentile": "Percentile",
+            "totalUsers": "Total {scope}",
+            "cohortComparison": "Comparing indexes with {scope} average",
+            "difference": {
+                "above": "Above Average",
+                "below": "Below Average"
+            },
+            "you": "You",
+            "average": "Average"
+        },
+        "indexes": {
+            "pageTitle": "Innovation Indexes",
+            "title": "📊 The 8 Innovation Indexes",
+            "subtitle": "Details of each index and how it is calculated",
+            "recalculate": "🔄 Recalculate Indexes",
+            "overallScore": "Overall Score",
+            "outOf100": "out of 100",
+            "lastCalculated": "Last calculated: {date}",
+            "empty": {
+                "title": "Your indexes are not calculated yet",
+                "description": "Add your achievements first, then click \"Recalculate Indexes\".",
+                "action": "🔄 Calculate Indexes Now"
+            },
+            "types": {
+                "skills": "Skills",
+                "innovation": "Innovation",
+                "intelligence": "Intelligence",
+                "creativity": "Creativity",
+                "projects": "Projects",
+                "leadership": "Leadership",
+                "ip": "Intellectual Property",
+                "future_readiness": "Future Readiness"
+            }
+        },
+        "history": {
+            "pageTitle": "Index History",
+            "title": "📈 Index History Over Time",
+            "subtitle": "Track your progress journey in each index",
+            "empty": {
+                "title": "No history yet",
+                "description": "The evolution of your indexes will appear here as you add new achievements."
+            },
+            "changelog": "🗓️ Change Log",
+            "triggers": {
+                "achievement_added": "Achievement Added",
+                "achievement_updated": "Achievement Updated",
+                "achievement_deleted": "Achievement Deleted",
+                "skill_added": "Skill Added",
+                "manual_recalc": "Manual Recalculation",
+                "system_recalc": "System Recalculation"
+            }
+        },
+        "recommendations": {
+            "pageTitle": "Smart Recommendations",
+            "title": "🤖 AI Recommendations",
+            "subtitle": "Personalized recommendations based on index analysis",
+            "empty": {
+                "title": "No recommendations yet",
+                "description": "Add more achievements so AI can analyze your profile and generate personalized recommendations."
+            },
+            "generalAdvice": "General Advice",
+            "studentLevel": "Student Level: {level}",
+            "score": "Score: {score}",
+            "targetLevel": "Target Level:",
+            "strengths": "💪 Strengths",
+            "gaps": "🔍 Learning Gaps",
+            "skills": "⚙️ Acquired Skills",
+            "outcomes": "🏆 Achieved Learning Outcomes",
+            "nextChallenge": "Next Challenge / Next Skill",
+            "strengthsLabel": "Strengths",
+            "improvementsLabel": "Points of Improvement",
+            "generalRecs": "📋 General Recommendations",
+            "priority": {
+                "high": "High Priority",
+                "medium": "Medium Priority",
+                "low": "Low Priority"
+            },
+            "suggestedCourses": "📚 Suggested Courses",
+            "suggestedCompetitions": "🏆 Suggested Competitions",
+            "suggestedProjects": "🏗️ Suggested Projects"
+        },
+        "smartSearch": {
+            "pageTitle": "Smart Search",
+            "title": "🔍 Smart Search",
+            "subtitle": "Search in natural language — e.g. \"student with high leadership and knows Python\"",
+            "placeholder": "Type what you are looking for...",
+            "searching": "⏳ Searching...",
+            "search": "🔍 Search",
+            "results": "Results: {total}",
+            "noResults": "No results match your search.",
+            "levels": {
+                "diamond": "Diamond",
+                "platinum": "Platinum",
+                "gold": "Gold",
+                "silver": "Silver",
+                "bronze": "Bronze",
+                "developing": "Developing"
+            }
+        }
+    },
     "common": {
         "appName": "Innovators Legacy",
         "welcomeBack": "Welcome Back",
@@ -830,6 +1091,21 @@ export const en = {
                 "generic": "Something went wrong while submitting.",
                 "fileTooLarge": "The file “{name}” is larger than 10 MB.",
                 "fileTypeUnsupported": "The file type for “{name}” is not supported."
+            },
+            "pickerSubtitle": "Use this page to choose a project, then complete the submission from the project page itself.",
+            "backToList": "Back to list",
+            "startSubmissionFromProject": "Start submission from the project page",
+            "noProjectsAvailable": "No projects available to start a new submission right now.",
+            "history": {
+                "title": "Track submissions",
+                "subtitle": "Each submission opens its original project to review or edit it from the same place.",
+                "backToProjects": "Projects page",
+                "previousSubmissions": "Previous submissions",
+                "attachedFiles": "Attached files",
+                "fileFallback": "File",
+                "yourComment": "Your comment",
+                "feedback": "Rating / feedback",
+                "openProjectPage": "Open project page"
             }
         },
         "evaluation": {
@@ -1673,17 +1949,35 @@ export const en = {
         "form": {
             "titleLabel": "Project title",
             "titlePlaceholder": "Enter project title",
+            "titleArLabel": "Project title (Arabic) *",
+            "titleArPlaceholder": "Enter project title in Arabic",
+            "titleEnLabel": "Project title (English) *",
+            "titleEnPlaceholder": "Enter project title in English",
             "descriptionLabel": "Project description",
             "descriptionPlaceholder": "Enter a project description",
+            "descriptionArLabel": "Project description (Arabic) *",
+            "descriptionArPlaceholder": "Enter a project description in Arabic",
+            "descriptionEnLabel": "Project description (English) *",
+            "descriptionEnPlaceholder": "Enter a project description in English",
             "categoryLabel": "Project category",
             "schoolLabel": "School",
             "schoolPlaceholder": "Choose a school (optional)",
             "filesLabel": "Files",
             "dropzoneTitle": "Drag and drop files here or click to choose",
             "dropzoneSubtitle": "Images, video, PDF (max: 10 MB per file)",
+            "dropzoneFileHint": "📏 Max: 10MB per file | 📁 Supported types: images (JPG, PNG, GIF), videos (MP4, AVI, MOV), documents (PDF, DOC, DOCX)",
             "coverImageLabel": "Cover Image *",
             "uploadCoverImage": "Click to upload cover image",
             "coverImageHint": "JPG, PNG — max 5 MB"
+        },
+        "aiAssistant": {
+            "title": "AI project assistant",
+            "description": "Write a simple idea and the assistant will generate a professional title, a full description, and a suitable cover image.",
+            "placeholder": "Example: a project about recycling plastic at school...",
+            "generating": "Generating...",
+            "generateButton": "Generate project details",
+            "ideaRequired": "Please enter a project idea first.",
+            "error": "Something went wrong while generating the project details"
         },
         "schoolInfo": {
             "linkedSchool": "Linked school",
@@ -1738,6 +2032,30 @@ export const en = {
             "fileTooLarge": "File {name} is larger than 10 MB",
             "fileTypeNotSupported": "File type for {name} is not supported"
         }
+    },
+    "teacherProjectsEditPage": {
+        "pageTitle": "Edit project - {appName}",
+        "headerTitle": "Edit project",
+        "alerts": {
+            "coverTooLarge": "Cover image size must not exceed 5 MB",
+            "coverMustBeImage": "The file must be an image",
+            "fileTooLarge": "The file {name} is larger than 10 MB",
+            "fileTypeNotSupported": "The file type for {name} is not supported",
+            "requiredFields": "Please fill in all required fields",
+            "cannotEditAfterReview": "The project cannot be edited after it has been approved or rejected",
+            "saveError": "Something went wrong while saving the changes",
+            "errorPrefix": "Error: "
+        },
+        "coverImageLabel": "Cover image (required on update)",
+        "maxSize": "Max 5MB",
+        "chooseImage": "Choose image",
+        "noCoverImage": "No cover image yet",
+        "existingFilesLabel": "Existing files",
+        "viewFile": "View file",
+        "addNewFilesLabel": "Add new files",
+        "statusWarning": "The project cannot be edited after it has been approved or rejected",
+        "updating": "Updating...",
+        "saveChanges": "Save changes"
     },
     "schoolDashboardPage": {
         "pageTitle": "School Dashboard - {appName}",
@@ -2173,6 +2491,7 @@ export const en = {
     "adminProjectsIndexPage": {
         "pageTitle": "Projects Management - {appName}",
         "title": "Projects Management",
+        "aiCoverImageLabel": "Cover image (AI generated)",
         "stats": {
             "total": "Total projects",
             "approved": "Approved",
@@ -2232,6 +2551,91 @@ export const en = {
         "schoolAvailability": {
             "allSchools": "All educational institutions",
             "selectedSchool": "Selected educational institution"
+        }
+    },
+    "adminProjectShowPage": {
+        "pageTitleSuffix": "Project details",
+        "headerTitle": "Project details",
+        "backToList": "Back to projects list",
+        "status": {
+            "approved": "Approved",
+            "pending": "Under review",
+            "rejected": "Rejected"
+        },
+        "stats": {
+            "views": "Views",
+            "likes": "Likes",
+            "rating": "Rating"
+        },
+        "aiEvaluation": {
+            "title": "AI evaluation",
+            "generateButton": "Evaluate project",
+            "regenerateButton": "Re-evaluate",
+            "evaluating": "Evaluating...",
+            "hint": "Click \"Evaluate project\" to have the AI analyze the project and suggest a score and recommendation to help you decide.",
+            "strengthsTitle": "Strengths",
+            "weaknessesTitle": "Areas needing improvement",
+            "disclaimer": "* This is an AI-assisted evaluation for guidance only — the final decision is up to the reviewer.",
+            "error": "Something went wrong while evaluating the project"
+        },
+        "recommendation": {
+            "approve": "Recommended for approval",
+            "reject": "Recommended for rejection",
+            "needsRevision": "Needs revision"
+        },
+        "filesImages": {
+            "title": "Files and images",
+            "imagesTitle": "Images",
+            "filesTitle": "Files",
+            "imageAlt": "Image {n}"
+        },
+        "submissions": {
+            "title": "Submissions ({count})",
+            "notSet": "Not set",
+            "status": {
+                "submitted": "Submitted",
+                "reviewed": "Reviewed",
+                "approved": "Approved",
+                "rejected": "Rejected"
+            },
+            "actionEvaluate": "Evaluate",
+            "actionView": "View"
+        },
+        "sidebar": {
+            "projectInfoTitle": "Project information",
+            "createdAt": "Created at",
+            "approvedAt": "Approval date",
+            "pointsEarned": "Points earned",
+            "publisherTitle": "Publisher",
+            "studentInfoTitle": "Student information",
+            "belongsToSchoolTitle": "Belongs to a school",
+            "sourceTitle": "Source",
+            "fromAdminCommunity": "From the Innovators Legacy community administration",
+            "teacherTitle": "Teacher"
+        },
+        "actions": {
+            "title": "Actions",
+            "approve": "Approve project",
+            "reject": "Reject project",
+            "delete": "Delete project"
+        },
+        "confirm": {
+            "approve": {
+                "title": "Confirm approval",
+                "message": "Are you sure you want to approve the project \"{title}\"?",
+                "confirmText": "Approve"
+            },
+            "reject": {
+                "title": "Confirm rejection",
+                "message": "Are you sure you want to reject the project \"{title}\"? You can enter a reason in the next step.",
+                "confirmText": "Reject",
+                "reasonPrompt": "Please enter a rejection reason (optional):"
+            },
+            "delete": {
+                "title": "Confirm deletion",
+                "message": "Are you sure you want to delete the project \"{title}\"? This action cannot be undone.",
+                "confirmText": "Delete"
+            }
         }
     },
     "adminBookingsShowPage": {
@@ -2857,7 +3261,8 @@ export const en = {
             "dates": "Dates",
             "stats": "Statistics",
             "assignedStudents": "Assigned students",
-            "moreInfo": "Additional information"
+            "moreInfo": "Additional information",
+            "evaluationCriteria": "Evaluation criteria"
         },
         "points": "{count} points",
         "unlimited": "Unlimited",
@@ -2902,6 +3307,49 @@ export const en = {
         "errors": {
             "imageTooLarge": "Image is larger than {maxMb}MB",
             "imageTypeNotSupported": "Unsupported image type. Please choose a JPEG, PNG, GIF, or WebP image."
+        },
+        "evaluationCriteria": {
+            "title": "Evaluation criteria",
+            "totalWeight": "Total weight: {total}%",
+            "empty": "No criteria for this challenge yet.",
+            "emptyWithAiHint": "No criteria yet. Use the AI assistant above to generate them automatically based on the challenge content, or add them manually.",
+            "namePlaceholder": "Criterion name",
+            "addCriterion": "Add criterion"
+        },
+        "aiAssistant": {
+            "title": "AI challenge assistant",
+            "description": "Write a simple idea and the assistant will generate a professional title, a full description, a category, a cover image, and evaluation criteria based on the challenge content.",
+            "placeholder": "Example: a challenge about inventing water-saving solutions...",
+            "generating": "Generating...",
+            "generateButton": "Generate details",
+            "ideaRequired": "Please enter a challenge idea first.",
+            "error": "Something went wrong while generating the challenge details"
+        },
+        "aiFieldNotGenerated": "The AI could not generate this field automatically — please fill it in manually."
+    },
+    "schoolChallengesShowPage": {
+        "headerTitle": "Challenge details",
+        "pageTitleFallback": "Challenge",
+        "pageTitleSuffix": "School dashboard",
+        "backToList": "Back to challenges list",
+        "meta": {
+            "challengeType": "Challenge type",
+            "category": "Category",
+            "startDate": "Start date",
+            "endDate": "End date",
+            "participants": "Participants",
+            "pointsReward": "Reward points",
+            "difficultyLevel": "Difficulty level"
+        },
+        "sections": {
+            "objective": "Challenge objective",
+            "description": "Challenge description",
+            "instructions": "How to complete"
+        },
+        "actions": {
+            "title": "Actions",
+            "viewSubmissions": "View submissions",
+            "editChallenge": "Edit challenge"
         }
     },
     "teacherCertificateShowPage": {
@@ -2928,7 +3376,7 @@ export const en = {
             "excellenceParagraph": "During the membership period, they demonstrated outstanding educational commitment and contributed to enriching educational initiatives with high-quality innovations that reflect a spirit of belonging and excellence in educational and professional performance.",
             "motto": "We plant passion, we harvest success",
             "ceoTitle": "Chief Executive Officer",
-            "ceoName": "A. Laila Ibrahim Al Jasmi",
+            "ceoName": "Layla Ibrahim Aljasmi",
             "ceoOrg": "AWJ CULTURE & ARTS PUBLISHING",
             "issueDate": "Issue date"
         },
@@ -3028,7 +3476,7 @@ export const en = {
             "achievementPeriodLine": "This achievement was completed during the period from [{start}] to [{end}].",
             "highlight": "This achievement is a role model for excellence and innovation, and a source of pride for us all at AWJ CULTURE & ARTS PUBLISHING.",
             "ceoTitle": "Chief Executive Officer",
-            "ceoName": "A. Laila Ibrahim Al Jasmi",
+            "ceoName": "Layla Ibrahim Aljasmi",
             "issueDate": "Issue date"
         },
         "actions": {
@@ -3364,7 +3812,15 @@ export const en = {
     },
     "adminChallengesCreatePage": {
         "pageTitle": "Add new challenge - {appName}",
-        "title": "Add new challenge"
+        "title": "Add new challenge",
+        "aiAssistant": {
+            "title": "AI challenge assistant",
+            "description": "Write a simple idea and the assistant will generate a title, objective, description, instructions, category, cover image, and evaluation criteria based on the challenge content.",
+            "placeholder": "Example: a challenge to design a waste-sorting robot...",
+            "ideaRequired": "Please enter a challenge idea first.",
+            "error": "Something went wrong while generating the challenge details",
+            "incompleteFieldsPrefix": "The challenge was generated. Please review and complete the following fields: "
+        }
     },
     "schoolCertificatesIndexPage": {
         "pageTitle": "Certificates management - {appName}",
@@ -3918,6 +4374,16 @@ export const en = {
         "badgesList": "Badges list",
         "addNew": "Add new badge",
         "backToList": "Back to badges list",
+        "aiAssistant": {
+            "title": "AI badge assistant",
+            "description": "Write a simple idea and the assistant will generate the badge name, description, emoji icon, type, a suggested point value, and a suitable image.",
+            "placeholder": "Example: a badge for the most active student in challenges...",
+            "generating": "Generating...",
+            "generateButton": "Generate details",
+            "ideaRequired": "Please enter a badge idea first.",
+            "error": "Something went wrong while generating the badge details",
+            "incompleteFieldsPrefix": "The badge was generated. Please review and complete the following fields: "
+        },
         "searchPlaceholder": "Search for a badge...",
         "empty": "No badges",
         "badgeUnit": "badge(s)",
@@ -4301,6 +4767,59 @@ export const en = {
         "reviewedDateLabel": "Review Date:",
         "reviewerLabel": "Reviewer:",
         "downloadAttachment": "Download attachment"
+    },
+    "schoolChallengeSubmissionsListPage": {
+        "pageTitle": "Submissions: {title}",
+        "backToList": "Back to challenges list",
+        "subtitle": "View and evaluate student submissions for this challenge",
+        "filters": {
+            "all": "All",
+            "submitted": "Submitted",
+            "reviewed": "Reviewed",
+            "approved": "Accepted",
+            "rejected": "Rejected"
+        },
+        "table": {
+            "student": "Student",
+            "submittedAt": "Submission date",
+            "status": "Status",
+            "rating": "Rating",
+            "actions": "Actions"
+        },
+        "unknownStudent": "Unknown",
+        "view": "View",
+        "empty": "No submissions for this challenge yet"
+    },
+    "studentChallengeSubmissionShowPage": {
+        "pageTitleFallback": "Submission Details",
+        "pageTitle": "Submission status - {title}",
+        "challengeFallback": "Challenge",
+        "backToChallenge": "Back to challenge",
+        "status": {
+            "submitted": { "label": "Submitted", "description": "Your submission has been received and will be reviewed soon" },
+            "reviewed": { "label": "Under review", "description": "Your submission is currently being reviewed" },
+            "approved": { "label": "Accepted", "description": "Your submission was accepted! Congratulations" },
+            "rejected": { "label": "Rejected", "description": "Your submission was rejected" }
+        },
+        "sections": {
+            "submissionStatus": "Submission status",
+            "submissionContent": "Submission content",
+            "reviewerFeedback": "Reviewer feedback"
+        },
+        "meta": {
+            "submittedAt": "Submitted at",
+            "reviewedAt": "Review date",
+            "reviewer": "Reviewer",
+            "rating": "Rating",
+            "pointsEarned": "Points earned"
+        },
+        "content": {
+            "answer": "Answer",
+            "yourComment": "Your comment",
+            "attachedFiles": "Attached files",
+            "fileFallback": "File {n}",
+            "download": "Download"
+        }
     },
     "schoolChallengesIndexPage": {
         "pageTitle": "Innovation Challenges - School Dashboard - {appName}",
@@ -5914,8 +6433,21 @@ export const en = {
         "submit": "Publish article",
         "alerts": {
             "invalidImageType": "Please choose a valid image file",
-            "imageTooLarge": "The image size must not exceed 2 MB"
+            "imageTooLarge": "The image size must not exceed 2 MB",
+            "pdfRequired": "The attached file must be a PDF.",
+            "pdfTooLarge": "The file size must not exceed 10 MB.",
+            "titleRequiredForAI": "Please enter the article title (in Arabic or English) first to generate the content.",
+            "aiGenerateError": "Something went wrong while generating the content"
         },
+        "aiAssistant": {
+            "title": "AI content generation",
+            "description": "Write only the title (in Arabic or English) and the AI will write the article and choose a suitable image.",
+            "generating": "Generating...",
+            "generateButton": "Generate now"
+        },
+        "pdfFileLabel": "PDF attachment (optional)",
+        "pdfHintBooklet": "Attach the booklet file as a PDF (max 10 MB).",
+        "pdfHintGeneral": "You can attach a PDF file for the issue (booklet/magazine), max 10 MB.",
         "youtubeUrlLabel": "YouTube URL",
         "youtubeUrlHint": "Optional link to a related YouTube video."
     },
@@ -6151,7 +6683,7 @@ export const en = {
             "issueDateLine": "This certificate was issued on: {date}",
             "supportParagraph": "Through this certificate, the platform confirms its continuous support for the member school and its commitment to the values and vision that foster innovation and knowledge development.",
             "ceoTitle": "Chief Executive Officer",
-            "ceoName": "A. Laila Ibrahim Al Jasmi",
+            "ceoName": "Layla Ibrahim Aljasmi",
             "ceoOrg": "AWJ CULTURE & ARTS PUBLISHING",
             "issueDate": "Issue date:"
         },
@@ -6224,6 +6756,66 @@ export const en = {
         "actions": {
             "saving": "Saving...",
             "publish": "Publish publication"
+        }
+    },
+    "adminPublicationEditPage": {
+        "headerTitle": "Edit publication",
+        "pageTitle": "Edit: {title} — {appName}",
+        "backToDetails": "Back to publication details",
+        "currentFileAvailable": "Current file available —",
+        "download": "Download",
+        "publishDateLabel": "Publish date",
+        "publisherNameLabel": "Publisher name",
+        "saveChanges": "Save changes"
+    },
+    "adminPublicationShowPage": {
+        "headerTitle": "Publication details",
+        "backToList": "Back to publications list",
+        "descriptionTitle": "Description",
+        "contentTitle": "Content",
+        "downloadFile": "Download file",
+        "status": {
+            "approved": "Approved",
+            "pending": "Under review",
+            "rejected": "Rejected"
+        },
+        "sidebar": {
+            "infoTitle": "Publication information",
+            "createdAt": "Created at",
+            "approvedAt": "Approval date",
+            "issueNumber": "Issue number",
+            "publishDate": "Publish date",
+            "publisherName": "Publisher",
+            "authorInfoTitle": "Author information",
+            "schoolTitle": "School",
+            "approverTitle": "Approved by"
+        },
+        "actions": {
+            "title": "Actions",
+            "approve": "Approve publication",
+            "reject": "Reject publication",
+            "view": "View publication",
+            "edit": "Edit publication",
+            "delete": "Delete publication"
+        },
+        "confirm": {
+            "approve": {
+                "title": "Confirm approval",
+                "message": "Are you sure you want to approve the publication \"{title}\"?",
+                "confirmText": "Approve"
+            },
+            "delete": {
+                "title": "Confirm deletion",
+                "message": "Are you sure you want to delete the publication \"{title}\"? This action cannot be undone.",
+                "confirmText": "Delete"
+            }
+        },
+        "rejectModal": {
+            "title": "Reject publication",
+            "reasonLabel": "Rejection reason (optional)",
+            "reasonPlaceholder": "Enter the rejection reason...",
+            "rejecting": "Rejecting...",
+            "rejectButton": "Reject"
         }
     },
     "adminSubscriptionShowPage": {
@@ -6679,7 +7271,64 @@ export const en = {
         "totalStudents": "Total Students",
         "avgScore": "Average Score",
         "needsAttention": "Needs Attention",
-        "topStudents": "Outstanding"
+        "topStudents": "Outstanding",
+        "needsAttentionList": "⚠️ Students who need attention:"
+    },
+    "compareStudents": {
+        "pageTitle": "Compare Students",
+        "heading": "⚖️ Compare Students",
+        "subtitle": "Comparing the eight indexes across {count} students",
+        "backLink": "→ Back to Innovation Tracking",
+        "selectAtLeastTwo": "Select at least two students",
+        "selectAtLeastTwoDescription": "Select students from the Innovation Tracking page, then click \"Compare\".",
+        "overallScore": "Overall score",
+        "sideBySide": "📊 Indexes side by side",
+        "indexColumn": "Index"
+    },
+    "cognitiveAssessment": {
+        "factors": {
+            "fluid_reasoning": "Fluid Reasoning",
+            "knowledge": "Knowledge",
+            "quantitative_reasoning": "Quantitative Reasoning",
+            "visual_spatial": "Visual-Spatial Processing",
+            "working_memory": "Working Memory"
+        },
+        "scoreLabels": {
+            "verySuperior": "Very Superior",
+            "superior": "Superior",
+            "aboveAverage": "Above Average",
+            "average": "Average",
+            "belowAverage": "Below Average",
+            "borderline": "Borderline",
+            "delayed": "Delayed"
+        },
+        "standardScore": "Standard Score"
+    },
+    "studentReport": {
+        "pageTitlePrefix": "Report",
+        "studentFallback": "Student",
+        "subtitle": "Comprehensive AI-generated report",
+        "backLink": "→ Back to Innovation Tracking",
+        "overallScore": "Overall score",
+        "indexesNotCalculated": "Indexes not calculated yet",
+        "cognitiveMapHeading": "🧠 Cognitive Ability Map (Stanford-Binet)",
+        "cognitiveMapSubtitle": "The five major factors — standard scores (mean 100)",
+        "updateAssessment": "✏️ Update assessment",
+        "addAssessment": "+ Add cognitive assessment",
+        "fullScaleIq": "Full Scale IQ",
+        "verbalIq": "Verbal",
+        "nonverbalIq": "Nonverbal",
+        "strengthsHeading": "💪 Strengths",
+        "weaknessesHeading": "📌 Weaknesses",
+        "examinerNotes": "📝 Examiner notes",
+        "noCognitiveAssessment": "No cognitive assessment has been entered for this student yet.",
+        "summaryHeading": "📄 Summary",
+        "strengthsAnalysisHeading": "💪 Strengths analysis",
+        "weaknessesAnalysisHeading": "📌 Areas for improvement analysis",
+        "indexAnalysisHeading": "📊 Index analysis",
+        "developmentPlanHeading": "🗺️ Development plan",
+        "overallAssessmentHeading": "⚖️ Overall assessment",
+        "conclusionHeading": "🏁 Conclusion"
     },
     "sections": {
         "testimonials": {

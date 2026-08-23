@@ -207,6 +207,13 @@ class AdminInnovationController extends Controller
     public function smartSearch(Request $request, SmartSearchService $searchService): Response
     {
         $query = trim((string) $request->get('query', ''));
+
+        if ($query !== '') {
+            // البحث قد يستغرق وقتاً طويلاً بسبب إعادة المحاولة التلقائية في
+            // GeminiClient، بينما max_execution_time الافتراضي على السيرفر أقل من ذلك.
+            set_time_limit(300);
+        }
+
         $searchResult = $query !== '' ? $searchService->search($query, 30) : null;
 
         return Inertia::render('Admin/Innovation/SmartSearch', [
@@ -229,6 +236,10 @@ class AdminInnovationController extends Controller
 
         $type = $request->input('type');
         $purpose = $request->input('purpose', 'تميز ابتكاري وعلمي');
+
+        // التوليد قد يستغرق وقتاً طويلاً بسبب إعادة المحاولة التلقائية في
+        // GeminiClient، بينما max_execution_time الافتراضي على السيرفر أقل من ذلك.
+        set_time_limit(300);
 
         try {
             if ($type === 'cv') {
