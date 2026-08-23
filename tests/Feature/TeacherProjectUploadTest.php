@@ -38,7 +38,9 @@ class TeacherProjectUploadTest extends TestCase
             ->actingAs($teacherUser)
             ->post('/teacher/projects', [
                 'title' => 'Innovation Project',
+                'title_ar' => 'مشروع ابتكاري',
                 'description' => 'A project submitted by a teacher.',
+                'description_ar' => 'مشروع مقدم من معلم.',
                 'category' => 'science',
                 'school_id' => $institution->id,
                 'thumbnail' => UploadedFile::fake()->image('cover.jpg')->size(200),
@@ -74,7 +76,9 @@ class TeacherProjectUploadTest extends TestCase
             ->actingAs($teacherUser)
             ->post('/teacher/projects', [
                 'title' => 'Recovered Teacher Profile Project',
+                'title_ar' => 'مشروع معلم مسترجع',
                 'description' => 'A project submitted by a teacher without an existing teacher profile.',
+                'description_ar' => 'مشروع مقدم من معلم بدون ملف تعريف مسبق.',
                 'category' => 'technology',
                 'school_id' => $school->id,
                 'thumbnail' => UploadedFile::fake()->image('cover.jpg')->size(200),

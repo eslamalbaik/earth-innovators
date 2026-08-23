@@ -253,6 +253,117 @@ class GeminiClient
             }
         }
 
+        // 0a. Publication / Article creation (checked before the project branch below,
+        // since publication prompts also contain title/title_ar/description keywords)
+        if (str_contains($systemContent, 'content_ar')) {
+            $title_en = 'The Importance of Innovation in Education';
+            $title_ar = 'أهمية الابتكار في التعليم';
+            $desc_en = 'A look at how innovative teaching methods can transform the learning experience for students.';
+            $desc_ar = 'نظرة على كيفية إسهام أساليب التدريس المبتكرة في تحويل تجربة التعلم لدى الطلاب.';
+
+            if (preg_match('/(?:عنوان المقال|عنوان|title):\s*([^\n\r]+)/iu', $userPrompt, $matches)) {
+                $idea = trim($matches[1]);
+                if (preg_match('/[\x{0600}-\x{06FF}]/u', $idea)) {
+                    $translated = $this->translateToEnglish($idea);
+                    $title_en = $translated;
+                    $title_ar = $idea;
+                } else {
+                    $translatedAr = $this->translateToArabic($idea);
+                    $title_en = $idea;
+                    $title_ar = $translatedAr;
+                }
+            }
+
+            $content_en = '<h2>' . $title_en . '</h2><p>' . $desc_en . '</p>'
+                . '<h3>Overview</h3><p>This article explores the topic in depth, covering the core concepts, '
+                . 'practical applications, and the impact on students and educators alike.</p>'
+                . '<h3>Practical Applications</h3><p>Schools and teachers can apply these ideas through hands-on '
+                . 'activities, collaborative projects, and continuous assessment to measure real progress.</p>'
+                . '<h3>Conclusion</h3><p>Adopting these approaches helps build a generation of innovative, '
+                . 'well-rounded learners ready for future challenges.</p>';
+
+            $content_ar = '<h2>' . $title_ar . '</h2><p>' . $desc_ar . '</p>'
+                . '<h3>نظرة عامة</h3><p>يستعرض هذا المقال الموضوع بعمق، ويغطي المفاهيم الأساسية والتطبيقات '
+                . 'العملية وأثرها على الطلاب والمعلمين على حد سواء.</p>'
+                . '<h3>التطبيقات العملية</h3><p>يمكن للمدارس والمعلمين تطبيق هذه الأفكار من خلال أنشطة عملية '
+                . 'ومشاريع تعاونية وتقييم مستمر لقياس التقدم الفعلي.</p>'
+                . '<h3>خاتمة</h3><p>يساهم تبني هذه الأساليب في بناء جيل من المتعلمين المبتكرين والمتكاملين '
+                . 'الجاهزين لمواجهة تحديات المستقبل.</p>';
+
+            return [
+                'title' => $title_en,
+                'title_ar' => $title_ar,
+                'description' => $desc_en,
+                'description_ar' => $desc_ar,
+                'content' => $content_en,
+                'content_ar' => $content_ar,
+                'image_keyword' => 'education innovation',
+            ];
+        }
+
+        // 0b. Badge creation (name_ar/description_ar, no English 'description' keyword)
+        if (str_contains($systemContent, 'name_ar') && str_contains($systemContent, 'description_ar')) {
+            $nameAr = 'شارة الابتكار المتميز';
+            $nameEn = 'Distinguished Innovator Badge';
+            $descriptionAr = 'تُمنح هذه الشارة تقديراً للتميز والإبداع في إنجاز المشاريع الابتكارية.';
+
+            if (preg_match('/(?:فكرة الشارة|فكرة|idea):\s*([^\n\r]+)/iu', $userPrompt, $matches)) {
+                $idea = trim($matches[1]);
+                if ($idea !== '') {
+                    $nameAr = 'شارة ' . $idea;
+                    $nameEn = ucfirst($idea) . ' Badge';
+                    $descriptionAr = 'تُمنح هذه الشارة تقديراً للتميز في: ' . $idea . '.';
+                }
+            }
+
+            return [
+                'name' => $nameEn,
+                'name_ar' => $nameAr,
+                'description_ar' => $descriptionAr,
+                'icon' => '🏅',
+                'type' => 'custom',
+                'points_required' => 100,
+                'image_keyword' => 'achievement badge',
+            ];
+        }
+
+        // 0c. Challenge creation (title/description/objective/instructions, no title_ar)
+        if (str_contains($systemContent, 'objective') && str_contains($systemContent, 'instructions') && str_contains($systemContent, 'criteria')) {
+            $title = 'تحدي الابتكار التقني';
+            $objective = 'تنمية مهارات التفكير الابتكاري وحل المشكلات لدى الطلاب من خلال مشروع عملي تطبيقي.';
+            $description = 'يهدف هذا التحدي إلى دفع الطلاب لتصميم وتنفيذ حل مبتكر لمشكلة حقيقية باستخدام أدوات '
+                . 'التفكير التصميمي. يُطلب من المشاركين تحديد المشكلة، اقتراح حل عملي، وبناء نموذج أولي '
+                . 'يوضح فكرتهم، مع مراعاة معايير الجدوى والأثر المجتمعي.';
+            $instructions = 'حدد مشكلة واقعية ترغب في حلها.'.PHP_EOL
+                . 'اقترح فكرة الحل وابحث عن أمثلة مشابهة.'.PHP_EOL
+                . 'صمم نموذجاً أولياً أو خطة تنفيذ واضحة.'.PHP_EOL
+                . 'قدّم عرضاً نهائياً يوضح الفكرة والنتائج المتوقعة.';
+
+            if (preg_match('/(?:فكرة التحدي|فكرة|idea):\s*([^\n\r]+)/iu', $userPrompt, $matches)) {
+                $idea = trim($matches[1]);
+                if ($idea !== '') {
+                    $title = 'تحدي: ' . $idea;
+                    $description = 'يهدف هذا التحدي إلى دفع الطلاب لتصميم وتنفيذ حل مبتكر يتعلق بـ: ' . $idea
+                        . '. يُطلب من المشاركين تحديد المشكلة، اقتراح حل عملي، وبناء نموذج أولي يوضح فكرتهم.';
+                }
+            }
+
+            return [
+                'title' => $title,
+                'objective' => $objective,
+                'description' => $description,
+                'instructions' => $instructions,
+                'category' => 'technology',
+                'image_keyword' => 'innovation challenge',
+                'criteria' => [
+                    ['name_ar' => 'الإبداع والابتكار', 'weight' => 30],
+                    ['name_ar' => 'جودة التنفيذ', 'weight' => 30],
+                    ['name_ar' => 'الأثر والجدوى', 'weight' => 25],
+                    ['name_ar' => 'العرض والتقديم', 'weight' => 15],
+                ],
+            ];
+        }
+
         // 1. Project / Publication / Challenge creation
         if (str_contains($systemContent, 'title') && str_contains($systemContent, 'title_ar') && str_contains($systemContent, 'description')) {
             $title_en = 'Innovative Educational STEM Project';
