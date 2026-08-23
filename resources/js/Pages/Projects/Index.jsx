@@ -51,7 +51,15 @@ export default function ProjectsIndex({ auth, projects, userRole, viewMode = 'pu
         { value: 'other', label: t('categories.other') },
     ];
 
-    const categoriesList = categories && categories.length > 0 ? categories : defaultCategories;
+    // Category labels always come from i18n, keyed off the server-provided
+    // `value` — the server sends localized `label` text (Arabic only), which
+    // would stay untranslated when the UI language is switched to English.
+    const categoriesList = categories && categories.length > 0
+        ? categories.map((cat) => ({
+            ...cat,
+            label: cat.value === '' ? t('common.all') : t(`categories.${cat.value}`),
+        }))
+        : defaultCategories;
 
     useEffect(() => {
         const { search: s, category: c } = parseQueryFromUrl(page.url);
