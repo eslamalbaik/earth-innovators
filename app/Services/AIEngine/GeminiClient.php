@@ -106,30 +106,74 @@ class GeminiClient
                 'Content-Type'   => 'application/json',
             ])
             ->timeout($asJson ? 90 : 60)
-            ->retry(4, fn (int $attempt) => min(1000 * (2 ** ($attempt - 1)), 8000))
+            ->retry(
+                6,
+                fn (int $attempt) => min(1000 * (2 ** ($attempt - 1)), 10000),
+                // 429 on this API is daily-quota exhaustion (RESOURCE_EXHAUSTED),
+                // not a rate blip — Google's own retryDelay hint is 50s+, so
+                // retrying within our short backoff window only wastes time.
+                // Only retry transient overload responses (5xx) or connection
+                // failures.
+                function (\Throwable $exception) {
+                    if (! $exception instanceof RequestException || ! $exception->response) {
+                        return true;
+                    }
+
+                    return $exception->response->status() >= 500;
+                }
+            )
             ->post("{$this->baseUrl}/models/{$this->model}:generateContent", $body);
 
             if ($response->successful()) {
                 $data = $response->json();
                 $content = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
+                $finishReason = $data['candidates'][0]['finishReason'] ?? null;
 
                 Log::info('Gemini API call successful', [
-                    'usage' => $data['usageMetadata'] ?? [],
-                    'model' => $this->model,
+                    'usage'         => $data['usageMetadata'] ?? [],
+                    'model'         => $this->model,
+                    'finishReason'  => $finishReason,
                 ]);
+
+                if ($content === null) {
+                    Log::error('Gemini API returned no content', [
+                        'finishReason' => $finishReason,
+                        'data'         => $data,
+                    ]);
+                }
 
                 return $content;
             }
 
-            Log::error('Gemini API error', [
-                'status' => $response->status(),
-                'body'   => $response->body(),
-            ]);
+            if ($response->status() === 429) {
+                Log::error('Gemini API quota exceeded — check the API key\'s plan/billing in Google AI Studio', [
+                    'model' => $this->model,
+                    'body'  => $response->body(),
+                ]);
+            } else {
+                Log::error('Gemini API error', [
+                    'status' => $response->status(),
+                    'body'   => $response->body(),
+                ]);
+            }
 
             return null;
 
         } catch (RequestException $e) {
-            Log::error('Gemini API request failed', [
+            if ($e->response?->status() === 429) {
+                Log::error('Gemini API quota exceeded — check the API key\'s plan/billing in Google AI Studio', [
+                    'model' => $this->model,
+                    'body'  => $e->response->body(),
+                ]);
+            } else {
+                Log::error('Gemini API request failed', [
+                    'status' => $e->response?->status(),
+                    'error'  => $e->getMessage(),
+                ]);
+            }
+            return null;
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            Log::error('Gemini API connection failed', [
                 'error' => $e->getMessage(),
             ]);
             return null;
