@@ -13,8 +13,35 @@ export default function StudentChallengesIndex({ auth, challenges, filters, mess
     const [showFilterModal, setShowFilterModal] = useState(false);
     const [category, setCategory] = useState('');
 
-    // Use categories from database, fallback to default if empty
-    const categoriesList = categories && categories.length > 0 ? categories : [
+    const categoryLabelKeys = {
+        science: 'categories.science',
+        technology: 'categories.technology',
+        engineering: 'categories.engineering',
+        mathematics: 'categories.mathematics',
+        arts: 'categories.arts',
+        heritage: 'studentChallengesIndexPage.categories.heritage',
+        environmental: 'studentChallengesIndexPage.categories.environmental',
+        other: 'categories.other',
+    };
+
+    const resolveCategoryLabel = (value, fallbackLabel = '') => {
+        if (!value) {
+            return t('common.all');
+        }
+
+        return categoryLabelKeys[value]
+            ? t(categoryLabelKeys[value])
+            : (fallbackLabel || value);
+    };
+
+    // Use categories from database, fallback to default if empty. DB-provided
+    // categories carry an Arabic-only `label` (custom categories a school
+    // added have no i18n key), so known slugs are still translated and only
+    // genuinely custom ones fall back to the raw stored name.
+    const categoriesList = categories && categories.length > 0 ? categories.map((item) => ({
+        ...item,
+        label: resolveCategoryLabel(item.value, item.label),
+    })) : [
         { value: '', label: t('common.all') },
         { value: 'science', label: t('categories.science') },
         { value: 'arts', label: t('categories.arts') },
