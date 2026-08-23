@@ -112,11 +112,12 @@ class SchoolChallengeController extends Controller
                     . 'قم باختيار إحدى الفئات التالية حصراً: science, technology, engineering, mathematics, arts, other. '
                     . 'اقترح أيضاً كلمة مفتاحية واحدة باللغة الإنجليزية للبحث عن صورة غلاف من Unsplash. '
                     . 'هام جداً للتنسيق: استخدم فقرات واضحة ومسافات أسطر (Newlines) لتنسيق النصوص بشكل جميل، ولا تستخدم وسوم HTML إطلاقاً لأن النص سيعرض في حقل نصي عادي. '
+                    . 'يجب توفير العنوان والهدف والوصف وخطوات التنفيذ باللغتين العربية والإنجليزية. '
                     . 'أجب بصيغة JSON فقط مع الحقول التالية، ولا تترك أياً منها فارغاً: '
-                    . 'title (عنوان احترافي وجذاب للتحدي بالعربية), '
-                    . 'objective (الهدف التعليمي أو الابتكاري المحدد لهذا التحدي، جملة أو جملتين بالعربية), '
-                    . 'description (وصف مفصل وشامل ومحفز للتحدي كنص عادي منسق بأسطر واضحة، يشمل الأهداف والمعايير), '
-                    . 'instructions (خطوات تنفيذ التحدي بالتفصيل للطالب، كنص عادي منسق بأسطر واضحة), '
+                    . 'title (عنوان احترافي وجذاب للتحدي بالإنجليزية), title_ar (نفس العنوان بالعربية), '
+                    . 'objective (الهدف التعليمي أو الابتكاري المحدد لهذا التحدي بالإنجليزية، جملة أو جملتين), objective_ar (نفس الهدف بالعربية), '
+                    . 'description (وصف مفصل وشامل ومحفز للتحدي بالإنجليزية كنص عادي منسق بأسطر واضحة، يشمل الأهداف والمعايير), description_ar (نفس الوصف بالعربية بنفس مستوى التفصيل), '
+                    . 'instructions (خطوات تنفيذ التحدي بالتفصيل للطالب بالإنجليزية، كنص عادي منسق بأسطر واضحة), instructions_ar (نفس الخطوات بالعربية), '
                     . 'category (إحدى الفئات المسموحة فقط باللغة الإنجليزية), '
                     . 'image_keyword (كلمة مفتاحية واحدة بالإنجليزية), '
                     . 'criteria (مصفوفة من 3 إلى 5 معايير تقييم مبنية على محتوى التحدي تحديداً، كل عنصر فيها كائن يحتوي على name_ar (اسم معيار قصير بالعربية) وweight (وزن رقمي)، بحيث يكون مجموع كل الأوزان يساوي 100 بالضبط).'
@@ -129,10 +130,14 @@ class SchoolChallengeController extends Controller
             }
 
             // Fallbacks for structure
-            $title = $aiResponse['title'] ?? 'تحدي جديد';
+            $title = $aiResponse['title'] ?? $idea;
+            $title_ar = $aiResponse['title_ar'] ?? $title;
             $objective = trim($aiResponse['objective'] ?? '');
+            $objective_ar = trim($aiResponse['objective_ar'] ?? $objective);
             $description = $aiResponse['description'] ?? $idea;
+            $description_ar = $aiResponse['description_ar'] ?? $description;
             $instructions = trim($aiResponse['instructions'] ?? '');
+            $instructions_ar = trim($aiResponse['instructions_ar'] ?? $instructions);
             $category = $aiResponse['category'] ?? 'other';
             $keyword = $aiResponse['image_keyword'] ?? 'education challenge';
 
@@ -164,7 +169,9 @@ class SchoolChallengeController extends Controller
             // instead of silently submitting a form that fails validation.
             $incompleteFields = array_keys(array_filter([
                 'objective' => $objective === '',
+                'objective_ar' => $objective_ar === '',
                 'instructions' => $instructions === '',
+                'instructions_ar' => $instructions_ar === '',
             ]));
 
             // Fetch image from Unsplash
@@ -188,9 +195,13 @@ class SchoolChallengeController extends Controller
 
             return response()->json([
                 'title' => $title,
+                'title_ar' => $title_ar,
                 'objective' => $objective,
+                'objective_ar' => $objective_ar,
                 'description' => $description,
+                'description_ar' => $description_ar,
                 'instructions' => $instructions,
+                'instructions_ar' => $instructions_ar,
                 'category' => strtolower($category),
                 'image_url' => $imageUrl,
                 'incomplete_fields' => $incompleteFields,

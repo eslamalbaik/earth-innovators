@@ -1,8 +1,10 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FaArrowRight, FaSave, FaTimes } from 'react-icons/fa';
+import { useTranslation } from '@/i18n';
 
 export default function CustomRolesEdit({ auth, customRole, baseRoles }) {
+    const { t } = useTranslation();
     const { data, setData, put, processing, errors } = useForm({
         name_ar: customRole.name_ar || '',
         name_en: customRole.name_en || '',
@@ -17,8 +19,8 @@ export default function CustomRolesEdit({ auth, customRole, baseRoles }) {
     };
 
     return (
-        <DashboardLayout header="تعديل دور مخصص" auth={auth}>
-            <Head title="تعديل دور مخصص - إرث المبتكرين" />
+        <DashboardLayout header={t('adminCustomRolesPage.edit.header')} auth={auth}>
+            <Head title={t('adminCustomRolesPage.edit.pageTitle', { appName: t('common.appName') })} />
 
             <div className="mb-6">
                 <Link
@@ -26,18 +28,18 @@ export default function CustomRolesEdit({ auth, customRole, baseRoles }) {
                     className="text-blue-600 hover:text-blue-800 flex items-center gap-2"
                 >
                     <FaArrowRight className="transform rotate-180" />
-                    العودة إلى قائمة الأدوار المخصصة
+                    {t('adminCustomRolesPage.form.backToList')}
                 </Link>
             </div>
 
             <div className="bg-white rounded-xl shadow-lg p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">معلومات الدور</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('adminCustomRolesPage.form.roleInfoTitle')}</h2>
 
                 <form onSubmit={submit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                الاسم بالعربية <span className="text-red-500">*</span>
+                                {t('adminCustomRolesPage.form.nameArLabel')} <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
@@ -51,7 +53,7 @@ export default function CustomRolesEdit({ auth, customRole, baseRoles }) {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                الاسم بالإنجليزية
+                                {t('adminCustomRolesPage.form.nameEnLabel')}
                             </label>
                             <input
                                 type="text"
@@ -64,7 +66,7 @@ export default function CustomRolesEdit({ auth, customRole, baseRoles }) {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                المعرّف (slug) <span className="text-red-500">*</span>
+                                {t('adminCustomRolesPage.form.slugLabel')} <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
@@ -79,7 +81,7 @@ export default function CustomRolesEdit({ auth, customRole, baseRoles }) {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                مبني على دور <span className="text-red-500">*</span>
+                                {t('adminCustomRolesPage.form.baseRoleLabel')} <span className="text-red-500">*</span>
                             </label>
                             <select
                                 value={data.base_role}
@@ -92,7 +94,7 @@ export default function CustomRolesEdit({ auth, customRole, baseRoles }) {
                                 ))}
                             </select>
                             <p className="mt-2 text-sm text-gray-500">
-                                تنبيه: تغيير الدور الأساسي يغيّر لوحة التحكم والصلاحيات لكل من يحمل هذا الدور المخصص حالياً.
+                                {t('adminCustomRolesPage.form.baseRoleHelpEdit')}
                             </p>
                             {errors.base_role && <p className="mt-1 text-sm text-red-600">{errors.base_role}</p>}
                         </div>
@@ -105,10 +107,10 @@ export default function CustomRolesEdit({ auth, customRole, baseRoles }) {
                                     onChange={(e) => setData('is_active', e.target.checked)}
                                     className="rounded border-gray-300 text-[#A3C042] focus:ring-[#A3C042]"
                                 />
-                                <span className="text-sm font-medium text-gray-700">مفعّل (متاح للاختيار عند إسناده لمستخدم)</span>
+                                <span className="text-sm font-medium text-gray-700">{t('adminCustomRolesPage.form.activeCheckboxLabel')}</span>
                             </label>
                             <p className="mt-2 text-sm text-gray-500">
-                                التعطيل لا يزيل الدور من المستخدمين الحاليين، فقط يخفيه من قوائم الإسناد الجديدة.
+                                {t('adminCustomRolesPage.form.inactiveHelp')}
                             </p>
                         </div>
                     </div>
@@ -120,14 +122,14 @@ export default function CustomRolesEdit({ auth, customRole, baseRoles }) {
                             className="px-6 py-2 bg-[#A3C042] hover:bg-blue-700 text-white font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50"
                         >
                             <FaSave />
-                            {processing ? 'جاري الحفظ...' : 'حفظ'}
+                            {processing ? t('common.saving') : t('common.save')}
                         </button>
                         <Link
                             href={route('admin.custom-roles.index')}
                             className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg flex items-center gap-2"
                         >
                             <FaTimes />
-                            إلغاء
+                            {t('common.cancel')}
                         </Link>
                     </div>
                 </form>

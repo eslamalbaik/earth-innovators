@@ -3,16 +3,17 @@ import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { FaSearch, FaBrain, FaUser, FaChartLine, FaLightbulb, FaSpinner, FaArrowLeft, FaFilter } from 'react-icons/fa';
 import ClassificationBadge from '@/Components/Innovation/ClassificationBadge';
-
-const SAMPLE_QUERIES = [
-    'طالب ماسي يجيد Python أو الذكاء الاصطناعي',
-    'طلاب لديهم مؤشر قيادة مرتفع ومشاريع قوية',
-    'مبتكرون يمتلكون مهارات الروبوتات والبرمجة',
-    'طلاب في تصنيف بلاتيني لديهم جاهزية مستقبلية عالية',
-    'طلاب لديهم إبداع فوق 85 ويحتاجون لتطوير الملكية الفكرية'
-];
+import { useTranslation } from '@/i18n';
 
 export default function SmartSearch({ query = '', results = null }) {
+    const { t, language } = useTranslation();
+    const SAMPLE_QUERIES = [
+        t('adminSmartSearchPage.sampleQueries.q1'),
+        t('adminSmartSearchPage.sampleQueries.q2'),
+        t('adminSmartSearchPage.sampleQueries.q3'),
+        t('adminSmartSearchPage.sampleQueries.q4'),
+        t('adminSmartSearchPage.sampleQueries.q5'),
+    ];
     const [searchQuery, setSearchQuery] = useState(query);
     const [searching, setSearching] = useState(false);
 
@@ -30,10 +31,10 @@ export default function SmartSearch({ query = '', results = null }) {
     };
 
     return (
-        <DashboardLayout header="البحث الذكي بالمواهب">
-            <Head title="البحث الذكي بالمواهب الابتكارية" />
+        <DashboardLayout header={t('adminSmartSearchPage.headerTitle')}>
+            <Head title={t('adminSmartSearchPage.pageTitle')} />
 
-            <div className="py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto" dir="rtl">
+            <div className="py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                 {/* Header Card */}
                 <div className="bg-gradient-to-l from-indigo-600 via-purple-600 to-blue-600 rounded-3xl p-6 sm:p-8 text-white shadow-lg mb-8">
                     <div className="flex items-center gap-3 mb-3">
@@ -41,8 +42,8 @@ export default function SmartSearch({ query = '', results = null }) {
                             <FaBrain />
                         </div>
                         <div>
-                            <h1 className="text-xl sm:text-2xl font-black">محرك البحث الذكي بالمواهب</h1>
-                            <p className="text-white/80 text-xs sm:text-sm mt-1">ابحث عن المبتكرين باستخدام اللغة الطبيعية — يعتمد المحرك على الذكاء الاصطناعي لفهم الشروط والمعايير</p>
+                            <h1 className="text-xl sm:text-2xl font-black">{t('adminSmartSearchPage.heroTitle')}</h1>
+                            <p className="text-white/80 text-xs sm:text-sm mt-1">{t('adminSmartSearchPage.heroSubtitle')}</p>
                         </div>
                     </div>
 
@@ -53,7 +54,7 @@ export default function SmartSearch({ query = '', results = null }) {
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="اكتب وصف الطالب المطلوب باللغة الطبيعية (مثال: طالب لديه مهارات برمجة وقيادة مرتفعة)..."
+                                placeholder={t('adminSmartSearchPage.searchPlaceholder')}
                                 className="w-full bg-white/95 text-gray-900 placeholder-gray-400 rounded-2xl py-4 pr-12 pl-32 text-sm sm:text-base font-medium shadow-xl focus:outline-none focus:ring-4 focus:ring-white/30 border-0 transition"
                             />
                             <FaSearch className="absolute right-4 text-gray-400 text-lg" />
@@ -65,11 +66,11 @@ export default function SmartSearch({ query = '', results = null }) {
                                 {searching ? (
                                     <>
                                         <FaSpinner className="animate-spin" />
-                                        <span>جاري البحث...</span>
+                                        <span>{t('adminSmartSearchPage.searching')}</span>
                                     </>
                                 ) : (
                                     <>
-                                        <span>بحث ذكي</span>
+                                        <span>{t('adminSmartSearchPage.searchButton')}</span>
                                         <FaArrowLeft className="text-xs" />
                                     </>
                                 )}
@@ -80,7 +81,7 @@ export default function SmartSearch({ query = '', results = null }) {
                     {/* Sample Query Pills */}
                     <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
                         <span className="text-white/75 flex items-center gap-1 font-bold">
-                            <FaLightbulb className="text-amber-300" /> مقترحات سريعة:
+                            <FaLightbulb className="text-amber-300" /> {t('adminSmartSearchPage.quickSuggestionsLabel')}
                         </span>
                         {SAMPLE_QUERIES.map((sq, idx) => (
                             <button
@@ -104,10 +105,10 @@ export default function SmartSearch({ query = '', results = null }) {
                         <div className="flex items-center justify-between border-b border-gray-200 pb-4">
                             <h2 className="font-bold text-gray-800 text-lg flex items-center gap-2">
                                 <FaFilter className="text-indigo-600 text-sm" />
-                                <span>نتائج البحث عن: "<span className="text-indigo-600">{query}</span>"</span>
+                                <span>{t('adminSmartSearchPage.resultsForLabel')} "<span className="text-indigo-600">{query}</span>"</span>
                             </h2>
                             <span className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold border border-indigo-100">
-                                تم العثور على {results.length} طالب
+                                {t('adminSmartSearchPage.resultsCount', { count: results.length })}
                             </span>
                         </div>
 
@@ -116,8 +117,8 @@ export default function SmartSearch({ query = '', results = null }) {
                                 <div className="w-16 h-16 rounded-full bg-gray-50 text-gray-400 flex items-center justify-center text-3xl mx-auto mb-4">
                                     <FaSearch />
                                 </div>
-                                <h3 className="font-bold text-gray-800 mb-1">لم يتم العثور على مواهب تطابق هذا الاستعلام</h3>
-                                <p className="text-xs text-gray-400 max-w-md mx-auto mb-6">جرب صياغة أخرى أو استخدم مصطلحات مهارات أوسع (مثل: تقنية، برمجة، قيادة).</p>
+                                <h3 className="font-bold text-gray-800 mb-1">{t('adminSmartSearchPage.noResultsTitle')}</h3>
+                                <p className="text-xs text-gray-400 max-w-md mx-auto mb-6">{t('adminSmartSearchPage.noResultsDescription')}</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -145,7 +146,7 @@ export default function SmartSearch({ query = '', results = null }) {
                                                                 {student.name}
                                                             </Link>
                                                         </h3>
-                                                        <p className="text-xs text-gray-400 truncate max-w-[180px]">{student.institution || 'مؤسسة غير محددة'}</p>
+                                                        <p className="text-xs text-gray-400 truncate max-w-[180px]">{student.institution || t('adminSmartSearchPage.institutionFallback')}</p>
                                                     </div>
                                                 </div>
                                                 <ClassificationBadge classification={student.classification} size="sm" />
@@ -153,7 +154,7 @@ export default function SmartSearch({ query = '', results = null }) {
 
                                             {/* Score Bar */}
                                             <div className="bg-gray-50 rounded-xl p-3 mb-4 flex items-center justify-between border border-gray-100/80">
-                                                <span className="text-xs text-gray-500 font-medium">الدرجة الإجمالية:</span>
+                                                <span className="text-xs text-gray-500 font-medium">{t('adminSmartSearchPage.overallScoreLabel')}</span>
                                                 <div className="flex items-center gap-2">
                                                     <div className="w-24 bg-gray-200 rounded-full h-2 overflow-hidden">
                                                         <div
@@ -168,7 +169,7 @@ export default function SmartSearch({ query = '', results = null }) {
                                             {/* Skills */}
                                             {student.skills && student.skills.length > 0 && (
                                                 <div className="mb-4">
-                                                    <p className="text-[10px] font-bold text-gray-400 mb-1.5">المهارات والمكتسبات:</p>
+                                                    <p className="text-[10px] font-bold text-gray-400 mb-1.5">{t('adminSmartSearchPage.skillsLabel')}</p>
                                                     <div className="flex flex-wrap gap-1.5">
                                                         {student.skills.slice(0, 5).map((skill, i) => (
                                                             <span key={i} className="bg-indigo-50/70 text-indigo-700 px-2.5 py-0.5 rounded-lg text-[11px] font-medium border border-indigo-100/50">
@@ -191,7 +192,7 @@ export default function SmartSearch({ query = '', results = null }) {
                                                 href={route('admin.innovation.user-profile', student.id)}
                                                 className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"
                                             >
-                                                <span>عرض الملف والتقرير الذكي</span>
+                                                <span>{t('adminSmartSearchPage.viewProfileButton')}</span>
                                                 <FaArrowLeft className="text-[10px]" />
                                             </Link>
                                         </div>

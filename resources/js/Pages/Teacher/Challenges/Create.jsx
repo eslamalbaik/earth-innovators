@@ -15,10 +15,14 @@ export default function TeacherChallengeCreate({ auth, school }) {
 
     const { data, setData, post, processing, errors } = useForm({
         title: '',
+        title_ar: '',
         objective: '',
+        objective_ar: '',
         description: '',
+        description_ar: '',
         image: null,
         instructions: '',
+        instructions_ar: '',
         challenge_type: 'cognitive',
         category: 'mathematics',
         age_group: '10-13',
@@ -153,6 +157,21 @@ export default function TeacherChallengeCreate({ auth, school }) {
                             <InputError message={errors.title} className="mt-2" />
                         </div>
 
+                        {/* Title (Arabic) */}
+                        <div>
+                            <InputLabel htmlFor="title_ar" value={t('teacherChallengesCreatePage.fields.titleAr')} />
+                            <TextInput
+                                id="title_ar"
+                                type="text"
+                                dir="rtl"
+                                value={data.title_ar}
+                                onChange={(e) => setData('title_ar', e.target.value)}
+                                className="mt-1 block w-full"
+                                required
+                            />
+                            <InputError message={errors.title_ar} className="mt-2" />
+                        </div>
+
                         {/* Objective */}
                         <div>
                             <InputLabel htmlFor="objective" value={t('teacherChallengesCreatePage.fields.objective')} />
@@ -167,6 +186,21 @@ export default function TeacherChallengeCreate({ auth, school }) {
                             <InputError message={errors.objective} className="mt-2" />
                         </div>
 
+                        {/* Objective (Arabic) */}
+                        <div>
+                            <InputLabel htmlFor="objective_ar" value={t('teacherChallengesCreatePage.fields.objectiveAr')} />
+                            <textarea
+                                id="objective_ar"
+                                dir="rtl"
+                                value={data.objective_ar}
+                                onChange={(e) => setData('objective_ar', e.target.value)}
+                                rows={3}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
+                                required
+                            />
+                            <InputError message={errors.objective_ar} className="mt-2" />
+                        </div>
+
                         {/* Description */}
                         <div>
                             <InputLabel htmlFor="description" value={t('teacherChallengesCreatePage.fields.description')} />
@@ -179,6 +213,21 @@ export default function TeacherChallengeCreate({ auth, school }) {
                                 required
                             />
                             <InputError message={errors.description} className="mt-2" />
+                        </div>
+
+                        {/* Description (Arabic) */}
+                        <div>
+                            <InputLabel htmlFor="description_ar" value={t('teacherChallengesCreatePage.fields.descriptionAr')} />
+                            <textarea
+                                id="description_ar"
+                                dir="rtl"
+                                value={data.description_ar}
+                                onChange={(e) => setData('description_ar', e.target.value)}
+                                rows={4}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
+                                required
+                            />
+                            <InputError message={errors.description_ar} className="mt-2" />
                         </div>
 
                         {/* Image */}

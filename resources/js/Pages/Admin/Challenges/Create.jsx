@@ -13,10 +13,14 @@ export default function AdminChallengesCreate({ schools = [] }) {
 
     const { data, setData, post, processing, errors } = useForm({
         title: '',
+        title_ar: '',
         objective: '',
+        objective_ar: '',
         description: '',
+        description_ar: '',
         image: null,
         instructions: '',
+        instructions_ar: '',
         challenge_type: '',
         category: '',
         age_group: '',
@@ -90,9 +94,13 @@ export default function AdminChallengesCreate({ schools = [] }) {
             setData((prev) => ({
                 ...prev,
                 title: result.title || prev.title,
+                title_ar: result.title_ar || prev.title_ar,
                 objective: result.objective || prev.objective,
+                objective_ar: result.objective_ar || prev.objective_ar,
                 description: result.description || prev.description,
+                description_ar: result.description_ar || prev.description_ar,
                 instructions: result.instructions || prev.instructions,
+                instructions_ar: result.instructions_ar || prev.instructions_ar,
                 category: result.category || prev.category,
                 criteria: (result.suggested_criteria && result.suggested_criteria.length > 0)
                     ? result.suggested_criteria
@@ -262,6 +270,25 @@ export default function AdminChallengesCreate({ schools = [] }) {
                             )}
                         </div>
 
+                        {/* العنوان بالعربية */}
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                {t('adminChallengesEditPage.fields.titleAr')} <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                dir="rtl"
+                                value={data.title_ar}
+                                onChange={(e) => setData('title_ar', e.target.value)}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.title_ar ? 'border-red-500' : 'border-gray-300'
+                                    }`}
+                                required
+                            />
+                            {errors.title_ar && (
+                                <p className="mt-1 text-sm text-red-600">{errors.title_ar}</p>
+                            )}
+                        </div>
+
                         {/* الهدف */}
                         <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -280,6 +307,25 @@ export default function AdminChallengesCreate({ schools = [] }) {
                             )}
                         </div>
 
+                        {/* الهدف بالعربية */}
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                {t('adminChallengesEditPage.fields.objectiveAr')} <span className="text-red-500">*</span>
+                            </label>
+                            <textarea
+                                dir="rtl"
+                                value={data.objective_ar}
+                                onChange={(e) => setData('objective_ar', e.target.value)}
+                                rows={3}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.objective_ar ? 'border-red-500' : 'border-gray-300'
+                                    }`}
+                                required
+                            />
+                            {errors.objective_ar && (
+                                <p className="mt-1 text-sm text-red-600">{errors.objective_ar}</p>
+                            )}
+                        </div>
+
                         {/* الوصف */}
                         <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -295,6 +341,25 @@ export default function AdminChallengesCreate({ schools = [] }) {
                             />
                             {errors.description && (
                                 <p className="mt-1 text-sm text-red-600">{errors.description}</p>
+                            )}
+                        </div>
+
+                        {/* الوصف بالعربية */}
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                {t('adminChallengesEditPage.fields.descriptionAr')} <span className="text-red-500">*</span>
+                            </label>
+                            <textarea
+                                dir="rtl"
+                                value={data.description_ar}
+                                onChange={(e) => setData('description_ar', e.target.value)}
+                                rows={4}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.description_ar ? 'border-red-500' : 'border-gray-300'
+                                    }`}
+                                required
+                            />
+                            {errors.description_ar && (
+                                <p className="mt-1 text-sm text-red-600">{errors.description_ar}</p>
                             )}
                         </div>
 
@@ -358,6 +423,25 @@ export default function AdminChallengesCreate({ schools = [] }) {
                             />
                             {errors.instructions && (
                                 <p className="mt-1 text-sm text-red-600">{errors.instructions}</p>
+                            )}
+                        </div>
+
+                        {/* كيفية التنفيذ بالعربية */}
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                {t('adminChallengesEditPage.fields.instructionsAr')} <span className="text-red-500">*</span>
+                            </label>
+                            <textarea
+                                dir="rtl"
+                                value={data.instructions_ar}
+                                onChange={(e) => setData('instructions_ar', e.target.value)}
+                                rows={4}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.instructions_ar ? 'border-red-500' : 'border-gray-300'
+                                    }`}
+                                required
+                            />
+                            {errors.instructions_ar && (
+                                <p className="mt-1 text-sm text-red-600">{errors.instructions_ar}</p>
                             )}
                         </div>
 

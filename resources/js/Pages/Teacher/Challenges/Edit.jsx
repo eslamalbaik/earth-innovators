@@ -16,11 +16,15 @@ export default function TeacherChallengeEdit({ auth, challenge }) {
 
     const { data, setData, post, processing, errors } = useForm({
         title: challenge?.title || '',
+        title_ar: challenge?.title_ar || '',
         objective: challenge?.objective || '',
+        objective_ar: challenge?.objective_ar || '',
         description: challenge?.description || '',
+        description_ar: challenge?.description_ar || '',
         image: null,
         _method: 'PUT',
         instructions: challenge?.instructions || '',
+        instructions_ar: challenge?.instructions_ar || '',
         challenge_type: challenge?.challenge_type || 'cognitive',
         category: challenge?.category || 'mathematics',
         age_group: challenge?.age_group || '10-13',
@@ -131,6 +135,20 @@ export default function TeacherChallengeEdit({ auth, challenge }) {
                         </div>
 
                         <div>
+                            <InputLabel htmlFor="title_ar" value={t('teacherChallengesCreatePage.fields.titleAr')} />
+                            <TextInput
+                                id="title_ar"
+                                type="text"
+                                dir="rtl"
+                                value={data.title_ar}
+                                onChange={(e) => setData('title_ar', e.target.value)}
+                                className="mt-1 block w-full"
+                                required
+                            />
+                            <InputError message={errors.title_ar} className="mt-2" />
+                        </div>
+
+                        <div>
                             <InputLabel htmlFor="objective" value={t('teacherChallengesCreatePage.fields.objective')} />
                             <textarea
                                 id="objective"
@@ -144,6 +162,20 @@ export default function TeacherChallengeEdit({ auth, challenge }) {
                         </div>
 
                         <div>
+                            <InputLabel htmlFor="objective_ar" value={t('teacherChallengesCreatePage.fields.objectiveAr')} />
+                            <textarea
+                                id="objective_ar"
+                                dir="rtl"
+                                value={data.objective_ar}
+                                onChange={(e) => setData('objective_ar', e.target.value)}
+                                rows={3}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
+                                required
+                            />
+                            <InputError message={errors.objective_ar} className="mt-2" />
+                        </div>
+
+                        <div>
                             <InputLabel htmlFor="description" value={t('teacherChallengesCreatePage.fields.description')} />
                             <textarea
                                 id="description"
@@ -154,6 +186,20 @@ export default function TeacherChallengeEdit({ auth, challenge }) {
                                 required
                             />
                             <InputError message={errors.description} className="mt-2" />
+                        </div>
+
+                        <div>
+                            <InputLabel htmlFor="description_ar" value={t('teacherChallengesCreatePage.fields.descriptionAr')} />
+                            <textarea
+                                id="description_ar"
+                                dir="rtl"
+                                value={data.description_ar}
+                                onChange={(e) => setData('description_ar', e.target.value)}
+                                rows={4}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
+                                required
+                            />
+                            <InputError message={errors.description_ar} className="mt-2" />
                         </div>
 
                         <div>
@@ -229,6 +275,20 @@ export default function TeacherChallengeEdit({ auth, challenge }) {
                                 required
                             />
                             <InputError message={errors.instructions} className="mt-2" />
+                        </div>
+
+                        <div>
+                            <InputLabel htmlFor="instructions_ar" value={t('teacherChallengesCreatePage.fields.instructionsAr')} />
+                            <textarea
+                                id="instructions_ar"
+                                dir="rtl"
+                                value={data.instructions_ar}
+                                onChange={(e) => setData('instructions_ar', e.target.value)}
+                                rows={4}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
+                                required
+                            />
+                            <InputError message={errors.instructions_ar} className="mt-2" />
                         </div>
 
                         <div>

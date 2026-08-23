@@ -3,17 +3,18 @@ import { Head } from '@inertiajs/react';
 import { useState, useRef, useEffect } from 'react';
 import { FaPaperPlane, FaRobot, FaUser, FaSpinner, FaChartLine, FaLightbulb, FaTrashAlt } from 'react-icons/fa';
 import axios from 'axios';
-
-const SUGGESTION_CHIPS = [
-    { label: 'ملخص الأداء العام', question: 'أعطني ملخصاً عن أداء الطلاب العام ومتوسط المؤشرات' },
-    { label: 'أضعف المؤشرات', question: 'ما هي أضعف المؤشرات على مستوى جميع الطلاب وكيف يمكن تحسينها؟' },
-    { label: 'الطلاب المتميزون', question: 'من هم الطلاب الأعلى أداءً وما هي تصنيفاتهم؟' },
-    { label: 'طلاب يحتاجون اهتماماً', question: 'من هم الطلاب الذين يحتاجون لاهتمام خاص ولماذا؟' },
-    { label: 'توزيع التصنيفات', question: 'كيف يتوزع الطلاب على التصنيفات المختلفة (ماسي، بلاتيني، ذهبي...)؟' },
-    { label: 'مقارنة المؤشرات', question: 'قارن بين متوسطات المؤشرات الثمانية وحدد أقوى وأضعف مؤشر' },
-];
+import { useTranslation } from '@/i18n';
 
 export default function AdminChat() {
+    const { t, language } = useTranslation();
+    const SUGGESTION_CHIPS = [
+        { label: t('adminChatPage.suggestions.performanceSummary.label'), question: t('adminChatPage.suggestions.performanceSummary.question') },
+        { label: t('adminChatPage.suggestions.weakestIndexes.label'), question: t('adminChatPage.suggestions.weakestIndexes.question') },
+        { label: t('adminChatPage.suggestions.topStudents.label'), question: t('adminChatPage.suggestions.topStudents.question') },
+        { label: t('adminChatPage.suggestions.needAttention.label'), question: t('adminChatPage.suggestions.needAttention.question') },
+        { label: t('adminChatPage.suggestions.classificationDistribution.label'), question: t('adminChatPage.suggestions.classificationDistribution.question') },
+        { label: t('adminChatPage.suggestions.compareIndexes.label'), question: t('adminChatPage.suggestions.compareIndexes.question') },
+    ];
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
@@ -32,7 +33,8 @@ export default function AdminChat() {
         const text = question || input.trim();
         if (!text || loading) return;
 
-        const userMsg = { role: 'user', content: text, timestamp: new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) };
+        const locale = language === 'ar' ? 'ar-SA' : 'en-US';
+        const userMsg = { role: 'user', content: text, timestamp: new Date().toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' }) };
         setMessages(prev => [...prev, userMsg]);
         setInput('');
         setLoading(true);
@@ -42,15 +44,15 @@ export default function AdminChat() {
             const aiMsg = {
                 role: 'assistant',
                 content: response.data.answer,
-                timestamp: new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })
+                timestamp: new Date().toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })
             };
             setMessages(prev => [...prev, aiMsg]);
         } catch (error) {
             const errorMsg = {
                 role: 'assistant',
-                content: 'حدث خطأ أثناء معالجة سؤالك. تأكد من اتصال خدمة الذكاء الاصطناعي وحاول مرة أخرى.',
+                content: t('adminChatPage.errorMessage'),
                 isError: true,
-                timestamp: new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })
+                timestamp: new Date().toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })
             };
             setMessages(prev => [...prev, errorMsg]);
         } finally {
@@ -71,10 +73,10 @@ export default function AdminChat() {
     };
 
     return (
-        <DashboardLayout header="الوكيل الذكي">
-            <Head title="الوكيل الذكي — مساعد الأدمن" />
+        <DashboardLayout header={t('adminChatPage.headerTitle')}>
+            <Head title={t('adminChatPage.pageTitle')} />
 
-            <div className="py-6 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto" dir="rtl">
+            <div className="py-6 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col" style={{ height: 'calc(100vh - 200px)' }}>
                     {/* Header */}
                     <div className="bg-gradient-to-l from-blue-600 to-indigo-600 p-4 flex items-center justify-between">
@@ -83,15 +85,15 @@ export default function AdminChat() {
                                 <FaRobot />
                             </div>
                             <div>
-                                <h2 className="text-white font-bold text-sm">الوكيل الذكي</h2>
-                                <p className="text-white/70 text-[11px]">مساعد الأدمن — يحلل بيانات الطلاب ومؤشرات الابتكار</p>
+                                <h2 className="text-white font-bold text-sm">{t('adminChatPage.headerTitle')}</h2>
+                                <p className="text-white/70 text-[11px]">{t('adminChatPage.subtitle')}</p>
                             </div>
                         </div>
                         {messages.length > 0 && (
                             <button
                                 onClick={clearChat}
                                 className="text-white/60 hover:text-white/90 transition p-2 rounded-lg hover:bg-white/10"
-                                title="مسح المحادثة"
+                                title={t('adminChatPage.clearChatTooltip')}
                             >
                                 <FaTrashAlt className="text-sm" />
                             </button>
@@ -105,8 +107,8 @@ export default function AdminChat() {
                                 <div className="w-16 h-16 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-3xl mb-4">
                                     <FaRobot />
                                 </div>
-                                <h3 className="font-bold text-gray-800 mb-1">مرحباً بك في الوكيل الذكي</h3>
-                                <p className="text-xs text-gray-400 max-w-sm mb-6">اسألني أي سؤال عن بيانات الطلاب أو مؤشرات الابتكار أو التصنيفات وسأجيبك فوراً.</p>
+                                <h3 className="font-bold text-gray-800 mb-1">{t('adminChatPage.welcomeTitle')}</h3>
+                                <p className="text-xs text-gray-400 max-w-sm mb-6">{t('adminChatPage.welcomeDescription')}</p>
 
                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-w-lg">
                                     {SUGGESTION_CHIPS.map((chip, i) => (
@@ -143,7 +145,7 @@ export default function AdminChat() {
                                 <div className="bg-white rounded-2xl rounded-tr-sm px-4 py-3 border border-gray-100 shadow-sm">
                                     <div className="flex items-center gap-2 text-sm text-gray-500">
                                         <FaSpinner className="animate-spin text-blue-500" />
-                                        <span>جاري التحليل...</span>
+                                        <span>{t('adminChatPage.analyzing')}</span>
                                     </div>
                                 </div>
                             </div>
@@ -161,7 +163,7 @@ export default function AdminChat() {
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
                                 onKeyDown={handleKeyDown}
-                                placeholder="اكتب سؤالك هنا..."
+                                placeholder={t('adminChatPage.inputPlaceholder')}
                                 disabled={loading}
                                 className="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition disabled:opacity-50 disabled:bg-gray-50"
                                 autoFocus
@@ -174,7 +176,7 @@ export default function AdminChat() {
                                 <FaPaperPlane />
                             </button>
                         </div>
-                        <p className="text-[10px] text-gray-400 mt-2 text-center">الوكيل يحلل بيانات حقيقية من قاعدة البيانات. لا يخترع معلومات.</p>
+                        <p className="text-[10px] text-gray-400 mt-2 text-center">{t('adminChatPage.footerNote')}</p>
                     </div>
                 </div>
             </div>

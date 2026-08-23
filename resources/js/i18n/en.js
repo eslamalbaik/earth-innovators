@@ -3202,11 +3202,15 @@ export const en = {
         "title": "Create new challenge",
         "mustBeLinkedToSchool": "You must be linked to a school to create challenges.",
         "fields": {
-            "title": "Challenge title *",
-            "objective": "Challenge objective *",
-            "description": "Challenge description *",
+            "title": "Challenge title (English) *",
+            "titleAr": "Challenge title (Arabic) *",
+            "objective": "Challenge objective (English) *",
+            "objectiveAr": "Challenge objective (Arabic) *",
+            "description": "Challenge description (English) *",
+            "descriptionAr": "Challenge description (Arabic) *",
             "imageOptional": "Challenge image (optional)",
-            "instructions": "How to complete *",
+            "instructions": "How to complete (English) *",
+            "instructionsAr": "How to complete (Arabic) *",
             "challengeType": "Challenge type *",
             "category": "Category *",
             "ageGroup": "Age group *",
@@ -3276,11 +3280,15 @@ export const en = {
         "pageTitle": "Create new challenge - School dashboard",
         "title": "Create new challenge",
         "fields": {
-            "title": "Challenge title *",
-            "objective": "Challenge objective *",
-            "description": "Challenge description *",
+            "title": "Challenge title (English) *",
+            "titleAr": "Challenge title (Arabic) *",
+            "objective": "Challenge objective (English) *",
+            "objectiveAr": "Challenge objective (Arabic) *",
+            "description": "Challenge description (English) *",
+            "descriptionAr": "Challenge description (Arabic) *",
             "imageOptional": "Challenge image (optional)",
-            "instructions": "How to complete *",
+            "instructions": "How to complete (English) *",
+            "instructionsAr": "How to complete (Arabic) *",
             "challengeType": "Challenge type *",
             "category": "Category *",
             "ageGroup": "Age group *",
@@ -3758,11 +3766,15 @@ export const en = {
             "changeImage": "Change image"
         },
         "fields": {
-            "title": "Challenge title",
-            "objective": "Challenge objective",
-            "description": "Challenge description",
+            "title": "Challenge title (English)",
+            "titleAr": "Challenge title (Arabic)",
+            "objective": "Challenge objective (English)",
+            "objectiveAr": "Challenge objective (Arabic)",
+            "description": "Challenge description (English)",
+            "descriptionAr": "Challenge description (Arabic)",
             "imageOptional": "Challenge image (optional)",
-            "instructions": "How to implement",
+            "instructions": "How to implement (English)",
+            "instructionsAr": "How to implement (Arabic)",
             "challengeType": "Challenge type",
             "category": "Category",
             "ageGroup": "Age group",
@@ -7334,6 +7346,130 @@ export const en = {
         "testimonials": {
             "title": "Stories from Our Community",
             "subtitle": "Real experiences from our students, teachers and innovators"
+        }
+    },
+    "adminTalentMapPage": {
+        "headerTitle": "Talent Map",
+        "managementTitle": "Manage Student Index Calculation",
+        "managementDescription": "You can manually recalculate innovation and readiness indexes for all students to update classifications.",
+        "recalculateAllButton": "Recalculate All Indexes",
+        "recalculateAllConfirm": "Are you sure you want to recalculate the indexes for all students? This may take some time.",
+        "recalculateTooltip": "Recalculate Indexes",
+        "stats": {
+            "total": "Total",
+            "assessed": "Assessed",
+            "ready": "Ready",
+            "developing": "Developing",
+            "gaps": "Gaps"
+        },
+        "filters": {
+            "schoolLabel": "School",
+            "allSchools": "All Schools",
+            "searchLabel": "Search by name or email",
+            "searchPlaceholder": "Type to search...",
+            "apply": "Apply"
+        },
+        "avgScoreLabel": "Average readiness score for assessed students:",
+        "strongestLabel": "Strongest: {index}",
+        "notEvaluatedYet": "Not evaluated yet",
+        "noStudentsHere": "No students here",
+        "unknownInitial": "?",
+        "footnote": "* Classification is automatic based on the readiness score calculated by the evaluation engine. Unassessed students appear under \"Gaps\" until their indexes are calculated."
+    },
+    "adminChatPage": {
+        "headerTitle": "AI Agent",
+        "pageTitle": "AI Agent — Admin Assistant",
+        "subtitle": "Admin assistant — analyzes student data and innovation indexes",
+        "clearChatTooltip": "Clear Chat",
+        "welcomeTitle": "Welcome to the AI Agent",
+        "welcomeDescription": "Ask me any question about student data, innovation indexes, or classifications and I'll answer immediately.",
+        "analyzing": "Analyzing...",
+        "inputPlaceholder": "Type your question here...",
+        "footerNote": "The agent analyzes real data from the database. It doesn't make up information.",
+        "errorMessage": "An error occurred while processing your question. Make sure the AI service is connected and try again.",
+        "suggestions": {
+            "performanceSummary": { "label": "General Performance Summary", "question": "Give me a summary of overall student performance and average indexes" },
+            "weakestIndexes": { "label": "Weakest Indexes", "question": "What are the weakest indexes across all students and how can they be improved?" },
+            "topStudents": { "label": "Top Students", "question": "Who are the highest-performing students and what are their classifications?" },
+            "needAttention": { "label": "Students Needing Attention", "question": "Who are the students who need special attention and why?" },
+            "classificationDistribution": { "label": "Classification Distribution", "question": "How are students distributed across the different classifications (Diamond, Platinum, Gold...)?" },
+            "compareIndexes": { "label": "Compare Indexes", "question": "Compare the averages of the eight indexes and identify the strongest and weakest index" }
+        }
+    },
+    "adminSmartSearchPage": {
+        "headerTitle": "Talent Smart Search",
+        "pageTitle": "Innovative Talent Smart Search",
+        "heroTitle": "Talent Smart Search Engine",
+        "heroSubtitle": "Search for innovators using natural language — the engine uses AI to understand conditions and criteria",
+        "searchPlaceholder": "Type a description of the desired student in natural language (example: a student with strong programming and leadership skills)...",
+        "searching": "Searching...",
+        "searchButton": "Smart Search",
+        "quickSuggestionsLabel": "Quick suggestions:",
+        "resultsForLabel": "Search results for:",
+        "resultsCount": "Found {count} students",
+        "noResultsTitle": "No talents matching this query were found",
+        "noResultsDescription": "Try a different phrasing or use broader skill terms (e.g. technology, programming, leadership).",
+        "institutionFallback": "Unspecified institution",
+        "overallScoreLabel": "Overall Score:",
+        "skillsLabel": "Skills & Achievements:",
+        "viewProfileButton": "View Profile & Smart Report",
+        "sampleQueries": {
+            "q1": "Diamond-level student proficient in Python or AI",
+            "q2": "Students with high leadership index and strong projects",
+            "q3": "Innovators with robotics and programming skills",
+            "q4": "Platinum-classified students with high future readiness",
+            "q5": "Students with creativity above 85 who need IP development"
+        }
+    },
+    "adminCustomRolesPage": {
+        "index": {
+            "header": "Manage Custom Roles",
+            "pageTitle": "Manage Custom Roles - {appName}",
+            "description": "Add roles with custom names (like \"Trainer\" or \"Talent Advisor\") built on one of the base roles — same permissions and dashboard, but with a different name shown everywhere instead of the default name.",
+            "searchPlaceholder": "Search by name or identifier...",
+            "allBaseRoles": "All Base Roles",
+            "addNew": "Add New Role",
+            "table": {
+                "name": "Name",
+                "identifier": "Identifier",
+                "basedOn": "Based On",
+                "usersCount": "Users Count"
+            },
+            "activeStatus": "Active",
+            "inactiveStatus": "Inactive",
+            "emptyState": "No custom roles yet",
+            "pagination": {
+                "showing": "Showing",
+                "to": "to",
+                "ofTotal": "of",
+                "results": "results"
+            },
+            "deleteModal": {
+                "title": "Delete Role",
+                "message": "Are you sure you want to delete the role \"{name}\"?"
+            }
+        },
+        "form": {
+            "backToList": "Back to Custom Roles List",
+            "roleInfoTitle": "Role Information",
+            "nameArLabel": "Arabic Name",
+            "nameArPlaceholder": "Example: Trainer",
+            "nameEnLabel": "English Name",
+            "slugLabel": "Identifier (slug)",
+            "slugHelp": "Automatically generated from the Arabic name, and can be edited.",
+            "baseRoleLabel": "Based on Role",
+            "baseRoleHelpCreate": "The custom role inherits the same dashboard and permissions of this base role, just with a different name.",
+            "baseRoleHelpEdit": "Warning: changing the base role changes the dashboard and permissions for everyone currently holding this custom role.",
+            "activeCheckboxLabel": "Active (selectable when assigning to a user)",
+            "inactiveHelp": "Disabling doesn't remove the role from current users, it just hides it from new assignment lists."
+        },
+        "create": {
+            "header": "Add Custom Role",
+            "pageTitle": "Add Custom Role - {appName}"
+        },
+        "edit": {
+            "header": "Edit Custom Role",
+            "pageTitle": "Edit Custom Role - {appName}"
         }
     }
 };

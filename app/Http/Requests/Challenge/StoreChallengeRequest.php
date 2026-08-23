@@ -23,10 +23,14 @@ class StoreChallengeRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
+            'title_ar' => 'required|string|max:255',
             'objective' => 'required|string|max:1000',
+            'objective_ar' => 'required|string|max:1000',
             'description' => 'required|string',
+            'description_ar' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'instructions' => 'required|string',
+            'instructions_ar' => 'required|string',
             'challenge_type' => 'required|in:cognitive,applied,creative,artistic_creative,collaborative,analytical,technological,behavioral,60_seconds,mental_math,conversions,team_fastest,build_problem,custom',
             'category' => 'required|in:science,technology,engineering,mathematics,arts,other',
             'age_group' => 'required|in:6-9,10-13,14-17,18+',
@@ -43,12 +47,16 @@ class StoreChallengeRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'title.required' => 'عنوان التحدي مطلوب',
+            'title.required' => 'عنوان التحدي (بالإنجليزية) مطلوب',
             'title.max' => 'عنوان التحدي يجب ألا يتجاوز 255 حرفاً',
-            'objective.required' => 'الهدف من التحدي مطلوب',
+            'title_ar.required' => 'عنوان التحدي (بالعربية) مطلوب',
+            'objective.required' => 'الهدف من التحدي (بالإنجليزية) مطلوب',
             'objective.max' => 'الهدف يجب ألا يتجاوز 1000 حرف',
-            'description.required' => 'وصف التحدي مطلوب',
-            'instructions.required' => 'كيفية التنفيذ مطلوبة',
+            'objective_ar.required' => 'الهدف من التحدي (بالعربية) مطلوب',
+            'description.required' => 'وصف التحدي (بالإنجليزية) مطلوب',
+            'description_ar.required' => 'وصف التحدي (بالعربية) مطلوب',
+            'instructions.required' => 'كيفية التنفيذ (بالإنجليزية) مطلوبة',
+            'instructions_ar.required' => 'كيفية التنفيذ (بالعربية) مطلوبة',
             'challenge_type.required' => 'نوع التحدي مطلوب',
             'challenge_type.in' => 'نوع التحدي غير صحيح',
             'category.required' => 'الفئة مطلوبة',
