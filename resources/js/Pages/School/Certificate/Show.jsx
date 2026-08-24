@@ -7,7 +7,7 @@ import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import DesktopFooter from '@/Components/Mobile/DesktopFooter';
 import { useToast } from '@/Contexts/ToastContext';
-import { downloadElementAsImage, printElementAsImage, shareElementAsImage } from '@/utils/downloadElementAsImage';
+import { downloadElementAsImage, downloadElementAsPdf, printElementAsImage, shareElementAsImage } from '@/utils/downloadElementAsImage';
 import CertificateCard from '@/Components/Certificate/CertificateCard';
 import { useTranslation } from '@/i18n';
 
@@ -25,9 +25,9 @@ export default function SchoolCertificateShow({ auth, user, certificate, members
     const handleDownload = async () => {
         gate(async () => {
             try {
-                await downloadElementAsImage(
+                await downloadElementAsPdf(
                     certificateRef.current,
-                    `certificate_${certificate?.certificate_number || user?.membership_number || 'school'}.png`,
+                    `certificate_${certificate?.certificate_number || user?.membership_number || 'school'}.pdf`,
                 );
             } catch (error) {
                 showError({ translationKey: 'toastMessages.genericUnexpectedError' });

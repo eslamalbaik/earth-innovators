@@ -8,7 +8,7 @@ import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import DesktopFooter from '@/Components/Mobile/DesktopFooter';
 import { useTranslation } from '@/i18n';
 import { useToast } from '@/Contexts/ToastContext';
-import { downloadElementAsImage, printElementAsImage, shareElementAsImage } from '@/utils/downloadElementAsImage';
+import { downloadElementAsImage, downloadElementAsPdf, printElementAsImage, shareElementAsImage } from '@/utils/downloadElementAsImage';
 import CertificateCard from '@/Components/Certificate/CertificateCard';
 
 export default function StudentCertificateShow({ auth, user, stats, certificate, membershipSummary = null }) {
@@ -25,9 +25,9 @@ export default function StudentCertificateShow({ auth, user, stats, certificate,
     const handleDownload = async () => {
         gate(async () => {
             try {
-                await downloadElementAsImage(
+                await downloadElementAsPdf(
                     certificateRef.current,
-                    `certificate_${certificate?.certificate_number || user?.membership_number || 'student'}.png`
+                    `certificate_${certificate?.certificate_number || user?.membership_number || 'student'}.pdf`
                 );
             } catch (error) {
                 showError(t('errors.somethingWentWrong'));

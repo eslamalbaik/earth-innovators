@@ -7,8 +7,9 @@ import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import DesktopFooter from '@/Components/Mobile/DesktopFooter';
 import { useTranslation } from '@/i18n';
 import { useToast } from '@/Contexts/ToastContext';
-import { downloadElementAsImage } from '@/utils/downloadElementAsImage';
+import { downloadElementAsPdf } from '@/utils/downloadElementAsImage';
 import { usePremiumGate } from '@/Hooks/usePremiumGate';
+import CertificateCard from '@/Components/Certificate/CertificateCard';
 
 export default function MembershipCertificateShow({ auth, certificate, eligibility, user, membershipSummary = null }) {
     const { t, language } = useTranslation();
@@ -28,9 +29,9 @@ export default function MembershipCertificateShow({ auth, certificate, eligibili
             }
 
             try {
-                await downloadElementAsImage(
+                await downloadElementAsPdf(
                     certificateRef.current,
-                    `certificate_${certificate.certificate_number || user?.membership_number || 'membership'}.png`
+                    `certificate_${certificate.certificate_number || user?.membership_number || 'membership'}.pdf`
                 );
             } catch (error) {
                 showError(t('errors.somethingWentWrong'));

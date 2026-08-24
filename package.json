@@ -42,6 +42,7 @@
         "@types/react-window": "^1.8.8",
         "@vitejs/plugin-react": "^5.0.4",
         "chart.js": "^4.5.1",
+        "jspdf": "^4.2.1",
         "laravel-echo": "^1.19.0",
         "pusher-js": "^8.4.0",
         "react": "^19.2.0",

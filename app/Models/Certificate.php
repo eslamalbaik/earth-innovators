@@ -34,6 +34,11 @@ class Certificate extends Model
     ];
 
     protected $casts = [
+        'user_id' => 'integer',
+        'school_id' => 'integer',
+        'issued_by' => 'integer',
+        'requested_by' => 'integer',
+        'reviewed_by' => 'integer',
         'issue_date' => 'date',
         'expiry_date' => 'date',
         'approved_at' => 'datetime',

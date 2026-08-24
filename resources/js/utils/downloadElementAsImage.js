@@ -199,6 +199,20 @@ export const downloadElementAsImage = async (element, filename = 'certificate.pn
     link.remove();
 };
 
+export const downloadElementAsPdf = async (element, filename = 'certificate.pdf') => {
+    if (!element) {
+        throw new Error('Element is required.');
+    }
+
+    const canvas = await renderElementToCanvas(element);
+    const { jsPDF } = await import('jspdf');
+
+    const orientation = canvas.width >= canvas.height ? 'landscape' : 'portrait';
+    const doc = new jsPDF({ orientation, unit: 'px', format: [canvas.width, canvas.height] });
+    doc.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, canvas.width, canvas.height);
+    doc.save(filename.endsWith('.pdf') ? filename : `${filename}.pdf`);
+};
+
 export const renderElementToPngDataUrl = async (element) => {
     const canvas = await renderElementToCanvas(element);
     return canvas.toDataURL('image/png');
