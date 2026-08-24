@@ -30,7 +30,7 @@ class ContentAnalyzer
             GeminiClient::userMessage(
                 "نوع المحتوى: {$type}\n\nالمحتوى:\n{$content}\n\nقائمة المعايير المرجعية للاستدلال بها:\n" . json_encode(config('standards'), JSON_UNESCAPED_UNICODE)
             ),
-        ]);
+        ], temperature: 0.2, maxTokens: 1500);
 
         return $result ?? [
             'originality'      => 0,

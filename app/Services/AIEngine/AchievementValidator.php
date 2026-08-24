@@ -36,7 +36,7 @@ class AchievementValidator
                 . 'standards_alignment (array of strings - أسماء المعايير التي تتوافق مع هذا الإنجاز من القائمة المرجعية)'
             ),
             GeminiClient::userMessage($prompt),
-        ]);
+        ], temperature: 0.2, maxTokens: 1500);
 
         if (!$result) {
             return [

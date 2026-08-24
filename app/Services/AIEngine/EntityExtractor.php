@@ -33,7 +33,7 @@ class EntityExtractor
                 . 'أجب بصيغة JSON فقط مع حقول: skills, technologies, tools, languages, institutions, specializations.'
             ),
             GeminiClient::userMessage($content),
-        ]);
+        ], temperature: 0.2, maxTokens: 2000);
 
         return $result ?? [
             'skills'          => [],

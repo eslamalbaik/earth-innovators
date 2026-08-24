@@ -112,8 +112,8 @@ class GeminiClient
             ])
             ->timeout($asJson ? 90 : 60)
             ->retry(
-                6,
-                fn (int $attempt) => min(1000 * (2 ** ($attempt - 1)), 10000),
+                3,
+                fn (int $attempt) => min(1000 * (2 ** ($attempt - 1)), 3000),
                 // 429 on this API is daily-quota exhaustion (RESOURCE_EXHAUSTED),
                 // not a rate blip — Google's own retryDelay hint is 50s+, so
                 // retrying within our short backoff window only wastes time.

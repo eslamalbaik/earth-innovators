@@ -12,6 +12,7 @@ use App\Services\BenchmarkingService;
 use App\Jobs\RecalculateIndexesJob;
 use App\Jobs\GenerateAIReportJob;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -71,7 +72,16 @@ class InnovationController extends Controller
      */
     public function recommendations(Request $request, RecommendationEngine $engine): Response
     {
-        $recommendations = $engine->generateRecommendations($request->user());
+        $user = $request->user();
+
+        // Same cache key as Admin\AdminInnovationController::userProfile — reuses
+        // whichever call (student or admin viewing the student) generates first.
+        // Without this, every page visit blocked on a live Gemini call (5-90s+).
+        $recommendations = Cache::remember(
+            "recommendations_user_{$user->id}",
+            86400,
+            fn () => $engine->generateRecommendations($user)
+        );
 
         return Inertia::render('Innovator/Recommendations', [
             'recommendations' => $recommendations,

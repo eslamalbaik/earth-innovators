@@ -191,7 +191,7 @@ class AIArticleGenerationTest extends TestCase
         Http::assertSentCount(1);
     }
 
-    public function test_client_retries_transient_overload_up_to_six_times_then_gives_up(): void
+    public function test_client_retries_transient_overload_up_to_three_times_then_gives_up(): void
     {
         Http::fake([
             'generativelanguage.googleapis.com/*' => Http::response($this->fakeGemini503Body(), 503),
@@ -202,7 +202,7 @@ class AIArticleGenerationTest extends TestCase
         ]);
 
         $this->assertNotNull($result);
-        Http::assertSentCount(6);
+        Http::assertSentCount(3);
     }
 
     public function test_client_stops_retrying_once_a_later_attempt_succeeds(): void

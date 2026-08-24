@@ -55,7 +55,7 @@ class SmartSearchService
                 . 'keywords (array of strings)'
             ),
             GeminiClient::userMessage("استعلام البحث: {$query}"),
-        ]);
+        ], temperature: 0.2, maxTokens: 500);
 
         return $result;
     }

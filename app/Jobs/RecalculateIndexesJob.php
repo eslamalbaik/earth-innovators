@@ -34,6 +34,9 @@ class RecalculateIndexesJob implements ShouldQueue
             Log::info("Recalculation complete for user #{$this->user->id}: overall={$index->overall_score}, classification={$index->classification}");
         } finally {
             Cache::forget("recalculating_user_{$this->user->id}");
+            // Recommendations are keyed off the index scores computed above and
+            // cached 24h (Innovation/AdminInnovation controllers) — stale after recalc.
+            Cache::forget("recommendations_user_{$this->user->id}");
         }
     }
 }
