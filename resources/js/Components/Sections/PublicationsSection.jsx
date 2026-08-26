@@ -10,7 +10,8 @@ export default function PublicationsSection({
     viewAllLink = "/publications",
     compact = false
 }) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const language = i18n.language;
     const ForwardIcon = useForwardIcon();
     
     const displayTitle = title || t('sections.publications.title');
@@ -88,7 +89,7 @@ export default function PublicationsSection({
                             <div className="relative">
                                 <img
                                     src={coverImage}
-                                    alt={publication.title}
+                                    alt={language === 'ar' ? (publication.title_ar || publication.title) : (publication.title || publication.title_ar)}
                                     className="w-full h-48 md:h-64 object-cover"
                                 />
                                 <div className="absolute top-3 right-3 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
@@ -104,7 +105,7 @@ export default function PublicationsSection({
                             <div className="p-4 md:p-6">
                                 {/* Title */}
                                 <h3 className="text-base md:text-lg font-bold text-gray-900 mb-2 line-clamp-2">
-                                    {publication.title}
+                                    {language === 'ar' ? (publication.title_ar || publication.title) : (publication.title || publication.title_ar)}
                                     {publication.issue_number && (
                                         <span className="text-gray-600 font-normal"> - {t('sections.publications.issue')} {publication.issue_number}</span>
                                     )}
@@ -130,7 +131,7 @@ export default function PublicationsSection({
                                 {/* Description */}
                                 {publication.description && (
                                     <p className="text-sm md:text-base text-gray-700 mb-4 line-clamp-2 leading-relaxed">
-                                        {publication.description}
+                                        {language === 'ar' ? (publication.description_ar || publication.description) : (publication.description || publication.description_ar)}
                                     </p>
                                 )}
 

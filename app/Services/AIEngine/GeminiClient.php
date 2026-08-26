@@ -301,11 +301,12 @@ class GeminiClient
             ];
         }
 
-        // 0b. Badge creation (name_ar/description_ar, no English 'description' keyword)
+        // 0b. Badge creation
         if (str_contains($systemContent, 'name_ar') && str_contains($systemContent, 'description_ar')) {
             $nameAr = 'شارة الابتكار المتميز';
             $nameEn = 'Distinguished Innovator Badge';
             $descriptionAr = 'تُمنح هذه الشارة تقديراً للتميز والإبداع في إنجاز المشاريع الابتكارية.';
+            $descriptionEn = 'Awarded in recognition of excellence and creativity in innovative projects.';
 
             if (preg_match('/(?:فكرة الشارة|فكرة|idea):\s*([^\n\r]+)/iu', $userPrompt, $matches)) {
                 $idea = trim($matches[1]);
@@ -313,12 +314,14 @@ class GeminiClient
                     $nameAr = 'شارة ' . $idea;
                     $nameEn = ucfirst($idea) . ' Badge';
                     $descriptionAr = 'تُمنح هذه الشارة تقديراً للتميز في: ' . $idea . '.';
+                    $descriptionEn = 'Awarded in recognition of excellence in: ' . $idea . '.';
                 }
             }
 
             return [
                 'name' => $nameEn,
                 'name_ar' => $nameAr,
+                'description' => $descriptionEn,
                 'description_ar' => $descriptionAr,
                 'icon' => '🏅',
                 'type' => 'custom',
@@ -327,32 +330,39 @@ class GeminiClient
             ];
         }
 
-        // 0c. Challenge creation (title/description/objective/instructions, no title_ar)
+        // 0c. Challenge creation
         if (str_contains($systemContent, 'objective') && str_contains($systemContent, 'instructions') && str_contains($systemContent, 'criteria')) {
-            $title = 'تحدي الابتكار التقني';
-            $objective = 'تنمية مهارات التفكير الابتكاري وحل المشكلات لدى الطلاب من خلال مشروع عملي تطبيقي.';
-            $description = 'يهدف هذا التحدي إلى دفع الطلاب لتصميم وتنفيذ حل مبتكر لمشكلة حقيقية باستخدام أدوات '
-                . 'التفكير التصميمي. يُطلب من المشاركين تحديد المشكلة، اقتراح حل عملي، وبناء نموذج أولي '
-                . 'يوضح فكرتهم، مع مراعاة معايير الجدوى والأثر المجتمعي.';
-            $instructions = 'حدد مشكلة واقعية ترغب في حلها.'.PHP_EOL
-                . 'اقترح فكرة الحل وابحث عن أمثلة مشابهة.'.PHP_EOL
-                . 'صمم نموذجاً أولياً أو خطة تنفيذ واضحة.'.PHP_EOL
-                . 'قدّم عرضاً نهائياً يوضح الفكرة والنتائج المتوقعة.';
+            $titleAr = 'تحدي الابتكار التقني';
+            $titleEn = 'Tech Innovation Challenge';
+            
+            $objectiveAr = 'تنمية مهارات التفكير الابتكاري وحل المشكلات لدى الطلاب من خلال مشروع عملي تطبيقي.';
+            $objectiveEn = 'Developing students\' innovative thinking and problem-solving skills through a practical applied project.';
+            
+            $descriptionAr = 'يهدف هذا التحدي إلى دفع الطلاب لتصميم وتنفيذ حل مبتكر لمشكلة حقيقية باستخدام أدوات التفكير التصميمي.';
+            $descriptionEn = 'This challenge aims to push students to design and implement an innovative solution to a real problem using design thinking tools.';
+            
+            $instructionsAr = 'حدد مشكلة واقعية ترغب في حلها.'.PHP_EOL.'اقترح فكرة الحل وابحث عن أمثلة مشابهة.';
+            $instructionsEn = 'Identify a real problem you want to solve.'.PHP_EOL.'Propose a solution idea and search for similar examples.';
 
             if (preg_match('/(?:فكرة التحدي|فكرة|idea):\s*([^\n\r]+)/iu', $userPrompt, $matches)) {
                 $idea = trim($matches[1]);
                 if ($idea !== '') {
-                    $title = 'تحدي: ' . $idea;
-                    $description = 'يهدف هذا التحدي إلى دفع الطلاب لتصميم وتنفيذ حل مبتكر يتعلق بـ: ' . $idea
-                        . '. يُطلب من المشاركين تحديد المشكلة، اقتراح حل عملي، وبناء نموذج أولي يوضح فكرتهم.';
+                    $titleAr = 'تحدي: ' . $idea;
+                    $titleEn = 'Challenge: ' . $idea;
+                    $descriptionAr = 'يهدف هذا التحدي إلى دفع الطلاب لتصميم وتنفيذ حل مبتكر يتعلق بـ: ' . $idea;
+                    $descriptionEn = 'This challenge aims to push students to design and implement an innovative solution related to: ' . $idea;
                 }
             }
 
             return [
-                'title' => $title,
-                'objective' => $objective,
-                'description' => $description,
-                'instructions' => $instructions,
+                'title' => $titleEn,
+                'title_ar' => $titleAr,
+                'objective' => $objectiveEn,
+                'objective_ar' => $objectiveAr,
+                'description' => $descriptionEn,
+                'description_ar' => $descriptionAr,
+                'instructions' => $instructionsEn,
+                'instructions_ar' => $instructionsAr,
                 'category' => 'technology',
                 'image_keyword' => 'innovation challenge',
                 'criteria' => [

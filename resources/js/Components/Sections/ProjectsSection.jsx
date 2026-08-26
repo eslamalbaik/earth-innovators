@@ -9,7 +9,8 @@ export default function ProjectsSection({
     projects = [],
     onViewAllProjects
 }) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const language = i18n.language;
     const ForwardIcon = useForwardIcon();
     
     const displayTitle = title || t('sections.projects.title');
@@ -70,11 +71,11 @@ export default function ProjectsSection({
                                     </div>
 
                                     <h3 className="text-lg font-bold text-gray-900 mb-2 hover:text-blue-600 transition line-clamp-2">
-                                        {project.title}
+                                        {language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar)}
                                     </h3>
 
                                     <p className="text-gray-600 text-sm mb-4 line-clamp-3 flex-grow">
-                                        {project.description}
+                                        {language === 'ar' ? (project.description_ar || project.description) : (project.description || project.description_ar)}
                                     </p>
 
                                     <div className="flex items-center justify-between text-sm text-gray-500 pt-4 border-t border-gray-200 mt-auto">

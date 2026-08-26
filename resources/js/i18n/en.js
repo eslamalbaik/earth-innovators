@@ -1283,6 +1283,10 @@ export const en = {
             "title": "Numbers That Prove Our Success!",
             "subtitle": "The community of innovators and talented individuals grows daily on Innovators Legacy platform.",
             "loading": "Loading statistics..."
+        },
+        "testimonials": {
+            "title": "Stories from Our Community",
+            "subtitle": "Real experiences from our students, teachers and innovators"
         }
     },
     "quickLinks": {
@@ -7341,12 +7345,6 @@ export const en = {
         "developmentPlanHeading": "🗺️ Development plan",
         "overallAssessmentHeading": "⚖️ Overall assessment",
         "conclusionHeading": "🏁 Conclusion"
-    },
-    "sections": {
-        "testimonials": {
-            "title": "Stories from Our Community",
-            "subtitle": "Real experiences from our students, teachers and innovators"
-        }
     },
     "adminTalentMapPage": {
         "headerTitle": "Talent Map",

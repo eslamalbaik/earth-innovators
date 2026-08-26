@@ -1283,6 +1283,10 @@ export const ar = {
             "title": "أرقام تثبت نجاحنا!",
             "subtitle": "مجتمع المبتكرين والموهوبين ينمو يومياً على منصة إرث المبتكرين.",
             "loading": "جاري تحميل الإحصائيات..."
+        },
+        "testimonials": {
+            "title": "قصص من مجتمعنا",
+            "subtitle": "تجارب حقيقية من طلابنا ومعلمينا ومبتكرينا"
         }
     },
     "quickLinks": {
@@ -7341,12 +7345,6 @@ export const ar = {
         "developmentPlanHeading": "🗺️ خطة التطوير",
         "overallAssessmentHeading": "⚖️ التقييم العام",
         "conclusionHeading": "🏁 الخاتمة"
-    },
-    "sections": {
-        "testimonials": {
-            "title": "قصص من مجتمعنا",
-            "subtitle": "تجارب حقيقية من طلابنا ومعلمينا ومبتكرينا"
-        }
     },
     "adminTalentMapPage": {
         "headerTitle": "خريطة المواهب",

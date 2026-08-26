@@ -79,6 +79,7 @@ class BadgeController extends Controller
                     . 'أجب بصيغة JSON فقط مع الحقول التالية، ولا تترك أياً منها فارغاً: '
                     . 'name (اسم الشارة بالإنجليزية), '
                     . 'name_ar (اسم الشارة بالعربية، جذاب ومختصر), '
+                    . 'description (وصف قصير محفز للشارة بالإنجليزية، جملة أو جملتين), '
                     . 'description_ar (وصف قصير محفز للشارة بالعربية، جملة أو جملتين), '
                     . 'icon (رمز تعبيري واحد فقط), '
                     . 'type (أحد الأنواع المسموحة فقط), '
@@ -94,6 +95,7 @@ class BadgeController extends Controller
 
             $name = $aiResponse['name'] ?? 'New Badge';
             $nameAr = $aiResponse['name_ar'] ?? '';
+            $description = trim($aiResponse['description'] ?? '');
             $descriptionAr = trim($aiResponse['description_ar'] ?? '');
             $icon = $aiResponse['icon'] ?? '🏅';
             $type = $aiResponse['type'] ?? 'custom';
@@ -107,6 +109,7 @@ class BadgeController extends Controller
 
             $incompleteFields = array_keys(array_filter([
                 'name_ar' => $nameAr === '',
+                'description' => $description === '',
                 'description_ar' => $descriptionAr === '',
             ]));
 
@@ -131,6 +134,7 @@ class BadgeController extends Controller
             return response()->json([
                 'name' => $name,
                 'name_ar' => $nameAr,
+                'description' => $description,
                 'description_ar' => $descriptionAr,
                 'icon' => $icon,
                 'type' => $type,

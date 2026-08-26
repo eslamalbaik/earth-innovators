@@ -39,7 +39,7 @@ export default function FeaturedProjectsSection({ projects = [], getCategoryLabe
                             {project.image_url || project.thumbnail ? (
                                 <img
                                     src={project.image_url || project.thumbnail}
-                                    alt={project.title}
+                                    alt={isAr ? (project.title_ar || project.title) : (project.title || project.title_ar)}
                                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                                 />
                             ) : (
@@ -61,10 +61,10 @@ export default function FeaturedProjectsSection({ projects = [], getCategoryLabe
                         {/* Body */}
                         <div className="flex flex-1 flex-col p-4">
                             <h3 className="mb-2 text-sm font-bold text-gray-900 line-clamp-2 md:text-base">
-                                {project.title}
+                                {isAr ? (project.title_ar || project.title) : (project.title || project.title_ar)}
                             </h3>
                             <p className="mb-3 flex-1 text-xs text-gray-500 line-clamp-2">
-                                {project.description}
+                                {isAr ? (project.description_ar || project.description) : (project.description || project.description_ar)}
                             </p>
                             <div className="flex items-center justify-between border-t border-gray-100 pt-3">
                                 {project.views > 0 && (

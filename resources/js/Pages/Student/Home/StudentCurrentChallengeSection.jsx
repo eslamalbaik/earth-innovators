@@ -3,7 +3,7 @@ import { Link } from '@inertiajs/react';
 import { useTranslation } from '@/i18n';
 import { getChallengeImageUrl } from '@/utils/imageUtils';
 
-function ChallengeCard({ challenge, onJoin, t }) {
+function ChallengeCard({ challenge, onJoin, t, language }) {
     if (!challenge) return null;
 
     const deadline = challenge.deadline ? new Date(challenge.deadline) : null;
@@ -41,7 +41,7 @@ function ChallengeCard({ challenge, onJoin, t }) {
             <div className="relative">
                 <img
                     src={getChallengeImage()}
-                    alt={challenge.title || t('homePage.challengeAlt')}
+                    alt={language === 'ar' && challenge.title_ar ? challenge.title_ar : (challenge.title || t('homePage.challengeAlt'))}
                     className="h-40 w-full object-cover"
                     loading="lazy"
                     onError={(e) => {
@@ -57,10 +57,12 @@ function ChallengeCard({ challenge, onJoin, t }) {
 
             <div className="p-4">
                 <h3 className="text-sm font-extrabold text-gray-900 line-clamp-2 mb-1">
-                    {challenge.title}
+                    {language === 'ar' && challenge.title_ar ? challenge.title_ar : challenge.title}
                 </h3>
                 <p className="text-xs text-gray-500 line-clamp-2 mb-3">
-                    {challenge.description || challenge.objective || ''}
+                    {language === 'ar' 
+                        ? (challenge.description_ar || challenge.objective_ar || challenge.description || challenge.objective || '') 
+                        : (challenge.description || challenge.objective || '')}
                 </p>
 
                 <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
@@ -115,7 +117,7 @@ function ChallengeCard({ challenge, onJoin, t }) {
 }
 
 export default function StudentCurrentChallengeSection({ challenges = [], onViewAll, onJoin }) {
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
     const activeChallenges = Array.isArray(challenges) ? challenges.slice(0, 2) : [];
 
     if (activeChallenges.length === 0) {
@@ -173,6 +175,7 @@ export default function StudentCurrentChallengeSection({ challenges = [], onView
                         challenge={challenge}
                         onJoin={onJoin}
                         t={t}
+                        language={language}
                     />
                 ))}
             </div>

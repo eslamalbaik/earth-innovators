@@ -1,4 +1,4 @@
-﻿import { Head, Link, useForm, router } from '@inertiajs/react';
+import { Head, Link, useForm, router } from '@inertiajs/react';
 import MobileAppLayout from '@/Layouts/MobileAppLayout';
 import { useState, useRef } from 'react';
 import {
@@ -200,6 +200,8 @@ export default function StudentChallengeShow({ auth, challenge, membershipSummar
         new Date(challenge.start_date) <= new Date() &&
         new Date(challenge.deadline) >= new Date();
 
+    const displayTitle = language === 'ar' && challenge.title_ar ? challenge.title_ar : challenge.title;
+
     const renderChallengeContent = (
         <div className="space-y-4">
             {/* Challenge Header */}
@@ -207,7 +209,7 @@ export default function StudentChallengeShow({ auth, challenge, membershipSummar
                 <div className="mb-3">
                     <div className="flex items-center gap-2 mb-2">
                         <FaTrophy className="text-yellow-600 text-xl" />
-                        <h1 className="text-lg font-extrabold text-gray-900 flex-1">{challenge.title}</h1>
+                        <h1 className="text-lg font-extrabold text-gray-900 flex-1">{displayTitle}</h1>
                         <span className={`px-2 py-1 ${statusBadge.bg} ${statusBadge.text} text-xs font-semibold rounded-full flex items-center gap-1`}>
                             <StatusIcon className="text-[10px]" />
                             {statusBadge.label}
@@ -271,24 +273,24 @@ export default function StudentChallengeShow({ auth, challenge, membershipSummar
             {/* Details Tab */}
             {activeTab === 'details' && (
                 <div className="space-y-4">
-                    {challenge.objective && (
+                    {(language === 'ar' && challenge.objective_ar ? challenge.objective_ar : challenge.objective) && (
                         <div className="bg-white rounded-2xl border border-gray-100 p-4">
                             <h3 className="text-sm font-bold text-gray-900 mb-2">{t('studentChallengesShowPage.sections.objective')}</h3>
-                            <p className="text-sm text-gray-700">{challenge.objective}</p>
+                            <p className="text-sm text-gray-700">{language === 'ar' && challenge.objective_ar ? challenge.objective_ar : challenge.objective}</p>
                         </div>
                     )}
 
-                    {challenge.description && (
+                    {(language === 'ar' && challenge.description_ar ? challenge.description_ar : challenge.description) && (
                         <div className="bg-white rounded-2xl border border-gray-100 p-4">
                             <h3 className="text-sm font-bold text-gray-900 mb-2">{t('studentChallengesShowPage.sections.description')}</h3>
-                            <p className="text-sm text-gray-700 whitespace-pre-line">{challenge.description}</p>
+                            <p className="text-sm text-gray-700 whitespace-pre-line">{language === 'ar' && challenge.description_ar ? challenge.description_ar : challenge.description}</p>
                         </div>
                     )}
 
-                    {challenge.instructions && (
+                    {(language === 'ar' && challenge.instructions_ar ? challenge.instructions_ar : challenge.instructions) && (
                         <div className="bg-white rounded-2xl border border-gray-100 p-4">
                             <h3 className="text-sm font-bold text-gray-900 mb-2">{t('studentChallengesShowPage.sections.howTo')}</h3>
-                            <p className="text-sm text-gray-700 whitespace-pre-line">{challenge.instructions}</p>
+                            <p className="text-sm text-gray-700 whitespace-pre-line">{language === 'ar' && challenge.instructions_ar ? challenge.instructions_ar : challenge.instructions}</p>
                         </div>
                     )}
 
@@ -455,13 +457,13 @@ export default function StudentChallengeShow({ auth, challenge, membershipSummar
 
     return (
         <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-gray-50">
-            <Head title={t('studentChallengesShowPage.pageTitle', { title: challenge.title, appName: t('common.appName') })} />
+            <Head title={t('studentChallengesShowPage.pageTitle', { title: displayTitle, appName: t('common.appName') })} />
 
             {/* Mobile View */}
             <div className="block md:hidden">
                 <MobileAppLayout
                     auth={auth}
-                    title={challenge.title}
+                    title={displayTitle}
                     activeNav="challenges"
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
@@ -475,7 +477,7 @@ export default function StudentChallengeShow({ auth, challenge, membershipSummar
             <div className="hidden md:block">
                 <MobileAppLayout
                     auth={auth}
-                    title={challenge.title}
+                    title={displayTitle}
                     activeNav="challenges"
                     unreadCount={auth?.unreadCount || 0}
                     onNotifications={() => router.visit('/notifications')}
