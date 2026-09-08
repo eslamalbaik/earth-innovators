@@ -62,6 +62,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
         status: 'pending',
         files: [],
         images: [],
+        is_ai_generated: false,
     });
 
     /**
@@ -173,6 +174,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                 description_ar: result.description_ar || prev.description_ar,
                 category: result.category || prev.category,
                 images: result.image_url ? [result.image_url] : prev.images,
+                is_ai_generated: true,
             }));
 
             setAiImagePreview(result.image_url || null);
@@ -783,6 +785,13 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                     </button>
                                 </div>
                             </div>
+
+                            {createData.is_ai_generated && (
+                                <div className="flex items-center gap-2 rounded-lg border border-indigo-100 bg-indigo-50 px-4 py-2.5 text-xs font-semibold text-indigo-700">
+                                    <FaRobot className="text-indigo-500" />
+                                    {t('teacherProjectsCreatePage.aiAssistant.disclosureNotice')}
+                                </div>
+                            )}
 
                             {aiImagePreview && (
                                 <div>

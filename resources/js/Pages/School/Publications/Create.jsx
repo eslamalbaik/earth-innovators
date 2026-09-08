@@ -27,6 +27,7 @@ export default function SchoolPublicationCreate({ auth }) {
         file: null,
         youtube_url: '',
         issue_number: '',
+        is_ai_generated: false,
     });
 
     const [coverPreview, setCoverPreview] = useState(null);
@@ -60,6 +61,7 @@ export default function SchoolPublicationCreate({ auth }) {
                 content_ar: result.content_ar || prev.content_ar,
                 description: result.description || prev.description,
                 description_ar: result.description_ar || prev.description_ar,
+                is_ai_generated: true,
             }));
 
             if (result.image_url) {
@@ -160,6 +162,13 @@ export default function SchoolPublicationCreate({ auth }) {
                                 )}
                             </button>
                         </div>
+
+                        {data.is_ai_generated && (
+                            <div className="flex items-center gap-2 rounded-lg border border-indigo-100 bg-indigo-50 px-4 py-2.5 text-xs font-semibold text-indigo-700">
+                                <FaRobot className="text-indigo-500" />
+                                {t('teacherPublicationCreatePage.aiAssistant.disclosureNotice')}
+                            </div>
+                        )}
 
                         <div>
                             <InputLabel htmlFor="type" value={t('schoolPublicationsPage.form.typeLabel')} />

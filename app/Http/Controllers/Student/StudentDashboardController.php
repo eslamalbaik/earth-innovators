@@ -118,39 +118,49 @@ class StudentDashboardController extends Controller
         // Membership summary for trial/subscription banner
         $membershipSummary = app(MembershipAccessService::class)->getMembershipSummary($user);
 
-        // Innovation summary (إرث المبتكرين)
-        try {
-            $latestIndex = $user->latestInnovationIndex;
-            $innovation = [
-                'hasIndex'              => (bool) $latestIndex,
-                'overallScore'          => (float) ($latestIndex->overall_score ?? 0),
-                'classification'        => $latestIndex->classification ?? 'developing',
-                'classificationDetails' => $latestIndex?->getClassificationDetails()
-                    ?? \App\Models\InnovationIndex::CLASSIFICATIONS['developing'],
-                'indexes'               => $latestIndex?->toIndexArray() ?? [],
-                'indexNames'            => \App\Models\InnovationIndex::INDEX_NAMES,
-                'achievements'          => [
-                    'total'     => $user->achievements()->count(),
-                    'validated' => $user->achievements()->where('ai_validation_status', 'validated')->count(),
-                    'pending'   => $user->achievements()->where('ai_validation_status', 'pending')->count(),
-                ],
-                'recentAchievements'    => $user->achievements()
-                    ->latest()
-                    ->limit(3)
-                    ->get(['id', 'title', 'type', 'ai_validation_status', 'date']),
-            ];
-        } catch (\Exception $e) {
-            $innovation = [
-                'hasIndex'              => false,
-                'overallScore'          => 0,
-                'classification'        => 'developing',
-                'classificationDetails' => \App\Models\InnovationIndex::CLASSIFICATIONS['developing'],
-                'indexes'               => [],
-                'indexNames'            => \App\Models\InnovationIndex::INDEX_NAMES,
-                'achievements'          => ['total' => 0, 'validated' => 0, 'pending' => 0],
-                'recentAchievements'    => [],
-            ];
-        }
+        // Innovation summary (إرث المبتكرين). Cached — invalidated by
+        // RecalculateIndexesJob whenever the user's indexes actually change.
+        $innovation = \Illuminate\Support\Facades\Cache::remember("innovation_summary_user_{$user->id}", 300, function () use ($user) {
+            try {
+                $latestIndex = $user->latestInnovationIndex;
+
+                $achievementCounts = $user->achievements()->selectRaw(
+                    "COUNT(*) as total, " .
+                    "SUM(CASE WHEN ai_validation_status = 'validated' THEN 1 ELSE 0 END) as validated, " .
+                    "SUM(CASE WHEN ai_validation_status = 'pending' THEN 1 ELSE 0 END) as pending"
+                )->first();
+
+                return [
+                    'hasIndex'              => (bool) $latestIndex,
+                    'overallScore'          => (float) ($latestIndex->overall_score ?? 0),
+                    'classification'        => $latestIndex->classification ?? 'developing',
+                    'classificationDetails' => $latestIndex?->getClassificationDetails()
+                        ?? \App\Models\InnovationIndex::CLASSIFICATIONS['developing'],
+                    'indexes'               => $latestIndex?->toIndexArray() ?? [],
+                    'indexNames'            => \App\Models\InnovationIndex::INDEX_NAMES,
+                    'achievements'          => [
+                        'total'     => (int) ($achievementCounts->total ?? 0),
+                        'validated' => (int) ($achievementCounts->validated ?? 0),
+                        'pending'   => (int) ($achievementCounts->pending ?? 0),
+                    ],
+                    'recentAchievements'    => $user->achievements()
+                        ->latest()
+                        ->limit(3)
+                        ->get(['id', 'title', 'type', 'ai_validation_status', 'date']),
+                ];
+            } catch (\Exception $e) {
+                return [
+                    'hasIndex'              => false,
+                    'overallScore'          => 0,
+                    'classification'        => 'developing',
+                    'classificationDetails' => \App\Models\InnovationIndex::CLASSIFICATIONS['developing'],
+                    'indexes'               => [],
+                    'indexNames'            => \App\Models\InnovationIndex::INDEX_NAMES,
+                    'achievements'          => ['total' => 0, 'validated' => 0, 'pending' => 0],
+                    'recentAchievements'    => [],
+                ];
+            }
+        });
 
         return Inertia::render('Student/Dashboard', [
             'stats'                => $stats,

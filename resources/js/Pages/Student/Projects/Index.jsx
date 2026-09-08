@@ -17,27 +17,25 @@ export default function StudentProjectsIndex({ auth, projects, message, noticeKe
         return Number.isFinite(value) ? value : 0;
     };
 
-    // Map project status to filter categories
+    // Map project status to filter categories. A project's own `status` is
+    // always 'approved' here (this list only shows approved projects) — it
+    // says nothing about whether *this student* submitted to it. Only the
+    // student's own submission_status determines pending/evaluated/winner.
     const getProjectStatus = (project) => {
+        if (!project.submission_status) {
+            return 'available';
+        }
+
         const rating = getRatingValue(project.rating);
 
-        // If project has submission status, use it
-        if (project.submission_status) {
-            if (project.submission_status === 'pending' || project.submission_status === 'under_review') {
-                return 'pending';
-            }
-            if (project.submission_status === 'evaluated' || project.submission_status === 'approved') {
-                return rating >= 4.5 ? 'winners' : 'evaluated';
-            }
-        }
-        // Otherwise use project status
-        if (project.status === 'pending' || project.status === 'under_review') {
+        if (project.submission_status === 'pending' || project.submission_status === 'under_review') {
             return 'pending';
         }
-        if (project.status === 'approved' || project.status === 'evaluated') {
+        if (project.submission_status === 'evaluated' || project.submission_status === 'approved') {
             return rating >= 4.5 ? 'winners' : 'evaluated';
         }
-        return 'evaluated';
+
+        return 'available';
     };
 
     const filteredProjects = useMemo(() => {
@@ -57,7 +55,7 @@ export default function StudentProjectsIndex({ auth, projects, message, noticeKe
         if (status === 'winners') {
             return { label: t('studentProjects.statusWinner'), color: 'bg-green-100 text-green-700 border-green-300' };
         }
-        return { label: t('studentProjects.statusEvaluated'), color: 'bg-blue-100 text-blue-700 border-blue-300' };
+        return { label: t('studentProjects.statusAvailable'), color: 'bg-gray-100 text-gray-700 border-gray-300' };
     };
 
     const getCategoryLabel = (category) => {
@@ -169,59 +167,58 @@ export default function StudentProjectsIndex({ auth, projects, message, noticeKe
             )}
 
             {filteredProjects.length > 0 ? (
-                <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {filteredProjects.map((project) => {
                         const statusInfo = getStatusLabel(project);
                         const categoryLabel = getCategoryLabel(project.category);
                         const projectDate = formatDate(project.submitted_at || project.created_at || project.approved_at);
                         const rating = getRatingValue(project.rating);
                         const pointsEarned = Number(project.points_earned) || 0;
+                        const imageSrc = project.thumbnail || (Array.isArray(project.images) && project.images[0]) || null;
+                        const title = (language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar)) || t('studentProjects.defaultProjectTitle');
 
                         return (
                             <div
                                 key={project.id}
                                 onClick={() => handleViewProject(project.id)}
-                                className="bg-white rounded-2xl border border-gray-100 p-4 flex items-start gap-4 cursor-pointer hover:shadow-md transition"
+                                className="group bg-white rounded-2xl border border-gray-100 overflow-hidden cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
                             >
                                 {/* Project Image */}
-                                <div className="flex-shrink-0">
-                                    {project.image || project.thumbnail ? (
+                                <div className="relative w-full aspect-video bg-gray-100 overflow-hidden">
+                                    {imageSrc ? (
                                         <img
-                                            src={project.image || project.thumbnail || '/images/hero.png'}
-                                            alt={(language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar)) || t('studentProjects.imageAlt')}
-                                            className="w-20 h-20 rounded-xl object-cover"
+                                            src={imageSrc}
+                                            alt={title}
+                                            loading="lazy"
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                         />
                                     ) : (
-                                        <div className="w-20 h-20 rounded-xl bg-gray-200 flex items-center justify-center">
-                                            <FaImage className="text-gray-400 text-2xl" />
+                                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                                            <FaImage className="text-gray-400 text-3xl" />
                                         </div>
                                     )}
+                                    <span className={`absolute top-2 ${isRtl ? 'right-2' : 'left-2'} px-2 py-1 rounded-full text-[10px] font-semibold border shadow-sm bg-white/90 backdrop-blur ${statusInfo.color}`}>
+                                        {statusInfo.label}
+                                    </span>
                                 </div>
 
                                 {/* Project Info */}
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex items-start justify-between gap-2 mb-2">
-                                        <div className="flex-1">
-                                            <h3 className="text-sm font-bold text-gray-900 mb-1 line-clamp-1">
-                                                {(language === 'ar' ? (project.title_ar || project.title) : (project.title || project.title_ar)) || t('studentProjects.defaultProjectTitle')}
-                                            </h3>
-                                            <p className="text-xs text-gray-500">{projectDate}</p>
-                                        </div>
-                                        <FaEye className="text-gray-400 text-sm flex-shrink-0" />
+                                <div className="p-4">
+                                    <div className="flex items-start justify-between gap-2 mb-1">
+                                        <h3 className="text-sm font-bold text-gray-900 line-clamp-1">{title}</h3>
+                                        <FaEye className="text-gray-300 text-sm flex-shrink-0 group-hover:text-[#A3C042] transition-colors" />
                                     </div>
+                                    <p className="text-xs text-gray-500 mb-2">{projectDate}</p>
 
                                     <div className="flex items-center gap-2 flex-wrap mb-2">
                                         <span className="px-2 py-1 rounded-full text-[10px] font-semibold bg-gray-100 text-gray-700 border border-gray-200">
                                             {categoryLabel}
                                         </span>
-                                        <span className={`px-2 py-1 rounded-full text-[10px] font-semibold border ${statusInfo.color}`}>
-                                            {statusInfo.label}
-                                        </span>
                                     </div>
 
                                     {/* Rating and Points */}
                                     {(rating > 0 || pointsEarned > 0) && (
-                                        <div className="flex items-center gap-3 mt-2">
+                                        <div className="flex items-center gap-3 pt-2 mt-2 border-t border-gray-100">
                                             {rating > 0 && (
                                                 <div className="flex items-center gap-1 text-xs text-yellow-600">
                                                     <FaStar className="text-yellow-500" />

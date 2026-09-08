@@ -6,6 +6,7 @@ import { FaBook, FaBuilding, FaCalendar, FaEye, FaFileAlt, FaHeart } from 'react
 import { useState } from 'react';
 import axios from 'axios';
 import { getPublicationFileUrl, getPublicationImageUrl } from '@/utils/imageUtils';
+import AiDisclosureBadge from '@/Components/Innovation/AiDisclosureBadge';
 import { useTranslation } from '@/i18n';
 
 const monthKeys = [
@@ -204,6 +205,8 @@ export default function PublicationShow({
                             </span>
                         )}
                     </h1>
+
+                    {publication.is_ai_generated && <AiDisclosureBadge />}
 
                     <div className="flex flex-wrap items-center gap-3 text-xs text-gray-600">
                         {publication.publish_date && (

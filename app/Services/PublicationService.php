@@ -48,7 +48,7 @@ class PublicationService extends BaseService
 
         $publication = $this->cacheTags($cacheTag, $cacheKey, function () use ($publicationId) {
             return Publication::with(['author:id,name', 'school:id,name', 'approver:id,name'])
-                ->select('id', 'title', 'title_ar', 'description', 'description_ar', 'type', 'cover_image', 'file', 'youtube_url', 'content', 'content_ar', 'issue_number', 'publish_date', 'publisher_name', 'likes_count', 'views', 'author_id', 'school_id', 'approved_by', 'status', 'created_at')
+                ->select('id', 'title', 'title_ar', 'description', 'description_ar', 'type', 'cover_image', 'file', 'youtube_url', 'content', 'content_ar', 'is_ai_generated', 'issue_number', 'publish_date', 'publisher_name', 'likes_count', 'views', 'author_id', 'school_id', 'approved_by', 'status', 'created_at')
                 ->find($publicationId);
         }, 600); // Cache for 10 minutes
 
@@ -138,7 +138,7 @@ class PublicationService extends BaseService
         return $this->cacheTags($cacheTag, $cacheKey, function () use ($userId, $perPage, $page) {
             return Publication::where('author_id', $userId)
                 ->with('school:id,name')
-                ->select('id', 'title', 'title_ar', 'description', 'description_ar', 'type', 'status', 'cover_image', 'file', 'youtube_url', 'content', 'content_ar', 'issue_number', 'publish_date', 'publisher_name', 'likes_count', 'views', 'school_id', 'created_at')
+                ->select('id', 'title', 'title_ar', 'description', 'description_ar', 'type', 'status', 'cover_image', 'file', 'youtube_url', 'content', 'content_ar', 'is_ai_generated', 'issue_number', 'publish_date', 'publisher_name', 'likes_count', 'views', 'school_id', 'created_at')
                 ->orderBy('created_at', 'desc')
                 ->paginate($perPage, ['*'], 'page', $page);
         }, 300); // Cache for 5 minutes
@@ -156,7 +156,7 @@ class PublicationService extends BaseService
                 $query->where('school_id', $schoolId);
             }
             $query->with('author:id,name')
-                ->select('id', 'title', 'title_ar', 'description', 'description_ar', 'type', 'status', 'cover_image', 'file', 'youtube_url', 'content', 'content_ar', 'issue_number', 'publish_date', 'publisher_name', 'likes_count', 'views', 'author_id', 'created_at')
+                ->select('id', 'title', 'title_ar', 'description', 'description_ar', 'type', 'status', 'cover_image', 'file', 'youtube_url', 'content', 'content_ar', 'is_ai_generated', 'issue_number', 'publish_date', 'publisher_name', 'likes_count', 'views', 'author_id', 'created_at')
                 ->orderBy('created_at', 'desc');
 
             if ($status) {

@@ -5,8 +5,6 @@ import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { queryClient } from './lib/react-query';
 import { ToastProvider } from './Contexts/ToastContext';
 import AppUpdateNotifier from './Components/AppUpdateNotifier';
 import { ConfirmProvider } from './Contexts/ConfirmContext';
@@ -43,14 +41,12 @@ createInertiaApp({
 
         root.render(
             <Provider store={store}>
-                <QueryClientProvider client={queryClient}>
-                    <ToastProvider>
-                        <ConfirmProvider>
-                            <AppUpdateNotifier initialBuildId={props.initialPage?.props?.appBuildId} />
-                            <App {...props} />
-                        </ConfirmProvider>
-                    </ToastProvider>
-                </QueryClientProvider>
+                <ToastProvider>
+                    <ConfirmProvider>
+                        <AppUpdateNotifier initialBuildId={props.initialPage?.props?.appBuildId} />
+                        <App {...props} />
+                    </ConfirmProvider>
+                </ToastProvider>
             </Provider>
         );
     },

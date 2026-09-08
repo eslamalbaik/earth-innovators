@@ -8,8 +8,6 @@ import {
     FaTrash,
     FaUser,
     FaSchool,
-    FaCalendar,
-    FaBook,
     FaDownload,
     FaEye,
     FaEdit,
@@ -21,7 +19,7 @@ import AiDisclosureBadge from '@/Components/Innovation/AiDisclosureBadge';
 
 const MONTH_KEYS = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
 
-export default function AdminPublicationShow({ publication }) {
+export default function SchoolPublicationShow({ auth, publication }) {
     const { confirm } = useConfirmDialog();
     const { t, language } = useTranslation();
     const publicationTitle = language === 'ar'
@@ -38,6 +36,8 @@ export default function AdminPublicationShow({ publication }) {
         reason: '',
     });
 
+    const isOwner = publication.author_id === auth?.user?.id;
+
     const handleApprove = async () => {
         const confirmed = await confirm({
             title: t('adminPublicationShowPage.confirm.approve.title'),
@@ -48,18 +48,16 @@ export default function AdminPublicationShow({ publication }) {
         });
 
         if (confirmed) {
-            router.post(route('admin.publications.approve', publication.id), {}, {
+            router.post(route('school.publications.approve', publication.id), {}, {
                 preserveScroll: true,
-                onSuccess: () => {
-                    router.reload();
-                },
+                onSuccess: () => router.reload(),
             });
         }
     };
 
     const handleReject = (e) => {
         e.preventDefault();
-        router.post(route('admin.publications.reject', publication.id), data, {
+        router.post(route('school.publications.reject', publication.id), data, {
             preserveScroll: true,
             onSuccess: () => {
                 setShowRejectModal(false);
@@ -78,7 +76,7 @@ export default function AdminPublicationShow({ publication }) {
         });
 
         if (confirmed) {
-            router.delete(route('admin.publications.destroy', publication.id));
+            router.delete(route('school.publications.destroy', publication.id));
         }
     };
 
@@ -120,7 +118,7 @@ export default function AdminPublicationShow({ publication }) {
 
             <div className="mb-6">
                 <Link
-                    href={route('admin.publications.index')}
+                    href={route('school.publications.index')}
                     className="text-blue-600 hover:text-blue-800 flex items-center gap-2"
                 >
                     <FaArrowRight className="transform rotate-180" />
@@ -131,7 +129,6 @@ export default function AdminPublicationShow({ publication }) {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Main Content */}
                 <div className="lg:col-span-2 space-y-6">
-                    {/* Publication Info */}
                     <div className="bg-white rounded-xl shadow-lg p-6">
                         <div className="flex items-start justify-between mb-4">
                             <div>
@@ -146,7 +143,6 @@ export default function AdminPublicationShow({ publication }) {
                             {getStatusBadge(publication.status)}
                         </div>
 
-                        {/* Cover Image */}
                         {coverImage && (
                             <div className="mb-6">
                                 <img
@@ -173,7 +169,6 @@ export default function AdminPublicationShow({ publication }) {
                             </div>
                         )}
 
-                        {/* File Download */}
                         {publication.file && (
                             <div className="mt-6 pt-6 border-t border-gray-200">
                                 <a
@@ -192,43 +187,22 @@ export default function AdminPublicationShow({ publication }) {
 
                 {/* Sidebar */}
                 <div className="space-y-6">
-                    {/* Publication Details */}
                     <div className="bg-white rounded-xl shadow-lg p-6">
                         <h2 className="text-xl font-bold text-gray-900 mb-4">{t('adminPublicationShowPage.sidebar.infoTitle')}</h2>
-
                         <div className="space-y-4">
                             <div>
                                 <p className="text-sm text-gray-600 mb-1">{t('adminPublicationShowPage.sidebar.createdAt')}</p>
                                 <p className="font-semibold text-gray-900">{formatDate(publication.created_at)}</p>
                             </div>
-                            {publication.approved_at && (
-                                <div>
-                                    <p className="text-sm text-gray-600 mb-1">{t('adminPublicationShowPage.sidebar.approvedAt')}</p>
-                                    <p className="font-semibold text-gray-900">{formatDate(publication.approved_at)}</p>
-                                </div>
-                            )}
-                            {publication.issue_number && (
-                                <div>
-                                    <p className="text-sm text-gray-600 mb-1">{t('adminPublicationShowPage.sidebar.issueNumber')}</p>
-                                    <p className="font-semibold text-gray-900">{publication.issue_number}</p>
-                                </div>
-                            )}
                             {publication.publish_date && (
                                 <div>
                                     <p className="text-sm text-gray-600 mb-1">{t('adminPublicationShowPage.sidebar.publishDate')}</p>
                                     <p className="font-semibold text-gray-900">{formatDate(publication.publish_date)}</p>
                                 </div>
                             )}
-                            {publication.publisher_name && (
-                                <div>
-                                    <p className="text-sm text-gray-600 mb-1">{t('adminPublicationShowPage.sidebar.publisherName')}</p>
-                                    <p className="font-semibold text-gray-900">{publication.publisher_name}</p>
-                                </div>
-                            )}
                         </div>
                     </div>
 
-                    {/* Author Info */}
                     {publication.author && (
                         <div className="bg-white rounded-xl shadow-lg p-6">
                             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -244,7 +218,6 @@ export default function AdminPublicationShow({ publication }) {
                         </div>
                     )}
 
-                    {/* School Info */}
                     {publication.school && (
                         <div className="bg-white rounded-xl shadow-lg p-6">
                             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -255,18 +228,6 @@ export default function AdminPublicationShow({ publication }) {
                         </div>
                     )}
 
-                    {/* Approver Info */}
-                    {publication.approver && (
-                        <div className="bg-white rounded-xl shadow-lg p-6">
-                            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                <FaCheckCircle className="text-green-500" />
-                                {t('adminPublicationShowPage.sidebar.approverTitle')}
-                            </h2>
-                            <p className="font-semibold text-gray-900">{publication.approver.name}</p>
-                        </div>
-                    )}
-
-                    {/* Actions */}
                     <div className="bg-white rounded-xl shadow-lg p-6">
                         <h2 className="text-xl font-bold text-gray-900 mb-4">{t('adminPublicationShowPage.actions.title')}</h2>
                         <div className="space-y-3">
@@ -288,34 +249,39 @@ export default function AdminPublicationShow({ publication }) {
                                     </button>
                                 </>
                             )}
-                            <a
-                                href={route('publications.show', publication.id)}
-                                target="_blank"
-                                className="w-full bg-[#A3C042] hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
-                            >
-                                <FaEye />
-                                {t('adminPublicationShowPage.actions.view')}
-                            </a>
-                            <Link
-                                href={route('admin.publications.edit', publication.id)}
-                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
-                            >
-                                <FaEdit />
-                                {t('adminPublicationShowPage.actions.edit')}
-                            </Link>
-                            <button
-                                onClick={handleDelete}
-                                className="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
-                            >
-                                <FaTrash />
-                                {t('adminPublicationShowPage.actions.delete')}
-                            </button>
+                            {publication.status === 'approved' && (
+                                <a
+                                    href={route('publications.show', publication.id)}
+                                    target="_blank"
+                                    className="w-full bg-[#A3C042] hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
+                                >
+                                    <FaEye />
+                                    {t('adminPublicationShowPage.actions.view')}
+                                </a>
+                            )}
+                            {isOwner && (
+                                <Link
+                                    href={route('school.publications.edit', publication.id)}
+                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
+                                >
+                                    <FaEdit />
+                                    {t('adminPublicationShowPage.actions.edit')}
+                                </Link>
+                            )}
+                            {isOwner && (
+                                <button
+                                    onClick={handleDelete}
+                                    className="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2"
+                                >
+                                    <FaTrash />
+                                    {t('adminPublicationShowPage.actions.delete')}
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Reject Modal */}
             {showRejectModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-xl shadow-xl p-6 max-w-md w-full">

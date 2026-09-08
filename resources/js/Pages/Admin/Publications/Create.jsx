@@ -25,6 +25,7 @@ export default function AdminPublicationCreate({ schools }) {
         youtube_url: '',
         issue_number: '',
         school_id: '',
+        is_ai_generated: false,
     });
 
     const [coverPreview, setCoverPreview] = useState(null);
@@ -51,6 +52,7 @@ export default function AdminPublicationCreate({ schools }) {
                 content_ar: result.content_ar || prev.content_ar,
                 description: result.description || prev.description,
                 description_ar: result.description_ar || prev.description_ar,
+                is_ai_generated: true,
             }));
 
             if (result.image_url) {

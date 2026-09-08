@@ -264,8 +264,7 @@ export default function SchoolPublicationsIndex({ auth, publications, stats, fil
 
                                                     <div className="flex items-center gap-2">
                                                         <Link
-                                                            href={`/publications/${publication.id}`}
-                                                            target="_blank"
+                                                            href={`/school/publications/${publication.id}`}
                                                             className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition text-sm"
                                                         >
                                                             <FaEye />

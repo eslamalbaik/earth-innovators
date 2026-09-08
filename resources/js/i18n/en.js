@@ -302,6 +302,12 @@ export const en = {
         "dashboard": "Dashboard",
         "privacy": "Privacy Policy",
         "terms": "Terms & Conditions",
+        "aiEthics": "AI Ethics Policy",
+        "aiGeneratedDisclosure": "AI-generated content — human reviewed",
+        "aiAppealAction": "Object to this AI result",
+        "aiAppealTitle": "Object to an AI Result",
+        "aiAppealPlaceholder": "Explain why you disagree with this AI-generated result or recommendation...",
+        "aiAppealSubmit": "Submit Objection",
         "allRightsReserved": "All Rights Reserved",
         "loading": "Loading...",
         "saving": "Saving...",
@@ -946,6 +952,12 @@ export const en = {
         "copyright": "All Rights Reserved - Innovators Legacy",
         "privacy": "Privacy Policy",
         "terms": "Terms & Conditions",
+        "aiEthics": "AI Ethics Policy",
+        "aiGeneratedDisclosure": "AI-generated content — human reviewed",
+        "aiAppealAction": "Object to this AI result",
+        "aiAppealTitle": "Object to an AI Result",
+        "aiAppealPlaceholder": "Explain why you disagree with this AI-generated result or recommendation...",
+        "aiAppealSubmit": "Submit Objection",
         "contact": "Contact Us",
         "about": "About",
         "support": "Support",
@@ -1010,6 +1022,7 @@ export const en = {
         "statusUnderReview": "Under review",
         "statusEvaluated": "Evaluated",
         "statusWinner": "Winner",
+        "statusAvailable": "Open for submission",
         "empty": "No projects yet",
         "pointsCount": "{count} points",
         "defaultProjectTitle": "Untitled project",
@@ -1403,6 +1416,8 @@ export const en = {
         "fixErrors": "Please fix the following errors:",
         "phoneInUseMessage": "already registered to another user",
         "creating": "Creating account...",
+        "aiConsentLabel": "I agree to my data being processed to power the platform's AI features (recommendations, reports, content generation), in line with the",
+        "aiConsentLinkText": "AI Ethics & Governance policy",
         "hasAccount": "Already have an account?",
         "forgotPasswordTitle": "Forgot Password",
         "forgotPasswordDescription": "Enter your email and we will send you a verification code to reset your password",
@@ -1981,7 +1996,8 @@ export const en = {
             "generating": "Generating...",
             "generateButton": "Generate project details",
             "ideaRequired": "Please enter a project idea first.",
-            "error": "Something went wrong while generating the project details"
+            "error": "Something went wrong while generating the project details",
+            "disclosureNotice": "This project's content was generated with AI assistance. It will be labeled \"AI-generated content\" for readers once published."
         },
         "schoolInfo": {
             "linkedSchool": "Linked school",
@@ -3835,7 +3851,8 @@ export const en = {
             "placeholder": "Example: a challenge to design a waste-sorting robot...",
             "ideaRequired": "Please enter a challenge idea first.",
             "error": "Something went wrong while generating the challenge details",
-            "incompleteFieldsPrefix": "The challenge was generated. Please review and complete the following fields: "
+            "incompleteFieldsPrefix": "The challenge was generated. Please review and complete the following fields: ",
+            "disclosureNotice": "This challenge's content was generated with AI assistance. It will be labeled \"AI-generated content\" for participants once published."
         }
     },
     "schoolCertificatesIndexPage": {
@@ -4398,7 +4415,8 @@ export const en = {
             "generateButton": "Generate details",
             "ideaRequired": "Please enter a badge idea first.",
             "error": "Something went wrong while generating the badge details",
-            "incompleteFieldsPrefix": "The badge was generated. Please review and complete the following fields: "
+            "incompleteFieldsPrefix": "The badge was generated. Please review and complete the following fields: ",
+            "disclosureNotice": "This badge's content was generated with AI assistance. It will be labeled \"AI-generated content\" for viewers once published."
         },
         "searchPlaceholder": "Search for a badge...",
         "empty": "No badges",
@@ -5343,6 +5361,51 @@ export const en = {
             "specialBadgeDescription": "Received the \"Innovator of the Month\" badge for outstanding projects"
         }
     },
+    "aiEthics": {
+        "pageTitle": "AI Ethics & Governance - {appName}",
+        "title": "AI Ethics & Governance Center",
+        "heroDescription": "Earth Innovators uses artificial intelligence to support recommendations, reports, and content generation. This page explains how we use AI responsibly, transparently, and in service of students, teachers, and schools.",
+        "commitmentTitle": "Our Commitment",
+        "commitmentDescription": "AI on this platform is a decision-support tool, not a decision-maker. Every AI-assisted output is clearly labeled, explainable, and subject to human oversight, especially for anything that affects a student's evaluation, ranking, or record.",
+        "complianceTitle": "UAE Regulatory Alignment",
+        "complianceDescription": "Our data handling and AI governance practices are guided by UAE Federal Decree-Law No. 45 of 2021 on the Protection of Personal Data (PDPL) and the UAE Charter for the Development and Use of Artificial Intelligence. This includes lawful, transparent processing of personal data, purpose limitation, data subject rights (access, correction, deletion), and responsible, human-centered use of AI.",
+        "principles": {
+            "disclosure": {
+                "title": "AI Disclosure",
+                "description": "Content that is generated or supported by AI (recommendations, reports, smart search, auto-generated text) is clearly marked so users always know when they are viewing AI-assisted output."
+            },
+            "explainability": {
+                "title": "Explainable Recommendations",
+                "description": "When the AI engine suggests a recommendation, course, competition, or classification, we aim to show the reasoning behind it, not just the result."
+            },
+            "humanReview": {
+                "title": "Human-in-the-Loop",
+                "description": "Sensitive or final decisions, such as awards, certifications, or disputed evaluations, are never made by AI alone. A human reviewer is involved before any such decision is finalized."
+            },
+            "fairness": {
+                "title": "Bias & Fairness",
+                "description": "We periodically review AI outputs for signs of bias across gender, school, region, or background, and adjust our models and prompts to promote fair treatment of every user."
+            },
+            "dataProtection": {
+                "title": "Data Protection",
+                "description": "Student and teacher data used by AI features is handled according to our data protection practices and is never shared with third parties beyond what is required to operate the AI features."
+            },
+            "auditLog": {
+                "title": "Auditable AI Decisions",
+                "description": "Key AI-assisted actions are logged so that, when needed, administrators can trace back why a particular AI output or recommendation was produced."
+            },
+            "appeal": {
+                "title": "Right to Object",
+                "description": "If you disagree with an AI-generated result or recommendation, you can request a human review and object to the outcome through your school administrator or our support channel."
+            },
+            "retention": {
+                "title": "Data Retention & Deletion",
+                "description": "Data used to power AI features is retained only as long as needed for the platform's educational purpose, and can be deleted upon request in line with our data retention policy."
+            }
+        },
+        "contactTitle": "Questions or Concerns",
+        "contactDescription": "If you have questions about how AI is used on this platform, or want to raise a concern about an AI-generated result, please contact our support team."
+    },
     "aboutPage": {
         "pageTitle": "About Us - {appName}",
         "title": "About Us",
@@ -5777,6 +5840,9 @@ export const en = {
         "points": "Points",
         "smartAgent": "Smart Agent",
         "smartTalentSearch": "Smart Talent Search",
+        "aiAppeals": "AI Appeals",
+        "dataRequests": "Data Requests",
+        "biasReport": "Bias & Fairness Report",
         "teachersManagement": "Teachers Management"
     },
     "notifications": {
@@ -6459,7 +6525,8 @@ export const en = {
             "title": "AI content generation",
             "description": "Write only the title (in Arabic or English) and the AI will write the article and choose a suitable image.",
             "generating": "Generating...",
-            "generateButton": "Generate now"
+            "generateButton": "Generate now",
+            "disclosureNotice": "This article's content was generated with AI assistance. It will be labeled \"AI-generated content\" for readers once published."
         },
         "pdfFileLabel": "PDF attachment (optional)",
         "pdfHintBooklet": "Attach the booklet file as a PDF (max 10 MB).",
@@ -7392,6 +7459,92 @@ export const en = {
             "needAttention": { "label": "Students Needing Attention", "question": "Who are the students who need special attention and why?" },
             "classificationDistribution": { "label": "Classification Distribution", "question": "How are students distributed across the different classifications (Diamond, Platinum, Gold...)?" },
             "compareIndexes": { "label": "Compare Indexes", "question": "Compare the averages of the eight indexes and identify the strongest and weakest index" }
+        }
+    },
+    "myDataPage": {
+        "title": "My Data & Privacy",
+        "subtitle": "Manage your consent and submit requests about the personal data we hold about you.",
+        "consentTitle": "AI Data Processing Consent",
+        "consentGiven": "You agreed to AI data processing on {date}.",
+        "consentMissing": "No consent record found. Contact support if you believe this is an error.",
+        "formTitle": "Submit a request",
+        "types": {
+            "access": "Access my data",
+            "correction": "Correct my data",
+            "deletion": "Delete my data"
+        },
+        "detailsPlaceholder": "Add any details about your request (optional)...",
+        "submit": "Submit request",
+        "historyTitle": "Your requests",
+        "empty": "No requests submitted yet.",
+        "resolutionLabel": "Resolution",
+        "status": {
+            "pending": "Pending",
+            "processing": "Processing",
+            "completed": "Completed",
+            "rejected": "Rejected"
+        }
+    },
+    "adminDataRequests": {
+        "headerTitle": "Data Requests",
+        "pageTitle": "Data Subject Requests",
+        "title": "Data Subject Requests",
+        "subtitle": "Handle user requests to access, correct, or delete their personal data (PDPL compliance).",
+        "empty": "No data requests to review.",
+        "notesPlaceholder": "Resolution notes (optional)...",
+        "resolutionLabel": "Resolution",
+        "types": {
+            "access": "Access",
+            "correction": "Correction",
+            "deletion": "Deletion"
+        },
+        "status": {
+            "pending": "Pending",
+            "processing": "Processing",
+            "completed": "Completed",
+            "rejected": "Rejected"
+        },
+        "actions": {
+            "processing": "Mark as Processing",
+            "complete": "Complete",
+            "reject": "Reject"
+        }
+    },
+    "adminBiasReport": {
+        "headerTitle": "Bias & Fairness Report",
+        "pageTitle": "AI Bias & Fairness Report",
+        "title": "AI Bias & Fairness Report",
+        "subtitle": "Compares AI-derived scores and AI validation outcomes across schools using real platform data.",
+        "platformAvgScore": "Platform-wide average innovation score",
+        "platformFlaggedRate": "Platform-wide AI-flagged achievement rate",
+        "needsReview": "Needs manual review",
+        "students": "Students",
+        "avgScore": "Avg. score",
+        "achievements": "Achievements",
+        "aiFlaggedRate": "AI-flagged rate",
+        "limitations": {
+            "gender": "No gender or demographic field exists on the users table, so gender-based fairness slicing is not available.",
+            "sampleSize": "Small student counts per school make averages noisy — treat flags as a starting point for manual review, not proof of bias."
+        }
+    },
+    "adminAiAppeals": {
+        "headerTitle": "AI Appeals",
+        "pageTitle": "AI Appeals Review",
+        "title": "AI Decision Appeals",
+        "subtitle": "Review objections users raised against AI-generated results and recommendations.",
+        "empty": "No appeals to review.",
+        "notesPlaceholder": "Resolution notes (optional)...",
+        "resolutionLabel": "Resolution",
+        "status": {
+            "pending": "Pending",
+            "reviewing": "Reviewing",
+            "resolved": "Resolved",
+            "rejected": "Rejected"
+        },
+        "actions": {
+            "reviewing": "Mark as Reviewing",
+            "resolve": "Resolve",
+            "reject": "Reject"
         }
     },
     "adminSmartSearchPage": {

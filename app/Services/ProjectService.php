@@ -81,7 +81,7 @@ class ProjectService extends BaseService
                 },
             ])
             ->withCount('comments')
-            ->select('id', 'title', 'title_ar', 'description', 'description_ar', 'category', 'status', 'teacher_id', 'user_id', 'school_id', 'approved_by', 'views', 'likes', 'rating', 'files', 'images', 'thumbnail', 'project_document', 'created_at')
+            ->select('id', 'title', 'title_ar', 'description', 'description_ar', 'is_ai_generated', 'category', 'status', 'teacher_id', 'user_id', 'school_id', 'approved_by', 'views', 'likes', 'rating', 'files', 'images', 'thumbnail', 'project_document', 'created_at')
             ->find($projectId);
         }, 600); // Cache for 10 minutes
 

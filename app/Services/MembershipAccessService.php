@@ -4,9 +4,23 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\UserPackage;
+use Illuminate\Support\Facades\Cache;
 
 class MembershipAccessService
 {
+    /**
+     * Bust the cached summary for a user right after their subscription
+     * state actually changes (payment confirmed, admin activated/expired,
+     * cancelled, renewed) so the gate/banner reflects it immediately
+     * instead of waiting out the 60s TTL.
+     */
+    public function forgetMembershipCache(User $user): void
+    {
+        Cache::forget("membership_summary_user_{$user->id}");
+        Cache::forget("engagement_summary_user_{$user->id}");
+        Cache::forget("inertia_subscription_banner_user_{$user->id}");
+    }
+
     public function getActiveSubscription(User $user): ?UserPackage
     {
         return $this->subscriptionQueryForUser($user)
@@ -71,7 +85,20 @@ class MembershipAccessService
         return $owner->membership_type === 'subscription' && $owner->contract_status === 'active' && $owner->isContractValid();
     }
 
+    /**
+     * Called by EnsureMembershipActive on nearly every authenticated
+     * request, so it's cached briefly — the short TTL keeps the
+     * subscription-gate checks fresh enough after a payment/approval
+     * without re-querying subscriptions on every page load.
+     */
     public function getMembershipSummary(User $user): array
+    {
+        return Cache::remember("membership_summary_user_{$user->id}", 60, function () use ($user) {
+            return $this->buildMembershipSummary($user);
+        });
+    }
+
+    private function buildMembershipSummary(User $user): array
     {
         $owner = $this->getAccessOwner($user);
         $packagesAvailable = $this->hasAvailablePackagesFor($owner);
@@ -158,6 +185,8 @@ class MembershipAccessService
             return;
         }
 
+        $this->forgetMembershipCache($user);
+
         $startDate = $userPackage->start_date ?? now();
         $endDate = $userPackage->end_date ?? now();
 
@@ -180,6 +209,7 @@ class MembershipAccessService
 
     public function syncMembershipFromSubscriptions(User $user): void
     {
+        $this->forgetMembershipCache($user);
         $user->loadMissing('teacher');
 
         $activeSubscription = $this->getActiveSubscription($user);

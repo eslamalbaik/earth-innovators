@@ -29,6 +29,7 @@ export default function AdminPublicationEdit({ publication, schools }) {
         publish_date:   publication?.publish_date || '',
         publisher_name: publication?.publisher_name || '',
         school_id:      publication?.school_id || '',
+        is_ai_generated: publication?.is_ai_generated || false,
     });
 
     const [coverPreview, setCoverPreview]       = useState(() => getPublicationImageUrl(publication?.cover_image, null));

@@ -30,6 +30,7 @@ export default function SchoolPublicationEdit({ auth, publication }) {
         issue_number: publication?.issue_number || '',
         publish_date: publication?.publish_date || '',
         publisher_name: publication?.publisher_name || '',
+        is_ai_generated: publication?.is_ai_generated || false,
         _method: 'PUT',
     });
 

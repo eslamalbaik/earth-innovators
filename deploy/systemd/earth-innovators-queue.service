@@ -1,0 +1,35 @@
+# Runs the Laravel queue worker as a persistent, auto-restarting service.
+# composer dev's `queue:listen` is dev-only — it re-bootstraps the app on
+# every job, which is fine locally but too slow for production. `queue:work`
+# boots once and processes jobs in a loop, which is what this service runs.
+#
+# Install:
+#   sudo cp deploy/systemd/earth-innovators-queue.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now earth-innovators-queue
+#
+# After each deploy (code changes queue-job classes):
+#   sudo systemctl restart earth-innovators-queue
+#
+# Logs:
+#   journalctl -u earth-innovators-queue -f
+
+[Unit]
+Description=Earth Innovators - Laravel queue worker
+After=network.target redis-server.service mysql.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/earth-innovators
+ExecStart=/usr/bin/php /var/www/earth-innovators/artisan queue:work redis --sleep=3 --tries=3 --max-time=3600 --timeout=120
+Restart=always
+RestartSec=5
+
+# --max-time=3600 makes queue:work exit cleanly every hour so systemd
+# restarts it with a fresh process (avoids slow memory growth); Restart=always
+# means the exit is treated as a normal restart, not a failure.
+
+[Install]
+WantedBy=multi-user.target

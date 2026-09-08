@@ -7,6 +7,7 @@ use App\Models\StoreReward;
 use App\Models\StoreRewardRequest;
 use App\Models\UserBadge;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -20,6 +21,13 @@ class StudentEngagementService
     ) {}
 
     public function getSummary(User $user): array
+    {
+        return Cache::remember("engagement_summary_user_{$user->id}", 60, function () use ($user) {
+            return $this->buildSummary($user);
+        });
+    }
+
+    private function buildSummary(User $user): array
     {
         $membershipSummary = $this->membershipAccessService->getMembershipSummary($user);
         $subscription = $membershipSummary['subscription'] ?? null;

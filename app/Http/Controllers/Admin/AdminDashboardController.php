@@ -27,8 +27,8 @@ class AdminDashboardController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $kpis = $this->getKPIs();
         $usersByRole = $this->getUsersByRole();
+        $kpis = $this->getKPIs($usersByRole);
 
         $publishedProjects = Project::with(['user:id,name,email', 'school:id,name', 'teacher:id,name_ar'])
             ->where('status', 'approved')
@@ -140,22 +140,43 @@ class AdminDashboardController extends Controller
         ]);
     }
 
-    private function getKPIs(): array
+    private function getKPIs(?array $usersByRole = null): array
     {
+        $usersByRole ??= $this->getUsersByRole();
+
+        $projectStats = Project::selectRaw(
+            "COUNT(*) as total, " .
+            "SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved, " .
+            "SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending"
+        )->first();
+
+        $publicationStats = Publication::selectRaw(
+            "COUNT(*) as total, " .
+            "SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved"
+        )->first();
+
+        $today = now()->toDateString();
+        $subscriptionStats = UserPackage::selectRaw(
+            "COUNT(*) as total, " .
+            "SUM(CASE WHEN status = 'active' AND (end_date IS NULL OR end_date >= ?) THEN 1 ELSE 0 END) as active, " .
+            "SUM(CASE WHEN status = 'active' AND (end_date IS NULL OR end_date >= ?) THEN paid_amount ELSE 0 END) as active_revenue",
+            [$today, $today]
+        )->first();
+
         return [
-            'total_projects' => Project::count(),
-            'published_projects' => Project::where('status', 'approved')->count(),
-            'pending_projects' => Project::where('status', 'pending')->count(),
+            'total_projects' => (int) $projectStats->total,
+            'published_projects' => (int) $projectStats->approved,
+            'pending_projects' => (int) $projectStats->pending,
             'total_users' => User::where('role', '!=', 'admin')->count(),
-            'total_schools' => User::where('role', 'school')->count(),
-            'total_students' => User::where('role', 'student')->count(),
-            'total_teachers' => User::where('role', 'teacher')->count(),
-            'total_publications' => Publication::count(),
-            'approved_publications' => Publication::where('status', 'approved')->count(),
-            'total_subscriptions' => UserPackage::count(),
-            'active_subscriptions' => UserPackage::currentActive()->count(),
+            'total_schools' => $usersByRole['schools'] ?? 0,
+            'total_students' => $usersByRole['students'] ?? 0,
+            'total_teachers' => $usersByRole['teachers'] ?? 0,
+            'total_publications' => (int) $publicationStats->total,
+            'approved_publications' => (int) $publicationStats->approved,
+            'total_subscriptions' => (int) $subscriptionStats->total,
+            'active_subscriptions' => (int) $subscriptionStats->active,
             'total_revenue' => Payment::where('status', 'completed')->sum('amount'),
-            'subscription_revenue' => UserPackage::currentActive()->sum('paid_amount'),
+            'subscription_revenue' => (float) $subscriptionStats->active_revenue,
         ];
     }
 
@@ -215,6 +236,15 @@ class AdminDashboardController extends Controller
         return $years;
     }
 
+    private function monthNumberExpression(string $column): string
+    {
+        return match (DB::connection()->getDriverName()) {
+            'sqlite' => "CAST(strftime('%m', {$column}) AS INTEGER)",
+            'pgsql' => "EXTRACT(MONTH FROM {$column})::integer",
+            default => "MONTH({$column})",
+        };
+    }
+
     private function getChartData(int $year = null): array
     {
         if ($year === null) {
@@ -226,22 +256,27 @@ class AdminDashboardController extends Controller
             'July', 'August', 'September', 'October', 'November', 'December',
         ];
 
+        $yearStart = \Carbon\Carbon::create($year, 1, 1)->startOfYear();
+        $yearEnd = \Carbon\Carbon::create($year, 12, 31)->endOfYear();
+        $monthExpr = $this->monthNumberExpression('created_at');
+
+        $usersByMonth = User::where('role', '!=', 'admin')
+            ->whereBetween('created_at', [$yearStart, $yearEnd])
+            ->selectRaw("{$monthExpr} as m, COUNT(*) as c")
+            ->groupBy('m')
+            ->pluck('c', 'm');
+
+        $projectsByMonth = Project::whereBetween('created_at', [$yearStart, $yearEnd])
+            ->selectRaw("{$monthExpr} as m, COUNT(*) as c")
+            ->groupBy('m')
+            ->pluck('c', 'm');
+
         $usersData = [];
         $projectsData = [];
 
         for ($month = 1; $month <= 12; $month++) {
-            $startDate = \Carbon\Carbon::create($year, $month, 1)->startOfMonth();
-            $endDate = \Carbon\Carbon::create($year, $month, 1)->endOfMonth();
-
-            $usersCount = User::where('role', '!=', 'admin')
-                ->whereBetween('created_at', [$startDate, $endDate])
-                ->count();
-
-            $projectsCount = Project::whereBetween('created_at', [$startDate, $endDate])
-                ->count();
-
-            $usersData[] = $usersCount;
-            $projectsData[] = $projectsCount;
+            $usersData[] = (int) ($usersByMonth[$month] ?? 0);
+            $projectsData[] = (int) ($projectsByMonth[$month] ?? 0);
         }
 
         $totalUsers = array_sum($usersData);
@@ -286,6 +321,15 @@ class AdminDashboardController extends Controller
         return \App\Support\StorageUrl::url($imagePath);
     }
 
+    private function monthKeyExpression(string $column): string
+    {
+        return match (DB::connection()->getDriverName()) {
+            'sqlite' => "strftime('%Y-%m', {$column})",
+            'pgsql' => "to_char({$column}, 'YYYY-MM')",
+            default => "DATE_FORMAT({$column}, '%Y-%m')",
+        };
+    }
+
     private function getStudentEngagementData(): array
     {
         $topStudents = User::where('role', 'student')
@@ -298,6 +342,12 @@ class AdminDashboardController extends Controller
                     $query->where('status', 'completed');
                 },
             ])
+            ->withSum(['projects as total_views' => function ($query) {
+                $query->where('status', 'approved');
+            }], 'views')
+            ->withSum(['projects as total_likes' => function ($query) {
+                $query->where('status', 'approved');
+            }], 'likes')
             ->with(['projects' => function ($query) {
                 $query->where('status', 'approved')
                     ->select('id', 'user_id', 'title', 'views', 'likes', 'approved_at')
@@ -311,14 +361,8 @@ class AdminDashboardController extends Controller
                 $points = $student->points ?? 0;
                 $challengesCompleted = $student->challenges_participated ?? 0;
 
-                $projectStats = DB::table('projects')
-                    ->where('user_id', $student->id)
-                    ->where('status', 'approved')
-                    ->selectRaw('SUM(views) as total_views, SUM(likes) as total_likes')
-                    ->first();
-
-                $totalViews = $projectStats->total_views ?? 0;
-                $totalLikes = $projectStats->total_likes ?? 0;
+                $totalViews = $student->total_views ?? 0;
+                $totalLikes = $student->total_likes ?? 0;
 
                 $projectScore = min(100, ($approvedProjects / 5) * 100);
                 $badgeScore = min(100, ($badges / 10) * 100);
@@ -366,50 +410,54 @@ class AdminDashboardController extends Controller
                 return $student;
             });
 
-        $monthlyData = [];
         $months = ['January', 'February', 'March', 'April', 'May', 'June'];
+        $windowStart = now()->subMonths(5)->startOfMonth();
+
+        // Points aren't tracked historically per month in this schema, so
+        // (as in the original logic) we use each student's current total.
+        $studentPoints = User::where('role', 'student')->pluck('points', 'id');
+
+        $monthExpr = $this->monthKeyExpression('approved_at');
+        $projectsByMonth = Project::where('status', 'approved')
+            ->where('approved_at', '>=', $windowStart)
+            ->selectRaw("user_id, {$monthExpr} as ym, COUNT(*) as approved_count, COALESCE(SUM(views), 0) as total_views, COALESCE(SUM(likes), 0) as total_likes")
+            ->groupBy('user_id', 'ym')
+            ->get()
+            ->groupBy('ym');
+
+        $badgeMonthExpr = $this->monthKeyExpression('created_at');
+        $badgesByMonth = DB::table('user_badges')
+            ->where('created_at', '>=', $windowStart)
+            ->selectRaw("user_id, {$badgeMonthExpr} as ym, COUNT(*) as badges_count")
+            ->groupBy('user_id', 'ym')
+            ->get()
+            ->groupBy('ym');
+
+        $monthlyData = [];
 
         for ($i = 5; $i >= 0; $i--) {
             $date = now()->subMonths($i);
-            $startDate = $date->copy()->startOfMonth();
-            $endDate = $date->copy()->endOfMonth();
-            $students = User::where('role', 'student')->get();
+            $ym = $date->format('Y-m');
 
-            if ($students->isEmpty()) {
-                $monthlyData[] = [
-                    'month' => $months[5 - $i],
-                    'value' => 0,
-                ];
+            if ($studentPoints->isEmpty()) {
+                $monthlyData[] = ['month' => $months[5 - $i], 'value' => 0];
                 continue;
             }
 
+            $monthProjects = ($projectsByMonth->get($ym) ?? collect())->keyBy('user_id');
+            $monthBadges = ($badgesByMonth->get($ym) ?? collect())->keyBy('user_id');
+
             $engagementScores = [];
-            foreach ($students as $student) {
-                $approvedProjects = Project::where('user_id', $student->id)
-                    ->where('status', 'approved')
-                    ->whereBetween('approved_at', [$startDate, $endDate])
-                    ->count();
-
-                $badges = DB::table('user_badges')
-                    ->where('user_id', $student->id)
-                    ->whereBetween('created_at', [$startDate, $endDate])
-                    ->count();
-
-                $points = $student->points ?? 0;
-
-                $projectStats = DB::table('projects')
-                    ->where('user_id', $student->id)
-                    ->where('status', 'approved')
-                    ->whereBetween('approved_at', [$startDate, $endDate])
-                    ->selectRaw('COALESCE(SUM(views), 0) as total_views, COALESCE(SUM(likes), 0) as total_likes')
-                    ->first();
-
-                $totalViews = $projectStats->total_views ?? 0;
-                $totalLikes = $projectStats->total_likes ?? 0;
+            foreach ($studentPoints as $studentId => $points) {
+                $projectRow = $monthProjects->get($studentId);
+                $approvedProjects = $projectRow->approved_count ?? 0;
+                $totalViews = $projectRow->total_views ?? 0;
+                $totalLikes = $projectRow->total_likes ?? 0;
+                $badges = $monthBadges->get($studentId)->badges_count ?? 0;
 
                 $projectScore = min(100, ($approvedProjects / 5) * 100);
                 $badgeScore = min(100, ($badges / 10) * 100);
-                $pointScore = min(100, ($points / 500) * 100);
+                $pointScore = min(100, (($points ?? 0) / 500) * 100);
                 $viewScore = min(100, ($totalViews / 1000) * 100);
                 $likeScore = min(100, ($totalLikes / 100) * 100);
 

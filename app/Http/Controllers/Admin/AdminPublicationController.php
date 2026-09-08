@@ -25,7 +25,7 @@ class AdminPublicationController extends Controller
     public function index(Request $request): Response
     {
         $publications = Publication::with(['author:id,name', 'school:id,name', 'approver:id,name'])
-            ->select('id', 'title', 'description', 'type', 'status', 'author_id', 'school_id', 'approved_by', 'created_at', 'cover_image')
+            ->select('id', 'title', 'title_ar', 'description', 'description_ar', 'type', 'status', 'author_id', 'school_id', 'approved_by', 'created_at', 'cover_image')
             ->when($request->has('search') && $request->search, function ($q) use ($request) {
                 $search = $request->search;
                 $q->where(function ($query) use ($search) {

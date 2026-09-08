@@ -126,17 +126,14 @@ class TeacherDashboardController extends Controller
 
         $pendingRewardRequests = 0;
         if (Schema::hasTable('store_reward_requests')) {
-            $linkedStudentIds = Project::query()
-                ->where('teacher_id', $teacher->id)
-                ->distinct()
-                ->pluck('user_id');
-
-            if ($linkedStudentIds->isNotEmpty()) {
-                $pendingRewardRequests = StoreRewardRequest::query()
-                    ->whereIn('user_id', $linkedStudentIds)
-                    ->where('status', 'pending')
-                    ->count();
-            }
+            $pendingRewardRequests = StoreRewardRequest::query()
+                ->where('status', 'pending')
+                ->whereIn('user_id', function ($query) use ($teacher) {
+                    $query->select('user_id')
+                        ->from('projects')
+                        ->where('teacher_id', $teacher->id);
+                })
+                ->count();
         }
 
         $pendingChallengeSuggestions = 0;

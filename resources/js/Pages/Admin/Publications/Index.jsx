@@ -44,6 +44,12 @@ export default function AdminPublicationsIndex({
             : (publication.title || publication.title_ar)
     );
 
+    const getPublicationDescription = (publication) => (
+        language === 'ar'
+            ? (publication.description_ar || publication.description)
+            : (publication.description || publication.description_ar)
+    );
+
     const handleDelete = async (publication) => {
         const confirmed = await confirm({
             title: t('adminPublicationsIndexPage.deleteConfirm.title'),
@@ -255,9 +261,9 @@ export default function AdminPublicationsIndex({
                                                 {getStatusBadge(publication.status)}
                                             </div>
 
-                                            {publication.description ? (
+                                            {getPublicationDescription(publication) ? (
                                                 <p className="text-gray-700 mb-4 line-clamp-2">
-                                                    {publication.description}
+                                                    {getPublicationDescription(publication)}
                                                 </p>
                                             ) : null}
 

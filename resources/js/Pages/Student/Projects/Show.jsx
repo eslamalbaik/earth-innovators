@@ -29,6 +29,7 @@ import TextInput from '../../../Components/TextInput';
 import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
 import PrimaryButton from '../../../Components/PrimaryButton';
+import AiDisclosureBadge from '@/Components/Innovation/AiDisclosureBadge';
 
 export default function StudentProjectShow({ auth, project, existingSubmission, initialTab = 'details', backTo = '/student/projects' }) {
     const { t, language } = useTranslation();
@@ -242,11 +243,44 @@ export default function StudentProjectShow({ auth, project, existingSubmission, 
         }, 100);
     };
 
+    const projectImages = Array.isArray(project.images) ? project.images.filter(Boolean) : [];
+    const [activeImage, setActiveImage] = useState(0);
+
     const ProjectContent = () => (
         <div className="space-y-4">
             {/* Header */}
             <div className="mb-4">
-                <h1 className="text-lg font-extrabold text-gray-900 mb-2">{displayTitle}</h1>
+                {projectImages.length > 0 && (
+                    <div className="mb-3">
+                        <div className="w-full aspect-video overflow-hidden rounded-2xl border border-gray-100 bg-gray-100">
+                            <img
+                                src={projectImages[activeImage]}
+                                alt={displayTitle}
+                                className="h-full w-full object-cover"
+                                loading="lazy"
+                            />
+                        </div>
+                        {projectImages.length > 1 && (
+                            <div className="mt-2 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                                {projectImages.map((src, idx) => (
+                                    <button
+                                        key={idx}
+                                        type="button"
+                                        onClick={() => setActiveImage(idx)}
+                                        className={`h-14 w-20 shrink-0 overflow-hidden rounded-lg border-2 transition ${idx === activeImage ? 'border-[#A3C042]' : 'border-transparent opacity-70'
+                                            }`}
+                                    >
+                                        <img src={src} alt={`${displayTitle} ${idx + 1}`} className="h-full w-full object-cover" loading="lazy" />
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+                <div className="flex items-start justify-between gap-2 mb-2">
+                    <h1 className="text-lg font-extrabold text-gray-900">{displayTitle}</h1>
+                    {project.is_ai_generated && <AiDisclosureBadge />}
+                </div>
                 <div className="flex items-center gap-2 flex-wrap">
                     <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
                         {t('common.approved')}

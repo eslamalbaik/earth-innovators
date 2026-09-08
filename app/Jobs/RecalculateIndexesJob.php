@@ -37,6 +37,8 @@ class RecalculateIndexesJob implements ShouldQueue
             // Recommendations are keyed off the index scores computed above and
             // cached 24h (Innovation/AdminInnovation controllers) — stale after recalc.
             Cache::forget("recommendations_user_{$this->user->id}");
+            // Student dashboard's innovation summary card (5min cache) — stale after recalc.
+            Cache::forget("innovation_summary_user_{$this->user->id}");
         }
     }
 }

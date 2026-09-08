@@ -4,11 +4,16 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Services\ProjectService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class AdminProjectController extends Controller
 {
+    public function __construct(private ProjectService $projectService)
+    {
+    }
+
     /**
      * عرض جميع المشاريع
      */
@@ -266,6 +271,7 @@ class AdminProjectController extends Controller
             'status' => 'required|in:pending,approved,rejected',
             'files' => 'nullable|array',
             'images' => 'nullable|array',
+            'is_ai_generated' => 'nullable|boolean',
         ], [
             'title.required' => 'عنوان المشروع (بالإنجليزية) مطلوب',
             'title_ar.required' => 'عنوان المشروع (بالعربية) مطلوب',
@@ -283,6 +289,19 @@ class AdminProjectController extends Controller
             $schoolId = $validated['school_id'] ?? null;
         }
 
+        $images = $validated['images'] ?? [];
+
+        // AI-generated projects created without running the "توليد بالذكاء
+        // الاصطناعي" step (e.g. admin filled fields manually then just
+        // ticked is_ai_generated) end up with no cover image. Fetch one
+        // best-effort so the project never ships blank.
+        if (empty($images) && ($validated['is_ai_generated'] ?? false)) {
+            $fallbackImage = $this->fetchUnsplashImage($validated['title']);
+            if ($fallbackImage) {
+                $images = [$fallbackImage];
+            }
+        }
+
         $project = Project::create([
             'title' => $validated['title'],
             'title_ar' => $validated['title_ar'],
@@ -290,12 +309,13 @@ class AdminProjectController extends Controller
             'description_ar' => $validated['description_ar'],
             'category' => $validated['category'] ?? 'other',
             'curriculum_type' => $validated['curriculum_type'] ?? null,
+            'is_ai_generated' => $validated['is_ai_generated'] ?? false,
             'user_id' => auth()->id(),
             'school_id' => $schoolId,
             'teacher_id' => null,
             'status' => $validated['status'],
             'files' => $validated['files'] ?? [],
-            'images' => $validated['images'] ?? [],
+            'images' => $images,
             'approved_by' => $validated['status'] === 'approved' ? auth()->id() : null,
             'approved_at' => $validated['status'] === 'approved' ? now() : null,
         ]);
@@ -304,9 +324,36 @@ class AdminProjectController extends Controller
             \App\Jobs\SendNewProjectNotification::dispatch($project);
         }
 
+        $this->projectService->clearProjectCache($project->id, $project->user_id, $project->teacher_id, $project->school_id);
+
         return redirect()
             ->route('admin.projects.index')
             ->with('success', __('messages.msg_024'));
+    }
+
+    private function fetchUnsplashImage(string $keyword): ?string
+    {
+        $unsplashAccessKey = config('services.unsplash.access_key');
+        if (!$unsplashAccessKey) {
+            return null;
+        }
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::timeout(8)->get('https://api.unsplash.com/search/photos', [
+                'query' => $keyword,
+                'client_id' => $unsplashAccessKey,
+                'per_page' => 1,
+                'orientation' => 'landscape',
+            ]);
+
+            if ($response->successful()) {
+                return $response->json('results.0.urls.regular');
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Unsplash fallback image fetch failed', ['error' => $e->getMessage()]);
+        }
+
+        return null;
     }
 
     public function edit(Project $project)
@@ -397,6 +444,7 @@ class AdminProjectController extends Controller
             'status' => 'required|in:pending,approved,rejected',
             'files' => 'nullable|array',
             'images' => 'nullable|array',
+            'is_ai_generated' => 'nullable|boolean',
         ], [
             'title.required' => 'عنوان المشروع (بالإنجليزية) مطلوب',
             'title_ar.required' => 'عنوان المشروع (بالعربية) مطلوب',
@@ -414,6 +462,19 @@ class AdminProjectController extends Controller
             $schoolId = $validated['school_id'] ?? null;
         }
 
+        // Keep the existing images unless the request explicitly sends a
+        // replacement — an empty payload here previously wiped them out.
+        $images = $validated['images'] ?? $project->getRawOriginal('images');
+        $images = is_string($images) ? (json_decode($images, true) ?? []) : ($images ?? []);
+        $isAiGenerated = $validated['is_ai_generated'] ?? $project->is_ai_generated;
+
+        if (empty($images) && $isAiGenerated) {
+            $fallbackImage = $this->fetchUnsplashImage($validated['title']);
+            if ($fallbackImage) {
+                $images = [$fallbackImage];
+            }
+        }
+
         $updateData = [
             'title' => $validated['title'],
             'title_ar' => $validated['title_ar'],
@@ -421,11 +482,12 @@ class AdminProjectController extends Controller
             'description_ar' => $validated['description_ar'],
             'category' => $validated['category'] ?? null,
             'curriculum_type' => $validated['curriculum_type'] ?? null,
+            'is_ai_generated' => $isAiGenerated,
             'school_id' => $schoolId,
             'teacher_id' => null,
             'status' => $validated['status'],
             'files' => $validated['files'] ?? [],
-            'images' => $validated['images'] ?? [],
+            'images' => $images,
         ];
 
         $wasApproved = $project->status === 'approved';
@@ -439,6 +501,8 @@ class AdminProjectController extends Controller
         if ($validated['status'] === 'approved' && !$wasApproved) {
             \App\Jobs\SendNewProjectNotification::dispatch($project);
         }
+
+        $this->projectService->clearProjectCache($project->id, $project->user_id, $project->teacher_id, $project->school_id);
 
         return redirect()
             ->route('admin.projects.index')
@@ -566,6 +630,8 @@ class AdminProjectController extends Controller
             \App\Jobs\SendNewProjectNotification::dispatch($project);
         }
 
+        $this->projectService->clearProjectCache($project->id, $project->user_id, $project->teacher_id, $project->school_id);
+
         return back()->with('success', __('messages.msg_026'));
     }
 
@@ -579,6 +645,8 @@ class AdminProjectController extends Controller
             'status' => 'rejected',
             'approved_by' => auth()->id(),
         ]);
+
+        $this->projectService->clearProjectCache($project->id, $project->user_id, $project->teacher_id, $project->school_id);
 
         return back()->with('success', __('messages.msg_027'));
     }
@@ -613,9 +681,7 @@ class AdminProjectController extends Controller
         $project->delete();
 
         // مسح الكاش بشكل شامل
-        if (isset($this->projectService)) {
-            $this->projectService->clearProjectCache($projectId, $userId, $teacherId, $schoolId);
-        }
+        $this->projectService->clearProjectCache($projectId, $userId, $teacherId, $schoolId);
 
         return redirect()
             ->route('admin.projects.index')

@@ -90,36 +90,47 @@ class HandleInertiaRequests extends Middleware
                 'isPrimaryHost' => SiteUrl::isPrimaryHost($request->getHost()),
                 'isSecondaryHost' => SiteUrl::isSecondaryHost($request->getHost()),
             ],
-            // Subscription/Trial banner data — lightweight, computed once per request
+            // Subscription/Trial banner data — evaluated on every request (Inertia
+            // only skips lazy props on partial reloads, not full page loads), so
+            // it's cached briefly to avoid re-querying on every navigation. Cache
+            // is busted immediately on real subscription changes (see
+            // MembershipAccessService::forgetMembershipCache).
             'subscription' => function () use ($user) {
                 if (!$user || in_array($user->role, ['admin'])) {
                     return null;
                 }
-                try {
-                    $sub = UserPackage::with('package:id,name')
-                        ->where('user_id', $user->id)
-                        ->whereIn('status', ['active', 'trial'])
-                        ->orderByDesc('created_at')
-                        ->first();
 
-                    if (!$sub) return ['status' => 'none'];
+                return \Illuminate\Support\Facades\Cache::remember(
+                    "inertia_subscription_banner_user_{$user->id}",
+                    60,
+                    function () use ($user) {
+                        try {
+                            $sub = UserPackage::with('package:id,name')
+                                ->where('user_id', $user->id)
+                                ->whereIn('status', ['active', 'trial'])
+                                ->orderByDesc('created_at')
+                                ->first();
 
-                    $daysLeft = $sub->end_date
-                        ? (int) now()->startOfDay()->diffInDays($sub->end_date, false)
-                        : null;
+                            if (!$sub) return ['status' => 'none'];
 
-                    return [
-                        'status'      => $sub->status,
-                        'packageName' => $sub->package?->name ?? '',
-                        'endDate'     => $sub->end_date?->toDateString(),
-                        'daysLeft'    => $daysLeft,
-                        'isTrial'     => $sub->status === 'trial',
-                        'isExpiring'  => $daysLeft !== null && $daysLeft <= 7 && $daysLeft >= 0,
-                        'isExpired'   => $daysLeft !== null && $daysLeft < 0,
-                    ];
-                } catch (\Exception $e) {
-                    return null;
-                }
+                            $daysLeft = $sub->end_date
+                                ? (int) now()->startOfDay()->diffInDays($sub->end_date, false)
+                                : null;
+
+                            return [
+                                'status'      => $sub->status,
+                                'packageName' => $sub->package?->name ?? '',
+                                'endDate'     => $sub->end_date?->toDateString(),
+                                'daysLeft'    => $daysLeft,
+                                'isTrial'     => $sub->status === 'trial',
+                                'isExpiring'  => $daysLeft !== null && $daysLeft <= 7 && $daysLeft >= 0,
+                                'isExpired'   => $daysLeft !== null && $daysLeft < 0,
+                            ];
+                        } catch (\Exception $e) {
+                            return null;
+                        }
+                    }
+                );
             },
         ]);
     }
