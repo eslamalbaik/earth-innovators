@@ -246,6 +246,9 @@ export default function MainLayout({ children, auth }) {
                             <Link href="/terms" className="text-white hover:text-gray-100 transition duration-300 underline">
                                 {t('common.terms')}
                             </Link>
+                            <Link href="/ai-ethics" className="text-white hover:text-gray-100 transition duration-300 underline">
+                                {t('common.aiEthics')}
+                            </Link>
                         </div>
 
                         <div className="flex items-center gap-4">

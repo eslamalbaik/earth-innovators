@@ -3,6 +3,7 @@ import { Head } from '@inertiajs/react';
 import { useState, useRef, useEffect } from 'react';
 import { FaPaperPlane, FaRobot, FaUser, FaSpinner, FaChartLine, FaLightbulb, FaTrashAlt } from 'react-icons/fa';
 import axios from 'axios';
+import AiDisclosureBadge from '@/Components/Innovation/AiDisclosureBadge';
 
 const SUGGESTION_CHIPS = [
     { label: 'ملخص الأداء العام', question: 'أعطني ملخصاً عن أداء طلاب مدرستي العام ومتوسط المؤشرات' },
@@ -87,6 +88,7 @@ export default function SchoolChat() {
                                 <p className="text-white/70 text-[11px]">مساعد المدرسة — يحلل بيانات طلاب مدرستك ومؤشرات الابتكار</p>
                             </div>
                         </div>
+                        <AiDisclosureBadge className="!bg-white/15 !border-white/25 !text-white hover:!bg-white/25" />
                         {messages.length > 0 && (
                             <button
                                 onClick={clearChat}

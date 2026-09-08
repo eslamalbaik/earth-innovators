@@ -12,3 +12,8 @@ Artisan::command('inspire', function () {
 Schedule::command('subscriptions:process')
     ->dailyAt('02:00')
     ->withoutOverlapping();
+
+// AI Ethics data-retention policy: purge AI audit logs past the retention window.
+Schedule::command('ai:prune-logs')
+    ->weeklyOn(0, '03:00')
+    ->withoutOverlapping();

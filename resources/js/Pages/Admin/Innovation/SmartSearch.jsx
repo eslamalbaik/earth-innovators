@@ -3,6 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { FaSearch, FaBrain, FaUser, FaChartLine, FaLightbulb, FaSpinner, FaArrowLeft, FaFilter } from 'react-icons/fa';
 import ClassificationBadge from '@/Components/Innovation/ClassificationBadge';
+import AiDisclosureBadge from '@/Components/Innovation/AiDisclosureBadge';
 import { useTranslation } from '@/i18n';
 
 export default function SmartSearch({ query = '', results = null }) {
@@ -46,6 +47,7 @@ export default function SmartSearch({ query = '', results = null }) {
                             <p className="text-white/80 text-xs sm:text-sm mt-1">{t('adminSmartSearchPage.heroSubtitle')}</p>
                         </div>
                     </div>
+                    <AiDisclosureBadge className="!bg-white/15 !border-white/25 !text-white hover:!bg-white/25" />
 
                     {/* Search Bar */}
                     <form onSubmit={(e) => handleSearch(e)} className="mt-6">

@@ -62,6 +62,11 @@ return [
         'model' => env('GEMINI_MODEL', 'gemini-flash-latest'),
     ],
 
+    'ai' => [
+        // AI Ethics & Governance: how long AI audit log entries are kept before pruning.
+        'audit_retention_days' => env('AI_AUDIT_RETENTION_DAYS', 365),
+    ],
+
     'unsplash' => [
         'access_key' => env('UNSPLASH_ACCESS_KEY'),
         'secret_key' => env('UNSPLASH_SECRET_KEY'),

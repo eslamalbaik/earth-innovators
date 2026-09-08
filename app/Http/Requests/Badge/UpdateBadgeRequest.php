@@ -25,6 +25,7 @@ class UpdateBadgeRequest extends FormRequest
             'level' => 'nullable|in:bronze,silver,gold',
             'points_required' => 'required|integer|min:0',
             'is_active' => 'boolean',
+            'is_ai_generated' => 'nullable|boolean',
         ];
     }
 }

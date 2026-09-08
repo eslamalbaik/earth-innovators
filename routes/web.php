@@ -491,6 +491,17 @@ Route::get('/contact', function () {
     return Inertia::render('Contact');
 })->name('contact');
 
+Route::get('/ai-ethics', function () {
+    return Inertia::render('AiEthics');
+})->name('ai-ethics');
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/ai-appeals', [\App\Http\Controllers\AiAppealController::class, 'store'])->name('ai-appeals.store');
+
+    Route::get('/privacy/my-data', [\App\Http\Controllers\DataSubjectRequestController::class, 'index'])->name('privacy.my-data');
+    Route::post('/privacy/my-data', [\App\Http\Controllers\DataSubjectRequestController::class, 'store'])->name('privacy.my-data.store');
+});
+
 Route::middleware(['auth', 'membership_active'])->group(function () {
     Route::get('/dashboard', function () {
         $user = Auth::user();
@@ -818,6 +829,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/dashboard', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/chart-data', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'getChartDataApi'])->name('dashboard.chart-data');
     Route::get('/analytics', [\App\Http\Controllers\Admin\AnalyticsController::class, 'dashboard'])->name('analytics');
+
+    Route::get('/ai-appeals', [\App\Http\Controllers\Admin\AiAppealController::class, 'index'])->name('ai-appeals.index');
+    Route::patch('/ai-appeals/{appeal}', [\App\Http\Controllers\Admin\AiAppealController::class, 'resolve'])->name('ai-appeals.resolve');
+
+    Route::get('/data-requests', [\App\Http\Controllers\Admin\DataSubjectRequestController::class, 'index'])->name('data-requests.index');
+    Route::patch('/data-requests/{dataSubjectRequest}', [\App\Http\Controllers\Admin\DataSubjectRequestController::class, 'resolve'])->name('data-requests.resolve');
+
+    Route::get('/bias-report', [\App\Http\Controllers\Admin\BiasReportController::class, 'index'])->name('bias-report.index');
 
     Route::get('/subjects', [SubjectController::class, 'adminIndex'])->name('subjects.index');
     Route::post('/subjects', [SubjectController::class, 'store'])->name('subjects.store');

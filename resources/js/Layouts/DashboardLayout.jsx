@@ -6,7 +6,8 @@ import {
     FaCalendar, FaChartLine, FaUser, FaSignOutAlt,
     FaGraduationCap, FaCommentDots, FaTachometerAlt, FaBell, FaBook,
     FaChevronDown, FaCreditCard, FaTrophy, FaProjectDiagram, FaMedal, FaFile,
-    FaCheckCircle, FaGift, FaLightbulb, FaChalkboardTeacher, FaRobot, FaSearch, FaUserTag
+    FaCheckCircle, FaGift, FaLightbulb, FaChalkboardTeacher, FaRobot, FaSearch, FaUserTag,
+    FaShieldAlt,
 } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import ApplicationLogo from '@/Components/ApplicationLogo';
@@ -416,6 +417,9 @@ export default function DashboardLayout({ children, header }) {
             { name: t('sidebar.talentMap'), href: '/admin/innovation/talent-map', icon: FaChartLine },
             { name: t('sidebar.smartAgent'), href: '/admin/innovation/chat', icon: FaRobot },
             { name: t('sidebar.smartTalentSearch'), href: '/admin/innovation/smart-search', icon: FaSearch },
+            { name: t('sidebar.aiAppeals'), href: '/admin/ai-appeals', icon: FaRobot },
+            { name: t('sidebar.dataRequests'), href: '/admin/data-requests', icon: FaShieldAlt },
+            { name: t('sidebar.biasReport'), href: '/admin/bias-report', icon: FaChartLine },
             { name: t('sidebar.users'), href: '/admin/users', icon: FaUsers },
             { name: t('sidebar.customRoles'), href: '/admin/custom-roles', icon: FaUserTag },
             { name: t('sidebar.badges'), href: '/admin/badges', icon: FaCommentDots },

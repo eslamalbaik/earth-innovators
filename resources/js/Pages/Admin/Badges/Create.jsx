@@ -28,6 +28,7 @@ export default function AdminBadgesCreate() {
         type: '',
         points_required: 0,
         is_active: true,
+        is_ai_generated: false,
     });
 
     const handleAIGenerate = async () => {
@@ -50,6 +51,7 @@ export default function AdminBadgesCreate() {
                 icon: result.icon || prev.icon,
                 type: result.type || prev.type,
                 points_required: result.points_required ?? prev.points_required,
+                is_ai_generated: true,
             }));
 
             if (result.image_url) {
@@ -152,6 +154,13 @@ export default function AdminBadgesCreate() {
                             </button>
                         </div>
                     </div>
+
+                    {data.is_ai_generated && (
+                        <div className="flex items-center gap-2 rounded-lg border border-indigo-100 bg-indigo-50 px-4 py-2.5 text-xs font-semibold text-indigo-700 mb-4">
+                            <FaRobot className="text-indigo-500" />
+                            {t('adminBadgesPage.aiAssistant.disclosureNotice')}
+                        </div>
+                    )}
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>

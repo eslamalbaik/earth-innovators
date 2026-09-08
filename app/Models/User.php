@@ -47,6 +47,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'supporting_documents',
         'innovator_classification',
         'overall_innovation_score',
+        'consent_ai_processing_at',
     ];
 
     protected $hidden = [
@@ -66,7 +67,13 @@ class User extends Authenticatable implements MustVerifyEmail
             'official_links' => 'array',
             'supporting_documents' => 'array',
             'overall_innovation_score' => 'decimal:2',
+            'consent_ai_processing_at' => 'datetime',
         ];
+    }
+
+    public function dataSubjectRequests()
+    {
+        return $this->hasMany(DataSubjectRequest::class);
     }
 
     public function teacher(): HasOne

@@ -22,6 +22,7 @@ class Publication extends Model
         'description_ar',
         'content',
         'content_ar',
+        'is_ai_generated',
         'cover_image',
         'file',
         'youtube_url',
@@ -40,6 +41,7 @@ class Publication extends Model
     protected $casts = [
         'approved_at' => 'datetime',
         'publish_date' => 'date',
+        'is_ai_generated' => 'boolean',
     ];
 
     /**

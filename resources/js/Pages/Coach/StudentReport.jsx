@@ -2,6 +2,8 @@ import { Head, Link } from '@inertiajs/react';
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import IndexRadarChart from '@/Components/Innovation/IndexRadarChart';
 import ClassificationBadge from '@/Components/Innovation/ClassificationBadge';
+import AiDisclosureBadge from '@/Components/Innovation/AiDisclosureBadge';
+import AiAppealButton from '@/Components/Innovation/AiAppealButton';
 import { useTranslation } from '@/i18n';
 
 const COGNITIVE_FACTOR_NAMES = {
@@ -61,6 +63,10 @@ export default function StudentReport({ auth, student, report = {}, index, index
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">📋 {title || `${t('studentReport.pageTitlePrefix')} ${student?.name}`}</h1>
                         <p className="text-gray-500 mt-1">{t('studentReport.subtitle')}</p>
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                            <AiDisclosureBadge />
+                            <AiAppealButton feature="student_report" subjectType="Student" subjectId={student?.id} />
+                        </div>
                     </div>
                     <Link
                         href={route('teacher.innovation.dashboard')}

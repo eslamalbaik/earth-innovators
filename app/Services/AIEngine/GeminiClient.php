@@ -5,6 +5,7 @@ namespace App\Services\AIEngine;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Client\RequestException;
+use App\Models\ActivityLog;
 
 /**
  * Gemini API Client
@@ -40,7 +41,7 @@ class GeminiClient
     /**
      * Send a chat request expecting JSON structured output
      */
-    public function chatWithJson(array $messages, float $temperature = 0.2, int $maxTokens = 8192): ?array
+    public function chatWithJson(array $messages, float $temperature = 0.2, int $maxTokens = 2048): ?array
     {
         $content = $this->request($messages, $temperature, $maxTokens, true);
 
@@ -147,8 +148,12 @@ class GeminiClient
                     ]);
                 }
 
+                $this->auditLog($messages, $content, 'success');
+
                 return $content;
             }
+
+            $this->auditLog($messages, null, 'failed');
 
             if ($response->status() === 429) {
                 Log::error('Gemini API quota exceeded — check the API key\'s plan/billing in Google AI Studio', [
@@ -176,12 +181,51 @@ class GeminiClient
                     'error'  => $e->getMessage(),
                 ]);
             }
+            $this->auditLog($messages, null, 'error');
             return null;
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
             Log::error('Gemini API connection failed', [
                 'error' => $e->getMessage(),
             ]);
+            $this->auditLog($messages, null, 'error');
             return null;
+        }
+    }
+
+    /**
+     * AI governance: record every outbound Gemini call to the shared activity
+     * log so admins can audit which feature triggered it, on whose behalf,
+     * and what was produced — required for the AI Ethics & Governance
+     * center's "auditable AI decisions" commitment.
+     */
+    private function auditLog(array $messages, ?string $content, string $status): void
+    {
+        try {
+            $caller = null;
+            foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 6) as $frame) {
+                if (($frame['class'] ?? null) && $frame['class'] !== self::class) {
+                    $caller = $frame['class'] . '::' . ($frame['function'] ?? '');
+                    break;
+                }
+            }
+
+            $promptText = collect($messages)->pluck('content')->implode("\n");
+
+            ActivityLog::create([
+                'user_id'      => auth()->id(),
+                'action'       => 'ai_call',
+                'subject_type' => $caller,
+                'subject_id'   => null,
+                'properties'   => [
+                    'model'          => $this->model,
+                    'status'         => $status,
+                    'prompt_hash'    => hash('sha256', $promptText),
+                    'response_hash'  => $content !== null ? hash('sha256', $content) : null,
+                    'prompt_preview' => mb_substr($promptText, 0, 300),
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('AI audit log write failed', ['error' => $e->getMessage()]);
         }
     }
 

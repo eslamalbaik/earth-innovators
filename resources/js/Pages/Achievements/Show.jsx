@@ -1,5 +1,7 @@
 import { Link } from '@inertiajs/react';
 import StudentPageShell from '@/Components/Innovation/StudentPageShell';
+import AiDisclosureBadge from '@/Components/Innovation/AiDisclosureBadge';
+import AiAppealButton from '@/Components/Innovation/AiAppealButton';
 import { useTranslation } from '@/i18n';
 
 export default function AchievementShow({ achievement }) {
@@ -83,7 +85,13 @@ export default function AchievementShow({ achievement }) {
                         {/* AI Analysis */}
                         {analysis.feedback && (
                             <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-5 border border-indigo-200 dark:border-indigo-700">
-                                <h3 className="font-bold text-indigo-800 dark:text-indigo-300 mb-3">{t('achievements.show.aiAnalysis')}</h3>
+                                <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                                    <h3 className="font-bold text-indigo-800 dark:text-indigo-300">{t('achievements.show.aiAnalysis')}</h3>
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <AiDisclosureBadge />
+                                        <AiAppealButton feature="achievement_validation" subjectType="Achievement" subjectId={achievement.id} />
+                                    </div>
+                                </div>
                                 <p className="text-indigo-700 dark:text-indigo-200 mb-3">{analysis.feedback}</p>
                                 {analysis.suggestions?.length > 0 && (
                                     <div>

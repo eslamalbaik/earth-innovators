@@ -18,6 +18,7 @@ class Badge extends Model
         'description_ar',
         'icon',
         'image',
+        'is_ai_generated',
         'type',
         'badge_category',
         'level',
@@ -33,6 +34,7 @@ class Badge extends Model
 
     protected $casts = [
         'approved_at' => 'datetime',
+        'is_ai_generated' => 'boolean',
     ];
 
     public function users(): BelongsToMany

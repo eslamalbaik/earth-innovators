@@ -53,6 +53,7 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'phone' => ['nullable', 'string', 'max:20', 'unique:' . User::class . ',phone'],
             'role' => 'required|string|in:student,teacher,school,educational_institution',
+            'consent_ai_processing' => 'required|accepted',
         ];
 
         // يجب تضمين school_id في القواعد حتى يُمرَّر إلى $validated ويُحفظ عند التسجيل (الطالب/المعلم)
@@ -77,6 +78,8 @@ class RegisteredUserController extends Controller
             'role.in' => 'نوع الحساب غير صالح.',
             'school_id.required' => 'يجب اختيار المدرسة.',
             'school_id.exists' => 'المدرسة المختارة غير موجودة أو غير متاحة.',
+            'consent_ai_processing.required' => 'يجب الموافقة على سياسة استخدام الذكاء الاصطناعي والبيانات للمتابعة.',
+            'consent_ai_processing.accepted' => 'يجب الموافقة على سياسة استخدام الذكاء الاصطناعي والبيانات للمتابعة.',
         ]);
 
         if (in_array($validated['role'], ['student', 'teacher'], true)) {
@@ -97,6 +100,7 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($validated['password']),
             'phone' => $validated['phone'] ?? null,
             'role' => $validated['role'],
+            'consent_ai_processing_at' => now(),
         ];
 
         if (in_array($validated['role'], ['student', 'teacher'], true)) {

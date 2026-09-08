@@ -24,6 +24,7 @@ class Challenge extends Model
         'image',
         'instructions',
         'instructions_ar',
+        'is_ai_generated',
         'challenge_type',
         'category',
         'age_group',
@@ -41,6 +42,7 @@ class Challenge extends Model
         'start_date' => 'datetime',
         'deadline' => 'datetime',
         'badges_reward' => 'array',
+        'is_ai_generated' => 'boolean',
     ];
 
     protected $appends = [

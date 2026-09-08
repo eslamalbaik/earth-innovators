@@ -1,4 +1,6 @@
 import StudentPageShell from '@/Components/Innovation/StudentPageShell';
+import AiDisclosureBadge from '@/Components/Innovation/AiDisclosureBadge';
+import AiAppealButton from '@/Components/Innovation/AiAppealButton';
 import { useTranslation } from '@/i18n';
 
 const PRIORITY_STYLES = {
@@ -30,6 +32,10 @@ export default function Recommendations({ recommendations }) {
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">{t('innovation.recommendations.title')}</h1>
                     <p className="text-gray-500 mt-1">{t('innovation.recommendations.subtitle')}</p>
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <AiDisclosureBadge />
+                        <AiAppealButton feature="recommendations" />
+                    </div>
                 </div>
 
                 {isEmpty && (

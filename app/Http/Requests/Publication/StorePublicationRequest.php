@@ -28,6 +28,7 @@ class StorePublicationRequest extends FormRequest
             'publish_date' => 'nullable|date',
             'publisher_name' => 'nullable|string|max:255',
             'school_id' => 'nullable|exists:users,id',
+            'is_ai_generated' => 'nullable|boolean',
         ];
     }
 

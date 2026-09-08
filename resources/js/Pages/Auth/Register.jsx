@@ -28,6 +28,7 @@ export default function Register({ schools = [] }) {
         role: 'student',
         phone: '',
         school_id: '',
+        consent_ai_processing: false,
     });
 
     const roleOptions = [
@@ -327,10 +328,27 @@ export default function Register({ schools = [] }) {
                                 />
                             </div>
 
+                            <div className="flex items-start gap-2">
+                                <input
+                                    id="consent_ai_processing"
+                                    type="checkbox"
+                                    checked={data.consent_ai_processing}
+                                    onChange={(e) => setData('consent_ai_processing', e.target.checked)}
+                                    className="mt-1 h-4 w-4 rounded border-gray-300 text-[#A3C042] focus:ring-[#A3C042]"
+                                />
+                                <label htmlFor="consent_ai_processing" className="text-xs text-gray-600 leading-relaxed">
+                                    {t('auth.aiConsentLabel')}{' '}
+                                    <Link href="/ai-ethics" target="_blank" className="text-[#A3C042] underline hover:text-[#8CA635]">
+                                        {t('auth.aiConsentLinkText')}
+                                    </Link>
+                                </label>
+                            </div>
+                            <InputError message={errors.consent_ai_processing} className="mt-1" />
+
                             <div>
                                 <PrimaryButton
                                     className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white !bg-[#A3C042] hover:!bg-[#F9D536] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#A3C042] disabled:opacity-50"
-                                    disabled={processing || ((data.role === 'student' || data.role === 'teacher') && !data.school_id) || (schools && schools.length === 0 && (data.role === 'student' || data.role === 'teacher'))}
+                                    disabled={processing || !data.consent_ai_processing || ((data.role === 'student' || data.role === 'teacher') && !data.school_id) || (schools && schools.length === 0 && (data.role === 'student' || data.role === 'teacher'))}
                                 >
                                     {processing ? (
                                         <div className="flex items-center">

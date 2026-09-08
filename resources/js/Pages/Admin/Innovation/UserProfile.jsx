@@ -10,6 +10,8 @@ import {
 import axios from 'axios';
 import IndexRadarChart from '@/Components/Innovation/IndexRadarChart';
 import ClassificationBadge from '@/Components/Innovation/ClassificationBadge';
+import AiDisclosureBadge from '@/Components/Innovation/AiDisclosureBadge';
+import AiAppealButton from '@/Components/Innovation/AiAppealButton';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 
 const COGNITIVE_FACTOR_NAMES = {
@@ -153,6 +155,10 @@ export default function UserProfile({
                             <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
                                 {student.institution || 'مؤسسة تعليمية غير محددة'}
                             </span>
+                            <div className="mt-3 flex flex-wrap items-center gap-2">
+                                <AiDisclosureBadge />
+                                <AiAppealButton feature="user_profile" subjectType="Student" subjectId={student.id} />
+                            </div>
                         </div>
                     </div>
 

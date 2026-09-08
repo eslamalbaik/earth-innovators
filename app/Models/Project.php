@@ -22,6 +22,7 @@ class Project extends Model
         'title_ar',
         'description',
         'description_ar',
+        'is_ai_generated',
         'category',
         'curriculum_type',
         'status',
@@ -46,6 +47,7 @@ class Project extends Model
         'self_evaluation' => 'array',
         'rating' => 'decimal:2',
         'approved_at' => 'datetime',
+        'is_ai_generated' => 'boolean',
     ];
 
     public function user(): BelongsTo

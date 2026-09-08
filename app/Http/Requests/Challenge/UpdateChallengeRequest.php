@@ -41,6 +41,7 @@ class UpdateChallengeRequest extends FormRequest
             'status' => 'nullable|in:draft,active,completed,cancelled',
             'points_reward' => 'nullable|integer|min:0',
             'max_participants' => 'nullable|integer|min:1',
+            'is_ai_generated' => 'nullable|boolean',
         ];
     }
 
