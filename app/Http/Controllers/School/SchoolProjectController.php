@@ -81,7 +81,7 @@ class SchoolProjectController extends Controller
                 \App\Services\AIEngine\GeminiClient::systemMessage(
                     'أنت مستشار تخطيط مشاريع تعليمية وابتكارية. '
                     . 'بناءً على الفكرة أو الوصف القصير الذي تقدمه المدرسة، قم بإنشاء تفاصيل مشروع كاملة وجاهزة للنشر باللغتين العربية والإنجليزية. '
-                    . 'اقترح كلمة مفتاحية واحدة باللغة الإنجليزية للبحث عن صورة غلاف من Unsplash. '
+                    . 'اقترح عبارة بحث دقيقة من 3 إلى 5 كلمات وصفية باللغة الإنجليزية تصف بالتحديد المشهد البصري لهذا المشروع تحديداً (وليست كلمة عامة مثل innovation أو education)، لاستخدامها في البحث عن صورة غلاف مطابقة من Unsplash. '
                     . 'اختر القيم الإلزامية التالية من الخيارات المتاحة حصراً باللغة الإنجليزية: '
                     . 'category: (science, technology, engineering, mathematics, arts, other). '
                     . 'grade: (grade_1, grade_2, grade_3, grade_4, grade_5, grade_6, grade_7, grade_8, grade_9, grade_10, grade_11, grade_12). '
@@ -95,7 +95,7 @@ class SchoolProjectController extends Controller
                     . 'grade (قيمة واحدة من الخيارات المتاحة), '
                     . 'subject (قيمة واحدة من الخيارات المتاحة), '
                     . 'instructional_approach (قيمة واحدة من الخيارات المتاحة), '
-                    . 'image_keyword (كلمة مفتاحية واحدة بالإنجليزية).'
+                    . 'image_keyword (عبارة بحث دقيقة من 3 إلى 5 كلمات وصفية بالإنجليزية خاصة بمحتوى هذا المشروع تحديداً، وليست كلمة عامة).'
                 ),
                 \App\Services\AIEngine\GeminiClient::userMessage("فكرة المشروع: " . $idea),
             ]);
