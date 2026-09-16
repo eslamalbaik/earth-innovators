@@ -3,6 +3,7 @@ import DashboardLayout from '@/Layouts/DashboardLayout';
 import IndexRadarChart from '@/Components/Innovation/IndexRadarChart';
 import ClassificationBadge from '@/Components/Innovation/ClassificationBadge';
 import AiDisclosureBadge from '@/Components/Innovation/AiDisclosureBadge';
+import AgentAttribution from '@/Components/Innovation/AgentAttribution';
 import AiAppealButton from '@/Components/Innovation/AiAppealButton';
 import { useTranslation } from '@/i18n';
 
@@ -65,6 +66,7 @@ export default function StudentReport({ auth, student, report = {}, index, index
                         <p className="text-gray-500 mt-1">{t('studentReport.subtitle')}</p>
                         <div className="mt-3 flex flex-wrap items-center gap-2">
                             <AiDisclosureBadge />
+                            <AgentAttribution agentKey="reporting" />
                             <AiAppealButton feature="student_report" subjectType="Student" subjectId={student?.id} />
                         </div>
                     </div>

@@ -16,6 +16,7 @@ class ProjectSubmission extends Model
         'comment',
         'status',
         'feedback',
+        'ai_rubric_evaluation',
         'reviewed_by',
         'rating',
         'badges',
@@ -26,6 +27,7 @@ class ProjectSubmission extends Model
     protected $casts = [
         'files' => 'array',
         'badges' => 'array',
+        'ai_rubric_evaluation' => 'array',
         'rating' => 'decimal:2',
         'submitted_at' => 'datetime',
         'reviewed_at' => 'datetime',

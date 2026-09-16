@@ -56,6 +56,7 @@ class StudentProfileController extends Controller
             'projects' => $dashboardStats['total_projects'] ?? $user->projects()->count(),
             'badges' => $dashboardStats['total_badges'] ?? $user->badges()->count(),
             'winning' => $winningProjects,
+            'membershipNumber' => $user->membership_number,
         ];
 
         // Get recent projects

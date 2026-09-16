@@ -1,7 +1,7 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import {
     FaRobot, FaShieldAlt, FaBalanceScale, FaUserCheck, FaLock,
-    FaHistory, FaGavel, FaTrashAlt, FaCommentDots, FaLightbulb, FaLandmark,
+    FaHistory, FaGavel, FaTrashAlt, FaCommentDots, FaLightbulb, FaLandmark, FaArrowLeft, FaArrowRight,
 } from 'react-icons/fa';
 import MobileAppLayout from '../Layouts/MobileAppLayout';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
@@ -67,6 +67,25 @@ export default function AiEthics({ auth }) {
                     {t('aiEthics.complianceDescription')}
                 </p>
             </div>
+
+            <Link
+                href="/ai-agents"
+                className="block bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-700 rounded-2xl p-6 md:p-8 text-white shadow-sm transition hover:opacity-95"
+            >
+                <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
+                        <FaRobot className="text-xl" />
+                    </div>
+                    <h2 className="text-xl md:text-2xl font-bold">{t('aiEthics.agentDirectory.title')}</h2>
+                </div>
+                <p className="text-white/90 text-sm md:text-base leading-relaxed mb-4">
+                    {t('aiEthics.agentDirectory.description')}
+                </p>
+                <span className="inline-flex items-center gap-2 text-sm font-semibold">
+                    {t('aiEthics.agentDirectory.cta')}
+                    {isArabic ? <FaArrowLeft /> : <FaArrowRight />}
+                </span>
+            </Link>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 {principles.map(({ icon: Icon, key }) => (

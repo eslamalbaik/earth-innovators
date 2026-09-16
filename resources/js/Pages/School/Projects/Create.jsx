@@ -1,4 +1,5 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
+import AgentAttribution from '@/Components/Innovation/AgentAttribution';
 import { Head, useForm, router, Link } from '@inertiajs/react';
 import { useState, useRef } from 'react';
 import { FaArrowLeft, FaUpload, FaCloudUploadAlt, FaFile, FaSpinner, FaTrash, FaRobot } from 'react-icons/fa';
@@ -294,6 +295,7 @@ export default function CreateSchoolProject({ auth }) {
                                 <p className="text-sm text-blue-600">
                                     {t('teacherProjectsCreatePage.aiAssistant.description')}
                                 </p>
+                                <AgentAttribution agentKey="content_generation" className="mb-3" />
                             </div>
                             <div className="flex-1 flex gap-2 w-full md:w-auto">
                                 <input

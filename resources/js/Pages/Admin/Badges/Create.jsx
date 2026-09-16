@@ -1,4 +1,5 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
+import AgentAttribution from '@/Components/Innovation/AgentAttribution';
 import { useTranslation } from '@/i18n';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FaArrowRight, FaSave, FaTimes, FaUpload, FaRobot, FaSpinner } from 'react-icons/fa';
@@ -131,6 +132,7 @@ export default function AdminBadgesCreate() {
                             <p className="text-sm text-blue-600">
                                 {t('adminBadgesPage.aiAssistant.description')}
                             </p>
+                            <AgentAttribution agentKey="content_generation" className="mb-3" />
                         </div>
                         <div className="flex-1 flex gap-2 w-full md:w-auto">
                             <input

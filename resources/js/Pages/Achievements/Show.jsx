@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import StudentPageShell from '@/Components/Innovation/StudentPageShell';
 import AiDisclosureBadge from '@/Components/Innovation/AiDisclosureBadge';
+import AgentAttribution from '@/Components/Innovation/AgentAttribution';
 import AiAppealButton from '@/Components/Innovation/AiAppealButton';
 import { useTranslation } from '@/i18n';
 
@@ -89,6 +90,7 @@ export default function AchievementShow({ achievement }) {
                                     <h3 className="font-bold text-indigo-800 dark:text-indigo-300">{t('achievements.show.aiAnalysis')}</h3>
                                     <div className="flex flex-wrap items-center gap-2">
                                         <AiDisclosureBadge />
+                                        <AgentAttribution agentKey="achievement_validation" />
                                         <AiAppealButton feature="achievement_validation" subjectType="Achievement" subjectId={achievement.id} />
                                     </div>
                                 </div>

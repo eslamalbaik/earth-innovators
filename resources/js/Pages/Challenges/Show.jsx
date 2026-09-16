@@ -22,6 +22,7 @@ import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import { useTranslation } from '@/i18n';
 import AiDisclosureBadge from '@/Components/Innovation/AiDisclosureBadge';
+import AgentAttribution from '@/Components/Innovation/AgentAttribution';
 import { usePremiumGate } from '@/Hooks/usePremiumGate';
 import { getChallengeImageUrl } from '@/utils/imageUtils';
 
@@ -197,7 +198,12 @@ export default function ChallengeShow({ auth, challenge, canManage = false, canS
                             </Link>
                         )}
                     </div>
-                    {challenge.is_ai_generated && <AiDisclosureBadge className="mt-2" />}
+                    {challenge.is_ai_generated && (
+                        <div className="flex flex-wrap items-center gap-2 mt-2">
+                            <AiDisclosureBadge />
+                            <AgentAttribution agentKey="content_generation" />
+                        </div>
+                    )}
                     <div className="mt-2">
                         <span className={`px-2 py-1 ${statusBadge.bg} ${statusBadge.text} text-xs font-semibold rounded-full inline-flex items-center gap-1`}>
                             <StatusIcon className="text-[10px]" />

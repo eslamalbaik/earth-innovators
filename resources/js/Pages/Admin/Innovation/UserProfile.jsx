@@ -11,6 +11,7 @@ import axios from 'axios';
 import IndexRadarChart from '@/Components/Innovation/IndexRadarChart';
 import ClassificationBadge from '@/Components/Innovation/ClassificationBadge';
 import AiDisclosureBadge from '@/Components/Innovation/AiDisclosureBadge';
+import AgentAttribution from '@/Components/Innovation/AgentAttribution';
 import AiAppealButton from '@/Components/Innovation/AiAppealButton';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 
@@ -157,6 +158,7 @@ export default function UserProfile({
                             </span>
                             <div className="mt-3 flex flex-wrap items-center gap-2">
                                 <AiDisclosureBadge />
+                                <AgentAttribution agentKey="recommendations" />
                                 <AiAppealButton feature="user_profile" subjectType="Student" subjectId={student.id} />
                             </div>
                         </div>

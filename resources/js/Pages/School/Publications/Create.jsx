@@ -1,4 +1,5 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
+import AgentAttribution from '@/Components/Innovation/AgentAttribution';
 import { useTranslation } from '@/i18n';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
@@ -148,6 +149,7 @@ export default function SchoolPublicationCreate({ auth }) {
                                 <p className="text-xs text-blue-600 mt-1">
                                     {t('teacherPublicationCreatePage.aiAssistant.description')}
                                 </p>
+                                <AgentAttribution agentKey="content_generation" className="mb-3" />
                             </div>
                             <button
                                 type="button"

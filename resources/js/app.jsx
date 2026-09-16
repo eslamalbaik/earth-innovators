@@ -7,6 +7,7 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { ToastProvider } from './Contexts/ToastContext';
 import AppUpdateNotifier from './Components/AppUpdateNotifier';
+import SmartAssistantWidget from './Components/Student/SmartAssistantWidget';
 import { ConfirmProvider } from './Contexts/ConfirmContext';
 import store from './store/store';
 import { getTranslation } from './i18n';
@@ -35,7 +36,21 @@ createInertiaApp({
         resolvePageComponent(
             `./Pages/${name}.jsx`,
             import.meta.glob('./Pages/**/*.jsx'),
-        ),
+        ).then((module) => {
+            // No page sets a persistent Inertia layout (module.default.layout), so this
+            // default fallback applies everywhere — it's the only way to mount a widget
+            // that needs usePage() on literally every page without touching each one.
+            const page = module.default;
+            if (page && !page.layout) {
+                page.layout = (pageElement) => (
+                    <>
+                        {pageElement}
+                        <SmartAssistantWidget />
+                    </>
+                );
+            }
+            return module;
+        }),
     setup({ el, App, props }) {
         const root = createRoot(el);
 

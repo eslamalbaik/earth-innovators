@@ -1,5 +1,6 @@
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import { useState } from 'react';
+import axios from 'axios';
 import {
     FaStar,
     FaUser,
@@ -8,22 +9,102 @@ import {
     FaDownload,
     FaPaperPlane,
     FaFilePdf,
-    FaImage
+    FaImage,
+    FaLandmark
 } from 'react-icons/fa';
 import InputError from '../../../Components/InputError';
 import MobileAppLayout from '@/Layouts/MobileAppLayout';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
+import AiDisclosureBadge from '@/Components/Innovation/AiDisclosureBadge';
+import AgentAttribution from '@/Components/Innovation/AgentAttribution';
+import { useToast } from '@/Contexts/ToastContext';
 import { useTranslation } from '@/i18n';
 import { getProjectFileUrl } from '@/utils/imageUtils';
 
 const REVIEW_STATUSES = ['reviewed', 'approved', 'rejected'];
 
+function csrfToken() {
+    return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+}
+
 export default function TeacherSubmissionShow({ auth, submission, availableBadges, allSubmissions = [] }) {
     const { t, language } = useTranslation();
+    const { showSuccess, showError } = useToast();
     const [rating, setRating] = useState(submission.rating || 0);
     const [hoveredRating, setHoveredRating] = useState(0);
     const [selectedBadges, setSelectedBadges] = useState(submission.badges || []);
+
+    const rubric = submission.project?.rubric || null;
+    const [rubricEvaluation, setRubricEvaluation] = useState(submission.ai_rubric_evaluation || null);
+    const [rubricCriteria, setRubricCriteria] = useState(
+        (submission.ai_rubric_evaluation?.criteria || []).map((c) => ({ ...c }))
+    );
+    const [generatingRubric, setGeneratingRubric] = useState(false);
+    const [savingRubric, setSavingRubric] = useState(false);
+
+    const applyRubricEvaluation = (evaluation) => {
+        setRubricEvaluation(evaluation);
+        setRubricCriteria((evaluation?.criteria || []).map((c) => ({ ...c })));
+    };
+
+    const handleGenerateRubricEvaluation = async () => {
+        setGeneratingRubric(true);
+        try {
+            const { data } = await axios.post(
+                `/teacher/submissions/${submission.id}/rubric-evaluation/generate`,
+                {},
+                { headers: { 'X-CSRF-TOKEN': csrfToken(), 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' } }
+            );
+            if (data.success) {
+                applyRubricEvaluation(data.evaluation);
+                showSuccess(t('teacherSubmissionsPage.rubricEvaluation.generateSuccess'));
+            } else {
+                showError(data.message || t('teacherSubmissionsPage.rubricEvaluation.generateError'));
+            }
+        } catch (err) {
+            showError(err.response?.data?.message || t('teacherSubmissionsPage.rubricEvaluation.generateError'));
+        } finally {
+            setGeneratingRubric(false);
+        }
+    };
+
+    const handleExplanationChange = (criterionId, value) => {
+        const field = language === 'ar' ? 'explanation_ar' : 'explanation';
+        setRubricCriteria((prev) => prev.map((c) => (
+            c.criterion_id === criterionId ? { ...c, [field]: value, teacher_edited: true } : c
+        )));
+    };
+
+    const handleSaveRubricEvaluation = async (release) => {
+        setSavingRubric(true);
+        try {
+            const { data } = await axios.put(
+                `/teacher/submissions/${submission.id}/rubric-evaluation`,
+                {
+                    release,
+                    criteria: rubricCriteria.map((c) => ({
+                        criterion_id: c.criterion_id,
+                        explanation: c.explanation,
+                        explanation_ar: c.explanation_ar,
+                    })),
+                },
+                { headers: { 'X-CSRF-TOKEN': csrfToken(), 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' } }
+            );
+            if (data.success) {
+                applyRubricEvaluation(data.evaluation);
+                showSuccess(release
+                    ? t('teacherSubmissionsPage.rubricEvaluation.releaseSuccess')
+                    : t('teacherSubmissionsPage.rubricEvaluation.saveSuccess'));
+            } else {
+                showError(data.message || t('teacherSubmissionsPage.rubricEvaluation.saveError'));
+            }
+        } catch (err) {
+            showError(err.response?.data?.message || t('teacherSubmissionsPage.rubricEvaluation.saveError'));
+        } finally {
+            setSavingRubric(false);
+        }
+    };
 
     const { data, setData, post, processing, errors } = useForm({
         rating: submission.rating || 0,
@@ -148,6 +229,127 @@ export default function TeacherSubmissionShow({ auth, submission, availableBadge
                         </div>
                     </div>
                 )}
+            </div>
+
+            <div className="mt-4 bg-white rounded-2xl border border-gray-100 p-4">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                        <div className="text-sm font-bold text-gray-900">{t('teacherSubmissionsPage.rubricEvaluation.title')}</div>
+                        {rubricEvaluation && (
+                            <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${rubricEvaluation.released ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
+                                {rubricEvaluation.released
+                                    ? t('teacherSubmissionsPage.rubricEvaluation.released')
+                                    : t('teacherSubmissionsPage.rubricEvaluation.draft')}
+                            </span>
+                        )}
+                    </div>
+
+                    {rubricEvaluation ? (
+                        <p className="text-xs text-gray-500 mb-1">
+                            {language === 'ar' ? rubricEvaluation.rubric_name_ar : rubricEvaluation.rubric_name}
+                        </p>
+                    ) : rubric ? (
+                        <p className="text-xs text-gray-500 mb-1">{language === 'ar' ? rubric.name_ar : rubric.name}</p>
+                    ) : null}
+
+                    {(rubricEvaluation ? rubricEvaluation.is_fallback_default : !rubric) && (
+                        <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-full px-2.5 py-1 mb-3">
+                            <FaLandmark />
+                            {t('teacherSubmissionsPage.rubricEvaluation.usingDefaultStandards')}
+                        </div>
+                    )}
+
+                    {!rubricEvaluation && (
+                        <div className="text-center py-4">
+                            <p className="text-xs text-gray-500 mb-3">{t('teacherSubmissionsPage.rubricEvaluation.emptyHint')}</p>
+                            <button
+                                type="button"
+                                onClick={handleGenerateRubricEvaluation}
+                                disabled={generatingRubric}
+                                className="rounded-xl bg-[#A3C042] text-white text-sm font-bold px-4 py-2 disabled:opacity-60"
+                            >
+                                {generatingRubric
+                                    ? t('teacherSubmissionsPage.rubricEvaluation.generating')
+                                    : t('teacherSubmissionsPage.rubricEvaluation.generateButton')}
+                            </button>
+                        </div>
+                    )}
+
+                    {rubricEvaluation && (
+                        <>
+                            <div className="text-xs font-semibold text-gray-700 mb-3">
+                                {t('teacherSubmissionsPage.rubricEvaluation.overallScore', { score: rubricEvaluation.overall_weighted_score })}
+                            </div>
+
+                            <div className="space-y-3">
+                                {rubricCriteria.map((c) => {
+                                    const name = language === 'ar' ? c.name_ar : c.name;
+                                    const levelName = language === 'ar' ? c.level_name_ar : c.level_name;
+                                    const nextLevelName = language === 'ar' ? c.next_level_name_ar : c.next_level_name;
+                                    const text = language === 'ar' ? c.explanation_ar : c.explanation;
+
+                                    return (
+                                        <div key={c.criterion_id} className="border border-gray-200 rounded-xl p-3">
+                                            <div className="flex items-center justify-between flex-wrap gap-1 mb-1">
+                                                <div className="text-sm font-bold text-gray-900">{name}</div>
+                                                <div className="text-xs font-semibold text-gray-600">
+                                                    {levelName} — {c.score}/{c.max_score} ({c.weight}%)
+                                                </div>
+                                            </div>
+                                            {nextLevelName && (
+                                                <div className="text-[11px] text-gray-500 mb-2">
+                                                    {t('teacherSubmissionsPage.rubricEvaluation.nextLevel', { level: nextLevelName })}
+                                                </div>
+                                            )}
+                                            <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                                                <AiDisclosureBadge />
+                                                <AgentAttribution agentKey="rubric_evaluation" />
+                                                {c.teacher_edited && (
+                                                    <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">
+                                                        {t('teacherSubmissionsPage.rubricEvaluation.editedByTeacher')}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <textarea
+                                                value={text || ''}
+                                                onChange={(e) => handleExplanationChange(c.criterion_id, e.target.value)}
+                                                rows={4}
+                                                className="w-full text-xs rounded-lg border border-gray-200 p-2 focus:outline-none focus:ring-2 focus:ring-[#A3C042]/30"
+                                            />
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            <div className="flex flex-wrap gap-2 mt-3">
+                                <button
+                                    type="button"
+                                    onClick={handleGenerateRubricEvaluation}
+                                    disabled={generatingRubric}
+                                    className="rounded-xl border border-gray-300 text-gray-700 text-xs font-bold px-3 py-2 disabled:opacity-60"
+                                >
+                                    {generatingRubric
+                                        ? t('teacherSubmissionsPage.rubricEvaluation.generating')
+                                        : t('teacherSubmissionsPage.rubricEvaluation.regenerateButton')}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleSaveRubricEvaluation(false)}
+                                    disabled={savingRubric}
+                                    className="rounded-xl border border-[#A3C042] text-[#A3C042] text-xs font-bold px-3 py-2 disabled:opacity-60"
+                                >
+                                    {savingRubric ? t('teacherSubmissionsPage.rubricEvaluation.saving') : t('teacherSubmissionsPage.rubricEvaluation.saveDraft')}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleSaveRubricEvaluation(true)}
+                                    disabled={savingRubric}
+                                    className="rounded-xl bg-[#A3C042] text-white text-xs font-bold px-3 py-2 disabled:opacity-60"
+                                >
+                                    {savingRubric ? t('teacherSubmissionsPage.rubricEvaluation.saving') : t('teacherSubmissionsPage.rubricEvaluation.releaseButton')}
+                                </button>
+                            </div>
+                        </>
+                    )}
             </div>
 
             <div className="mt-4 bg-white rounded-2xl border border-gray-100 p-4">

@@ -39,6 +39,7 @@ class Project extends Model
         'instructional_approach',
         'grade',
         'subject',
+        'rubric_id',
     ];
 
     protected $casts = [
@@ -68,6 +69,11 @@ class Project extends Model
     public function teacher(): BelongsTo
     {
         return $this->belongsTo(Teacher::class, 'teacher_id');
+    }
+
+    public function rubric(): BelongsTo
+    {
+        return $this->belongsTo(Rubric::class);
     }
 
     public function challenges(): BelongsToMany

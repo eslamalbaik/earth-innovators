@@ -204,6 +204,14 @@ export default function DesktopFooter({ auth }) {
                             <Link href="/about" className="text-sm text-white/80 transition hover:text-white">
                                 {t('common.about')}
                             </Link>
+                            <Link href="/ai-ethics" className="text-sm text-white/80 transition hover:text-white">
+                                {t('common.aiEthics')}
+                            </Link>
+                            {isAuthed && (
+                                <Link href="/privacy/my-data" className="text-sm text-white/80 transition hover:text-white">
+                                    {t('myDataPage.title')}
+                                </Link>
+                            )}
                         </div>
                     </div>
                 </div>

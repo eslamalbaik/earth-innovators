@@ -1,4 +1,5 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
+import AgentAttribution from '@/Components/Innovation/AgentAttribution';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FaArrowRight, FaSave, FaTimes, FaImage, FaTrash, FaRobot, FaSpinner, FaPlus, FaClipboardCheck } from 'react-icons/fa';
 import { useState, useRef } from 'react';
@@ -174,6 +175,7 @@ export default function AdminChallengesCreate({ schools = [] }) {
                                 <p className="text-sm text-blue-600">
                                     {t('adminChallengesCreatePage.aiAssistant.description')}
                                 </p>
+                                <AgentAttribution agentKey="content_generation" className="mb-3" />
                             </div>
                             <div className="flex-1 flex gap-2 w-full md:w-auto">
                                 <input

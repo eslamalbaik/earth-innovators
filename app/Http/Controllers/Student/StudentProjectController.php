@@ -209,6 +209,12 @@ class StudentProjectController extends Controller
             $existingSubmission->file_urls = $existingSubmission->files;
         }
 
+        // شروح مؤشرات الأداء المولّدة بالذكاء الاصطناعي تبقى مسودة للمعلم
+        // فقط حتى يعتمد نشرها؛ لا تصل إلى الطالب قبل ذلك.
+        if ($existingSubmission && ! ($existingSubmission->ai_rubric_evaluation['released'] ?? false)) {
+            $existingSubmission->ai_rubric_evaluation = null;
+        }
+
         return Inertia::render('Student/Projects/Show', [
             'project'            => $projectDetails,
             'existingSubmission' => $existingSubmission,

@@ -2,6 +2,8 @@ import { router } from '@inertiajs/react';
 import StudentPageShell from '@/Components/Innovation/StudentPageShell';
 import IndexRadarChart from '@/Components/Innovation/IndexRadarChart';
 import ClassificationBadge from '@/Components/Innovation/ClassificationBadge';
+import RoleBadge from '@/Components/Innovation/RoleBadge';
+import AgentAttribution from '@/Components/Innovation/AgentAttribution';
 import { useTranslation } from '@/i18n';
 
 const INDEX_ICONS = {
@@ -17,7 +19,7 @@ const barColor = (value) => {
     return 'bg-red-400';
 };
 
-export default function Indexes({ index, indexNames, metadata = {} }) {
+export default function Indexes({ index, indexNames, metadata = {}, referenceStandards = {}, roleBadge = null }) {
     const { t, language } = useTranslation();
     const indexes = index
         ? {
@@ -71,6 +73,20 @@ export default function Indexes({ index, indexNames, metadata = {} }) {
                                         }
                                         size="lg"
                                     />
+                                    {roleBadge && <RoleBadge role={roleBadge} size="lg" />}
+                                    {index.national_level && (
+                                        <div
+                                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold text-white cursor-help"
+                                            style={{ backgroundColor: index.national_level.color }}
+                                            title={t('innovation.indexes.nationalLevelTooltip', {
+                                                min: index.national_level.min,
+                                                max: index.national_level.max,
+                                            })}
+                                        >
+                                            {index.national_level.code} —{' '}
+                                            {language === 'ar' ? index.national_level.label_ar : index.national_level.label_en}
+                                        </div>
+                                    )}
                                     {index.calculated_at && (
                                         <p className="text-xs text-gray-400">
                                             {t('innovation.indexes.lastCalculated', { date: new Date(index.calculated_at).toLocaleDateString(language === 'ar' ? 'ar' : 'en') })}
@@ -101,6 +117,18 @@ export default function Indexes({ index, indexNames, metadata = {} }) {
                                                 className={`h-full rounded-full transition-all ${barColor(value)}`}
                                                 style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
                                             />
+                                        </div>
+                                        <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                                            <AgentAttribution agentKey={key} />
+                                            {(referenceStandards[key] || []).map((std) => (
+                                                <span
+                                                    key={std.id}
+                                                    title={language === 'ar' ? std.usage_ar : std.usage_en}
+                                                    className="px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-100 rounded-full text-[11px] font-semibold cursor-help"
+                                                >
+                                                    {t('innovation.indexes.compliantWith', { standard: std.standard_name })}
+                                                </span>
+                                            ))}
                                         </div>
                                     </div>
                                 );

@@ -6,6 +6,10 @@
  * status في الواجهة: available | insufficient | locked (يتطلب اشتراكاً، إلخ)
  */
 return [
+    // معطّل افتراضياً بانتظار إتمام التكامل الرسمي مع مزودي الجوائز (مثل برنامج فزعة).
+    // يُفعَّل بتغيير STORE_REWARDS_REDEMPTION_ENABLED=true في البيئة عند اكتمال التكامل.
+    'redemption_enabled' => (bool) env('STORE_REWARDS_REDEMPTION_ENABLED', false),
+
     'weekly_redemption_limit' => (int) env('STORE_REWARD_WEEKLY_LIMIT', 1),
 
     'items' => [

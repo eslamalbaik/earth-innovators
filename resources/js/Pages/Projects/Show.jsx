@@ -7,6 +7,7 @@ import { useState, useRef } from 'react';
 import { toHijriDate } from '@/utils/dateUtils';
 import { useTranslation } from '@/i18n';
 import AiDisclosureBadge from '@/Components/Innovation/AiDisclosureBadge';
+import AgentAttribution from '@/Components/Innovation/AgentAttribution';
 import {
     FaArrowLeft,
     FaUpload,
@@ -199,7 +200,12 @@ export default function ProjectShow({ auth, project, existingSubmission, userRol
                 <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-4">
                     <div>
                         <h1 className="text-xl font-extrabold text-gray-900 mb-3">{displayTitle}</h1>
-                        {project.is_ai_generated && <AiDisclosureBadge className="mb-3" />}
+                        {project.is_ai_generated && (
+                            <div className="flex flex-wrap items-center gap-2 mb-3">
+                                <AiDisclosureBadge />
+                                <AgentAttribution agentKey="content_generation" />
+                            </div>
+                        )}
                         <div className="flex items-center gap-2 flex-wrap mb-3">
                             <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold border border-green-300">
                                 {t('common.approved')}

@@ -109,6 +109,29 @@ class InnovationIndex extends Model
     }
 
     /**
+     * National level (L1-L5) for this index's overall_score, resolved from
+     * admin-configurable thresholds in national_level_settings.
+     */
+    public function getNationalLevelDetails(): ?array
+    {
+        return self::nationalLevelForScore((float) $this->overall_score);
+    }
+
+    public static function nationalLevelForScore(float $score): ?array
+    {
+        $level = NationalLevelSetting::forScore($score);
+
+        return $level ? [
+            'code'     => $level->code,
+            'label_ar' => $level->label_ar,
+            'label_en' => $level->label_en,
+            'color'    => $level->color,
+            'min'      => $level->min_score,
+            'max'      => $level->max_score,
+        ] : null;
+    }
+
+    /**
      * Get all indexes as an array
      */
     public function toIndexArray(): array

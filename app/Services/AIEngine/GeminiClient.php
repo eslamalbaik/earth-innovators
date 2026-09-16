@@ -345,6 +345,11 @@ class GeminiClient
             ];
         }
 
+        // 0a-bis. Rubric criteria evaluation (Performance Indicator Explanation system)
+        if (str_contains($systemContent, 'criteria_evaluations')) {
+            return $this->mockRubricEvaluation($userPrompt);
+        }
+
         // 0b. Badge creation
         if (str_contains($systemContent, 'name_ar') && str_contains($systemContent, 'description_ar')) {
             $nameAr = 'شارة الابتكار المتميز';
@@ -636,6 +641,45 @@ class GeminiClient
 
         // Catch-all generic JSON response
         return [];
+    }
+
+    /**
+     * Mock fallback for the rubric performance-indicator evaluation prompt:
+     * picks the middle proficiency level for every criterion found in the
+     * prompt and writes a short, criterion-specific 4-sentence explanation
+     * in both languages so the feature still works end-to-end without a
+     * live Gemini API key (e.g. local dev, tests).
+     */
+    private function mockRubricEvaluation(string $userPrompt): array
+    {
+        preg_match_all(
+            '/معيار \(المعرف\/criterion_id: (\d+)\)\s*\nالاسم: ([^\/\n]+) \/ ([^\n]+)/u',
+            $userPrompt,
+            $matches,
+            PREG_SET_ORDER
+        );
+
+        $evaluations = [];
+        foreach ($matches as $m) {
+            $id = (int) $m[1];
+            $nameAr = trim($m[2]);
+            $nameEn = trim($m[3]);
+
+            $evaluations[] = [
+                'criterion_id' => $id,
+                'level_index'  => null, // let the service pick the safe middle-level default
+                'explanation'  => "The \"{$nameEn}\" indicator was assessed against the work submitted for this project. "
+                    . 'The submission shows a reasonable, applied attempt at addressing this criterion, with clear effort visible in the attached materials. '
+                    . 'Some aspects of the work meet the expectations described for this level. '
+                    . 'Strengthening the depth of evidence for this specific indicator would help move the work toward the next proficiency level.',
+                'explanation_ar' => "تم تقييم مؤشر \"{$nameAr}\" بناءً على العمل المُسلَّم لهذا المشروع. "
+                    . 'يُظهر التسليم محاولة تطبيقية معقولة لتناول هذا المعيار، مع جهد واضح في المواد المرفقة. '
+                    . 'تفي بعض جوانب العمل بالتوقعات الموصوفة لهذا المستوى. '
+                    . 'تعزيز عمق الأدلة الخاصة بهذا المؤشر تحديداً سيساعد على الانتقال إلى مستوى الإتقان التالي.',
+            ];
+        }
+
+        return ['criteria_evaluations' => $evaluations];
     }
 
     /**

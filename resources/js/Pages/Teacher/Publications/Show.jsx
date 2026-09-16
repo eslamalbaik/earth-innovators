@@ -12,6 +12,7 @@ import { getPublicationFileUrl, getPublicationImageUrl } from '@/utils/imageUtil
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 import { useTranslation } from '@/i18n';
 import AiDisclosureBadge from '@/Components/Innovation/AiDisclosureBadge';
+import AgentAttribution from '@/Components/Innovation/AgentAttribution';
 
 const MONTH_KEYS = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
 
@@ -100,7 +101,12 @@ export default function TeacherPublicationShow({ publication }) {
                                     <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
                                         {getTypeLabel(publication.type)}
                                     </span>
-                                    {publication.is_ai_generated && <AiDisclosureBadge />}
+                                    {publication.is_ai_generated && (
+                                        <>
+                                            <AiDisclosureBadge />
+                                            <AgentAttribution agentKey="content_generation" />
+                                        </>
+                                    )}
                                 </div>
                             </div>
                             {getStatusBadge(publication.status)}

@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import IndexRadarChart from '@/Components/Innovation/IndexRadarChart';
 import ClassificationBadge from '@/Components/Innovation/ClassificationBadge';
+import RoleBadge from '@/Components/Innovation/RoleBadge';
 import { useTranslation } from '@/i18n';
 
 const TYPE_ICONS = {
@@ -22,6 +23,7 @@ export default function InnovationSummaryCard({ innovation }) {
         overallScore,
         classification,
         classificationDetails,
+        roleBadge,
         indexes,
         indexNames,
         achievements,
@@ -43,7 +45,10 @@ export default function InnovationSummaryCard({ innovation }) {
                     <h2 className="text-lg font-bold text-gray-900">{t('innovationSummaryCard.heading')}</h2>
                     <p className="text-sm text-gray-500 mt-0.5">{t('innovationSummaryCard.subtitle')}</p>
                 </div>
-                {hasIndex && <ClassificationBadge details={classificationDetails} classificationKey={classification} size="lg" />}
+                <div className="flex flex-wrap items-center gap-2">
+                    {hasIndex && <ClassificationBadge details={classificationDetails} classificationKey={classification} size="lg" />}
+                    {roleBadge && <RoleBadge role={roleBadge} size="lg" />}
+                </div>
             </div>
 
             {hasIndex ? (

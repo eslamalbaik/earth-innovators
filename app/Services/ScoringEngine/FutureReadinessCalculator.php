@@ -15,7 +15,7 @@ class FutureReadinessCalculator
     /**
      * Keywords that indicate future-readiness in skills
      */
-    private const FUTURE_KEYWORDS = [
+    public const FUTURE_KEYWORDS = [
         'ai', 'artificial intelligence', 'machine learning', 'deep learning',
         'الذكاء الاصطناعي', 'تعلم الآلة', 'التعلم العميق',
         'blockchain', 'بلوكتشين',

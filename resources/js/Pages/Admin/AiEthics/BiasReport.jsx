@@ -1,6 +1,7 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { Head } from '@inertiajs/react';
 import { FaBalanceScale, FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa';
+import AgentAttribution from '@/Components/Innovation/AgentAttribution';
 import { useTranslation } from '@/i18n';
 
 const CLASSIFICATION_LABELS_AR = {
@@ -23,6 +24,9 @@ export default function BiasReport({ report }) {
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900">{t('adminBiasReport.title')}</h1>
                         <p className="text-sm text-gray-500">{t('adminBiasReport.subtitle')}</p>
+                        <div className="mt-2">
+                            <AgentAttribution agentKey="fairness_bias" />
+                        </div>
                     </div>
                 </div>
 

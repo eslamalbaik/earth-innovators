@@ -43,6 +43,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'year',
         'grade',
         'section',
+        'subjects',
         'official_links',
         'supporting_documents',
         'innovator_classification',
@@ -66,6 +67,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'year' => 'integer',
             'official_links' => 'array',
             'supporting_documents' => 'array',
+            'subjects' => 'array',
             'overall_innovation_score' => 'decimal:2',
             'consent_ai_processing_at' => 'datetime',
         ];

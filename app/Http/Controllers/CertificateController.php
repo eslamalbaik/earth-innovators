@@ -160,6 +160,13 @@ class CertificateController extends Controller
             abort(403, __('messages.msg_083'));
         }
 
+        // Server-side subscription entitlement check — a package can be
+        // "active" (passes EnsureMembershipActive) without including
+        // certificate_access, so this must be checked explicitly here too.
+        if (!$user->isAdmin() && !$this->membershipAccessService->hasCertificateAccess($user)) {
+            abort(403, __('messages.msg_083'));
+        }
+
         try {
             if ($certificate->file_path && Storage::disk('public')->exists($certificate->file_path)) {
                 return Storage::disk('public')->download(

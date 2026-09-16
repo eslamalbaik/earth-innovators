@@ -5,6 +5,7 @@ import { useTranslation } from '@/i18n';
 import { toHijriDate } from '@/utils/dateUtils';
 import { getBadgeImageUrl } from '@/utils/imageUtils';
 import AiDisclosureBadge from '@/Components/Innovation/AiDisclosureBadge';
+import AgentAttribution from '@/Components/Innovation/AgentAttribution';
 
 const statusConfig = {
     pending: { icon: FaClock, color: 'bg-yellow-100 text-yellow-700 border-yellow-300' },
@@ -44,7 +45,12 @@ export default function TeacherBadgeShow({ badge, auth }) {
                             </div>
                             <div className="flex-1">
                                 <h1 className="text-2xl font-bold text-gray-900">{badgeName}</h1>
-                                {badge.is_ai_generated && <AiDisclosureBadge className="mt-2" />}
+                                {badge.is_ai_generated && (
+                                    <div className="flex flex-wrap items-center gap-2 mt-2">
+                                        <AiDisclosureBadge />
+                                        <AgentAttribution agentKey="content_generation" />
+                                    </div>
+                                )}
                                 <p className="mt-2 text-gray-600">{badge.description_ar || badge.description}</p>
                                 <div className="mt-4 flex flex-wrap items-center gap-3">
                                     <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-semibold ${status.color}`}>

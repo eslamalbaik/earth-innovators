@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { FaPaperPlane, FaRobot, FaUser, FaSpinner, FaChartLine, FaLightbulb, FaTrashAlt } from 'react-icons/fa';
 import axios from 'axios';
 import AiDisclosureBadge from '@/Components/Innovation/AiDisclosureBadge';
+import AgentAttribution from '@/Components/Innovation/AgentAttribution';
 import { useTranslation } from '@/i18n';
 
 export default function AdminChat() {
@@ -90,7 +91,10 @@ export default function AdminChat() {
                                 <p className="text-white/70 text-[11px]">{t('adminChatPage.subtitle')}</p>
                             </div>
                         </div>
-                        <AiDisclosureBadge className="!bg-white/15 !border-white/25 !text-white hover:!bg-white/25" />
+                        <div className="flex flex-wrap items-center gap-2">
+                            <AiDisclosureBadge className="!bg-white/15 !border-white/25 !text-white hover:!bg-white/25" />
+                            <AgentAttribution agentKey="platform_insights" className="!bg-white/15 !border-white/25 !text-white hover:!bg-white/25" />
+                        </div>
                         {messages.length > 0 && (
                             <button
                                 onClick={clearChat}

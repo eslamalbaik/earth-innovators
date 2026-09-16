@@ -111,16 +111,26 @@ class BadgeController extends Controller
         $user = $request->user();
         $currentBalance = $user ? (int) ($user->points ?? 0) : 0;
         $redeemableItems = $this->storeRewardService->getRedeemableItemsForUser($user);
+        $redemptionEnabled = (bool) config('store_rewards.redemption_enabled', false);
+        $notifyMeRegistered = $redemptionEnabled
+            ? false
+            : (bool) ($user?->notification_preferences['store_rewards_notify'] ?? false);
 
         return Inertia::render('StoreMembership', [
             'user' => $user,
             'currentBalance' => $currentBalance,
             'redeemableItems' => $redeemableItems,
+            'redemptionEnabled' => $redemptionEnabled,
+            'notifyMeRegistered' => $notifyMeRegistered,
         ]);
     }
 
     public function redeemStore(Request $request): JsonResponse
     {
+        if (! (bool) config('store_rewards.redemption_enabled', false)) {
+            return response()->json(['success' => false, 'message_key' => 'toastMessages.storeRewardComingSoon'], 422);
+        }
+
         $request->validate([
             'reward_id' => 'required|string|max:64',
         ]);
@@ -141,6 +151,21 @@ class BadgeController extends Controller
         }
 
         return response()->json($result);
+    }
+
+    public function notifyMeStoreRewards(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        if (! $user) {
+            return response()->json(['success' => false, 'message_key' => 'toastMessages.authLoginFirst'], 401);
+        }
+
+        $preferences = $user->notification_preferences ?? [];
+        $preferences['store_rewards_notify'] = true;
+        $user->notification_preferences = $preferences;
+        $user->save();
+
+        return response()->json(['success' => true, 'message_key' => 'toastMessages.storeRewardNotifyMeSuccess']);
     }
 
     private function buildLearnerLevelsForDisplay(): array

@@ -7,6 +7,7 @@ use App\Services\ActivityService;
 use App\Services\DashboardService;
 use App\Services\MembershipAccessService;
 use App\Services\StudentEngagementService;
+use App\Services\ScoringEngine\StudentRoleBadgeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -136,6 +137,7 @@ class StudentDashboardController extends Controller
                     'classification'        => $latestIndex->classification ?? 'developing',
                     'classificationDetails' => $latestIndex?->getClassificationDetails()
                         ?? \App\Models\InnovationIndex::CLASSIFICATIONS['developing'],
+                    'roleBadge'             => app(StudentRoleBadgeService::class)->resolve($user),
                     'indexes'               => $latestIndex?->toIndexArray() ?? [],
                     'indexNames'            => \App\Models\InnovationIndex::INDEX_NAMES,
                     'achievements'          => [
@@ -154,6 +156,7 @@ class StudentDashboardController extends Controller
                     'overallScore'          => 0,
                     'classification'        => 'developing',
                     'classificationDetails' => \App\Models\InnovationIndex::CLASSIFICATIONS['developing'],
+                    'roleBadge'             => null,
                     'indexes'               => [],
                     'indexNames'            => \App\Models\InnovationIndex::INDEX_NAMES,
                     'achievements'          => ['total' => 0, 'validated' => 0, 'pending' => 0],

@@ -1,4 +1,5 @@
 import { Head, useForm, router, Link } from '@inertiajs/react';
+import AgentAttribution from '../../../Components/Innovation/AgentAttribution';
 import { useState, useRef } from 'react';
 import { FaArrowLeft, FaUpload, FaCloudUploadAlt, FaFile, FaSpinner, FaTrash, FaCheckCircle, FaImage, FaRobot } from 'react-icons/fa';
 import TextInput from '../../../Components/TextInput';
@@ -11,7 +12,7 @@ import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import { useToast } from '@/Contexts/ToastContext';
 import { useTranslation } from '@/i18n';
 
-export default function CreateProject({ auth, school, schools = [] }) {
+export default function CreateProject({ auth, school, schools = [], rubrics = [] }) {
     const { showError, showSuccess } = useToast();
     const { t, language } = useTranslation();
     const { data, setData, post, processing, errors } = useForm({
@@ -21,6 +22,7 @@ export default function CreateProject({ auth, school, schools = [] }) {
         description_ar: '',
         category: 'other',
         school_id: school?.id || null,
+        rubric_id: '',
         thumbnail: null,
         files: [],
         evaluation: {
@@ -285,6 +287,7 @@ export default function CreateProject({ auth, school, schools = [] }) {
                                 <p className="text-xs text-blue-600 mb-3">
                                     {t('teacherProjectsCreatePage.aiAssistant.description')}
                                 </p>
+                                <AgentAttribution agentKey="content_generation" className="mb-3" />
                                 <div className="flex flex-col gap-2">
                                     <input
                                         type="text"
@@ -412,6 +415,28 @@ export default function CreateProject({ auth, school, schools = [] }) {
                                     <InputError message={errors.school_id} className="mt-2" />
                                 </div>
                             )}
+
+                            {/* Rubric Selection */}
+                            <div>
+                                <InputLabel htmlFor="rubric_id" value={t('teacherProjectsCreatePage.form.rubricLabel')} className="text-sm font-medium text-gray-700 mb-2" />
+                                <select
+                                    id="rubric_id"
+                                    value={data.rubric_id || ''}
+                                    onChange={(e) => setData('rubric_id', e.target.value || '')}
+                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
+                                >
+                                    <option value="">{t('teacherProjectsCreatePage.form.rubricPlaceholder')}</option>
+                                    {rubrics.map((r) => (
+                                        <option key={r.id} value={r.id}>
+                                            {language === 'ar' ? r.name_ar : r.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                <InputError message={errors.rubric_id} className="mt-2" />
+                                <Link href="/teacher/rubrics/create" className="mt-2 inline-block text-xs font-semibold text-[#A3C042] hover:underline">
+                                    {t('teacherProjectsCreatePage.form.createRubricLink')}
+                                </Link>
+                            </div>
 
                             {/* File Upload */}
                             <div>
@@ -617,6 +642,7 @@ export default function CreateProject({ auth, school, schools = [] }) {
                                         <p className="text-sm text-blue-600">
                                             {t('teacherProjectsCreatePage.aiAssistant.description')}
                                         </p>
+                                        <AgentAttribution agentKey="content_generation" className="mb-3" />
                                     </div>
                                     <div className="flex-1 flex gap-2 w-full md:w-auto">
                                         <input
@@ -775,6 +801,28 @@ export default function CreateProject({ auth, school, schools = [] }) {
                                         <InputError message={errors.school_id} className="mt-2" />
                                     </div>
                                 )}
+
+                                {/* Rubric Selection */}
+                                <div>
+                                    <InputLabel htmlFor="rubric_id" value={t('teacherProjectsCreatePage.form.rubricLabel')} className="text-sm font-medium text-gray-700 mb-2" />
+                                    <select
+                                        id="rubric_id"
+                                        value={data.rubric_id || ''}
+                                        onChange={(e) => setData('rubric_id', e.target.value || '')}
+                                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
+                                    >
+                                        <option value="">{t('teacherProjectsCreatePage.form.rubricPlaceholder')}</option>
+                                        {rubrics.map((r) => (
+                                            <option key={r.id} value={r.id}>
+                                                {language === 'ar' ? r.name_ar : r.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <InputError message={errors.rubric_id} className="mt-2" />
+                                    <Link href="/teacher/rubrics/create" className="mt-2 inline-block text-xs font-semibold text-[#A3C042] hover:underline">
+                                        {t('teacherProjectsCreatePage.form.createRubricLink')}
+                                    </Link>
+                                </div>
 
                                 {/* File Upload */}
                                 <div>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Models\Rubric;
 use App\Models\Teacher;
 use App\Models\User;
 use App\Services\ProjectService;
@@ -46,18 +47,20 @@ class TeacherProjectController extends Controller
     {
         try {
             $user = Auth::user();
-            
+
             if (!$user) {
                 return redirect()->route('login');
             }
-            
+
             // الحصول على مدرسة المعلم (من user model)
             $school = $user->school;
-            
+
             // الحصول على قائمة المؤسسات تعليمية المتاحة (اختياري - يمكن للمعلم اختيار مدرسة)
             $schools = User::whereIn('role', ['school', 'educational_institution'])
                 ->select('id', 'name')
                 ->get();
+
+            $teacher = $this->resolveTeacherProfile($user);
 
             return Inertia::render('Teacher/Projects/Create', [
                 'auth' => [
@@ -69,6 +72,7 @@ class TeacherProjectController extends Controller
                     'name' => $school->name,
                 ] : null,
                 'schools' => $schools,
+                'rubrics' => $teacher ? $this->rubricsForSelect($teacher->id) : [],
             ]);
         } catch (\Exception $e) {
             \Log::error('Error in TeacherProjectController@create: ' . $e->getMessage());
@@ -182,6 +186,7 @@ class TeacherProjectController extends Controller
             'description_ar' => 'required|string',
             'category' => 'nullable|in:science,technology,engineering,mathematics,arts,other',
             'school_id' => 'nullable|exists:users,id',
+            'rubric_id' => 'nullable|exists:rubrics,id',
             'files' => 'nullable|array',
             'files.*' => 'file|max:10240|mimes:pdf,doc,docx,jpg,jpeg,png,gif,mp4,avi,mov',
             'thumbnail' => 'required|image|max:5120',
@@ -217,6 +222,8 @@ class TeacherProjectController extends Controller
             }
         }
 
+        $rubricId = $this->authorizedRubricId($validated['rubric_id'] ?? null, $teacher->id);
+
         $project = Project::create([
             'user_id' => $user->id,
             'teacher_id' => $teacher->id,
@@ -226,6 +233,7 @@ class TeacherProjectController extends Controller
             'description' => $validated['description'],
             'description_ar' => $validated['description_ar'],
             'category' => $validated['category'] ?? 'other',
+            'rubric_id' => $rubricId,
             'self_evaluation' => $validated['evaluation'] ?? null,
             'status' => 'pending', // بانتظار موافقة المدرسة (إن وجدت)
         ]);
@@ -357,6 +365,34 @@ class TeacherProjectController extends Controller
     }
 
     /**
+     * قائمة معايير التقييم (Rubrics) المتاحة لهذا المعلم لاختيارها عند
+     * إنشاء أو تعديل مشروع — تُربط تلقائياً بمحرك التقييم بالذكاء الاصطناعي
+     * (انظر RubricEvaluationService) بمجرد اختيارها هنا.
+     */
+    private function rubricsForSelect(int $teacherId)
+    {
+        return Rubric::forTeacher($teacherId)
+            ->active()
+            ->orderBy('name_ar')
+            ->get(['id', 'name', 'name_ar', 'scope', 'grade', 'subject']);
+    }
+
+    /**
+     * يتأكد أن معرف الرابرك المُرسَل فعلاً يملكه هذا المعلم قبل ربطه
+     * بالمشروع، لمنع ربط مشروع برابرك معلم آخر.
+     */
+    private function authorizedRubricId(?int $rubricId, int $teacherId): ?int
+    {
+        if (!$rubricId) {
+            return null;
+        }
+
+        $owned = Rubric::where('id', $rubricId)->where('teacher_id', $teacherId)->exists();
+
+        return $owned ? $rubricId : null;
+    }
+
+    /**
      * عرض تفاصيل مشروع
      */
     public function show(Project $project)
@@ -470,6 +506,7 @@ class TeacherProjectController extends Controller
                 'name' => $project->school->name,
             ] : null,
             'schools' => $schools,
+            'rubrics' => $this->rubricsForSelect($teacher->id),
         ]);
     }
 
@@ -504,6 +541,7 @@ class TeacherProjectController extends Controller
             'description_ar' => 'required|string',
             'category' => 'nullable|in:science,technology,engineering,mathematics,arts,other',
             'school_id' => 'nullable|exists:users,id',
+            'rubric_id' => 'nullable|exists:rubrics,id',
             'files' => 'nullable|array',
             'files.*' => 'file|max:10240',
             'thumbnail' => 'nullable|image|max:5120',
@@ -625,6 +663,7 @@ class TeacherProjectController extends Controller
             'description_ar' => $validated['description_ar'],
             'category' => $validated['category'] ?? 'other',
             'school_id' => $schoolId,
+            'rubric_id' => $this->authorizedRubricId($validated['rubric_id'] ?? null, $teacher->id),
         ]);
 
         if (isset($validated['evaluation'])) {

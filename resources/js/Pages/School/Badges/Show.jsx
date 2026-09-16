@@ -16,6 +16,7 @@ import { useTranslation } from '@/i18n';
 import { toHijriDate } from '@/utils/dateUtils';
 import { getBadgeImageUrl } from '@/utils/imageUtils';
 import AiDisclosureBadge from '@/Components/Innovation/AiDisclosureBadge';
+import AgentAttribution from '@/Components/Innovation/AgentAttribution';
 
 export default function SchoolBadgeShow({ auth, badge }) {
     const { t, language } = useTranslation();
@@ -88,7 +89,12 @@ export default function SchoolBadgeShow({ auth, badge }) {
                         {t('schoolBadgesPage.actions.details')}
                     </p>
                     <h1 className="text-3xl font-bold text-gray-900">{badgeName}</h1>
-                    {badge?.is_ai_generated && <AiDisclosureBadge className="mt-2" />}
+                    {badge?.is_ai_generated && (
+                        <div className="flex flex-wrap items-center gap-2 mt-2">
+                            <AiDisclosureBadge />
+                            <AgentAttribution agentKey="content_generation" />
+                        </div>
+                    )}
                 </div>
 
                 <div className="flex flex-wrap gap-3">

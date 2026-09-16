@@ -450,6 +450,9 @@ Route::get('/store-membership', [App\Http\Controllers\BadgeController::class, 's
 Route::post('/store-membership/redeem', [App\Http\Controllers\BadgeController::class, 'redeemStore'])
     ->middleware('auth')
     ->name('store-membership.redeem');
+Route::post('/store-membership/notify-me', [App\Http\Controllers\BadgeController::class, 'notifyMeStoreRewards'])
+    ->middleware('auth')
+    ->name('store-membership.notify-me');
 
 // Package subscription routes (public)
 Route::get('/packages', [\App\Http\Controllers\PackageSubscriptionController::class, 'index'])->name('packages.index');
@@ -494,6 +497,10 @@ Route::get('/contact', function () {
 Route::get('/ai-ethics', function () {
     return Inertia::render('AiEthics');
 })->name('ai-ethics');
+
+Route::get('/ai-agents', function () {
+    return Inertia::render('AiAgents/Index');
+})->name('ai-agents');
 
 Route::middleware(['auth'])->group(function () {
     Route::post('/ai-appeals', [\App\Http\Controllers\AiAppealController::class, 'store'])->name('ai-appeals.store');
@@ -599,6 +606,9 @@ Route::middleware(['auth', 'membership_active'])->group(function () {
     // Student Points
     Route::get('/student/points', [\App\Http\Controllers\Student\StudentPointsController::class, 'index'])->name('student.points');
 
+    // المساعد الذكي للطالب (ودجت دردشة عائم متاح من أي صفحة في حساب الطالب)
+    Route::post('/student/assistant/ask', [\App\Http\Controllers\Student\StudentAssistantController::class, 'ask'])->name('student.assistant.ask');
+
     // مشاريع الطلاب
     Route::get('/student/submissions', [StudentSubmissionController::class, 'index'])->name('student.submissions.index');
     Route::get('/student/projects', [\App\Http\Controllers\Student\StudentProjectController::class, 'index'])->name('student.projects.index');
@@ -635,6 +645,9 @@ Route::middleware(['auth', 'membership_active'])->group(function () {
     Route::get('/membership-certificate', [\App\Http\Controllers\MembershipCertificateController::class, 'show'])->name('membership-certificates.show');
     Route::get('/membership-certificates/{id}/download', [\App\Http\Controllers\MembershipCertificateController::class, 'download'])->name('membership-certificates.download');
     Route::post('/membership-certificates/check-eligibility', [\App\Http\Controllers\MembershipCertificateController::class, 'checkEligibility'])->name('membership-certificates.check-eligibility');
+
+    // مبادرات المدرسة والمبادرات العامة (منفصلة بوضوح) — البند 7.3
+    Route::get('/initiatives', [\App\Http\Controllers\InitiativeViewController::class, 'index'])->name('initiatives.view');
 
     // تسليمات التحديات
     Route::post('/challenges/{challenge}/submissions', [\App\Http\Controllers\ChallengeSubmissionController::class, 'store'])->name('challenge.submissions.store');
@@ -677,7 +690,19 @@ Route::middleware(['auth', 'school', 'membership_active'])->prefix('school')->na
     Route::post('/teachers', [\App\Http\Controllers\School\SchoolTeacherController::class, 'store'])->name('teachers.store');
     Route::put('/teachers/{id}', [\App\Http\Controllers\School\SchoolTeacherController::class, 'update'])->name('teachers.update');
     Route::delete('/teachers/{id}', [\App\Http\Controllers\School\SchoolTeacherController::class, 'destroy'])->name('teachers.destroy');
-    
+
+    // أكواد الدعوة (انضمام معلم/طالب مباشرة عبر كود دون تجاوز الصلاحيات)
+    Route::get('/invite-codes', [\App\Http\Controllers\InviteCodeController::class, 'index'])->name('invite-codes.index');
+    Route::post('/invite-codes', [\App\Http\Controllers\InviteCodeController::class, 'store'])->name('invite-codes.store');
+    Route::delete('/invite-codes/{inviteCode}', [\App\Http\Controllers\InviteCodeController::class, 'destroy'])->name('invite-codes.destroy');
+
+    // تحليلات الابتكار على مستوى المدرسة (توزيع L1-L5، الاتجاه، مقارنة المعلمين، المتأخرون) — البند 8.2
+    Route::get('/analytics', [\App\Http\Controllers\School\SchoolAnalyticsController::class, 'index'])->name('analytics.index');
+    Route::get('/analytics/export', [\App\Http\Controllers\School\SchoolAnalyticsController::class, 'exportExcel'])->name('analytics.export');
+
+    // مبادرات المدرسة الخاصة (منفصلة عن المبادرات العامة) — البند 7.3
+    Route::resource('initiatives', \App\Http\Controllers\School\SchoolInitiativeController::class)->except(['show', 'create', 'edit']);
+
     // تقارير تقييم الطلاب
     Route::get('/students/evaluation-report', [\App\Http\Controllers\School\StudentEvaluationController::class, 'index'])->name('students.evaluation-report');
     Route::get('/students/{studentId}/evaluation', [\App\Http\Controllers\School\StudentEvaluationController::class, 'show'])->name('students.evaluation');
@@ -740,6 +765,11 @@ Route::middleware(['auth', 'teacher', 'membership_active'])->group(function () {
     Route::get('/teacher/students/{student}', [\App\Http\Controllers\Teacher\TeacherStudentController::class, 'show'])->name('teacher.students.show');
     Route::put('/teacher/students/{student}', [\App\Http\Controllers\Teacher\TeacherStudentController::class, 'update'])->name('teacher.students.update');
     Route::delete('/teacher/students/{student}', [\App\Http\Controllers\Teacher\TeacherStudentController::class, 'destroy'])->name('teacher.students.destroy');
+
+    // أكواد الدعوة الخاصة بالمعلم (انضمام طلاب شعبته مباشرة)
+    Route::get('/teacher/invite-codes', [\App\Http\Controllers\InviteCodeController::class, 'index'])->name('teacher.invite-codes.index');
+    Route::post('/teacher/invite-codes', [\App\Http\Controllers\InviteCodeController::class, 'store'])->name('teacher.invite-codes.store');
+    Route::delete('/teacher/invite-codes/{inviteCode}', [\App\Http\Controllers\InviteCodeController::class, 'destroy'])->name('teacher.invite-codes.destroy');
     
     // تقارير تقييم الطلاب
     Route::get('/teacher/students/evaluation-report', [\App\Http\Controllers\Teacher\StudentEvaluationController::class, 'index'])->name('teacher.students.evaluation-report');
@@ -812,10 +842,20 @@ Route::middleware(['auth', 'teacher', 'membership_active'])->group(function () {
     Route::put('/teacher/projects/{project}', [\App\Http\Controllers\Teacher\TeacherProjectController::class, 'update'])->name('teacher.projects.update');
     Route::delete('/teacher/projects/{id}', [\App\Http\Controllers\Teacher\TeacherProjectController::class, 'destroy'])->name('teacher.projects.destroy');
 
+    // رابركات التقييم (Rubrics) — يبنيها المعلم ويعيد استخدامها عند إنشاء أي مشروع جديد
+    Route::get('/teacher/rubrics', [\App\Http\Controllers\Teacher\TeacherRubricController::class, 'index'])->name('teacher.rubrics.index');
+    Route::get('/teacher/rubrics/create', [\App\Http\Controllers\Teacher\TeacherRubricController::class, 'create'])->name('teacher.rubrics.create');
+    Route::post('/teacher/rubrics', [\App\Http\Controllers\Teacher\TeacherRubricController::class, 'store'])->name('teacher.rubrics.store');
+    Route::get('/teacher/rubrics/{rubric}/edit', [\App\Http\Controllers\Teacher\TeacherRubricController::class, 'edit'])->name('teacher.rubrics.edit');
+    Route::put('/teacher/rubrics/{rubric}', [\App\Http\Controllers\Teacher\TeacherRubricController::class, 'update'])->name('teacher.rubrics.update');
+    Route::delete('/teacher/rubrics/{rubric}', [\App\Http\Controllers\Teacher\TeacherRubricController::class, 'destroy'])->name('teacher.rubrics.destroy');
+
     // إدارة تسليمات المشاريع للمعلمين
     Route::get('/teacher/submissions', [\App\Http\Controllers\Teacher\TeacherSubmissionController::class, 'index'])->name('teacher.submissions.index');
     Route::get('/teacher/submissions/{submission}', [\App\Http\Controllers\Teacher\TeacherSubmissionController::class, 'show'])->name('teacher.submissions.show');
     Route::match(['get', 'post'], '/teacher/submissions/{submission}/evaluate', [\App\Http\Controllers\Teacher\TeacherSubmissionController::class, 'evaluate'])->name('teacher.submissions.evaluate');
+    Route::post('/teacher/submissions/{submission}/rubric-evaluation/generate', [\App\Http\Controllers\Teacher\TeacherSubmissionController::class, 'generateRubricEvaluation'])->name('teacher.submissions.rubric-evaluation.generate');
+    Route::put('/teacher/submissions/{submission}/rubric-evaluation', [\App\Http\Controllers\Teacher\TeacherSubmissionController::class, 'saveRubricEvaluation'])->name('teacher.submissions.rubric-evaluation.save');
 
     // إدارة الشهادات
     Route::get('/teacher/certificates', [\App\Http\Controllers\Teacher\TeacherCertificateController::class, 'index'])->name('teacher.certificates.index');
@@ -903,6 +943,36 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Categories Management
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
+
+    // Rubric Criterion Library — the admin-managed "general national standards"
+    // (QFEmirates) default that RubricEvaluationService falls back to when a
+    // project has no teacher-authored rubric attached.
+    Route::resource('rubric-library', \App\Http\Controllers\Admin\RubricLibraryController::class)->except(['show', 'create', 'edit']);
+    Route::patch('/rubric-library/{rubricLibrary}/toggle-active', [\App\Http\Controllers\Admin\RubricLibraryController::class, 'toggleActive'])->name('rubric-library.toggle-active');
+
+    // National performance levels (L1-L5) — admin-editable score thresholds
+    // that InnovationIndex::nationalLevelForScore() maps every overall_score to.
+    Route::get('/national-levels', [\App\Http\Controllers\Admin\NationalLevelSettingController::class, 'index'])->name('national-levels.index');
+    Route::put('/national-levels/{nationalLevel}', [\App\Http\Controllers\Admin\NationalLevelSettingController::class, 'update'])->name('national-levels.update');
+
+    // Reference standards map (QFEmirates, SFIA, UNESCO, ISO, EFQM, WIPO, ...)
+    // linked to evaluation domains — requirement 2.4.
+    Route::resource('reference-standards', \App\Http\Controllers\Admin\ReferenceStandardController::class)->except(['show', 'create', 'edit']);
+
+    // مبادرات عامة (تظهر لكل المدارس) — البند 7.3
+    Route::resource('initiatives', \App\Http\Controllers\Admin\InitiativeController::class)->except(['show', 'create', 'edit']);
+
+    // Academic structure (curriculum -> subject -> grade/section study plans) — requirement 5.3
+    Route::get('/academic-structure', [\App\Http\Controllers\Admin\AcademicStructureController::class, 'index'])->name('academic-structure.index');
+    Route::post('/academic-structure/curricula', [\App\Http\Controllers\Admin\AcademicStructureController::class, 'storeCurriculum'])->name('academic-structure.curricula.store');
+    Route::put('/academic-structure/curricula/{curriculum}', [\App\Http\Controllers\Admin\AcademicStructureController::class, 'updateCurriculum'])->name('academic-structure.curricula.update');
+    Route::delete('/academic-structure/curricula/{curriculum}', [\App\Http\Controllers\Admin\AcademicStructureController::class, 'destroyCurriculum'])->name('academic-structure.curricula.destroy');
+    Route::post('/academic-structure/subjects', [\App\Http\Controllers\Admin\AcademicStructureController::class, 'storeSubject'])->name('academic-structure.subjects.store');
+    Route::put('/academic-structure/subjects/{subject}', [\App\Http\Controllers\Admin\AcademicStructureController::class, 'updateSubject'])->name('academic-structure.subjects.update');
+    Route::delete('/academic-structure/subjects/{subject}', [\App\Http\Controllers\Admin\AcademicStructureController::class, 'destroySubject'])->name('academic-structure.subjects.destroy');
+    Route::post('/academic-structure/study-plans', [\App\Http\Controllers\Admin\AcademicStructureController::class, 'storeStudyPlan'])->name('academic-structure.study-plans.store');
+    Route::put('/academic-structure/study-plans/{studyPlan}', [\App\Http\Controllers\Admin\AcademicStructureController::class, 'updateStudyPlan'])->name('academic-structure.study-plans.update');
+    Route::delete('/academic-structure/study-plans/{studyPlan}', [\App\Http\Controllers\Admin\AcademicStructureController::class, 'destroyStudyPlan'])->name('academic-structure.study-plans.destroy');
 
     // Payment Gateways Management
     Route::get('/payment-gateways', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'index'])->name('payment-gateways.index');

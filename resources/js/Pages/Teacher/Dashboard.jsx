@@ -13,7 +13,8 @@ import {
     FaAward,
     FaExclamationTriangle,
     FaPlus,
-    FaGraduationCap
+    FaGraduationCap,
+    FaClipboardCheck
 } from 'react-icons/fa';
 
 export default function TeacherDashboard({ auth, teacher, stats, innovationStats = null, membershipSummary = null, activationBanner }) {
@@ -432,7 +433,7 @@ export default function TeacherDashboard({ auth, teacher, stats, innovationStats
                     )}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     <Link
                         href="/teacher/projects/create"
                         className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition group"
@@ -474,6 +475,21 @@ export default function TeacherDashboard({ auth, teacher, stats, innovationStats
                             <div>
                                 <h3 className="font-bold text-gray-900">{t('teacherDashboardPage.createChallengeTitle')}</h3>
                                 <p className="text-sm text-gray-600 mt-1">{t('teacherDashboardPage.createChallengeSubtitle')}</p>
+                            </div>
+                        </div>
+                    </Link>
+
+                    <Link
+                        href="/teacher/rubrics"
+                        className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition group"
+                    >
+                        <div className="flex items-center gap-4">
+                            <div className="bg-indigo-50 p-3 rounded-xl border border-indigo-100 group-hover:bg-indigo-100 transition">
+                                <FaClipboardCheck className="text-indigo-600 text-2xl" />
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-gray-900">{t('teacherDashboardPage.manageRubricsTitle')}</h3>
+                                <p className="text-sm text-gray-600 mt-1">{t('teacherDashboardPage.manageRubricsSubtitle')}</p>
                             </div>
                         </div>
                     </Link>

@@ -1,4 +1,5 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
+import AgentAttribution from '@/Components/Innovation/AgentAttribution';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { useState, useCallback, useMemo } from 'react';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
@@ -762,6 +763,7 @@ export default function AdminProjectsIndex({ projects, stats, filters, users, sc
                                     <p className="text-sm text-blue-600">
                                         {t('teacherProjectsCreatePage.aiAssistant.description')}
                                     </p>
+                                    <AgentAttribution agentKey="content_generation" className="mb-3" />
                                 </div>
                                 <div className="flex-1 flex gap-2 w-full md:w-auto">
                                     <input

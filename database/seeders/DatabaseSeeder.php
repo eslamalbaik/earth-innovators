@@ -14,5 +14,8 @@ class DatabaseSeeder extends Seeder
         $this->call(EarthDemoSeeder::class);
         $this->call(InnovationDemoSeeder::class);
         $this->call(MagazineDemoSeeder::class);
+        $this->call(RubricLibrarySeeder::class);
+        $this->call(NationalLevelSettingsSeeder::class);
+        $this->call(ReferenceStandardsSeeder::class);
     }
 }

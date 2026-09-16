@@ -9,7 +9,7 @@ import PrimaryButton from '../../../Components/PrimaryButton';
 import { getProjectFileUrl, getProjectImageUrl } from '@/utils/imageUtils';
 import { useTranslation } from '@/i18n';
 
-export default function EditProject({ auth, project, school, schools = [] }) {
+export default function EditProject({ auth, project, school, schools = [], rubrics = [] }) {
     const { t, language } = useTranslation();
     const { data, setData, put, processing, errors } = useForm({
         title: project?.title || '',
@@ -18,6 +18,7 @@ export default function EditProject({ auth, project, school, schools = [] }) {
         description_ar: project?.description_ar || '',
         category: project?.category || 'other',
         school_id: project?.school_id || school?.id || null,
+        rubric_id: project?.rubric_id || '',
         thumbnail: null,
         files: [],
         remove_files: [],
@@ -44,6 +45,7 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                 description_ar: project.description_ar || '',
                 category: project.category || 'other',
                 school_id: project.school_id || school?.id || null,
+                rubric_id: project.rubric_id || '',
                 thumbnail: null,
                 files: [],
                 remove_files: [],
@@ -196,6 +198,10 @@ export default function EditProject({ auth, project, school, schools = [] }) {
 
         if (data.school_id) {
             formData.append('school_id', data.school_id);
+        }
+
+        if (data.rubric_id) {
+            formData.append('rubric_id', data.rubric_id);
         }
 
         // Cover image is optional on update; keep the existing one when no file is selected.
@@ -403,6 +409,28 @@ export default function EditProject({ auth, project, school, schools = [] }) {
                                 <InputError message={errors.school_id} className="mt-2" />
                             </div>
                         )}
+
+                        {/* Rubric Selection */}
+                        <div>
+                            <InputLabel htmlFor="rubric_id" value={t('teacherProjectsCreatePage.form.rubricLabel')} className="text-sm font-medium text-gray-700 mb-2" />
+                            <select
+                                id="rubric_id"
+                                value={data.rubric_id || ''}
+                                onChange={(e) => setData('rubric_id', e.target.value || '')}
+                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A3C042] focus:ring-[#A3C042]"
+                            >
+                                <option value="">{t('teacherProjectsCreatePage.form.rubricPlaceholder')}</option>
+                                {rubrics.map((r) => (
+                                    <option key={r.id} value={r.id}>
+                                        {language === 'ar' ? r.name_ar : r.name}
+                                    </option>
+                                ))}
+                            </select>
+                            <InputError message={errors.rubric_id} className="mt-2" />
+                            <Link href="/teacher/rubrics/create" className="mt-2 inline-block text-xs font-semibold text-[#A3C042] hover:underline">
+                                {t('teacherProjectsCreatePage.form.createRubricLink')}
+                            </Link>
+                        </div>
 
                         {/* Existing Files */}
                         {existingFiles.length > 0 && (

@@ -7,7 +7,7 @@ import {
     FaGraduationCap, FaCommentDots, FaTachometerAlt, FaBell, FaBook,
     FaChevronDown, FaCreditCard, FaTrophy, FaProjectDiagram, FaMedal, FaFile,
     FaCheckCircle, FaGift, FaLightbulb, FaChalkboardTeacher, FaRobot, FaSearch, FaUserTag,
-    FaShieldAlt,
+    FaShieldAlt, FaClipboardCheck, FaLandmark, FaGlobe,
 } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import ApplicationLogo from '@/Components/ApplicationLogo';
@@ -428,6 +428,11 @@ export default function DashboardLayout({ children, header }) {
             { name: t('sidebar.storeRewardRequests'), href: '/admin/store-reward-requests', icon: FaGift },
             { name: t('sidebar.subscriptions'), href: '/admin/subscriptions', icon: FaCreditCard },
             { name: t('sidebar.certificates'), href: '/admin/certificates', icon: FaGraduationCap },
+            { name: t('sidebar.rubricLibrary'), href: '/admin/rubric-library', icon: FaLandmark },
+            { name: t('sidebar.nationalLevels'), href: '/admin/national-levels', icon: FaLandmark },
+            { name: t('sidebar.referenceStandards'), href: '/admin/reference-standards', icon: FaGlobe },
+            { name: t('sidebar.academicStructure'), href: '/admin/academic-structure', icon: FaBook },
+            { name: t('sidebar.initiatives'), href: '/admin/initiatives', icon: FaGift },
             { name: t('sidebar.paymentGateways'), href: '/admin/payment-gateways', icon: FaCreditCard },
             { name: t('sidebar.acceptanceCriteria'), href: '/admin/acceptance-criteria', icon: FaCheckCircle },
             { name: t('sidebar.profile'), href: '/profile', icon: FaUser },
@@ -441,6 +446,7 @@ export default function DashboardLayout({ children, header }) {
                 subItems: [
                     { name: t('sidebar.submissions'), href: '/teacher/submissions', icon: FaFile },
                     { name: t('sidebar.reviewProjects'), href: '/teacher/projects', icon: FaBookOpen },
+                    { name: t('sidebar.rubrics'), href: '/teacher/rubrics', icon: FaClipboardCheck },
                 ]
             },
             {
@@ -462,8 +468,10 @@ export default function DashboardLayout({ children, header }) {
                 ]
             },
             { name: t('sidebar.followedStudents'), href: '/teacher/students', icon: FaGraduationCap },
+            { name: t('sidebar.inviteCodes'), href: '/teacher/invite-codes', icon: FaUserTag },
             { name: t('sidebar.innovationTracking'), href: '/teacher/innovation/dashboard', icon: FaChartLine },
             { name: t('sidebar.myBadges'), href: '/teacher/badges', icon: FaMedal },
+            { name: t('sidebar.initiatives'), href: '/initiatives', icon: FaGift },
             { name: t('sidebar.certificates'), href: '/teacher/certificates', icon: FaFile },
             { name: t('sidebar.profile'), href: '/teacher/profile', icon: FaUser },
         ],
@@ -511,6 +519,9 @@ export default function DashboardLayout({ children, header }) {
             { name: t('sidebar.innovationTracking'), href: '/teacher/innovation/dashboard', icon: FaChartLine },
             { name: t('sidebar.smartAgent'), href: '/school/innovation/chat', icon: FaRobot },
             { name: t('sidebar.teachersManagement'), href: '/school/teachers', icon: FaChalkboardTeacher },
+            { name: t('sidebar.inviteCodes'), href: '/school/invite-codes', icon: FaUserTag },
+            { name: t('sidebar.schoolAnalytics'), href: '/school/analytics', icon: FaChartLine },
+            { name: t('sidebar.initiatives'), href: '/school/initiatives', icon: FaGift },
             { name: t('sidebar.certificates'), href: '/school/certificates', icon: FaFile },
             { name: t('sidebar.packages'), href: '/packages', icon: FaCreditCard },
             { name: t('sidebar.profile'), href: '/profile', icon: FaUser },
@@ -560,6 +571,9 @@ export default function DashboardLayout({ children, header }) {
             { name: t('sidebar.innovationTracking'), href: '/teacher/innovation/dashboard', icon: FaChartLine },
             { name: t('sidebar.smartAgent'), href: '/school/innovation/chat', icon: FaRobot },
             { name: t('sidebar.teachersManagement'), href: '/school/teachers', icon: FaChalkboardTeacher },
+            { name: t('sidebar.inviteCodes'), href: '/school/invite-codes', icon: FaUserTag },
+            { name: t('sidebar.schoolAnalytics'), href: '/school/analytics', icon: FaChartLine },
+            { name: t('sidebar.initiatives'), href: '/school/initiatives', icon: FaGift },
             { name: t('sidebar.certificates'), href: '/school/certificates', icon: FaFile },
             { name: t('sidebar.packages'), href: '/packages', icon: FaCreditCard },
             { name: t('sidebar.profile'), href: '/profile', icon: FaUser },
@@ -583,6 +597,7 @@ export default function DashboardLayout({ children, header }) {
             { name: t('sidebar.challengeSuggestions'), href: '/student/challenge-suggestions/create', icon: FaLightbulb },
             { name: t('sidebar.badges'), href: '/badges', icon: FaCommentDots },
             { name: t('sidebar.points'), href: '/student/points', icon: FaChartLine },
+            { name: t('sidebar.initiatives'), href: '/initiatives', icon: FaGift },
             { name: t('sidebar.profile'), href: '/student/profile', icon: FaUser },
         ]
     };

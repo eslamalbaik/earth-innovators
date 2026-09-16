@@ -2,6 +2,7 @@ import { useForm } from '@inertiajs/react';
 import StudentPageShell from '@/Components/Innovation/StudentPageShell';
 import ClassificationBadge from '@/Components/Innovation/ClassificationBadge';
 import AiDisclosureBadge from '@/Components/Innovation/AiDisclosureBadge';
+import AgentAttribution from '@/Components/Innovation/AgentAttribution';
 import { useTranslation } from '@/i18n';
 
 export default function SmartSearch({ searchResults = null, query = '' }) {
@@ -33,7 +34,10 @@ export default function SmartSearch({ searchResults = null, query = '' }) {
                     <p className="text-gray-500 mt-1">
                         {t('innovation.smartSearch.subtitle')}
                     </p>
-                    <AiDisclosureBadge className="mt-3" />
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <AiDisclosureBadge />
+                        <AgentAttribution agentKey="smart_search" />
+                    </div>
                 </div>
 
                 <form onSubmit={handleSubmit} className="flex gap-2">

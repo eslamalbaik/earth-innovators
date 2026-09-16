@@ -1,24 +1,50 @@
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import axios from 'axios';
-import { FaGift, FaCheckCircle, FaTimes, FaClock, FaPaperPlane, FaCalendar } from 'react-icons/fa';
+import { FaGift, FaCheckCircle, FaTimes, FaClock, FaPaperPlane, FaCalendar, FaBell, FaHourglassHalf } from 'react-icons/fa';
 import MobileTopBar from '@/Components/Mobile/MobileTopBar';
 import MobileBottomNav from '@/Components/Mobile/MobileBottomNav';
 import { useToast } from '@/Contexts/ToastContext';
 import { useTranslation } from '@/i18n';
 
-export default function StoreMembership({ auth, user, currentBalance = 0, redeemableItems = [] }) {
-    const { showSuccess, showError } = useToast();
+export default function StoreMembership({ auth, user, currentBalance = 0, redeemableItems = [], redemptionEnabled = false, notifyMeRegistered = false }) {
+    const { showSuccess, showError, showInfo } = useToast();
     const { t, language } = useTranslation();
     const [selectedItem, setSelectedItem] = useState(null);
     const [submitting, setSubmitting] = useState(false);
+    const [notifying, setNotifying] = useState(false);
+    const [notifyRegistered, setNotifyRegistered] = useState(!!notifyMeRegistered);
 
     const items = Array.isArray(redeemableItems) ? redeemableItems : [];
     const balance = user?.points ?? currentBalance ?? 0;
     const selected = items.find((i) => i.id === selectedItem);
     const manualHint = selected?.requires_manual_approval;
 
+    const handleNotifyMe = async () => {
+        if (notifyRegistered || notifying) return;
+        setNotifying(true);
+        try {
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            await axios.post(
+                '/store-membership/notify-me',
+                {},
+                { headers: { 'X-CSRF-TOKEN': token || '', 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' } }
+            );
+            setNotifyRegistered(true);
+            showSuccess(t('storeMembershipPage.comingSoon.notifySuccess'));
+        } catch (err) {
+            showError(t('storeMembershipPage.comingSoon.notifyError'));
+        } finally {
+            setNotifying(false);
+        }
+    };
+
     const handleRedeem = async () => {
+        if (!redemptionEnabled) {
+            showInfo(t('storeMembershipPage.comingSoon.hint'));
+            return;
+        }
+
         if (!selectedItem) {
             showError(t('storeMembershipPage.messages.selectGiftFirst'));
             return;
@@ -128,7 +154,7 @@ export default function StoreMembership({ auth, user, currentBalance = 0, redeem
                             <p className="text-center text-sm text-gray-500 py-4">{t('storeMembershipPage.emptyRewards')}</p>
                         )}
                         {items.map((item) => {
-                            const canSelect = item.status === 'available' || item.status === 'ready';
+                            const canSelect = redemptionEnabled && (item.status === 'available' || item.status === 'ready');
                             const isSelected = selectedItem === item.id;
                             return (
                                 <div
@@ -161,18 +187,51 @@ export default function StoreMembership({ auth, user, currentBalance = 0, redeem
                 </div>
 
                 {/* Redeem Button */}
-                <button
-                    type="button"
-                    disabled={submitting || items.length === 0}
-                    onClick={handleRedeem}
-                    className="w-full bg-[#A3C042] text-white rounded-xl py-3 font-bold text-sm flex items-center justify-center gap-2 hover:bg-[#8CA635] transition disabled:opacity-50"
-                >
-                    <FaGift />
-                    {submitting ? t('common.saving') : t('storeMembershipPage.redeemButton')}
-                </button>
-                <p className="text-[10px] text-gray-500 text-center">
-                    {manualHint ? t('storeMembershipPage.redeemHintManual') : t('storeMembershipPage.redeemHint')}
-                </p>
+                <div className="relative">
+                    <button
+                        type="button"
+                        disabled={redemptionEnabled && (submitting || items.length === 0)}
+                        onClick={handleRedeem}
+                        className={`w-full rounded-xl py-3 font-bold text-sm flex items-center justify-center gap-2 transition disabled:opacity-50 ${
+                            redemptionEnabled
+                                ? 'bg-[#A3C042] text-white hover:bg-[#8CA635]'
+                                : 'bg-gray-200 text-gray-500 cursor-pointer hover:bg-gray-300'
+                        }`}
+                    >
+                        {redemptionEnabled ? <FaGift /> : <FaHourglassHalf />}
+                        {redemptionEnabled
+                            ? (submitting ? t('common.saving') : t('storeMembershipPage.redeemButton'))
+                            : t('storeMembershipPage.comingSoon.badge')}
+                    </button>
+                    {!redemptionEnabled && (
+                        <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow">
+                            {t('storeMembershipPage.comingSoon.badge')}
+                        </span>
+                    )}
+                </div>
+
+                {redemptionEnabled ? (
+                    <p className="text-[10px] text-gray-500 text-center">
+                        {manualHint ? t('storeMembershipPage.redeemHintManual') : t('storeMembershipPage.redeemHint')}
+                    </p>
+                ) : (
+                    <div className="space-y-2">
+                        <p className="text-[11px] text-gray-600 text-center leading-relaxed">
+                            {t('storeMembershipPage.comingSoon.explanation')}
+                        </p>
+                        <button
+                            type="button"
+                            disabled={notifying || notifyRegistered}
+                            onClick={handleNotifyMe}
+                            className="w-full border-2 border-[#A3C042] text-[#A3C042] rounded-xl py-2.5 font-bold text-xs flex items-center justify-center gap-2 hover:bg-[#A3C042]/5 transition disabled:opacity-60"
+                        >
+                            {notifyRegistered ? <FaCheckCircle /> : <FaBell />}
+                            {notifyRegistered
+                                ? t('storeMembershipPage.comingSoon.notifyRegistered')
+                                : (notifying ? t('common.saving') : t('storeMembershipPage.comingSoon.notifyButton'))}
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* Right Column - Desktop */}

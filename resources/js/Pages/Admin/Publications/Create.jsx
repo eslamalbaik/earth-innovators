@@ -1,4 +1,5 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
+import AgentAttribution from '@/Components/Innovation/AgentAttribution';
 import { Head, useForm, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { FaUpload, FaSpinner, FaYoutube, FaRobot } from 'react-icons/fa';
@@ -133,6 +134,7 @@ export default function AdminPublicationCreate({ schools }) {
                                 <p className="text-xs text-blue-600 mt-1">
                                     {t('teacherPublicationCreatePage.aiAssistant.description')}
                                 </p>
+                                <AgentAttribution agentKey="content_generation" className="mb-3" />
                             </div>
                             <button
                                 type="button"

@@ -155,6 +155,7 @@ export const en = {
             "title": "⚖️ Benchmarking",
             "subtitle": "Your position compared to your peers in {scope}",
             "cohort": "Cohort",
+            "overall_score": "Overall Score",
             "empty": {
                 "title": "No data for comparison",
                 "description": "Add your achievements and calculate your indexes first."
@@ -178,6 +179,8 @@ export const en = {
             "overallScore": "Overall Score",
             "outOf100": "out of 100",
             "lastCalculated": "Last calculated: {date}",
+            "nationalLevelTooltip": "This national level corresponds to a score of {min}-{max} out of 100",
+            "compliantWith": "Compliant with {standard}",
             "empty": {
                 "title": "Your indexes are not calculated yet",
                 "description": "Add your achievements first, then click \"Recalculate Indexes\".",
@@ -266,6 +269,7 @@ export const en = {
         "teacher": "Teacher",
         "discover": "Discover",
         "all": "All",
+        "institution": "Institution",
         "close": "Close",
         "january": "January",
         "february": "February",
@@ -700,6 +704,18 @@ export const en = {
             "imageUploadError": "Image upload error: {message}",
             "saveDataErrorTitle": "An error occurred while saving the data:"
         }
+    },
+    "initiativesPage": {
+        "title": "Initiatives",
+        "subtitle": "Discounts, events, and trips available to you",
+        "mySchool": "My School's Initiatives",
+        "global": "Global Initiatives",
+        "noSchoolInitiatives": "No initiatives from your school yet",
+        "noGlobalInitiatives": "No global initiatives yet"
+    },
+    "studentDigitalCard": {
+        "title": "Digital Card",
+        "viewRewards": "View Rewards"
     },
     "studentProfilePage": {
         "pageTitle": "Profile - {appName}",
@@ -1296,10 +1312,6 @@ export const en = {
             "title": "Numbers That Prove Our Success!",
             "subtitle": "The community of innovators and talented individuals grows daily on Innovators Legacy platform.",
             "loading": "Loading statistics..."
-        },
-        "testimonials": {
-            "title": "Stories from Our Community",
-            "subtitle": "Real experiences from our students, teachers and innovators"
         }
     },
     "quickLinks": {
@@ -1413,6 +1425,12 @@ export const en = {
         "noInstitutions": "Warning: No educational institutions registered in the system",
         "contactAdmin": "Please contact administration to create a school account first",
         "schoolRequired": "A school must be registered in the system first. Please contact administration.",
+        "grade": "Grade Level",
+        "selectGrade": "Select grade",
+        "section": "Section",
+        "sectionPlaceholder": "e.g. A",
+        "subjects": "Subjects",
+        "joiningViaInvite": "You're joining as a {role} at {school} via a valid invite code.",
         "fixErrors": "Please fix the following errors:",
         "phoneInUseMessage": "already registered to another user",
         "creating": "Creating account...",
@@ -1459,6 +1477,7 @@ export const en = {
         "otpTimeLimitRegister": "Please enter it within 10 minutes to complete account creation."
     },
     "dashboard": {
+        "indexes": "Indexes",
         "welcome": "Welcome",
         "dashboard": "Dashboard",
         "studentDashboard": "Student Dashboard",
@@ -1851,6 +1870,8 @@ export const en = {
         "publishArticleSubtitle": "Showcase your reflections with the community",
         "createChallengeTitle": "Create a Challenge",
         "createChallengeSubtitle": "Invite learners to design solutions",
+        "manageRubricsTitle": "Assessment Rubrics",
+        "manageRubricsSubtitle": "Create and customize your project rubrics",
         "recentProjectsTitle": "Recent Projects",
         "noRecentProjects": "No recent projects yet",
         "createProjectAction": "Create Project",
@@ -1959,6 +1980,65 @@ export const en = {
             "description": "Studies show friendly competitions can increase innovation productivity by 40%. Choose an engaging topic and start a challenge now."
         }
     },
+    "teacherRubricsPage": {
+        "pageTitle": "Assessment Rubrics - {appName}",
+        "title": "Assessment Rubrics",
+        "subtitle": "Create and customize project assessment rubrics — pick from the ready-made library or build your own.",
+        "newRubric": "+ New Rubric",
+        "scopeClass": "Class-level",
+        "scopeTeacher": "Teacher-level",
+        "criteriaCount": "{count} criteria",
+        "projectsCount": "{count} projects",
+        "archiveAction": "Archive",
+        "archiveSuccess": "Rubric archived",
+        "archiveError": "Could not archive the rubric",
+        "archiveConfirm": {
+            "title": "Archive this rubric?",
+            "message": "Are you sure you want to archive \"{name}\"? Projects that already use it will keep their current criteria."
+        },
+        "empty": {
+            "title": "No rubrics yet",
+            "description": "Create your first rubric to attach it to upcoming projects and enable automatic AI evaluation.",
+            "action": "+ Create a Rubric"
+        },
+        "builder": {
+            "pageTitle": "Create Rubric - {appName}",
+            "createTitle": "Create a New Rubric",
+            "editTitle": "Edit Rubric",
+            "subtitle": "Define criteria and proficiency levels, then save to attach it to your projects.",
+            "basicInfo": "Basic Information",
+            "nameAr": "Name (Arabic)",
+            "nameEn": "Name (English)",
+            "descriptionAr": "Description (Arabic)",
+            "descriptionEn": "Description (English)",
+            "scopeLabel": "Scope",
+            "scopeTeacherHint": "This rubric will be available as an option when creating any of your projects.",
+            "scopeClassHint": "This rubric is limited to a specific grade and subject.",
+            "grade": "Grade",
+            "gradePlaceholder": "e.g. Grade 6",
+            "subject": "Subject",
+            "subjectPlaceholder": "e.g. Science",
+            "criteriaTitle": "Criteria (Performance Indicators)",
+            "totalWeight": "Total weight: {total}%",
+            "quickStart": "Quick start: add all library criteria",
+            "browseLibrary": "Browse Library",
+            "addCustom": "New Custom Criterion",
+            "defaultWeight": "Default weight: {weight}%",
+            "criterionNamePlaceholder": "Criterion name",
+            "editLevels": "Edit levels",
+            "performanceLevels": "Proficiency Levels",
+            "addLevel": "Add level",
+            "levelNameAr": "Level name (Arabic)",
+            "levelNameEn": "Level name (English)",
+            "score": "Score",
+            "levelDescAr": "Level description (Arabic)",
+            "levelDescEn": "Level description (English)",
+            "noCriteria": "No criteria added yet. Use quick start or add a custom criterion.",
+            "save": "Save Rubric",
+            "saveSuccess": "Rubric saved successfully",
+            "saveError": "Could not save the rubric. Please check the entered data."
+        }
+    },
     "teacherProjectsCreatePage": {
         "pageTitle": "Upload project - {appName}",
         "tabs": {
@@ -1981,6 +2061,9 @@ export const en = {
             "categoryLabel": "Project category",
             "schoolLabel": "School",
             "schoolPlaceholder": "Choose a school (optional)",
+            "rubricLabel": "Assessment Rubric",
+            "rubricPlaceholder": "No custom rubric (optional)",
+            "createRubricLink": "+ Create a new rubric",
             "filesLabel": "Files",
             "dropzoneTitle": "Drag and drop files here or click to choose",
             "dropzoneSubtitle": "Images, video, PDF (max: 10 MB per file)",
@@ -2930,6 +3013,10 @@ export const en = {
             "awardedBadges": "Awarded badges",
             "badgeFallback": "Badge #{id}",
             "reviewedAt": "Reviewed at"
+        },
+        "rubricEvaluation": {
+            "title": "Performance Indicator Explanations",
+            "nextLevel": "To reach the next \"{level}\" level, see the explanation above."
         },
         "form": {
             "commentLabel": "Comment (optional)",
@@ -4478,6 +4565,43 @@ export const en = {
             "createdAt": "Created at"
         }
     },
+    "adminRubricLibraryPage": {
+        "pageTitle": "National Standards Library - {appName}",
+        "title": "National Standards Library",
+        "subtitle": "The general standards (QFEmirates) the AI assessment engine automatically falls back to for any project whose teacher hasn't attached a custom rubric.",
+        "addNew": "+ Add New Criterion",
+        "empty": "No criteria in the library yet.",
+        "activeWeightTotal": "Total weight of currently active criteria: {total}%",
+        "weightHint": "Ideally this sums to 100% for a balanced evaluation; the system will normalize weights automatically at evaluation time even if the total isn't exact.",
+        "weightLabel": "Weight: {weight}%",
+        "levelsCount": "levels",
+        "activate": "Activate",
+        "deactivate": "Deactivate",
+        "createSuccess": "Criterion added successfully",
+        "updateSuccess": "Criterion updated successfully",
+        "saveError": "Could not save the criterion, please check the entered data.",
+        "deleteConfirm": {
+            "title": "Delete this criterion?",
+            "message": "Are you sure you want to delete \"{name}\"? This won't affect past evaluations that used it."
+        },
+        "form": {
+            "nameAr": "Criterion name (Arabic)",
+            "nameEn": "Criterion name (English)",
+            "descriptionAr": "Indicator definition (Arabic)",
+            "descriptionEn": "Indicator definition (English)",
+            "weight": "Relative weight (%)",
+            "category": "Category",
+            "categoryPlaceholder": "e.g. creativity, technical",
+            "isActive": "Active in the default standards",
+            "levels": "Proficiency levels",
+            "addLevel": "Add level",
+            "levelNameAr": "Level name (Arabic)",
+            "levelNameEn": "Level name (English)",
+            "score": "Score",
+            "levelDescAr": "Level description (Arabic)",
+            "levelDescEn": "Level description (English)"
+        }
+    },
     "adminCategoriesPage": {
         "pageTitle": "Categories Management - {appName}",
         "title": "Categories Management",
@@ -5367,6 +5491,11 @@ export const en = {
         "heroDescription": "Earth Innovators uses artificial intelligence to support recommendations, reports, and content generation. This page explains how we use AI responsibly, transparently, and in service of students, teachers, and schools.",
         "commitmentTitle": "Our Commitment",
         "commitmentDescription": "AI on this platform is a decision-support tool, not a decision-maker. Every AI-assisted output is clearly labeled, explainable, and subject to human oversight, especially for anything that affects a student's evaluation, ranking, or record.",
+        "agentDirectory": {
+            "title": "AI Agent Directory",
+            "description": "Every AI recommendation, report, or evaluation the platform shows comes from one of several specialized agents, each with its own name and role. Browse the full directory to see every agent and the type of analytics it provides.",
+            "cta": "Browse the agent directory"
+        },
         "complianceTitle": "UAE Regulatory Alignment",
         "complianceDescription": "Our data handling and AI governance practices are guided by UAE Federal Decree-Law No. 45 of 2021 on the Protection of Personal Data (PDPL) and the UAE Charter for the Development and Use of Artificial Intelligence. This includes lawful, transparent processing of personal data, purpose limitation, data subject rights (access, correction, deletion), and responsible, human-centered use of AI.",
         "principles": {
@@ -5808,6 +5937,14 @@ export const en = {
         "projects": "Projects",
         "submissions": "Submissions",
         "reviewProjects": "Review Projects",
+        "inviteCodes": "Invite Codes",
+        "initiatives": "Initiatives",
+        "schoolAnalytics": "Innovation Analytics",
+        "rubrics": "Assessment Rubrics",
+        "rubricLibrary": "National Standards Library",
+        "nationalLevels": "National Levels",
+        "referenceStandards": "Reference Standards",
+        "academicStructure": "Curricula & Subjects",
         "myProjects": "My Projects",
         "createProject": "Create Project",
         "publications": "Publications",
@@ -6092,6 +6229,15 @@ export const en = {
         "redeemButton": "Redeem Points",
         "redeemHint": "Points are deducted automatically and the gift will be sent to your account or email.",
         "redeemHintManual": "This reward requires manual approval: your request is sent to your school and teacher. Points are deducted only after an administrator approves.",
+        "comingSoon": {
+            "badge": "Coming Soon",
+            "hint": "Point redemption is being finalized right now.",
+            "explanation": "We're finalizing the official partnership with reward providers (such as the Fazaa program) to guarantee reliable delivery for every gift. Redemption will be enabled as soon as this integration is complete.",
+            "notifyButton": "Notify me upon activation",
+            "notifyRegistered": "We'll notify you when it's live",
+            "notifySuccess": "You're on the list — we'll notify you as soon as this feature is live.",
+            "notifyError": "Couldn't register your request. Please try again."
+        },
         "itemStatuses": {
             "almostThere": "Almost there!",
             "bookNow": "Book now",
@@ -6162,6 +6308,27 @@ export const en = {
         "submittedProjectsTitle": "Submitted Projects",
         "unknownSubmissionProject": "Unknown project",
         "unknownSubmissionStudent": "Unknown student",
+        "rubricEvaluation": {
+            "title": "Performance Indicator Explanations",
+            "emptyHint": "No performance-indicator explanation has been generated for this submission yet. If the project has no custom rubric, the system will automatically use the general national standards.",
+            "usingDefaultStandards": "Currently in use: General National Standards (QFEmirates) — no custom rubric is attached to this project",
+            "generateButton": "Generate AI Explanation",
+            "regenerateButton": "Regenerate",
+            "generating": "Generating...",
+            "saveDraft": "Save as draft",
+            "releaseButton": "Save and release to student",
+            "saving": "Saving...",
+            "draft": "Draft — not visible to the student",
+            "released": "Released to student",
+            "overallScore": "Overall weighted score: {score}",
+            "nextLevel": "To reach the next \"{level}\" level, see the explanation below.",
+            "editedByTeacher": "Edited by teacher",
+            "generateSuccess": "Performance indicator explanations generated successfully.",
+            "generateError": "Could not generate the explanation. Make sure a rubric is attached to the project and try again.",
+            "saveSuccess": "Changes saved.",
+            "saveError": "Could not save changes. Please try again.",
+            "releaseSuccess": "The explanation was released to the student successfully."
+        },
         "table": {
             "student": "Student",
             "project": "Project",
@@ -7029,6 +7196,8 @@ export const en = {
         "storeRewardSuccess": "Redeemed successfully ({points} points).",
         "storeRewardPendingApproval": "Your request was submitted. Points will be deducted after approval.",
         "storeRewardError": "Could not complete redemption. Please try again.",
+        "storeRewardComingSoon": "Point redemption is being finalized and will be enabled soon.",
+        "storeRewardNotifyMeSuccess": "You're on the list — we'll notify you as soon as this feature is live.",
         "certificateDownloadFailed": "Could not generate or download the certificate. Please try again in a moment.",
         "certificatePdfLibraryMissing": "PDF engine is missing. Please contact support to enable certificate downloads.",
         "certificateTemplateMissing": "Certificate template is missing. Upload/assign a valid template and retry.",
@@ -7621,6 +7790,146 @@ export const en = {
         "edit": {
             "header": "Edit Custom Role",
             "pageTitle": "Edit Custom Role - {appName}"
+        }
+    },
+    "aiAgents": {
+        "pageTitle": "AI Agent Directory - {appName}",
+        "title": "AI Agent Directory",
+        "heroDescription": "Every result, recommendation, or evaluation the AI shows on this platform is produced by one of these specialized agents. Learn about each agent, its role, and the type of analytics it provides.",
+        "footnote": "{count} AI agents power the platform's features today — new ones can be added without changing this page's structure.",
+        "categories": {
+            "scoring": "Diagnostic Scoring",
+            "guidance": "Personalized Recommendations",
+            "generation": "Generative Content",
+            "validation": "Validation & Quality Review",
+            "search": "Semantic Search",
+            "reporting": "Narrative Reporting",
+            "conversational": "Conversational Analytics",
+            "governance": "Fairness Monitoring"
+        },
+        "agents": {
+            "skills": {
+                "name": "Nova",
+                "title": "Skills Ambassador",
+                "description": "Analyzes your registered skills, their diversity across categories, proficiency levels, and courses/certificates to compute your Skills index."
+            },
+            "innovation": {
+                "name": "Spark",
+                "title": "Innovation Ambassador",
+                "description": "Scores your AI-validated innovative projects, awards, documented ideas, and patents to compute your Innovation index."
+            },
+            "intelligence": {
+                "name": "Sage",
+                "title": "Intelligence Ambassador",
+                "description": "Evaluates your validated research, certificates, published articles, and AI-assessed content quality to compute your Intelligence index."
+            },
+            "creativity": {
+                "name": "Muse",
+                "title": "Creativity Ambassador",
+                "description": "Measures your creative projects and products, written content, and awards in creative fields to compute your Creativity index."
+            },
+            "projects": {
+                "name": "Atlas",
+                "title": "Projects Ambassador",
+                "description": "Tracks your project quality ratings, completion rate, and AI validation to compute your Projects index."
+            },
+            "leadership": {
+                "name": "Beacon",
+                "title": "Leadership Ambassador",
+                "description": "Analyzes challenges you've completed, projects or challenges you've led, and peer reviews to compute your Leadership index."
+            },
+            "ip": {
+                "name": "Vault",
+                "title": "Intellectual Property Ambassador",
+                "description": "Assesses your registered patents, research and publications, and the evidence quality behind them to compute your IP index."
+            },
+            "future_readiness": {
+                "name": "Horizon",
+                "title": "Forecasting & Foresight Ambassador",
+                "description": "Forecasts your readiness for emerging technologies by analyzing your future-tech skills, digital certifications, and continuous learning activity."
+            },
+            "recommendations": {
+                "name": "Compass",
+                "title": "Growth & Recommendations Ambassador",
+                "description": "Generates personalized growth recommendations — courses, competitions, projects, and development paths — based on your full innovation profile and strengths/weaknesses."
+            },
+            "content_generation": {
+                "name": "Quill",
+                "title": "Content Creation Ambassador",
+                "description": "Drafts bilingual (Arabic/English) content for projects, publications, badges, and challenges, always subject to human review before publishing."
+            },
+            "achievement_validation": {
+                "name": "Warden",
+                "title": "Achievements Verification Ambassador",
+                "description": "Reviews submitted achievements for logical consistency, duplicate detection, and evidence sufficiency before they're counted toward your indexes."
+            },
+            "rubric_evaluation": {
+                "name": "Ledger",
+                "title": "Performance Indicator Evaluation Ambassador",
+                "description": "Evaluates a student's submitted work against every performance indicator in the project's rubric and writes an explanation specific to that work, covering the level reached and the gap to the next one, subject to teacher review before release to the student."
+            },
+            "smart_search": {
+                "name": "Scout",
+                "title": "Smart Search Ambassador",
+                "description": "Interprets natural-language search queries and matches them against real student, skill, and project data on the platform."
+            },
+            "reporting": {
+                "name": "Chronicle",
+                "title": "Reporting & Insights Ambassador",
+                "description": "Compiles comprehensive innovation reports summarizing each student's strengths, weaknesses, and suggested development plan."
+            },
+            "platform_insights": {
+                "name": "Overseer",
+                "title": "Platform Insights Ambassador",
+                "description": "Answers platform-wide admin questions using live student and index data across all institutions."
+            },
+            "school_insights": {
+                "name": "Steward",
+                "title": "School Insights Ambassador",
+                "description": "Answers a school administrator's questions using that school's real student and index data only."
+            },
+            "student_success": {
+                "name": "Buddy",
+                "title": "Student Success Ambassador",
+                "description": "Answers a student's questions about learning, innovation, and creativity, explains their scores in detail, and suggests concrete next steps — grounded in their own documented record."
+            },
+            "fairness_bias": {
+                "name": "Equity",
+                "title": "Fairness & Bias Ambassador",
+                "description": "Continuously monitors AI validation outcomes across different student groups to flag any potential scoring bias."
+            }
+        }
+    },
+    "studentAssistant": {
+        "openLabel": "Open Smart Assistant",
+        "title": "Smart Assistant",
+        "subtitle": "Analyzes your real achievements and index data",
+        "welcome": "Ask me about learning and innovation, or ask why you got a certain score and how to raise it next time.",
+        "placeholder": "Type your question here...",
+        "send": "Send",
+        "thinking": "Analyzing...",
+        "error": "Something went wrong while processing your question. Check your connection and try again.",
+        "disclaimer": "My answers about your scores are based strictly on your actual achievement data on record.",
+        "chips": {
+            "explainOverall": "Why did I get this overall score?",
+            "explainInnovation": "Why did I get this score in Innovation?",
+            "howToImprove": "How do I improve my indexes next time?",
+            "motivateMe": "Give me a tip to develop my creative skills"
+        }
+    },
+    "academic": {
+        "grades": {
+            "kg1": "KG1", "kg2": "KG2",
+            "grade_1": "Grade 1", "grade_2": "Grade 2", "grade_3": "Grade 3",
+            "grade_4": "Grade 4", "grade_5": "Grade 5", "grade_6": "Grade 6",
+            "grade_7": "Grade 7", "grade_8": "Grade 8", "grade_9": "Grade 9",
+            "grade_10": "Grade 10", "grade_11": "Grade 11", "grade_12": "Grade 12"
+        },
+        "subjects": {
+            "arabic": "Arabic", "english": "English", "math": "Mathematics",
+            "science": "Science", "chemistry": "Chemistry", "physics": "Physics",
+            "identity_values": "Identity, Values & Family", "innovation_invention": "Innovation & Invention",
+            "social_emotional": "Social & Emotional Intelligence", "ai_future_tech": "AI & Future Technologies"
         }
     }
 };

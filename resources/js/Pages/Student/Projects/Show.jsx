@@ -30,6 +30,7 @@ import InputLabel from '../../../Components/InputLabel';
 import InputError from '../../../Components/InputError';
 import PrimaryButton from '../../../Components/PrimaryButton';
 import AiDisclosureBadge from '@/Components/Innovation/AiDisclosureBadge';
+import AgentAttribution from '@/Components/Innovation/AgentAttribution';
 
 export default function StudentProjectShow({ auth, project, existingSubmission, initialTab = 'details', backTo = '/student/projects' }) {
     const { t, language } = useTranslation();
@@ -279,7 +280,12 @@ export default function StudentProjectShow({ auth, project, existingSubmission, 
                 )}
                 <div className="flex items-start justify-between gap-2 mb-2">
                     <h1 className="text-lg font-extrabold text-gray-900">{displayTitle}</h1>
-                    {project.is_ai_generated && <AiDisclosureBadge />}
+                    {project.is_ai_generated && (
+                        <div className="flex flex-wrap items-center gap-2">
+                            <AiDisclosureBadge />
+                            <AgentAttribution agentKey="content_generation" />
+                        </div>
+                    )}
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
                     <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
@@ -506,6 +512,50 @@ export default function StudentProjectShow({ auth, project, existingSubmission, 
                                             {t('studentProjectShowPage.evaluation.reviewedAt')}: {toGregorianDate(existingSubmission.reviewed_at)}
                                         </p>
                                     )}
+                                </div>
+                            )}
+
+                            {/* Performance indicator explanations, released by the teacher */}
+                            {existingSubmission.ai_rubric_evaluation?.criteria?.length > 0 && (
+                                <div className="mt-4 bg-white border-2 border-indigo-100 rounded-2xl p-4">
+                                    <h3 className="text-base font-bold text-gray-900 mb-1">
+                                        {t('studentProjectShowPage.rubricEvaluation.title')}
+                                    </h3>
+                                    <p className="text-xs text-gray-500 mb-3">
+                                        {language === 'ar'
+                                            ? existingSubmission.ai_rubric_evaluation.rubric_name_ar
+                                            : existingSubmission.ai_rubric_evaluation.rubric_name}
+                                    </p>
+
+                                    <div className="space-y-3">
+                                        {existingSubmission.ai_rubric_evaluation.criteria.map((c) => {
+                                            const name = language === 'ar' ? c.name_ar : c.name;
+                                            const levelName = language === 'ar' ? c.level_name_ar : c.level_name;
+                                            const nextLevelName = language === 'ar' ? c.next_level_name_ar : c.next_level_name;
+                                            const text = language === 'ar' ? c.explanation_ar : c.explanation;
+
+                                            return (
+                                                <div key={c.criterion_id} className="border border-gray-200 rounded-xl p-3">
+                                                    <div className="flex items-center justify-between flex-wrap gap-1 mb-1">
+                                                        <div className="text-sm font-bold text-gray-900">{name}</div>
+                                                        <div className="text-xs font-semibold text-gray-600">
+                                                            {levelName} — {c.score}/{c.max_score}
+                                                        </div>
+                                                    </div>
+                                                    {nextLevelName && (
+                                                        <div className="text-[11px] text-gray-500 mb-2">
+                                                            {t('studentProjectShowPage.rubricEvaluation.nextLevel', { level: nextLevelName })}
+                                                        </div>
+                                                    )}
+                                                    <p className="text-sm text-gray-700 whitespace-pre-line mb-2">{text}</p>
+                                                    <div className="flex flex-wrap items-center gap-1.5">
+                                                        <AiDisclosureBadge />
+                                                        <AgentAttribution agentKey="rubric_evaluation" />
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
                             )}
                         </div>

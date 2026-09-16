@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\InviteCode;
 use App\Models\Teacher;
 use App\Models\User;
 use App\Services\MembershipService;
@@ -24,7 +25,7 @@ class RegisteredUserController extends Controller
         private MembershipService $membershipService
     ) {}
 
-    public function create(): Response
+    public function create(Request $request): Response
     {
         $schools = User::whereIn('role', ['school', 'educational_institution'])
             ->orderBy('name')
@@ -36,8 +37,27 @@ class RegisteredUserController extends Controller
                 ];
             });
 
+        $inviteCode = null;
+        if ($request->filled('code')) {
+            $code = InviteCode::with('school')->where('code', strtoupper($request->query('code')))->first();
+            if ($code && $code->isValidFor($code->role)) {
+                $inviteCode = [
+                    'code'        => $code->code,
+                    'role'        => $code->role,
+                    'school_id'   => $code->school_id,
+                    'school_name' => $code->school?->name,
+                    'grade'       => $code->grade,
+                    'section'     => $code->section,
+                ];
+            }
+        }
+
         return Inertia::render('Auth/Register', [
             'schools' => $schools,
+            'curricula' => config('academic.curricula'),
+            'grades' => config('academic.grades'),
+            'subjects' => config('academic.subjects'),
+            'inviteCode' => $inviteCode,
         ]);
     }
 
@@ -57,8 +77,25 @@ class RegisteredUserController extends Controller
         ];
 
         // يجب تضمين school_id في القواعد حتى يُمرَّر إلى $validated ويُحفظ عند التسجيل (الطالب/المعلم)
-        if (in_array($request->role, ['student', 'teacher'], true)) {
+        $inviteCode = null;
+        if ($request->filled('code')) {
+            $inviteCode = InviteCode::where('code', strtoupper($request->input('code')))->first();
+            if (! $inviteCode || ! $inviteCode->isValidFor($request->role)) {
+                return back()->withErrors([
+                    'code' => 'كود الدعوة غير صالح أو منتهي الصلاحية.',
+                ])->withInput();
+            }
+        }
+
+        if (in_array($request->role, ['student', 'teacher'], true) && ! $inviteCode) {
             $rules['school_id'] = 'required|exists:users,id';
+        }
+
+        if ($request->role === 'student') {
+            $rules['grade'] = 'required|string|in:' . implode(',', config('academic.grades'));
+            $rules['section'] = 'required|string|max:10';
+            $rules['subjects'] = 'required|array|min:1';
+            $rules['subjects.*'] = 'string|in:' . implode(',', array_keys(config('academic.subjects')));
         }
 
         $validated = $request->validate($rules, [
@@ -80,9 +117,15 @@ class RegisteredUserController extends Controller
             'school_id.exists' => 'المدرسة المختارة غير موجودة أو غير متاحة.',
             'consent_ai_processing.required' => 'يجب الموافقة على سياسة استخدام الذكاء الاصطناعي والبيانات للمتابعة.',
             'consent_ai_processing.accepted' => 'يجب الموافقة على سياسة استخدام الذكاء الاصطناعي والبيانات للمتابعة.',
+            'grade.required' => 'الصف الدراسي مطلوب.',
+            'section.required' => 'الشعبة مطلوبة.',
+            'subjects.required' => 'يجب اختيار مادة دراسية واحدة على الأقل.',
+            'subjects.min' => 'يجب اختيار مادة دراسية واحدة على الأقل.',
         ]);
 
-        if (in_array($validated['role'], ['student', 'teacher'], true)) {
+        if ($inviteCode) {
+            $validated['school_id'] = $inviteCode->school_id;
+        } elseif (in_array($validated['role'], ['student', 'teacher'], true)) {
             $school = User::where('id', $validated['school_id'])
                 ->whereIn('role', ['school', 'educational_institution'])
                 ->first();
@@ -105,6 +148,16 @@ class RegisteredUserController extends Controller
 
         if (in_array($validated['role'], ['student', 'teacher'], true)) {
             $userData['school_id'] = $validated['school_id'];
+        }
+
+        if ($validated['role'] === 'student') {
+            $userData['grade'] = $validated['grade'];
+            $userData['section'] = $validated['section'];
+            $userData['subjects'] = $validated['subjects'];
+
+            if ($inviteCode && $inviteCode->teacher_id) {
+                $userData['teacher_id'] = $inviteCode->teacher_id;
+            }
         }
 
         try {
@@ -152,6 +205,13 @@ class RegisteredUserController extends Controller
 
                 return $user;
             });
+
+            if ($inviteCode) {
+                $inviteCode->increment('used_count');
+                if ($inviteCode->max_uses !== null && $inviteCode->used_count >= $inviteCode->max_uses) {
+                    $inviteCode->update(['is_active' => false]);
+                }
+            }
 
             try {
                 app(PackagePaymentService::class)->activateDefaultTrialForNewUser($user);

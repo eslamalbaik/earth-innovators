@@ -98,16 +98,17 @@ class ScoringEngineService
     }
 
     /**
-     * Calculate weighted overall score using configurable weights
+     * Resolve the active per-index weights (falls back to defaults if none configured).
+     * Shared by calculateOverallScore() and anything explaining how the overall
+     * score was composed (e.g. the student Smart Assistant).
      */
-    public function calculateOverallScore(array $indexes): float
+    public function resolveWeights(): array
     {
         $weights = DB::table('index_weights')
             ->where('is_active', true)
             ->pluck('weight', 'index_name')
             ->toArray();
 
-        // Default weights if none configured
         if (empty($weights)) {
             $weights = [
                 'skills'           => 0.15,
@@ -120,6 +121,16 @@ class ScoringEngineService
                 'future_readiness' => 0.10,
             ];
         }
+
+        return $weights;
+    }
+
+    /**
+     * Calculate weighted overall score using configurable weights
+     */
+    public function calculateOverallScore(array $indexes): float
+    {
+        $weights = $this->resolveWeights();
 
         $score = 0;
         $totalWeight = 0;

@@ -155,6 +155,7 @@ export const ar = {
             "title": "⚖️ المقارنات المرجعية",
             "subtitle": "موقعك مقارنة بزملائك في {scope}",
             "cohort": "الدفعة",
+            "overall_score": "الدرجة الإجمالية",
             "empty": {
                 "title": "لا توجد بيانات للمقارنة",
                 "description": "أضف إنجازاتك واحسب مؤشراتك أولاً."
@@ -178,6 +179,8 @@ export const ar = {
             "overallScore": "الدرجة الكلية",
             "outOf100": "من 100",
             "lastCalculated": "آخر احتساب: {date}",
+            "nationalLevelTooltip": "هذا المستوى الوطني يقابل نطاق النتيجة {min}–{max} من 100",
+            "compliantWith": "متوافق مع {standard}",
             "empty": {
                 "title": "لم تُحسب مؤشراتك بعد",
                 "description": "أضف إنجازاتك أولاً ثم اضغط \"إعادة احتساب المؤشرات\".",
@@ -266,12 +269,13 @@ export const ar = {
         "teacher": "معلم",
         "discover": "اكتشف",
         "all": "الكل",
+        "institution": "المؤسسة",
         "close": "إغلاق",
         "january": "يناير",
         "february": "فبراير",
         "march": "مارس",
         "april": "أبريل",
-        "may": "ربما",
+        "may": "مايو",
         "june": "يونيو",
         "july": "يوليو",
         "august": "أغسطس",
@@ -309,8 +313,8 @@ export const ar = {
         "aiAppealPlaceholder": "اشرح سبب عدم موافقتك على هذه النتيجة أو التوصية المولدة بالذكاء الاصطناعي...",
         "aiAppealSubmit": "إرسال الاعتراض",
         "allRightsReserved": "جميع الحقوق محفوظة",
-        "loading": "جاري التحميل...",
-        "saving": "جاري الحفظ...",
+        "loading": "جارٍ التحميل...",
+        "saving": "جارٍ الحفظ...",
         "saveChanges": "حفظ التعديلات",
         "noData": "لا توجد بيانات",
         "other": "أخرى",
@@ -361,7 +365,7 @@ export const ar = {
             "draft": "مسودة",
             "active": "نشط",
             "completed": "مكتمل",
-            "cancelled": "ملغي"
+            "cancelled": "ملغى"
         },
         "difficultyLevels": {
             "easy": "سهل",
@@ -375,20 +379,20 @@ export const ar = {
             "18+": "18+ سنة"
         },
         "challengeTypes": {
-            "cognitive": "تحدٍّ معرفي",
-            "applied": "تحدٍّ تطبيقي/مهاري",
-            "creative": "تحدٍّ إبداعي",
-            "artistic_creative": "تحدٍّ إبداعي فني",
-            "collaborative": "تحدٍّ تعاوني",
-            "analytical": "تحدٍّ تحليلي/استقصائي",
-            "technological": "تحدٍّ تقني",
-            "behavioral": "تحدٍّ سلوكي/قيمي",
-            "60_seconds": "تحدي 60 ثانية",
+            "cognitive": "تحدٍ معرفي",
+            "applied": "تحدٍ تطبيقي/مهاري",
+            "creative": "تحدٍ إبداعي",
+            "artistic_creative": "تحدٍ إبداعي فني",
+            "collaborative": "تحدٍ تعاوني",
+            "analytical": "تحدٍ تحليلي/استقصائي",
+            "technological": "تحدٍ تقني",
+            "behavioral": "تحدٍ سلوكي/قيمي",
+            "60_seconds": "تحدٍ 60 ثانية",
             "mental_math": "حلها بدون قلم",
             "conversions": "تحدي التحويلات",
             "team_fastest": "تحدي الفريق الأسرع",
             "build_problem": "ابنِ مسألة",
-            "custom": "تحدٍّ مخصص"
+            "custom": "تحدٍ مخصص"
         },
         "categories": {
             "science": "علوم",
@@ -462,8 +466,8 @@ export const ar = {
         "accepted": "مقبول",
         "rejected": "مرفوض",
         "completed": "مكتمل",
-        "expired": "منتهي",
-        "cancelled": "ملغي",
+        "expired": "منتهٍ",
+        "cancelled": "ملغى",
         "failed": "فاشل",
         "inProgress": "قيد التنفيذ",
         "draft": "مسودة",
@@ -533,11 +537,11 @@ export const ar = {
         "perHour": "/ ساعة",
         "school": "مدرسة",
         "approved": "معتمد",
-        "deleting": "جاري الحذف",
+        "deleting": "جارٍ الحذف",
         "user": "المستخدم",
         "avatar": "صورة رمزية",
         "notAvailable": "غير متوفر",
-        "admin": "أدمن",
+        "admin": "مدير",
         "invalidDate": "تاريخ غير صحيح",
         "currencySymbol": "العملة",
         "months": {
@@ -557,13 +561,13 @@ export const ar = {
         "days": "أيام",
         "hours": "ساعات",
         "remove": "إزالة",
-        "sending": "جاري الإرسال...",
+        "sending": "جارٍ الإرسال...",
         "showing": "عرض"
     },
     "roles": {
         "system_supervisor": "مشرف النظام",
         "school_support_coordinator": "منسق دعم المؤسسات التعليمية",
-        "admin": "أدمن",
+        "admin": "مدير",
         "teacher": "معلم",
         "student": "طالب",
         "school": "مدرسة",
@@ -600,16 +604,16 @@ export const ar = {
         },
         "emailNotVerified": "بريدك الإلكتروني غير مفعّل. يرجى التحقق من بريدك.",
         "actions": {
-            "saving": "جاري الحفظ...",
+            "saving": "جارٍ الحفظ...",
             "saveChanges": "حفظ التغييرات",
             "edit": "تعديل",
             "cancel": "إلغاء",
             "savedSuccess": "تم حفظ التغييرات بنجاح",
             "imageSavedSuccess": "تم رفع الصورة بنجاح",
-            "uploadingImage": "جاري رفع الصورة...",
+            "uploadingImage": "جارٍ رفع الصورة...",
             "updatePassword": "تحديث كلمة المرور",
             "deleteAccount": "حذف الحساب",
-            "deleting": "جاري الحذف...",
+            "deleting": "جارٍ الحذف...",
             "confirmDeleteAccount": "حذف الحساب"
         },
         "password": {
@@ -655,7 +659,7 @@ export const ar = {
                 "qualifications": "المؤهلات",
                 "experienceYears": "سنوات الخبرة",
                 "educationType": "نوع التعليم",
-                "pricePerHourAed": "السعر في الساعة (درهم إماراتي)",
+                "pricePerHourAed": "السعر بالساعة (درهم إماراتي)",
                 "curriculumType": "نوع المنهاج",
                 "teachingLanguage": "لغة التدريس",
                 "city": "الإمارة"
@@ -693,13 +697,25 @@ export const ar = {
                 "british": "بريطانية",
                 "american": "أمريكية",
                 "ib": "IB",
-                "uaeMinistry": "التربية والتعليم (اماراتي)"
+                "uaeMinistry": "التربية والتعليم (إماراتي)"
             }
         },
         "alerts": {
             "imageUploadError": "خطأ في رفع الصورة: {message}",
             "saveDataErrorTitle": "حدث خطأ أثناء حفظ البيانات:"
         }
+    },
+    "initiativesPage": {
+        "title": "المبادرات",
+        "subtitle": "خصومات وفعاليات ورحلات متاحة لك",
+        "mySchool": "مبادرات مدرستي",
+        "global": "مبادرات عامة",
+        "noSchoolInitiatives": "لا توجد مبادرات من مدرستك حالياً",
+        "noGlobalInitiatives": "لا توجد مبادرات عامة حالياً"
+    },
+    "studentDigitalCard": {
+        "title": "البطاقة الرقمية",
+        "viewRewards": "عرض المكافآت"
     },
     "studentProfilePage": {
         "pageTitle": "الملف الشخصي - {appName}",
@@ -813,7 +829,7 @@ export const ar = {
         "viewDetails": "عرض التفاصيل",
         "active": "نشط",
         "upcoming": "قادم",
-        "past": "منتهي",
+        "past": "منتهٍ",
         "goal": "الهدف",
         "category": "الفئة",
         "joinNow": "شارك الآن",
@@ -827,7 +843,7 @@ export const ar = {
         "specialReward": "مكافأة خاصة",
         "assignedReward": "المكافأة الممنوحة",
         "manageParticipants": "إدارة المشاركين",
-        "viewAllSubmissions": "عرض جميع التقديمات",
+        "viewAllSubmissions": "عرض جميع التسليمات",
         "start": "بداية",
         "end": "نهاية",
         "challenge": "التحدي",
@@ -841,7 +857,7 @@ export const ar = {
         "applyFilters": "تطبيق الفلاتر",
         "status": "الحالة",
         "challengeType": "نوع التحدي",
-        "finished": "منتهي",
+        "finished": "منتهٍ",
         "noChallenges": "لا توجد تحديات تطابق معايير البحث",
         "noChallengesStudent": "لا توجد تحديات متاحة لمدرستك حالياً",
         "noChallengesTeacher": "لا توجد تحديات متاحة لمدرستك أو التي أنشأتها",
@@ -859,11 +875,11 @@ export const ar = {
         "technical": "فني",
         "heritage": "تراثي",
         "environmental": "بيئي",
-        "cognitive": "تحدّي معرفي",
-        "applied": "تحدّي تطبيقي",
-        "creative": "تحدّي إبداعي",
+        "cognitive": "تحدٍ معرفي",
+        "applied": "تحدٍ تطبيقي",
+        "creative": "تحدٍ إبداعي",
         "artisticCreative": "إبداعي فني",
-        "collaborative": "تحدّي تعاوني",
+        "collaborative": "تحدٍ تعاوني",
         "analytical": "تحليلي",
         "technological": "تكنولوجي",
         "behavioral": "سلوكي",
@@ -936,7 +952,7 @@ export const ar = {
     },
     "badges": {
         "title": "الشارات",
-        "myBadges": "شاراتيا",
+        "myBadges": "شاراتي",
         "allBadges": "جميع الشارات",
         "earned": "مكتسبة",
         "locked": "مقفل",
@@ -984,7 +1000,7 @@ export const ar = {
         "switchToArabicShort": "ع"
     },
     "hero": {
-        "title": "نحن معا نحو التقدم والتطور",
+        "title": "نحن معاً نحو التقدم والتطور",
         "subtitle": "مشاريع إبداعية في كل المجالات",
         "startJourney": "ابدأ رحلتك معنا",
         "goToDashboard": "اذهب إلى لوحة التحكم",
@@ -1041,7 +1057,7 @@ export const ar = {
             "topBarTitle": "تسليم عمل",
             "blockedToast": "التسليم غير متاح في الوضع الحالي.",
             "success": "تم إرسال عملك بنجاح.",
-            "uploading": "جاري الرفع…",
+            "uploading": "جارٍ الرفع…",
             "submit": "إرسال العمل",
             "dropzoneHint": "اسحب الملفات هنا أو انقر للاختيار",
             "dropzoneTypes": "صور أو فيديو أو PDF أو ملفات Word أو ملفات مضغوطة (بحد أقصى 10 ميجابايت لكل ملف)",
@@ -1168,7 +1184,7 @@ export const ar = {
                 "report": "تقرير"
             }
         },
-        "publicationsSubtitle": "اكتشف محتوى مبتكر من الطلاب والمعلمين: مجلات، كتيبات وتقارير تعرض إبداع مؤسسات تعليميةنا.",
+        "publicationsSubtitle": "اكتشف محتوى مبتكر من الطلاب والمعلمين: مجلات، كتيبات وتقارير تعرض إبداع مؤسساتنا التعليمية.",
         "cta": {
             "title": "ابدأ رحلتك مع إرث المبتكرين!",
             "description": "انضم إلى مجتمع المبتكرين والموهوبين، شارك مشاريعك الإبداعية، وكن جزءاً من التحديات التعليمية المثيرة.",
@@ -1196,7 +1212,7 @@ export const ar = {
             "question2": "كيف أحصل على الشارات والنقاط؟",
             "answer2": "تحصل على الشارات والنقاط عند مشاركة المشاريع، المشاركة في التحديات، تحقيق مراكز متقدمة، أو عند إنجازات معينة. كل شارة لها متطلباتها الخاصة من النقاط أو الإنجازات.",
             "question3": "كيف يمكنني المشاركة في التحديات؟",
-            "answer3": "تصفح قائمة التحديات النشطة، اختر التحدي المناسب لفئتك العمرية ومجال اهتمامك، ثم قم برفع مشروعك المرتبط بالتحدي. يجب أن يتم التقديم قبل الموعد النهائي للتحدي.",
+            "answer3": "تصفح قائمة التحديات النشطة، اختر التحدي المناسب لفئتك العمرية ومجال اهتمامك، ثم قم برفع مشروعك المرتبط بالتحدي. يجب أن يتم التسليم قبل الموعد النهائي للتحدي.",
             "question4": "ما هي الباقات المتاحة وكيف يمكنني الاشتراك؟",
             "answer4": "نوفر باقات متنوعة للمؤسسات التعليمية والطلاب (شهرية، ربع سنوية، سنوية). كل باقة توفر ميزات مختلفة مثل عدد المشاريع المسموح بها، عدد التحديات، إمكانية الحصول على شهادات، وغيرها. يمكنك الاشتراك من صفحة الباقات."
         },
@@ -1295,11 +1311,7 @@ export const ar = {
         "stats": {
             "title": "أرقام تثبت نجاحنا!",
             "subtitle": "مجتمع المبتكرين والموهوبين ينمو يومياً على منصة إرث المبتكرين.",
-            "loading": "جاري تحميل الإحصائيات..."
-        },
-        "testimonials": {
-            "title": "قصص من مجتمعنا",
-            "subtitle": "تجارب حقيقية من طلابنا ومعلمينا ومبتكرينا"
+            "loading": "جارٍ تحميل الإحصائيات..."
         }
     },
     "quickLinks": {
@@ -1339,7 +1351,7 @@ export const ar = {
             "draft": "مسودة",
             "active": "نشط",
             "completed": "مكتمل",
-            "cancelled": "ملغي"
+            "cancelled": "ملغى"
         },
         "difficultyLevels": {
             "easy": "سهل",
@@ -1402,7 +1414,7 @@ export const ar = {
         "teacherAccess": "للوصول إلى لوحة المعلم",
         "schoolAccess": "للوصول إلى لوحة المدرسة",
         "institutionAccess": "للوصول إلى لوحة المؤسسة التعليمية",
-        "loggingIn": "جاري تسجيل الدخول...",
+        "loggingIn": "جارٍ تسجيل الدخول...",
         "noAccount": "ليس لديك حساب؟",
         "createAccountAs": "إنشاء حساب كـ",
         "createAsStudent": "إنشاء حساب كطالب",
@@ -1413,9 +1425,15 @@ export const ar = {
         "noInstitutions": "تحذير: لا توجد مؤسسات تعليمية مسجلة في النظام",
         "contactAdmin": "يرجى التواصل مع الإدارة لإنشاء حساب مدرسة أولاً",
         "schoolRequired": "يجب أن تكون هناك مدرسة مسجلة في النظام أولاً. يرجى التواصل مع الإدارة.",
+        "grade": "الصف الدراسي",
+        "selectGrade": "اختر الصف",
+        "section": "الشعبة",
+        "sectionPlaceholder": "مثال: أ",
+        "subjects": "المواد الدراسية",
+        "joiningViaInvite": "تنضم كـ{role} إلى {school} عبر كود دعوة صالح.",
         "fixErrors": "يرجى تصحيح الأخطاء التالية:",
         "phoneInUseMessage": "مسجل لمستخدم آخر",
-        "creating": "جاري إنشاء الحساب...",
+        "creating": "جارٍ إنشاء الحساب...",
         "aiConsentLabel": "أوافق على معالجة بياناتي لتشغيل ميزات الذكاء الاصطناعي بالمنصة (التوصيات، التقارير، توليد المحتوى)، وفق",
         "aiConsentLinkText": "سياسة أخلاقيات وحوكمة الذكاء الاصطناعي",
         "hasAccount": "لديك حساب بالفعل؟",
@@ -1425,12 +1443,12 @@ export const ar = {
         "resetPasswordSubtitle": "أدخل كلمة المرور الجديدة",
         "newPassword": "كلمة المرور الجديدة",
         "updatePassword": "تحديث كلمة المرور",
-        "updating": "جاري التحديث...",
+        "updating": "جارٍ التحديث...",
         "confirmPasswordTitle": "تأكيد كلمة المرور",
         "confirmPasswordDescription": "هذه منطقة آمنة من التطبيق. يرجى تأكيد كلمة المرور للمتابعة.",
-        "confirming": "جاري التأكيد...",
+        "confirming": "جارٍ التأكيد...",
         "resetPasswordLink": "إرسال رمز التحقق",
-        "sending": "جاري الإرسال...",
+        "sending": "جارٍ الإرسال...",
         "backToLogin": "العودة لتسجيل الدخول",
         "enterEmail": "البريد الإلكتروني",
         "otpVerificationTitle": "التحقق من رمز إعادة تعيين كلمة المرور",
@@ -1439,7 +1457,7 @@ export const ar = {
         "emailLabel": "البريد الإلكتروني:",
         "otpVerificationErrorTitle": "يرجى تصحيح الأخطاء التالية:",
         "otpInputLabel": "أدخل رمز التحقق المكون من 6 أرقام",
-        "verifying": "جاري التحقق...",
+        "verifying": "جارٍ التحقق...",
         "verifyCode": "التحقق من الرمز",
         "resendCode": "إعادة الإرسال",
         "otpInstructions": "تم إرسال رمز مكون من 6 أرقام إلى بريدك الإلكتروني.",
@@ -1459,6 +1477,7 @@ export const ar = {
         "otpTimeLimitRegister": "يرجى إدخاله خلال 10 دقائق لإكمال إنشاء الحساب."
     },
     "dashboard": {
+        "indexes": "المؤشرات",
         "welcome": "مرحباً",
         "dashboard": "لوحة التحكم",
         "studentDashboard": "لوحة تحكم الطالب",
@@ -1499,8 +1518,8 @@ export const ar = {
         "messages": "الرسائل",
         "myCourses": "كورساتي",
         "mySubjects": "موادي",
-        "myStudents": "طلابيا",
-        "myTeachers": "معلميا",
+        "myStudents": "طلابي",
+        "myTeachers": "معلمي",
         "progress": "التقدم",
         "completion": "الإكمال",
         "started": "بدأت",
@@ -1538,7 +1557,7 @@ export const ar = {
         "sort": "ترتيب",
         "search": "بحث",
         "refresh": "تحديث",
-        "loading": "جاري التحميل...",
+        "loading": "جارٍ التحميل...",
         "noData": "لا توجد بيانات",
         "error": "حدث خطأ",
         "success": "تم بنجاح",
@@ -1631,7 +1650,7 @@ export const ar = {
         "creditCard": "بطاقة ائتمان",
         "paypal": "باي بال",
         "applePay": "أبل باي",
-        "googlePay": "جوجول باي",
+        "googlePay": "جوجل باي",
         "bankTransfer": "تحويل بنكي",
         "cash": "نقداً",
         "free": "مجاني",
@@ -1767,7 +1786,7 @@ export const ar = {
         "supportedFormats": "الصيغ المدعومة",
         "uploadFailed": "فشل الرفع",
         "uploadSuccess": "تم الرفع بنجاح",
-        "sending": "جاري الإرسال...",
+        "sending": "جارٍ الإرسال...",
         "sentSuccess": "تم الإرسال بنجاح",
         "sendFailed": "فشل الإرسال",
         "schedule": "جدولة",
@@ -1823,7 +1842,7 @@ export const ar = {
         "boolean": "{attribute} يجب أن يكون صح أو خطأ",
         "confirmed": "{attribute} لا يتطابق مع التأكيد",
         "date": "{attribute} ليس تاريخاً صالحاً",
-        "dateFormat": "{attribute} لا يتطابق مع формат {format}",
+        "dateFormat": "{attribute} لا يتطابق مع الصيغة {format}",
         "different": "{attribute} و{other} يجب أن يكونا مختلفين",
         "digits": "{attribute} يجب أن يكون {digits} أرقام",
         "digitsBetween": "{attribute} يجب أن يكون بين {min} و{max} أرقام",
@@ -1858,7 +1877,7 @@ export const ar = {
         "requiredUnless": "{attribute} مطلوب ما لم يكن {other} في {values}",
         "requiredWith": "{attribute} مطلوب عند وجود {values}",
         "requiredWithout": "{attribute} مطلوب عند عدم وجود {values}",
-        "requiredWithoutAll": "{attribute} مطلوب عند عدم وجود أياً من {values}",
+        "requiredWithoutAll": "{attribute} مطلوب عند عدم وجود أيٍّ من {values}",
         "same": "{attribute} و{other} يجب أن يتطابقا",
         "size": "{attribute} يجب أن يكون {size}",
         "string": "{attribute} يجب أن يكون نصاً",
@@ -1956,6 +1975,14 @@ export const ar = {
         "projects": "المشاريع",
         "submissions": "التسليمات",
         "reviewProjects": "مراجعة المشاريع",
+        "inviteCodes": "أكواد الدعوة",
+        "initiatives": "المبادرات",
+        "schoolAnalytics": "تحليلات الابتكار",
+        "rubrics": "معايير التقييم (Rubrics)",
+        "rubricLibrary": "مكتبة المعايير الوطنية",
+        "nationalLevels": "المستويات الوطنية",
+        "referenceStandards": "المرجعيات والمعايير",
+        "academicStructure": "المناهج والمواد",
         "myProjects": "مشاريعي",
         "createProject": "إنشاء مشروع",
         "publications": "مقالات",
@@ -2014,7 +2041,7 @@ export const ar = {
     "reviews": {
         "editReply": "تعديل الرد",
         "replyToReview": "رد على التقييم",
-        "sending": "جاري الإرسال...",
+        "sending": "جارٍ الإرسال...",
         "send": "إرسال",
         "reply": "رد"
     },
@@ -2023,12 +2050,12 @@ export const ar = {
         "approved": "مؤكد",
         "confirmed": "مؤكد",
         "rejected": "مرفوض",
-        "cancelled": "ملغي",
+        "cancelled": "ملغى",
         "completed": "مكتمل"
     },
     "school": {
         "science": "علوم",
-        "technology": "تقني",
+        "technology": "تقنية",
         "engineering": "هندسة",
         "mathematics": "رياضيات",
         "arts": "فنون",
@@ -2069,7 +2096,7 @@ export const ar = {
         "challengeMinParticipants": "الحد الأدنى: {count}",
         "challengeMinPoints": "الحد الأدنى: {points}",
         "challengeJoinNow": "شارك الآن",
-        "viewSubmissionButton": "عرض التقديم",
+        "viewSubmissionButton": "عرض التسليم",
         "noProjectsTitle": "لا توجد مشاريع بعد",
         "noProjectsDescription": "ابدأ رحلتك الإبداعية برفع مشروعك الأول.",
         "noActiveChallengesTitle": "لا توجد تحديات نشطة",
@@ -2099,7 +2126,7 @@ export const ar = {
         "suggestModalSubmit": "إرسال"
     },
     "submissionStatuses": {
-        "submitted": "مُسلم",
+        "submitted": "مُسلَّم",
         "reviewed": "تم المراجعة",
         "approved": "مقبول",
         "rejected": "مرفوض"
@@ -2173,8 +2200,8 @@ export const ar = {
         },
         "backToBookings": "العودة إلى حجوزاتي",
         "retry": "إعادة المحاولة",
-        "redirectHeader": "جاري التحويل",
-        "redirectTitle": "جاري تحويلك إلى بوابة تمارا",
+        "redirectHeader": "جارٍ التحويل",
+        "redirectTitle": "جارٍ تحويلك إلى بوابة تمارا",
         "redirectDescriptionBefore": "انتظر لحظات وسيتم فتح صفحة الدفع الآمنة. إذا لم يتم التحويل تلقائياً، يمكنك العودة إلى",
         "redirectDescriptionAfter": ".",
         "successHeader": "تم الدفع بنجاح",
@@ -2229,7 +2256,7 @@ export const ar = {
         "pageTitle": "بطاقة عضوية المتجر - {appName}",
         "title": "بطاقة عضوية المتجر",
         "banner": {
-            "title": "إربح مع كل إنجاز!",
+            "title": "اربح مع كل إنجاز!",
             "subtitle": "كلما ارتفع مستواك، زادت المزايا والهدايا."
         },
         "currentBalanceTitle": "رصيدك الحالي",
@@ -2240,6 +2267,15 @@ export const ar = {
         "redeemButton": "استبدل النقاط",
         "redeemHint": "يتم خصم النقاط تلقائياً وإرسال الهدية إلى حسابك أو بريدك.",
         "redeemHintManual": "هذه المكافأة تتطلب موافقة يدوية: يُرسل طلبك إلى مدرستك ومعلمك. تُخصم النقاط فقط بعد موافقة الإدارة.",
+        "comingSoon": {
+            "badge": "قريباً",
+            "hint": "ميزة استبدال النقاط قيد التجهيز حالياً.",
+            "explanation": "نعمل حالياً على إتمام الشراكة الرسمية مع مزودي الجوائز (مثل برنامج فزعة) لضمان تسليم موثوق لجميع الهدايا. ستُفعَّل ميزة الاستبدال فور اكتمال هذا التكامل.",
+            "notifyButton": "أعلمني عند التفعيل",
+            "notifyRegistered": "سنُعلمك عند التفعيل",
+            "notifySuccess": "تم تسجيل رغبتك، سنُعلمك فور تفعيل الميزة.",
+            "notifyError": "تعذر تسجيل طلبك، حاول مرة أخرى."
+        },
         "itemStatuses": {
             "almostThere": "قريب جداً!",
             "bookNow": "احجز الآن",
@@ -2305,11 +2341,32 @@ export const ar = {
         "addCommentPlaceholder": "أضف تعليق...",
         "evaluationNotesTitle": "ملاحظات تقييمية",
         "evaluationNotesPlaceholder": "أضف ملاحظات حول المشروع...",
-        "saving": "جاري الحفظ...",
+        "saving": "جارٍ الحفظ...",
         "saveEvaluation": "حفظ التقييم",
         "submittedProjectsTitle": "المشاريع المقدمة",
         "unknownSubmissionProject": "مشروع غير محدد",
         "unknownSubmissionStudent": "طالب غير محدد",
+        "rubricEvaluation": {
+            "title": "شرح مؤشرات الأداء",
+            "emptyHint": "لم يتم توليد شرح لمؤشرات الأداء لهذا التسليم بعد. إن لم يكن للمشروع معيار تقييم مخصص، سيعتمد النظام تلقائياً على المعايير الوطنية العامة.",
+            "usingDefaultStandards": "قيد الاستخدام: المعايير الوطنية العامة (QFEmirates) — لم يُرفق معيار تقييم مخصص لهذا المشروع",
+            "generateButton": "توليد شرح بالذكاء الاصطناعي",
+            "regenerateButton": "إعادة التوليد",
+            "generating": "جارٍ التوليد...",
+            "saveDraft": "حفظ كمسودة",
+            "releaseButton": "حفظ ونشر للطالب",
+            "saving": "جارٍ الحفظ...",
+            "draft": "مسودة — غير مرئية للطالب",
+            "released": "منشور للطالب",
+            "overallScore": "الدرجة الموزونة الإجمالية: {score}",
+            "nextLevel": "للوصول إلى مستوى \"{level}\" التالي، راجع الشرح أدناه.",
+            "editedByTeacher": "عدّله المعلم",
+            "generateSuccess": "تم توليد شرح مؤشرات الأداء بنجاح.",
+            "generateError": "تعذر توليد الشرح. تأكد من إرفاق معيار تقييم (Rubric) بالمشروع وحاول مرة أخرى.",
+            "saveSuccess": "تم حفظ التعديلات.",
+            "saveError": "تعذر حفظ التعديلات. حاول مرة أخرى.",
+            "releaseSuccess": "تم نشر الشرح للطالب بنجاح."
+        },
         "table": {
             "year": "السنة",
             "student": "الطالب",
@@ -2329,7 +2386,7 @@ export const ar = {
         "empty": "لا توجد تسليمات لهذا التحدي",
         "table": {
             "student": "الطالب",
-            "submittedAt": "تاريخ التقديم",
+            "submittedAt": "تاريخ التسليم",
             "status": "الحالة",
             "rating": "التقييم",
             "actions": "الإجراءات"
@@ -2465,6 +2522,8 @@ export const ar = {
         "publishArticleSubtitle": "سلّط الضوء على أعمالك وتفكيرك",
         "createChallengeTitle": "أنشئ تحدياً",
         "createChallengeSubtitle": "ادعُ المجتمع لتصميم حلول",
+        "manageRubricsTitle": "معايير التقييم",
+        "manageRubricsSubtitle": "أنشئ وخصص معايير تقييم مشاريعك",
         "recentProjectsTitle": "أحدث المشاريع",
         "noRecentProjects": "لا توجد مشاريع حديثة",
         "createProjectAction": "أضف مشروعاً",
@@ -2573,6 +2632,65 @@ export const ar = {
             "description": "أفادت الدراسات أن المسابقات الودية تزيد من معدل إنتاجية الابتكار بنسبة 40%. اختر موضوعًا شيقًا وابدأ التحدي الآن."
         }
     },
+    "teacherRubricsPage": {
+        "pageTitle": "معايير التقييم - {appName}",
+        "title": "معايير التقييم (Rubrics)",
+        "subtitle": "أنشئ وخصص معايير تقييم المشاريع، واختر من المكتبة الجاهزة أو أنشئ معاييرك الخاصة.",
+        "newRubric": "+ معيار تقييم جديد",
+        "scopeClass": "مستوى الصف",
+        "scopeTeacher": "مستوى المعلم",
+        "criteriaCount": "{count} معيار",
+        "projectsCount": "{count} مشروع",
+        "archiveAction": "أرشفة",
+        "archiveSuccess": "تمت أرشفة معيار التقييم",
+        "archiveError": "تعذر أرشفة معيار التقييم",
+        "archiveConfirm": {
+            "title": "أرشفة معيار التقييم؟",
+            "message": "هل أنت متأكد من أرشفة \"{name}\"؟ ستحتفظ المشاريع التي استخدمته بمعايير تقييمها الحالية."
+        },
+        "empty": {
+            "title": "لا توجد معايير تقييم بعد",
+            "description": "أنشئ أول معيار تقييم لربطه بمشاريعك القادمة وتفعيل التقييم الآلي بالذكاء الاصطناعي.",
+            "action": "+ إنشاء معيار تقييم"
+        },
+        "builder": {
+            "pageTitle": "إنشاء معيار تقييم - {appName}",
+            "createTitle": "إنشاء معيار تقييم جديد",
+            "editTitle": "تعديل معيار التقييم",
+            "subtitle": "حدد المعايير ومستويات الإتقان، ثم احفظ لربطه بمشاريعك.",
+            "basicInfo": "المعلومات الأساسية",
+            "nameAr": "الاسم (بالعربية)",
+            "nameEn": "الاسم (بالإنجليزية)",
+            "descriptionAr": "الوصف (بالعربية)",
+            "descriptionEn": "الوصف (بالإنجليزية)",
+            "scopeLabel": "نطاق الاستخدام",
+            "scopeTeacherHint": "يظهر هذا المعيار كخيار متاح عند إنشاء أي مشروع من مشاريعك.",
+            "scopeClassHint": "يقتصر هذا المعيار على صف ومادة محددين.",
+            "grade": "الصف",
+            "gradePlaceholder": "مثال: الصف السادس",
+            "subject": "المادة",
+            "subjectPlaceholder": "مثال: العلوم",
+            "criteriaTitle": "المعايير (مؤشرات الأداء)",
+            "totalWeight": "مجموع الأوزان: {total}%",
+            "quickStart": "بداية سريعة: أضف كل معايير المكتبة",
+            "browseLibrary": "تصفح المكتبة",
+            "addCustom": "معيار مخصص جديد",
+            "defaultWeight": "الوزن الافتراضي: {weight}%",
+            "criterionNamePlaceholder": "اسم المعيار",
+            "editLevels": "تعديل المستويات",
+            "performanceLevels": "مستويات الإتقان",
+            "addLevel": "إضافة مستوى",
+            "levelNameAr": "اسم المستوى (عربي)",
+            "levelNameEn": "اسم المستوى (إنجليزي)",
+            "score": "الدرجة",
+            "levelDescAr": "وصف المستوى (عربي)",
+            "levelDescEn": "وصف المستوى (إنجليزي)",
+            "noCriteria": "لم تتم إضافة أي معيار بعد. استخدم البداية السريعة أو أضف معياراً مخصصاً.",
+            "save": "حفظ معيار التقييم",
+            "saveSuccess": "تم حفظ معيار التقييم بنجاح",
+            "saveError": "تعذر حفظ معيار التقييم. تحقق من البيانات المدخلة."
+        }
+    },
     "teacherProjectsCreatePage": {
         "pageTitle": "رفع المشروع - {appName}",
         "tabs": {
@@ -2595,6 +2713,9 @@ export const ar = {
             "categoryLabel": "فئة المشروع",
             "schoolLabel": "المدرسة",
             "schoolPlaceholder": "اختر مدرسة (اختياري)",
+            "rubricLabel": "معيار التقييم (Rubric)",
+            "rubricPlaceholder": "بدون معيار تقييم مخصص (اختياري)",
+            "createRubricLink": "+ إنشاء معيار تقييم جديد",
             "filesLabel": "الملفات",
             "dropzoneTitle": "اسحب وأفلت الملفات هنا أو انقر للاختيار",
             "dropzoneSubtitle": "صور، فيديو، PDF (الحد الأقصى: 10 ميجابايت لكل ملف)",
@@ -2607,7 +2728,7 @@ export const ar = {
             "title": "مساعد الذكاء الاصطناعي للمشاريع",
             "description": "اكتب فكرة مبسطة وسيقوم المساعد بتوليد عنوان احترافي، وصف شامل، وتحديد الفئة وصورة غلاف مناسبة.",
             "placeholder": "مثال: مشروع عن تدوير البلاستيك في المدرسة...",
-            "generating": "جاري التوليد...",
+            "generating": "جارٍ التوليد...",
             "generateButton": "توليد تفاصيل المشروع",
             "ideaRequired": "يرجى إدخال فكرة المشروع أولاً.",
             "error": "حدث خطأ أثناء توليد تفاصيل المشروع",
@@ -2657,7 +2778,7 @@ export const ar = {
         },
         "actions": {
             "chooseFiles": "اختر ملفات",
-            "uploading": "جاري الرفع...",
+            "uploading": "جارٍ الرفع...",
             "uploadProject": "رفع المشروع",
             "completeProjectInfo": "إكمال بيانات المشروع",
             "backToFiles": "العودة للملفات"
@@ -2688,14 +2809,14 @@ export const ar = {
         "viewFile": "عرض الملف",
         "addNewFilesLabel": "إضافة ملفات جديدة",
         "statusWarning": "لا يمكن تعديل المشروع بعد الموافقة عليه أو رفضه",
-        "updating": "جاري التحديث...",
+        "updating": "جارٍ التحديث...",
         "saveChanges": "حفظ التعديلات"
     },
     "schoolDashboardPage": {
         "pageTitle": "لوحة تحكم المدرسة - {appName}",
         "openTeachers": "إدارة المعلمين",
         "totalProjects": "إجمالي المشاريع",
-        "approvedShort": "موافق",
+        "approvedShort": "معتمدة",
         "pendingReviewShort": "قيد المراجعة",
         "totalStudents": "عدد الطلاب",
         "studentsWithProjects": "{count} لديهم مشاريع",
@@ -2855,14 +2976,14 @@ export const ar = {
     },
     "adminLoginPage": {
         "pageTitle": "تسجيل دخول الإدارة - {appName}",
-        "title": "تسجيل دخول الأدمن",
+        "title": "تسجيل دخول المدير",
         "emailLabel": "البريد الإلكتروني",
         "passwordLabel": "كلمة المرور",
         "emailPlaceholder": "admin@example.com",
         "passwordPlaceholder": "••••••••",
         "togglePassword": "إظهار أو إخفاء كلمة المرور",
         "rememberMe": "تذكرني",
-        "loggingIn": "جاري تسجيل الدخول...",
+        "loggingIn": "جارٍ تسجيل الدخول...",
         "loginButton": "تسجيل الدخول"
     },
     "adminPaymentsPage": {
@@ -2902,7 +3023,7 @@ export const ar = {
             "processing": "قيد المعالجة",
             "completed": "مكتمل",
             "failed": "فشل",
-            "cancelled": "ملغي",
+            "cancelled": "ملغى",
             "refunded": "مسترد"
         },
         "methods": {
@@ -2946,7 +3067,7 @@ export const ar = {
     },
     "studentChallengesIndexPage": {
         "pageTitle": "التحديات - {appName}",
-        "searchPlaceholder": "ابحث عن التحديات ..",
+        "searchPlaceholder": "ابحث عن التحديات...",
         "filterOptions": "خيارات الفلترة",
         "count": "{count} تحديات",
         "empty": "لا توجد تحديات تطابق معايير البحث",
@@ -2957,10 +3078,10 @@ export const ar = {
         },
         "deadlineLabel": "الموعد النهائي: {date}",
         "status": {
-            "finished": "منتهي"
+            "finished": "منتهٍ"
         },
         "submissionStatuses": {
-            "submitted": "تم التقديم",
+            "submitted": "تم التسليم",
             "reviewed": "قيد المراجعة",
             "approved": "مقبول",
             "rejected": "مرفوض"
@@ -3013,8 +3134,8 @@ export const ar = {
         },
         "tabs": {
             "details": "التفاصيل",
-            "submitSolution": "تقديم الحل",
-            "updateSubmission": "تحديث التقديم"
+            "submitSolution": "تسليم الحل",
+            "updateSubmission": "تحديث التسليم"
         },
         "sections": {
             "objective": "الهدف",
@@ -3022,7 +3143,7 @@ export const ar = {
             "howTo": "كيفية التنفيذ"
         },
         "submissionStatus": {
-            "title": "حالة التقديم",
+            "title": "حالة التسليم",
             "rating": "التقييم",
             "pointsEarned": "النقاط المكتسبة",
             "reviewerNotes": "ملاحظات المقيّم"
@@ -3038,7 +3159,7 @@ export const ar = {
         },
         "actions": {
             "chooseFiles": "اختر ملفات",
-            "sending": "جاري الإرسال..."
+            "sending": "جارٍ الإرسال..."
         },
         "errors": {
             "fileTooLarge": "الملف {name} أكبر من 10 ميجابايت",
@@ -3088,7 +3209,7 @@ export const ar = {
             "pending": "في الانتظار",
             "approved": "موافق عليه",
             "rejected": "مرفوض",
-            "cancelled": "ملغي",
+            "cancelled": "ملغى",
             "completed": "مكتمل",
             "unknown": "غير معروف"
         },
@@ -3114,7 +3235,7 @@ export const ar = {
             "reject": "رفض"
         },
         "table": {
-            "bookingNumber": "رقم الطلب",
+            "bookingNumber": "رقم الحجز",
             "paymentStatus": "حالة الدفع"
         },
         "deleteConfirm": {
@@ -3157,10 +3278,10 @@ export const ar = {
         },
         "actions": {
             "addNew": "إضافة مشروع جديد",
-            "deleting": "جاري الحذف...",
+            "deleting": "جارٍ الحذف...",
             "update": "تحديث",
-            "updating": "جاري التحديث...",
-            "saving": "جاري الحفظ..."
+            "updating": "جارٍ التحديث...",
+            "saving": "جارٍ الحفظ..."
         },
         "emptyState": "لا توجد مشاريع",
         "pagination": {
@@ -3205,7 +3326,7 @@ export const ar = {
             "title": "التقييم بالذكاء الاصطناعي",
             "generateButton": "قيّم المشروع",
             "regenerateButton": "إعادة التقييم",
-            "evaluating": "جاري التقييم...",
+            "evaluating": "جارٍ التقييم...",
             "hint": "اضغط \"قيّم المشروع\" ليحلّل الذكاء الاصطناعي المشروع ويقترح درجة وتوصية تساعدك في قرار المراجعة.",
             "strengthsTitle": "نقاط القوة",
             "weaknessesTitle": "نقاط تحتاج تحسيناً",
@@ -3324,8 +3445,8 @@ export const ar = {
         },
         "subscriptionStatus": {
             "active": "نشط",
-            "expired": "منتهي",
-            "cancelled": "ملغي"
+            "expired": "منتهٍ",
+            "cancelled": "ملغى"
         },
         "paymentStatus": {
             "completed": "مكتمل",
@@ -3530,7 +3651,7 @@ export const ar = {
             "submittedAt": "تاريخ التسليم",
             "yourComment": "تعليقك",
             "status": {
-                "submitted": "مُسلم",
+                "submitted": "مُسلَّم",
                 "reviewed": "تمت المراجعة",
                 "approved": "مقبول",
                 "rejected": "مرفوض",
@@ -3545,6 +3666,10 @@ export const ar = {
             "badgeFallback": "شارة #{id}",
             "reviewedAt": "تم التقييم في"
         },
+        "rubricEvaluation": {
+            "title": "شرح مؤشرات الأداء",
+            "nextLevel": "للوصول إلى مستوى \"{level}\" التالي، راجع الشرح أعلاه."
+        },
         "form": {
             "commentLabel": "تعليق (اختياري)",
             "commentPlaceholder": "اكتب تعليقاً على تسليمك...",
@@ -3556,7 +3681,7 @@ export const ar = {
         },
         "actions": {
             "chooseFiles": "اختر ملفات",
-            "submitting": "جاري التسليم...",
+            "submitting": "جارٍ التسليم...",
             "submitProject": "تسليم المشروع",
             "updateSubmission": "تحديث التسليم"
         },
@@ -3564,7 +3689,7 @@ export const ar = {
             "replyTitle": "رد على التعليق",
             "addTitle": "إضافة تعليق",
             "placeholder": "اكتب تعليقك...",
-            "sending": "جاري الإرسال...",
+            "sending": "جارٍ الإرسال...",
             "sendReply": "إرسال الرد",
             "sendComment": "إرسال التعليق",
             "replyAction": "رد",
@@ -3672,7 +3797,7 @@ export const ar = {
             "more": "ميزات إضافية"
         },
         "actions": {
-            "processing": "جاري المعالجة...",
+            "processing": "جارٍ المعالجة...",
             "renew": "تجديد الاشتراك",
             "subscribe": "اشترك الآن",
             "subscribeNow": "اشترك الآن",
@@ -3722,9 +3847,9 @@ export const ar = {
             "cancelled": "ملغاة"
         },
         "duration": {
-            "monthly": "شهر",
+            "monthly": "شهري",
             "quarterly": "ربع سنوي",
-            "yearly": "سنة"
+            "yearly": "سنوي"
         }
     },
     "teacherDashboardProfilePage": {
@@ -3771,7 +3896,7 @@ export const ar = {
             "changeImage": "تغيير الصورة",
             "editProfile": "تعديل الملف",
             "cancelEdit": "إلغاء التعديل",
-            "saving": "جاري الحفظ..."
+            "saving": "جارٍ الحفظ..."
         },
         "badges": {
             "verified": "معتمد",
@@ -3795,7 +3920,7 @@ export const ar = {
         "contractStatus": {
             "active": "نشط",
             "inactive": "غير نشط",
-            "expired": "منتهي",
+            "expired": "منتهٍ",
             "pending": "قيد الانتظار"
         },
         "nationalities": {
@@ -3962,7 +4087,7 @@ export const ar = {
             "title": "مساعد الذكاء الاصطناعي للتحديات",
             "description": "اكتب فكرة مبسطة وسيقوم المساعد بتوليد عنوان احترافي، وصف شامل، تحديد الفئة، صورة غلاف، ومعايير تقييم مبنية على محتوى التحدي.",
             "placeholder": "مثال: تحدي عن ابتكار حلول لترشيد المياه...",
-            "generating": "جاري التوليد...",
+            "generating": "جارٍ التوليد...",
             "generateButton": "توليد التفاصيل",
             "ideaRequired": "يرجى إدخال فكرة التحدي أولاً.",
             "error": "حدث خطأ أثناء توليد تفاصيل التحدي"
@@ -4008,7 +4133,7 @@ export const ar = {
         },
         "certificate": {
             "title": "شهادة العضوية",
-            "heading": "شهادة عضوية و تقدير",
+            "heading": "شهادة عضوية وتقدير",
             "platformCertifies": "تشهد منصة {appName} بأن",
             "teacherFallback": "المعلم/ة",
             "nameLine": "الأستاذ/ة: {name}",
@@ -4016,10 +4141,10 @@ export const ar = {
             "programName": "\"معلمو النخبة: تميزي العلمي\"",
             "periodLine": "وذلك للفترة من {start} وحتى {end}.",
             "excellenceParagraph": "وقد تميّز/ت خلال فترة العضوية بالتزام تربوي رفيع، وساهم/ت في إثراء المبادرات التعليمية بابتكارات نوعية، تعكس روح الانتماء والتميز في الأداء التربوي والمهني.",
-            "motto": "نزرع الشعف نحصد النجاح",
+            "motto": "نزرع الشغف نحصد النجاح",
             "ceoTitle": "المدير التنفيذي",
             "ceoName": "أ. ليلى إبراهيم الجسمي",
-            "ceoOrg": "مؤسسة أوح لنشر مطبوعات الثقافة والفنون",
+            "ceoOrg": "مؤسسة أوج لنشر مطبوعات الثقافة والفنون",
             "issueDate": "تاريخ الإصدار"
         },
         "actions": {
@@ -4044,7 +4169,7 @@ export const ar = {
             "processing": "قيد المعالجة",
             "completed": "مكتمل",
             "failed": "فشل",
-            "cancelled": "ملغي",
+            "cancelled": "ملغى",
             "refunded": "مسترد"
         },
         "methods": {
@@ -4112,7 +4237,7 @@ export const ar = {
         },
         "certificate": {
             "title": "شهادة العضوية",
-            "heading": "شهادة عضوية و تقدير",
+            "heading": "شهادة عضوية وتقدير",
             "studentFallback": "الطالب",
             "bodyParagraph": "هو/هي عضو رسمي وفعّال في منصة إرث المبتكرين، ونقدم له/لها هذا التكريم اعترافاً بإنجازه/إنجازها العلمي المتميز وجهوده/جهودها التعليمية الرائدة، التي تجسد روح الاجتهاد والالتزام، وتعكس رغبة صادقة في تطوير الذات والمجتمع العلمي.",
             "achievementPeriodLine": "تم تحقيق هذا الإنجاز العلمي خلال الفترة من [{start}] إلى [{end}].",
@@ -4147,8 +4272,8 @@ export const ar = {
         },
         "status": {
             "active": "نشط",
-            "expired": "منتهي",
-            "cancelled": "ملغي"
+            "expired": "منتهٍ",
+            "cancelled": "ملغى"
         },
         "placeholders": {
             "search": "ابحث عن مشترك..."
@@ -4314,7 +4439,7 @@ export const ar = {
             "backToProjects": "العودة إلى المشاريع",
             "chooseImages": "اختر الصور",
             "chooseFiles": "اختر الملفات",
-            "saving": "جاري الحفظ...",
+            "saving": "جارٍ الحفظ...",
             "createProject": "إنشاء المشروع"
         },
         "errors": {
@@ -4430,20 +4555,20 @@ export const ar = {
             "hint": "JPEG, PNG, GIF, WebP (حد أقصى {maxMb} ميجابايت)"
         },
         "challengeTypes": {
-            "cognitive": "تحدّي معرفي",
-            "applied": "تحدّي تطبيقي/مهاري",
-            "creative": "تحدّي إبداعي",
-            "artisticCreative": "تحدّي إبداعي فني",
-            "collaborative": "تحدّي تعاوني",
-            "analytical": "تحدّي تحليلي/استقصائي",
-            "technological": "تحدّي تكنولوجي",
-            "behavioral": "تحدّي سلوكي/قيمي",
-            "sixtySeconds": "تحدّي 60 ثانية",
+            "cognitive": "تحدٍ معرفي",
+            "applied": "تحدٍ تطبيقي/مهاري",
+            "creative": "تحدٍ إبداعي",
+            "artisticCreative": "تحدٍ إبداعي فني",
+            "collaborative": "تحدٍ تعاوني",
+            "analytical": "تحدٍ تحليلي/استقصائي",
+            "technological": "تحدٍ تكنولوجي",
+            "behavioral": "تحدٍ سلوكي/قيمي",
+            "sixtySeconds": "تحدٍ 60 ثانية",
             "mentalMath": "حلها بدون قلم",
             "conversions": "تحدّي التحويلات",
             "teamFastest": "تحدّي الفريق الأسرع",
             "buildProblem": "ابنِ مسألة",
-            "custom": "تحدّي مخصص"
+            "custom": "تحدٍ مخصص"
         },
         "ageGroups": {
             "sixToNine": "6-9 سنوات",
@@ -4504,11 +4629,11 @@ export const ar = {
             "approve": "اعتماد",
             "reject": "رفض",
             "issueNow": "إصدار شهادة",
-            "issuing": "جاري الإصدار...",
+            "issuing": "جارٍ الإصدار...",
             "download": "تحميل",
             "createCertificate": "إنشاء شهادة",
             "preview": "معاينة",
-            "generating": "جاري الإنشاء...",
+            "generating": "جارٍ الإنشاء...",
             "generateAndDownload": "إنشاء وتحميل"
         },
         "roles": {
@@ -4981,7 +5106,7 @@ export const ar = {
             },
             "students": {
                 "title": "تقرير الطلاب",
-                "description": "عرض إحصائيات الطلاب الإجمالية والجدد",
+                "description": "عرض إجمالي الطلاب والطلاب الجدد",
                 "stats": {
                     "total": "إجمالي الطلاب",
                     "new": "طلاب جدد"
@@ -5024,8 +5149,8 @@ export const ar = {
         "aiAssistant": {
             "title": "مساعد الذكاء الاصطناعي للشارات",
             "description": "اكتب فكرة مبسطة وسيقوم المساعد بتوليد اسم الشارة، الوصف، الرمز التعبيري، النوع، عدد النقاط المقترح، وصورة مناسبة.",
-            "placeholder": "مثال: شارة لأكثر طالب مشارك في التحديات...",
-            "generating": "جاري التوليد...",
+            "placeholder": "مثال: شارة لأكثر الطلاب مشاركة في التحديات...",
+            "generating": "جارٍ التوليد...",
             "generateButton": "توليد التفاصيل",
             "ideaRequired": "يرجى إدخال فكرة الشارة أولاً.",
             "error": "حدث خطأ أثناء توليد تفاصيل الشارة",
@@ -5083,7 +5208,7 @@ export const ar = {
             "challengePlaceholder": "معرف التحدي",
             "reasonLabel": "السبب (اختياري)",
             "reasonPlaceholder": "سبب منح الشارة...",
-            "awarding": "جاري المنح..."
+            "awarding": "جارٍ المنح..."
         },
         "table": {
             "badge": "الشارة",
@@ -5092,11 +5217,48 @@ export const ar = {
             "createdAt": "تاريخ الإنشاء"
         }
     },
+    "adminRubricLibraryPage": {
+        "pageTitle": "مكتبة المعايير الوطنية - {appName}",
+        "title": "مكتبة المعايير الوطنية",
+        "subtitle": "المعايير العامة (QFEmirates) التي يعتمدها محرك التقييم بالذكاء الاصطناعي تلقائياً لأي مشروع لم يرفق له المعلم معيار تقييم مخصص.",
+        "addNew": "+ إضافة معيار جديد",
+        "empty": "لا توجد معايير في المكتبة بعد.",
+        "activeWeightTotal": "مجموع أوزان المعايير المفعّلة حالياً: {total}%",
+        "weightHint": "يُفضّل أن يكون المجموع 100% ليعكس تقييماً متوازناً؛ سيُطبّع النظام الأوزان تلقائياً عند الاستخدام حتى لو لم يكن المجموع مضبوطاً بدقة.",
+        "weightLabel": "الوزن: {weight}%",
+        "levelsCount": "مستويات",
+        "activate": "تفعيل",
+        "deactivate": "إلغاء التفعيل",
+        "createSuccess": "تمت إضافة المعيار بنجاح",
+        "updateSuccess": "تم تحديث المعيار بنجاح",
+        "saveError": "تعذر حفظ المعيار، تحقق من البيانات المدخلة.",
+        "deleteConfirm": {
+            "title": "حذف المعيار؟",
+            "message": "هل أنت متأكد من حذف معيار \"{name}\"؟ لن يؤثر هذا على التقييمات السابقة التي استخدمته."
+        },
+        "form": {
+            "nameAr": "اسم المعيار (بالعربية)",
+            "nameEn": "اسم المعيار (بالإنجليزية)",
+            "descriptionAr": "تعريف المؤشر (بالعربية)",
+            "descriptionEn": "تعريف المؤشر (بالإنجليزية)",
+            "weight": "الوزن النسبي (%)",
+            "category": "الفئة",
+            "categoryPlaceholder": "مثال: creativity، technical",
+            "isActive": "مفعّل ضمن المعايير الافتراضية",
+            "levels": "مستويات الإتقان",
+            "addLevel": "إضافة مستوى",
+            "levelNameAr": "اسم المستوى (عربي)",
+            "levelNameEn": "اسم المستوى (إنجليزي)",
+            "score": "الدرجة",
+            "levelDescAr": "وصف المستوى (عربي)",
+            "levelDescEn": "وصف المستوى (إنجليزي)"
+        }
+    },
     "adminCategoriesPage": {
         "pageTitle": "إدارة الفئات - {appName}",
         "title": "إدارة الفئات",
         "listTitle": "الفئات",
-        "subtitle": "إدارة فئات المشاريع والتحديشات والمنشورات",
+        "subtitle": "إدارة فئات المشاريع والتحديات والمنشورات",
         "createPageTitle": "إضافة فئة جديدة - {appName}",
         "createTitle": "إضافة فئة جديدة",
         "createSubtitle": "أضف فئة جديدة لتنظيم المحتوى",
@@ -5282,7 +5444,7 @@ export const ar = {
         "clearAll": "مسح الكل",
         "noSelectedSessions": "لم يتم اختيار أي موعد",
         "subjectLabel": "المادة: {subject}",
-        "paymentRedirecting": "جاري التوجيه إلى بوابة الدفع...",
+        "paymentRedirecting": "جارٍ التوجيه إلى بوابة الدفع...",
         "completePayment": "أكمل الدفع بـ {total}",
         "showBookedSessions": "إظهار الحصص المحجوزة",
         "cityDefault": "الرياض",
@@ -5337,7 +5499,7 @@ export const ar = {
         "phoneLabel": "رقم الجوال",
         "passwordLabel": "كلمة المرور (اختياري)",
         "passwordConfirmLabel": "تأكيد كلمة المرور",
-        "saving": "جاري الحفظ..."
+        "saving": "جارٍ الحفظ..."
     },
     "adminStudentsIndexPage": {
         "pageTitle": "إدارة الطلاب - {appName}",
@@ -5384,13 +5546,13 @@ export const ar = {
         "backToSubmissions": "العودة إلى التسليمات",
         "objectiveLabel": "الهدف:",
         "studentLabel": "الطالب: {name}",
-        "submissionDateLabel": "تاريخ التقديم: {date}",
+        "submissionDateLabel": "تاريخ التسليم: {date}",
         "answerTitle": "الحل / الإجابة:",
         "commentTitle": "تعليق الطالب:",
         "attachmentsTitle": "الملفات المرفقة:",
-        "evaluationTitle": "تقييم التقديم",
+        "evaluationTitle": "تقييم التسليم",
         "statusLabel": "الحالة *",
-        "statusSubmitted": "مُسلم",
+        "statusSubmitted": "مُسلَّم",
         "statusReviewed": "تم المراجعة",
         "statusApproved": "مقبول",
         "statusRejected": "مرفوض",
@@ -5399,13 +5561,13 @@ export const ar = {
         "pointsEarnedLabel": "النقاط المكتسبة",
         "pointsMaxLabel": "الحد الأقصى: {points} نقطة",
         "feedbackLabel": "ملاحظات المقيّم",
-        "feedbackPlaceholder": "اكتب ملاحظاتك على التقديم...",
+        "feedbackPlaceholder": "اكتب ملاحظاتك على التسليم...",
         "badgesLabel": "الشارات (اختياري)",
         "saveEvaluation": "حفظ التقييم",
-        "saving": "جاري الحفظ...",
+        "saving": "جارٍ الحفظ...",
         "toasts": {
-            "statusUpdated": "تم تحديث التقديم بنجاح",
-            "statusUpdateFailed": "تعذر تحديث التقديم، حاول مرة أخرى."
+            "statusUpdated": "تم تحديث التسليم بنجاح",
+            "statusUpdateFailed": "تعذر تحديث التسليم، حاول مرة أخرى."
         },
         "currentStatusTitle": "الحالة الحالية",
         "statusShortLabel": "الحالة:",
@@ -5422,14 +5584,14 @@ export const ar = {
         "subtitle": "عرض وتقييم تسليمات الطلاب لهذا التحدي",
         "filters": {
             "all": "الكل",
-            "submitted": "مُسلم",
+            "submitted": "مُسلَّم",
             "reviewed": "تم المراجعة",
             "approved": "مقبول",
             "rejected": "مرفوض"
         },
         "table": {
             "student": "الطالب",
-            "submittedAt": "تاريخ التقديم",
+            "submittedAt": "تاريخ التسليم",
             "status": "الحالة",
             "rating": "التقييم",
             "actions": "الإجراءات"
@@ -5440,22 +5602,22 @@ export const ar = {
     },
     "studentChallengeSubmissionShowPage": {
         "pageTitleFallback": "تفاصيل التسليم",
-        "pageTitle": "حالة التقديم - {title}",
+        "pageTitle": "حالة التسليم - {title}",
         "challengeFallback": "التحدي",
         "backToChallenge": "العودة إلى التحدي",
         "status": {
-            "submitted": { "label": "تم التقديم", "description": "تم استلام تسليمك وسيتم مراجعته قريباً" },
+            "submitted": { "label": "تم التسليم", "description": "تم استلام تسليمك وسيتم مراجعته قريباً" },
             "reviewed": { "label": "قيد المراجعة", "description": "يتم حالياً مراجعة تسليمك" },
             "approved": { "label": "مقبول", "description": "تم قبول تسليمك! تهانينا" },
             "rejected": { "label": "مرفوض", "description": "تم رفض تسليمك" }
         },
         "sections": {
-            "submissionStatus": "حالة التقديم",
-            "submissionContent": "محتوى التقديم",
+            "submissionStatus": "حالة التسليم",
+            "submissionContent": "محتوى التسليم",
             "reviewerFeedback": "تعليق المراجع"
         },
         "meta": {
-            "submittedAt": "تاريخ التقديم",
+            "submittedAt": "تاريخ التسليم",
             "reviewedAt": "تاريخ المراجعة",
             "reviewer": "المراجع",
             "rating": "التقييم",
@@ -5565,7 +5727,7 @@ export const ar = {
             "maxParticipantsLabel": "الحد الأقصى للمشاركين",
             "unlimitedPlaceholder": "غير محدود",
             "saveChanges": "حفظ التغييرات",
-            "saving": "جاري التحديث..."
+            "saving": "جارٍ التحديث..."
         },
         "ageGroups": {
             "6to9": "6-9 سنوات",
@@ -5596,23 +5758,23 @@ export const ar = {
         "title": "إدارة المستخدمين",
         "stats": {
             "totalUsers": "إجمالي المستخدمين",
-            "educationalInstitutions": "المؤسسات تعليمية",
+            "educationalInstitutions": "المؤسسات التعليمية",
             "students": "الطلاب",
             "teachers": "المعلمون",
-            "admins": "الأدمن"
+            "admins": "المدراء"
         },
         "searchPlaceholder": "ابحث بـ ID، الاسم، البريد الإلكتروني...",
         "roleFilter": {
             "all": "جميع الأدوار"
         },
         "roles": {
-            "admin": "أدمن",
+            "admin": "مدير",
             "teacher": "معلم",
             "student": "طالب",
             "school": "مدرسة",
             "educationalInstitution": "مؤسسة تعليمية",
             "systemSupervisor": "مشرف النظام",
-            "schoolSupportCoordinator": "منسق دعم المؤسسات تعليمية"
+            "schoolSupportCoordinator": "منسق دعم المؤسسات التعليمية"
         },
         "accountTypes": {
             "regular": "حساب عادي",
@@ -5639,7 +5801,7 @@ export const ar = {
             "registeredAt": "تاريخ التسجيل"
         },
         "empty": "لا توجد مستخدمين",
-        "deleting": "جاري الحذف...",
+        "deleting": "جارٍ الحذف...",
         "editModal": {
             "title": "تعديل مستخدم",
             "accountTypeLabel": "نوع الحساب",
@@ -5651,7 +5813,7 @@ export const ar = {
             "passwordHint": "كلمة المرور (اتركه فارغاً إذا لم تريد تغييره)",
             "passwordConfirmLabel": "تأكيد كلمة المرور",
             "update": "تحديث",
-            "saving": "جاري التحديث..."
+            "saving": "جارٍ التحديث..."
         },
         "deleteConfirm": {
             "title": "تأكيد الحذف",
@@ -5677,8 +5839,8 @@ export const ar = {
         "status": {
             "active": "نشط",
             "pending": "قيد المعالجة",
-            "expired": "منتهي",
-            "cancelled": "ملغي"
+            "expired": "منتهٍ",
+            "cancelled": "ملغى"
         },
         "labels": {
             "from": "من",
@@ -5688,7 +5850,7 @@ export const ar = {
             "free": "مجاني"
         },
         "actions": {
-            "cancelling": "جاري الإلغاء...",
+            "cancelling": "جارٍ الإلغاء...",
             "cancelSubscription": "إلغاء الاشتراك",
             "browsePackages": "تصفح الباقات",
             "backToPackages": "العودة إلى قائمة الباقات",
@@ -5748,7 +5910,7 @@ export const ar = {
         "otpPrompt": "أدخل رمز التحقق المكون من 4 أرقام",
         "otpSentLine1": "تم إرسال رمز مكون من 4 أرقام إلى بريدك الإلكتروني {email}.",
         "otpSentLine2": "يرجى إدخاله خلال 10 دقائق لإكمال عملية الانضمام.",
-        "verifying": "جاري التحقق...",
+        "verifying": "جارٍ التحقق...",
         "confirmCode": "تأكيد الرمز",
         "noCode": "لم تستلم الرمز؟ ",
         "backToJoin": "العودة إلى صفحة الانضمام",
@@ -5801,7 +5963,7 @@ export const ar = {
             "statusLabel": "الحالة",
             "notesLabel": "ملاحظات",
             "notesPlaceholder": "أضف ملاحظات حول هذا الطلب...",
-            "updating": "جاري التحديث...",
+            "updating": "جارٍ التحديث...",
             "saveChanges": "حفظ التغييرات"
         }
     },
@@ -5840,7 +6002,7 @@ export const ar = {
             "commentPlaceholder": "اكتب تقييمك هنا...",
             "imageLabel": "الصورة الشخصية",
             "chooseImage": "اختر صورة",
-            "saving": "جاري الحفظ...",
+            "saving": "جارٍ الحفظ...",
             "submit": "إرسال التقييم",
             "errors": {
                 "imageTooLarge": "حجم الصورة يجب أن يكون أقل من 2 ميجابايت.",
@@ -5886,7 +6048,7 @@ export const ar = {
         "currentProjectTotalLabel": "المجموع الحالي للمشروع: {value}%",
         "currentGeneralTotalLabel": "المجموع الحالي للمعايير العامة: {value}%",
         "weightWarning": "⚠️ تحذير: مجموع الأوزان سيتجاوز 100%!",
-        "saving": "جاري الحفظ...",
+        "saving": "جارٍ الحفظ...",
         "save": "حفظ",
         "saveChanges": "حفظ التعديلات",
         "cancel": "إلغاء",
@@ -5942,7 +6104,7 @@ export const ar = {
                 "points": "0-20 نقطة"
             },
             "creativeChangeMaker": {
-                "title": "صانع لتغيير إبداعي",
+                "title": "صانع تغيير إبداعي",
                 "points": "21-50 نقطة"
             },
             "creativeLeader": {
@@ -5981,6 +6143,11 @@ export const ar = {
         "heroDescription": "تستخدم منصة إرث المبتكرين الذكاء الاصطناعي لدعم التوصيات والتقارير وتوليد المحتوى. توضح هذه الصفحة كيف نستخدم الذكاء الاصطناعي بمسؤولية وشفافية، وبما يخدم الطلاب والمعلمين والمدارس.",
         "commitmentTitle": "التزامنا",
         "commitmentDescription": "الذكاء الاصطناعي في المنصة أداة مساعدة في اتخاذ القرار، وليس صانع القرار. كل مخرج مدعوم بالذكاء الاصطناعي موسوم بوضوح وقابل للتفسير وخاضع لمراجعة بشرية، خاصة فيما يتعلق بتقييم الطالب أو ترتيبه أو سجله.",
+        "agentDirectory": {
+            "title": "دليل وكلاء الذكاء الاصطناعي",
+            "description": "كل توصية أو تقرير أو تقييم تعرضه المنصة بالذكاء الاصطناعي صادر عن أحد وكلاء متخصصين لهم اسم ودور محددان. تصفّح الدليل الكامل لكل وكيل ونوع التحليلات التي يقدّمها.",
+            "cta": "تصفح دليل الوكلاء"
+        },
         "complianceTitle": "التوافق مع التشريعات الإماراتية",
         "complianceDescription": "تسترشد ممارساتنا في حماية البيانات وحوكمة الذكاء الاصطناعي بأحكام المرسوم بقانون اتحادي رقم 45 لسنة 2021 بشأن حماية البيانات الشخصية (PDPL)، وميثاق دولة الإمارات لتطوير واستخدام الذكاء الاصطناعي. ويشمل ذلك المعالجة القانونية والشفافة للبيانات الشخصية، وتحديد الغرض من جمعها، وحقوق أصحاب البيانات (الاطلاع، التصحيح، الحذف)، والاستخدام المسؤول والمتمحور حول الإنسان للذكاء الاصطناعي.",
         "principles": {
@@ -6107,7 +6274,7 @@ export const ar = {
         "title": "الفائزون",
         "headerTitle": "الفائزون في التحديات",
         "headerSubtitle": "قائمة بجميع الفائزين في التحديات المختلفة",
-        "noWinners": "لا توجد فائزين حالياً",
+        "noWinners": "لا يوجد فائزون حالياً",
         "backToChallenges": "العودة إلى التحديات",
         "rankLabel": "#{rank}",
         "ratingLabel": "{rating} ★",
@@ -6139,7 +6306,7 @@ export const ar = {
         "pageTitle": "انضم لنا كمعلم - {appName}",
         "breadcrumbHome": "الرئيسية",
         "breadcrumbTitle": "انضم لنا كمعلم",
-        "title": "انضم إلى فريق معلمك وابدأ في صنع الفرق في مسيرة طلابك التعليمية",
+        "title": "انضم إلى فريق التدريس لدينا وابدأ في صنع الفرق في مسيرة طلابك التعليمية",
         "subtitle": "نحن نبحث عن معلمين موهوبين ومتحمسين للانضمام إلى منصتنا ومساعدة الطلاب في تحقيق أهدافهم التعليمية.",
         "form": {
             "imagePreviewAlt": "معاينة الصورة الشخصية",
@@ -6190,8 +6357,8 @@ export const ar = {
                 "passwordConfirmation": "تأكيد كلمة المرور",
                 "bio": "نبذة شخصية",
                 "stillWorking": "لا زلت أعمل في هذه الوظيفة",
-                "stagesLabel": "اختر المراحل الدراسية التي ترغب بتدريسها عبر المنصة: *",
-                "subjectsLabel": "اختر المواد التي ترغب بتدريسها عبر المنصة: *",
+                "stagesLabel": "اختر المراحل الدراسية التي ترغب في تدريسها عبر المنصة: *",
+                "subjectsLabel": "اختر المواد التي ترغب في تدريسها عبر المنصة: *",
                 "hourlyRate": "سعر الحصة (ساعة)",
                 "hourlyRateHint": "السعر بالريال السعودي"
             },
@@ -6212,7 +6379,7 @@ export const ar = {
                 "add": "إضافة",
                 "addExperience": "إضافة خبرة",
                 "submit": "انضم كمعلم",
-                "submitting": "جاري الإرسال..."
+                "submitting": "جارٍ الإرسال..."
             },
             "errors": {
                 "requiredFields": "يرجى ملء جميع الحقول المطلوبة",
@@ -6338,7 +6505,7 @@ export const ar = {
         "imageLabel": "صورة الشارة",
         "previewAlt": "معاينة صورة الشارة",
         "cancel": "إلغاء",
-        "submitting": "جاري الإرسال...",
+        "submitting": "جارٍ الإرسال...",
         "submit": "إرسال للمراجعة",
         "types": {
             "custom": "مخصص",
@@ -6420,7 +6587,7 @@ export const ar = {
             "descriptionLabel": "وصف مختصر",
             "descriptionPlaceholder": "يمكنك ترك الوصف فارغًا لاستخدام الوصف الافتراضي.",
             "submit": "إرسال الطلب",
-            "submitting": "جاري الإرسال..."
+            "submitting": "جارٍ الإرسال..."
         },
         "alerts": {
             "systemNotReadyTitle": "نظام توليد الشهادات غير جاهز بعد",
@@ -6448,9 +6615,9 @@ export const ar = {
         "schoolLabel": "المدرسة: {school}",
         "selectStudentsTitle": "اختيار الطلاب",
         "selectStudentsDescription": "اختر الطلاب الذين تريد تعيينهم لهذا التحدي وحدد نوع المشاركة لكل طالب.",
-        "noStudents": "لا توجد طلاب متاحون في هذه المدرسة",
+        "noStudents": "لا يوجد طلاب متاحون في هذه المدرسة",
         "selectedStudentsCount": "تم اختيار {count} طالب",
-        "saving": "جاري الحفظ...",
+        "saving": "جارٍ الحفظ...",
         "legendTitle": "أنواع المشاركة:",
         "participationTypes": {
             "mandatory": "إلزامي",
@@ -6473,7 +6640,7 @@ export const ar = {
         "statuses": {
             "active": "نشط",
             "upcoming": "قادم",
-            "ended": "منتهي"
+            "ended": "منتهٍ"
         }
     },
     "teacherChallengeSubmissionsIndexPage": {
@@ -6482,7 +6649,7 @@ export const ar = {
         "subtitle": "عرض وتقييم تسليمات الطلاب لهذا التحدي",
         "table": {
             "student": "الطالب",
-            "submittedAt": "تاريخ التقديم",
+            "submittedAt": "تاريخ التسليم",
             "status": "الحالة",
             "rating": "التقييم",
             "actions": "الإجراءات"
@@ -6498,24 +6665,24 @@ export const ar = {
         "objectiveLabel": "الهدف:",
         "studentLabel": "الطالب: {name}",
         "unknownStudent": "غير محدد",
-        "submissionDateLabel": "تاريخ التقديم: {date}",
+        "submissionDateLabel": "تاريخ التسليم: {date}",
         "answerTitle": "الحل / الإجابة:",
         "commentTitle": "تعليق الطالب:",
         "attachmentsTitle": "الملفات المرفقة:",
-        "evaluationTitle": "تقييم التقديم",
+        "evaluationTitle": "تقييم التسليم",
         "statusLabel": "الحالة *",
         "ratingLabel": "التقييم (0-10)",
         "ratingValue": "({rating} / 10)",
         "pointsEarnedLabel": "النقاط المكتسبة",
         "pointsMaxLabel": "الحد الأقصى: {points} نقطة",
         "feedbackLabel": "ملاحظات المقيّم",
-        "feedbackPlaceholder": "اكتب ملاحظاتك على التقديم...",
+        "feedbackPlaceholder": "اكتب ملاحظاتك على التسليم...",
         "badgesLabel": "الشارات (اختياري)",
         "saveEvaluation": "حفظ التقييم",
-        "saving": "جاري الحفظ...",
+        "saving": "جارٍ الحفظ...",
         "toasts": {
-            "statusUpdated": "تم تحديث التقديم بنجاح",
-            "statusUpdateFailed": "تعذر تحديث التقديم، حاول مرة أخرى."
+            "statusUpdated": "تم تحديث التسليم بنجاح",
+            "statusUpdateFailed": "تعذر تحديث التسليم، حاول مرة أخرى."
         },
         "currentStatusTitle": "الحالة الحالية",
         "statusShortLabel": "الحالة:",
@@ -6586,7 +6753,7 @@ export const ar = {
         "schoolLabel": "المدرسة",
         "schoolReviewHint": "سيتم إرسال المقال للمدرسة للمراجعة والموافقة عليه قبل النشر",
         "cancel": "إلغاء",
-        "publishing": "جاري النشر...",
+        "publishing": "جارٍ النشر...",
         "submit": "نشر المقال",
         "alerts": {
             "invalidImageType": "يرجى اختيار ملف صورة صحيح",
@@ -6599,7 +6766,7 @@ export const ar = {
         "aiAssistant": {
             "title": "توليد المحتوى بالذكاء الاصطناعي",
             "description": "اكتب العنوان فقط (بالعربية أو الإنجليزية) وسيقوم الذكاء الاصطناعي بكتابة المقال واختيار صورة مناسبة.",
-            "generating": "جاري التوليد...",
+            "generating": "جارٍ التوليد...",
             "generateButton": "توليد الآن",
             "disclosureNotice": "محتوى هذا المقال تم توليده بمساعدة الذكاء الاصطناعي. سيتم وسمه بـ\"محتوى مولّد بالذكاء الاصطناعي\" للقراء بعد النشر."
         },
@@ -6656,9 +6823,9 @@ export const ar = {
         },
         "actions": {
             "add": "إضافة مادة",
-            "adding": "جاري الإضافة...",
+            "adding": "جارٍ الإضافة...",
             "update": "تحديث المادة",
-            "updating": "جاري التحديث..."
+            "updating": "جارٍ التحديث..."
         },
         "modals": {
             "addTitle": "إضافة مادة جديدة",
@@ -6753,7 +6920,7 @@ export const ar = {
             "editLabel": "تعديل الرد:",
             "placeholder": "اكتب ردك هنا...",
             "submit": "إرسال",
-            "submitting": "جاري الإرسال..."
+            "submitting": "جارٍ الإرسال..."
         },
         "actions": {
             "reply": "رد",
@@ -6777,7 +6944,7 @@ export const ar = {
             "coverImageLabel": "صورة الغلاف",
             "coverPreviewAlt": "معاينة الغلاف",
             "coverLoadError": "فشل تحميل الصورة",
-            "loadingImage": "جاري تحميل الصورة...",
+            "loadingImage": "جارٍ تحميل الصورة...",
             "fileLabel": "ملف PDF (اختياري)",
             "issueNumberLabel": "رقم العدد (للمجلات)",
             "publishDateLabel": "تاريخ النشر",
@@ -6787,7 +6954,7 @@ export const ar = {
             "youtubeUrlHint": "رابط اختياري لفيديو يوتيوب مرتبط بالمقال."
         },
         "actions": {
-            "saving": "جاري الحفظ...",
+            "saving": "جارٍ الحفظ...",
             "saveChanges": "حفظ التغييرات"
         }
     },
@@ -6835,7 +7002,7 @@ export const ar = {
         },
         "certificate": {
             "title": "شهادة العضوية",
-            "heading": "شهادة عضوية و تقدير",
+            "heading": "شهادة عضوية وتقدير",
             "platformCertifies": "تشهد منصة {appName} بأن",
             "bodyParagraph": "هي عضو فاعل في منصة إرث المبتكرين، وتؤكد هذه الشهادة انتماءها للمجتمع العلمي والإبداعي للمنصة وتقديراً لإنجازاتها التعليمية والابتكارية.",
             "issueDateLine": "تم إصدار هذه الشهادة بتاريخ: {date}",
@@ -6902,7 +7069,7 @@ export const ar = {
             "contentLabel": "المحتوى",
             "contentPlaceholder": "أدخل محتوى المنشور...",
             "schoolLabel": "المدرسة (اختياري)",
-            "schoolPlaceholder": "-- لا شيء (منشور عام من الأدمن) --",
+            "schoolPlaceholder": "-- لا شيء (منشور عام من الإدارة) --",
             "coverImageLabel": "صورة الغلاف",
             "coverPreviewAlt": "معاينة الغلاف",
             "fileLabel": "ملف PDF (اختياري)",
@@ -6912,7 +7079,7 @@ export const ar = {
             "youtubeUrlHint": "أضف رابط فيديو YouTube ليظهر مُضمّناً في صفحة المنشور"
         },
         "actions": {
-            "saving": "جاري الحفظ...",
+            "saving": "جارٍ الحفظ...",
             "publish": "نشر المنشور"
         }
     },
@@ -6972,7 +7139,7 @@ export const ar = {
             "title": "رفض المقال",
             "reasonLabel": "سبب الرفض (اختياري)",
             "reasonPlaceholder": "أدخل سبب الرفض...",
-            "rejecting": "جاري الرفض...",
+            "rejecting": "جارٍ الرفض...",
             "rejectButton": "رفض"
         }
     },
@@ -6987,8 +7154,8 @@ export const ar = {
         "additionalInfoTitle": "معلومات إضافية",
         "statuses": {
             "active": "نشط",
-            "expired": "منتهي",
-            "cancelled": "ملغي"
+            "expired": "منتهٍ",
+            "cancelled": "ملغى"
         },
         "autoRenew": {
             "enabled": "مفعل",
@@ -7104,6 +7271,8 @@ export const ar = {
         "storeRewardSuccess": "تم الاسترداد بنجاح ({points} نقطة).",
         "storeRewardPendingApproval": "تم إرسال طلبك. ستُخصم النقاط بعد الموافقة.",
         "storeRewardError": "تعذر إتمام الاسترداد. حاول مرة أخرى.",
+        "storeRewardComingSoon": "ميزة استبدال النقاط قيد التجهيز حالياً وستُفعَّل قريباً.",
+        "storeRewardNotifyMeSuccess": "تم تسجيل رغبتك، سنُعلمك فور تفعيل الميزة.",
         "certificateDownloadFailed": "فشل تحميل أو توليد الشهادة. يرجى المحاولة بعد لحظات.",
         "certificatePdfLibraryMissing": "محرك الـ PDF غير متوفر. يرجى التواصل مع الدعم لتفعيله.",
         "certificateTemplateMissing": "قالب الشهادة مفقود. فضلاً ارفع/حدد قالباً صالحاً ثم أعد المحاولة.",
@@ -7159,7 +7328,7 @@ export const ar = {
         "pageTitle": "طلبات المكافآت - {appName}",
         "listTitle": "الطلبات",
         "backToRewards": "العودة للمكافآت",
-        "empty": "لا توجد طلبات في هذا التصفية.",
+        "empty": "لا توجد طلبات في هذه التصفية.",
         "approve": "موافقة",
         "reject": "رفض",
         "approveConfirm": {
@@ -7262,7 +7431,7 @@ export const ar = {
         },
         "addAdminUser": "إضافة مستخدم إداري",
         "table": {
-            "role": "نوع الصلاحية",
+            "role": "الدور",
             "createdAt": "تاريخ الإنشاء"
         },
         "deleteConfirmTitle": "تأكيد الحذف",
@@ -7278,7 +7447,7 @@ export const ar = {
         "createError": "حدث خطأ أثناء الإنشاء"
     },
     "trialBanner": {
-        "trialActive": "أنت في الفترة التجريبية لـ {package} — تبقى {days} يوم",
+        "trialActive": "أنت في الفترة التجريبية لـ {package} — يبقى {days} يوم",
         "trialActiveNoDate": "أنت في الفترة التجريبية لـ {package}",
         "daysRemaining": "متبقٍّ {count} يوم",
         "endsAt": "ينتهي في {date}",
@@ -7303,7 +7472,7 @@ export const ar = {
         "benefit1": "وصول كامل إلى جميع أدوات المنصة",
         "benefit2": "شهادات وشارات حصرية",
         "benefit3": "نقاط إضافية عند الاشتراك",
-        "benefit4": "دعم فني مخصص وأولوية في التجويب",
+        "benefit4": "دعم فني مخصص وأولوية في الاستجابة",
         "viewPackages": "عرض الباقات",
         "upgrade": "ترقية الاشتراك"
     },
@@ -7382,7 +7551,7 @@ export const ar = {
             "aboveAverage": "فوق المتوسط",
             "average": "متوسط",
             "belowAverage": "أقل من المتوسط",
-            "borderline": "ضعف بيني",
+            "borderline": "ضعف حدّي",
             "delayed": "متأخر"
         },
         "standardScore": "الدرجة المعيارية"
@@ -7443,12 +7612,12 @@ export const ar = {
     },
     "adminChatPage": {
         "headerTitle": "الوكيل الذكي",
-        "pageTitle": "الوكيل الذكي — مساعد الأدمن",
-        "subtitle": "مساعد الأدمن — يحلل بيانات الطلاب ومؤشرات الابتكار",
+        "pageTitle": "الوكيل الذكي — مساعد الإدارة",
+        "subtitle": "مساعد الإدارة — يحلل بيانات الطلاب ومؤشرات الابتكار",
         "clearChatTooltip": "مسح المحادثة",
         "welcomeTitle": "مرحباً بك في الوكيل الذكي",
         "welcomeDescription": "اسألني أي سؤال عن بيانات الطلاب أو مؤشرات الابتكار أو التصنيفات وسأجيبك فوراً.",
-        "analyzing": "جاري التحليل...",
+        "analyzing": "جارٍ التحليل...",
         "inputPlaceholder": "اكتب سؤالك هنا...",
         "footerNote": "الوكيل يحلل بيانات حقيقية من قاعدة البيانات. لا يخترع معلومات.",
         "errorMessage": "حدث خطأ أثناء معالجة سؤالك. تأكد من اتصال خدمة الذكاء الاصطناعي وحاول مرة أخرى.",
@@ -7553,7 +7722,7 @@ export const ar = {
         "heroTitle": "محرك البحث الذكي بالمواهب",
         "heroSubtitle": "ابحث عن المبتكرين باستخدام اللغة الطبيعية — يعتمد المحرك على الذكاء الاصطناعي لفهم الشروط والمعايير",
         "searchPlaceholder": "اكتب وصف الطالب المطلوب باللغة الطبيعية (مثال: طالب لديه مهارات برمجة وقيادة مرتفعة)...",
-        "searching": "جاري البحث...",
+        "searching": "جارٍ البحث...",
         "searchButton": "بحث ذكي",
         "quickSuggestionsLabel": "مقترحات سريعة:",
         "resultsForLabel": "نتائج البحث عن:",
@@ -7621,6 +7790,146 @@ export const ar = {
         "edit": {
             "header": "تعديل دور مخصص",
             "pageTitle": "تعديل دور مخصص - {appName}"
+        }
+    },
+    "aiAgents": {
+        "pageTitle": "دليل وكلاء الذكاء الاصطناعي - {appName}",
+        "title": "دليل وكلاء الذكاء الاصطناعي",
+        "heroDescription": "كل نتيجة أو توصية أو تقييم يعرضه الذكاء الاصطناعي على المنصة صادر عن أحد هؤلاء الوكلاء المتخصصين. تعرّف على كل وكيل، دوره، ونوع التحليلات التي يقدّمها.",
+        "footnote": "{count} وكيل ذكاء اصطناعي يعمل خلف ميزات المنصة، ويمكن إضافة المزيد دون تغيير بنية هذه الصفحة.",
+        "categories": {
+            "scoring": "تقييم تشخيصي",
+            "guidance": "توصيات مخصصة",
+            "generation": "توليد محتوى",
+            "validation": "تحقق ومراجعة جودة",
+            "search": "بحث دلالي",
+            "reporting": "تقارير سردية",
+            "conversational": "تحليلات تفاعلية",
+            "governance": "رصد العدالة"
+        },
+        "agents": {
+            "skills": {
+                "name": "Nova",
+                "title": "سفيرة المهارات",
+                "description": "يحلل مهاراتك المسجّلة وتنوعها عبر التصنيفات المختلفة، ومستوى إتقانها، ودوراتك وشهاداتك، لحساب مؤشر المهارات الخاص بك."
+            },
+            "innovation": {
+                "name": "Spark",
+                "title": "سفير الابتكار",
+                "description": "يقيّم مشاريعك الابتكارية المعتمدة، وجوائزك، وأفكارك الموثقة، وبراءات اختراعك، لحساب مؤشر الابتكار."
+            },
+            "intelligence": {
+                "name": "Sage",
+                "title": "سفير الذكاء",
+                "description": "يقيّم أبحاثك المعتمدة وشهاداتك ومقالاتك المنشورة وجودة محتواك بحسب تحليل الذكاء الاصطناعي، لحساب مؤشر الذكاء."
+            },
+            "creativity": {
+                "name": "Muse",
+                "title": "سفيرة الإبداع",
+                "description": "يقيس مشاريعك ومنتجاتك الإبداعية، ومحتواك المكتوب، وجوائزك في المجالات الإبداعية، لحساب مؤشر الإبداع."
+            },
+            "projects": {
+                "name": "Atlas",
+                "title": "سفير المشاريع",
+                "description": "يتتبع تقييمات جودة مشاريعك، ونسبة إكمالها، واعتمادها من الذكاء الاصطناعي، لحساب مؤشر المشاريع."
+            },
+            "leadership": {
+                "name": "Beacon",
+                "title": "سفير القيادة",
+                "description": "يحلل التحديات التي أكملتها، والمشاريع أو التحديات التي قدتها، وتقييمات زملائك، لحساب مؤشر القيادة."
+            },
+            "ip": {
+                "name": "Vault",
+                "title": "سفير الملكية الفكرية",
+                "description": "يقيّم براءات اختراعك المسجّلة، وأبحاثك ومنشوراتك، وجودة الأدلة المرفقة بها، لحساب مؤشر الملكية الفكرية."
+            },
+            "future_readiness": {
+                "name": "Horizon",
+                "title": "سفير الاستشراف والجاهزية المستقبلية",
+                "description": "يستشرف مدى جاهزيتك لتقنيات المستقبل من خلال تحليل مهاراتك المرتبطة بها، وشهاداتك الرقمية، ونشاطك التعليمي المستمر."
+            },
+            "recommendations": {
+                "name": "Compass",
+                "title": "سفير النمو والتوصيات",
+                "description": "يولّد توصيات نمو مخصصة — دورات ومسابقات ومشاريع ومسارات تطوير — استناداً إلى ملفك الابتكاري الكامل ونقاط قوتك وضعفك."
+            },
+            "content_generation": {
+                "name": "Quill",
+                "title": "سفير إنشاء المحتوى",
+                "description": "يصوغ محتوى ثنائي اللغة (عربي/إنجليزي) للمشاريع والإصدارات والشارات والتحديات، ليخضع دائماً لمراجعة بشرية قبل النشر."
+            },
+            "achievement_validation": {
+                "name": "Warden",
+                "title": "سفير التحقق من الإنجازات",
+                "description": "يراجع الإنجازات المُقدَّمة للتحقق من اتساقها المنطقي، واكتشاف التكرار، وكفاية الأدلة المرفقة، قبل احتسابها ضمن مؤشراتك."
+            },
+            "rubric_evaluation": {
+                "name": "Ledger",
+                "title": "سفير تقييم مؤشرات الأداء",
+                "description": "يقيّم عمل الطالب المُسلَّم مقابل كل مؤشر أداء في معيار التقييم (Rubric)، ويكتب شرحاً مخصصاً لهذا العمل تحديداً يوضح المستوى المُحقَّق والفجوة إلى المستوى التالي، تحت مراجعة المعلم قبل نشره للطالب."
+            },
+            "smart_search": {
+                "name": "Scout",
+                "title": "سفير البحث الذكي",
+                "description": "يفسّر عبارات البحث الطبيعية ويطابقها مع بيانات الطلاب والمهارات والمشاريع الفعلية على المنصة."
+            },
+            "reporting": {
+                "name": "Chronicle",
+                "title": "سفير التقارير والرؤى",
+                "description": "يُعِدّ تقارير ابتكار شاملة تلخّص نقاط القوة والضعف وخطط التطوير المقترحة لكل طالب."
+            },
+            "platform_insights": {
+                "name": "Overseer",
+                "title": "سفير رؤى المنصة",
+                "description": "يجيب عن أسئلة الإدارة على مستوى المنصة بالكامل، مستنداً إلى بيانات حية للطلاب والمؤشرات عبر جميع المؤسسات."
+            },
+            "school_insights": {
+                "name": "Steward",
+                "title": "سفير رؤى المدرسة",
+                "description": "يجيب عن أسئلة مسؤول المدرسة، مستنداً إلى بيانات طلاب مدرسته الفعلية ومؤشراتهم فقط."
+            },
+            "student_success": {
+                "name": "Buddy",
+                "title": "سفير نجاح الطالب",
+                "description": "يجيب عن أسئلة الطالب حول التعلم والابتكار والإبداع، ويشرح درجاته بالتفصيل، ويقترح خطوات عملية لتحسينها — استناداً إلى سجله الموثق فعلياً."
+            },
+            "fairness_bias": {
+                "name": "Equity",
+                "title": "سفير العدالة والحياد",
+                "description": "يراقب باستمرار نتائج تقييم الذكاء الاصطناعي عبر الفئات المختلفة من الطلاب لرصد أي مؤشرات تحيّز محتملة في التقييم."
+            }
+        }
+    },
+    "studentAssistant": {
+        "openLabel": "افتح المساعد الذكي",
+        "title": "المساعد الذكي",
+        "subtitle": "يحلل بيانات إنجازاتك ومؤشراتك الفعلية",
+        "welcome": "اسألني عن التعلم والابتكار، أو اسألني لماذا حصلت على درجة معينة وكيف ترفعها في محاولتك القادمة.",
+        "placeholder": "اكتب سؤالك هنا...",
+        "send": "إرسال",
+        "thinking": "جارٍ التحليل...",
+        "error": "حدث خطأ أثناء معالجة سؤالك. تأكد من اتصالك بالإنترنت وحاول مرة أخرى.",
+        "disclaimer": "إجاباتي عن درجاتك مبنية حصراً على بيانات إنجازاتك الفعلية المسجَّلة في حسابك.",
+        "chips": {
+            "explainOverall": "لماذا حصلت على هذه الدرجة الإجمالية؟",
+            "explainInnovation": "لماذا حصلت على هذه الدرجة في الابتكار؟",
+            "howToImprove": "كيف أحسّن مؤشراتي في المحاولة القادمة؟",
+            "motivateMe": "أعطني نصيحة لتطوير مهاراتي الإبداعية"
+        }
+    },
+    "academic": {
+        "grades": {
+            "kg1": "روضة أولى", "kg2": "روضة ثانية",
+            "grade_1": "الصف الأول", "grade_2": "الصف الثاني", "grade_3": "الصف الثالث",
+            "grade_4": "الصف الرابع", "grade_5": "الصف الخامس", "grade_6": "الصف السادس",
+            "grade_7": "الصف السابع", "grade_8": "الصف الثامن", "grade_9": "الصف التاسع",
+            "grade_10": "الصف العاشر", "grade_11": "الصف الحادي عشر", "grade_12": "الصف الثاني عشر"
+        },
+        "subjects": {
+            "arabic": "اللغة العربية", "english": "اللغة الإنجليزية", "math": "الرياضيات",
+            "science": "العلوم", "chemistry": "الكيمياء", "physics": "الفيزياء",
+            "identity_values": "الهوية والقيم والأسرة", "innovation_invention": "الابتكار والاختراع",
+            "social_emotional": "الذكاء الاجتماعي والعاطفي", "ai_future_tech": "الذكاء الاصطناعي والتقنيات المستقبلية"
         }
     }
 };

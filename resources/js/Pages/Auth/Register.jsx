@@ -7,11 +7,11 @@ import GuestLayout from '@/Layouts/GuestLayout';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Head, Link, useForm, usePage, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
-import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaPhone, FaExclamationTriangle, FaTimes, FaSchool, FaUserGraduate, FaChalkboardTeacher, FaUniversity } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaPhone, FaExclamationTriangle, FaTimes, FaSchool, FaUserGraduate, FaChalkboardTeacher, FaUniversity, FaKey } from 'react-icons/fa';
 import { getTranslation, useTranslation } from '@/i18n';
 import PhoneInput from '@/Components/PhoneInput';
 
-export default function Register({ schools = [] }) {
+export default function Register({ schools = [], grades = [], subjects = {}, inviteCode = null }) {
     const { t, language } = useTranslation();
     const { props } = usePage();
     const phoneInUseMessage = getTranslation('ar', 'auth.phoneInUseMessage');
@@ -25,9 +25,13 @@ export default function Register({ schools = [] }) {
         email: '',
         password: '',
         password_confirmation: '',
-        role: 'student',
+        role: inviteCode?.role || 'student',
         phone: '',
-        school_id: '',
+        school_id: inviteCode?.school_id || '',
+        grade: inviteCode?.grade || '',
+        section: inviteCode?.section || '',
+        subjects: [],
+        code: inviteCode?.code || '',
         consent_ai_processing: false,
     });
 
@@ -62,6 +66,12 @@ export default function Register({ schools = [] }) {
             setData('school_id', '');
         }
     }, [data.role]);
+
+    const toggleSubject = (key) => {
+        setData('subjects', data.subjects.includes(key)
+            ? data.subjects.filter((s) => s !== key)
+            : [...data.subjects, key]);
+    };
 
     const submit = (e) => {
         e.preventDefault();
@@ -106,6 +116,19 @@ export default function Register({ schools = [] }) {
                                     />
                                 </div>
                             </div>
+                            {inviteCode && (
+                                <div className="flex items-center gap-2 rounded-xl border border-[#A3C042] bg-[#A3C042]/10 px-3 py-2.5 text-sm">
+                                    <FaKey className="text-[#A3C042] shrink-0" />
+                                    <span>
+                                        {t('auth.joiningViaInvite', {
+                                            role: inviteCode.role === 'student' ? t('roles.student') : t('roles.teacher'),
+                                            school: inviteCode.school_name,
+                                        })}
+                                    </span>
+                                </div>
+                            )}
+
+                            {!inviteCode && (
                             <div>
                                 <div className='text-xs mb-1 opacity-75'>{t('auth.createAccountAs')}</div>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5 md:gap-3">
@@ -135,9 +158,10 @@ export default function Register({ schools = [] }) {
                                 </div>
                                 <InputError message={errors.role} className="mt-2" />
                             </div>
+                            )}
 
                             {/* School selector for students and teachers */}
-                            {(data.role === 'student' || data.role === 'teacher') && (
+                            {!inviteCode && (data.role === 'student' || data.role === 'teacher') && (
                                 <div>
                                     <div className="relative">
                                         <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
@@ -172,6 +196,69 @@ export default function Register({ schools = [] }) {
                                             {t('auth.schoolRequired')}
                                         </p>
                                     )}
+                                </div>
+                            )}
+
+                            {/* Grade / section / subjects for students — mandatory (requirement 5.1) */}
+                            {data.role === 'student' && (
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <InputLabel htmlFor="grade" value={t('auth.grade')} />
+                                            <SelectInput
+                                                id="grade"
+                                                name="grade"
+                                                value={data.grade}
+                                                onChange={(e) => setData('grade', e.target.value)}
+                                                className="block w-full py-3 border-2 border-gray-300 rounded-lg shadow-sm mt-1"
+                                                required
+                                            >
+                                                <option value="">{t('auth.selectGrade')}</option>
+                                                {grades.map((g) => (
+                                                    <option key={g} value={g}>{t(`academic.grades.${g}`)}</option>
+                                                ))}
+                                            </SelectInput>
+                                            <InputError message={errors.grade} className="mt-2" />
+                                        </div>
+                                        <div>
+                                            <InputLabel htmlFor="section" value={t('auth.section')} />
+                                            <TextInput
+                                                id="section"
+                                                name="section"
+                                                value={data.section}
+                                                onChange={(e) => setData('section', e.target.value)}
+                                                className="block w-full mt-1"
+                                                placeholder={t('auth.sectionPlaceholder')}
+                                                required
+                                            />
+                                            <InputError message={errors.section} className="mt-2" />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <InputLabel value={t('auth.subjects')} />
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
+                                            {Object.entries(subjects).map(([key, label]) => (
+                                                <label
+                                                    key={key}
+                                                    className={`flex items-center gap-2 rounded-lg border px-2.5 py-2 text-xs cursor-pointer transition ${
+                                                        data.subjects.includes(key)
+                                                            ? 'border-[#A3C042] bg-[#A3C042]/10 font-semibold'
+                                                            : 'border-gray-300'
+                                                    }`}
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={data.subjects.includes(key)}
+                                                        onChange={() => toggleSubject(key)}
+                                                        className="rounded border-gray-300"
+                                                    />
+                                                    {t(`academic.subjects.${key}`)}
+                                                </label>
+                                            ))}
+                                        </div>
+                                        <InputError message={errors.subjects} className="mt-2" />
+                                    </div>
                                 </div>
                             )}
 
@@ -348,7 +435,7 @@ export default function Register({ schools = [] }) {
                             <div>
                                 <PrimaryButton
                                     className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white !bg-[#A3C042] hover:!bg-[#F9D536] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#A3C042] disabled:opacity-50"
-                                    disabled={processing || !data.consent_ai_processing || ((data.role === 'student' || data.role === 'teacher') && !data.school_id) || (schools && schools.length === 0 && (data.role === 'student' || data.role === 'teacher'))}
+                                    disabled={processing || !data.consent_ai_processing || ((data.role === 'student' || data.role === 'teacher') && !data.school_id) || (schools && schools.length === 0 && (data.role === 'student' || data.role === 'teacher')) || (data.role === 'student' && (!data.grade || !data.section || data.subjects.length === 0))}
                                 >
                                     {processing ? (
                                         <div className="flex items-center">

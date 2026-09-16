@@ -1,5 +1,6 @@
 import StudentPageShell from '@/Components/Innovation/StudentPageShell';
 import AiDisclosureBadge from '@/Components/Innovation/AiDisclosureBadge';
+import AgentAttribution from '@/Components/Innovation/AgentAttribution';
 import AiAppealButton from '@/Components/Innovation/AiAppealButton';
 import { useTranslation } from '@/i18n';
 
@@ -34,6 +35,7 @@ export default function Recommendations({ recommendations }) {
                     <p className="text-gray-500 mt-1">{t('innovation.recommendations.subtitle')}</p>
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                         <AiDisclosureBadge />
+                        <AgentAttribution agentKey="recommendations" />
                         <AiAppealButton feature="recommendations" />
                     </div>
                 </div>

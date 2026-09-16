@@ -32,12 +32,20 @@ class InnovationController extends Controller
 
         if ($index) {
             $index->setAttribute('classification_details', $index->getClassificationDetails());
+            $index->setAttribute('national_level', $index->getNationalLevelDetails());
         }
 
+        $roleBadge = app(\App\Services\ScoringEngine\StudentRoleBadgeService::class)->resolve($user);
+
+        $referenceStandards = collect(array_keys(InnovationIndex::INDEX_NAMES))
+            ->mapWithKeys(fn ($key) => [$key => \App\Models\ReferenceStandard::forIndexKey($key)]);
+
         return Inertia::render('Innovator/Indexes', [
-            'index'      => $index,
-            'indexNames' => InnovationIndex::INDEX_NAMES,
-            'metadata'   => $index?->calculation_metadata ?? [],
+            'index'              => $index,
+            'indexNames'         => InnovationIndex::INDEX_NAMES,
+            'metadata'           => $index?->calculation_metadata ?? [],
+            'referenceStandards' => $referenceStandards,
+            'roleBadge'          => $roleBadge,
         ]);
     }
 

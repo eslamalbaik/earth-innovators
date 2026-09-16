@@ -7,6 +7,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { getPublicationFileUrl, getPublicationImageUrl } from '@/utils/imageUtils';
 import AiDisclosureBadge from '@/Components/Innovation/AiDisclosureBadge';
+import AgentAttribution from '@/Components/Innovation/AgentAttribution';
 import { useTranslation } from '@/i18n';
 
 const monthKeys = [
@@ -206,7 +207,12 @@ export default function PublicationShow({
                         )}
                     </h1>
 
-                    {publication.is_ai_generated && <AiDisclosureBadge />}
+                    {publication.is_ai_generated && (
+                        <div className="flex flex-wrap items-center gap-2">
+                            <AiDisclosureBadge />
+                            <AgentAttribution agentKey="content_generation" />
+                        </div>
+                    )}
 
                     <div className="flex flex-wrap items-center gap-3 text-xs text-gray-600">
                         {publication.publish_date && (
