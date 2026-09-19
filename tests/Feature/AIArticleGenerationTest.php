@@ -85,6 +85,11 @@ class AIArticleGenerationTest extends TestCase
     /** @dataProvider publicationRoleProvider */
     public function test_generate_returns_ai_content_on_success(string $role, string $routeName): void
     {
+        // The controller only calls Unsplash when an access key is configured
+        // (empty in .env.example/testing by default) — set one so the faked
+        // Unsplash response below is actually exercised.
+        config(['services.unsplash.access_key' => 'test-unsplash-key']);
+
         Http::fake([
             'generativelanguage.googleapis.com/*' => Http::response($this->fakeGeminiSuccessBody(), 200),
             'api.unsplash.com/*'                  => Http::response($this->fakeUnsplashSuccessBody(), 200),
