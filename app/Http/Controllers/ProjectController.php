@@ -61,15 +61,15 @@ class ProjectController extends Controller
             $projectId = $project->id;
         } elseif (is_numeric($project)) {
             $projectId = (int) $project;
+        } elseif (empty($project)) {
+            abort(404, __('messages.msg_113'));
         } else {
-            $projectModel = Project::where('slug', $project)
-                ->orWhere('title', $project)
-                ->first();
-            
+            $projectModel = Project::where('title', $project)->first();
+
             if (!$projectModel) {
                 abort(404, __('messages.msg_113'));
             }
-            
+
             $projectId = $projectModel->id;
         }
         
