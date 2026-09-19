@@ -31,6 +31,10 @@ class RegistrationTest extends TestCase
             'password_confirmation' => 'password',
             'role' => 'student',
             'school_id' => $school->id,
+            'grade' => 'grade_1',
+            'section' => 'A',
+            'subjects' => ['math'],
+            'consent_ai_processing' => true,
         ]);
 
         $this->assertAuthenticated();
