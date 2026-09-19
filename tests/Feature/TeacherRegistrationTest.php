@@ -30,6 +30,7 @@ class TeacherRegistrationTest extends TestCase
             'phone' => '+966501234567',
             'role' => 'teacher',
             'school_id' => $school->id,
+            'consent_ai_processing' => true,
         ]);
 
         // التحقق من إعادة التوجيه

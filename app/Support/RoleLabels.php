@@ -19,8 +19,12 @@ class RoleLabels
         'educational_institution' => 'مؤسسة تعليمية',
     ];
 
-    public static function label(string $role): string
+    public static function label(?string $role): string
     {
+        if ($role === null) {
+            return '';
+        }
+
         return self::LABELS[$role] ?? $role;
     }
 }
