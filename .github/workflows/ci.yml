@@ -37,6 +37,21 @@ jobs:
           cp .env.example .env
           php artisan key:generate
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build assets
+        # Feature tests that hit real Inertia pages render app.blade.php's
+        # @vite directive, which needs public/build/manifest.json — without
+        # this, every such test fails with "Vite manifest not found".
+        run: npm run build
+
       - name: Run tests
         # phpunit.xml pins sqlite :memory:, array cache/session, and sync queue,
         # so no external database or services are required.
