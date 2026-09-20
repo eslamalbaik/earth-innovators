@@ -15,8 +15,8 @@ class PasswordUpdateTest extends TestCase
     public function test_password_can_be_updated(): void
     {
         $user = User::factory()->create();
-        // random strong password to satisfy the uncompromised (not-pwned) password rule
-        $newPassword = Str::password(20);
+        // Password must have: 8+ chars, mixed case, numbers, symbols, and not compromised
+        $newPassword = 'NewSecurePass123!@#';
 
         $response = $this
             ->actingAs($user)
