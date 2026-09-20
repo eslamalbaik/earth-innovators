@@ -87,6 +87,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Temporary diagnostic. The deploy step below fails with
+      # "dial tcp ***:***: i/o timeout", which narrows to either a wrong
+      # SSH_PORT secret or a firewall dropping GitHub's runner IPs. Probing
+      # the configured port and port 22 separately tells the two apart:
+      # 22 open but configured port timing out => the secret is wrong;
+      # both timing out => the firewall is dropping this runner.
+      # Only lengths are printed, never the secret values. Remove once fixed.
+      - name: Probe SSH connectivity
+        env:
+          HOST: ${{ secrets.SSH_HOST }}
+          PORT: ${{ secrets.SSH_PORT || 22 }}
+        run: |
+          echo "runner public IP: $(curl -s --max-time 10 https://api.ipify.org)"
+          echo "host length: ${#HOST} (expect 11)"
+          echo "port length: ${#PORT} (expect 2)"
+          echo "--- configured port ---"
+          nc -vz -w 10 "$HOST" "$PORT" || echo "FAILED on configured port"
+          echo "--- port 22 explicitly ---"
+          nc -vz -w 10 "$HOST" 22 || echo "FAILED on port 22"
+
       - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
