@@ -7,7 +7,8 @@ import { useTranslation } from '@/i18n';
 import InitiativeForm from '@/Components/Initiatives/InitiativeForm';
 
 export default function AdminInitiativesIndex({ auth, initiatives }) {
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
+    const isAr = language === 'ar';
     const { confirm } = useConfirmDialog();
     const [adding, setAdding] = useState(false);
     const [editing, setEditing] = useState(null);
@@ -50,8 +51,8 @@ export default function AdminInitiativesIndex({ auth, initiatives }) {
                         <div key={i.id} className="bg-white border border-gray-100 rounded-2xl p-4">
                             <div className="flex items-start justify-between gap-2">
                                 <div>
-                                    <h3 className="font-bold text-gray-900">{i.title_ar}</h3>
-                                    <p className="text-sm text-gray-600 mt-1">{i.description_ar}</p>
+                                    <h3 className="font-bold text-gray-900">{isAr ? i.title_ar : i.title_en}</h3>
+                                    <p className="text-sm text-gray-600 mt-1">{isAr ? i.description_ar : i.description_en}</p>
                                     {(i.start_date || i.end_date) && (
                                         <div className="flex items-center gap-1 text-xs text-gray-400 mt-2">
                                             <FaCalendar /> {i.start_date || '—'} → {i.end_date || '—'}
