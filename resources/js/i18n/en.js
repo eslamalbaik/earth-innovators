@@ -5351,6 +5351,32 @@ export const en = {
             "saveChanges": "Save changes"
         }
     },
+    "teacherInviteCodesPage": {
+        "pageTitle": "Student Invite Codes - {appName}",
+        "title": "My Student Invite Codes",
+        "subtitle": "Share this code or link with your students so they can join directly under your supervision without selecting a school from a general list."
+    },
+    "schoolInviteCodesPage": {
+        "pageTitle": "Invite Codes - {appName}",
+        "title": "Invite Codes for Teachers and Students",
+        "subtitle": "Share this code or link with a teacher or student to join your school directly without selecting from a general list — prevents unauthorized accounts from joining."
+    },
+    "inviteCodesPanel": {
+        "studentRole": "Student Code",
+        "teacherRole": "Teacher Code",
+        "gradeLabel": "Grade (optional)",
+        "sectionLabel": "Section (optional)",
+        "maxUsesLabel": "Number of uses (unlimited if empty)",
+        "createButton": "Create Code",
+        "createSuccess": "Code created successfully",
+        "copySuccess": "Invite link copied",
+        "studentLabel": "Student",
+        "teacherLabel": "Teacher",
+        "usedLabel": "Used",
+        "revokedLabel": "Revoked",
+        "unlimitedUses": "unlimited",
+        "empty": "No invite codes yet"
+    },
     "teachersPage": {
         "pageTitle": "Teachers - {appName}",
         "heroTitle": "Find your ideal teacher easily",

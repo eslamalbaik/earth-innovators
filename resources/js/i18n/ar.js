@@ -6018,6 +6018,32 @@ export const ar = {
             "saveChanges": "حفظ التغييرات"
         }
     },
+    "teacherInviteCodesPage": {
+        "pageTitle": "أكواد دعوة الطلاب - {appName}",
+        "title": "أكواد دعوة طلابي",
+        "subtitle": "شارك هذا الكود أو الرابط مع طلاب شعبتك لينضموا مباشرة تحت إشرافك دون اختيار مدرسة من قائمة عامة."
+    },
+    "schoolInviteCodesPage": {
+        "pageTitle": "أكواد الدعوة - {appName}",
+        "title": "أكواد دعوة المعلمين والطلاب",
+        "subtitle": "شارك هذا الكود أو الرابط مع معلم أو طالب لينضم مباشرة لمدرستك دون اختيار مدرسة من قائمة عامة — يمنع انضمام حسابات غير مصرح بها."
+    },
+    "inviteCodesPanel": {
+        "studentRole": "كود طالب",
+        "teacherRole": "كود معلم",
+        "gradeLabel": "الصف (اختياري)",
+        "sectionLabel": "الشعبة (اختياري)",
+        "maxUsesLabel": "عدد الاستخدامات (بلا حد إن فارغ)",
+        "createButton": "إنشاء كود",
+        "createSuccess": "تم إنشاء الكود",
+        "copySuccess": "تم نسخ رابط الدعوة",
+        "studentLabel": "طالب",
+        "teacherLabel": "معلم",
+        "usedLabel": "استُخدم",
+        "revokedLabel": "ملغى",
+        "unlimitedUses": "بلا حد",
+        "empty": "لا توجد أكواد دعوة بعد"
+    },
     "teachersPage": {
         "pageTitle": "المعلمون - {appName}",
         "heroTitle": "ابحث عن معلمك المثالي بسهولة",
