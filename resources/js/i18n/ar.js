@@ -6018,6 +6018,35 @@ export const ar = {
             "saveChanges": "حفظ التغييرات"
         }
     },
+    "adminAcademicStructurePage": {
+        "pageTitle": "الهيكل الأكاديمي - {appName}",
+        "curriculaTab": "المناهج",
+        "subjectsTab": "المواد",
+        "gradesTab": "المراحل",
+        "curriculumPlaceholderAr": "اسم المنهج (عربي)",
+        "curriculumPlaceholderEn": "Curriculum (English)",
+        "addCurriculum": "إضافة",
+        "deleteCurriculumTitle": "حذف المنهج؟",
+        "deleteCurriculumMessage": "سيتم حذف \"{name}\" نهائياً.",
+        "active": "نشط",
+        "inactive": "موقوف",
+        "subjectPlaceholderAr": "اسم المادة (عربي)",
+        "subjectPlaceholderEn": "Subject (English)",
+        "addSubject": "إضافة",
+        "deleteSubjectTitle": "حذف المادة؟",
+        "deleteSubjectMessage": "سيتم حذف \"{name}\" نهائياً.",
+        "addSuccess": "تمت الإضافة"
+    },
+    "adminInitiativesPage": {
+        "pageTitle": "المبادرات العامة - {appName}",
+        "title": "المبادرات العامة",
+        "subtitle": "تظهر لكل الطلاب والمعلمين بكل المدارس، منفصلة عن مبادرات كل مدرسة الخاصة.",
+        "addButton": "مبادرة جديدة",
+        "deleteTitle": "حذف المبادرة؟",
+        "deleteMessage": "سيتم حذف \"{name}\" نهائياً.",
+        "inactive": "موقوفة",
+        "empty": "لا توجد مبادرات بعد"
+    },
     "teacherInviteCodesPage": {
         "pageTitle": "أكواد دعوة الطلاب - {appName}",
         "title": "أكواد دعوة طلابي",

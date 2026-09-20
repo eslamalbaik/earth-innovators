@@ -3,32 +3,37 @@ import { Head, router } from '@inertiajs/react';
 import { FaPlus, FaTrash, FaEdit, FaCalendar, FaGlobe } from 'react-icons/fa';
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
+import { useTranslation } from '@/i18n';
 import InitiativeForm from '@/Components/Initiatives/InitiativeForm';
 
 export default function AdminInitiativesIndex({ auth, initiatives }) {
+    const { t } = useTranslation();
     const { confirm } = useConfirmDialog();
     const [adding, setAdding] = useState(false);
     const [editing, setEditing] = useState(null);
 
     const remove = async (i) => {
-        const ok = await confirm?.({ title: 'حذف المبادرة؟', message: `سيتم حذف "${i.title_ar}" نهائياً.` });
+        const ok = await confirm?.({
+            title: t('adminInitiativesPage.deleteTitle'),
+            message: t('adminInitiativesPage.deleteMessage', { name: i.title_ar })
+        });
         if (ok === false) return;
         router.delete(route('admin.initiatives.destroy', i.id));
     };
 
     return (
         <DashboardLayout auth={auth}>
-            <Head title="المبادرات العامة" />
+            <Head title={t('adminInitiativesPage.pageTitle', { appName: t('common.appName') })} />
             <div className="p-6 max-w-4xl mx-auto">
                 <div className="flex items-center justify-between mb-1">
-                    <h1 className="text-2xl font-black text-gray-900 flex items-center gap-2"><FaGlobe className="text-indigo-500" /> المبادرات العامة</h1>
+                    <h1 className="text-2xl font-black text-gray-900 flex items-center gap-2"><FaGlobe className="text-indigo-500" /> {t('adminInitiativesPage.title')}</h1>
                     {!adding && !editing && (
                         <button onClick={() => setAdding(true)} className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700">
-                            <FaPlus /> مبادرة جديدة
+                            <FaPlus /> {t('adminInitiativesPage.addButton')}
                         </button>
                     )}
                 </div>
-                <p className="text-sm text-gray-600 mb-6">تظهر لكل الطلاب والمعلمين بكل المدارس، منفصلة عن مبادرات كل مدرسة الخاصة.</p>
+                <p className="text-sm text-gray-600 mb-6">{t('adminInitiativesPage.subtitle')}</p>
 
                 {(adding || editing) && (
                     <InitiativeForm
@@ -54,7 +59,7 @@ export default function AdminInitiativesIndex({ auth, initiatives }) {
                                     )}
                                 </div>
                                 <div className="flex items-center gap-1 shrink-0">
-                                    {!i.is_active && <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-500">موقوفة</span>}
+                                    {!i.is_active && <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-500">{t('adminInitiativesPage.inactive')}</span>}
                                     <button onClick={() => setEditing(i)} className="text-indigo-600 hover:bg-indigo-50 p-1.5 rounded-lg"><FaEdit size={13} /></button>
                                     <button onClick={() => remove(i)} className="text-red-500 hover:bg-red-50 p-1.5 rounded-lg"><FaTrash size={13} /></button>
                                 </div>
@@ -62,7 +67,7 @@ export default function AdminInitiativesIndex({ auth, initiatives }) {
                         </div>
                     ))}
                     {initiatives.length === 0 && !adding && (
-                        <div className="text-center text-gray-400 py-10">لا توجد مبادرات بعد</div>
+                        <div className="text-center text-gray-400 py-10">{t('adminInitiativesPage.empty')}</div>
                     )}
                 </div>
             </div>

@@ -4,8 +4,10 @@ import { FaPlus, FaTrash, FaSave, FaBook, FaLayerGroup, FaTimes } from 'react-ic
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 import { useToast } from '@/Contexts/ToastContext';
+import { useTranslation } from '@/i18n';
 
 function CurriculaTab({ curricula }) {
+    const { t } = useTranslation();
     const { confirm } = useConfirmDialog();
     const { showSuccess } = useToast();
     const [form, setForm] = useState({ name_ar: '', name_en: '', is_active: true });
@@ -14,12 +16,15 @@ function CurriculaTab({ curricula }) {
         e.preventDefault();
         router.post(route('admin.academic-structure.curricula.store'), form, {
             preserveScroll: true,
-            onSuccess: () => { showSuccess?.('تمت الإضافة'); setForm({ name_ar: '', name_en: '', is_active: true }); },
+            onSuccess: () => { showSuccess?.(t('adminAcademicStructurePage.addSuccess')); setForm({ name_ar: '', name_en: '', is_active: true }); },
         });
     };
 
     const remove = async (c) => {
-        const ok = await confirm?.({ title: 'حذف المنهج؟', message: `سيتم حذف "${c.name_ar}" نهائياً.` });
+        const ok = await confirm?.({
+            title: t('adminAcademicStructurePage.deleteCurriculumTitle'),
+            message: t('adminAcademicStructurePage.deleteCurriculumMessage', { name: c.name_ar })
+        });
         if (ok === false) return;
         router.delete(route('admin.academic-structure.curricula.destroy', c.id), { preserveScroll: true });
     };
@@ -31,9 +36,9 @@ function CurriculaTab({ curricula }) {
     return (
         <div>
             <form onSubmit={add} className="flex flex-wrap gap-2 mb-4 bg-gray-50 p-3 rounded-xl">
-                <input required placeholder="اسم المنهج (عربي)" className="border rounded-lg px-2 py-1.5 flex-1 min-w-[160px]" value={form.name_ar} onChange={(e) => setForm((f) => ({ ...f, name_ar: e.target.value }))} />
-                <input placeholder="Curriculum (English)" className="border rounded-lg px-2 py-1.5 flex-1 min-w-[160px]" value={form.name_en} onChange={(e) => setForm((f) => ({ ...f, name_en: e.target.value }))} />
-                <button className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-sm font-semibold flex items-center gap-1"><FaPlus /> إضافة</button>
+                <input required placeholder={t('adminAcademicStructurePage.curriculumPlaceholderAr')} className="border rounded-lg px-2 py-1.5 flex-1 min-w-[160px]" value={form.name_ar} onChange={(e) => setForm((f) => ({ ...f, name_ar: e.target.value }))} />
+                <input placeholder={t('adminAcademicStructurePage.curriculumPlaceholderEn')} className="border rounded-lg px-2 py-1.5 flex-1 min-w-[160px]" value={form.name_en} onChange={(e) => setForm((f) => ({ ...f, name_en: e.target.value }))} />
+                <button className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-sm font-semibold flex items-center gap-1"><FaPlus /> {t('adminAcademicStructurePage.addCurriculum')}</button>
             </form>
             <div className="space-y-2">
                 {curricula.map((c) => (
@@ -44,7 +49,7 @@ function CurriculaTab({ curricula }) {
                         </div>
                         <div className="flex items-center gap-2">
                             <button onClick={() => toggle(c)} className={`text-xs px-2 py-1 rounded-full font-semibold ${c.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>
-                                {c.is_active ? 'نشط' : 'موقوف'}
+                                {c.is_active ? t('adminAcademicStructurePage.active') : t('adminAcademicStructurePage.inactive')}
                             </button>
                             <button onClick={() => remove(c)} className="text-red-500 hover:bg-red-50 p-1.5 rounded-lg"><FaTrash size={13} /></button>
                         </div>
@@ -56,6 +61,7 @@ function CurriculaTab({ curricula }) {
 }
 
 function SubjectsTab({ subjects }) {
+    const { t } = useTranslation();
     const { confirm } = useConfirmDialog();
     const { showSuccess } = useToast();
     const [form, setForm] = useState({ name_ar: '', name_en: '', is_active: true });
@@ -64,12 +70,15 @@ function SubjectsTab({ subjects }) {
         e.preventDefault();
         router.post(route('admin.academic-structure.subjects.store'), form, {
             preserveScroll: true,
-            onSuccess: () => { showSuccess?.('تمت الإضافة'); setForm({ name_ar: '', name_en: '', is_active: true }); },
+            onSuccess: () => { showSuccess?.(t('adminAcademicStructurePage.addSuccess')); setForm({ name_ar: '', name_en: '', is_active: true }); },
         });
     };
 
     const remove = async (s) => {
-        const ok = await confirm?.({ title: 'حذف المادة؟', message: `سيتم حذف "${s.name_ar}" نهائياً.` });
+        const ok = await confirm?.({
+            title: t('adminAcademicStructurePage.deleteSubjectTitle'),
+            message: t('adminAcademicStructurePage.deleteSubjectMessage', { name: s.name_ar })
+        });
         if (ok === false) return;
         router.delete(route('admin.academic-structure.subjects.destroy', s.id), { preserveScroll: true });
     };
@@ -81,9 +90,9 @@ function SubjectsTab({ subjects }) {
     return (
         <div>
             <form onSubmit={add} className="flex flex-wrap gap-2 mb-4 bg-gray-50 p-3 rounded-xl">
-                <input required placeholder="اسم المادة (عربي)" className="border rounded-lg px-2 py-1.5 flex-1 min-w-[160px]" value={form.name_ar} onChange={(e) => setForm((f) => ({ ...f, name_ar: e.target.value }))} />
-                <input placeholder="Subject (English)" className="border rounded-lg px-2 py-1.5 flex-1 min-w-[160px]" value={form.name_en} onChange={(e) => setForm((f) => ({ ...f, name_en: e.target.value }))} />
-                <button className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-sm font-semibold flex items-center gap-1"><FaPlus /> إضافة</button>
+                <input required placeholder={t('adminAcademicStructurePage.subjectPlaceholderAr')} className="border rounded-lg px-2 py-1.5 flex-1 min-w-[160px]" value={form.name_ar} onChange={(e) => setForm((f) => ({ ...f, name_ar: e.target.value }))} />
+                <input placeholder={t('adminAcademicStructurePage.subjectPlaceholderEn')} className="border rounded-lg px-2 py-1.5 flex-1 min-w-[160px]" value={form.name_en} onChange={(e) => setForm((f) => ({ ...f, name_en: e.target.value }))} />
+                <button className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-sm font-semibold flex items-center gap-1"><FaPlus /> {t('adminAcademicStructurePage.addSubject')}</button>
             </form>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {subjects.map((s) => (
@@ -94,7 +103,7 @@ function SubjectsTab({ subjects }) {
                         </div>
                         <div className="flex items-center gap-2">
                             <button onClick={() => toggle(s)} className={`text-xs px-2 py-1 rounded-full font-semibold ${s.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>
-                                {s.is_active ? 'نشط' : 'موقوف'}
+                                {s.is_active ? t('adminAcademicStructurePage.active') : t('adminAcademicStructurePage.inactive')}
                             </button>
                             <button onClick={() => remove(s)} className="text-red-500 hover:bg-red-50 p-1.5 rounded-lg"><FaTrash size={13} /></button>
                         </div>
@@ -193,17 +202,18 @@ function StudyPlansTab({ studyPlans, curricula, subjects, schools }) {
 }
 
 export default function AcademicStructureIndex({ auth, curricula, subjects, studyPlans, schools }) {
+    const { t } = useTranslation();
     const [tab, setTab] = useState('curricula');
 
     const tabs = [
-        { key: 'curricula', label: 'المناهج', icon: <FaLayerGroup /> },
-        { key: 'subjects', label: 'المواد', icon: <FaBook /> },
+        { key: 'curricula', label: t('adminAcademicStructurePage.curriculaTab'), icon: <FaLayerGroup /> },
+        { key: 'subjects', label: t('adminAcademicStructurePage.subjectsTab'), icon: <FaBook /> },
         { key: 'study-plans', label: 'صف/شعبة/ساعات', icon: <FaLayerGroup /> },
     ];
 
     return (
         <DashboardLayout auth={auth}>
-            <Head title="إدارة المناهج والمواد" />
+            <Head title={t('adminAcademicStructurePage.pageTitle', { appName: t('common.appName') })} />
             <div className="p-6 max-w-6xl mx-auto">
                 <h1 className="text-2xl font-black text-gray-900 mb-1">إدارة المناهج والمواد</h1>
                 <p className="text-sm text-gray-600 mb-6">نموذج بيانات هرمي: منهج ← مادة ← بيانات صف/شعبة. أي إضافة هنا تظهر فوراً بقوائم اختيار المشاريع والتقييمات.</p>

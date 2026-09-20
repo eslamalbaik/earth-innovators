@@ -5351,6 +5351,35 @@ export const en = {
             "saveChanges": "Save changes"
         }
     },
+    "adminAcademicStructurePage": {
+        "pageTitle": "Academic Structure - {appName}",
+        "curriculaTab": "Curricula",
+        "subjectsTab": "Subjects",
+        "gradesTab": "Grades",
+        "curriculumPlaceholderAr": "Curriculum name (Arabic)",
+        "curriculumPlaceholderEn": "Curriculum name (English)",
+        "addCurriculum": "Add",
+        "deleteCurriculumTitle": "Delete Curriculum?",
+        "deleteCurriculumMessage": "\"{name}\" will be permanently deleted.",
+        "active": "Active",
+        "inactive": "Inactive",
+        "subjectPlaceholderAr": "Subject name (Arabic)",
+        "subjectPlaceholderEn": "Subject name (English)",
+        "addSubject": "Add",
+        "deleteSubjectTitle": "Delete Subject?",
+        "deleteSubjectMessage": "\"{name}\" will be permanently deleted.",
+        "addSuccess": "Added successfully"
+    },
+    "adminInitiativesPage": {
+        "pageTitle": "Global Initiatives - {appName}",
+        "title": "Global Initiatives",
+        "subtitle": "Visible to all students and teachers across all schools, separate from each school's own initiatives.",
+        "addButton": "New Initiative",
+        "deleteTitle": "Delete Initiative?",
+        "deleteMessage": "\"{name}\" will be permanently deleted.",
+        "inactive": "Inactive",
+        "empty": "No initiatives yet"
+    },
     "teacherInviteCodesPage": {
         "pageTitle": "Student Invite Codes - {appName}",
         "title": "My Student Invite Codes",
