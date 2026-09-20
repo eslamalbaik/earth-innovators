@@ -36,10 +36,16 @@ class CoreCatalogSeeder extends Seeder
 
         // Subjects (used in bookings/teacher profiles)
         $subjects = [
-            ['name_ar' => 'الرياضيات', 'name_en' => 'Mathematics'],
-            ['name_ar' => 'العلوم', 'name_en' => 'Science'],
             ['name_ar' => 'اللغة العربية', 'name_en' => 'Arabic'],
             ['name_ar' => 'اللغة الإنجليزية', 'name_en' => 'English'],
+            ['name_ar' => 'الرياضيات', 'name_en' => 'Mathematics'],
+            ['name_ar' => 'العلوم', 'name_en' => 'Science'],
+            ['name_ar' => 'الكيمياء', 'name_en' => 'Chemistry'],
+            ['name_ar' => 'الفيزياء', 'name_en' => 'Physics'],
+            ['name_ar' => 'الهوية والقيم والأسرة', 'name_en' => 'Identity, Values & Family'],
+            ['name_ar' => 'الابتكار والاختراع', 'name_en' => 'Innovation & Invention'],
+            ['name_ar' => 'الذكاء الاجتماعي والعاطفي', 'name_en' => 'Social & Emotional Intelligence'],
+            ['name_ar' => 'الذكاء الاصطناعي والتقنيات المستقبلية', 'name_en' => 'AI & Future Technologies'],
         ];
 
         foreach ($subjects as $i => $subject) {
