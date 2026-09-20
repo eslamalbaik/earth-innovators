@@ -393,6 +393,64 @@ export default function DashboardLayout({ children, header }) {
         return false;
     };
 
+    // `school` and `educational_institution` are both live roles in the users table
+    // and had separate copies of this list, which had already drifted apart — only
+    // one of them linked /school/badges/pending. Defined once and shared so the two
+    // roles cannot diverge again.
+    const schoolNavigation = [
+        { name: t('sidebar.dashboard'), href: '/school/dashboard', icon: FaTachometerAlt },
+        {
+            name: t('sidebar.projectBox'),
+            href: '/school/projects',
+            icon: FaProjectDiagram,
+            subItems: [
+                { name: t('sidebar.submissions'), href: '/school/submissions', icon: FaFile },
+                { name: t('sidebar.reviewProjects'), href: '/school/projects/pending', icon: FaBookOpen },
+                { name: t('sidebar.projects'), href: '/school/projects', icon: FaProjectDiagram },
+            ]
+        },
+        {
+            name: t('sidebar.badges'),
+            href: '/school/badges',
+            icon: FaMedal,
+            subItems: [
+                { name: t('sidebar.pendingBadges'), href: '/school/badges/pending', icon: FaMedal },
+                { name: t('sidebar.badges'), href: '/school/badges', icon: FaCommentDots },
+                { name: t('sidebar.ranking'), href: '/school/ranking', icon: FaTrophy },
+            ]
+        },
+        {
+            name: t('sidebar.publications'),
+            href: '/school/publications',
+            icon: FaBook,
+            subItems: [
+                { name: t('sidebar.schoolPublications'), href: '/school/publications', icon: FaBook },
+                { name: t('sidebar.pendingPublications'), href: '/school/publications/pending', icon: FaBookOpen },
+            ]
+        },
+        {
+            name: t('sidebar.challenges'),
+            href: '/school/challenges',
+            icon: FaCalendar,
+            subItems: [
+                { name: t('sidebar.challengeSubmissions'), href: '/school/challenge-submissions', icon: FaFile },
+                { name: t('sidebar.challengeSuggestions'), href: '/school/challenge-suggestions', icon: FaLightbulb },
+                { name: t('sidebar.challenges'), href: '/school/challenges', icon: FaCalendar },
+            ]
+        },
+        { name: t('sidebar.addReports'), href: '/school/reports', icon: FaFile },
+        { name: t('sidebar.students'), href: '/school/students', icon: FaGraduationCap },
+        { name: t('sidebar.innovationTracking'), href: '/teacher/innovation/dashboard', icon: FaChartLine },
+        { name: t('sidebar.smartAgent'), href: '/school/innovation/chat', icon: FaRobot },
+        { name: t('sidebar.teachersManagement'), href: '/school/teachers', icon: FaChalkboardTeacher },
+        { name: t('sidebar.inviteCodes'), href: '/school/invite-codes', icon: FaUserTag },
+        { name: t('sidebar.schoolAnalytics'), href: '/school/analytics', icon: FaChartLine },
+        { name: t('sidebar.initiatives'), href: '/school/initiatives', icon: FaGift },
+        { name: t('sidebar.certificates'), href: '/school/certificates', icon: FaFile },
+        { name: t('sidebar.packages'), href: '/packages', icon: FaCreditCard },
+        { name: t('sidebar.profile'), href: '/profile', icon: FaUser },
+    ];
+
     const navigation = {
         admin: [
             { name: t('sidebar.dashboard'), href: '/admin/dashboard', icon: FaTachometerAlt },
@@ -469,115 +527,36 @@ export default function DashboardLayout({ children, header }) {
             },
             { name: t('sidebar.followedStudents'), href: '/teacher/students', icon: FaGraduationCap },
             { name: t('sidebar.inviteCodes'), href: '/teacher/invite-codes', icon: FaUserTag },
-            { name: t('sidebar.innovationTracking'), href: '/teacher/innovation/dashboard', icon: FaChartLine },
+            {
+                name: t('sidebar.innovationTracking'),
+                href: '/teacher/innovation/dashboard',
+                icon: FaChartLine,
+                subItems: [
+                    { name: t('sidebar.innovationTracking'), href: '/teacher/innovation/dashboard', icon: FaChartLine },
+                    { name: t('sidebar.compareStudents'), href: '/teacher/innovation/compare', icon: FaCheckCircle },
+                ]
+            },
+            {
+                // The tutoring side of the teacher panel: these pages all render
+                // real Inertia views but had no link anywhere in the sidebar.
+                // /teacher/bookings is deliberately absent — it returns JSON, not a page.
+                name: t('sidebar.tutoring'),
+                href: '/teacher/subjects',
+                icon: FaChalkboardTeacher,
+                subItems: [
+                    { name: t('sidebar.subjects'), href: '/teacher/subjects', icon: FaBookOpen },
+                    { name: t('sidebar.availability'), href: '/teacher/availability', icon: FaCalendar },
+                    { name: t('sidebar.reviews'), href: '/teacher/reviews', icon: FaCommentDots },
+                    { name: t('sidebar.payments'), href: '/teacher/payments', icon: FaCreditCard },
+                ]
+            },
             { name: t('sidebar.myBadges'), href: '/teacher/badges', icon: FaMedal },
             { name: t('sidebar.initiatives'), href: '/initiatives', icon: FaGift },
             { name: t('sidebar.certificates'), href: '/teacher/certificates', icon: FaFile },
             { name: t('sidebar.profile'), href: '/teacher/profile', icon: FaUser },
         ],
-        school: [
-            { name: t('sidebar.dashboard'), href: '/school/dashboard', icon: FaTachometerAlt },
-            {
-                name: t('sidebar.projectBox'),
-                href: '/school/projects',
-                icon: FaProjectDiagram,
-                subItems: [
-                    { name: t('sidebar.submissions'), href: '/school/submissions', icon: FaFile },
-                    { name: t('sidebar.reviewProjects'), href: '/school/projects/pending', icon: FaBookOpen },
-                    { name: t('sidebar.projects'), href: '/school/projects', icon: FaProjectDiagram },
-                ]
-            },
-            {
-                name: t('sidebar.badges'),
-                href: '/school/badges',
-                icon: FaMedal,
-                subItems: [
-                    { name: t('sidebar.badges'), href: '/school/badges', icon: FaCommentDots },
-                    { name: t('sidebar.ranking'), href: '/school/ranking', icon: FaTrophy },
-                ]
-            },
-            {
-                name: t('sidebar.publications'),
-                href: '/school/publications',
-                icon: FaBook,
-                subItems: [
-                    { name: t('sidebar.schoolPublications'), href: '/school/publications', icon: FaBook },
-                ]
-            },
-            {
-                name: t('sidebar.challenges'),
-                href: '/school/challenges',
-                icon: FaCalendar,
-                subItems: [
-                    { name: t('sidebar.challengeSubmissions'), href: '/school/challenge-submissions', icon: FaFile },
-                    { name: t('sidebar.challengeSuggestions'), href: '/school/challenge-suggestions', icon: FaLightbulb },
-                    { name: t('sidebar.challenges'), href: '/school/challenges', icon: FaCalendar },
-                ]
-            },
-            { name: t('sidebar.addReports'), href: '/school/reports', icon: FaFile },
-            { name: t('sidebar.students'), href: '/school/students', icon: FaGraduationCap },
-            { name: t('sidebar.innovationTracking'), href: '/teacher/innovation/dashboard', icon: FaChartLine },
-            { name: t('sidebar.smartAgent'), href: '/school/innovation/chat', icon: FaRobot },
-            { name: t('sidebar.teachersManagement'), href: '/school/teachers', icon: FaChalkboardTeacher },
-            { name: t('sidebar.inviteCodes'), href: '/school/invite-codes', icon: FaUserTag },
-            { name: t('sidebar.schoolAnalytics'), href: '/school/analytics', icon: FaChartLine },
-            { name: t('sidebar.initiatives'), href: '/school/initiatives', icon: FaGift },
-            { name: t('sidebar.certificates'), href: '/school/certificates', icon: FaFile },
-            { name: t('sidebar.packages'), href: '/packages', icon: FaCreditCard },
-            { name: t('sidebar.profile'), href: '/profile', icon: FaUser },
-        ],
-        educational_institution: [
-            { name: t('sidebar.dashboard'), href: '/school/dashboard', icon: FaTachometerAlt },
-            {
-                name: t('sidebar.projectBox'),
-                href: '/school/projects',
-                icon: FaProjectDiagram,
-                subItems: [
-                    { name: t('sidebar.submissions'), href: '/school/submissions', icon: FaFile },
-                    { name: t('sidebar.reviewProjects'), href: '/school/projects/pending', icon: FaBookOpen },
-                    { name: t('sidebar.projects'), href: '/school/projects', icon: FaProjectDiagram },
-                ]
-            },
-            {
-                name: t('sidebar.badges'),
-                href: '/school/badges',
-                icon: FaMedal,
-                subItems: [
-                    { name: t('sidebar.reviewProjects'), href: '/school/badges/pending', icon: FaMedal },
-                    { name: t('sidebar.badges'), href: '/school/badges', icon: FaCommentDots },
-                    { name: t('sidebar.ranking'), href: '/school/ranking', icon: FaTrophy },
-                ]
-            },
-            {
-                name: t('sidebar.publications'),
-                href: '/school/publications',
-                icon: FaBook,
-                subItems: [
-                    { name: t('sidebar.schoolPublications'), href: '/school/publications', icon: FaBook },
-                ]
-            },
-            {
-                name: t('sidebar.challenges'),
-                href: '/school/challenges',
-                icon: FaCalendar,
-                subItems: [
-                    { name: t('sidebar.challengeSubmissions'), href: '/school/challenge-submissions', icon: FaFile },
-                    { name: t('sidebar.challengeSuggestions'), href: '/school/challenge-suggestions', icon: FaLightbulb },
-                    { name: t('sidebar.challenges'), href: '/school/challenges', icon: FaCalendar },
-                ]
-            },
-            { name: t('sidebar.addReports'), href: '/school/reports', icon: FaFile },
-            { name: t('sidebar.students'), href: '/school/students', icon: FaGraduationCap },
-            { name: t('sidebar.innovationTracking'), href: '/teacher/innovation/dashboard', icon: FaChartLine },
-            { name: t('sidebar.smartAgent'), href: '/school/innovation/chat', icon: FaRobot },
-            { name: t('sidebar.teachersManagement'), href: '/school/teachers', icon: FaChalkboardTeacher },
-            { name: t('sidebar.inviteCodes'), href: '/school/invite-codes', icon: FaUserTag },
-            { name: t('sidebar.schoolAnalytics'), href: '/school/analytics', icon: FaChartLine },
-            { name: t('sidebar.initiatives'), href: '/school/initiatives', icon: FaGift },
-            { name: t('sidebar.certificates'), href: '/school/certificates', icon: FaFile },
-            { name: t('sidebar.packages'), href: '/packages', icon: FaCreditCard },
-            { name: t('sidebar.profile'), href: '/profile', icon: FaUser },
-        ],
+        school: schoolNavigation,
+        educational_institution: schoolNavigation,
         student: [
             { name: t('sidebar.dashboard'), href: '/dashboard', icon: FaTachometerAlt },
             {
