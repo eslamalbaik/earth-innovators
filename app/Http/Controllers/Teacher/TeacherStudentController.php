@@ -134,10 +134,10 @@ class TeacherStudentController extends Controller
         $teacher = Auth::user();
 
         if ($student->role !== 'student' || (int) $student->teacher_id !== (int) $teacher->id) {
-            abort(404);
+            return redirect('/');
         }
         if (!empty($teacher->school_id) && (int) $student->school_id !== (int) $teacher->school_id) {
-            abort(404);
+            return redirect('/');
         }
 
         return redirect()->route('teacher.students.index');

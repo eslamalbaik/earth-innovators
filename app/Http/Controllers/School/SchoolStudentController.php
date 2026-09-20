@@ -84,7 +84,7 @@ class SchoolStudentController extends Controller
         try {
             $this->studentService->ensureStudentBelongsToSchool((int) $id, $school->id);
         } catch (\Throwable $e) {
-            abort(404);
+            return redirect('/');
         }
 
         return redirect()->route('school.students.index');
@@ -137,7 +137,7 @@ class SchoolStudentController extends Controller
         try {
             $this->studentService->ensureStudentBelongsToSchool((int) $id, $school->id);
         } catch (\Throwable $e) {
-            abort(404);
+            return redirect('/');
         }
 
         return redirect()->route('school.students.index');
