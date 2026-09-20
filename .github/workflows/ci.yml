@@ -114,7 +114,35 @@ jobs:
           echo "--- port 22 explicitly ---"
           nc -vz -w 10 "$HOST" 22 || echo "FAILED on port 22"
 
+      # Proves the SSH host, port, key and deploy path are all correct without
+      # changing anything on the server: every command here only reads state.
+      # migrate:status is a plain query against the migrations table, so it
+      # reports the pending backlog without applying any of it.
+      - name: Verify SSH access (read-only)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script_stop: false
+          script: |
+            echo "connected as: $(whoami)@$(hostname)"
+            cd ${{ secrets.DEPLOY_PATH }} || { echo "DEPLOY_PATH not reachable"; exit 1; }
+            echo "path: $(pwd)"
+            echo "--- current checkout ---"
+            git log --oneline -1 || true
+            git status --short || true
+            echo "--- pending migrations (not applied) ---"
+            php artisan migrate:status 2>/dev/null | grep -ci pending || echo "0 (or status unavailable)"
+
+      # Disabled by default. This runs composer/npm installs and, critically,
+      # `php artisan migrate --force`, which applies every pending migration to
+      # the production database without prompting. Set the repository variable
+      # DEPLOY_ENABLED to "true" only once the read-only check above looks right
+      # and the pending-migration backlog has been reviewed.
       - name: Deploy over SSH
+        if: vars.DEPLOY_ENABLED == 'true'
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
