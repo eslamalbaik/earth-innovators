@@ -60,10 +60,28 @@ server.registerTool(
   {
     title: 'Execute a write SQL statement',
     description:
-      'Full-access tool: run INSERT/UPDATE/DELETE/DDL statements against the application database. Use with care — this mutates real data.',
-    inputSchema: { sql: z.string(), params: z.array(z.union([z.string(), z.number(), z.null()])).optional() },
+      'Full-access tool: run INSERT/UPDATE/DELETE/DDL statements against the application database. Use with care — this mutates real data. ' +
+      'Requires confirm=true. Call once without confirm to preview what would run, then call again with confirm=true to actually execute it.',
+    inputSchema: {
+      sql: z.string(),
+      params: z.array(z.union([z.string(), z.number(), z.null()])).optional(),
+      confirm: z.boolean().optional().describe('Must be true to actually execute the statement.'),
+    },
   },
-  async ({ sql, params }) => {
+  async ({ sql, params, confirm }) => {
+    if (!confirm) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text:
+              `⚠️ Confirmation required before this statement runs against the real database:\n\n` +
+              `SQL: ${sql}\nParams: ${JSON.stringify(params || [])}\n\n` +
+              `Nothing was executed. Call db_execute again with confirm: true to proceed.`,
+          },
+        ],
+      };
+    }
     const result = await db.query(sql, params || []);
     return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
   }
@@ -74,10 +92,27 @@ server.registerTool(
   {
     title: 'Run an artisan command',
     description:
-      'Full-access tool: run a `php artisan` command against the Earth Innovators app (e.g. "migrate", "db:seed --class=CoreCatalogSeeder", "tinker --execute=...").',
-    inputSchema: { args: z.array(z.string()) },
+      'Full-access tool: run a `php artisan` command against the Earth Innovators app (e.g. "migrate", "db:seed --class=CoreCatalogSeeder", "tinker --execute=..."). ' +
+      'Requires confirm=true. Call once without confirm to preview the command, then call again with confirm=true to actually run it.',
+    inputSchema: {
+      args: z.array(z.string()),
+      confirm: z.boolean().optional().describe('Must be true to actually run the command.'),
+    },
   },
-  async ({ args }) => {
+  async ({ args, confirm }) => {
+    if (!confirm) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text:
+              `⚠️ Confirmation required before this command runs against the real application:\n\n` +
+              `php artisan ${args.join(' ')}\n\n` +
+              `Nothing was executed. Call artisan again with confirm: true to proceed.`,
+          },
+        ],
+      };
+    }
     const { stdout, stderr } = await execFileAsync('php', ['artisan', ...args], {
       cwd: APP_ROOT,
       maxBuffer: 10 * 1024 * 1024,

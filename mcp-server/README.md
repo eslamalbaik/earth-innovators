@@ -9,8 +9,8 @@ Desktop, Claude Code, etc.).
 - `db_list_tables` — list all tables in the app database.
 - `db_describe_table` — show columns for a table.
 - `db_query` — run a read-only `SELECT` query.
-- `db_execute` — **full access**: run `INSERT`/`UPDATE`/`DELETE`/DDL statements.
-- `artisan` — **full access**: run any `php artisan` command (migrations, seeders, tinker, queue jobs, etc.).
+- `db_execute` — **full access**: run `INSERT`/`UPDATE`/`DELETE`/DDL statements. Requires `confirm: true` (first call without it previews and executes nothing).
+- `artisan` — **full access**: run any `php artisan` command (migrations, seeders, tinker, queue jobs, etc.). Requires `confirm: true` (first call without it previews and executes nothing).
 
 It reads DB credentials from the Laravel app's `.env` (`DB_CONNECTION`,
 `DB_HOST`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`) and supports both
