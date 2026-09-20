@@ -145,13 +145,12 @@ export default function ReferenceStandardsIndex({ auth, standards, indexKeys }) 
                             onClick={() => setAdding(true)}
                             className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700"
                         >
-                            <FaPlus /> إضافة معيار
+                            <FaPlus /> {t('adminReferenceStandardsPage.addButton')}
                         </button>
                     )}
                 </div>
                 <p className="text-sm text-gray-600 mb-6">
-                    يربط كل مجال تقييم بالمعيار الوطني/الدولي المقابل له. أي معيار مرتبط بمؤشر تقييم (مثل المهارات أو الابتكار)
-                    يمكن استخدامه لاحقاً لعرض عبارة "هذا التقييم متوافق مع معيار X" في تقارير الطالب والمدرسة.
+                    {t('adminReferenceStandardsPage.subtitle')}
                 </p>
 
                 {(adding || editing) && (

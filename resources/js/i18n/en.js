@@ -5416,6 +5416,8 @@ export const en = {
     "adminReferenceStandardsPage": {
         "pageTitle": "Reference Standards - {appName}",
         "title": "Reference Standards",
+        "subtitle": "Each evaluation domain is linked to its corresponding national/international standard. Any standard linked to an evaluation indicator (such as Skills or Innovation) can later be used to display the phrase \"this evaluation is compatible with standard X\" in student and school reports.",
+        "addButton": "Add Standard",
         "nationalReference": "National Reference",
         "internationalAlignment": "International Alignment",
         "notLinked": "— Not linked to evaluation indicator —",
