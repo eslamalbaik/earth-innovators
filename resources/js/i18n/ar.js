@@ -6103,7 +6103,8 @@ export const ar = {
         "linkedTo": "مرتبط بـ",
         "delete": "حذف",
         "deleteTitle": "حذف المعيار؟",
-        "deleteMessage": "سيتم حذف هذا المعيار نهائياً."
+        "deleteMessage": "سيتم حذف هذا المعيار نهائياً.",
+        "deleteSuccess": "تم الحذف"
     },
     "adminNationalLevelsPage": {
         "pageTitle": "المستويات الوطنية - {appName}",

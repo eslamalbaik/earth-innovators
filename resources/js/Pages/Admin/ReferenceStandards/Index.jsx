@@ -130,7 +130,7 @@ export default function ReferenceStandardsIndex({ auth, standards, indexKeys }) 
         const ok = await confirm?.({ title: t('adminReferenceStandardsPage.deleteTitle'), message: t('adminReferenceStandardsPage.deleteMessage') });
         if (ok === false) return;
         router.delete(route('admin.reference-standards.destroy', row.id), {
-            onSuccess: () => showSuccess?.('تم الحذف'),
+            onSuccess: () => showSuccess?.(t('adminReferenceStandardsPage.deleteSuccess')),
         });
     };
 

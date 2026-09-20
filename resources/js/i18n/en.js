@@ -5436,7 +5436,8 @@ export const en = {
         "linkedTo": "Linked to",
         "delete": "Delete",
         "deleteTitle": "Delete Standard?",
-        "deleteMessage": "This standard will be permanently deleted."
+        "deleteMessage": "This standard will be permanently deleted.",
+        "deleteSuccess": "Deleted successfully"
     },
     "adminNationalLevelsPage": {
         "pageTitle": "National Levels - {appName}",
