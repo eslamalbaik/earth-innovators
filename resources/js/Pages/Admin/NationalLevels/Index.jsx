@@ -6,6 +6,7 @@ import { useToast } from '@/Contexts/ToastContext';
 import { useTranslation } from '@/i18n';
 
 function LevelRow({ level }) {
+    const { t } = useTranslation();
     const { showSuccess, showError } = useToast();
     const [form, setForm] = useState({
         label_ar: level.label_ar,
@@ -22,8 +23,8 @@ function LevelRow({ level }) {
         setProcessing(true);
         router.put(route('admin.national-levels.update', level.id), form, {
             preserveScroll: true,
-            onSuccess: () => showSuccess?.('تم الحفظ'),
-            onError: () => showError?.('تعذر الحفظ — تأكد أن الحد الأدنى أقل من أو يساوي الحد الأعلى'),
+            onSuccess: () => showSuccess?.(t('adminNationalLevelsPage.saveSuccess')),
+            onError: () => showError?.(t('adminNationalLevelsPage.saveError')),
             onFinish: () => setProcessing(false),
         });
     };
@@ -59,7 +60,7 @@ function LevelRow({ level }) {
                     disabled={processing}
                     className="flex items-center gap-1 px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50"
                 >
-                    <FaSave /> حفظ
+                    <FaSave /> {t('adminNationalLevelsPage.save')}
                 </button>
             </td>
         </tr>
@@ -71,27 +72,26 @@ export default function NationalLevelsIndex({ auth, levels }) {
 
     return (
         <DashboardLayout auth={auth}>
-            <Head title="المستويات الوطنية" />
+            <Head title={t('adminNationalLevelsPage.pageTitle', { appName: t('common.appName') })} />
             <div className="p-6 max-w-5xl mx-auto">
                 <div className="flex items-center gap-3 mb-2">
                     <FaLandmark className="text-2xl text-indigo-600" />
-                    <h1 className="text-2xl font-black text-gray-900">المستويات الوطنية (L1–L5)</h1>
+                    <h1 className="text-2xl font-black text-gray-900">{t('adminNationalLevelsPage.title')}</h1>
                 </div>
                 <p className="text-sm text-gray-600 mb-6">
-                    هذه الحدود تحوّل كل نتيجة تقييم (0–100) تلقائياً إلى مستوى وطني معتمد، وتظهر بجانب النتيجة في صفحات
-                    التقييم والتقارير والشهادات. أي تعديل هنا ينعكس فوراً بدون أي تعديل برمجي.
+                    {t('adminNationalLevelsPage.subtitle')}
                 </p>
 
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="bg-gray-50 text-gray-600 text-xs">
-                                <th className="p-3 text-start">الرمز</th>
-                                <th className="p-3 text-start">التصنيف (عربي)</th>
-                                <th className="p-3 text-start">Classification (English)</th>
-                                <th className="p-3 text-start">من</th>
-                                <th className="p-3 text-start">إلى</th>
-                                <th className="p-3 text-start">اللون</th>
+                                <th className="p-3 text-start">{t('adminNationalLevelsPage.code')}</th>
+                                <th className="p-3 text-start">{t('adminNationalLevelsPage.labelAr')}</th>
+                                <th className="p-3 text-start">{t('adminNationalLevelsPage.labelEn')}</th>
+                                <th className="p-3 text-start">{t('adminNationalLevelsPage.from')}</th>
+                                <th className="p-3 text-start">{t('adminNationalLevelsPage.to')}</th>
+                                <th className="p-3 text-start">{t('adminNationalLevelsPage.color')}</th>
                                 <th className="p-3 text-start"></th>
                             </tr>
                         </thead>

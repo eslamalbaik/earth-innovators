@@ -4,6 +4,7 @@ import { FaPlus, FaTrash, FaSave, FaGlobe, FaFlag, FaTimes } from 'react-icons/f
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import { useConfirmDialog } from '@/Contexts/ConfirmContext';
 import { useToast } from '@/Contexts/ToastContext';
+import { useTranslation } from '@/i18n';
 
 const blank = () => ({
     scope: 'national',
@@ -16,6 +17,7 @@ const blank = () => ({
 });
 
 function StandardForm({ initial, indexKeys, onCancel, onSaved }) {
+    const { t } = useTranslation();
     const { showSuccess, showError } = useToast();
     const [form, setForm] = useState(initial);
     const [processing, setProcessing] = useState(false);
@@ -30,8 +32,8 @@ function StandardForm({ initial, indexKeys, onCancel, onSaved }) {
             ? route('admin.reference-standards.update', initial.id)
             : route('admin.reference-standards.store');
         router[isEdit ? 'put' : 'post'](url, form, {
-            onSuccess: () => { showSuccess?.('تم الحفظ'); onSaved(); },
-            onError: () => showError?.('تعذر الحفظ، تحقق من الحقول'),
+            onSuccess: () => { showSuccess?.(t('adminReferenceStandardsPage.saveSuccess')); onSaved(); },
+            onError: () => showError?.(t('adminReferenceStandardsPage.saveError')),
             onFinish: () => setProcessing(false),
         });
     };
@@ -39,26 +41,26 @@ function StandardForm({ initial, indexKeys, onCancel, onSaved }) {
     return (
         <form onSubmit={submit} className="bg-indigo-50/50 border border-indigo-100 rounded-xl p-4 grid grid-cols-1 md:grid-cols-2 gap-3">
             <select className="border rounded-lg px-2 py-1.5" value={form.scope} onChange={set('scope')}>
-                <option value="national">مرجعية وطنية</option>
-                <option value="international">مواءمة دولية</option>
+                <option value="national">{t('adminReferenceStandardsPage.nationalReference')}</option>
+                <option value="international">{t('adminReferenceStandardsPage.internationalAlignment')}</option>
             </select>
             <select className="border rounded-lg px-2 py-1.5" value={form.index_key || ''} onChange={set('index_key')}>
-                <option value="">— غير مرتبط بمؤشر تقييم —</option>
+                <option value="">{t('adminReferenceStandardsPage.notLinked')}</option>
                 {Object.entries(indexKeys).map(([key, label]) => (
                     <option key={key} value={key}>{label}</option>
                 ))}
             </select>
-            <input required placeholder="المجال (عربي)" className="border rounded-lg px-2 py-1.5" value={form.domain_ar} onChange={set('domain_ar')} />
-            <input required placeholder="Domain (English)" className="border rounded-lg px-2 py-1.5" value={form.domain_en} onChange={set('domain_en')} />
-            <input required placeholder="اسم المعيار" className="border rounded-lg px-2 py-1.5 md:col-span-2" value={form.standard_name} onChange={set('standard_name')} />
-            <input required placeholder="الاستخدام (عربي)" className="border rounded-lg px-2 py-1.5" value={form.usage_ar} onChange={set('usage_ar')} />
-            <input required placeholder="Usage (English)" className="border rounded-lg px-2 py-1.5" value={form.usage_en} onChange={set('usage_en')} />
+            <input required placeholder={t('adminReferenceStandardsPage.domainAr')} className="border rounded-lg px-2 py-1.5" value={form.domain_ar} onChange={set('domain_ar')} />
+            <input required placeholder={t('adminReferenceStandardsPage.domainEn')} className="border rounded-lg px-2 py-1.5" value={form.domain_en} onChange={set('domain_en')} />
+            <input required placeholder={t('adminReferenceStandardsPage.standardName')} className="border rounded-lg px-2 py-1.5 md:col-span-2" value={form.standard_name} onChange={set('standard_name')} />
+            <input required placeholder={t('adminReferenceStandardsPage.usageAr')} className="border rounded-lg px-2 py-1.5" value={form.usage_ar} onChange={set('usage_ar')} />
+            <input required placeholder={t('adminReferenceStandardsPage.usageEn')} className="border rounded-lg px-2 py-1.5" value={form.usage_en} onChange={set('usage_en')} />
             <div className="md:col-span-2 flex gap-2 justify-end">
                 <button type="button" onClick={onCancel} className="px-3 py-1.5 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-100 flex items-center gap-1">
-                    <FaTimes /> إلغاء
+                    <FaTimes /> {t('adminReferenceStandardsPage.cancel')}
                 </button>
                 <button type="submit" disabled={processing} className="px-4 py-1.5 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-1">
-                    <FaSave /> حفظ
+                    <FaSave /> {t('adminReferenceStandardsPage.save')}
                 </button>
             </div>
         </form>
@@ -66,6 +68,7 @@ function StandardForm({ initial, indexKeys, onCancel, onSaved }) {
 }
 
 function ScopeTable({ title, icon, rows, indexKeys, onEdit, onDelete }) {
+    const { t } = useTranslation();
     return (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
             <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 border-b border-gray-100 font-bold text-gray-800">
@@ -75,10 +78,10 @@ function ScopeTable({ title, icon, rows, indexKeys, onEdit, onDelete }) {
                 <table className="w-full text-sm">
                     <thead>
                         <tr className="text-gray-500 text-xs">
-                            <th className="p-3 text-start">المجال</th>
-                            <th className="p-3 text-start">المعيار</th>
-                            <th className="p-3 text-start">الاستخدام</th>
-                            <th className="p-3 text-start">مرتبط بـ</th>
+                            <th className="p-3 text-start">{t('adminReferenceStandardsPage.domain')}</th>
+                            <th className="p-3 text-start">{t('adminReferenceStandardsPage.standard')}</th>
+                            <th className="p-3 text-start">{t('adminReferenceStandardsPage.usage')}</th>
+                            <th className="p-3 text-start">{t('adminReferenceStandardsPage.linkedTo')}</th>
                             <th className="p-3"></th>
                         </tr>
                     </thead>
@@ -114,6 +117,7 @@ function ScopeTable({ title, icon, rows, indexKeys, onEdit, onDelete }) {
 }
 
 export default function ReferenceStandardsIndex({ auth, standards, indexKeys }) {
+    const { t } = useTranslation();
     const { confirm } = useConfirmDialog();
     const { showSuccess } = useToast();
     const [editing, setEditing] = useState(null);
@@ -123,7 +127,7 @@ export default function ReferenceStandardsIndex({ auth, standards, indexKeys }) 
     const international = standards.filter((s) => s.scope === 'international');
 
     const handleDelete = async (row) => {
-        const ok = await confirm?.({ title: 'حذف المعيار؟', message: `سيتم حذف "${row.standard_name}" نهائياً.` });
+        const ok = await confirm?.({ title: t('adminReferenceStandardsPage.deleteTitle'), message: t('adminReferenceStandardsPage.deleteMessage') });
         if (ok === false) return;
         router.delete(route('admin.reference-standards.destroy', row.id), {
             onSuccess: () => showSuccess?.('تم الحذف'),
@@ -132,10 +136,10 @@ export default function ReferenceStandardsIndex({ auth, standards, indexKeys }) 
 
     return (
         <DashboardLayout auth={auth}>
-            <Head title="المرجعيات والمعايير" />
+            <Head title={t('adminReferenceStandardsPage.pageTitle', { appName: t('common.appName') })} />
             <div className="p-6 max-w-5xl mx-auto">
                 <div className="flex items-center justify-between mb-2">
-                    <h1 className="text-2xl font-black text-gray-900">المرجعيات والمعايير الوطنية والدولية</h1>
+                    <h1 className="text-2xl font-black text-gray-900">{t('adminReferenceStandardsPage.title')}</h1>
                     {!adding && !editing && (
                         <button
                             onClick={() => setAdding(true)}
@@ -162,7 +166,7 @@ export default function ReferenceStandardsIndex({ auth, standards, indexKeys }) 
                 )}
 
                 <ScopeTable
-                    title="المرجعية الوطنية"
+                    title={t('adminReferenceStandardsPage.nationalReference')}
                     icon={<FaFlag className="text-emerald-600" />}
                     rows={national}
                     indexKeys={indexKeys}
@@ -170,7 +174,7 @@ export default function ReferenceStandardsIndex({ auth, standards, indexKeys }) 
                     onDelete={handleDelete}
                 />
                 <ScopeTable
-                    title="المواءمة الدولية"
+                    title={t('adminReferenceStandardsPage.internationalAlignment')}
                     icon={<FaGlobe className="text-blue-600" />}
                     rows={international}
                     indexKeys={indexKeys}
