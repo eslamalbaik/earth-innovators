@@ -7,7 +7,7 @@ import { useToast } from '@/Contexts/ToastContext';
 import { useTranslation } from '@/i18n';
 
 function CurriculaTab({ curricula }) {
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
     const { confirm } = useConfirmDialog();
     const { showSuccess } = useToast();
     const [form, setForm] = useState({ name_ar: '', name_en: '', is_active: true });
@@ -44,8 +44,8 @@ function CurriculaTab({ curricula }) {
                 {curricula.map((c) => (
                     <div key={c.id} className="flex items-center justify-between bg-white border border-gray-100 rounded-xl px-4 py-2.5">
                         <div>
-                            <span className="font-semibold text-gray-800">{c.name_ar}</span>
-                            {c.name_en && <span className="text-gray-400 text-sm ms-2">({c.name_en})</span>}
+                            <span className="font-semibold text-gray-800">{language === 'ar' ? c.name_ar : c.name_en}</span>
+                            {(language === 'ar' ? c.name_en : c.name_ar) && <span className="text-gray-400 text-sm ms-2">({language === 'ar' ? c.name_en : c.name_ar})</span>}
                         </div>
                         <div className="flex items-center gap-2">
                             <button onClick={() => toggle(c)} className={`text-xs px-2 py-1 rounded-full font-semibold ${c.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>
@@ -61,7 +61,7 @@ function CurriculaTab({ curricula }) {
 }
 
 function SubjectsTab({ subjects }) {
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
     const { confirm } = useConfirmDialog();
     const { showSuccess } = useToast();
     const [form, setForm] = useState({ name_ar: '', name_en: '', is_active: true });
@@ -98,8 +98,8 @@ function SubjectsTab({ subjects }) {
                 {subjects.map((s) => (
                     <div key={s.id} className="flex items-center justify-between bg-white border border-gray-100 rounded-xl px-4 py-2.5">
                         <div>
-                            <span className="font-semibold text-gray-800">{s.name_ar}</span>
-                            {s.name_en && <span className="text-gray-400 text-sm ms-2">({s.name_en})</span>}
+                            <span className="font-semibold text-gray-800">{language === 'ar' ? s.name_ar : s.name_en}</span>
+                            {(language === 'ar' ? s.name_en : s.name_ar) && <span className="text-gray-400 text-sm ms-2">({language === 'ar' ? s.name_en : s.name_ar})</span>}
                         </div>
                         <div className="flex items-center gap-2">
                             <button onClick={() => toggle(s)} className={`text-xs px-2 py-1 rounded-full font-semibold ${s.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>
@@ -115,7 +115,7 @@ function SubjectsTab({ subjects }) {
 }
 
 function StudyPlansTab({ studyPlans, curricula, subjects, schools }) {
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
     const { confirm } = useConfirmDialog();
     const { showSuccess, showError } = useToast();
     const blank = { school_id: '', curriculum_id: '', subject_id: '', stage: '', grade: '', section: '', hours: '', academic_year: '', semester: '' };
@@ -181,8 +181,8 @@ function StudyPlansTab({ studyPlans, curricula, subjects, schools }) {
                     <tbody>
                         {studyPlans.map((p) => (
                             <tr key={p.id} className="border-t border-gray-50">
-                                <td className="p-2">{p.curriculum?.name_ar}</td>
-                                <td className="p-2">{p.subject?.name_ar}</td>
+                                <td className="p-2">{language === 'ar' ? p.curriculum?.name_ar : p.curriculum?.name_en}</td>
+                                <td className="p-2">{language === 'ar' ? p.subject?.name_ar : p.subject?.name_en}</td>
                                 <td className="p-2 text-gray-500">{p.school?.name || '— الكل —'}</td>
                                 <td className="p-2 text-gray-500">{[p.stage, p.grade, p.section].filter(Boolean).join(' / ') || '—'}</td>
                                 <td className="p-2">{p.hours ?? '—'}</td>

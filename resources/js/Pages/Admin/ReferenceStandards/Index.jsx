@@ -68,7 +68,8 @@ function StandardForm({ initial, indexKeys, onCancel, onSaved }) {
 }
 
 function ScopeTable({ title, icon, rows, indexKeys, onEdit, onDelete }) {
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
+    const isAr = language === 'ar';
     return (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
             <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 border-b border-gray-100 font-bold text-gray-800">
@@ -88,9 +89,9 @@ function ScopeTable({ title, icon, rows, indexKeys, onEdit, onDelete }) {
                     <tbody>
                         {rows.map((r) => (
                             <tr key={r.id} className="border-t border-gray-50 hover:bg-gray-50 cursor-pointer" onClick={() => onEdit(r)}>
-                                <td className="p-3 font-semibold text-gray-800">{r.domain_ar}</td>
+                                <td className="p-3 font-semibold text-gray-800">{isAr ? r.domain_ar : r.domain_en}</td>
                                 <td className="p-3 text-indigo-700 font-medium">{r.standard_name}</td>
-                                <td className="p-3 text-gray-600">{r.usage_ar}</td>
+                                <td className="p-3 text-gray-600">{isAr ? r.usage_ar : r.usage_en}</td>
                                 <td className="p-3 text-xs">
                                     {r.index_key
                                         ? <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full">{indexKeys[r.index_key]}</span>
