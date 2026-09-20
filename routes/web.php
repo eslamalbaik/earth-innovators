@@ -788,14 +788,6 @@ Route::middleware(['auth', 'teacher', 'membership_active'])->group(function () {
     Route::get('/teacher/reviews', [\App\Http\Controllers\Teacher\TeacherReviewController::class, 'index'])->name('teacher.reviews');
     Route::post('/teacher/reviews/{review}/reply', [\App\Http\Controllers\Teacher\TeacherReviewController::class, 'reply'])->name('teacher.reviews.reply');
 
-    Route::get('/teacher/payments', [\App\Http\Controllers\Teacher\TeacherPaymentController::class, 'index'])->name('teacher.payments');
-    Route::match(['get', 'post'], '/teacher/payments/{id}/cancel', [\App\Http\Controllers\Teacher\TeacherPaymentController::class, 'cancel'])->name('teacher.payments.cancel');
-    Route::match(['get', 'post'], '/teacher/payments/{id}/refund', [\App\Http\Controllers\Teacher\TeacherPaymentController::class, 'refund'])->name('teacher.payments.refund');
-    Route::get('/teacher/availability', [AvailabilityController::class, 'index'])->name('teacher.availability.index');
-    Route::post('/teacher/availability', [AvailabilityController::class, 'store'])->name('teacher.availability.store');
-    Route::put('/teacher/availability/{availability}', [AvailabilityController::class, 'update'])->name('teacher.availability.update');
-    Route::delete('/teacher/availability/{availability}', [AvailabilityController::class, 'destroy'])->name('teacher.availability.destroy');
-
     // إدارة مقالات المعلمين
     Route::get('/teacher/publications', [\App\Http\Controllers\Teacher\TeacherPublicationController::class, 'index'])->name('teacher.publications.index');
     Route::post('/teacher/publications/generate', [\App\Http\Controllers\Teacher\TeacherPublicationController::class, 'generate'])->name('teacher.publications.generate');
