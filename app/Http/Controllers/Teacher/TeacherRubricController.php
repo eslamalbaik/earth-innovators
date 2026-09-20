@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Teacher;
 use App\Http\Controllers\Controller;
 use App\Models\Rubric;
 use App\Models\RubricCriterionLibrary;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -187,16 +188,37 @@ class TeacherRubricController extends Controller
         }
     }
 
-    private function resolveTeacher()
+    /**
+     * Legacy/imported teacher accounts may have no teachers row yet; create it
+     * on first use, mirroring TeacherProjectController::resolveTeacherProfile().
+     */
+    private function resolveTeacher(): Teacher
     {
         $user = Auth::user();
-        $teacher = $user?->teacher;
 
-        if (!$teacher) {
+        if (!$user || !$user->isTeacher()) {
             abort(403, __('messages.msg_075'));
         }
 
-        return $teacher;
+        return $user->teacher()->firstOrCreate(
+            ['user_id' => $user->id],
+            [
+                'name_ar' => $user->name,
+                'name_en' => $user->name,
+                'nationality' => 'غير محدد',
+                'gender' => null,
+                'bio' => null,
+                'qualifications' => null,
+                'subjects' => [],
+                'stages' => [],
+                'experience_years' => 0,
+                'city' => 'غير محدد',
+                'neighborhoods' => [],
+                'price_per_hour' => 0,
+                'is_verified' => false,
+                'is_active' => false,
+            ]
+        );
     }
 
     private function authorizeOwnership(Rubric $rubric): void

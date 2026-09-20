@@ -72,4 +72,39 @@ class ProtectedPagesSmokeTest extends TestCase
         $this->actingAs($admin)->get('/admin/publications')->assertOk();
         $this->actingAs($admin)->get('/admin/certificates')->assertOk();
     }
+
+    public function test_admin_evaluation_settings_pages_render_successfully(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $this->actingAs($admin)->get('/admin/rubric-library')->assertOk()
+            ->assertInertia(fn ($page) => $page->component('Admin/RubricLibrary/Index'));
+        $this->actingAs($admin)->get('/admin/national-levels')->assertOk()
+            ->assertInertia(fn ($page) => $page->component('Admin/NationalLevels/Index'));
+        $this->actingAs($admin)->get('/admin/reference-standards')->assertOk()
+            ->assertInertia(fn ($page) => $page->component('Admin/ReferenceStandards/Index'));
+        $this->actingAs($admin)->get('/admin/academic-structure')->assertOk()
+            ->assertInertia(fn ($page) => $page->component('Admin/AcademicStructure/Index'));
+        $this->actingAs($admin)->get('/admin/initiatives')->assertOk()
+            ->assertInertia(fn ($page) => $page->component('Admin/Initiatives/Index'));
+    }
+
+    public function test_teacher_rubric_and_invite_pages_render_successfully(): void
+    {
+        $teacher = User::factory()->create(['role' => 'teacher']);
+
+        $this->actingAs($teacher)->get('/teacher/rubrics')->assertOk()
+            ->assertInertia(fn ($page) => $page->component('Teacher/Rubrics/Index'));
+        $this->actingAs($teacher)->get('/teacher/rubrics/create')->assertOk()
+            ->assertInertia(fn ($page) => $page->component('Teacher/Rubrics/Builder'));
+        $this->actingAs($teacher)->get('/teacher/invite-codes')->assertOk()
+            ->assertInertia(fn ($page) => $page->component('Teacher/InviteCodes/Index')->has('codes', 0));
+
+        $school = User::factory()->create(['role' => 'school']);
+        $linkedTeacher = User::factory()->create(['role' => 'teacher', 'school_id' => $school->id]);
+
+        $this->actingAs($linkedTeacher)->post('/teacher/invite-codes', ['role' => 'student'])->assertRedirect();
+        $this->actingAs($linkedTeacher)->get('/teacher/invite-codes')->assertOk()
+            ->assertInertia(fn ($page) => $page->component('Teacher/InviteCodes/Index')->has('codes', 1));
+    }
 }

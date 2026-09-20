@@ -21,21 +21,34 @@ class InviteCodeController extends Controller
     public function index(): Response
     {
         $user = Auth::user();
+        $schoolId = $this->schoolIdFor($user);
 
-        $query = InviteCode::query()->where('school_id', $this->schoolIdFor($user));
+        $codes = collect();
 
-        if ($user->isTeacher()) {
-            $query->where('role', 'student')->where('teacher_id', $user->id);
+        if ($schoolId !== null) {
+            $query = InviteCode::query()->where('school_id', $schoolId);
+
+            if ($user->isTeacher()) {
+                $query->where('role', 'student')->where('teacher_id', $user->id);
+            }
+
+            $codes = $query->latest()->get();
         }
 
         return Inertia::render($user->isTeacher() ? 'Teacher/InviteCodes/Index' : 'School/InviteCodes/Index', [
-            'codes' => $query->latest()->get(),
+            'codes' => $codes,
         ]);
     }
 
     public function store(Request $request)
     {
         $user = Auth::user();
+        $schoolId = $this->schoolIdFor($user);
+
+        if ($schoolId === null) {
+            return back()->with('error', 'يجب ربط حسابك بمدرسة قبل إنشاء أكواد الدعوة.');
+        }
+
         $allowedRoles = $user->isTeacher() ? ['student'] : ['student', 'teacher'];
 
         $validated = $request->validate([
@@ -49,7 +62,7 @@ class InviteCodeController extends Controller
         InviteCode::create([
             'code'       => InviteCode::generateUniqueCode(),
             'role'       => $validated['role'],
-            'school_id'  => $this->schoolIdFor($user),
+            'school_id'  => $schoolId,
             'teacher_id' => $validated['role'] === 'student' && $user->isTeacher() ? $user->id : null,
             'grade'      => $validated['grade'] ?? null,
             'section'    => $validated['section'] ?? null,
@@ -73,7 +86,7 @@ class InviteCodeController extends Controller
         return back()->with('flash', ['success' => true]);
     }
 
-    private function schoolIdFor($user): int
+    private function schoolIdFor($user): ?int
     {
         return $user->isSchool() ? $user->id : $user->school_id;
     }
