@@ -1,0 +1,19 @@
+{
+  "name": "earth-innovators-mcp",
+  "version": "1.0.0",
+  "description": "MCP server exposing full access to the Earth Innovators Laravel application (database + artisan) to MCP-compatible AI clients.",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "earth-innovators-mcp": "src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "better-sqlite3": "^11.5.0",
+    "mysql2": "^3.11.4",
+    "zod": "^3.23.8"
+  }
+}
