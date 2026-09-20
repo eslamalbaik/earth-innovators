@@ -138,7 +138,26 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->with('error', 'هذا الرابط مخصص لتنفيذ إجراء وليس صفحة مباشرة.');
         });
 
+        // This used to redirect every 404 to '/', which made a missing route
+        // indistinguishable from a working one — broken links looked like they
+        // simply bounced you home, and nothing was ever logged. Render a real
+        // 404 instead, and log the miss so broken links stay visible.
         $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e, \Illuminate\Http\Request $request) {
-            return redirect('/');
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json(['message' => 'Not found.'], 404);
+            }
+
+            \Illuminate\Support\Facades\Log::warning('404 Not Found', [
+                'path' => $request->fullUrl(),
+                'method' => $request->method(),
+                'referer' => $request->headers->get('referer'),
+            ]);
+
+            // An unmatched route never runs the web middleware group, so Inertia's
+            // shared props are absent here. The page and MainLayout both guard on a
+            // missing auth prop, so the bare render is safe.
+            return \Inertia\Inertia::render('Errors/NotFound', [
+                'requestedPath' => '/'.ltrim($request->path(), '/'),
+            ])->toResponse($request)->setStatusCode(404);
         });
     })->create();

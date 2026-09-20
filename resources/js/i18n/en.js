@@ -5881,6 +5881,13 @@ export const en = {
         "critical": "Critical"
     },
     "errors": {
+        "notFound": {
+            "title": "Page not found",
+            "heading": "We couldn't find that page",
+            "message": "The link you opened is not valid, or the page has been moved or deleted.",
+            "goHome": "Go to homepage",
+            "goBack": "Go back"
+        },
         "required": "This field is required",
         "email": "Invalid email address",
         "minLength": "Minimum {min} characters",
