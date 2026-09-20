@@ -5355,6 +5355,7 @@ export const en = {
         "pageTitle": "Academic Structure - {appName}",
         "curriculaTab": "Curricula",
         "subjectsTab": "Subjects",
+        "studyPlansTab": "Grade/Section/Hours",
         "gradesTab": "Grades",
         "curriculumPlaceholderAr": "Curriculum name (Arabic)",
         "curriculumPlaceholderEn": "Curriculum name (English)",
@@ -5368,7 +5369,16 @@ export const en = {
         "addSubject": "Add",
         "deleteSubjectTitle": "Delete Subject?",
         "deleteSubjectMessage": "\"{name}\" will be permanently deleted.",
-        "addSuccess": "Added successfully"
+        "addSuccess": "Added successfully",
+        "addError": "Check required fields (Curriculum and Subject)",
+        "stagePlaceholder": "Stage",
+        "gradePlaceholder": "Grade",
+        "sectionPlaceholder": "Section",
+        "hoursPlaceholder": "Hours",
+        "academicYearPlaceholder": "Academic Year (2025-2026)",
+        "semesterPlaceholder": "Semester",
+        "deleteStudyPlanTitle": "Delete Study Plan Data?",
+        "deleteStudyPlanMessage": "This assignment will be permanently deleted."
     },
     "adminInitiativesPage": {
         "pageTitle": "Global Initiatives - {appName}",

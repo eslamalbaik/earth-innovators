@@ -115,6 +115,7 @@ function SubjectsTab({ subjects }) {
 }
 
 function StudyPlansTab({ studyPlans, curricula, subjects, schools }) {
+    const { t } = useTranslation();
     const { confirm } = useConfirmDialog();
     const { showSuccess, showError } = useToast();
     const blank = { school_id: '', curriculum_id: '', subject_id: '', stage: '', grade: '', section: '', hours: '', academic_year: '', semester: '' };
@@ -126,13 +127,13 @@ function StudyPlansTab({ studyPlans, curricula, subjects, schools }) {
         e.preventDefault();
         router.post(route('admin.academic-structure.study-plans.store'), form, {
             preserveScroll: true,
-            onSuccess: () => { showSuccess?.('تمت الإضافة'); setForm(blank); },
-            onError: () => showError?.('تحقق من الحقول المطلوبة (المنهج والمادة)'),
+            onSuccess: () => { showSuccess?.(t('adminAcademicStructurePage.addSuccess')); setForm(blank); },
+            onError: () => showError?.(t('adminAcademicStructurePage.addError')),
         });
     };
 
     const remove = async (p) => {
-        const ok = await confirm?.({ title: 'حذف بيانات المنهج؟', message: 'سيتم حذف هذا التخصيص نهائياً.' });
+        const ok = await confirm?.({ title: t('adminAcademicStructurePage.deleteStudyPlanTitle'), message: t('adminAcademicStructurePage.deleteStudyPlanMessage') });
         if (ok === false) return;
         router.delete(route('admin.academic-structure.study-plans.destroy', p.id), { preserveScroll: true });
     };
@@ -155,12 +156,12 @@ function StudyPlansTab({ studyPlans, curricula, subjects, schools }) {
                     <option value="">— كل المدارس —</option>
                     {schools.map((sc) => <option key={sc.id} value={sc.id}>{sc.name}</option>)}
                 </select>
-                <input placeholder="المرحلة" className="border rounded-lg px-2 py-1.5" value={form.stage} onChange={set('stage')} />
-                <input placeholder="الصف" className="border rounded-lg px-2 py-1.5" value={form.grade} onChange={set('grade')} />
-                <input placeholder="الشعبة" className="border rounded-lg px-2 py-1.5" value={form.section} onChange={set('section')} />
-                <input type="number" min={0} placeholder="عدد الساعات" className="border rounded-lg px-2 py-1.5" value={form.hours} onChange={set('hours')} />
-                <input placeholder="العام الدراسي (2025-2026)" className="border rounded-lg px-2 py-1.5" value={form.academic_year} onChange={set('academic_year')} />
-                <input placeholder="الفصل الدراسي" className="border rounded-lg px-2 py-1.5" value={form.semester} onChange={set('semester')} />
+                <input placeholder={t('adminAcademicStructurePage.stagePlaceholder')} className="border rounded-lg px-2 py-1.5" value={form.stage} onChange={set('stage')} />
+                <input placeholder={t('adminAcademicStructurePage.gradePlaceholder')} className="border rounded-lg px-2 py-1.5" value={form.grade} onChange={set('grade')} />
+                <input placeholder={t('adminAcademicStructurePage.sectionPlaceholder')} className="border rounded-lg px-2 py-1.5" value={form.section} onChange={set('section')} />
+                <input type="number" min={0} placeholder={t('adminAcademicStructurePage.hoursPlaceholder')} className="border rounded-lg px-2 py-1.5" value={form.hours} onChange={set('hours')} />
+                <input placeholder={t('adminAcademicStructurePage.academicYearPlaceholder')} className="border rounded-lg px-2 py-1.5" value={form.academic_year} onChange={set('academic_year')} />
+                <input placeholder={t('adminAcademicStructurePage.semesterPlaceholder')} className="border rounded-lg px-2 py-1.5" value={form.semester} onChange={set('semester')} />
                 <button className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-sm font-semibold flex items-center justify-center gap-1"><FaPlus /> إضافة</button>
             </form>
 
@@ -208,7 +209,7 @@ export default function AcademicStructureIndex({ auth, curricula, subjects, stud
     const tabs = [
         { key: 'curricula', label: t('adminAcademicStructurePage.curriculaTab'), icon: <FaLayerGroup /> },
         { key: 'subjects', label: t('adminAcademicStructurePage.subjectsTab'), icon: <FaBook /> },
-        { key: 'study-plans', label: 'صف/شعبة/ساعات', icon: <FaLayerGroup /> },
+        { key: 'study-plans', label: t('adminAcademicStructurePage.studyPlansTab'), icon: <FaLayerGroup /> },
     ];
 
     return (

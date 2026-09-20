@@ -6022,6 +6022,7 @@ export const ar = {
         "pageTitle": "الهيكل الأكاديمي - {appName}",
         "curriculaTab": "المناهج",
         "subjectsTab": "المواد",
+        "studyPlansTab": "صف/شعبة/ساعات",
         "gradesTab": "المراحل",
         "curriculumPlaceholderAr": "اسم المنهج (عربي)",
         "curriculumPlaceholderEn": "Curriculum (English)",
@@ -6035,7 +6036,16 @@ export const ar = {
         "addSubject": "إضافة",
         "deleteSubjectTitle": "حذف المادة؟",
         "deleteSubjectMessage": "سيتم حذف \"{name}\" نهائياً.",
-        "addSuccess": "تمت الإضافة"
+        "addSuccess": "تمت الإضافة",
+        "addError": "تحقق من الحقول المطلوبة (المنهج والمادة)",
+        "stagePlaceholder": "المرحلة",
+        "gradePlaceholder": "الصف",
+        "sectionPlaceholder": "الشعبة",
+        "hoursPlaceholder": "عدد الساعات",
+        "academicYearPlaceholder": "العام الدراسي (2025-2026)",
+        "semesterPlaceholder": "الفصل الدراسي",
+        "deleteStudyPlanTitle": "حذف بيانات المنهج؟",
+        "deleteStudyPlanMessage": "سيتم حذف هذا التخصيص نهائياً."
     },
     "adminInitiativesPage": {
         "pageTitle": "المبادرات العامة - {appName}",
