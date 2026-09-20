@@ -6020,6 +6020,8 @@ export const ar = {
     },
     "adminAcademicStructurePage": {
         "pageTitle": "الهيكل الأكاديمي - {appName}",
+        "title": "إدارة المناهج والمواد",
+        "subtitle": "نموذج بيانات هرمي: منهج ← مادة ← بيانات صف/شعبة. أي إضافة هنا تظهر فوراً بقوائم اختيار المشاريع والتقييمات.",
         "curriculaTab": "المناهج",
         "subjectsTab": "المواد",
         "studyPlansTab": "صف/شعبة/ساعات",

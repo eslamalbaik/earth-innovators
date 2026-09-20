@@ -216,8 +216,8 @@ export default function AcademicStructureIndex({ auth, curricula, subjects, stud
         <DashboardLayout auth={auth}>
             <Head title={t('adminAcademicStructurePage.pageTitle', { appName: t('common.appName') })} />
             <div className="p-6 max-w-6xl mx-auto">
-                <h1 className="text-2xl font-black text-gray-900 mb-1">إدارة المناهج والمواد</h1>
-                <p className="text-sm text-gray-600 mb-6">نموذج بيانات هرمي: منهج ← مادة ← بيانات صف/شعبة. أي إضافة هنا تظهر فوراً بقوائم اختيار المشاريع والتقييمات.</p>
+                <h1 className="text-2xl font-black text-gray-900 mb-1">{t('adminAcademicStructurePage.title')}</h1>
+                <p className="text-sm text-gray-600 mb-6">{t('adminAcademicStructurePage.subtitle')}</p>
 
                 <div className="flex gap-2 mb-5 border-b border-gray-200">
                     {tabs.map((t) => (

@@ -5353,6 +5353,8 @@ export const en = {
     },
     "adminAcademicStructurePage": {
         "pageTitle": "Academic Structure - {appName}",
+        "title": "Curriculum and Subject Management",
+        "subtitle": "Hierarchical data model: curriculum ← subject ← grade/section data. Any addition here appears immediately in project and evaluation selection dropdowns.",
         "curriculaTab": "Curricula",
         "subjectsTab": "Subjects",
         "studyPlansTab": "Grade/Section/Hours",
