@@ -18,6 +18,7 @@ class GeminiClient
     private string $apiKey;
     private string $baseUrl;
     private string $model;
+    private ?string $lastFinishReason = null;
 
     public function __construct()
     {
@@ -40,8 +41,13 @@ class GeminiClient
 
     /**
      * Send a chat request expecting JSON structured output
+     *
+     * maxTokens must stay generous: bilingual (AR/EN) prompts such as challenge and
+     * publication generation routinely exceed 2048 output tokens (Arabic text is
+     * token-heavy, and thinking models spend part of the budget on reasoning). A
+     * lower cap truncates the JSON mid-string, which is unrecoverable.
      */
-    public function chatWithJson(array $messages, float $temperature = 0.2, int $maxTokens = 2048): ?array
+    public function chatWithJson(array $messages, float $temperature = 0.2, int $maxTokens = 8192): ?array
     {
         $content = $this->request($messages, $temperature, $maxTokens, true);
 
@@ -74,6 +80,7 @@ class GeminiClient
         if (json_last_error() !== JSON_ERROR_NONE) {
             Log::error('Gemini API returned invalid JSON', [
                 'json_error'     => json_last_error_msg(),
+                'finishReason'   => $this->lastFinishReason,
                 'content_base64' => base64_encode($content),
                 'content'    => mb_substr($content, 0, 2000),
             ]);
@@ -89,6 +96,7 @@ class GeminiClient
     private function request(array $messages, float $temperature, int $maxTokens, bool $asJson): ?string
     {
         [$systemInstruction, $contents] = $this->buildPayload($messages);
+        $this->lastFinishReason = null;
 
         $body = [
             'contents' => $contents,
@@ -134,6 +142,7 @@ class GeminiClient
                 $data = $response->json();
                 $content = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
                 $finishReason = $data['candidates'][0]['finishReason'] ?? null;
+                $this->lastFinishReason = $finishReason;
 
                 Log::info('Gemini API call successful', [
                     'usage'         => $data['usageMetadata'] ?? [],
